@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 {
   imports = [
     ./home.nix
@@ -9,7 +9,11 @@
     ./programs/firefox.nix
     ./programs/cava.nix
     ./programs/btop.nix
-    ./programs/discord.nix
+  ];
+
+  home.packages = with pkgs; [
+    spotify
+    discord
   ];
 
   monitors = [

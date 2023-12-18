@@ -24,7 +24,6 @@
 
   home.packages = with pkgs; [
     neofetch
-    spotify
   ];
 
   # Enable home-manager and git

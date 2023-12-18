@@ -49,13 +49,13 @@
 
       #workspaces button {
           padding: 5px;
+          border-color: @transparent;
       }
 
       #workspaces button:hover {
           box-shadow: inherit;
           text-shadow: inherit;
           background: @transparent;
-          border-color: @transparent;
       }
 
       #workspaces button label {

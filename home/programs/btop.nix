@@ -1,0 +1,3 @@
+{
+  programs.btop.enable = true;
+}

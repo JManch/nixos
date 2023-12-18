@@ -9,6 +9,7 @@
     ./programs/firefox.nix
     ./programs/cava.nix
     ./programs/btop.nix
+    ./programs/discord.nix
   ];
 
   monitors = [

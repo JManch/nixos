@@ -25,7 +25,6 @@
   home.packages = with pkgs; [
     neofetch
     spotify
-    discord
   ];
 
   # Enable home-manager and git

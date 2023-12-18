@@ -1,7 +1,26 @@
-{ pkgs, config, ... }: {
+{ pkgs, config, ... }:
+let
+    chipID = "8620";
+in {
   environment.systemPackages = with pkgs; [
     lm_sensors
+    config.boot.kernelPackages.it87
   ];
+
+  boot = {
+    kernelModules = [ "it87" ];
+    extraModulePackages = with config.boot.kernelPackages; [ it87 ];
+    /*
+    The chipID is a mystery. 0x8688 matches the hardware of the motherboard and
+    worked perfectly on an old deployment but has broken for an unknown reason.
+    Works fine on Arch, just not on Nix. Using 0x8620 instead as it still
+    provides fan speeds but is missing a bunch of temp sensors. If fan control
+    ever breaks it's probably because of this.
+    */
+    extraModprobeConfig = ''
+      options it87 ignore_resource_conflict=1 force_id=0x${chipID}
+    '';
+  };
 
   /*
   CPU_FAN: AIO pump. Only provides a reading, cannot control.
@@ -9,47 +28,58 @@
   SYS_FAN1: Intake GPU fans on the bottom of the case.
 
   SYS_FAN2: Intake CPU radiator fans on the side of the case.
-
-  WARNING: The temperature sensor labels are complete guesses.
   */
   environment.etc."sensors.d/gigabyte-b550i.conf".text = ''
-    chip "it8688-*"
+    chip "it${chipID}-*"
         label fan1 "CPU_FAN"
         label fan2 "SYS_FAN1"
         label fan3 "SYS_FAN2"
-        label temp1 "System 1"
-        label temp2 "VSOC MOS"
-        label temp3 "CPU"
-        label temp5 "VRM MOS"
-        label temp6 "PCH"
+  '';
+
+  environment.etc."fan2go/gpu_temp.sh".text =
+  builtins.replaceStrings [ "\\\\" ] ["\\"] /* bash */ ''
+    #!/bin/sh
+    temp=$(${config.hardware.nvidia.package.bin}/bin/nvidia-smi \\
+      --query-gpu=temperature.gpu \\
+      --format=csv,noheader,nounits)
+    echo "''${temp}000"
   '';
 
   programs.fan2go = {
     enable = true;
-    systemd.enable = false;
+    systemd.enable = true;
     settings = {
       fans = {
-        id = "cpu_fan";
+        id = "gpu";
         hwmon = {
-          platform = "it8688-*";
+          platform = "it${chipID}-*";
           rpmChannel = 2;
-          pwmChannel = 2;
         };
-        neverStop = true;
-        curve = "cpu_curve";
+        neverStop = false;
+        curve = "gpu_curve";
       };
       sensors = {
         id = "gpu_temp";
         cmd = {
-          # exec = "${config.hardware.nvidia.package}/bin/nvidia-smi";
+          exec = "${pkgs.bash}/bin/sh";
+          args = [ "/etc/fan2go/gpu_temp.sh" ];
         };
       };
       curves = {
-        id = "cpu_curve";
+        id = "gpu_curve";
         linear = {
-          sensor = "cpu_package";
+          sensor = "gpu_temp";
           min = 40;
           max = 80;
+          steps = [
+            {"49" = 0;}
+            {"50" = 102;}
+            {"60" = 128;}
+            {"70" = 153;}
+            {"76" = 184;}
+            {"80" = 230;}
+            {"90" = 255;}
+          ];
         };
       };
     };

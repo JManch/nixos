@@ -42,7 +42,7 @@ in
         };
 
         serviceConfig = {
-          ExecStart = "${lib.getExe cfg.package} -c ${configFile} --no-style";
+          ExecStart = "${cfg.package}/bin/fan2go -c ${configFile} --no-style";
           LimitNOFILE = 8192;
           Environment = [ "DISPLAY=:0" ];
           Restart = "always";

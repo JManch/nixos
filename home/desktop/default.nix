@@ -10,4 +10,6 @@
   home.packages = with pkgs; [
     wl-clipboard
   ];
+
+  home.sessionVariables.NIXOS_OZONE_WL = "1";
 }

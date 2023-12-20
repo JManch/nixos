@@ -1,9 +1,11 @@
-{ inputs, config, lib, ... }: {
+{ inputs, config, lib, pkgs, ... }: {
   imports = [
     ./../../../modules/nixos
     ./security.nix
     ./networking.nix
     ./boot.nix
+    ./agenix.nix
+    ./ssh.nix
   ];
 
   nixpkgs = {
@@ -35,6 +37,10 @@
       value.source = value.flake;
     })
     config.nix.registry;
+
+  environment.systemPackages = [
+    pkgs.git
+  ];
 
   programs.zsh.enable = true;
   time.timeZone = "Europe/London";

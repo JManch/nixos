@@ -3,7 +3,7 @@
   programs.waybar = {
     enable = true;
     systemd.enable = true;
-    style = ''
+    style = /* css */ ''
       @define-color background #${config.colorscheme.colors.base00};
       @define-color border #${config.colorscheme.colors.base05};
       @define-color text-dark #${config.colorscheme.colors.base00};
@@ -47,15 +47,18 @@
           background: @blue;
       }
 
+      button {
+        border-color: @transparent;
+        background: @transparent;
+      }
+
       #workspaces button {
           padding: 5px;
-          border-color: @transparent;
       }
 
       #workspaces button:hover {
           box-shadow: inherit;
           text-shadow: inherit;
-          background: @transparent;
       }
 
       #workspaces button label {

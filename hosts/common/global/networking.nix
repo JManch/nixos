@@ -20,12 +20,8 @@
     "net.core.default_qdisc" = "cake";
   };
 
-  services = {
-    resolved.enable = true;
-
-    openssh = {
-      enable = true;
-      settings.PasswordAuthentication = false;
-    };
+  services.resolved = {
+    enable = true;
+    fallbackDns = [ ];
   };
 }

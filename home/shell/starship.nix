@@ -14,15 +14,12 @@
         vimcmd_replace_symbol = "[❮](purple)";
         vimcmd_visual_symbol = "[❮](yellow)";
       };
+      hostname = {
+        ssh_symbol = "";
+      };
       directory = {
         format = "[$path]($style)[$read_only]($read_only_style) ";
         style = "cyan";
-      };
-      username = {
-        disabled = true;
-      };
-      hostname = {
-        disabled = true;
       };
       git_metrics = {
         disabled = false;

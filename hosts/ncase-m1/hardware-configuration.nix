@@ -30,7 +30,7 @@
     };
 
     "/persist" = {
-      device = "zpool/nix";
+      device = "zpool/persist";
       fsType = "zfs";
       neededForBoot = true;
     };

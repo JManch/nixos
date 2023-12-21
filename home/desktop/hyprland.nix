@@ -291,4 +291,6 @@
       }
     '';
   };
+
+  home.persistence."/persist/home/joshua".directories = [ ".cache/swww" ];
 }

@@ -88,4 +88,6 @@
       };
     };
   };
+
+  home.persistence."/persist/home/joshua".directories = [ ".mozilla" ".cache/mozilla" ];
 }

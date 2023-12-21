@@ -17,4 +17,10 @@
   #   source = config.lib.file.mkOutOfStoreSymlink ./nvim;
   #   recursive = true;
   # };
+
+  home.persistence."/persist/home/joshua".directories = [ 
+    ".config/nvim"
+    ".local/share/nvim"
+    ".cache/nvim"
+  ];
 }

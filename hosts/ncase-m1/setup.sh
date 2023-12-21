@@ -33,7 +33,7 @@ echo "Creating ZFS pool"
 sleep 2
 ZPOOL_ARGS=(
     -o ashift=12                # Use 4k sectors for performance
-    -o atime=off                # Disable access time for performance
+    -O atime=off                # Disable access time for performance
     -O mountpoint=none          # Disable automatic mounting
     -O xattr=sa                 # Improve performance of extended attributes
     -O acltype=posixacl         # Just needed

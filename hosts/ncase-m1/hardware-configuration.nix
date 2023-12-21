@@ -15,13 +15,13 @@
     "/" = {
       device = "none";
       fsType = "tmpfs";
-      options = [ "size=2G" "mode=755" ]; # only root can write to these files
+      options = [ "size=4G" "mode=755" ]; # only root can write to these files
     };
 
     "/home/joshua" = {
       device = "none";
       fsType = "tmpfs";
-      options = [ "size=2G" "mode=777" ];
+      options = [ "size=4G" "mode=777" ];
     };
 
     "/nix" = {
@@ -38,6 +38,7 @@
     "/boot" = {
       device = "/dev/disk/by-label/boot";
       fsType = "vfat";
+      options = [ "umask=0077" "defaults" ];
     };
   };
 

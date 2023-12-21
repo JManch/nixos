@@ -143,6 +143,21 @@
         "type": "github"
       }
     },
+    "impermanence": {
+      "locked": {
+        "lastModified": 1702984171,
+        "narHash": "sha256-reIUBrUXibohXmvXRsgpvtlCE0QQSvWSA+qQCKohgR0=",
+        "owner": "nix-community",
+        "repo": "impermanence",
+        "rev": "123e94200f63952639492796b8878e588a4a2851",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "impermanence",
+        "type": "github"
+      }
+    },
     "nix-colors": {
       "inputs": {
         "base16-schemes": "base16-schemes",
@@ -198,6 +213,7 @@
         "agenix": "agenix",
         "anyrun": "anyrun",
         "home-manager": "home-manager_2",
+        "impermanence": "impermanence",
         "nix-colors": "nix-colors",
         "nixpkgs": "nixpkgs"
       }

@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nix-colors.url = "github:misterio77/nix-colors";
+    impermanence.url = "github:nix-community/impermanence";
 
     anyrun = {
       url = "github:Kirottu/anyrun";

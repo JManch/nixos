@@ -1,4 +1,8 @@
 { inputs, lib, config, ... }:
+let
+  # Not sure if I actually need this, needs testing
+  hasOptinPersistence = config.environment.persistence ? "/persist";
+in
 {
   services.openssh = {
     enable = true;
@@ -8,7 +12,7 @@
     };
     hostKeys = [
       {
-        path = "/etc/ssh/ssh_host_ed25519_key";
+        path = "${lib.optionalString hasOptinPersistence "/persist"}/etc/ssh/ssh_host_ed25519_key";
         type = "ed25519";
       }
     ];

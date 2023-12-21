@@ -1,17 +1,6 @@
 #!/bin/sh
 set -e # Abort on error
 
-# Check necessary extra programs are available
-if ! command -v git &> /dev/null
-then
-    echo "git could not be found. Run inside 'nix-shell -p git bitwarden-cli' shell"
-    exit 1
-elif ! command -v bw &> /dev/null
-then
-    echo "bw could not be found. Run inside 'nix-shell -p git bitwarden-cli' shell"
-    exit 1
-fi
-
 # Disk prompt
 read -p "Enter install disk: " -r DISK
 echo "WARNING: This will erase all data on disk $DISK"
@@ -66,7 +55,7 @@ mkdir -p /mnt/{nix,boot,persist,home/joshua}
 mount -t zfs zpool/nix /mnt/nix
 mount -t zfs zpool/persist /mnt/persist
 mount -t tmpfs none /mnt/home/joshua
-mount /dev/disk/by-label/boot /mnt/boot
+mount -o umask=0077 /dev/disk/by-label/boot /mnt/boot
 
 # Setup keys
 printf "\n === Key Setup === \n"
@@ -82,4 +71,4 @@ cp "$(dirname "$0")/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
 # Install
 mkdir -p /mnt/persist/etc/nixos
 git clone https://github.com/JManch/dotfiles /mnt/persist/etc/nixos
-nixos-install --no-root-passwd --flake /mnt/persist/etc/nixos#virtual
+nixos-install --no-root-passwd --flake /mnt/persist/etc/nixos#ncase-m1

@@ -17,7 +17,6 @@ sleep 5
 
 # Create partitions
 printf "\n === Creating disk partitions === \n"
-sleep 5
 parted -s -a optimal $DISK \
     mklabel gpt \
     mkpart primary 0% 512MiB \
@@ -29,7 +28,6 @@ mkfs.fat -F 32 -n boot ${DISK}1
 
 # Create ZFS pool
 printf "\n === Creating ZFS pool === \n"
-sleep 5
 ZPOOL_ARGS=(
     -o ashift=12                # Use 4k sectors for performance
     -O atime=off                # Disable access time for performance
@@ -47,13 +45,11 @@ zpool create "${ZPOOL_ARGS[@]}"
 
 # Create ZFS datasets
 printf "\n === Creating ZFS datasets === \n"
-sleep 5
 zfs create -o mountpoint=legacy zpool/nix
 zfs create -o mountpoint=legacy zpool/persist
 
 # Mount filesystems
 printf "\n === Mounting filesystems === \n"
-sleep 5
 mount -t tmpfs none /mnt
 mkdir -p /mnt/{nix,boot,persist,home/joshua}
 mount -t zfs zpool/nix /mnt/nix
@@ -62,13 +58,17 @@ mount -t tmpfs none /mnt/home/joshua
 mount /dev/disk/by-label/boot /mnt/boot
 
 # Setup keys
+printf "\n === Key Setup === \n"
 mkdir -p /mnt/persist/etc/ssh
-read -p "Enter bitwarden url code: " -r CODE
-bw receive https://send.bitwarden.com/$CODE --output /mnt/persist/etc/ssh/ssh_host_ed25519_key
-chmod -R 600 /mnt/persist/etc/ssh
+while true; do
+    read -p "Enter bitwarden url code: " -r CODE
+    OUTPUT=$(bw receive https://send.bitwarden.com/$CODE --output /mnt/persist/etc/ssh/ssh_host_ed25519_key)
+    if [ "${OUTPUT:0:5}" == "Saved" ]; then break; fi
+done
+chmod 600 /mnt/persist/etc/ssh/ssh_host_ed25519_key
 cp "$(dirname "$0")/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
 
-# Download config
-mkdir -p /mnt/etc/nixos
-git clone https://github.com/JManch/dotfiles /mnt/etc/nixos
-# nixos-install --flake /mnt/etc/nixos#ncase-m1
+# Install
+mkdir -p /mnt/persist/etc/nixos
+git clone https://github.com/JManch/dotfiles /mnt/persist/etc/nixos
+nixos-install --no-root-passwd --flake /mnt/persist/etc/nixos#ncase-m1

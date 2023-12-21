@@ -12,12 +12,12 @@ if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
     exit 1
 fi;
 sleep .5
-printf "\nProceeding with install on disk $DISK\n"
+printf "\n === Proceeding with install on disk $DISK === \n"
 sleep 5
 
 
 # Create partitions
-printf "\nCreating disk partitions\n"
+printf "\n === Creating disk partitions === \n"
 sleep 5
 parted -s -a optimal $DISK \
     mklabel gpt \
@@ -29,7 +29,7 @@ parted -s -a optimal $DISK \
 mkfs.fat -F 32 -n boot ${DISK}1
 
 # Create ZFS pool
-printf "\nCreating ZFS pool\n"
+printf "\n === Creating ZFS pool === \n"
 sleep 5
 ZPOOL_ARGS=(
     -o ashift=12                # Use 4k sectors for performance
@@ -47,15 +47,15 @@ ZPOOL_ARGS=(
 zpool create "${ZPOOL_ARGS[@]}"
 
 # Create ZFS datasets
-printf "\nCreating ZFS datasets\n"
+printf "\n === Creating ZFS datasets === \n"
 sleep 5
 zfs create -o mountpoint=legacy zpool/nix
 zfs create -o mountpoint=legacy zpool/persist
 
 # Mount filesystems
-printf "\nMounting filesystems\n"
+printf "\n === Mounting filesystems === \n"
 sleep 5
-mkdir -p /mnt/{nix,boot,persist}
+mkdir -p /mnt/{nix,boot,persist,/home/joshua}
 mount /dev/disk/by-label/boot /mnt/boot
 mount -t zfs zpool/nix /mnt/nix
 mount -t zfs zpool/persist /mnt/persist

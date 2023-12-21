@@ -11,62 +11,35 @@
   };
   systemd.services.zfs-mount.enable = false;
 
-  fileSystems."/" =
-    { device = "zpool/root";
+  fileSystems = {
+    "/" = {
+      device = "none";
+      fsType = "tmpfs";
+      options = [ "size=2G" "mode=755" ]; # only root can write to these files
+    };
+
+    "/home/joshua" = {
+      device = "none";
+      fsType = "tmpfs";
+      options = [ "size=2G" "mode=777" ];
+    };
+
+    "/nix" = {
+      device = "zpool/nix";
       fsType = "zfs";
     };
 
-  fileSystems."/nix" =
-    { device = "zpool/nix";
+    "/persist" = {
+      device = "zpool/nix";
       fsType = "zfs";
+      neededForBoot = true;
     };
 
-  fileSystems."/var" =
-    { device = "zpool/var";
-      fsType = "zfs";
-    };
-
-  fileSystems."/home" =
-    { device = "zpool/home";
-      fsType = "zfs";
-    };
-
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-label/boot";
+    "/boot" = {
+      device = "/dev/disk/by-label/boot";
       fsType = "vfat";
     };
-
-  # Impermanence file system
-
-  # fileSystems = {
-  #   "/" = {
-  #     device = "none";
-  #     fsType = "tmpfs";
-  #     options = [ "size=4G" "mode=755" ]; # only root can write to these files
-  #   };
-  #
-  #   "/home/joshua" = {
-  #     device = "none";
-  #     fsType = "tmpfs";
-  #     options = [ "size=4G" "mode=777" ];
-  #   };
-  #
-  #   "/nix" = {
-  #     device = "zpool/nix";
-  #     fsType = "zfs";
-  #   };
-  #
-  #   "/persist" = {
-  #     device = "zpool/nix";
-  #     fsType = "zfs";
-  #     neededForBoot = true;
-  #   };
-  #
-  #   "/boot" = {
-  #     device = "/dev/disk/by-label/boot";
-  #     fsType = "vfat";
-  #   };
-  # }
+  };
 
   swapDevices = [ ];
 

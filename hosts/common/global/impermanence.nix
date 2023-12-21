@@ -11,7 +11,6 @@
       "/var/lib/systemd"
       "/var/lib/nixos"
       "/var/db/sudo/lectured"
-      "/etc/nixos"
       "/etc/ssh"
     ];
     files = [

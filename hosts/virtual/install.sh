@@ -80,6 +80,6 @@ chmod 600 /mnt/persist/etc/ssh/ssh_host_ed25519_key
 cp "$(dirname "$0")/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
 
 # Install
-mkdir -p /mnt/persist/etc/nixos
-git clone https://github.com/JManch/dotfiles /mnt/persist/etc/nixos
-nixos-install --no-root-passwd --flake /mnt/persist/etc/nixos#virtual
+mkdir -p /mnt/etc/nixos
+git clone https://github.com/JManch/dotfiles /mnt/etc/nixos
+nixos-install --no-root-passwd --flake /mnt/etc/nixos#virtual

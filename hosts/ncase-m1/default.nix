@@ -9,6 +9,7 @@
     ../common/optional/nvidia.nix
     ../common/optional/desktop.nix
     ../common/optional/pipewire.nix
+    ../common/optional/virtualisation.nix
   ];
 
   networking.hostName = "ncase-m1";

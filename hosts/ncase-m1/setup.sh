@@ -3,7 +3,6 @@ set -e # Abort on error
 
 # Disk prompt
 read -p "Enter install disk: " -r DISK
-echo "Selected disk $DISK"
 echo "WARNING: This will erase all data on disk $DISK"
 read -p "Do you want to proceed? (y/n): " -n 1 -r
 echo
@@ -61,3 +60,14 @@ mount -t zfs zpool/nix /mnt/nix
 mount -t zfs zpool/persist /mnt/persist
 mount -t tmpfs none /mnt/home/joshua
 mount /dev/disk/by-label/boot /mnt/boot
+
+# Setup keys
+read -p "Enter bitwarden url code: " -r CODE
+bw receive https://send.bitwarden.com/$CODE --output /mnt/persist/etc/ssh
+chmod -R 600 /mnt/persist/etc/ssh
+cp "$(dirname "$0")/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
+
+# Download config
+mkdir -p /mnt/etc/nixos
+git clone https://github.com/JManch/dotfiles /mnt/etc/nixos
+# nixos-install --flake /mnt/etc/nixos#ncase-m1

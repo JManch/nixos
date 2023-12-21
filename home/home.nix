@@ -31,7 +31,7 @@
       "Documents"
       "Videos"
       "Repos"
-      ".ssh"
+      { directory = ".ssh"; mode = "0700"; }
       "nixos"
     ];
   };

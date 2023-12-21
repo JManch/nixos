@@ -4,7 +4,6 @@
     ../modules/home-manager
     inputs.nix-colors.homeManagerModules.default
     inputs.anyrun.homeManagerModules.default
-    inputs.impermanence.nixosModules.home-manager.impermanence;
   ];
 
   nixpkgs = {
@@ -21,19 +20,6 @@
   home = {
     username = "joshua";
     homeDirectory = "/home/joshua";
-  };
-
-  home.persistence."/persist/home/joshua" = {
-    directories = [
-      "Downloads"
-      "Music"
-      "Pictures"
-      "Documents"
-      "Videos"
-      "Repos"
-      { directory = ".ssh"; mode = "0700"; }
-      ".config/nixos"
-    ];
   };
 
   home.packages = with pkgs; [

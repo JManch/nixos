@@ -17,14 +17,6 @@
     discord
   ];
 
-  home.persistence."/persist/home/joshua" = {
-    directories = [
-      ".cache/spotify"
-      ".config/spotify"
-      ".cache/nvidia"
-    ];
-  };
-
   monitors = [
     {
       name = "DP-2";

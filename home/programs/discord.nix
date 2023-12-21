@@ -17,6 +17,4 @@ in
       installPhase = builtins.replaceStrings ["${oldAttrs.desktopItem}"] ["${desktopItem}"] oldAttrs.installPhase;
     }))
   ];
-
-  home.persistence."/persist/home/joshua".directories = [ ".config/discord" ];
 }

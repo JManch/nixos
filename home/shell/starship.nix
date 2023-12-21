@@ -33,6 +33,4 @@
       };
     };
   };
-
-  home.persistence."/persist/home/joshua".directories = [ ".cache/starship" ];
 }

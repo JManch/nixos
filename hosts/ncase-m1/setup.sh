@@ -62,8 +62,9 @@ mount -t tmpfs none /mnt/home/joshua
 mount /dev/disk/by-label/boot /mnt/boot
 
 # Setup keys
+mkdir -p /mnt/persist/etc/ssh
 read -p "Enter bitwarden url code: " -r CODE
-bw receive https://send.bitwarden.com/$CODE --output /mnt/persist/etc/ssh
+bw receive https://send.bitwarden.com/$CODE --output /mnt/persist/etc/ssh/ssh_host_ed25519_key
 chmod -R 600 /mnt/persist/etc/ssh
 cp "$(dirname "$0")/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
 

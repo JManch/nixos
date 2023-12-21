@@ -32,7 +32,7 @@
       "Videos"
       "Repos"
       { directory = ".ssh"; mode = "0700"; }
-      "nixos"
+      ".config/nixos"
     ];
   };
 

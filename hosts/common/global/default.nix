@@ -6,6 +6,7 @@
     ./boot.nix
     ./agenix.nix
     ./ssh.nix
+    ./impermanence.nix
   ];
 
   nixpkgs = {

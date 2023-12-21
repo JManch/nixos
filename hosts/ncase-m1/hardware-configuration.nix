@@ -36,6 +36,38 @@
       fsType = "vfat";
     };
 
+  # Impermanence file system
+
+  # fileSystems = {
+  #   "/" = {
+  #     device = "none";
+  #     fsType = "tmpfs";
+  #     options = [ "size=4G" "mode=755" ]; # only root can write to these files
+  #   };
+  #
+  #   "/home/joshua" = {
+  #     device = "none";
+  #     fsType = "tmpfs";
+  #     options = [ "size=4G" "mode=777" ];
+  #   };
+  #
+  #   "/nix" = {
+  #     device = "zpool/nix";
+  #     fsType = "zfs";
+  #   };
+  #
+  #   "/persist" = {
+  #     device = "zpool/nix";
+  #     fsType = "zfs";
+  #     neededForBoot = true;
+  #   };
+  #
+  #   "/boot" = {
+  #     device = "/dev/disk/by-label/boot";
+  #     fsType = "vfat";
+  #   };
+  # }
+
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking

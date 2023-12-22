@@ -1,6 +1,17 @@
 #!/bin/sh
 set -e # Abort on error
 
+# Check necessary extra programs are available
+if ! command -v git &> /dev/null
+then
+    echo "git could not be found. Run inside 'nix-shell -p git bitwarden-cli' shell"
+    exit 1
+elif ! command -v bw &> /dev/null
+then
+    echo "bw could not be found. Run inside 'nix-shell -p git bitwarden-cli' shell"
+    exit 1
+fi
+
 # Disk prompt
 read -p "Enter install disk: " -r DISK
 echo "WARNING: This will erase all data on disk '$DISK'"
@@ -11,6 +22,7 @@ if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
     exit 1
 fi;
 
+# Host prompt
 HOST=""
 while true; do
     read -p "Enter install host: " -r HOST

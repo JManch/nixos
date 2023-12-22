@@ -3,17 +3,23 @@ set -e # Abort on error
 
 # Disk prompt
 read -p "Enter install disk: " -r DISK
-echo "WARNING: This will erase all data on disk $DISK"
+echo "WARNING: This will erase all data on disk '$DISK'"
 read -p "Do you want to proceed? (y/n): " -n 1 -r
 echo
 if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
     echo "Aborting"
     exit 1
 fi;
-sleep .5
-printf "\n === Proceeding with install on disk $DISK === \n"
-sleep 5
 
+HOST=""
+while true; do
+    read -p "Enter install host: " -r HOST
+    if [ -d "$(dirname "$0")/hosts/$HOST" ]; then break; fi
+    echo "Host '$HOST' does not exist"
+done
+
+printf "\n === Proceeding to install '$HOST' on '$DISK' === \n"
+sleep 5
 
 # Create partitions
 printf "\n === Creating disk partitions === \n"
@@ -65,9 +71,9 @@ while true; do
     if [ "${OUTPUT:0:5}" == "Saved" ]; then break; fi
 done
 chmod 600 /mnt/persist/etc/ssh/ssh_host_ed25519_key
-cp "$(dirname "$0")/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
+cp "$(dirname "$0")/hosts/$HOST/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
 
 # Install
-mkdir -p /mnt/persist/home/joshua/.config/nixos
-git clone https://github.com/JManch/dotfiles /mnt/persist/home/joshua/.config/nixos
-nixos-install --no-root-passwd --flake /mnt/persist/home/joshua/.config/nixos#ncase-m1
+mkdir -p /mnt/etc/nixos
+git clone https://github.com/JManch/dotfiles /mnt/etc/nixos
+nixos-install --no-root-passwd --flake /mnt/etc/nixos#$HOST

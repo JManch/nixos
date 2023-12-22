@@ -4,7 +4,7 @@
     ./home.nix
     ./shell
     ./programs/alacritty.nix
-    ./programs/neovim
+    ./programs/neovim.nix
     ./programs/btop.nix
     ./programs/git.nix
     ./programs/firefox.nix

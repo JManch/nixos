@@ -5,7 +5,7 @@
     ./shell
     ./desktop/hyprland.nix
     ./programs/alacritty.nix
-    ./programs/neovim
+    ./programs/neovim.nix
     ./programs/firefox.nix
     ./programs/cava.nix
     ./programs/btop.nix

@@ -43,22 +43,22 @@
       };
     };
 
-    homeConfigurations = {
-      "joshua@ncase-m1" = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        extraSpecialArgs = { inherit inputs; };
-        modules = [
-          ./home/ncase-m1.nix
-        ];
-      };
-
-      "joshua@virtual" = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        extraSpecialArgs = { inherit inputs; };
-        modules = [
-          ./home/virtual.nix
-        ];
-      };
-    };
+    # homeConfigurations = {
+    #   "joshua@ncase-m1" = home-manager.lib.homeManagerConfiguration {
+    #     pkgs = nixpkgs.legacyPackages.x86_64-linux;
+    #     extraSpecialArgs = { inherit inputs; };
+    #     modules = [
+    #       ./home/ncase-m1.nix
+    #     ];
+    #   };
+    #
+    #   "joshua@virtual" = home-manager.lib.homeManagerConfiguration {
+    #     pkgs = nixpkgs.legacyPackages.x86_64-linux;
+    #     extraSpecialArgs = { inherit inputs; };
+    #     modules = [
+    #       ./home/virtual.nix
+    #     ];
+    #   };
+    # };
   };
 }

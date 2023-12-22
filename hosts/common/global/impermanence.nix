@@ -30,6 +30,8 @@
         "Repos"
         ".config/nixos"
         ".cache/nix"
+        ".zcompdump"
+        ".zsh_history"
         { directory = ".ssh"; mode = "0700"; }
       ];
     };

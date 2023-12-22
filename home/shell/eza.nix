@@ -10,7 +10,6 @@
     ls = "eza";
     ll = "eza -la";
     la = "eza -a";
-    tree = "eza --tree";
   };
 
   home.sessionVariables = {

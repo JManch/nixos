@@ -7,6 +7,9 @@
         ".config/nvim"
         ".local/share/nvim"
         ".cache/nvim"
+
+        ".mozilla"
+        ".cache/mozilla"
       ];
     };
   };

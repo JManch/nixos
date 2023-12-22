@@ -6,5 +6,6 @@
     ./programs/neovim
     ./programs/btop.nix
     ./programs/git.nix
+    ./programs/firefox.nix
   ];
 }

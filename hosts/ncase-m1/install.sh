@@ -70,4 +70,4 @@ cp "$(dirname "$0")/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
 # Install
 mkdir -p /mnt/persist/home/joshua/.config/nixos
 git clone https://github.com/JManch/dotfiles /mnt/persist/home/joshua/.config/nixos
-nixos-install --no-root-passwd --flake /mnt/persist/home/joshua/.config/nixos
+nixos-install --no-root-passwd --flake /mnt/persist/home/joshua/.config/nixos#ncase-m1

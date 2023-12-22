@@ -18,12 +18,6 @@
       options = [ "size=4G" "mode=755" ]; # only root can write to these files
     };
 
-    "/home/joshua" = {
-      device = "none";
-      fsType = "tmpfs";
-      options = [ "size=4G" "mode=777" ];
-    };
-
     "/nix" = {
       device = "zpool/nix";
       fsType = "zfs";

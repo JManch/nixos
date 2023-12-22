@@ -19,12 +19,6 @@
       options = [ "size=2G" "mode=755" ];
     };
 
-    "/home/joshua" = {
-      device = "none";
-      fsType = "tmpfs";
-      options = [ "size=2G" "mode=777" ];
-    };
-
     "/nix" = {
       device = "zpool/nix";
       fsType = "zfs";

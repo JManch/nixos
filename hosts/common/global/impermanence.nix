@@ -10,12 +10,28 @@
       "/var/tmp"
       "/var/lib/systemd"
       "/var/lib/nixos"
+      "/var/lib/bluetooth"
       "/var/db/sudo/lectured"
-      "/etc/ssh"
     ];
     files = [
+      "/etc/ssh/ssh_host_ed25519_key"
+      "/etc/ssh/ssh_host_ed25519_key.pub"
       "/etc/machine-id"
       "/etc/adjtime"
     ];
+    users.joshua = {
+      directories = [
+        "Documents"
+        "Downloads"
+        "Desktop"
+        "Pictures"
+        "Music"
+        "Videos"
+        "Repos"
+        ".config/nixos"
+        ".cache/nix"
+        { directory = ".ssh"; mode = "0700"; }
+      ];
+    };
   };
 }

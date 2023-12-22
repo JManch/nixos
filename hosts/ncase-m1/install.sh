@@ -51,10 +51,9 @@ zfs create -o mountpoint=legacy zpool/persist
 # Mount filesystems
 printf "\n === Mounting filesystems === \n"
 mount -t tmpfs none /mnt
-mkdir -p /mnt/{nix,boot,persist,home/joshua}
+mkdir -p /mnt/{nix,boot}
 mount -t zfs zpool/nix /mnt/nix
 mount -t zfs zpool/persist /mnt/persist
-mount -t tmpfs none /mnt/home/joshua
 mount -o umask=0077 /dev/disk/by-label/boot /mnt/boot
 
 # Setup keys
@@ -69,6 +68,6 @@ chmod 600 /mnt/persist/etc/ssh/ssh_host_ed25519_key
 cp "$(dirname "$0")/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
 
 # Install
-mkdir -p /mnt/etc/nixos
-git clone https://github.com/JManch/dotfiles /mnt/etc/nixos
-nixos-install --no-root-passwd --flake /mnt/etc/nixos#ncase-m1
+mkdir -p /mnt/persist/home/joshua/.config/nixos
+git clone https://github.com/JManch/dotfiles /mnt/persist/home/joshua/.config/nixos
+nixos-install --no-root-passwd --flake /mnt/persist/home/joshua/.config/nixos

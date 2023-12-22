@@ -22,6 +22,9 @@ if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
     exit 1
 fi;
 
+DISKPART=$DISK
+if [[ "${DISK:5:4}" == "nvme" ]]; then DISKPART=${DISK}p; fi
+
 # Host prompt
 HOST=""
 while true; do
@@ -42,7 +45,7 @@ parted -s -a optimal $DISK \
     set 1 esp on
 
 # Format UEFI partition
-mkfs.fat -F 32 -n boot ${DISK}1
+mkfs.fat -F 32 -n boot ${DISKPART}1
 
 # Create ZFS pool
 printf "\n === Creating ZFS pool === \n"
@@ -57,7 +60,7 @@ ZPOOL_ARGS=(
     -O keylocation=prompt
     -O compression=lz4
     zpool
-    ${DISK}2
+    ${DISKPART}2
 )
 zpool create "${ZPOOL_ARGS[@]}"
 

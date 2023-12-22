@@ -1,4 +1,9 @@
-{ lib, inputs, config, ... }: {
+{
+  lib,
+  inputs,
+  config,
+  ...
+}: {
   imports = [
     inputs.impermanence.nixosModules.impermanence
   ];
@@ -32,9 +37,12 @@
         ".cache/nix"
         ".local/state/zsh"
         ".cache/zsh"
-        { directory = ".ssh"; mode = "0700"; }
+        {
+          directory = ".ssh";
+          mode = "0700";
+        }
       ];
-      files = [ ];
+      files = [];
     };
   };
 }

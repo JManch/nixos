@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   services.xserver = {
     enable = true;
     displayManager.lightdm.enable = false;
@@ -14,6 +13,6 @@
       xdg-desktop-portal-hyprland
       xdg-desktop-portal-gtk
     ];
-    configPackages = [ pkgs.hyprland ];
+    configPackages = [pkgs.hyprland];
   };
 }

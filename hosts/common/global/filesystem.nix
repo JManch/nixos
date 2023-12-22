@@ -10,7 +10,7 @@
     "/" = {
       device = "none";
       fsType = "tmpfs";
-      options = [ "size=4G" "mode=755" ]; # only root can write to these files
+      options = ["size=4G" "mode=755"]; # only root can write to these files
     };
 
     "/nix" = {
@@ -27,11 +27,11 @@
     "/boot" = {
       device = "/dev/disk/by-label/boot";
       fsType = "vfat";
-      options = [ "umask=0077" "defaults" ];
+      options = ["umask=0077" "defaults"];
     };
   };
 
-  swapDevices = [ ];
+  swapDevices = [];
   zramSwap.enable = true;
 
   systemd.services.zfs-mount.enable = false;

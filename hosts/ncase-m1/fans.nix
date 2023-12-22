@@ -1,7 +1,10 @@
-{ pkgs, config, ... }:
-let
-    # chipID = "8620";
-    chipID = "8688";
+{
+  pkgs,
+  config,
+  ...
+}: let
+  # chipID = "8620";
+  chipID = "8688";
 in {
   environment.systemPackages = with pkgs; [
     lm_sensors
@@ -9,8 +12,8 @@ in {
   ];
 
   boot = {
-    kernelModules = [ "it87" ];
-    extraModulePackages = with config.boot.kernelPackages; [ it87 ];
+    kernelModules = ["it87"];
+    extraModulePackages = with config.boot.kernelPackages; [it87];
     /*
     The chipID is a mystery. 0x8688 matches the hardware of the motherboard and
     worked perfectly on an old deployment but has broken for an unknown reason.
@@ -38,15 +41,19 @@ in {
   '';
 
   environment.etc."fan2go/gpu_temp.sh".text =
-  builtins.replaceStrings [ "\\\\" ] ["\\"] /* bash */ ''
-    #!/bin/sh
-    temp=$(${config.hardware.nvidia.package.bin}/bin/nvidia-smi \\
-      --query-gpu=temperature.gpu \\
-      --format=csv,noheader,nounits)
-    echo "''${temp}000"
-  '';
+    builtins.replaceStrings ["\\\\"] ["\\"]
+    /*
+    bash
+    */
+    ''
+      #!/bin/sh
+      temp=$(${config.hardware.nvidia.package.bin}/bin/nvidia-smi \\
+        --query-gpu=temperature.gpu \\
+        --format=csv,noheader,nounits)
+      echo "''${temp}000"
+    '';
 
-  environment.persistence."/persist".files = [ "/etc/fan2go/fan2go.db" ];
+  environment.persistence."/persist".files = ["/etc/fan2go/fan2go.db"];
 
   programs.fan2go = {
     enable = false;
@@ -65,7 +72,7 @@ in {
         id = "gpu_temp";
         cmd = {
           exec = "${pkgs.bash}/bin/sh";
-          args = [ "/etc/fan2go/gpu_temp.sh" ];
+          args = ["/etc/fan2go/gpu_temp.sh"];
         };
       };
       curves = {
@@ -87,5 +94,4 @@ in {
       };
     };
   };
-
 }

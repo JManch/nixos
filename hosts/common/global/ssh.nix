@@ -1,9 +1,12 @@
-{ inputs, lib, config, ... }:
-let
+{
+  inputs,
+  lib,
+  config,
+  ...
+}: let
   # Not sure if I actually need this, needs testing
   hasOptinPersistence = config.environment.persistence ? "/persist";
-in
-{
+in {
   services.openssh = {
     enable = true;
     settings = {
@@ -21,7 +24,7 @@ in
   programs.ssh = {
     startAgent = true;
     agentTimeout = "1h";
-    pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
+    pubkeyAcceptedKeyTypes = ["ssh-ed25519"];
   };
 
   security.pam.enableSSHAgentAuth = true;

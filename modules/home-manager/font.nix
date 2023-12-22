@@ -1,6 +1,8 @@
-{ lib, config, ... }:
-
 {
+  lib,
+  config,
+  ...
+}: {
   options.font = {
     enable = lib.mkEnableOption "Whether to enable font profiles";
     family = lib.mkOption {
@@ -19,6 +21,6 @@
 
   config = lib.mkIf config.font.enable {
     fonts.fontconfig.enable = true;
-    home.packages = [ config.font.package ];
+    home.packages = [config.font.package];
   };
 }

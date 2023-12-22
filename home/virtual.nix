@@ -1,5 +1,9 @@
-{ inputs, pkgs, lib, ... }:
 {
+  inputs,
+  pkgs,
+  lib,
+  ...
+}: {
   imports = [
     ./home.nix
     ./shell

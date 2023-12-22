@@ -1,103 +1,111 @@
-{ config, lib, pkgs, ... }:
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   programs.waybar = {
     enable = true;
     systemd.enable = true;
-    style = /* css */ ''
-      @define-color background #${config.colorscheme.colors.base00};
-      @define-color border #${config.colorscheme.colors.base05};
-      @define-color text-dark #${config.colorscheme.colors.base00};
-      @define-color text-light #${config.colorscheme.colors.base07};
-      @define-color green #${config.colorscheme.colors.base0B};
-      @define-color blue #${config.colorscheme.colors.base0D};
-      @define-color red #${config.colorscheme.colors.base08};
-      @define-color purple #${config.colorscheme.colors.base0E};
-      @define-color orange #${config.colorscheme.colors.base0F};
-      @define-color transparent rgba(0,0,0,0);
+    style =
+      /*
+      css
+      */
+      ''
+        @define-color background #${config.colorscheme.colors.base00};
+        @define-color border #${config.colorscheme.colors.base05};
+        @define-color text-dark #${config.colorscheme.colors.base00};
+        @define-color text-light #${config.colorscheme.colors.base07};
+        @define-color green #${config.colorscheme.colors.base0B};
+        @define-color blue #${config.colorscheme.colors.base0D};
+        @define-color red #${config.colorscheme.colors.base08};
+        @define-color purple #${config.colorscheme.colors.base0E};
+        @define-color orange #${config.colorscheme.colors.base0F};
+        @define-color transparent rgba(0,0,0,0);
 
-      * {
-          font-family: '${config.font.family}';
-          font-size: 16px;
-          font-weight: 500;
-          min-height: 0px;
-      }
+        * {
+            font-family: '${config.font.family}';
+            font-size: 16px;
+            font-weight: 500;
+            min-height: 0px;
+        }
 
-      tooltip {
-          background: @background;
-          color: @text-light;
-          border-radius: 5px;
-          border: 2px solid @background;
-      }
+        tooltip {
+            background: @background;
+            color: @text-light;
+            border-radius: 5px;
+            border: 2px solid @background;
+        }
 
-      window#waybar {
-          background: @background;
-          color: @text-light;
-          border-radius: 10px;
-          border: 2px solid @background;
-      }
+        window#waybar {
+            background: @background;
+            color: @text-light;
+            border-radius: 10px;
+            border: 2px solid @background;
+        }
 
-      window#waybar.fullscreen {
-          border: 2px solid @red;
-      }
+        window#waybar.fullscreen {
+            border: 2px solid @red;
+        }
 
-      #workspaces {
-          margin: 5px 0px 5px 5px;
-          padding: 0px 0px;
-          border-radius: 5px;
-          background: @blue;
-      }
+        #workspaces {
+            margin: 5px 0px 5px 5px;
+            padding: 0px 0px;
+            border-radius: 5px;
+            background: @blue;
+        }
 
-      button {
-        border-color: @transparent;
-        background: @transparent;
-      }
-
-      #workspaces button {
-          padding: 5px;
-      }
-
-      #workspaces button:hover {
-          box-shadow: inherit;
-          text-shadow: inherit;
-      }
-
-      #workspaces button label {
-          border-radius: 5px;
-          border: 2px solid @transparent;
-
-          padding: 0px 0.4em;
-
-          color: @text-dark;
-          font-weight: 500;
-      }
-
-      #workspaces button.visible label {
+        button {
+          border-color: @transparent;
           background: @transparent;
-          border: 2px solid @background;
-          color: @text-dark;
-          font-weight: 900;
-      }
+        }
 
-      #workspaces button.active label {
-          background: @background;
-          border: 2px solid @background;
-          color: @text-light;
-          font-weight: 900;
-      }
+        #workspaces button {
+            padding: 5px;
+        }
 
-      #custom-wlogout {
-          padding-right: 4px;
-          color: @red;
-      }
+        #workspaces button:hover {
+            box-shadow: inherit;
+            text-shadow: inherit;
+        }
 
-      #network.hostname {
-          margin: 5px 5px 5px 0px;
-          padding: 5px 7px;
-          border-radius: 5px;
-          background: @blue;
-          color: @text-dark;
-      }
-    '';
+        #workspaces button label {
+            border-radius: 5px;
+            border: 2px solid @transparent;
+
+            padding: 0px 0.4em;
+
+            color: @text-dark;
+            font-weight: 500;
+        }
+
+        #workspaces button.visible label {
+            background: @transparent;
+            border: 2px solid @background;
+            color: @text-dark;
+            font-weight: 900;
+        }
+
+        #workspaces button.active label {
+            background: @background;
+            border: 2px solid @background;
+            color: @text-light;
+            font-weight: 900;
+        }
+
+        #custom-wlogout {
+            padding-right: 4px;
+            color: @red;
+        }
+
+        #network.hostname {
+            margin: 5px 5px 5px 0px;
+            padding: 5px 7px;
+            border-radius: 5px;
+            background: @blue;
+            color: @text-dark;
+        }
+      '';
     settings = {
       bar = {
         layer = "top";

@@ -1,6 +1,10 @@
-{ inputs, config, lib, pkgs, ... }:
-
 {
+  inputs,
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   imports = [
     ./programs/waybar.nix
     ./programs/anyrun.nix
@@ -66,7 +70,6 @@
 
         # Cursor
         cursor_inactive_timeout = 0;
-
       };
 
       decoration = {
@@ -111,21 +114,21 @@
       };
 
       misc = {
-          disable_hyprland_logo = true;
-          focus_on_activate = false;
-          # groupbar_titles_font_size = 12
-          # groupbar_gradients = false
-          mouse_move_enables_dpms = true;
-          key_press_enables_dpms = true;
+        disable_hyprland_logo = true;
+        focus_on_activate = false;
+        # groupbar_titles_font_size = 12
+        # groupbar_gradients = false
+        mouse_move_enables_dpms = true;
+        key_press_enables_dpms = true;
       };
 
       dwindle = {
-          preserve_split = true;
-          force_split = 2;
+        preserve_split = true;
+        force_split = 2;
       };
 
       binds = {
-          workspace_back_and_forth = true;
+        workspace_back_and_forth = true;
       };
 
       bind = with modKeys // monitors; let
@@ -275,7 +278,6 @@
         border:false, rounding:false"
       ];
     };
-
   };
 
   xdg.configFile."screenShader" = {

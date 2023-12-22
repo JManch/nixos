@@ -1,6 +1,9 @@
-{ config, lib, pkgs, ... }:
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   # TODO: Enable fzf zsh support in fzf module
   programs.zsh = {
     enable = true;
@@ -27,8 +30,12 @@
       reload = "exec zsh";
       rebuild-home = "home-manager switch --flake ~/.config/nixos#joshua";
     };
-    initExtra = /* bash */ ''
-      setopt interactivecomments
-    '';
+    initExtra =
+      /*
+      bash
+      */
+      ''
+        setopt interactivecomments
+      '';
   };
 }

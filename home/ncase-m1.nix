@@ -1,5 +1,8 @@
-{ inputs, pkgs, ... }:
 {
+  inputs,
+  pkgs,
+  ...
+}: {
   imports = [
     ./home.nix
     ./shell
@@ -24,14 +27,14 @@
       refreshRate = 120;
       width = 2560;
       height = 1440;
-      workspaces = [ "1" "3" "5" "7" "9" ];
+      workspaces = ["1" "3" "5" "7" "9"];
     }
     {
       name = "HDMI-A-1";
       refreshRate = 59.951;
       width = 2560;
       height = 1440;
-      workspaces = [ "2" "4" "6" "8" ];
+      workspaces = ["2" "4" "6" "8"];
     }
     {
       name = "DP-3";

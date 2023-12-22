@@ -1,7 +1,10 @@
-{ inputs, pkgs, ... }:
 {
+  inputs,
+  pkgs,
+  ...
+}: {
   imports = [
-    inputs.agenix.nixosModules.default 
+    inputs.agenix.nixosModules.default
   ];
 
   environment.systemPackages = [

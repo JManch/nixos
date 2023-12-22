@@ -1,10 +1,14 @@
-{ config, lib, pkgs, ... }: with lib;
-let
-  cfg = config.programs.fan2go;
-  yamlFormat = pkgs.formats.yaml { };
-  configFile = yamlFormat.generate "fan2go.yaml" cfg.settings;
-in
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
+  cfg = config.programs.fan2go;
+  yamlFormat = pkgs.formats.yaml {};
+  configFile = yamlFormat.generate "fan2go.yaml" cfg.settings;
+in {
   options = {
     programs.fan2go = {
       enable = mkEnableOption "fan2go";
@@ -18,7 +22,7 @@ in
 
       settings = mkOption {
         type = yamlFormat.type;
-        default = { };
+        default = {};
       };
 
       systemd.enable = mkEnableOption "fan2go systemd integration";
@@ -27,8 +31,8 @@ in
 
   config = mkIf cfg.enable (mkMerge [
     {
-      environment.systemPackages = [ cfg.package ];
-      environment.etc."fan2go/fan2go.yaml" = mkIf (cfg.settings != { }) {
+      environment.systemPackages = [cfg.package];
+      environment.etc."fan2go/fan2go.yaml" = mkIf (cfg.settings != {}) {
         source = configFile;
       };
     }
@@ -37,18 +41,18 @@ in
       systemd.services.fan2go = {
         unitConfig = {
           Description = "Advanced Fan Control Program";
-          After = [ "lm-sensors.service" ];
+          After = ["lm-sensors.service"];
         };
 
         serviceConfig = {
           ExecStart = "${cfg.package}/bin/fan2go -c ${configFile} --no-style";
           LimitNOFILE = 8192;
-          Environment = [ "DISPLAY=:0" ];
+          Environment = ["DISPLAY=:0"];
           Restart = "always";
           RestartSec = "1s";
         };
 
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = ["multi-user.target"];
       };
     })
   ]);

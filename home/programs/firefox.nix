@@ -42,7 +42,6 @@
           "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts" = false;
           "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.searchEngines" = "";
 
-
           # QOL
           "signon.rememberSignons" = false;
           "signon.management.page.breach-alerts.enabled" = false;

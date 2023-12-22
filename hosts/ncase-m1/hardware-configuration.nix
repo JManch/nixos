@@ -10,6 +10,7 @@
     kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
   };
   systemd.services.zfs-mount.enable = false;
+  zramSwap.enable = true;
 
   fileSystems = {
     "/" = {

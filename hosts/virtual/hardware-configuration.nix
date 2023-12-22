@@ -11,6 +11,7 @@
     zfs.devNodes = "/dev/disk/by-partuuid";
   };
   systemd.services.zfs-mount.enable = false;
+  zramSwap.enable = true;
 
   fileSystems = {
     "/" = {

@@ -3,9 +3,10 @@
     ./../../../modules/nixos
     ./security.nix
     ./networking.nix
-    ./boot.nix
+    ./filesystem.nix
     ./agenix.nix
     ./ssh.nix
+    ./impermanence.nix
   ];
 
   nixpkgs = {
@@ -42,6 +43,12 @@
     pkgs.git
   ];
 
-  programs.zsh.enable = true;
+  programs.zsh = {
+    enable = true;
+    shellAliases = {
+      rebuild = "sudo nixos-rebuild switch --flake ~/.config/nixos#${config.networking.hostName}";
+    };
+  };
+
   time.timeZone = "Europe/London";
 }

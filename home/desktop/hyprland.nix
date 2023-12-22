@@ -1,10 +1,18 @@
 { inputs, config, lib, pkgs, ... }:
 
 {
+  imports = [
+    ./programs/waybar.nix
+    ./programs/anyrun.nix
+  ];
+
   home.packages = with pkgs; [
     hyprshot
     swww
+    wl-clipboard
   ];
+
+  home.sessionVariables.NIXOS_OZONE_WL = "1";
 
   wayland.windowManager.hyprland = {
     enable = true;

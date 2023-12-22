@@ -2,8 +2,8 @@
 {
   imports = [
     ./home.nix
-    ./desktop
     ./shell
+    ./desktop/hyprland.nix
     ./programs/alacritty.nix
     ./programs/neovim
     ./programs/firefox.nix

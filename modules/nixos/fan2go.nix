@@ -28,7 +28,6 @@ in
   config = mkIf cfg.enable (mkMerge [
     {
       environment.systemPackages = [ cfg.package ];
-
       environment.etc."fan2go/fan2go.yaml" = mkIf (cfg.settings != { }) {
         source = configFile;
       };
@@ -53,6 +52,4 @@ in
       };
     })
   ]);
-
-  environment.persistence."/persist".files = [ "/etc/fan2go/fan2go.db" ];
 }

@@ -45,6 +45,8 @@ in {
     echo "''${temp}000"
   '';
 
+  environment.persistence."/persist".files = [ "/etc/fan2go/fan2go.db" ];
+
   programs.fan2go = {
     enable = true;
     systemd.enable = true;

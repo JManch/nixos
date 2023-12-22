@@ -22,6 +22,7 @@
     };
     shellAliases = {
       reload = "exec zsh";
+      rebuild-home = "home-manager switch --flake ~/.config/nixos#joshua";
     };
   };
 }

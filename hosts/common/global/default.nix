@@ -43,6 +43,12 @@
     pkgs.git
   ];
 
-  programs.zsh.enable = true;
+  programs.zsh = {
+    enable = true;
+    shellAliases = {
+      rebuild = "sudo nixos-rebuild switch --flake ~/.config/nixos#${config.networking.hostName}";
+    };
+  };
+
   time.timeZone = "Europe/London";
 }

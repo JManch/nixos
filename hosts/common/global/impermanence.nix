@@ -30,12 +30,11 @@
         "Repos"
         ".config/nixos"
         ".cache/nix"
+        ".local/state/zsh"
+        ".cache/zsh"
         { directory = ".ssh"; mode = "0700"; }
       ];
-      files = [
-        ".zcompdump"
-        ".zsh_history"
-      ];
+      files = [ ];
     };
   };
 }

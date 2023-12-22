@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ inputs, pkgs, lib, ... }:
 {
   imports = [
     ./home.nix
@@ -9,4 +9,6 @@
     ./programs/git.nix
     ./programs/firefox.nix
   ];
+
+  programs.alacritty.settings.window.decorations = lib.mkForce "full";
 }

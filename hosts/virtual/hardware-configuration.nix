@@ -10,35 +10,9 @@
     kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
     zfs.devNodes = "/dev/disk/by-partuuid";
   };
-  systemd.services.zfs-mount.enable = false;
-  zramSwap.enable = true;
 
-  fileSystems = {
-    "/" = {
-      device = "none";
-      fsType = "tmpfs";
-      options = [ "size=2G" "mode=755" ];
-    };
-
-    "/nix" = {
-      device = "zpool/nix";
-      fsType = "zfs";
-    };
-
-    "/persist" = {
-      device = "zpool/persist";
-      fsType = "zfs";
-      neededForBoot = true;
-    };
-
-    "/boot" = {
-      device = "/dev/disk/by-label/boot";
-      fsType = "vfat";
-      options = [ "umask=0077" "defaults" ];
-    };
-  };
-
-  swapDevices = [ ];
+  # Reduce tmpfs size
+  fileSystems."/".options = lib.mkForce [ "size=1G" "mode=755" ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's

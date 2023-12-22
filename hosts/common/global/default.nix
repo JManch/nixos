@@ -3,7 +3,7 @@
     ./../../../modules/nixos
     ./security.nix
     ./networking.nix
-    ./boot.nix
+    ./filesystem.nix
     ./agenix.nix
     ./ssh.nix
     ./impermanence.nix

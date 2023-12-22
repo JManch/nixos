@@ -4,7 +4,6 @@
     ./home.nix
     ./shell
     ./desktop/hyprland.nix
-    ./desktop/font.nix
     ./programs/alacritty.nix
     ./programs/neovim
     ./programs/firefox.nix

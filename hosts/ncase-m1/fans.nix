@@ -1,6 +1,7 @@
 { pkgs, config, ... }:
 let
-    chipID = "8620";
+    # chipID = "8620";
+    chipID = "8688";
 in {
   environment.systemPackages = with pkgs; [
     lm_sensors
@@ -48,7 +49,7 @@ in {
   environment.persistence."/persist".files = [ "/etc/fan2go/fan2go.db" ];
 
   programs.fan2go = {
-    enable = true;
+    enable = false;
     systemd.enable = true;
     settings = {
       fans = {

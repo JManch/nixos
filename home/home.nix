@@ -17,6 +17,12 @@
 
   colorscheme = inputs.nix-colors.colorSchemes.ayu-mirage;
 
+  font = {
+    enable = true;
+    family = "FiraCode Nerd Font";
+    package = pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; };
+  };
+
   home = {
     username = "joshua";
     homeDirectory = "/home/joshua";
@@ -26,9 +32,7 @@
     neofetch
   ];
 
-  # Enable home-manager and git
   programs.home-manager.enable = true;
-  programs.git.enable = true;
 
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";

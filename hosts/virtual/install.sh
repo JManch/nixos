@@ -62,7 +62,7 @@ zfs create -o mountpoint=legacy zpool/persist
 # Mount filesystems
 printf "\n === Mounting filesystems === \n"
 mount -t tmpfs none /mnt
-mkdir -p /mnt/{nix,boot}
+mkdir -p /mnt/{nix,boot,persist}
 mount -t zfs zpool/nix /mnt/nix
 mount -t zfs zpool/persist /mnt/persist
 mount -o umask=0077 /dev/disk/by-label/boot /mnt/boot

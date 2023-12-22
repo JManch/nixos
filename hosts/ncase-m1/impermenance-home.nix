@@ -1,26 +1,26 @@
 {
   environment.persistence."/persist" = {
     users.joshua = {
-      # Program specific. This is not a nice solution since it means my
-      # home-manager config is no longer truly modular. Waiting on a solution
-      # maybe here https://redd.it/15xxqlj
-      ".cache/nvidia"
+      directories = [
+        # Not an ideal solution https://redd.it/15xxqlj
+        ".cache/nvidia"
 
-      ".mozilla"
-      ".cache/mozilla"
+        ".mozilla"
+        ".cache/mozilla"
 
-      ".cache/starship"
+        ".cache/starship"
 
-      ".config/nvim"
-      ".local/share/nvim"
-      ".cache/nvim"
+        ".config/nvim"
+        ".local/share/nvim"
+        ".cache/nvim"
 
-      ".cache/swww"
+        ".cache/swww"
 
-      ".config/discord"
+        ".config/discord"
 
-      ".cache/spotify"
-      ".config/spotify"
+        ".cache/spotify"
+        ".config/spotify"
+      ];
     };
   };
 }

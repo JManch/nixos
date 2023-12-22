@@ -10,5 +10,8 @@
     ./programs/firefox.nix
   ];
 
-  programs.alacritty.settings.window.decorations = lib.mkForce "full";
+  programs.alacritty.settings.window = {
+    decorations = lib.mkForce "full";
+    opacity = lib.mkForce 1;
+  };
 }

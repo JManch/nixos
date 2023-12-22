@@ -20,15 +20,25 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
   };
 
-  outputs = {self, nixpkgs, home-manager, ... }@inputs:
-  {
+  outputs = {
+    self,
+    nixpkgs,
+    home-manager,
+    ...
+  } @ inputs: let
+    systems = ["x86_64-linux"];
+    forEachSystem = f:
+      nixpkgs.lib.genAttrs systems (system:
+        f (nixpkgs.legacyPackages.${system}));
+  in {
+    formatter = forEachSystem (pkgs: pkgs.alejandra);
+
     nixosConfigurations = {
       ncase-m1 = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = { inherit inputs; };
+        specialArgs = {inherit inputs;};
         modules = [
           ./hosts/ncase-m1
         ];
@@ -36,29 +46,11 @@
 
       virtual = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = { inherit inputs; };
+        specialArgs = {inherit inputs;};
         modules = [
           ./hosts/virtual
         ];
       };
     };
-
-    # homeConfigurations = {
-    #   "joshua@ncase-m1" = home-manager.lib.homeManagerConfiguration {
-    #     pkgs = nixpkgs.legacyPackages.x86_64-linux;
-    #     extraSpecialArgs = { inherit inputs; };
-    #     modules = [
-    #       ./home/ncase-m1.nix
-    #     ];
-    #   };
-    #
-    #   "joshua@virtual" = home-manager.lib.homeManagerConfiguration {
-    #     pkgs = nixpkgs.legacyPackages.x86_64-linux;
-    #     extraSpecialArgs = { inherit inputs; };
-    #     modules = [
-    #       ./home/virtual.nix
-    #     ];
-    #   };
-    # };
   };
 }

@@ -2,6 +2,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./impermenance-home.nix
     ../common/global
     ../common/users/joshua
   ];

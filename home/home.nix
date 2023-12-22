@@ -1,26 +1,20 @@
-{ inputs, pkgs, lib, ... }: {
-
+{
+  inputs,
+  pkgs,
+  ...
+}: {
   imports = [
     ../modules/home-manager
     inputs.nix-colors.homeManagerModules.default
     inputs.anyrun.homeManagerModules.default
   ];
 
-  nixpkgs = {
-    overlays = [
-      # add overlays here
-    ];
-    config = {
-      allowUnfree = true;
-    };
-  };
-
   colorscheme = inputs.nix-colors.colorSchemes.ayu-mirage;
 
   font = {
     enable = true;
     family = "FiraCode Nerd Font";
-    package = pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; };
+    package = pkgs.nerdfonts.override {fonts = ["FiraCode"];};
   };
 
   home = {

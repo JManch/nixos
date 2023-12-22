@@ -1,5 +1,12 @@
-{ inputs, config, lib, pkgs, ... }: {
+{
+  inputs,
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   imports = [
+    inputs.home-manager.nixosModules.home-manager
     ./../../../modules/nixos
     ./security.nix
     ./networking.nix
@@ -9,8 +16,35 @@
     ./impermanence.nix
   ];
 
+  home-manager = {
+    extraSpecialArgs = {inherit inputs;};
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users = {
+      joshua = import ../../../home/${config.networking.hostName}.nix;
+    };
+  };
+
   nixpkgs = {
-    overlays = [];
+    overlays = [
+      (final: prev: {
+        eza = prev.eza.overrideAttrs (oldAttrs: rec {
+          version = "0.10.7";
+          src = final.fetchFromGitHub {
+            owner = "eza-community";
+            repo = "eza";
+            rev = "v${version}";
+            hash = "sha256-f8js+zToP61lgmxucz2gyh3uRZeZSnoxS4vuqLNVO7c=";
+          };
+
+          cargoDeps = oldAttrs.cargoDeps.overrideAttrs (prev.lib.const {
+            name = "eza-vendor.tar.gz";
+            inherit src;
+            outputHash = "sha256-OBsXeWxjjunlzd4q1B1NJTm8MrIjicep2KIkydACKqQ=";
+          });
+        });
+      })
+    ];
     config = {
       allowUnfree = true;
     };

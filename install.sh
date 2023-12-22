@@ -77,11 +77,13 @@ mount -o umask=0077 /dev/disk/by-label/boot /mnt/boot
 # Setup keys
 printf "\n === Key Setup === \n"
 mkdir -p /mnt/persist/etc/ssh
+set +e
 while true; do
     read -p "Enter bitwarden url code: " -r CODE
     OUTPUT=$(bw receive https://send.bitwarden.com/$CODE --output /mnt/persist/etc/ssh/ssh_host_ed25519_key)
     if [ "${OUTPUT:0:5}" == "Saved" ]; then break; fi
 done
+set -e
 chmod 600 /mnt/persist/etc/ssh/ssh_host_ed25519_key
 cp "$(dirname "$0")/hosts/$HOST/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
 

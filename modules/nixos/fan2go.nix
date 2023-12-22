@@ -53,4 +53,6 @@ in
       };
     })
   ]);
+
+  environment.persistence."/persist".files = [ "/etc/fan2go/fan2go.db" ];
 }

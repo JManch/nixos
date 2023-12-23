@@ -1,7 +1,5 @@
 {
-  inputs,
   config,
-  lib,
   pkgs,
   ...
 }: {
@@ -14,6 +12,7 @@
     hyprshot
     swww
     wl-clipboard
+    qtwayland
   ];
 
   home.sessionVariables.NIXOS_OZONE_WL = "1";

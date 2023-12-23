@@ -26,7 +26,7 @@
         deleted_style = "red";
       };
       memory_usage = {
-        disabled = false;
+        disabled = true;
         threshold = 50;
         style = "dimmed white";
       };

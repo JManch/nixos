@@ -3,7 +3,7 @@
   config,
   ...
 }: let
-  chipID = "8688";
+  chipID = "8620";
 in {
   environment.systemPackages = with pkgs; [
     lm_sensors
@@ -57,8 +57,8 @@ in {
   environment.persistence."/persist".files = ["/etc/fan2go/fan2go.db"];
 
   programs.fan2go = {
-    enable = false;
-    systemd.enable = false;
+    enable = true;
+    systemd.enable = true;
     settings = {
       fans = {
         id = "gpu";
@@ -66,7 +66,7 @@ in {
           platform = "it${chipID}-*";
           rpmChannel = 2;
         };
-        neverStop = false;
+        neverStop = true;
         curve = "gpu_curve";
       };
       sensors = {

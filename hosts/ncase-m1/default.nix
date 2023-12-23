@@ -1,19 +1,16 @@
 {
-  inputs,
-  pkgs,
-  ...
-}: {
   imports = [
     ./hardware-configuration.nix
     ./impermenance-home.nix
+    ./windows.nix
     ./fans.nix
-    ../common/global
-    ../common/users/joshua
 
-    ../common/optional/nvidia.nix
-    ../common/optional/desktop.nix
-    ../common/optional/pipewire.nix
+    ../common/global
+
     ../common/optional/virtualisation.nix
+    ../common/optional/pipewire.nix
+    ../common/optional/desktop.nix
+    ../common/optional/nvidia.nix
   ];
 
   networking.hostName = "ncase-m1";

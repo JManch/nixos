@@ -6,24 +6,16 @@
   ...
 }: {
   imports = [
-    inputs.home-manager.nixosModules.home-manager
     ./../../../modules/nixos
-    ./security.nix
+
+    ./home-manager.nix
     ./networking.nix
     ./filesystem.nix
     ./agenix.nix
     ./ssh.nix
     ./impermanence.nix
+    ./users.nix
   ];
-
-  home-manager = {
-    extraSpecialArgs = {inherit inputs;};
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users = {
-      joshua = import ../../../home/${config.networking.hostName}.nix;
-    };
-  };
 
   nixpkgs = {
     overlays = [
@@ -51,19 +43,15 @@
   };
 
   nix = {
-    # This will add each flake input as a registry
-    # To make nix3 commands consistent with your flake (I don't understand this)
+    # Allows referring to flakes with nixpkgs#flake
     registry = (lib.mapAttrs (_: flake: {inherit flake;})) ((lib.filterAttrs (_: lib.isType "flake")) inputs);
     settings = {
-      # Enable flakes and new 'nix' command
       experimental-features = "nix-command flakes";
-      # Deduplicate and optimize nix store
       auto-optimise-store = true;
     };
   };
 
-  # This will additionally add your inputs to the system's legacy channels
-  # Making legacy nix commands consistent as well, awesome!
+  # Add flake inputs to the system's legacy channels
   nix.nixPath = ["/etc/nix/path"];
   environment.etc =
     lib.mapAttrs'

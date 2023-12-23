@@ -4,6 +4,10 @@
   config,
   ...
 }: {
+  imports = [
+    inputs.anyrun.homeManagerModules.default
+  ];
+
   programs.anyrun = let
     color = base:
       inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorscheme.colors.${base};

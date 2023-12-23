@@ -4,14 +4,15 @@
   ...
 }: {
   imports = [
-    ./programs/waybar.nix
-    ./programs/anyrun.nix
+    ./waybar.nix
+    ./anyrun.nix
   ];
 
   home.packages = with pkgs; [
     hyprshot
     swww
     wl-clipboard
+    xclip # For xwayland apps
   ];
 
   wayland.windowManager.hyprland = {
@@ -53,6 +54,11 @@
       exec-once = [
         "hyprctl dispatch focusmonitor ${monitors.monitor1}"
         "sleep 2 && ${pkgs.swww}/bin/swww init"
+        # Temporary and buggy fix for fixing pasting into wine applications
+        # Can remove xclip package once this is fixed
+        # https://github.com/hyprwm/Hyprland/issues/2319
+        # https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4359
+        "wl-paste -t text -w sh -c 'v=$(cat); cmp -s <(xclip -selection clipboard -o)  <<< \"$v\" || xclip -selection clipboard <<< \"$v\"'"
       ];
 
       general = {

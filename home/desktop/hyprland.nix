@@ -14,8 +14,6 @@
     wl-clipboard
   ];
 
-  home.sessionVariables.NIXOS_OZONE_WL = "1";
-
   wayland.windowManager.hyprland = {
     enable = true;
     # extraConfig = (builtins.readFile ./hyprland.conf);
@@ -40,6 +38,7 @@
         "GBM_BACKEND,nvidia-drm"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
         "WLR_NO_HARDWARE_CURSORS,1"
+        "NIXOS_OZONE_WL,1"
       ];
 
       # TODO: Modularise this monitor config to be per-host

@@ -2,6 +2,8 @@
   description = "Joshua's NixOS Flake";
 
   inputs = {
+    # NOTE: Use the `nix flake metadata <flake_url>` command to check if a
+    # flake needs nixpkgs.follows defined
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nix-colors.url = "github:misterio77/nix-colors";
     impermanence.url = "github:nix-community/impermanence";
@@ -18,6 +20,11 @@
 
     agenix = {
       url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    spicetify-nix = {
+      url = "github:JManch/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

@@ -1,8 +1,4 @@
 {
-  inputs,
-  pkgs,
-  ...
-}: {
   imports = [
     ./hardware-configuration.nix
     ./impermenance-home.nix

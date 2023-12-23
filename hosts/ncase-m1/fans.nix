@@ -66,7 +66,7 @@ in {
           platform = "it${chipID}-*";
           rpmChannel = 2;
         };
-        neverStop = true;
+        neverStop = false;
         curve = "gpu_curve";
       };
       sensors = {

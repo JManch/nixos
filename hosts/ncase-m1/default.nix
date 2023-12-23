@@ -11,6 +11,7 @@
     ../common/optional/pipewire.nix
     ../common/optional/desktop.nix
     ../common/optional/nvidia.nix
+    ../common/optional/winbox.nix
   ];
 
   networking.hostName = "ncase-m1";

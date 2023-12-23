@@ -1,9 +1,11 @@
 {
   boot = {
-    loader.systemd-boot.enable = true;
+    loader.systemd-boot = {
+      enable = true;
+      consoleMode = "auto";
+    };
     loader.efi.canTouchEfiVariables = true;
     supportedFilesystems = ["zfs"];
-    kernelParams = ["nohibernate"];
   };
 
   fileSystems = {

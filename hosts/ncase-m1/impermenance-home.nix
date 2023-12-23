@@ -1,4 +1,5 @@
 {
+  # Persistence definitions for programs installed with home-manager
   environment.persistence."/persist" = {
     users.joshua = {
       directories = [

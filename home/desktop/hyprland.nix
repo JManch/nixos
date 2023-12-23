@@ -53,7 +53,7 @@
       # Launch apps
       exec-once = [
         "hyprctl dispatch focusmonitor ${monitors.monitor1}"
-        "sleep 5 && ${pkgs.swww}/bin/swww init"
+        "sleep 2 && ${pkgs.swww}/bin/swww init"
       ];
 
       general = {

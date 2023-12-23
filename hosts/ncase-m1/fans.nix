@@ -3,7 +3,6 @@
   config,
   ...
 }: let
-  # chipID = "8620";
   chipID = "8688";
 in {
   environment.systemPackages = with pkgs; [
@@ -20,6 +19,8 @@ in {
     Works fine on Arch, just not on Nix. Using 0x8620 instead as it still
     provides fan speeds but is missing a bunch of temp sensors. If fan control
     ever breaks it's probably because of this.
+
+    Update: did a fresh install on the Arch drive and 0x8688 works again.
     */
     extraModprobeConfig = ''
       options it87 ignore_resource_conflict=1 force_id=0x${chipID}
@@ -56,7 +57,7 @@ in {
   environment.persistence."/persist".files = ["/etc/fan2go/fan2go.db"];
 
   programs.fan2go = {
-    enable = false;
+    enable = true;
     systemd.enable = true;
     settings = {
       fans = {

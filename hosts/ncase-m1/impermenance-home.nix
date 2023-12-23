@@ -21,6 +21,9 @@
         ".cache/spotify"
         ".config/spotify"
       ];
+      files = [
+        ".config/lazygit/state.yml"
+      ];
     };
   };
 }

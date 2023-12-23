@@ -3,19 +3,22 @@
     ./global.nix
 
     ./shell
-    ./desktop/hyprland.nix
+    ./desktop/hyprland
+    ./desktop/gtk.nix
     ./programs/alacritty.nix
-    ./programs/neovim.nix
     ./programs/firefox.nix
+    ./programs/spotify.nix
+    ./programs/neovim.nix
     ./programs/cava.nix
     ./programs/btop.nix
     ./programs/git.nix
   ];
 
   home.packages = with pkgs; [
-    spotify
     discord
   ];
+
+  system.hostname = "ncase-m1";
 
   monitors = [
     {

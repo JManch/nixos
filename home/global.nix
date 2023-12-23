@@ -6,7 +6,6 @@
   imports = [
     ../modules/home-manager
     inputs.nix-colors.homeManagerModules.default
-    inputs.anyrun.homeManagerModules.default
   ];
 
   programs.home-manager.enable = true;

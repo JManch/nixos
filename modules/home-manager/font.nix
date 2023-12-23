@@ -2,24 +2,26 @@
   lib,
   config,
   ...
-}: {
+}: let
+  inherit (lib) mkIf mkEnableOption types mkOption;
+in {
   options.font = {
-    enable = lib.mkEnableOption "Whether to enable font profiles";
-    family = lib.mkOption {
-      type = lib.types.str;
+    enable = mkEnableOption "Whether to enable font profiles";
+    family = mkOption {
+      type = types.str;
       default = null;
       description = "Font family name";
       example = "Fira Code";
     };
-    package = lib.mkOption {
-      type = lib.types.package;
+    package = mkOption {
+      type = types.package;
       default = null;
       description = "Font package";
       example = "pkgs.fira-code";
     };
   };
 
-  config = lib.mkIf config.font.enable {
+  config = mkIf config.font.enable {
     fonts.fontconfig.enable = true;
     home.packages = [config.font.package];
   };

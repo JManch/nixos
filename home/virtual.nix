@@ -1,11 +1,7 @@
-{
-  inputs,
-  pkgs,
-  lib,
-  ...
-}: {
+{lib, ...}: {
   imports = [
-    ./home.nix
+    ./global.nix
+
     ./shell
     ./programs/alacritty.nix
     ./programs/neovim.nix

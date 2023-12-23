@@ -1,10 +1,7 @@
-{
-  inputs,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
-    ./home.nix
+    ./global.nix
+
     ./shell
     ./desktop/hyprland.nix
     ./programs/alacritty.nix

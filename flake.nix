@@ -36,6 +36,7 @@
     ...
   } @ inputs: let
     systems = ["x86_64-linux"];
+    username = "joshua";
     forEachSystem = f:
       nixpkgs.lib.genAttrs systems (system:
         f (nixpkgs.legacyPackages.${system}));
@@ -45,7 +46,7 @@
     nixosConfigurations = {
       ncase-m1 = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit inputs;};
+        specialArgs = {inherit inputs username;};
         modules = [
           ./hosts/ncase-m1
         ];
@@ -53,7 +54,7 @@
 
       virtual = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit inputs;};
+        specialArgs = {inherit inputs username;};
         modules = [
           ./hosts/virtual
         ];

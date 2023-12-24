@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  hostname,
   ...
 }: {
   programs.waybar = {
@@ -192,8 +193,8 @@
           format = "<span color='#${config.colorscheme.colors.base04}'></span> {used:0.1f}GiB";
         };
         "network#hostname" = {
-          "format-ethernet" = "${lib.toUpper config.system.hostname}";
-          "format-disconnected" = "<span color='#${config.colorscheme.colors.base08}'>${lib.toUpper config.system.hostname}</span>";
+          "format-ethernet" = "${lib.toUpper hostname}";
+          "format-disconnected" = "<span color='#${config.colorscheme.colors.base08}'>${lib.toUpper hostname}</span>";
           "tooltip-format-ethernet" = "<span color='#${config.colorscheme.colors.base0B}'>{ipaddr}</span>";
           "tooltip-format-disconnected" = "<span color='#${config.colorscheme.colors.base08}'>Disconnected</span>";
         };

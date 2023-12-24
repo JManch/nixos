@@ -1,7 +1,7 @@
-{
+{username, ...}: {
   # Persistence definitions for programs installed with home-manager
   environment.persistence."/persist" = {
-    users.joshua = {
+    users.${username} = {
       directories = [
         # Not an ideal solution https://redd.it/15xxqlj
         ".cache/nvidia"

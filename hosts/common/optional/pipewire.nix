@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  username,
+  ...
+}: {
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -16,7 +20,7 @@
     helvum
   ];
 
-  environment.persistence."/persist".users.joshua = {
+  environment.persistence."/persist".users.${username} = {
     directories = [
       ".config/easyeffects"
     ];

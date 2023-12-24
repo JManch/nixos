@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  username,
   ...
 }: {
   imports = [
@@ -10,8 +11,8 @@
 
   programs.home-manager.enable = true;
   home = {
-    username = "joshua";
-    homeDirectory = "/home/joshua";
+    username = "${username}";
+    homeDirectory = "/home/${username}";
     packages = with pkgs; [
       neofetch
       unzip

@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  username,
+  ...
+}: {
   environment.systemPackages = with pkgs; [
     # Support 64 bit only
     # Unstable native wayland support
@@ -8,7 +12,7 @@
     winetricks
   ];
 
-  environment.persistence."/persist".users.joshua = {
+  environment.persistence."/persist".users.${username} = {
     directories = [
       ".local/share/wineprefixes"
     ];

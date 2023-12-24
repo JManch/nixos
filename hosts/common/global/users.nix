@@ -1,11 +1,12 @@
 {
   config,
   pkgs,
+  username,
   ...
 }: {
   users.mutableUsers = false;
   users.users = {
-    joshua = {
+    ${username} = {
       isNormalUser = true;
       shell = pkgs.zsh;
       hashedPasswordFile = config.age.secrets.joshuaPasswd.path;

@@ -1,4 +1,8 @@
-{inputs, ...}: {
+{
+  inputs,
+  username,
+  ...
+}: {
   imports = [
     inputs.impermanence.nixosModules.impermanence
   ];
@@ -19,7 +23,7 @@
       "/etc/machine-id"
       "/etc/adjtime"
     ];
-    users.joshua = {
+    users.${username} = {
       directories = [
         "Documents"
         "Downloads"

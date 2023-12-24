@@ -1,6 +1,6 @@
-{
+{username, ...}: {
   environment.persistence."/persist" = {
-    users.joshua = {
+    users.${username} = {
       directories = [
         ".cache/starship"
 

@@ -25,11 +25,7 @@
         added_style = "green";
         deleted_style = "red";
       };
-      memory_usage = {
-        disabled = true;
-        threshold = 50;
-        style = "dimmed white";
-      };
+      memory_usage.disabled = true;
     };
   };
 }

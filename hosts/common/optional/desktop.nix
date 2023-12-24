@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  username,
+  ...
+}: {
   services.xserver = {
     enable = true;
     displayManager.lightdm.enable = false;
@@ -21,7 +25,7 @@
     settings = {
       default_session = {
         command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
-        user = "joshua";
+        user = "${username}";
       };
     };
   };

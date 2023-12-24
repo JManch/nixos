@@ -18,8 +18,6 @@
     discord
   ];
 
-  system.hostname = "ncase-m1";
-
   monitors = [
     {
       name = "DP-2";

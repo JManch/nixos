@@ -1,7 +1,6 @@
 {
   config,
-  lib,
-  pkgs,
+  username,
   ...
 }: {
   # TODO: Enable fzf zsh support in fzf module
@@ -28,7 +27,7 @@
     };
     shellAliases = {
       reload = "exec zsh";
-      rebuild-home = "home-manager switch --flake ~/.config/nixos#joshua";
+      rebuild-home = "home-manager switch --flake ~/.config/nixos#${username}";
     };
     initExtra =
       /*

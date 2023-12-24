@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  username,
   ...
 }: {
   imports = [
@@ -40,6 +41,7 @@
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
         "WLR_NO_HARDWARE_CURSORS,1"
         "NIXOS_OZONE_WL,1"
+        "HYPRSHOT_DIR,/home/${username}/pictures/screenshots"
       ];
 
       # TODO: Modularise this monitor config to be per-host

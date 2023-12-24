@@ -58,7 +58,7 @@ in {
       lyrics-plus
       {
         name = "localFiles";
-        src = "${config.home.homeDirectory}/Music";
+        src = "${config.home.homeDirectory}/music";
         appendName = false;
       }
     ];

@@ -25,13 +25,11 @@
     ];
     users.${username} = {
       directories = [
-        "Documents"
-        "Downloads"
-        "Desktop"
-        "Pictures"
-        "Music"
-        "Videos"
-        "Repos"
+        "downloads"
+        "pictures"
+        "music"
+        "videos"
+        "repos"
         ".config/nixos"
         ".cache/nix"
         ".local/state/zsh"

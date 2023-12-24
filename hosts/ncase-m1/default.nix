@@ -14,7 +14,6 @@
     ../common/optional/winbox.nix
   ];
 
-  networking.hostName = "ncase-m1";
   networking.hostId = "625ec505";
 
   system.stateVersion = "23.05";

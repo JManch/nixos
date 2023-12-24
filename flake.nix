@@ -46,7 +46,10 @@
     nixosConfigurations = {
       ncase-m1 = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit inputs username;};
+        specialArgs = {
+          hostname = "ncase-m1";
+          inherit inputs username;
+        };
         modules = [
           ./hosts/ncase-m1
         ];
@@ -54,7 +57,10 @@
 
       virtual = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit inputs username;};
+        specialArgs = {
+          hostname = "virtual";
+          inherit inputs username;
+        };
         modules = [
           ./hosts/virtual
         ];

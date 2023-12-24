@@ -6,7 +6,6 @@
     ../common/global
   ];
 
-  networking.hostName = "virtual";
   networking.hostId = "8d4ed64c";
 
   services.xserver = {

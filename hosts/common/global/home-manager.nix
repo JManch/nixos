@@ -1,16 +1,14 @@
 {
   inputs,
-  config,
   username,
+  hostname,
   ...
 }: {
   imports = [
     inputs.home-manager.nixosModules.home-manager
   ];
 
-  home-manager = let
-    hostname = config.networking.hostName;
-  in {
+  home-manager = {
     extraSpecialArgs = {inherit inputs username hostname;};
     useGlobalPkgs = true;
     useUserPackages = true;

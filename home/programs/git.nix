@@ -23,4 +23,19 @@
       git.overrideGpg = true;
     };
   };
+
+  programs.zsh = {
+    shellAliases = {
+      lg = "lazygit";
+    };
+    initExtra = ''
+      lazygit () {
+        local KEYS=$(${pkgs.openssh}/bin/ssh-add -l)
+        if [[ "$KEYS" == "The agent has no identities." ]]; then
+          ${pkgs.openssh}/bin/ssh-add
+        fi
+        command ${config.programs.lazygit.package}/bin/lazygit "$@"
+      }
+    '';
+  };
 }

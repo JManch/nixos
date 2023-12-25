@@ -14,7 +14,7 @@
     username = "${username}";
     homeDirectory = "/home/${username}";
     packages = with pkgs; [
-      neofetch
+      fastfetch
       unzip
       zip
       tree

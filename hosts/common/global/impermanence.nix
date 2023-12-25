@@ -30,6 +30,7 @@
         "music"
         "videos"
         "repos"
+        "files"
         ".config/nixos"
         ".cache/nix"
         ".local/state/zsh"

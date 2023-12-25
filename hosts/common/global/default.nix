@@ -15,6 +15,7 @@
     ./ssh.nix
     ./impermanence.nix
     ./users.nix
+    ./security.nix
   ];
 
   nixpkgs = {

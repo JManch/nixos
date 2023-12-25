@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}: {
+{config, ...}: {
   programs.alacritty = {
     enable = true;
     settings = {
@@ -45,7 +40,7 @@
         };
       };
       mouse = {
-        hide_when_typing = false;
+        hide_when_typing = true;
       };
       cursor = {
         style = {

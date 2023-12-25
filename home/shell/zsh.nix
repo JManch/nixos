@@ -1,6 +1,7 @@
 {
   config,
   username,
+  pkgs,
   ...
 }: {
   # TODO: Enable fzf zsh support in fzf module
@@ -26,7 +27,7 @@
       expireDuplicatesFirst = true;
     };
     shellAliases = {
-      reload = "exec zsh";
+      reload = "exec ${config.programs.zsh.package}/bin/zsh";
       rebuild-home = "home-manager switch --flake ~/.config/nixos#${username}";
     };
     initExtra =
@@ -35,6 +36,13 @@
       */
       ''
         setopt interactivecomments
+
+        reboot () {
+          read -q "REPLY?Are you sure you want to reboot? (y/n)"
+          if [[ $REPLY =~ ^[Yy]$ ]]; then
+            ${pkgs.systemd}/bin/reboot
+          fi
+        }
       '';
   };
 }

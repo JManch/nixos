@@ -16,7 +16,7 @@
         history = 10000;
       };
       font = {
-        size = 14;
+        size = 12;
         normal = {
           family = "${config.font.family}";
           style = "Regular";

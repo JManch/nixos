@@ -2,11 +2,15 @@
   config,
   pkgs,
   username,
+  lib,
   ...
 }: {
   imports = [
     ./waybar.nix
     ./anyrun.nix
+    ./swaylock.nix
+    ./swayidle.nix
+    ./shaders.nix
   ];
 
   home.packages = with pkgs; [
@@ -14,6 +18,13 @@
     swww
     wl-clipboard
     xclip # For xwayland apps
+  ];
+
+  assertions = [
+    {
+      assertion = (lib.length config.monitors) != 0;
+      message = "Monitors must be configured to use hyprland.";
+    }
   ];
 
   wayland.windowManager.hyprland = {
@@ -31,10 +42,12 @@
         modShift = "SUPERSHIFT";
         modShiftCtrl = "SUPERSHIFTCONTROL";
       };
+
+      cursorSize = "24";
     in {
       # Should inherit these from nvidia really
       env = [
-        "XCURSOR_SIZE,24"
+        "XCURSOR_SIZE,${cursorSize}"
         "LIBVA_DRIVER_NAME,nvidia"
         "XDG_SESSION_TYPE,wayland"
         "GBM_BACKEND,nvidia-drm"
@@ -61,6 +74,7 @@
         # https://github.com/hyprwm/Hyprland/issues/2319
         # https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4359
         "wl-paste -t text -w sh -c 'v=$(cat); cmp -s <(xclip -selection clipboard -o)  <<< \"$v\" || xclip -selection clipboard <<< \"$v\"'"
+        "hyprctl setcursor Bibata-Modern-Classic ${cursorSize}"
       ];
 
       general = {
@@ -96,7 +110,7 @@
         # TODO: Color blue
         # "col.shadow" = $blue;
 
-        screen_shader = "${config.xdg.configHome}/hypr/screenShader.frag";
+        screen_shader = "${config.xdg.configHome}/hypr/shaders/monitor1_gamma.frag";
       };
 
       input = {
@@ -155,7 +169,7 @@
         ", Print, exec, ${hyprshot} -m region --clipboard-only"
         "${mod}, Print, exec, ${hyprshot} -m region"
         "${modShift}, Print, exec, ${hyprshot} -m output"
-        "${mod}, Space, exec, sleep 0.5 && hyprctl dispatch dpms off"
+        "${mod}, Space, exec, ${config.xdg.configHome}/hypr/scripts/lock_screen.sh"
         "${mod}, T, exec, killall -SIGUSR1 ${waybar}"
 
         # Monitors
@@ -283,27 +297,5 @@
         border:false, rounding:false"
       ];
     };
-  };
-
-  xdg.configFile."screenShader" = {
-    enable = true;
-    target = "hypr/screenShader.frag";
-    text = ''
-      precision mediump float;
-      varying vec2 v_texcoord;
-      uniform sampler2D tex;
-      uniform int output;
-
-      void main() {
-          // Apply gamma adjustment to monitor
-          if (output == 1) {
-              vec4 pixColor = texture2D(tex, v_texcoord);
-              pixColor.rgb = pow(pixColor.rgb, vec3(1.2));
-              gl_FragColor = pixColor;
-          } else {
-              gl_FragColor = texture2D(tex, v_texcoord);
-          }
-      }
-    '';
   };
 }

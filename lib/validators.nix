@@ -1,3 +1,3 @@
-{lib, ...}: {
-  isWayland = config: config.home.desktop.compositor == "hyprland";
+lib: {
+  isWayland = config: config.desktop.compositor == "hyprland";
 }

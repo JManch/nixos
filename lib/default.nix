@@ -1,6 +1,4 @@
-{
-  import = [
-    ./fetchers.nix
-    ./validators.nix
-  ];
+lib: {
+  fetchers = import ./fetchers.nix lib;
+  validators = import ./validators.nix lib;
 }

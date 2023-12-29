@@ -1,4 +1,8 @@
-{config, ...}: {
+{ config, ... }:
+let
+  binary = "${config.programs.alacritty.package}/bin/alacritty";
+in
+{
   programs.alacritty = {
     enable = true;
     settings = {
@@ -51,4 +55,5 @@
       };
     };
   };
+  desktop.hyprland.binds = [ "${config.desktop.hyprland.modKey}, Return, exec, ${binary}" ];
 }

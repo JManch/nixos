@@ -1,3 +1,7 @@
+{ config, ... }:
+let
+  binary = "${config.programs.firefox.package}/bin/firefox";
+in
 {
   programs.firefox = {
     enable = true;
@@ -87,4 +91,5 @@
       };
     };
   };
+  desktop.hyprland.binds = [ "${config.desktop.hyprland.modKey}, Backspace, exec, ${binary}" ];
 }

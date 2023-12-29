@@ -1,7 +1,7 @@
-{
+{ config, lib, ... }: lib.mkIf (config.desktop.compositor == "hyprland") {
   xdg.configFile."hypr/shaders/monitor1_gamma.frag".text =
     /*
-    glsl
+      glsl
     */
     ''
       precision mediump float;
@@ -23,7 +23,7 @@
 
   xdg.configFile."hypr/shaders/blank.frag".text =
     /*
-    glsl
+      glsl
     */
     ''
       precision mediump float;

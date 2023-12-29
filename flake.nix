@@ -41,21 +41,21 @@
     mkLib = nixpkgs:
       nixpkgs.lib.extend
       (final: prev: (import ./lib final) // home-manager.lib);
+
     lib = mkLib nixpkgs;
 
     forEachSystem = f:
       nixpkgs.lib.genAttrs systems (system:
         f (nixpkgs.legacyPackages.${system}));
   in {
-    formatter = forEachSystem (pkgs: pkgs.alejandra);
+    formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
 
     nixosConfigurations = {
       ncase-m1 = nixpkgs.lib.nixosSystem {
-        inherit lib;
         system = "x86_64-linux";
         specialArgs = {
           hostname = "ncase-m1";
-          inherit inputs username;
+          inherit inputs username lib;
         };
         modules = [
           ./hosts/ncase-m1
@@ -63,11 +63,10 @@
       };
 
       virtual = nixpkgs.lib.nixosSystem {
-        inherit lib;
         system = "x86_64-linux";
         specialArgs = {
           hostname = "virtual";
-          inherit inputs username;
+          inherit inputs username lib;
         };
         modules = [
           ./hosts/virtual

@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{ pkgs, config, ... }: {
   gtk = {
     enable = true;
     theme = {
@@ -12,7 +12,12 @@
     cursorTheme = {
       name = "Bibata-Modern-Classic";
       package = pkgs.bibata-cursors;
-      size = 24;
+      size = config.desktop.cursorSize;
     };
   };
+
+  wayland.windowManager.hyprland.settings.env = [
+    "XCURSOR_THEME,Bibata-Modern-Classic"
+    "XCURSOR_SIZE,${builtins.toString config.desktop.cursorSize}"
+  ];
 }

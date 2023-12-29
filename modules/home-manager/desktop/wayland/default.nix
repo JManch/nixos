@@ -1,14 +1,20 @@
-{
-  lib,
-  config,
-  ...
+{ lib
+, config
+, ...
 }:
 with lib; {
-  options.desktop.wayland = {
+  imports = [
+    ./hyprland
+    ./programs/anyrun.nix
+    ./programs/swaylock.nix
+    ./services/swayidle.nix
+    ./services/waybar.nix
+  ];
+  options.desktop = {
     swaylock = {
       enable = mkEnableOption "Swaylock";
       lockScript = mkOption {
-        type = types.string;
+        type = types.str;
         description = "Script to run to lock the screen.";
         default = ''
           ${config.swaylock.package}/bin/swaylock -f
@@ -33,5 +39,7 @@ with lib; {
         description = "Turn off screen after this many idle seconds locked.";
       };
     };
+    anyrun.enable = mkEnableOption "Anyrun";
+    waybar.enable = mkEnableOption "Waybar";
   };
 }

@@ -1,9 +1,13 @@
-{
-  config,
-  lib,
-  hostname,
-  ...
-}: {
+{ config
+, lib
+, hostname
+, ...
+}:
+let
+  cfg = config.desktop.waybar;
+  isWayland = lib.validators.isWayland config;
+in
+lib.mkIf (isWayland && cfg.enable) {
   programs.waybar = {
     enable = true;
     systemd = {
@@ -12,8 +16,8 @@
     };
     style =
       /*
-      css
-      */
+        css
+        */
       ''
         @define-color background #${config.colorscheme.colors.base00};
         @define-color border #${config.colorscheme.colors.base05};

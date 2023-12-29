@@ -1,6 +1,6 @@
 {
   imports = [
+    ./desktop
     ./font.nix
-    ./monitors.nix
   ];
 }

@@ -1,9 +1,9 @@
-{config, ...}: {
+{ config, ... }: {
   programs.cava = {
     enable = true;
     settings = {
       general = {
-        framerate = 120;
+        framerate = 60;
         autosens = 1;
         bars = 0;
         bar_width = 2;

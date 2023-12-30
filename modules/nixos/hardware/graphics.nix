@@ -3,6 +3,7 @@ let
   inherit (lib) mkIf;
   nvidia = config.device.gpu == "nvidia";
   amd = config.device.gpu == "amd";
+  optional = lib.lists.optional;
 in
 {
   # AMD Driver Explanation
@@ -18,11 +19,8 @@ in
     driSupport = true;
     driSupport32Bit = true;
     extraPackages = with pkgs;
-      lib.lists.optionals (nvidia) [
-        vaapiVdpau # hardware acceleration
-      ] ++ lib.lists.optionals (amd) [
-        amdvlk
-      ];
+      optional nvidia vaapiVdpau # nvidia hardware acceleration
+      ++ optional amd amdvlk;
   };
 
   # Leave this as default setting for AMD

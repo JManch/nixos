@@ -4,6 +4,10 @@
 }:
 let
   chipID = "8620";
+  gpuTemp = pkgs.writeShellScript "gpu-temp" ''
+    temp=$(${config.hardware.nvidia.package.bin}/bin/nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits)
+    echo "''${temp}000"
+  '';
 in
 {
   environment.systemPackages = with pkgs; [
@@ -42,19 +46,6 @@ in
         label fan3 "SYS_FAN2"
   '';
 
-  environment.etc."fan2go/gpu_temp.sh".text =
-    builtins.replaceStrings [ "\\\\" ] [ "\\" ]
-      /*
-        bash
-      */
-      ''
-        #!/bin/sh
-        temp=$(${config.hardware.nvidia.package.bin}/bin/nvidia-smi \\
-          --query-gpu=temperature.gpu \\
-          --format=csv,noheader,nounits)
-        echo "''${temp}000"
-      '';
-
   environment.persistence."/persist".files = [ "/etc/fan2go/fan2go.db" ];
 
   programs.fan2go = {
@@ -74,7 +65,7 @@ in
         id = "gpu_temp";
         cmd = {
           exec = "${pkgs.bash}/bin/sh";
-          args = [ "/etc/fan2go/gpu_temp.sh" ];
+          args = [ "${gpuTemp.outPath}" ];
         };
       };
       curves = {
@@ -84,7 +75,8 @@ in
           min = 40;
           max = 80;
           steps = [
-            { "49" = 0; }
+            { "0" = 76; }
+            { "40" = 76; }
             { "50" = 102; }
             { "60" = 128; }
             { "70" = 153; }

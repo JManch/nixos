@@ -7,6 +7,7 @@ in
     ./ssh.nix
     ./desktop.nix
     ./audio.nix
+    ./windows.nix
     ./networking.nix
     ./impermanence.nix
     ./virtualisation.nix

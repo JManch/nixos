@@ -1,4 +1,8 @@
-{ config, lib, ... }: lib.mkIf (config.desktop.compositor == "hyprland") {
+{ osConfig
+, lib
+, ...
+}:
+lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") {
   xdg.configFile."hypr/shaders/monitor1_gamma.frag".text =
     /*
       glsl

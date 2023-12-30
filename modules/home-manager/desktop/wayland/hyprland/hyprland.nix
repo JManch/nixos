@@ -1,10 +1,14 @@
 { config
+, osConfig
 , pkgs
-, username
 , lib
 , ...
 }:
-lib.mkIf (config.desktop.compositor == "hyprland") {
+let
+  desktopCfg = osConfig.usrEnv.desktop;
+in
+lib.mkIf (desktopCfg.enable && desktopCfg.compositor == "hyprland") {
+  modules.desktop.sessionTarget = "hyprland-session.target";
 
   home.packages = with pkgs; [
     hyprshot
@@ -15,7 +19,7 @@ lib.mkIf (config.desktop.compositor == "hyprland") {
 
   assertions = [
     {
-      assertion = (lib.length config.desktop.monitors) != 0;
+      assertion = (lib.length osConfig.device.monitors) != 0;
       message = "Monitors must be configured to use Hyprland.";
     }
   ];
@@ -29,9 +33,8 @@ lib.mkIf (config.desktop.compositor == "hyprland") {
         "XDG_SESSION_TYPE,wayland"
         "XDG_SESSION_DESKTOP=Hyprland"
         "WLR_NO_HARDWARE_CURSORS,1"
-        "HYPRSHOT_DIR,/home/${username}/pictures/screenshots"
-      ] ++ [
-        # TODO: Make this conditional based on some system nvidia option
+        "HYPRSHOT_DIR,${config.xdg.userDirs.pictures}/screenshots"
+      ] ++ lib.lists.optionals (osConfig.device.gpu == "nvidia") [
         "LIBVA_DRIVER_NAME,nvidia"
         "GBM_BACKEND,nvidia-drm"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
@@ -43,17 +46,17 @@ lib.mkIf (config.desktop.compositor == "hyprland") {
           "${m.name}, " +
           (
             if !m.enabled
-            then "disable"
+            then
+              "disable"
             else
-              "${builtins.toString m.width}x${builtins.toString m.height}
-                @${builtins.toString m.refreshRate}, ${m.position}, 1"
+              "${builtins.toString m.width}x${builtins.toString m.height}@${builtins.toString m.refreshRate}, ${m.position}, 1"
           )
         )
-        config.desktop.monitors;
+        osConfig.device.monitors;
 
       # Launch apps
       exec-once = [
-        "hyprctl dispatch focusmonitor ${(lib.fetchers.getMonitorByNumber config 1).name}"
+        "hyprctl dispatch focusmonitor ${(lib.fetchers.getMonitorByNumber osConfig 1).name}"
         "sleep 1 && ${pkgs.swww}/bin/swww init"
         # Temporary and buggy fix for fixing pasting into wine applications
         # Can remove xclip package once this is fixed
@@ -140,7 +143,7 @@ lib.mkIf (config.desktop.compositor == "hyprland") {
               m.workspaces
           )
         )
-        config.desktop.monitors;
+        osConfig.device.monitors;
     };
   };
 }

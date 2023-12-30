@@ -1,12 +1,13 @@
 { inputs
 , pkgs
 , config
+, osConfig
 , lib
 , ...
 }:
 let
-  isWayland = lib.validators.isWayland config;
-  cfg = config.desktop.anyrun;
+  isWayland = lib.validators.isWayland osConfig;
+  cfg = config.modules.desktop.anyrun;
 in
 {
   imports = [
@@ -40,7 +41,7 @@ in
             * {
               all: unset;
               font-size: 2rem;
-              font-family: ${config.font.family};
+              font-family: ${config.modules.desktop.font.family};
             }
 
             #window,
@@ -85,7 +86,7 @@ in
 
     wayland.windowManager.hyprland.settings =
       let
-        modKey = config.desktop.hyprland.modKey;
+        modKey = config.modules.desktop.hyprland.modKey;
       in
       {
         bindr = [

@@ -29,49 +29,53 @@
     };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    home-manager,
-    ...
-  } @ inputs: let
-    systems = ["x86_64-linux"];
-    username = "joshua";
+  outputs =
+    { self
+    , nixpkgs
+    , home-manager
+    , ...
+    } @ inputs:
+    let
+      systems = [ "x86_64-linux" ];
+      username = "joshua";
 
-    mkLib = nixpkgs:
-      nixpkgs.lib.extend
-      (final: prev: (import ./lib final) // home-manager.lib);
+      mkLib = nixpkgs:
+        nixpkgs.lib.extend
+          (final: prev: (import ./lib final) // home-manager.lib);
 
-    lib = mkLib nixpkgs;
+      lib = mkLib nixpkgs;
 
-    forEachSystem = f:
-      nixpkgs.lib.genAttrs systems (system:
-        f (nixpkgs.legacyPackages.${system}));
-  in {
-    formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
+      forEachSystem = f:
+        nixpkgs.lib.genAttrs systems (system:
+          f (nixpkgs.legacyPackages.${system}));
+    in
+    {
+      formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
 
-    nixosConfigurations = {
-      ncase-m1 = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = {
-          hostname = "ncase-m1";
-          inherit inputs username lib;
+      nixosConfigurations = {
+        ncase-m1 = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            hostname = "ncase-m1";
+            inherit inputs username lib;
+          };
+          modules = [
+            ./modules/nixos
+            ./hosts/ncase-m1
+          ];
         };
-        modules = [
-          ./hosts/ncase-m1
-        ];
-      };
 
-      virtual = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = {
-          hostname = "virtual";
-          inherit inputs username lib;
+        virtual = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            hostname = "virtual";
+            inherit inputs username lib;
+          };
+          modules = [
+            ./modules/nixos
+            ./hosts/virtual
+          ];
         };
-        modules = [
-          ./hosts/virtual
-        ];
       };
     };
-  };
 }

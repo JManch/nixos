@@ -1,3 +1,0 @@
-{
-  security.pam.services.swaylock = {};
-}

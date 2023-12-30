@@ -1,3 +1,3 @@
 lib: {
-  isWayland = config: config.desktop.compositor == "hyprland";
+  isWayland = config: config.usrEnv.desktop.compositor == "hyprland";
 }

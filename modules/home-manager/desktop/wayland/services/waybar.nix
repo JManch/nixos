@@ -1,18 +1,19 @@
 { config
+, osConfig
 , lib
 , hostname
 , ...
 }:
 let
-  cfg = config.desktop.waybar;
-  isWayland = lib.validators.isWayland config;
+  cfg = config.modules.desktop.waybar;
+  isWayland = lib.validators.isWayland osConfig;
 in
 lib.mkIf (isWayland && cfg.enable) {
   programs.waybar = {
     enable = true;
     systemd = {
       enable = true;
-      target = "hyprland-session.target";
+      target = config.modules.desktop.sessionTarget;
     };
     style =
       /*
@@ -31,7 +32,7 @@ lib.mkIf (isWayland && cfg.enable) {
         @define-color transparent rgba(0,0,0,0);
 
         * {
-            font-family: '${config.font.family}';
+            font-family: '${config.modules.desktop.font.family}';
             font-size: 16px;
             font-weight: 500;
             min-height: 0px;

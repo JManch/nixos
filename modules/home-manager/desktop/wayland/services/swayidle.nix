@@ -1,13 +1,14 @@
 { pkgs
 , config
+, osConfig
 , lib
 , ...
 }:
 let
   inherit (lib) mkIf;
-  cfg = config.desktop.swayidle;
-  cfgParent = config.desktop;
-  isWayland = lib.validators.isWayland config;
+  cfg = config.modules.desktop.swayidle;
+  cfgParent = config.modules.desktop;
+  isWayland = lib.validators.isWayland osConfig;
 
   pgrep = "${pkgs.procps}/bin/pgrep";
   hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
@@ -20,7 +21,7 @@ mkIf (isWayland && cfg.enable) {
 
   services.swayidle = {
     enable = true;
-    systemdTarget = "hyprland-session.target";
+    systemdTarget = config.modules.desktop.sessionTarget;
     timeouts = [
       {
         timeout = cfg.lockTime;
@@ -47,7 +48,7 @@ mkIf (isWayland && cfg.enable) {
 
   desktop.hyprland.binds =
     let
-      mod = config.desktop.hyprland.modKey;
+      mod = config.modules.desktop.hyprland.modKey;
     in
     [
       "${mod}, Space, exec, ${lockScript.outPath}"

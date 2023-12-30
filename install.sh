@@ -26,6 +26,7 @@ DISKPART=$DISK
 if [[ "${DISK:5:4}" == "nvme" ]]; then DISKPART=${DISK}p; fi
 
 # Host prompt
+echo
 HOST=""
 while true; do
     read -p "Enter install host: " -r HOST
@@ -33,7 +34,29 @@ while true; do
     echo "Host '$HOST' does not exist"
 done
 
-printf "\n === Proceeding to install '$HOST' on '$DISK' === \n"
+# ZPOOL name prompt
+echo
+echo "WARNING: The zpool name must match modules.hardware.fileSystem.zpoolName in host config"
+read -p "Enter zpool name: " -r ZPOOL
+read -p "Are you sure you want to name the zpool '$ZPOOL'? (y/n): " -n 1 -r
+echo
+if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+    echo "Aborting"
+    exit 1
+fi;
+
+# Boot label prompt
+echo
+echo "WARNING: The boot label must be unique on the device and must match modules.hardware.fileSystem.bootLabel in host config"
+read -p "Enter boot label: " -r BOOTLABEL
+read -p "Are you sure you want to label the boot partition '$BOOTLABEL'? (y/n): " -n 1 -r
+echo
+if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+    echo "Aborting"
+    exit 1
+fi;
+
+printf "\n === Proceeding to install '$HOST' on '$DISK' with zpool '$ZPOOL' and boot label '$BOOTLABEL' === \n"
 sleep 5
 
 # Create partitions
@@ -45,7 +68,7 @@ parted -s -a optimal $DISK \
     set 1 esp on
 
 # Format UEFI partition
-mkfs.fat -F 32 -n boot ${DISKPART}1
+mkfs.fat -F 32 -n $BOOTLABEL ${DISKPART}1
 
 # Create ZFS pool
 printf "\n === Creating ZFS pool === \n"
@@ -59,23 +82,23 @@ ZPOOL_ARGS=(
     -O keyformat=passphrase
     -O keylocation=prompt
     -O compression=lz4
-    zpool
+    ${ZPOOL}
     ${DISKPART}2
 )
 zpool create "${ZPOOL_ARGS[@]}"
 
 # Create ZFS datasets
 printf "\n === Creating ZFS datasets === \n"
-zfs create -o mountpoint=legacy zpool/nix
-zfs create -o mountpoint=legacy zpool/persist
+zfs create -o mountpoint=legacy ${ZPOOL}/nix
+zfs create -o mountpoint=legacy ${ZPOOL}/persist
 
 # Mount filesystems
 printf "\n === Mounting filesystems === \n"
 mount -t tmpfs none /mnt
 mkdir -p /mnt/{nix,boot,persist}
-mount -t zfs zpool/nix /mnt/nix
-mount -t zfs zpool/persist /mnt/persist
-mount -o umask=0077 /dev/disk/by-label/boot /mnt/boot
+mount -t zfs ${ZPOOL}/nix /mnt/nix
+mount -t zfs ${ZPOOL}/persist /mnt/persist
+mount -o umask=0077 /dev/disk/by-label/${BOOTLABEL} /mnt/boot
 
 # Setup keys
 printf "\n === Key Setup === \n"

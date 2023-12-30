@@ -1,18 +1,19 @@
 { pkgs
 , config
+, osConfig
 , lib
 , ...
 }:
 let
   inherit (config.colorscheme) colors;
-  cfg = config.desktop.swaylock;
-  isWayland = lib.validators.isWayland config;
-  lockScript = pkgs.writeShellScript "lock-script" config.desktop.swaylock.lockScript;
+  cfg = config.modules.desktop.swaylock;
+  isWayland = lib.validators.isWayland osConfig;
+  lockScript = pkgs.writeShellScript "lock-script" config.modules.desktop.swaylock.lockScript;
 in
 lib.mkIf (isWayland && cfg.enable) {
   assertions = [
     {
-      assertion = (lib.length config.desktop.monitors) != 0;
+      assertion = (lib.length osConfig.device.monitors) != 0;
       message = "A primary monitor must be configured for Swayidle.";
     }
   ];
@@ -27,7 +28,7 @@ lib.mkIf (isWayland && cfg.enable) {
       clock = true;
       datestr = "%e %B %Y";
 
-      font = config.font.family;
+      font = config.modules.desktop.font.family;
       font-size = 25;
 
       effect-blur = "10x3";
@@ -38,8 +39,8 @@ lib.mkIf (isWayland && cfg.enable) {
 
       indicator = true;
       indicator-caps-lock = true;
-      indicator-y-position = builtins.floor ((lib.fetchers.primaryMonitor config).height * 0.5);
-      indicator-radius = builtins.floor ((lib.fetchers.primaryMonitor config).width * 0.04);
+      indicator-y-position = builtins.floor ((lib.fetchers.primaryMonitor osConfig).height * 0.5);
+      indicator-radius = builtins.floor ((lib.fetchers.primaryMonitor osConfig).width * 0.04);
 
       text-color = "#${colors.base07}";
 
@@ -66,5 +67,5 @@ lib.mkIf (isWayland && cfg.enable) {
       ring-caps-lock-color = "#${colors.base0E}";
     };
   };
-  desktop.hyprland.binds = [ "${config.desktop.hyprland.modKey}, Space, exec, ${lockScript.outPath}" ];
+  desktop.hyprland.binds = [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${lockScript.outPath}" ];
 }

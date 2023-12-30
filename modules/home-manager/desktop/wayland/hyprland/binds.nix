@@ -1,17 +1,19 @@
 { config
+, osConfig
 , pkgs
 , lib
 , ...
 }:
 let
   hyprshot = "${pkgs.hyprshot}/bin/hyprshot";
-  mod = config.desktop.hyprland.modKey;
-  modShift = "${config.desktop.hyprland.modKey}SHIFT";
-  modShiftCtrl = "${config.desktop.hyprland.modKey}SHIFTCONTROL";
-  getMonitorByNumber = number: lib.fetchers.getMonitorByNumber config number;
+  cfg = config.modules.desktop.hyprland;
+  mod = cfg.modKey;
+  modShift = "${cfg.modKey}SHIFT";
+  modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
+  getMonitorByNumber = number: lib.fetchers.getMonitorByNumber osConfig number;
 in
 {
-  wayland.windowManager.hyprland = lib.mkIf (config.desktop.compositor == "hyprland") {
+  wayland.windowManager.hyprland = lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") {
     settings.bind =
       [
         # General
@@ -74,14 +76,14 @@ in
     ];
     # Order-sensitive config has to go here
     extraConfig = ''
-      "${mod}, R, submap, resize"
-      "submap = resize"
-      "binde=, L, resizeactive, 20 0"
-      "binde=, H, resizeactive, -20 0"
-      "binde=, K, resizeactive, 0 -20"
-      "binde=, J, resizeactive, 0 20"
-      "bind= , Escape, submap, reset"
-      "submap = reset"
+      ${mod}, R, submap, resize
+      submap = resize
+      binde=, L, resizeactive, 20 0
+      binde=, H, resizeactive, -20 0
+      binde=, K, resizeactive, 0 -20
+      binde=, J, resizeactive, 0 20
+      bind= , Escape, submap, reset
+      submap = reset
     '';
   };
 }

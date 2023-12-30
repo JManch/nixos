@@ -42,6 +42,7 @@
       git.enable = true;
       neovim.enable = true;
       spotify.enable = true;
+      fastfetch.enable = true;
     };
   };
 }

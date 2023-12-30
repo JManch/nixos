@@ -14,7 +14,6 @@
     username = "${username}";
     homeDirectory = "/home/${username}";
     packages = with pkgs; [
-      fastfetch
       unzip
       zip
       tree

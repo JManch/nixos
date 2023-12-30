@@ -11,6 +11,7 @@ in
     ./git.nix
     ./neovim.nix
     ./spotify.nix
+    ./fastfetch.nix
   ];
 
   options.modules.programs = {
@@ -28,5 +29,6 @@ in
     git.enable = mkEnableOption "git and lazygit";
     neovim.enable = mkEnableOption "Neovim";
     spotify.enable = mkEnableOption "Spotify";
+    fastfetch.enable = mkEnableOption "Fastfetch";
   };
 }

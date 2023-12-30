@@ -25,7 +25,7 @@ lib.mkIf cfg.enable {
         history = 10000;
       };
       font = {
-        size = 12;
+        size = 13;
         normal = {
           family = "${config.modules.desktop.font.family}";
           style = "Regular";

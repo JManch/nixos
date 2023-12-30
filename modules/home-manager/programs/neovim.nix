@@ -15,8 +15,7 @@ lib.mkIf cfg.enable {
     nil
     # Formatters
     stylua
-    # nixpkgs-fmt
-    alejandra
+    nixpkgs-fmt
   ];
 
   programs.ripgrep.enable = true;

@@ -1,5 +1,12 @@
 {
   imports = [
-    ./fan2go.nix
+    ./core
+    ./hardware
+    ./system
+    ./special
+    ./programs
+    ./services
+    ./upstream
+    ./options
   ];
 }

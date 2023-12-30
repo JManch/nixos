@@ -1,6 +1,7 @@
 {
   imports = [
-    ./font.nix
-    ./monitors.nix
+    ./desktop
+    ./programs
+    ./shell
   ];
 }

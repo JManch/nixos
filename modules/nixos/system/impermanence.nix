@@ -14,6 +14,11 @@ in
     inputs.impermanence.nixosModules.impermanence
   ];
 
+  programs.zsh.shellAliases = {
+    # List all files that will be lost on shutdown
+    impermanence = ''sudo fd --base-directory / -a -tf -H -E "{$(findmnt -n -o TARGET --list -t zfs | sed 's/^.//' | tr '\n' ',' | sed 's/.$//'),proc,sys,run,dev,tmp,boot}"'';
+  };
+
   environment.persistence."/persist" = {
     hideMounts = true;
     directories = [
@@ -42,6 +47,7 @@ in
         "files"
         ".config/nixos"
         ".cache/nix"
+        ".cache/fontconfig"
         {
           directory = ".ssh";
           mode = "0700";
@@ -62,6 +68,7 @@ in
       ++ optionals cfg.neovim [
         ".config/nvim"
         ".local/share/nvim"
+        ".local/state/nvim"
         ".cache/nvim"
       ]
       ++ optional (config.device.gpu == "nvidia") ".cache/nvidia"

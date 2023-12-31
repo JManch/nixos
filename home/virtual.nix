@@ -1,17 +1,24 @@
-{ lib, ... }: {
+{
   imports = [
-    ./global.nix
-
-    ./shell
-    ./programs/alacritty.nix
-    ./programs/neovim.nix
-    ./programs/btop.nix
-    ./programs/git.nix
-    ./programs/firefox.nix
+    ./core.nix
   ];
 
-  programs.alacritty.settings.window = {
-    decorations = lib.mkForce "full";
-    opacity = lib.mkForce 1;
+  modules = {
+    shell.enable = true;
+
+    desktop = {
+      anyrun.enable = true;
+      waybar.enable = true;
+    };
+
+    programs = {
+      alacritty.enable = true;
+      btop.enable = true;
+      cava.enable = true;
+      firefox.enable = true;
+      git.enable = true;
+      neovim.enable = true;
+      fastfetch.enable = true;
+    };
   };
 }

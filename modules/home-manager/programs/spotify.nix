@@ -20,7 +20,7 @@ in
         name = "text";
         src = pkgs.fetchgit {
           url = "https://github.com/JManch/spicetify-themes";
-          sha256 = "sha256-0mWevxdbNCQibLir4KdgFZ9RX74NTm9qwWFd00J6pDw=";
+          sha256 = "sha256-WvQNRUD9mfH9/yPX6WzpJGTXPNLpYjz3iMhZqYlmFOM=";
         };
         injectCss = true;
         replaceColors = true;

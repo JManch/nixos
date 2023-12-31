@@ -32,10 +32,6 @@
   };
 
   colorscheme = inputs.nix-colors.colorSchemes.ayu-mirage;
-  modules.desktop.font = {
-    family = "FiraCode Nerd Font";
-    package = pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; };
-  };
 
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";

@@ -12,6 +12,7 @@
       url = "git+ssh://git@github.com/JManch/nix-resources";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     anyrun = {
       url = "github:Kirottu/anyrun";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -25,6 +26,7 @@
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
 
     spicetify-nix = {

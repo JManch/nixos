@@ -26,6 +26,7 @@ in
         type = types.str;
         description = "Size of the volatile root tmpfs partition";
         example = "4G";
+        default = "1G";
       };
     };
   };

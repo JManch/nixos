@@ -27,7 +27,7 @@ let
       };
       position = mkOption {
         type = types.str;
-        example = "0x0";
+        default = "0x0";
         description = "Relative position of the monitor from the top left corner";
       };
       enabled = mkOption {
@@ -56,6 +56,7 @@ in
 
     gpu = mkOption {
       type = with types; nullOr (enum [ "nvidia" "amd" ]);
+      default = null;
       description = "The device's GPU manufacturer";
     };
 

@@ -32,10 +32,7 @@ in
 
     audio = {
       enable = mkEnableOption "Pipewire audio";
-      extraAudioTools = mkOption {
-        type = types.bool;
-        description = "Whether to install extra audio tools including Easyeffects and Helvum";
-      };
+      extraAudioTools = mkEnableOption "extra audio tools including Easyeffects and Helvum";
     };
 
     virtualisation = {

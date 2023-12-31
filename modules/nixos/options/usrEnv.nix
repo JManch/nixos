@@ -1,5 +1,4 @@
 { lib
-, config
 , ...
 }:
 let
@@ -11,7 +10,7 @@ in
     desktop = {
       enable = mkEnableOption "have a desktop environment";
       compositor = mkOption {
-        type = with types; nullOr (enum [ "hyprland" ]);
+        type = with types; nullOr (enum [ ]);
         description = "The desktop compositor to use";
       };
     };

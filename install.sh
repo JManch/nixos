@@ -113,6 +113,11 @@ set -e
 chmod 600 /mnt/persist/etc/ssh/ssh_host_ed25519_key
 cp "$(dirname "$0")/hosts/$HOST/ssh_host_ed25519_key.pub" /mnt/persist/etc/ssh
 
+# Copy to home ssh dir for initial clone of private flakes
+mkdir ~/.ssh
+cp /mnt/persist/etc/ssh/ssh_host_ed25519_key.pub ~/.ssh/id_ed25519.pub
+cp /mnt/persist/etc/ssh/ssh_host_ed25519_key ~/.ssh/id_ed25519
+
 # Install
 mkdir -p /mnt/etc/nixos
 git clone https://github.com/JManch/dotfiles /mnt/etc/nixos

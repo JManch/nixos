@@ -10,7 +10,7 @@ in
     desktop = {
       enable = mkEnableOption "have a desktop environment";
       compositor = mkOption {
-        type = with types; nullOr (enum [ ]);
+        type = with types; nullOr (enum [ "hyprland" ]);
         description = "The desktop compositor to use";
       };
     };

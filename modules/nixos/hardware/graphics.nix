@@ -5,7 +5,7 @@ let
   amd = config.device.gpu == "amd";
   optional = lib.lists.optional;
 in
-{
+lib.mkIf (config.device.gpu != null) {
   # AMD Driver Explanation
   # There are two main AMD drivers: AMDVLK and RADV. AMDVLK is the offical open
   # source driver provided by AMD whilst RADV is made by Valve. Depending on

@@ -10,5 +10,5 @@
     inputs.agenix.packages.${pkgs.system}.default
   ];
 
-  age.secrets.joshuaPasswd.file = ../../../secrets/joshuaPasswd.age;
+  age.secrets.joshuaPasswd.file = ../../../secrets/joshua-passwd.age;
 }

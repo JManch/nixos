@@ -42,6 +42,7 @@
     , ...
     } @ inputs:
     let
+      inherit (self) outputs;
       systems = [ "x86_64-linux" ];
       username = "joshua";
 
@@ -63,7 +64,7 @@
           system = "x86_64-linux";
           specialArgs = {
             hostname = "ncase-m1";
-            inherit inputs username lib;
+            inherit inputs outputs username lib;
           };
           modules = [
             ./modules/nixos
@@ -75,7 +76,7 @@
           system = "x86_64-linux";
           specialArgs = {
             hostname = "virtual";
-            inherit inputs username lib;
+            inherit inputs outputs username lib;
           };
           modules = [
             ./modules/nixos

@@ -29,7 +29,6 @@
     };
 
     system = {
-      ssh.enable = true;
       networking = {
         tcpOptimisations = true;
         firewall.enable = false;

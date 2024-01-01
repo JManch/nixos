@@ -16,7 +16,6 @@ in
   options.modules.system = {
 
     ssh = {
-      enable = mkEnableOption "ssh";
       allowPasswordAuth = mkOption {
         type = types.bool;
         default = false;

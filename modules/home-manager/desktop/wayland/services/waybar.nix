@@ -34,7 +34,7 @@ lib.mkIf (isWayland && cfg.enable) {
         * {
             font-family: '${config.modules.desktop.font.family}';
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             min-height: 0px;
         }
 
@@ -117,13 +117,14 @@ lib.mkIf (isWayland && cfg.enable) {
     settings = {
       bar = {
         layer = "top";
-        height = 44;
+        height = 45;
         margin = "5";
         spacing = 17;
         "hyprland/workspaces" = {
           "on-click" = "activate";
           "sort-by-number" = true;
           "active-only" = false;
+          # TODO: Configure this modularly
           "persistent-workspaces" = {
             "1" = [
               "DP-2"

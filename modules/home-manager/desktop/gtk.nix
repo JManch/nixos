@@ -27,9 +27,13 @@ lib.mkIf osConfig.usrEnv.desktop.enable {
     };
   };
 
-  wayland.windowManager.hyprland.settings.env =
-    lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") [
-      "XCURSOR_THEME,Bibata-Modern-Classic"
+  wayland.windowManager.hyprland.settings = lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") {
+    env = [
+      "XCURSOR_THEME,${config.gtk.cursorTheme.name}"
       "XCURSOR_SIZE,${builtins.toString config.modules.desktop.cursorSize}"
     ];
+    exec-once = [
+      "hyprctl setcursor ${config.gtk.cursorTheme.name} ${builtins.toString config.modules.desktop.cursorSize}"
+    ];
+  };
 }

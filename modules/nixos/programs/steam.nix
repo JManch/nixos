@@ -14,4 +14,11 @@ lib.mkIf (config.modules.programs.steam.enable) {
   hardware = {
     steam-hardware.enable = true;
   };
+
+  environment.persistence."/persist".users.${username} = {
+    directories = [
+      ".steam"
+      ".local/share/Steam"
+    ];
+  };
 }

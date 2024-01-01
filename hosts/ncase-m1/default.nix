@@ -65,10 +65,10 @@
         enable = true;
         launchCmd = "Hyprland";
       };
+      syncthing.enable = true;
     };
 
     system = {
-      ssh.enable = true;
       windowsBootEntry.enable = true;
       networking = {
         tcpOptimisations = true;

@@ -5,6 +5,7 @@ in
 {
   imports = [
     ./greetd.nix
+    ./syncthing.nix
   ];
 
   options.modules.services = {
@@ -16,6 +17,12 @@ in
         description = "Login launch command";
         example = "Hyprland";
       };
+    };
+
+    syncthing = {
+      enable = mkEnableOption "syncthing";
+      # Only one host in a syncthing net should have this enabled
+      shareNotes = mkEnableOption "share notes directory";
     };
 
   };

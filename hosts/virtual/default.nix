@@ -7,25 +7,11 @@
     type = "vm";
     cpu = "vm-amd";
     gpu = null;
-    monitors = [
-      {
-        name = "UNKNOWN";
-        number = 1;
-        refreshRate = 59.951;
-        width = 1920;
-        height = 1080;
-        position = "0x0";
-        workspaces = [ 1 2 3 4 5 6 7 8 9 ];
-      }
-    ];
   };
 
   usrEnv = {
     homeManager.enable = true;
-    desktop = {
-      enable = true;
-      compositor = "hyprland";
-    };
+    desktop.enable = false;
   };
 
   modules = {
@@ -39,10 +25,7 @@
     };
 
     services = {
-      greetd = {
-        enable = false;
-        launchCmd = "Hyprland";
-      };
+      greetd.enable = false;
     };
 
     system = {
@@ -58,7 +41,6 @@
         starship = true;
         neovim = true;
         lazygit = true;
-        swww = true;
       };
     };
   };

@@ -6,11 +6,6 @@
   modules = {
     shell.enable = true;
 
-    desktop = {
-      anyrun.enable = true;
-      waybar.enable = true;
-    };
-
     programs = {
       alacritty.enable = true;
       btop.enable = true;

@@ -9,6 +9,4 @@
   environment.systemPackages = [
     inputs.agenix.packages.${pkgs.system}.default
   ];
-
-  age.secrets.joshuaPasswd.file = ../../../secrets/joshua-passwd.age;
 }

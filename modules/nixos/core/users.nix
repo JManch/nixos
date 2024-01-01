@@ -3,6 +3,7 @@
 , username
 , ...
 }: {
+  age.secrets.joshuaPasswd.file = ../../../secrets/passwds/joshua.age;
   users.mutableUsers = false;
   users.users = {
     ${username} = {

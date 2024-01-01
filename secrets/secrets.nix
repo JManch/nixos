@@ -4,5 +4,5 @@ let
   virtual = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIRMA3ZtwZr/w9QG7iFfWFFSCAIjxw0XSejZPGHdYCzW root@virtual";
 in
 {
-  "joshuaPasswd.age".publicKeys = [ ncase-m1 virtual joshua ];
+  "joshua-passwd.age".publicKeys = [ ncase-m1 virtual joshua ];
 }

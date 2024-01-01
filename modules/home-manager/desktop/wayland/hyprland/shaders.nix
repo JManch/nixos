@@ -17,7 +17,7 @@ lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") {
           // Apply gamma adjustment to monitor
           if (output == 1) {
               vec4 pixColor = texture2D(tex, v_texcoord);
-              pixColor.rgb = pow(pixColor.rgb, vec3(1.0 / 0.7));
+              pixColor.rgb = pow(pixColor.rgb, vec3(1.0 / 0.75));
               gl_FragColor = pixColor;
           } else {
               gl_FragColor = texture2D(tex, v_texcoord);

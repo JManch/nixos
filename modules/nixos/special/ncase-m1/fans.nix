@@ -52,40 +52,80 @@ in
     enable = true;
     systemd.enable = true;
     settings = {
-      fans = {
-        id = "gpu";
-        hwmon = {
-          platform = "it${chipID}-*";
-          rpmChannel = 2;
-        };
-        neverStop = false;
-        curve = "gpu_curve";
-      };
-      sensors = {
-        id = "gpu_temp";
-        cmd = {
-          exec = "${pkgs.bash}/bin/sh";
-          args = [ "${gpuTemp.outPath}" ];
-        };
-      };
-      curves = {
-        id = "gpu_curve";
-        linear = {
-          sensor = "gpu_temp";
-          min = 40;
-          max = 80;
-          steps = [
-            { "0" = 76; }
-            { "40" = 76; }
-            { "50" = 102; }
-            { "60" = 128; }
-            { "70" = 153; }
-            { "76" = 184; }
-            { "80" = 230; }
-            { "90" = 255; }
-          ];
-        };
-      };
+      fans = [
+        {
+          id = "gpu";
+          hwmon = {
+            platform = "it${chipID}-*";
+            rpmChannel = 2;
+          };
+          neverStop = false;
+          curve = "gpu_curve";
+        }
+        {
+          id = "cpu";
+          hwmon = {
+            platform = "it${chipID}-*";
+            rpmChannel = 3;
+          };
+          neverStop = false;
+          curve = "cpu_curve";
+        }
+      ];
+      sensors = [
+        {
+          id = "gpu_temp";
+          cmd = {
+            exec = "${pkgs.bash}/bin/sh";
+            args = [ "${gpuTemp.outPath}" ];
+          };
+        }
+        {
+          id = "cpu_temp";
+          hwmon = {
+            platform = "k10temp-*";
+            index = 1;
+          };
+        }
+      ];
+      curves = [
+        {
+          id = "gpu_curve";
+          linear = {
+            sensor = "gpu_temp";
+            min = 40;
+            max = 90;
+            steps = [
+              { "0" = 76; }
+              { "40" = 76; }
+              { "50" = 102; }
+              { "60" = 128; }
+              { "70" = 153; }
+              { "76" = 184; }
+              { "80" = 230; }
+              { "90" = 255; }
+            ];
+          };
+        }
+        {
+          id = "cpu_curve";
+          linear = {
+            sensor = "cpu_temp";
+            min = 40;
+            max = 90;
+            steps = [
+              { "0" = 51; }
+              { "40" = 51; }
+              { "50" = 77; }
+              { "58" = 102; }
+              { "62" = 130; }
+              { "65" = 165; }
+              { "70" = 204; }
+              { "90" = 255; }
+            ];
+          };
+        }
+      ];
     };
   };
 }

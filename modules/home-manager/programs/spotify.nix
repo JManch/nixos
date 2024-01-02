@@ -1,5 +1,6 @@
 { inputs
 , config
+, osConfig
 , pkgs
 , lib
 , ...
@@ -66,5 +67,8 @@ in
         }
       ];
     };
+
+    wayland.windowManager.hyprland.settings.windowrulev2 = lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland")
+      [ "bordercolor 0xff${config.colorscheme.colors.base0B}, initialTitle:^(Spotify( Premium)?)$" ];
   };
 }

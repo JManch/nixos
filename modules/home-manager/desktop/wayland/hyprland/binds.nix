@@ -76,7 +76,7 @@ in
     ];
     # Order-sensitive config has to go here
     extraConfig = ''
-      ${mod}, R, submap, resize
+      bind = ${mod}, R, submap, resize
       submap = resize
       binde=, L, resizeactive, 20 0
       binde=, H, resizeactive, -20 0

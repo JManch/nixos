@@ -7,13 +7,13 @@
 lib.mkIf config.modules.shell.enable {
   home.packages = with pkgs; [
     fd
+    bat
   ];
 
   home.sessionVariables = {
     COLORTERM = "truecolor";
   };
 
-  # TODO: Enable fzf zsh support in fzf module
   programs.zsh = {
     enable = true;
     dotDir = ".config/zsh";
@@ -40,19 +40,15 @@ lib.mkIf config.modules.shell.enable {
       reload = "exec ${config.programs.zsh.package}/bin/zsh";
       rebuild-home = "home-manager switch --flake ~/.config/nixos#${username}";
     };
-    initExtra =
-      /*
-      bash
-      */
-      ''
-        setopt interactivecomments
+    initExtra = /* bash */ ''
+      setopt interactivecomments
 
-        reboot () {
-          read -q "REPLY?Are you sure you want to reboot? (y/n)"
-          if [[ $REPLY =~ ^[Yy]$ ]]; then
-            ${pkgs.systemd}/bin/reboot
-          fi
-        }
-      '';
+      reboot () {
+        read -q "REPLY?Are you sure you want to reboot? (y/n)"
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          ${pkgs.systemd}/bin/reboot
+        fi
+      }
+    '';
   };
 }

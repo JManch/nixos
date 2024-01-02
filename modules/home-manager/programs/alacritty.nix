@@ -33,12 +33,12 @@ lib.mkIf cfg.enable {
       };
       colors = {
         primary = {
-          background = "#${config.colorscheme.colors.base01}";
+          background = "#${config.colorscheme.colors.base00}";
           foreground = "#${config.colorscheme.colors.base05}";
           bright_foreground = "#${config.colorscheme.colors.base06}";
         };
         normal = {
-          black = "#${config.colorscheme.colors.base00}";
+          black = "#${config.colorscheme.colors.base02}";
           red = "#${config.colorscheme.colors.base08}";
           green = "#${config.colorscheme.colors.base0B}";
           yellow = "#${config.colorscheme.colors.base0A}";

@@ -1,4 +1,6 @@
-{ lib, ... }:
+{ lib
+, ...
+}:
 let
   inherit (lib) mkEnableOption mkOption types;
 in
@@ -21,8 +23,14 @@ in
 
     syncthing = {
       enable = mkEnableOption "syncthing";
-      # Only one host in a syncthing net should have this enabled
-      shareNotes = mkEnableOption "share notes directory";
+      server = mkOption {
+        type = types.bool;
+        description = ''
+          Whether to act as the main syncthing server and share folders. Only
+          one device in a syncthing network should have this enabled.
+        '';
+        default = false;
+      };
     };
 
   };

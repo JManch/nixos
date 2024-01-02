@@ -2,38 +2,35 @@
 , config
 , username
 , hostname
+, pkgs
 , ...
 }:
 let
   cfg = config.modules.services.syncthing;
   syncthingDir = "/var/lib/syncthing";
+  mountServiceName = (builtins.replaceStrings [ "/" ] [ "-" ] (builtins.substring 1 ((builtins.stringLength syncthingDir) - 1) syncthingDir)) + ".mount";
+  isNotServer = (config.device.type != "server");
 
   devices = lib.attrsets.filterAttrs (h: _: h != hostname) {
     "ncase-m1" = {
       id = "HOHYHMW-A2QUJEL-NYOIKNF-GOQA5I5-NGDOLKH-BE5P7EP-T4RCN37-EE2FOA2";
       name = "NCASE-M1-NixOS";
-      # WARN: This setting breaks new folder permissions in the current version
-      # of syncthing. Folders that are auto accepted will have the permission
-      # 700 no matter what. If you're using a dedicated syncthing user, this
-      # makes them inaccessible from your normal user. I'm not sure if this is
-      # a bug with syncthing or my own idiocy but for now I'm applying a patch
-      # to syncthing that changes the default folder permission to 770.
-
-      # Can't set this anyway cause need to be able to disable permissions of
-      # newly added folders and the most reliable time to do this is when
-      # adding them
+      # This option would be nice but we can't use it because there's no way to
+      # declaratively configure shared folders we recieve. This just auto
+      # accepts the folders with some default settings. Also, it forces shared
+      # folders to have 700 permission mask which makes accessing shared files
+      # from our own user impossible.
       autoAcceptFolders = false;
     };
     "homelab" = {
       id = "YIEJ6FN-YOYO5V7-K4BXYDC-P26CQKL-SSV2P7Z-CORFJTZ-QIX2XSU-GMNVEAV";
       name = "HOMELAB";
-      autoAcceptFolders = false;
     };
   };
 
   folders = {
     "notes" = {
-      enable = cfg.shareNotes;
+      enable = cfg.server;
       path = "${syncthingDir}/notes";
       ignorePerms = true;
       # Share to all other devices
@@ -49,41 +46,68 @@ let
   };
 in
 lib.mkIf (cfg.enable) {
-  # NOTE: Use the syncthing generate command for generating an initial key on
-  # new deployments. Setup of a pre-configured deployment requires opening the
-  # syncthing interface at http://localhost:8384, adding the shared folder and
-  # enabling 'Ignore Permissions' under advanced settings.
 
-  # https://nitinpassa.com/running-syncthing-as-a-system-user-on-nixos/ https://archive.is/BgIQt
-  # WARN: Downside of this setup is that if I move files or folders into a sync
-  # dir, their group will not automatically be updated and syncthing will not
-  # track them. Can be worked around with some sort of time task.
+  # --- Deployment Instructions ---
+  # 1. For a new device, generate cert and key with `syncthing generate` then
+  # add to agenix.
+  # 2. Open http://localhost:8384 and add shared folders with staggered version
+  # and ignore permissions enabled.
 
-  # Ideally the home-manager module would have feature-parity with the system
-  # syncthing module, then I wouldn't have to mess with permissions.
+  # If the device is a server, syncthing files will not be accessible from the
+  # main user account.
+  # If the device is not a server, we apply a bunch of permission rules to
+  # ensure that files and directories created in shared folders belong to group
+  # 'syncthing' and have a 777 group permission mask. That way our main user
+  # can create files in shared folders and syncthing will be able to access
+  # them.
 
-  # So our user can access syncthing files
-  users.users.${username}.extraGroups = [ "syncthing" ];
-  systemd.services.syncthing.serviceConfig.UMask = "0007";
-  systemd.tmpfiles.rules = [
-    "d ${syncthingDir} 0750 ${username} syncthing"
+  # WARN: Downside of this setup is that if I move files or folders into a
+  # synced dir, their group will not automatically be updated and syncthing
+  # will not track them. Can be worked around with some sort of scheduled
+  # systemd task that updates permissions.
+
+  # Add main user to the syncthing group
+  users.users.${username}.extraGroups = lib.mkIf isNotServer [ "syncthing" ];
+  systemd.services.syncthing.serviceConfig = lib.mkMerge [
+    {
+      # Ensure syncthing service starts after persist bind mount
+      After = [ "${mountServiceName}" ];
+      Requires = [ "${mountServiceName}" ];
+    }
+    (lib.mkIf isNotServer {
+      UMask = "0007";
+      # https://serverfault.com/questions/349145/can-i-override-my-umask-using-acls-to-make-all-files-created-in-a-given-director
+      # Set ACL on shared folders (tip: manually remove acl with setfacl -b -d DIR)
+      # This ensure that any directories or files created in shared folders will have full syncthing group permissions
+      # (the + ensures the command runs as root even though the service runs as the syncthing user)
+      ExecStartPost = "+${
+        lib.concatStringsSep ";"
+        (lib.lists.map (folder: "${pkgs.acl}/bin/setfacl -d -m mask:07 /persist${syncthingDir}/${folder}") (builtins.attrNames folders))
+        }";
+    })
   ];
-  # For some reason I don't need to set gid flag?
-  # systemd.tmpfiles.rules = lib.lists.map
-  #   (folder: "d ${syncthingDir}/${folder} 2770 ${username} syncthing")
-  #   (builtins.attrNames folders);
+
+  systemd.tmpfiles.rules = lib.mkIf isNotServer (
+    # Apply setgid bit on shared folders
+    # This ensures that any directories or files created in shared folders will be part of the syncthing group
+    (lib.lists.map
+      (folder: "d /persist${syncthingDir}/${folder} 2770 ${username} syncthing")
+      (builtins.attrNames folders))
+    # Apply access permissions to root share folder
+    ++ [ "d /persist${syncthingDir} 0750 ${username} syncthing" ]
+  );
 
   # Load agenix cert and key for current host 
   age.secrets = {
     syncthingCert = {
       file = ../../../secrets/syncthing/${hostname}/cert.age;
-      mode = "770";
+      mode = "400";
       owner = "syncthing";
       group = "syncthing";
     };
     syncthingKey = {
       file = ../../../secrets/syncthing/${hostname}/key.age;
-      mode = "770";
+      mode = "400";
       owner = "syncthing";
       group = "syncthing";
     };
@@ -110,7 +134,7 @@ lib.mkIf (cfg.enable) {
   environment.persistence."/persist" = {
     directories = [
       {
-        directory = "/var/lib/syncthing";
+        directory = syncthingDir;
         user = "syncthing";
         group = "syncthing";
         mode = "u=rwx,g=rwx,o=";

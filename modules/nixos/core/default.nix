@@ -3,6 +3,7 @@
 , lib
 , pkgs
 , hostname
+, username
 , ...
 }: {
   imports = [
@@ -62,9 +63,10 @@
   programs.zsh = {
     enable = true;
     shellAliases = {
-      rebuild-switch = "sudo nixos-rebuild switch --flake ~/.config/nixos#${hostname}";
-      rebuild-build = "sudo nixos-rebuild build --flake ~/.config/nixos#${hostname}";
-      rebuild-boot = "sudo nixos-rebuild boot --flake ~/.config/nixos#${hostname}";
+      rebuild-switch = "sudo nixos-rebuild switch --flake /home/${username}/.config/nixos#${hostname}";
+      rebuild-build = "sudo nixos-rebuild build --flake /home/${username}/.config/nixos#${hostname}";
+      rebuild-boot = "sudo nixos-rebuild boot --flake /home/${username}/.config/nixos#${hostname}";
+      inspect-nix-config = "nix --extra-experimental-features repl-flake repl '/home/${username}/.config/nixos#nixosConfigurations.${hostname}'";
     };
   };
 

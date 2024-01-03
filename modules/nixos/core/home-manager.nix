@@ -11,7 +11,7 @@
 
   config = lib.mkIf config.usrEnv.homeManager.enable {
     home-manager = {
-      extraSpecialArgs = { inherit inputs username hostname; osConfig = config; };
+      extraSpecialArgs = { inherit inputs username hostname; };
       useGlobalPkgs = true;
       useUserPackages = true;
       users = {

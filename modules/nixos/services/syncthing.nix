@@ -122,7 +122,8 @@ lib.mkIf (cfg.enable) {
     openDefaultPorts = true;
     settings = {
       overrideDevices = true;
-      overrideFolders = true;
+      # Disable this on non-servers as the folder has to be manually added
+      overrideFolders = !isNotServer;
       devices = devices;
       folders = folders;
       options = {

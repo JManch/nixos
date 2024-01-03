@@ -1,6 +1,6 @@
 { inputs
 , config
-, osConfig
+, nixosConfig
 , pkgs
 , lib
 , ...
@@ -68,7 +68,12 @@ in
       ];
     };
 
-    wayland.windowManager.hyprland.settings.windowrulev2 = lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland")
+    impermanence.directories = [
+      ".cache/spotify"
+      ".config/spotify"
+    ];
+
+    wayland.windowManager.hyprland.settings.windowrulev2 = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland")
       [ "bordercolor 0xff${config.colorscheme.colors.base0B}, initialTitle:^(Spotify( Premium)?)$" ];
   };
 }

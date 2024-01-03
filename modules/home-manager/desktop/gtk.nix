@@ -1,10 +1,10 @@
 { pkgs
 , config
-, osConfig
+, nixosConfig
 , lib
 , ...
 }:
-lib.mkIf osConfig.usrEnv.desktop.enable {
+lib.mkIf nixosConfig.usrEnv.desktop.enable {
   gtk = {
     enable = true;
     theme = {
@@ -27,7 +27,7 @@ lib.mkIf osConfig.usrEnv.desktop.enable {
     };
   };
 
-  wayland.windowManager.hyprland.settings = lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") {
+  wayland.windowManager.hyprland.settings = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland") {
     env = [
       "XCURSOR_THEME,${config.gtk.cursorTheme.name}"
       "XCURSOR_SIZE,${builtins.toString config.modules.desktop.cursorSize}"

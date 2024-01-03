@@ -1,6 +1,6 @@
 { pkgs
 , config
-, osConfig
+, nixosConfig
 , lib
 , ...
 }:
@@ -8,7 +8,7 @@ let
   inherit (lib) mkIf;
   cfg = config.modules.desktop.swayidle;
   cfgParent = config.modules.desktop;
-  isWayland = lib.validators.isWayland osConfig;
+  isWayland = lib.validators.isWayland nixosConfig;
 
   pgrep = "${pkgs.procps}/bin/pgrep";
   hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";

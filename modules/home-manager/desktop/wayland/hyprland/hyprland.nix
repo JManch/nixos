@@ -1,26 +1,25 @@
 { config
-, osConfig
+, nixosConfig
 , inputs
 , pkgs
 , lib
 , ...
 }:
 let
-  desktopCfg = osConfig.usrEnv.desktop;
+  desktopCfg = nixosConfig.usrEnv.desktop;
 in
 lib.mkIf (desktopCfg.enable && desktopCfg.compositor == "hyprland") {
   modules.desktop.sessionTarget = "hyprland-session.target";
 
   home.packages = with pkgs; [
     hyprshot
-    swww
     wl-clipboard
     xclip # For xwayland apps
   ];
 
   assertions = [
     {
-      assertion = (lib.length osConfig.device.monitors) != 0;
+      assertion = (lib.length nixosConfig.device.monitors) != 0;
       message = "Monitors must be configured to use Hyprland.";
     }
   ];
@@ -36,7 +35,7 @@ lib.mkIf (desktopCfg.enable && desktopCfg.compositor == "hyprland") {
         "XDG_SESSION_DESKTOP=Hyprland"
         "WLR_NO_HARDWARE_CURSORS,1"
         "HYPRSHOT_DIR,${config.xdg.userDirs.pictures}/screenshots"
-      ] ++ lib.lists.optionals (osConfig.device.gpu == "nvidia") [
+      ] ++ lib.lists.optionals (nixosConfig.device.gpu == "nvidia") [
         "LIBVA_DRIVER_NAME,nvidia"
         "GBM_BACKEND,nvidia-drm"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
@@ -54,12 +53,11 @@ lib.mkIf (desktopCfg.enable && desktopCfg.compositor == "hyprland") {
               "${builtins.toString m.width}x${builtins.toString m.height}@${builtins.toString m.refreshRate}, ${m.position}, 1"
           )
         )
-        osConfig.device.monitors;
+        nixosConfig.device.monitors;
 
       # Launch apps
       exec-once = [
-        "hyprctl dispatch focusmonitor ${(lib.fetchers.getMonitorByNumber osConfig 1).name}"
-        "sleep 1 && ${pkgs.swww}/bin/swww init"
+        "hyprctl dispatch focusmonitor ${(lib.fetchers.getMonitorByNumber nixosConfig 1).name}"
         # Temporary and buggy fix for fixing pasting into wine applications
         # Can remove xclip package once this is fixed
         # https://github.com/hyprwm/Hyprland/issues/2319
@@ -145,7 +143,7 @@ lib.mkIf (desktopCfg.enable && desktopCfg.compositor == "hyprland") {
               m.workspaces
           )
         )
-        osConfig.device.monitors;
+        nixosConfig.device.monitors;
     };
   };
 }

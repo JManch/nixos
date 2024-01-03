@@ -1,12 +1,12 @@
 { config
-, osConfig
+, nixosConfig
 , lib
 , hostname
 , ...
 }:
 let
   cfg = config.modules.desktop.waybar;
-  isWayland = lib.validators.isWayland osConfig;
+  isWayland = lib.validators.isWayland nixosConfig;
 in
 lib.mkIf (isWayland && cfg.enable) {
   programs.waybar = {

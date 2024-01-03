@@ -1,5 +1,5 @@
 { config
-, osConfig
+, nixosConfig
 , lib
 , ...
 }:
@@ -96,6 +96,12 @@ lib.mkIf cfg.enable {
       };
     };
   };
-  desktop.hyprland.binds = lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland")
+
+  impermanence.directories = [
+    ".mozilla"
+    ".cache/mozilla"
+  ];
+
+  desktop.hyprland.binds = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland")
     [ "${config.modules.desktop.hyprland.modKey}, Backspace, exec, ${binary}" ];
 }

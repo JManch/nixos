@@ -1,5 +1,5 @@
 { config
-, osConfig
+, nixosConfig
 , lib
 , ...
 }:
@@ -60,6 +60,6 @@ lib.mkIf cfg.enable {
       };
     };
   };
-  desktop.hyprland.binds = lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland")
+  desktop.hyprland.binds = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland")
     [ "${config.modules.desktop.hyprland.modKey}, Return, exec, ${binary}" ];
 }

@@ -1,5 +1,5 @@
 { config
-, osConfig
+, nixosConfig
 , pkgs
 , lib
 , ...
@@ -10,10 +10,10 @@ let
   mod = cfg.modKey;
   modShift = "${cfg.modKey}SHIFT";
   modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
-  getMonitorByNumber = number: lib.fetchers.getMonitorByNumber osConfig number;
+  getMonitorByNumber = number: lib.fetchers.getMonitorByNumber nixosConfig number;
 in
 {
-  wayland.windowManager.hyprland = lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") {
+  wayland.windowManager.hyprland = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland") {
     settings.bind =
       [
         # General

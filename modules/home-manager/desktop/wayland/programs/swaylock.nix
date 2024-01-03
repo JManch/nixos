@@ -1,19 +1,19 @@
 { pkgs
 , config
-, osConfig
+, nixosConfig
 , lib
 , ...
 }:
 let
   inherit (config.colorscheme) colors;
   cfg = config.modules.desktop.swaylock;
-  isWayland = lib.validators.isWayland osConfig;
+  isWayland = lib.validators.isWayland nixosConfig;
   lockScript = pkgs.writeShellScript "lock-script" config.modules.desktop.swaylock.lockScript;
 in
 lib.mkIf (isWayland && cfg.enable) {
   assertions = [
     {
-      assertion = (lib.length osConfig.device.monitors) != 0;
+      assertion = (lib.length nixosConfig.device.monitors) != 0;
       message = "A primary monitor must be configured for Swayidle.";
     }
   ];
@@ -39,8 +39,8 @@ lib.mkIf (isWayland && cfg.enable) {
 
       indicator = true;
       indicator-caps-lock = true;
-      indicator-y-position = builtins.floor ((lib.fetchers.primaryMonitor osConfig).height * 0.5);
-      indicator-radius = builtins.floor ((lib.fetchers.primaryMonitor osConfig).width * 0.04);
+      indicator-y-position = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).height * 0.5);
+      indicator-radius = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).width * 0.04);
 
       text-color = "#${colors.base07}";
 

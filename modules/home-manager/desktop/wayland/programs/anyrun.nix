@@ -1,12 +1,12 @@
 { inputs
 , pkgs
 , config
-, osConfig
+, nixosConfig
 , lib
 , ...
 }:
 let
-  isWayland = lib.validators.isWayland osConfig;
+  isWayland = lib.validators.isWayland nixosConfig;
   cfg = config.modules.desktop.anyrun;
 in
 {
@@ -88,7 +88,7 @@ in
       let
         modKey = config.modules.desktop.hyprland.modKey;
       in
-      lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") {
+      lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland") {
         bindr = [
           "${modKey}, ${modKey}_L, exec, anyrun"
         ];

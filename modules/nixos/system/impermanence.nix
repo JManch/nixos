@@ -1,13 +1,11 @@
 { inputs
+, outputs
 , username
-, lib
-, config
+, hostname
 , ...
 }:
 let
-  cfg = config.modules.system.impermanence;
-  optionals = lib.lists.optionals;
-  optional = lib.lists.optional;
+  homeManagerImpermanence = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username}.impermanence;
 in
 {
   imports = [
@@ -35,47 +33,7 @@ in
       "/etc/machine-id"
       "/etc/adjtime"
     ];
-    # It's not ideal to define home persistance here but has to be done
-    # for performance reasons https://redd.it/15xxqlj
-    users.${username} = {
-      directories = [
-        "downloads"
-        "pictures"
-        "music"
-        "videos"
-        "repos"
-        "files"
-        ".config/nixos"
-        ".cache/nix"
-        ".cache/fontconfig"
-        {
-          directory = ".ssh";
-          mode = "0700";
-        }
-      ]
-      ++ optionals cfg.zsh [
-        ".local/state/zsh"
-        ".cache/zsh"
-      ]
-      ++ optionals cfg.firefox [
-        ".mozilla"
-        ".cache/mozilla"
-      ]
-      ++ optionals cfg.spotify [
-        ".cache/spotify"
-        ".config/spotify"
-      ]
-      ++ optionals cfg.neovim [
-        ".config/nvim"
-        ".local/share/nvim"
-        ".local/state/nvim"
-        ".cache/nvim"
-      ]
-      ++ optional (config.device.gpu == "nvidia") ".cache/nvidia"
-      ++ optional cfg.swww ".cache/swww"
-      ++ optional cfg.discord ".config/discord"
-      ++ optional cfg.starship ".cache/starship";
-      files = optional cfg.lazygit ".config/lazygit/state.yml";
-    };
+    # Take this config from our home-manager module
+    users.${username} = homeManagerImpermanence;
   };
 }

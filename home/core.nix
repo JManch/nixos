@@ -31,6 +31,17 @@
     videos = "${config.home.homeDirectory}/videos";
   };
 
+  impermanence.directories = [
+    "downloads"
+    "pictures"
+    "music"
+    "videos"
+    "repos"
+    "files"
+    ".config/nixos"
+    ".cache/nix"
+  ];
+
   colorscheme = inputs.nix-colors.colorSchemes.ayu-mirage;
   # base00: "#171B24"
   # base01: "#1F2430"

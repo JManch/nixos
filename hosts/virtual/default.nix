@@ -34,13 +34,6 @@
         firewall.enable = false;
         resolved.enable = true;
       };
-      impermanence = {
-        zsh = true;
-        firefox = true;
-        starship = true;
-        neovim = true;
-        lazygit = true;
-      };
     };
   };
 

@@ -38,17 +38,6 @@ in
       enable = mkEnableOption "virtualisation";
     };
 
-    impermanence = {
-      zsh = mkEnableOption "ZSH impermanence";
-      firefox = mkEnableOption "Firefox impermanence";
-      spotify = mkEnableOption "Spotify impermanence";
-      starship = mkEnableOption "Starship impermanence";
-      neovim = mkEnableOption "Neovim impermanence";
-      swww = mkEnableOption "Swww impermanence";
-      discord = mkEnableOption "Discord impermanence";
-      lazygit = mkEnableOption "Lazygit impermanence";
-    };
-
     windowsBootEntry = {
       enable = mkEnableOption "Windows boot menu entry";
     };

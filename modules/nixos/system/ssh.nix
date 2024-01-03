@@ -1,4 +1,5 @@
 { config
+, username
 , ...
 }:
 {
@@ -23,4 +24,12 @@
   };
 
   security.pam.enableSSHAgentAuth = true;
+
+  environment.persistence."/persist".users.${username}.directories =
+    [
+      {
+        directory = ".ssh";
+        mode = "0700";
+      }
+    ];
 }

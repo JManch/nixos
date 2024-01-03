@@ -42,4 +42,8 @@ lib.mkIf cfg.enable {
       }
     '';
   };
+
+  impermanence.files = [
+    ".config/lazygit/state.yml"
+  ];
 }

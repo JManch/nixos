@@ -51,4 +51,9 @@ lib.mkIf config.modules.shell.enable {
       }
     '';
   };
+
+  impermanence.directories = [
+    ".local/state/zsh"
+    ".cache/zsh"
+  ];
 }

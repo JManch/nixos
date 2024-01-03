@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{ config
+, pkgs
+, lib
+, username
+, ...
+}:
 let
   inherit (lib) mkIf;
   nvidia = config.device.gpu == "nvidia";
@@ -32,4 +37,9 @@ lib.mkIf (config.device.gpu != null) {
     open = true;
     nvidiaSettings = !(lib.validators.isWayland config);
   };
+
+  environment.persistence."/persist".users.${username}.directories =
+    mkIf (config.device.gpu == "nvidia") [
+      ".cache/nvidia"
+    ];
 }

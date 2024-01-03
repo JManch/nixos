@@ -32,4 +32,8 @@ lib.mkIf config.modules.shell.enable {
       memory_usage.disabled = true;
     };
   };
+
+  impermanence.directories = [
+    ".cache/starship"
+  ];
 }

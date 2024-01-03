@@ -27,5 +27,12 @@ lib.mkIf cfg.enable {
     vimAlias = true;
   };
 
+  impermanence.directories = [
+    ".config/nvim"
+    ".local/share/nvim"
+    ".local/state/nvim"
+    ".cache/nvim"
+  ];
+
   home.sessionVariables.NIX_NEOVIM = 1;
 }

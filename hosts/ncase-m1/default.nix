@@ -80,16 +80,6 @@
         extraAudioTools = true;
       };
       virtualisation.enable = true;
-      impermanence = {
-        zsh = true;
-        firefox = true;
-        spotify = true;
-        starship = true;
-        neovim = true;
-        swww = true;
-        discord = true;
-        lazygit = true;
-      };
     };
   };
 

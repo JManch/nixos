@@ -8,7 +8,10 @@
 
   home.packages = with pkgs; [
     discord
+    mpv
   ];
+
+  programs.obs-studio.enable = true;
 
   modules = {
     shell.enable = true;
@@ -32,6 +35,7 @@
       };
       anyrun.enable = true;
       waybar.enable = true;
+      dunst.enable = true;
     };
 
     programs = {

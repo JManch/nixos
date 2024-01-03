@@ -118,7 +118,7 @@ lib.mkIf (isWayland && cfg.enable) {
       bar = {
         layer = "top";
         height = 45;
-        margin = "5";
+        margin = "10 10 0 10";
         spacing = 17;
         "hyprland/workspaces" = {
           "on-click" = "activate";

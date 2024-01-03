@@ -21,9 +21,10 @@ lib.mkIf (isWayland && cfg.enable) {
         monitor = "0";
         follow = "none";
         enable_posix_regex = true;
-        font = "${config.modules.desktop.font.family} 11";
+        font = "${config.modules.desktop.font.family} 13";
         icon_theme = config.gtk.iconTheme.name;
         show_indicators = true;
+        format = "<b>%s</b>\\n<span font='11'>%b</span>";
 
         # TODO: Move the corner radius for waybar and this into a global option
         corner_radius = 10;

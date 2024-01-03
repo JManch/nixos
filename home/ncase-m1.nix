@@ -1,5 +1,6 @@
 { pkgs
 , config
+, inputs
 , ...
 }: {
   imports = [
@@ -7,16 +8,17 @@
   ];
 
   home.packages = with pkgs; [
-    discord
     mpv
   ];
-
-  programs.obs-studio.enable = true;
 
   modules = {
     shell.enable = true;
 
     desktop = {
+      font = {
+        family = "BerkeleyMono Nerd Font";
+        package = inputs.nix-resources.packages.${pkgs.system}.berkeley-mono-nerdfont;
+      };
       swaylock = {
         enable = true;
         lockScript = ''
@@ -36,6 +38,7 @@
       anyrun.enable = true;
       waybar.enable = true;
       dunst.enable = true;
+      swww.enable = true;
     };
 
     programs = {
@@ -47,6 +50,8 @@
       neovim.enable = true;
       spotify.enable = true;
       fastfetch.enable = true;
+      discord.enable = true;
+      obs.enable = true;
     };
   };
 }

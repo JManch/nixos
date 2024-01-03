@@ -80,7 +80,7 @@ lib.mkIf (desktopCfg.enable && desktopCfg.compositor == "hyprland") {
       };
 
       decoration = {
-        rounding = 10;
+        rounding = 8;
 
         blur = {
           enabled = true;

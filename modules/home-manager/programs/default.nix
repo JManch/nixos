@@ -12,6 +12,8 @@ in
     ./neovim.nix
     ./spotify.nix
     ./fastfetch.nix
+    ./discord.nix
+    ./obs.nix
   ];
 
   options.modules.programs = {
@@ -30,5 +32,7 @@ in
     neovim.enable = mkEnableOption "Neovim";
     spotify.enable = mkEnableOption "Spotify";
     fastfetch.enable = mkEnableOption "Fastfetch";
+    discord.enable = mkEnableOption "Discord";
+    obs.enable = mkEnableOption "Obs";
   };
 }

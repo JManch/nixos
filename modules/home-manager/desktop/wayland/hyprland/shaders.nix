@@ -1,7 +1,12 @@
-{ osConfig
+{ config
+, osConfig
 , lib
 , ...
 }:
+let
+  cfg = config.modules.desktop.hyprland;
+in
+# TODO: Modularise this shader config. Should probably have a gamma setting per monitor.
 lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") {
   xdg.configFile."hypr/shaders/monitor1_gamma.frag".text =
     /*
@@ -39,4 +44,15 @@ lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") {
           gl_FragColor = pixColor;
       }
     '';
+
+  wayland.windowManager.hyprland.settings.bind =
+    let
+      hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+      blankShader = "${config.xdg.configHome}/hypr/shaders/blank.frag";
+      shader = "${config.xdg.configHome}/hypr/shaders/monitor1_gamma.frag";
+    in
+    [
+      "${cfg.modKey}, O, exec, ${hyprctl} keyword decoration:screen_shader ${blankShader}"
+      "${cfg.modKey}SHIFT, O, exec, ${hyprctl} keyword decoration:screen_shader ${shader}"
+    ];
 }

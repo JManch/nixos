@@ -88,7 +88,7 @@ in
       let
         modKey = config.modules.desktop.hyprland.modKey;
       in
-      {
+      lib.mkIf (osConfig.usrEnv.desktop.compositor == "hyprland") {
         bindr = [
           "${modKey}, ${modKey}_L, exec, anyrun"
         ];

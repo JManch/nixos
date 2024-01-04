@@ -68,24 +68,32 @@ lib.mkIf (cfg.enable) {
 
   # Add main user to the syncthing group
   users.users.${username}.extraGroups = lib.mkIf isNotServer [ "syncthing" ];
-  systemd.services.syncthing.serviceConfig = lib.mkMerge [
+  systemd.services.syncthing = lib.mkMerge [
     {
       # Ensure syncthing service starts after persist bind mount
-      After = [ "${mountServiceName}" ];
-      Requires = [ "${mountServiceName}" ];
+      after = [ "${mountServiceName}" ];
+      requires = [ "${mountServiceName}" ];
     }
     (lib.mkIf isNotServer {
-      UMask = "0007";
-      # https://serverfault.com/questions/349145/can-i-override-my-umask-using-acls-to-make-all-files-created-in-a-given-director
-      # Set ACL on shared folders (tip: manually remove acl with setfacl -b -d DIR)
-      # This ensure that any directories or files created in shared folders will have full syncthing group permissions
-      # (the + ensures the command runs as root even though the service runs as the syncthing user)
-      ExecStartPost = "+${
-        lib.concatStringsSep ";"
-        (lib.lists.map (folder: "${pkgs.acl}/bin/setfacl -d -m mask:07 /persist${syncthingDir}/${folder}") (builtins.attrNames folders))
+      serviceConfig = {
+        UMask = "0007";
+        # https://serverfault.com/questions/349145/can-i-override-my-umask-using-acls-to-make-all-files-created-in-a-given-director
+        # Set ACL on shared folders (tip: manually remove acl with setfacl -b -d DIR)
+        # This ensure that any directories or files created in shared folders will have full syncthing group permissions
+        # (the + ensures the command runs as root even though the service runs as the syncthing user)
+        ExecStartPost = "+${
+          lib.concatStringsSep ";"
+          (lib.lists.map (folder: "${pkgs.acl}/bin/setfacl -d -m mask:07 /persist${syncthingDir}/${folder}") (builtins.attrNames folders))
         }";
+      };
     })
   ];
+
+  # Attempt to fix old config not merging
+  systemd.services.syncthing-init = {
+    after = [ "${mountServiceName}" ];
+    requires = [ "${mountServiceName}" ];
+  };
 
   systemd.tmpfiles.rules = lib.mkIf isNotServer (
     # Apply setgid bit on shared folders
@@ -121,7 +129,7 @@ lib.mkIf (cfg.enable) {
     dataDir = "${syncthingDir}";
     openDefaultPorts = true;
     settings = {
-      overrideDevices = true;
+      overrideDevices = !isNotServer;
       # Disable this on non-servers as the folder has to be manually added
       overrideFolders = !isNotServer;
       devices = devices;

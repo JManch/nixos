@@ -10,10 +10,11 @@ let
   inherit (lib) mkIf;
   nvidia = config.device.gpu == "nvidia";
   amd = config.device.gpu == "amd";
+  desktop = config.usrEnv.desktop.enable;
   optional = lib.lists.optional;
   homeManagerConfig = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username};
 in
-lib.mkIf (config.device.gpu != null) {
+{
   # AMD Driver Explanation
   # There are two main AMD drivers: AMDVLK and RADV. AMDVLK is the offical open
   # source driver provided by AMD whilst RADV is made by Valve. Depending on
@@ -32,7 +33,7 @@ lib.mkIf (config.device.gpu != null) {
   };
 
   # Leave this as default setting for AMD
-  services.xserver.videoDrivers = mkIf nvidia [ "nvidia" ];
+  services.xserver.videoDrivers = mkIf (desktop && nvidia) [ "nvidia" ];
 
   hardware.nvidia = mkIf nvidia {
     # Major issues if this is disabled

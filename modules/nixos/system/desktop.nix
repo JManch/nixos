@@ -32,6 +32,9 @@ lib.mkIf config.usrEnv.desktop.enable {
     };
   };
 
+  programs.dconf.enable = true;
+  security.polkit.enable = true;
+
   # Needed for swaylock authentication
   security.pam.services.swaylock = lib.mkIf (homeManagerConfig.modules.desktop.swaylock.enable) { };
 }

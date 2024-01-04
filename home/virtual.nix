@@ -4,6 +4,9 @@
   ];
 
   modules = {
+    desktop = {
+      dunst.enable = true;
+    };
     shell.enable = true;
 
     programs = {

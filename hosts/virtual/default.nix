@@ -11,7 +11,10 @@
 
   usrEnv = {
     homeManager.enable = true;
-    desktop.enable = false;
+    desktop = {
+      enable = true;
+      desktopManager = "xfce";
+    };
   };
 
   modules = {

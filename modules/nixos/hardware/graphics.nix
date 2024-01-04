@@ -1,7 +1,9 @@
 { config
+, outputs
 , pkgs
 , lib
 , username
+, hostname
 , ...
 }:
 let
@@ -9,6 +11,7 @@ let
   nvidia = config.device.gpu == "nvidia";
   amd = config.device.gpu == "amd";
   optional = lib.lists.optional;
+  homeManagerConfig = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username};
 in
 lib.mkIf (config.device.gpu != null) {
   # AMD Driver Explanation
@@ -35,7 +38,7 @@ lib.mkIf (config.device.gpu != null) {
     # Major issues if this is disabled
     modesetting.enable = true;
     open = true;
-    nvidiaSettings = !(lib.validators.isWayland config);
+    nvidiaSettings = !(lib.fetchers.isWayland homeManagerConfig);
   };
 
   environment.persistence."/persist".users.${username}.directories =

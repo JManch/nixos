@@ -7,21 +7,23 @@
 let
   inherit (lib) mkIf;
   cfg = config.modules.desktop.swayidle;
-  cfgParent = config.modules.desktop;
-  isWayland = lib.validators.isWayland nixosConfig;
+  desktopCfg = config.modules.desktop;
+  isWayland = lib.fetchers.isWayland config;
+  sessionTarget = lib.fetchers.getDesktopSessionTarget config;
+  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 
   pgrep = "${pkgs.procps}/bin/pgrep";
   hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
-  lockScript = pkgs.writeShellScript "lock-script" cfgParent.swaylock.lockScript;
+  lockScript = pkgs.writeShellScript "lock-script" desktopCfg.swaylock.lockScript;
 in
-mkIf (isWayland && cfg.enable) {
+mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   home.packages = with pkgs; [
     procps
   ];
 
   services.swayidle = {
     enable = true;
-    systemdTarget = config.modules.desktop.sessionTarget;
+    systemdTarget = sessionTarget;
     timeouts = [
       {
         timeout = cfg.lockTime;
@@ -32,7 +34,7 @@ mkIf (isWayland && cfg.enable) {
         command = "${hyprctl} dispatch dpms off";
         resumeCommand = "${hyprctl} dispatch dpms on";
       }
-      (mkIf (cfgParent.swaylock.enable) {
+      (mkIf (desktopCfg.swaylock.enable) {
         timeout = cfg.lockedScreenOffTime;
         command = "${pgrep} swaylock && ${hyprctl} dispatch dpms off";
         resumeCommand = "${hyprctl} dispatch dpms on";
@@ -50,7 +52,8 @@ mkIf (isWayland && cfg.enable) {
     let
       mod = config.modules.desktop.hyprland.modKey;
     in
-    [
-      "${mod}, Space, exec, ${lockScript.outPath}"
-    ];
+    mkIf (config.modules.desktop.windowManager == "hyprland")
+      [
+        "${mod}, Space, exec, ${lockScript.outPath}"
+      ];
 }

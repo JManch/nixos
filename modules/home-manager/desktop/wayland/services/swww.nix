@@ -7,9 +7,10 @@
 let
   inherit (lib) mkIf;
   cfg = config.modules.desktop.swww;
-  isWayland = lib.validators.isWayland nixosConfig;
+  isWayland = lib.fetchers.isWayland config;
+  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 in
-mkIf (isWayland && cfg.enable) {
+mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   home.packages = with pkgs; [
     swww
   ];
@@ -19,7 +20,7 @@ mkIf (isWayland && cfg.enable) {
   ];
 
   wayland.windowManager.hyprland.settings.exec-once =
-    mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland")
+    mkIf (config.modules.desktop.windowManager == "hyprland")
       [
         "sleep 1 && ${pkgs.swww}/bin/swww init"
       ];

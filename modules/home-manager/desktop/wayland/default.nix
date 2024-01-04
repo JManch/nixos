@@ -9,7 +9,6 @@ with lib; {
     ./programs/swaylock.nix
     ./services/swayidle.nix
     ./services/waybar.nix
-    ./services/dunst.nix
     ./services/swww.nix
   ];
   options.modules.desktop = {
@@ -43,7 +42,6 @@ with lib; {
     };
     anyrun.enable = mkEnableOption "Anyrun";
     waybar.enable = mkEnableOption "Waybar";
-    dunst.enable = mkEnableOption "Dunst";
     swww.enable = mkEnableOption "Swww";
   };
 }

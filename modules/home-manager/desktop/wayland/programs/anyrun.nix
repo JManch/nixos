@@ -6,15 +6,17 @@
 , ...
 }:
 let
-  isWayland = lib.validators.isWayland nixosConfig;
+  isWayland = lib.fetchers.isWayland config;
   cfg = config.modules.desktop.anyrun;
+  desktopCfg = config.modules.desktop;
+  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 in
 {
   imports = [
     inputs.anyrun.homeManagerModules.default
   ];
 
-  config = lib.mkIf (isWayland && cfg.enable) {
+  config = lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
     programs.anyrun =
       let
         color = base:
@@ -34,14 +36,14 @@ in
           closeOnClick = true;
         };
         extraCss =
-          /*
-        css
-          */
-          ''
+          let
+            cornerRadius = builtins.toString desktopCfg.style.cornerRadius;
+          in
+            /* css */ ''
             * {
               all: unset;
               font-size: 2rem;
-              font-family: ${config.modules.desktop.font.family};
+              font-family: ${desktopCfg.style.font.family};
             }
 
             #window,
@@ -52,7 +54,7 @@ in
             }
 
             #match.activatable {
-              border-radius: 10px;
+              border-radius: ${cornerRadius}px;
               padding: 0.3rem 0.9rem;
                margin-top: 0.01rem;
             }
@@ -78,17 +80,17 @@ in
             box#main {
               background: rgb(${color "base00"});
               border: 2px solid rgb(${color "base0D"});
-              border-radius: 10px;
+              border-radius: ${cornerRadius}px;
               padding: 0.3rem;
             }
           '';
       };
 
-    wayland.windowManager.hyprland.settings =
+    desktop.hyprland.settings =
       let
         modKey = config.modules.desktop.hyprland.modKey;
       in
-      lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland") {
+      lib.mkIf (config.modules.desktop.windowManager == "hyprland") {
         bindr = [
           "${modKey}, ${modKey}_L, exec, anyrun"
         ];

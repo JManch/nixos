@@ -6,14 +6,17 @@
 }:
 let
   hyprshot = "${pkgs.hyprshot}/bin/hyprshot";
+  desktopCfg = config.modules.desktop;
+  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
   cfg = config.modules.desktop.hyprland;
   mod = cfg.modKey;
   modShift = "${cfg.modKey}SHIFT";
   modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
   getMonitorByNumber = number: lib.fetchers.getMonitorByNumber nixosConfig number;
 in
+lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland")
 {
-  wayland.windowManager.hyprland = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland") {
+  wayland.windowManager.hyprland = {
     settings.bind =
       [
         # General

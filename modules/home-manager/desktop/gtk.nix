@@ -4,16 +4,20 @@
 , lib
 , ...
 }:
+let
+  desktopCfg = config.modules.desktop;
+  colors = config.colorscheme.colors;
+in
 lib.mkIf nixosConfig.usrEnv.desktop.enable {
   gtk = {
     enable = true;
     theme = {
       name = "Plata-Noir-Compact";
       package = pkgs.plata-theme.override {
-        selectionColor = "#${config.colorscheme.colors.base01}";
-        accentColor = "#${config.colorscheme.colors.base02}";
-        suggestionColor = "#${config.colorscheme.colors.base0D}";
-        destructionColor = "#${config.colorscheme.colors.base08}";
+        selectionColor = "#${colors.base01}";
+        accentColor = "#${colors.base02}";
+        suggestionColor = "#${colors.base0D}";
+        destructionColor = "#${colors.base08}";
       };
     };
     iconTheme = {
@@ -23,17 +27,19 @@ lib.mkIf nixosConfig.usrEnv.desktop.enable {
     cursorTheme = {
       name = "Bibata-Modern-Classic";
       package = pkgs.bibata-cursors;
-      size = config.modules.desktop.cursorSize;
+      size = desktopCfg.style.cursorSize;
     };
   };
 
-  wayland.windowManager.hyprland.settings = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland") {
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+
+  desktop.hyprland.settings = lib.mkIf (desktopCfg.windowManager == "hyprland") {
     env = [
       "XCURSOR_THEME,${config.gtk.cursorTheme.name}"
-      "XCURSOR_SIZE,${builtins.toString config.modules.desktop.cursorSize}"
+      "XCURSOR_SIZE,${builtins.toString desktopCfg.style.cursorSize}"
     ];
     exec-once = [
-      "hyprctl setcursor ${config.gtk.cursorTheme.name} ${builtins.toString config.modules.desktop.cursorSize}"
+      "hyprctl setcursor ${config.gtk.cursorTheme.name} ${builtins.toString desktopCfg.style.cursorSize}"
     ];
   };
 }

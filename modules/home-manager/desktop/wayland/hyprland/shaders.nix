@@ -4,10 +4,12 @@
 , ...
 }:
 let
+  desktopCfg = config.modules.desktop;
   cfg = config.modules.desktop.hyprland;
+  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 in
 # TODO: Modularise this shader config. Should probably have a gamma setting per monitor.
-lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland") {
+lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
   xdg.configFile."hypr/shaders/monitor1_gamma.frag".text =
     /*
       glsl

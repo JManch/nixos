@@ -1,6 +1,5 @@
 { inputs
 , config
-, nixosConfig
 , pkgs
 , lib
 , ...
@@ -8,6 +7,8 @@
 let
   spicePkgs = inputs.spicetify-nix.packages.${pkgs.system}.default;
   cfg = config.modules.programs.spotify;
+  desktopCfg = config.modules.desktop;
+  colors = config.colorscheme.colors;
 in
 {
   imports = [
@@ -31,18 +32,18 @@ in
       colorScheme = "custom";
       customColorScheme = {
         text = "FFFFFF";
-        accent = "${config.colorscheme.colors.base0B}";
-        accent-active = "${config.colorscheme.colors.base0B}";
-        accent-inactive = "${config.colorscheme.colors.base01}";
-        banner = "${config.colorscheme.colors.base0B}";
-        border-active = "${config.colorscheme.colors.base04}";
-        border-inactive = "${config.colorscheme.colors.base04}";
-        header = "${config.colorscheme.colors.base04}";
-        highlight = "${config.colorscheme.colors.base02}";
-        main = "${config.colorscheme.colors.base00}";
-        notification = "${config.colorscheme.colors.base02}";
-        notification-error = "${config.colorscheme.colors.base08}";
-        subtext = "${config.colorscheme.colors.base05}";
+        accent = "${colors.base0B}";
+        accent-active = "${colors.base0B}";
+        accent-inactive = "${colors.base01}";
+        banner = "${colors.base0B}";
+        border-active = "${colors.base04}";
+        border-inactive = "${colors.base04}";
+        header = "${colors.base04}";
+        highlight = "${colors.base02}";
+        main = "${colors.base00}";
+        notification = "${colors.base02}";
+        notification-error = "${colors.base08}";
+        subtext = "${colors.base05}";
       };
 
       enabledExtensions = with spicePkgs.extensions; [
@@ -73,7 +74,8 @@ in
       ".config/spotify"
     ];
 
-    wayland.windowManager.hyprland.settings.windowrulev2 = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland")
-      [ "bordercolor 0xff${config.colorscheme.colors.base0B}, initialTitle:^(Spotify( Premium)?)$" ];
+    desktop.hyprland.settings.windowrulev2 =
+      lib.mkIf (desktopCfg.windowManager == "hyprland")
+        [ "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$" ];
   };
 }

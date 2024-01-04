@@ -6,6 +6,7 @@
 let
   binary = "${config.programs.firefox.package}/bin/firefox";
   cfg = config.modules.programs.firefox;
+  desktopCfg = config.modules.desktop;
 in
 lib.mkIf cfg.enable {
   programs.firefox = {
@@ -102,6 +103,7 @@ lib.mkIf cfg.enable {
     ".cache/mozilla"
   ];
 
-  desktop.hyprland.binds = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland")
-    [ "${config.modules.desktop.hyprland.modKey}, Backspace, exec, ${binary}" ];
+  desktop.hyprland.binds =
+    lib.mkIf (desktopCfg.windowManager == "hyprland")
+      [ "${desktopCfg.hyprland.modKey}, Backspace, exec, ${binary}" ];
 }

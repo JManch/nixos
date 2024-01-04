@@ -40,7 +40,7 @@
     homeManager.enable = true;
     desktop = {
       enable = true;
-      compositor = "hyprland";
+      desktopManager = null;
     };
   };
 

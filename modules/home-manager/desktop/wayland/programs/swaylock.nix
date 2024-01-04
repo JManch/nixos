@@ -7,17 +7,12 @@
 let
   inherit (config.colorscheme) colors;
   cfg = config.modules.desktop.swaylock;
-  isWayland = lib.validators.isWayland nixosConfig;
+  desktopCfg = config.modules.desktop;
+  isWayland = lib.fetchers.isWayland config;
   lockScript = pkgs.writeShellScript "lock-script" config.modules.desktop.swaylock.lockScript;
+  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 in
-lib.mkIf (isWayland && cfg.enable) {
-  assertions = [
-    {
-      assertion = (lib.length nixosConfig.device.monitors) != 0;
-      message = "A primary monitor must be configured for Swayidle.";
-    }
-  ];
-
+lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   programs.swaylock = {
     enable = true;
     package = pkgs.swaylock-effects;
@@ -28,7 +23,7 @@ lib.mkIf (isWayland && cfg.enable) {
       clock = true;
       datestr = "%e %B %Y";
 
-      font = config.modules.desktop.font.family;
+      font = desktopCfg.style.font.family;
       font-size = 25;
 
       effect-blur = "10x3";
@@ -67,5 +62,8 @@ lib.mkIf (isWayland && cfg.enable) {
       ring-caps-lock-color = "#${colors.base0E}";
     };
   };
-  desktop.hyprland.binds = [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${lockScript.outPath}" ];
+
+  desktop.hyprland.binds =
+    lib.mkIf (config.modules.desktop.windowManager == "hyprland")
+      [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${lockScript.outPath}" ];
 }

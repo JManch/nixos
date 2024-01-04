@@ -6,27 +6,26 @@
 , ...
 }:
 let
-  desktopCfg = nixosConfig.usrEnv.desktop;
+  hyprlandPackages = inputs.hyprland.packages.${pkgs.system};
+  desktopCfg = config.modules.desktop;
+  colors = config.colorscheme.colors;
+  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 in
-lib.mkIf (desktopCfg.enable && desktopCfg.compositor == "hyprland") {
-  modules.desktop.sessionTarget = "hyprland-session.target";
-
+lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
   home.packages = with pkgs; [
     hyprshot
     wl-clipboard
     xclip # For xwayland apps
   ];
 
-  assertions = [
-    {
-      assertion = (lib.length nixosConfig.device.monitors) != 0;
-      message = "Monitors must be configured to use Hyprland.";
-    }
-  ];
+  xdg.portal = {
+    extraPortals = [ hyprlandPackages.xdg-desktop-portal-hyprland ];
+    configPackages = [ hyprlandPackages.hyprland ];
+  };
 
   wayland.windowManager.hyprland = {
     enable = true;
-    package = inputs.hyprland.packages.${pkgs.system}.default;
+    package = hyprlandPackages.hyprland;
     settings = {
       env = [
         "NIXOS_OZONE_WL,1"
@@ -65,20 +64,21 @@ lib.mkIf (desktopCfg.enable && desktopCfg.compositor == "hyprland") {
         "wl-paste -t text -w sh -c 'v=$(cat); cmp -s <(xclip -selection clipboard -o)  <<< \"$v\" || xclip -selection clipboard <<< \"$v\"'"
       ];
 
-      general = {
-        gaps_in = 5;
-        gaps_out = 10;
-        border_size = 2;
+      general = with desktopCfg.style; {
+        gaps_in = gapSize / 2;
+        gaps_out = gapSize;
+        border_size = borderWidth;
         resize_on_border = true;
         hover_icon_on_border = false;
-        "col.active_border" = "0xff${config.colorscheme.colors.base0D}";
-        "col.inactive_border" = "0xff${config.colorscheme.colors.base00}";
+        "col.active_border" = "0xff${colors.base0D}";
+        "col.inactive_border" = "0xff${colors.base00}";
 
         cursor_inactive_timeout = 0;
       };
 
       decoration = {
-        rounding = 8;
+        # Hyprland corner radius seems slightly stronger than CSS
+        rounding = desktopCfg.style.cornerRadius - 2;
 
         blur = {
           enabled = true;
@@ -90,7 +90,7 @@ lib.mkIf (desktopCfg.enable && desktopCfg.compositor == "hyprland") {
         drop_shadow = false;
         shadow_range = 10;
         shadow_render_power = 2;
-        "col.shadow" = "0xff${config.colorscheme.colors.base0D}";
+        "col.shadow" = "0xff${colors.base0D}";
 
         screen_shader = "${config.xdg.configHome}/hypr/shaders/monitor1_gamma.frag";
       };

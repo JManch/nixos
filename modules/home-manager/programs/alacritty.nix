@@ -1,11 +1,12 @@
 { config
-, nixosConfig
 , lib
 , ...
 }:
 let
   binary = "${config.programs.alacritty.package}/bin/alacritty";
   cfg = config.modules.programs.alacritty;
+  desktopCfg = config.modules.desktop;
+  colors = config.colorscheme.colors;
 in
 lib.mkIf cfg.enable {
   programs.alacritty = {
@@ -27,25 +28,25 @@ lib.mkIf cfg.enable {
       font = {
         size = 13.5;
         normal = {
-          family = "${config.modules.desktop.font.family}";
+          family = "${desktopCfg.style.font.family}";
           style = "Regular";
         };
       };
       colors = {
         primary = {
-          background = "#${config.colorscheme.colors.base00}";
-          foreground = "#${config.colorscheme.colors.base05}";
-          bright_foreground = "#${config.colorscheme.colors.base06}";
+          background = "#${colors.base00}";
+          foreground = "#${colors.base05}";
+          bright_foreground = "#${colors.base06}";
         };
         normal = {
-          black = "#${config.colorscheme.colors.base02}";
-          red = "#${config.colorscheme.colors.base08}";
-          green = "#${config.colorscheme.colors.base0B}";
-          yellow = "#${config.colorscheme.colors.base0A}";
-          blue = "#${config.colorscheme.colors.base0D}";
-          magenta = "#${config.colorscheme.colors.base0E}";
-          cyan = "#${config.colorscheme.colors.base0C}";
-          white = "#${config.colorscheme.colors.base07}";
+          black = "#${colors.base02}";
+          red = "#${colors.base08}";
+          green = "#${colors.base0B}";
+          yellow = "#${colors.base0A}";
+          blue = "#${colors.base0D}";
+          magenta = "#${colors.base0E}";
+          cyan = "#${colors.base0C}";
+          white = "#${colors.base07}";
         };
       };
       mouse = {
@@ -60,6 +61,6 @@ lib.mkIf cfg.enable {
       };
     };
   };
-  desktop.hyprland.binds = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland")
-    [ "${config.modules.desktop.hyprland.modKey}, Return, exec, ${binary}" ];
+  desktop.hyprland.binds = lib.mkIf (desktopCfg.windowManager == "hyprland")
+    [ "${desktopCfg.hyprland.modKey}, Return, exec, ${binary}" ];
 }

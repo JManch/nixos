@@ -5,6 +5,7 @@ with lib; {
     ./shaders.nix
     ./binds.nix
     (mkAliasOptionModule [ "desktop" "hyprland" "binds" ] [ "wayland" "windowManager" "hyprland" "settings" "bind" ])
+    (mkAliasOptionModule [ "desktop" "hyprland" "settings" ] [ "wayland" "windowManager" "hyprland" "settings" ])
   ];
   options.modules.desktop = {
     hyprland = {

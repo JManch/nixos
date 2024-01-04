@@ -95,6 +95,12 @@ lib.mkIf (cfg.enable) {
   systemd.services.syncthing-init = {
     after = [ "${mountServiceName}" ];
     requires = [ "${mountServiceName}" ];
+    serviceConfig = {
+      # For the config init service to sleep to make sure the main service has
+      # time to start
+      # This didn't fix the issue but I got a 404 page not found error instead of localhost error
+      # ExecStartPre = "${pkgs.coreutils}/bin/sleep 10";
+    };
   };
 
   systemd.tmpfiles.rules = lib.mkIf isNotServer (

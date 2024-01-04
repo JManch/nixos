@@ -71,19 +71,20 @@ in
       monitors = config.device.monitors;
     in
     {
-      assertions = [
+      assertions = with lib; [
         {
           assertion =
-            ((lib.length monitors) != 0)
-            -> ((lib.length (lib.filter (m: m.number == 1) monitors)) == 1);
+            ((length monitors) != 0)
+            -> ((length (filter (m: m.number == 1) monitors)) == 1);
           message = "Exactly one monitor must be set to primary (number 1).";
         }
         {
-          assertion = lib.allUnique (map (m: m.number) monitors);
+          assertion = allUnique (map (m: m.number) monitors);
           message = "Monitor numbers must be unique.";
         }
+        # TODO: Fix this
         # {
-        #   assertion = lib.lists.all (x: y: x + 1 == y) (lib.lists.sort (map (m: m.number) monitors));
+        #   assertion = lists.all (x: y: x + 1 == y) (lists.sort (a: b: a > b) (map (m: m.number) monitors));
         #   message = "Monitor numbers must be sequential.";
         # }
       ];

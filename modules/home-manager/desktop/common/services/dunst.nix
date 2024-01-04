@@ -1,39 +1,33 @@
 { config
 , nixosConfig
-, pkgs
 , lib
 , ...
 }:
 let
-  isWayland = lib.validators.isWayland nixosConfig;
+  desktopCfg = config.modules.desktop;
   cfg = config.modules.desktop.dunst;
   colors = config.colorscheme.colors;
-  hyprlandSettings = config.wayland.windowManager.hyprland.settings;
+  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 in
-# TODO:Move this entire module out of wayland as dunst can be used on wayland or x11
-lib.mkIf (isWayland && cfg.enable) {
-  home.packages = [ pkgs.libnotify ];
-
+lib.mkIf (osDesktopEnabled && cfg.enable) {
   services.dunst = {
     enable = true;
     settings = {
-      global = {
+      global = with desktopCfg.style; {
         monitor = "0";
         follow = "none";
         enable_posix_regex = true;
-        font = "${config.modules.desktop.font.family} 13";
+        font = "${desktopCfg.style.font.family} 13";
         icon_theme = config.gtk.iconTheme.name;
         show_indicators = true;
-        format = "<b>%s</b>\\n<span font='11'>%b</span>";
+        format = "<b>%s</b>\\n<span font='10'>%b</span>";
 
-        # TODO: Move the corner radius for waybar and this into a global option
-        corner_radius = 10;
+        corner_radius = cornerRadius;
         width = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).width * 0.15);
         height = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).height * 0.25);
-        # TODO: Move these hyprland settings out into global desktop options
-        offset = "${builtins.toString (hyprlandSettings.general.gaps_out * 2)}x${builtins.toString (hyprlandSettings.general.gaps_out*2)}";
-        gap_size = hyprlandSettings.general.gaps_out;
-        frame_width = hyprlandSettings.general.border_size;
+        offset = "${builtins.toString (gapSize * 2)}x${builtins.toString (gapSize * 2)}";
+        gap_size = gapSize;
+        frame_width = borderWidth;
         transparency = 100;
 
         mouse_left_click = "do_action";
@@ -66,13 +60,14 @@ lib.mkIf (isWayland && cfg.enable) {
     };
   };
 
-  wayland.windowManager.hyprland.settings = lib.mkIf (nixosConfig.usrEnv.desktop.compositor == "hyprland") {
-    exec-once = [
-      "${config.services.dunst.package}/bin/dunst"
-    ];
-    layerrule = [
-      "blur, notifications"
-      "xray 0, notifications"
-    ];
-  };
+  desktop.hyprland.settings =
+    lib.mkIf (desktopCfg.windowManager == "hyprland") {
+      exec-once = [
+        "${config.services.dunst.package}/bin/dunst"
+      ];
+      layerrule = [
+        "blur, notifications"
+        "xray 0, notifications"
+      ];
+    };
 }

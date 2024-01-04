@@ -66,6 +66,9 @@ lib.mkIf (cfg.enable) {
   # will not track them. Can be worked around with some sort of scheduled
   # systemd task that updates permissions.
 
+  # NOTE: Something is broken, preventing the old config being merged with the
+  # new one even though I have overrideFolders set to false
+
   # Add main user to the syncthing group
   users.users.${username}.extraGroups = lib.mkIf isNotServer [ "syncthing" ];
   systemd.services.syncthing = lib.mkMerge [
@@ -89,7 +92,6 @@ lib.mkIf (cfg.enable) {
     })
   ];
 
-  # Attempt to fix old config not merging
   systemd.services.syncthing-init = {
     after = [ "${mountServiceName}" ];
     requires = [ "${mountServiceName}" ];

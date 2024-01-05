@@ -50,6 +50,7 @@ lib.mkIf (config.modules.programs.steam.enable) {
     directories = [
       ".steam"
       ".local/share/Steam"
+      ".factorio"
     ];
   };
 }

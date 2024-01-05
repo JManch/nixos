@@ -10,6 +10,8 @@ let
   desktopCfg = config.usrEnv.desktop;
 in
 lib.mkIf config.usrEnv.desktop.enable {
+  # TODO: I think it would be a good idea to split this file up into multiple
+  # nix files for each desktop manager, just to make things cleaner
   services.xserver = {
     # Enable regardless of wayland for xwayland support
     enable = true;

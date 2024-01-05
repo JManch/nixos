@@ -14,6 +14,7 @@ in
     ./fastfetch.nix
     ./discord.nix
     ./obs.nix
+    ./vscode.nix
   ];
 
   options.modules.programs = {
@@ -34,5 +35,6 @@ in
     fastfetch.enable = mkEnableOption "Fastfetch";
     discord.enable = mkEnableOption "Discord";
     obs.enable = mkEnableOption "Obs";
+    vscode.enable = mkEnableOption "vscode";
   };
 }

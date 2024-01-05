@@ -21,7 +21,7 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland")
       [
         # General
         "${modShift}, Q, exit,"
-        "${mod}, W, killactive,"
+        "${modShift}, W, killactive,"
         "${mod}, C, togglefloating,"
         "${mod}, E, fullscreen, 1"
         "${modShift}, E, fullscreen, 0"

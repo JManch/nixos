@@ -65,7 +65,8 @@
         enable = true;
         launchCmd = "Hyprland";
       };
-      syncthing.enable = true;
+      # Broken cause of syncthing-init service
+      syncthing.enable = false;
     };
 
     system = {

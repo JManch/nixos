@@ -64,6 +64,11 @@
       fastfetch.enable = true;
       discord.enable = true;
       obs.enable = true;
+      vscode.enable = true;
+    };
+
+    services = {
+      syncthing.enable = true;
     };
   };
 }

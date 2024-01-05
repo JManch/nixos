@@ -15,6 +15,9 @@ let
   homeManagerConfig = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username};
 in
 {
+  # TODO: I think it would be a good idea to split this file up into multiple
+  # nix files for each desktop manager, just to make things cleaner
+
   # AMD Driver Explanation
   # There are two main AMD drivers: AMDVLK and RADV. AMDVLK is the offical open
   # source driver provided by AMD whilst RADV is made by Valve. Depending on

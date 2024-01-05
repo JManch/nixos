@@ -31,6 +31,32 @@
           });
         });
       })
+      (final: prev: {
+        neovide = prev.neovide.overrideAttrs (oldAttrs: rec {
+          version = "0.12.1";
+          src = final.fetchFromGitHub {
+            owner = "neovide";
+            repo = "neovide";
+            rev = version;
+            hash = "sha256-lmhTTBlhyEepUNHrm2hq42G1kA7siAsJUcYjBfajaHA=";
+          };
+          cargoDeps = oldAttrs.cargoDeps.overrideAttrs (prev.lib.const {
+            name = "neovide-vendor.tar.gz";
+            inherit src;
+            outputHash = "sha256-QqrK3Y+lTJBGnI+nua0/CzvN3f49fq9S2de/xQmioMk=";
+          });
+        });
+      })
+      (final: prev: {
+        vscode-extensions = final.lib.recursiveUpdate prev.vscode-extensions {
+          ms-vsliveshare.vsliveshare = final.vscode-utils.extensionFromVscodeMarketplace {
+            name = "vsliveshare";
+            publisher = "ms-vsliveshare";
+            version = "1.0.5900";
+            sha256 = "sha256-syVW/aS2ppJjg4OZaenzGM3lczt+sLy7prwsYFTDl9s=";
+          };
+        };
+      })
     ];
     config = {
       allowUnfree = true;

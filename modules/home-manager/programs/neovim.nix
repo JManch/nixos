@@ -8,6 +8,7 @@ let
 in
 lib.mkIf cfg.enable {
   home.packages = with pkgs; [
+    neovide
     # Tools
     fd
     # Language servers

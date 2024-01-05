@@ -7,6 +7,7 @@
   imports = [
     ../modules/home-manager
     inputs.nix-colors.homeManagerModules.default
+    inputs.agenix.homeManagerModules.default
   ];
 
   programs.home-manager.enable = true;

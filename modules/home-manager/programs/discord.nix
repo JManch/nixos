@@ -8,10 +8,10 @@ let
 in
 lib.mkIf cfg.enable {
   home.packages = with pkgs; [
-    discord
+    webcord
   ];
 
   impermanence.directories = [
-    ".config/discord"
+    ".config/WebCord"
   ];
 }

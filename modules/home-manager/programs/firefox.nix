@@ -1,5 +1,5 @@
 { config
-, nixosConfig
+, inputs
 , lib
 , ...
 }:
@@ -7,6 +7,8 @@ let
   binary = "${config.programs.firefox.package}/bin/firefox";
   cfg = config.modules.programs.firefox;
   desktopCfg = config.modules.desktop;
+  # color = base:
+  #   inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorscheme.colors.${base};
 in
 lib.mkIf cfg.enable {
   programs.firefox = {
@@ -24,6 +26,7 @@ lib.mkIf cfg.enable {
           # General
           "general.autoScroll" = true;
           "extensions.pocket.enabled" = false;
+          "toolkit.legacyUserProfileCustomizations.stylesheets" = true; # Enable userChrome.css modifications
 
           # Scrolling
           "mousewheel.default.delta_multiplier_x" = 95;
@@ -94,6 +97,91 @@ lib.mkIf cfg.enable {
           "network.captive-portal-service.enabled" = false;
           "network.connectivity-service.enabled" = false;
         };
+        userChrome = /* css */ ''
+          /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/autohide_toolbox.css made available under Mozilla Public License v. 2.0
+          See the above repository for updates as well as full license text. */
+
+          /* Hide the whole toolbar area unless urlbar is focused or cursor is over the toolbar */
+          /* Dimensions on non-Win10 OS probably needs to be adjusted */
+
+          /* Compatibility options for hide_tabs_toolbar.css and tabs_on_bottom.css at the end of this file */
+
+          :root{
+            --uc-autohide-toolbox-delay: 200ms; /* Wait 0.1s before hiding toolbars */
+            --uc-toolbox-rotation: 70deg;  /* This may need to be lower on mac - like 75 or so */
+          }
+
+          :root[sizemode="maximized"]{
+            --uc-toolbox-rotation: 70deg;
+          }
+
+          @media {
+            #navigator-toolbox:not(:-moz-lwtheme){ background-color: -moz-dialog !important; }
+          }
+
+          :root[sizemode="fullscreen"],
+          #navigator-toolbox[inFullscreen]{ margin-top: 0 !important; }
+
+          #navigator-toolbox{
+            position: fixed !important;
+            display: block;
+            background-color: var(--lwt-accent-color,black) !important;
+            transition: transform 82ms linear, opacity 82ms linear !important;
+            transition-delay: var(--uc-autohide-toolbox-delay) !important;
+            transform-origin: top;
+            transform: rotateX(var(--uc-toolbox-rotation));
+            opacity: 0;
+            line-height: 0;
+            z-index: 1;
+            pointer-events: none;
+          }
+
+          #navigator-toolbox:hover,
+          #navigator-toolbox:focus-within{
+            transition-delay: 33ms !important;
+            transform: rotateX(0);
+            opacity: 1;
+          }
+          /* This ruleset is separate, because not having :has support breaks other selectors as well */
+          #mainPopupSet:has(> #appMenu-popup:hover) ~ toolbox{
+            transition-delay: 33ms !important;
+            transform: rotateX(0);
+            opacity: 1;
+          }
+
+          #navigator-toolbox > *{ line-height: normal; pointer-events: auto }
+
+          #navigator-toolbox,
+          #navigator-toolbox > *{
+            width: 100vw;
+            -moz-appearance: none !important;
+          }
+
+          /* These two exist for oneliner compatibility */
+          #nav-bar{ width: var(--uc-navigationbar-width,100vw) }
+          #TabsToolbar{ width: calc(100vw - var(--uc-navigationbar-width,0px)) }
+
+          /* Don't apply transform before window has been fully created */
+          :root:not([sessionrestored]) #navigator-toolbox{ transform:none !important }
+
+          :root[customizing] #navigator-toolbox{
+            position: relative !important;
+            transform: none !important;
+            opacity: 1 !important;
+          }
+
+          #navigator-toolbox[inFullscreen] > #PersonalToolbar,
+          #PersonalToolbar[collapsed="true"]{ display: none }
+
+          /* Uncomment this if tabs toolbar is hidden with hide_tabs_toolbar.css */
+           /*#titlebar{ margin-bottom: -9px }*/
+
+          /* Uncomment the following for compatibility with tabs_on_bottom.css - this isn't well tested though */
+          /*
+          #navigator-toolbox{ flex-direction: column; display: flex; }
+          #titlebar{ order: 2 }
+          */
+        '';
       };
     };
   };
@@ -107,3 +195,48 @@ lib.mkIf cfg.enable {
     lib.mkIf (desktopCfg.windowManager == "hyprland")
       [ "${desktopCfg.hyprland.modKey}, Backspace, exec, ${binary}" ];
 }
+# TODO: Either theme firefox with this or figure out how to change theme through GTK
+
+# /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/color_variable_template.css made available under Mozilla Public License v. 2.0
+# See the above repository for updates as well as full license text. */
+#
+# /* You should enable any non-default theme for these to apply properly. Built-in dark and light themes should work */
+# :root{
+#   /* Popup panels */
+#   --arrowpanel-background: rgb(${color "base02"}) !important;
+#   --arrowpanel-border-color: rgb(${color "base00"}) !important;
+#   --arrowpanel-color: rgb(${color "base05"}) !important;
+#   --arrowpanel-dimmed: rgb(${color "base00"}) !important;
+#   /* window and toolbar background */
+#   --lwt-accent-color: rgb(${color "base02"}) !important;
+#   --lwt-accent-color-inactive: rgb(${color "base03"}) !important;
+#   --toolbar-bgcolor: rgb(${color "base00"}) !important;  
+#   /* tabs with system theme - text is not controlled by variable */
+#   --tab-selected-bgcolor: rgb(${color "base00"}) !important;
+#   /* tabs with any other theme */
+#   --lwt-text-color: rgb(${color "base05"}) !important;
+#   --lwt-selected-tab-background-color: rgb(${color "base02"}) !important;
+#   /* toolbar area */
+#   --toolbarbutton-icon-fill: rgb(${color "base05"}) !important;
+#   --lwt-toolbarbutton-hover-background: rgb(${color "base02"}) !important;
+#   --lwt-toolbarbutton-active-background: rgb(${color "base03"}) !important;
+#   /* urlbar */
+#   --toolbar-field-border-color: rgb(${color "base02"}) !important;
+#   --toolbar-field-focus-border-color: rgb(${color "base00"}) !important;
+#   --urlbar-popup-url-color: rgb(${color "base02"}) !important;
+#   /* urlbar Firefox 92+ */
+#   --toolbar-field-background-color: rgb(${color "base05"}) !important;
+#   --toolbar-field-focus-background-color: rgb(${color "base04"}) !important;
+#   --toolbar-field-color: rgb(${color "base02"}) !important;
+#   --toolbar-field-focus-color: rgb(${color "base05"}) !important;
+#   /* sidebar - note the sidebar-box rule for the header-area */
+#   --lwt-sidebar-background-color: rgb(${color "base02"}) !important;
+#   --lwt-sidebar-text-color: rgb(${color "base05"}) !important;
+# }
+# /* line between nav-bar and tabs toolbar,
+#     also fallback color for border around selected tab */
+# #navigator-toolbox{ --lwt-tabs-border-color: rgb(${color "base02"}) !important; }
+# /* Line above tabs */
+# #tabbrowser-tabs{ --lwt-tab-line-color: rgb(${color "base00"}) !important; }
+# /* the header-area of sidebar needs this to work */
+# #sidebar-box{ --sidebar-background-color: rgb(${color "base00"}) !important; }

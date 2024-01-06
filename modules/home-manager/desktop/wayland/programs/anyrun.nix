@@ -31,9 +31,11 @@ in
             shell
           ];
           width.fraction = 0.2;
-          y.fraction = 0.3;
+          y.fraction = 0.35;
           hidePluginInfo = true;
           closeOnClick = true;
+          # Blur background over waybar
+          ignoreExclusiveZones = true;
         };
         extraCss =
           let

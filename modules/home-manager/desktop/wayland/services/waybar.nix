@@ -21,9 +21,9 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
     };
     style =
       let
-        cornerRadius = builtins.toString desktopCfg.style.cornerRadius;
         halfCornerRadius = builtins.toString (desktopCfg.style.cornerRadius / 2);
         borderWidth = builtins.toString desktopCfg.style.borderWidth;
+        gapSize = desktopCfg.style.gapSize;
       in
         /* css */ ''
         @define-color background #${colors.base00};
@@ -54,16 +54,16 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
         window#waybar {
             background: @background;
             color: @text-light;
-            border-radius: ${cornerRadius}px;
+            border-radius: 0px;
             border: ${borderWidth}px solid @background;
         }
 
         window#waybar.fullscreen {
-            border: ${borderWidth}px solid @red;
+            border-bottom: ${borderWidth}px solid @blue;
         }
 
         #workspaces {
-            margin: 5px 0px 5px 5px;
+            margin: 5px 0px 5px ${builtins.toString (gapSize + 2)}px;
             padding: 0px 0px;
             border-radius: ${halfCornerRadius}px;
             background: @blue;
@@ -113,8 +113,8 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
         }
 
         #network.hostname {
-            margin: 5px 5px 5px 0px;
-            padding: 5px 7px;
+            margin: 5px ${builtins.toString (gapSize + 2)}px 5px 0px;
+            padding: 0px 7px;
             border-radius: ${halfCornerRadius}px;
             background: @blue;
             color: @text-dark;
@@ -128,7 +128,8 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
         {
           layer = "top";
           height = 45;
-          margin = "${gapSize} ${gapSize} 0 ${gapSize}";
+          # margin = "${gapSize} ${gapSize} 0 ${gapSize}";
+          margin = "0";
           spacing = 17;
           "hyprland/workspaces" = {
             "on-click" = "activate";
@@ -170,8 +171,8 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
               "weeks-pos" = "";
               "on-scroll" = 1;
               format = {
-                months = "<span color='#${colors.base05}'><b>{}</b></span>";
-                days = "<span color='#${colors.base05}'><b>{}</b></span>";
+                months = "<span color='#${colors.base07}'><b>{}</b></span>";
+                days = "<span color='#${colors.base07}'><b>{}</b></span>";
                 weekdays = "<span color='#${colors.base03}'><b>{}</b></span>";
                 today = "<span color='#${colors.base0B}'><b>{}</b></span>";
               };

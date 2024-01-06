@@ -1,6 +1,7 @@
 { config
 , nixosConfig
 , lib
+, pkgs
 , ...
 }:
 let
@@ -52,9 +53,10 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
       hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
       blankShader = "${config.xdg.configHome}/hypr/shaders/blank.frag";
       shader = "${config.xdg.configHome}/hypr/shaders/monitor1_gamma.frag";
+      getShader = "$(${hyprctl} getoption decoration:screen_shader -j | ${pkgs.jaq}/bin/jaq -r '.str')";
+      shaderToggle = "if [[ ${getShader} == \"${shader}\" ]]; then ${pkgs.coreutils}/bin/echo \"${blankShader}\"; else ${pkgs.coreutils}/bin/echo \"${shader}\"; fi";
     in
     [
-      "${cfg.modKey}, O, exec, ${hyprctl} keyword decoration:screen_shader ${blankShader}"
-      "${cfg.modKey}SHIFT, O, exec, ${hyprctl} keyword decoration:screen_shader ${shader}"
+      "${cfg.modKey}, O, exec, ${hyprctl} keyword decoration:screen_shader $(${shaderToggle})"
     ];
 }

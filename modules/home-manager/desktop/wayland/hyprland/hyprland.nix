@@ -38,21 +38,25 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         "LIBVA_DRIVER_NAME,nvidia"
         "GBM_BACKEND,nvidia-drm"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
+        "__GL_GSYNC_ALLOWED,0"
+        "__GL_VRR_ALLOWED,0"
       ];
 
-      monitor = lib.lists.map
+      monitor = (lib.lists.map
         (
           m:
           "${m.name}, " +
-          (
-            if !m.enabled
-            then
-              "disable"
-            else
-              "${builtins.toString m.width}x${builtins.toString m.height}@${builtins.toString m.refreshRate}, ${m.position}, 1"
-          )
+            (
+              if !m.enabled
+              then
+                "disable"
+              else
+                "${builtins.toString m.width}x${builtins.toString m.height}@${builtins.toString m.refreshRate}, ${m.position}, 1"
+            )
         )
-        nixosConfig.device.monitors;
+        nixosConfig.device.monitors) ++ [
+        ",preferred,auto,1" # automatic monitor detection
+      ];
 
       # Launch apps
       exec-once = [
@@ -72,7 +76,6 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         hover_icon_on_border = false;
         "col.active_border" = "0xff${colors.base0D}";
         "col.inactive_border" = "0xff${colors.base00}";
-
         cursor_inactive_timeout = 0;
       };
 
@@ -83,14 +86,12 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         blur = {
           enabled = true;
           size = 2;
-          passes = 2;
+          passes = 3; # drop to 2 or 3 for weaker blur
           xray = true;
+          special = true; # blur special workspace background
         };
 
         drop_shadow = false;
-        shadow_range = 10;
-        shadow_render_power = 2;
-        "col.shadow" = "0xff${colors.base0D}";
 
         screen_shader = "${config.xdg.configHome}/hypr/shaders/monitor1_gamma.frag";
       };
@@ -109,7 +110,25 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
 
       animations = {
         enabled = true;
-        # TODO: Configure animations to my liking
+        # Curves
+        bezier = [
+          "easeOutExpo,0.16,1,0.3,1"
+          "easeInQuart,0.5,0,0.75,0"
+          "easeOutQuart,0.25,1,0.5,1"
+          "easeInOutQuart,0.76,0,0.24,1"
+        ];
+        animation = [
+          # Windows
+          "windowsIn,1,3,easeOutQuart"
+          "windowsOut,1,3,easeInQuart"
+          "windowsMove,1,3,easeInOutQuart"
+          # Fade
+          "fade,1,1,easeInQuart"
+          "fadeOut,1,5,easeOutExpo"
+          # Workspaces
+          "workspaces,1,2,easeInOutQuart,slidevert"
+        ];
+
       };
 
       misc = {
@@ -117,15 +136,19 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         focus_on_activate = false;
         mouse_move_enables_dpms = true;
         key_press_enables_dpms = true;
+        background_color = "0xff${colors.base00}";
+        new_window_takes_over_fullscreen = 2;
       };
 
       dwindle = {
         preserve_split = true;
         force_split = 2;
+        no_gaps_when_only = 1;
       };
 
       binds = {
         workspace_back_and_forth = true;
+        movefocus_cycles_fullscreen = false;
       };
 
       workspace = lib.lists.concatMap

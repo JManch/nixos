@@ -50,12 +50,12 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
       urgency_low = {
         background = "#${colors.base00}b3";
         foreground = "#${colors.base07}";
-        frame_color = "#${colors.base00}b3";
+        frame_color = "#${colors.base0D}";
       };
       urgency_normal = {
         background = "#${colors.base00}b3";
         foreground = "#${colors.base07}";
-        frame_color = "#${colors.base0D}";
+        frame_color = "#${colors.base0E}";
       };
     };
   };

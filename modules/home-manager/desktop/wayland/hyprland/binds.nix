@@ -36,16 +36,18 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland")
         "${modShift}, L, movewindow, r"
         "${modShift}, K, movewindow, u"
         "${modShift}, J, movewindow, d"
-        "${mod}, mouse:276, workspace, m+1"
-        "${mod}, mouse:275, workspace, m-1"
-        "${mod}, Right, workspace, m+1"
-        "${mod}, Left, workspace, m-1"
+        "${mod}, mouse:276, workspace, r-1"
+        "${mod}, mouse:275, workspace, r+1"
+        "${mod}, mouse_up, workspace, r+1"
+        "${mod}, mouse_down, workspace, r-1"
+        "${mod}, Up, workspace, r-1"
+        "${mod}, Down, workspace, r+1"
 
         # Monitors
-        "${mod}, Comma, focusmonitor, ${(getMonitorByNumber 2).name}"
-        "${mod}, Period, focusmonitor, ${(getMonitorByNumber 1).name}"
-        "${modShift}, Comma, movecurrentworkspacetomonitor, ${(getMonitorByNumber 2).name}"
-        "${modShift}, Period, movecurrentworkspacetomonitor, ${(getMonitorByNumber 1).name}"
+        "${mod}, Left, focusmonitor, ${(getMonitorByNumber 2).name}"
+        "${mod}, Right, focusmonitor, ${(getMonitorByNumber 1).name}"
+        "${modShift}, Left, movecurrentworkspacetomonitor, ${(getMonitorByNumber 2).name}"
+        "${modShift}, Right, movecurrentworkspacetomonitor, ${(getMonitorByNumber 1).name}"
 
         # Dwindle
         "${mod}, P, pseudo,"

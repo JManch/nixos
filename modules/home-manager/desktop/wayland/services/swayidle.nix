@@ -18,7 +18,8 @@ let
 in
 mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   home.packages = with pkgs; [
-    procps
+    procps # provides pgrep
+    sway-audio-idle-inhibit
   ];
 
   services.swayidle = {
@@ -46,6 +47,24 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
         command = lockScript.outPath;
       }
     ];
+  };
+
+  systemd.user.services.sway-audio-idle-inhibit = {
+    Unit = {
+      Description = "Prevents swayidle from sleeping while any application is outputting or receiving audio";
+      After = [ "swayidle.service" ];
+      Requires = [ "swayidle.service" ];
+    };
+
+    Service = {
+      Restart = "always";
+      RestartSec = 3;
+      ExecStart = "${pkgs.sway-audio-idle-inhibit}/bin/sway-audio-idle-inhibit";
+    };
+
+    Install = {
+      WantedBy = [ sessionTarget ];
+    };
   };
 
   desktop.hyprland.binds =

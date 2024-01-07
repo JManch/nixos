@@ -189,9 +189,9 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
               "on-scroll-down" = "shift_down";
             };
           };
-          pulseaudio = {
+          pulseaudio = lib.mkIf audioEnabled {
             format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%";
-            "format-muted" = "<span color='#${colors.base08}'>󰖁</span> {volume:2}%";
+            "format-muted" = "<span color='#${colors.base08}' size='large'>󰖁</span> {volume:2}%";
             "format-icons" = {
               headphone = "";
               hdmi = "󰍹";
@@ -201,7 +201,16 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
                 "<span size='large'></span>"
               ];
             };
-            "on-click" = "pactl set-sink-mute @DEFAULT_SINK@ toggle";
+            "on-click" = "${pkgs.pulseaudio}/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle";
+            "on-click-middle" = lib.mkIf easyeffects.enable /* bash */ ''
+              ${pkgs.systemd}/bin/systemctl status --user easyeffects > /dev/null 2>&1 && {
+                ${pkgs.systemd}/bin/systemctl stop --user easyeffects
+                ${pkgs.libnotify}/bin/notify-send --urgency=low -t 3000 'Easyeffects disabled'
+              } || {
+                ${pkgs.systemd}/bin/systemctl start --user easyeffects
+                ${pkgs.libnotify}/bin/notify-send --urgency=low -t 3000 'Easyeffects enabled'
+              }
+            '';
             tooltip = false;
           };
           network = {

@@ -2,6 +2,7 @@
 , nixosConfig
 , lib
 , hostname
+, pkgs
 , ...
 }:
 let
@@ -11,6 +12,7 @@ let
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
   sessionTarget = lib.fetchers.getDesktopSessionTarget config;
   colors = config.colorscheme.colors;
+  vpnEnabled = nixosConfig.modules.services.wgnord.enable;
 in
 lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   programs.waybar = {
@@ -118,6 +120,10 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
             border-radius: ${halfCornerRadius}px;
             background: @blue;
             color: @text-dark;
+        }
+
+        #custom-vpn {
+            margin-right: 3px;
         }
       '';
     settings = {
@@ -228,6 +234,14 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
             "on-click" = "wlogout";
             tooltip = false;
           };
+          "custom/vpn" = lib.mkIf vpnEnabled {
+            format = "<span color='#${colors.base04}'></span> {}";
+            exec = "echo '{\"text\": \"${nixosConfig.modules.services.wgnord.country}\"}'";
+            exec-if = "${pkgs.systemd}/bin/systemctl status wgnord > /dev/null 2>&1";
+            return-type = "json";
+            tooltip = false;
+            interval = 5;
+          };
           "modules-left" = [
             "custom/fullscreen"
             "hyprland/workspaces"
@@ -238,6 +252,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
             "clock"
           ];
           "modules-right" = [
+            "custom/vpn"
             "network"
             "cpu"
             "memory"

@@ -8,6 +8,7 @@ in
   imports = [
     ./greetd.nix
     ./syncthing.nix
+    ./wgnord.nix
   ];
 
   options.modules.services = {
@@ -30,6 +31,15 @@ in
           one device in a syncthing network should have this enabled.
         '';
         default = false;
+      };
+    };
+
+    wgnord = {
+      enable = mkEnableOption "wgnord";
+      country = mkOption {
+        type = types.str;
+        description = "The country to VPN to";
+        default = "Switzerland";
       };
     };
 

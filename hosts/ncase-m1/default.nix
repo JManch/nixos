@@ -67,6 +67,7 @@
       };
       # Broken cause of syncthing-init service
       syncthing.enable = false;
+      wgnord.enable = true;
     };
 
     system = {

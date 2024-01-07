@@ -15,6 +15,7 @@ in
     ./discord.nix
     ./obs.nix
     ./vscode.nix
+    ./stremio.nix
   ];
 
   options.modules.programs = {
@@ -36,5 +37,6 @@ in
     discord.enable = mkEnableOption "Discord";
     obs.enable = mkEnableOption "Obs";
     vscode.enable = mkEnableOption "vscode";
+    stremio.enable = mkEnableOption "stremio";
   };
 }

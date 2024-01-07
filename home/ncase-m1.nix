@@ -65,6 +65,7 @@
       discord.enable = true;
       obs.enable = true;
       vscode.enable = true;
+      stremio.enable = true;
     };
 
     services = {

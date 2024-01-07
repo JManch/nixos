@@ -19,7 +19,7 @@ lib.mkMerge [
       wireplumber.enable = true;
     };
 
-    hardware.pulseaudio.enable = false;
+    hardware.pulseaudio.enable = lib.mkForce false;
 
     # Reduces latency in some situations
     security.rtkit.enable = true;

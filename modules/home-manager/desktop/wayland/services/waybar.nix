@@ -263,16 +263,18 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
           "modules-center" = [
             "clock"
           ];
-          "modules-right" = [
-            "custom/vpn"
-            "network"
-            "cpu"
-            "memory"
-            "pulseaudio"
-            "tray"
-            "custom/wlogout"
-            "network#hostname"
-          ];
+          "modules-right" =
+            optional wgnordConfig.enable "custom/vpn" ++
+            [
+              "network"
+              "cpu"
+              "memory"
+            ] ++ optional audioEnabled "pulseaudio" ++
+            [
+              "tray"
+              "custom/poweroff"
+              "network#hostname"
+            ];
         };
     };
   };

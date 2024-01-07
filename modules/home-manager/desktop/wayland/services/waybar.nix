@@ -12,7 +12,7 @@ let
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
   sessionTarget = lib.fetchers.getDesktopSessionTarget config;
   colors = config.colorscheme.colors;
-  vpnEnabled = nixosConfig.modules.services.wgnord.enable;
+  wgnordConfig = nixosConfig.modules.services.wgnord;
 in
 lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   programs.waybar = {
@@ -234,10 +234,10 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
             "on-click" = "wlogout";
             tooltip = false;
           };
-          "custom/vpn" = lib.mkIf vpnEnabled {
+          "custom/vpn" = lib.mkIf wgnordConfig.enable {
             format = "<span color='#${colors.base04}'></span> {}";
-            exec = "echo '{\"text\": \"${nixosConfig.modules.services.wgnord.country}\"}'";
-            exec-if = "${pkgs.systemd}/bin/systemctl status wgnord > /dev/null 2>&1";
+            exec = "echo '{\"text\": \"${wgnordConfig.country}\"}'";
+            exec-if = "${pkgs.iproute2}/bin/ip link show wgnord > /dev/null 2>&1";
             return-type = "json";
             tooltip = false;
             interval = 5;

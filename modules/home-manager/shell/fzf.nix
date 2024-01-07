@@ -13,7 +13,7 @@ lib.mkIf config.modules.shell.enable {
     enable = true;
     defaultCommand = "${fd} -H --type f";
     defaultOptions = [
-      "--height 80%"
+      "--height 20%"
       "--bind ctrl-p:preview-up,ctrl-n:preview-down,ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down"
       "--border rounded"
     ];

@@ -13,7 +13,8 @@ lib.mkIf cfg.enable {
     fd
     # Language servers
     lua-language-server
-    nil
+    # nil
+    nixd
     # Formatters
     stylua
     nixpkgs-fmt

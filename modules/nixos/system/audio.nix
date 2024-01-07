@@ -10,7 +10,10 @@ in
 lib.mkMerge [
 
   (lib.mkIf cfg.enable {
-    environment.systemPackages = [ pkgs.pavucontrol ];
+    environment.systemPackages = with pkgs; [
+      pkgs.pavucontrol
+      pkgs.pulseaudio # installing just for the pactl cli tool
+    ];
     services.pipewire = {
       enable = true;
       alsa.enable = true;
@@ -27,14 +30,12 @@ lib.mkMerge [
 
   (lib.mkIf (cfg.enable && cfg.extraAudioTools) {
     environment.systemPackages = with pkgs; [
-      easyeffects
       helvum
       qpwgraph
     ];
 
     environment.persistence."/persist".users.${username} = {
       directories = [
-        ".config/easyeffects"
         ".config/rncbc.org"
       ];
     };

@@ -70,6 +70,23 @@
 
     services = {
       syncthing.enable = true;
+      easyeffects = {
+        enable = true;
+        autoloadDevices = [
+          {
+            deviceName = "blue-snowball";
+            deviceType = "input";
+            config = /* json */ ''
+              {
+                "device": "alsa_input.usb-BLUE_MICROPHONE_Blue_Snowball_201306-00.mono-fallback",
+                "device-description": "Blue Snowball Mono",
+                "device-profile": "analog-input-mic",
+                "preset-name": "improved-microphone"
+              }
+            '';
+          }
+        ];
+      };
     };
   };
 }

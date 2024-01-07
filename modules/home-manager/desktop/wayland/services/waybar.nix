@@ -13,6 +13,9 @@ let
   sessionTarget = lib.fetchers.getDesktopSessionTarget config;
   colors = config.colorscheme.colors;
   wgnordConfig = nixosConfig.modules.services.wgnord;
+  audioEnabled = nixosConfig.modules.system.audio.enable;
+  easyeffects = config.modules.services.easyeffects;
+  optional = lib.lists.optional;
 in
 lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   programs.waybar = {
@@ -109,7 +112,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
             font-weight: 900;
         }
 
-        #custom-wlogout {
+        #custom-poweroff {
             padding-right: 4px;
             color: @red;
         }
@@ -238,10 +241,10 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
             "show-passive-items" = true;
             spacing = 17;
           };
-          "custom/wlogout" = {
+          "custom/poweroff" = {
             format = "⏻";
-            "on-click" = "wlogout";
-            tooltip = false;
+            "on-click-middle" = "${pkgs.systemd}/bin/systemctl poweroff";
+            tooltip = "Shutdown";
           };
           "custom/vpn" = lib.mkIf wgnordConfig.enable {
             format = "<span color='#${colors.base04}'></span> {}";

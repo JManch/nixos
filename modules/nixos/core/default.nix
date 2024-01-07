@@ -103,7 +103,5 @@
     XDG_STATE_HOME = "$HOME/.local/state";
   };
 
-  fonts.enableDefaultPackages = true;
-
   time.timeZone = "Europe/London";
 }

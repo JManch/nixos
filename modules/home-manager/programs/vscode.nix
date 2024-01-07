@@ -22,7 +22,7 @@ lib.mkIf cfg.enable {
       bbenoist.nix
       gruntfuggly.todo-tree
     ];
-    userSettings = {
+    userSettings = lib.mkIf (lib.fetchers.isWayland config) {
       # Prevents crash on launch
       "window.titleBarStyle" = "custom";
     };

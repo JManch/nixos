@@ -24,8 +24,8 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland")
     settings.bind =
       [
         # General
-        "${modShift}, Q, exit,"
-        "${modShift}, W, killactive,"
+        "${modShiftCtrl}, Q, exit,"
+        "${mod}, W, killactive,"
         "${mod}, C, togglefloating,"
         "${mod}, E, fullscreen, 1"
         "${modShift}, E, fullscreen, 0"

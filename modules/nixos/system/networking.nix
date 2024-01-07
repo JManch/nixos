@@ -9,7 +9,7 @@ let
 in
 {
   networking = {
-    hostName = "${hostname}";
+    hostName = hostname;
     networkmanager = {
       enable = true;
       wifi.powersave = true;

@@ -7,6 +7,17 @@
     type = "vm";
     cpu = "vm-amd";
     gpu = null;
+    monitors = [
+      {
+        name = "DP-1";
+        number = 1;
+        refreshRate = 60.0;
+        width = 1920;
+        height = 1080;
+        position = "0";
+        workspaces = [ 1 2 3 4 5 6 7 8 9 ];
+      }
+    ];
   };
 
   usrEnv = {

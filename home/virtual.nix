@@ -1,4 +1,7 @@
-{
+{ inputs
+, pkgs
+, ...
+}: {
   imports = [
     ./core.nix
   ];
@@ -6,6 +9,10 @@
   modules = {
     desktop = {
       dunst.enable = true;
+      style.font = {
+        family = "BerkeleyMono Nerd Font";
+        package = inputs.nix-resources.packages.${pkgs.system}.berkeley-mono-nerdfont;
+      };
     };
     shell.enable = true;
 

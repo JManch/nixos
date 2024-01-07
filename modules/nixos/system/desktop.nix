@@ -15,6 +15,7 @@ lib.mkIf config.usrEnv.desktop.enable {
   services.xserver = {
     # Enable regardless of wayland for xwayland support
     enable = true;
+    layout = "us";
 
     displayManager = {
       defaultSession = lib.mkIf (desktopCfg.desktopManager != null) desktopCfg.desktopManager;
@@ -34,8 +35,13 @@ lib.mkIf config.usrEnv.desktop.enable {
     };
   };
 
-  programs.dconf.enable = true;
+  programs = {
+    dconf.enable = true;
+    xwayland.enable = true;
+  };
   security.polkit.enable = true;
+
+  fonts.enableDefaultPackages = true;
 
   # Needed for swaylock authentication
   security.pam.services.swaylock = lib.mkIf (homeManagerConfig.modules.desktop.swaylock.enable) { };

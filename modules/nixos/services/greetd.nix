@@ -7,7 +7,8 @@
 let
   cfg = config.modules.services.greetd;
 in
-lib.mkIf (cfg.enable) {
+lib.mkIf cfg.enable
+{
   services.greetd = {
     enable = true;
     settings = {

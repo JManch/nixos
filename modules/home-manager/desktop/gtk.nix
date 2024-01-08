@@ -39,7 +39,7 @@ lib.mkIf nixosConfig.usrEnv.desktop.enable {
       "XCURSOR_SIZE,${builtins.toString desktopCfg.style.cursorSize}"
     ];
     exec-once = [
-      "sleep 1 && hyprctl setcursor ${config.gtk.cursorTheme.name} ${builtins.toString desktopCfg.style.cursorSize}"
+      "hyprctl setcursor ${config.gtk.cursorTheme.name} ${builtins.toString desktopCfg.style.cursorSize}"
     ];
   };
 }

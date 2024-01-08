@@ -13,6 +13,7 @@
   ];
 
   nixpkgs = {
+    # TODO: Move these overlays
     overlays = [
       (final: prev: {
         eza = prev.eza.overrideAttrs (oldAttrs: rec {

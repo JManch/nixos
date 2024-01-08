@@ -18,6 +18,7 @@ let
   optional = lib.lists.optional;
 in
 lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
+  # TODO: Add easyeffects module
   programs.waybar = {
     enable = true;
     systemd = {

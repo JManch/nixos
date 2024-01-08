@@ -4,7 +4,7 @@ let
 in
 {
   imports = [
-    ./graphics.nix
+    ./graphics
     ./filesystem.nix
     # ./bluetooth.nix TODO:
   ];

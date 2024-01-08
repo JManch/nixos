@@ -1,135 +1,31 @@
-{ config
-, nixosConfig
-, lib
-, hostname
+{ lib
 , pkgs
+, config
+, hostname
+, nixosConfig
 , ...
 }:
 let
   cfg = config.modules.desktop.waybar;
   desktopCfg = config.modules.desktop;
-  isWayland = lib.fetchers.isWayland config;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
-  sessionTarget = lib.fetchers.getDesktopSessionTarget config;
+  isWayland = lib.fetchers.isWayland config;
   colors = config.colorscheme.colors;
-  wgnordConfig = nixosConfig.modules.services.wgnord;
-  audioEnabled = nixosConfig.modules.system.audio.enable;
-  easyeffects = config.modules.services.easyeffects;
+  sessionTarget = lib.fetchers.getDesktopSessionTarget config;
   optional = lib.lists.optional;
+
+  audio = nixosConfig.modules.system.audio;
+  wgnord = nixosConfig.modules.services.wgnord;
+  easyeffects = config.modules.services.easyeffects;
 in
-lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
-  # TODO: Add easyeffects module
+lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
+{
   programs.waybar = {
     enable = true;
     systemd = {
       enable = true;
       target = sessionTarget;
     };
-    style =
-      let
-        halfCornerRadius = builtins.toString (desktopCfg.style.cornerRadius / 2);
-        borderWidth = builtins.toString desktopCfg.style.borderWidth;
-        gapSize = desktopCfg.style.gapSize;
-      in
-        /* css */ ''
-        @define-color background #${colors.base00};
-        @define-color border #${colors.base05};
-        @define-color text-dark #${colors.base00};
-        @define-color text-light #${colors.base07};
-        @define-color green #${colors.base0B};
-        @define-color blue #${colors.base0D};
-        @define-color red #${colors.base08};
-        @define-color purple #${colors.base0E};
-        @define-color orange #${colors.base0F};
-        @define-color transparent rgba(0,0,0,0);
-
-        * {
-            font-family: '${desktopCfg.style.font.family}';
-            font-size: 16px;
-            font-weight: 600;
-            min-height: 0px;
-        }
-
-        tooltip {
-            background: @background;
-            color: @text-light;
-            border-radius: ${halfCornerRadius}px;
-            border: ${borderWidth}px solid @background;
-        }
-
-        window#waybar {
-            background: @background;
-            color: @text-light;
-            border-radius: 0px;
-            border: ${borderWidth}px solid @background;
-        }
-
-        window#waybar.fullscreen {
-            border-bottom: ${borderWidth}px solid @blue;
-        }
-
-        #workspaces {
-            margin: 5px 0px 5px ${builtins.toString (gapSize + 2)}px;
-            padding: 0px 0px;
-            border-radius: ${halfCornerRadius}px;
-            background: @blue;
-        }
-
-        button {
-          border-color: @transparent;
-          background: @transparent;
-        }
-
-        #workspaces button {
-            padding: 5px;
-        }
-
-        #workspaces button:hover {
-            box-shadow: inherit;
-            text-shadow: inherit;
-        }
-
-        #workspaces button label {
-            border-radius: ${halfCornerRadius}px;
-            border: ${borderWidth}px solid @transparent;
-
-            padding: 0px 0.4em;
-
-            color: @text-dark;
-            font-weight: 500;
-        }
-
-        #workspaces button.visible label {
-            background: @transparent;
-            border: ${borderWidth}px solid @background;
-            color: @text-dark;
-            font-weight: 900;
-        }
-
-        #workspaces button.active label {
-            background: @background;
-            border: ${borderWidth}px solid @background;
-            color: @text-light;
-            font-weight: 900;
-        }
-
-        #custom-poweroff {
-            padding-right: 4px;
-            color: @red;
-        }
-
-        #network.hostname {
-            margin: 5px ${builtins.toString (gapSize + 2)}px 5px 0px;
-            padding: 0px 7px;
-            border-radius: ${halfCornerRadius}px;
-            background: @blue;
-            color: @text-dark;
-        }
-
-        #custom-vpn {
-            margin-right: 3px;
-        }
-      '';
     settings = {
       bar =
         let
@@ -193,7 +89,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
               "on-scroll-down" = "shift_down";
             };
           };
-          pulseaudio = lib.mkIf audioEnabled {
+          pulseaudio = lib.mkIf audio.enable {
             format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%";
             "format-muted" = "<span color='#${colors.base08}' size='large'>󰖁</span> {volume:2}%";
             "format-icons" = {
@@ -206,15 +102,6 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
               ];
             };
             "on-click" = "${pkgs.pulseaudio}/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle";
-            "on-click-middle" = lib.mkIf easyeffects.enable /* bash */ ''
-              ${pkgs.systemd}/bin/systemctl status --user easyeffects > /dev/null 2>&1 && {
-                ${pkgs.systemd}/bin/systemctl stop --user easyeffects
-                ${pkgs.libnotify}/bin/notify-send --urgency=low -t 3000 'Easyeffects disabled'
-              } || {
-                ${pkgs.systemd}/bin/systemctl start --user easyeffects
-                ${pkgs.libnotify}/bin/notify-send --urgency=low -t 3000 'Easyeffects enabled'
-              }
-            '';
             tooltip = false;
           };
           network = {
@@ -247,30 +134,32 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
             "on-click-middle" = "${pkgs.systemd}/bin/systemctl poweroff";
             tooltip = "Shutdown";
           };
-          "custom/vpn" = lib.mkIf wgnordConfig.enable {
+          "custom/vpn" = lib.mkIf wgnord.enable {
             format = "<span color='#${colors.base04}'></span> {}";
-            exec = "echo '{\"text\": \"${wgnordConfig.country}\"}'";
+            exec = "${pkgs.coreutils}/bin/echo '{\"text\": \"${wgnord.country}\"}'";
             exec-if = "${pkgs.iproute2}/bin/ip link show wgnord > /dev/null 2>&1";
             return-type = "json";
             tooltip = false;
             interval = 5;
           };
-          "modules-left" = [
+          modules-left = [
             "custom/fullscreen"
             "hyprland/workspaces"
             "hyprland/submap"
             "hyprland/window"
           ];
-          "modules-center" = [
+          modules-center = [
             "clock"
           ];
-          "modules-right" =
-            optional wgnordConfig.enable "custom/vpn" ++
+          modules-right =
+            optional wgnord.enable "custom/vpn" ++
             [
               "network"
               "cpu"
               "memory"
-            ] ++ optional audioEnabled "pulseaudio" ++
+            ] ++
+            optional audio.enable "pulseaudio" ++
+            optional easyeffects.enable "custom/easyeffects" ++
             [
               "tray"
               "custom/poweroff"

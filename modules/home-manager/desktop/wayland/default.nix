@@ -7,9 +7,9 @@ with lib; {
     ./hyprland
     ./programs/anyrun.nix
     ./programs/swaylock.nix
-    ./services/swayidle.nix
-    ./services/waybar.nix
+    ./services/waybar
     ./services/swww.nix
+    ./services/swayidle.nix
   ];
   options.modules.desktop = {
     swaylock = {

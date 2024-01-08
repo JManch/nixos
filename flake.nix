@@ -63,6 +63,7 @@
     in
     {
       formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
+      overlays = import ./overlays { inherit inputs outputs; };
 
       nixosConfigurations = {
         ncase-m1 = nixpkgs.lib.nixosSystem {

@@ -6,6 +6,9 @@
 }:
 let
   cfg = config.modules.services.easyeffects;
+  waybar = config.modules.desktop.waybar;
+  dconf = nixosConfig.programs.dconf;
+  audio = nixosConfig.modules.system.audio;
 
   autoloadDeviceConfigs = builtins.listToAttrs
     (builtins.map
@@ -14,7 +17,7 @@ let
     );
 in
 # easyeffects requires dconf
-lib.mkIf (cfg.enable && nixosConfig.programs.dconf.enable) {
+lib.mkIf (cfg.enable && audio.enable && dconf.enable) {
 
   home.packages = [ pkgs.easyeffects ];
 
@@ -34,7 +37,33 @@ lib.mkIf (cfg.enable && nixosConfig.programs.dconf.enable) {
     };
   };
 
-  xdg.configFile = {
+  programs.waybar = lib.mkIf waybar.enable {
+    settings.bar =
+      with pkgs;
+      let
+        colors = config.colorscheme.colors;
+      in
+      {
+        pulseaudio = {
+          "on-click-middle" = /* bash */ ''
+            ${systemd}/bin/systemctl status --user easyeffects > /dev/null 2>&1 && {
+              ${systemd}/bin/systemctl stop --user easyeffects
+              ${libnotify}/bin/notify-send --urgency=low -t 3000 'Easyeffects disabled'
+            } || {
+              ${systemd}/bin/systemctl start --user easyeffects
+              ${libnotify}/bin/notify-send --urgency=low -t 3000 'Easyeffects enabled'
+            }
+          '';
+        };
+        "custom/easyeffects" = {
+          format = "<span color='#${colors.base04}' size='large'>󰤽</span> Easyeffects";
+          exec = "${systemd}/bin/systemctl status --user easyeffects";
+          interval = 5;
+        };
+      };
+  };
+
+  xdg.configFile = autoloadDeviceConfigs // {
     "easyeffects/input/improved-microphone.json".text = /* json */ ''
       {
         "input": {
@@ -282,5 +311,5 @@ lib.mkIf (cfg.enable && nixosConfig.programs.dconf.enable) {
         }
       }
     '';
-  } // autoloadDeviceConfigs;
+  };
 }

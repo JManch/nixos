@@ -32,7 +32,7 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
           // [wlr] [GLES2] 0:4(13): error: illegal use of reserved word `output'
           // [wlr] [GLES2] 0:4(13): error: syntax error, unexpected ERROR_TOK, expecting ',' or ';'
 
-          if (monitor == 1) {
+          if (monitor == 0) {
               vec4 pixColor = texture2D(tex, v_texcoord);
               pixColor.rgb = pow(pixColor.rgb, vec3(1.0 / 0.75));
               gl_FragColor = pixColor;

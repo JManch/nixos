@@ -44,10 +44,10 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
             # TODO: Configure this modularly
             "persistent-workspaces" = {
               "1" = [
-                "DP-2"
+                "DP-1"
               ];
               "3" = [
-                "DP-2"
+                "DP-1"
               ];
               "2" = [
                 "HDMI-A-1"
@@ -114,6 +114,12 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
             interval = 5;
             format = "<span color='#${colors.base04}'></span> {usage}%";
           };
+          # TODO: Make this modular. Only works on AMD, just assume it is always hwmon0
+          "custom/gpu" = {
+            format = "<span color='#${colors.base04}' size='large'>󰾲</span> {}%";
+            exec = "${pkgs.coreutils}/bin/cat /sys/class/hwmon/hwmon0/device/gpu_busy_percent";
+            interval = 5;
+          };
           memory = {
             interval = 30;
             format = "<span color='#${colors.base04}'></span> {used:0.1f}GiB";
@@ -156,6 +162,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
             [
               "network"
               "cpu"
+              "custom/gpu"
               "memory"
             ] ++
             optional audio.enable "pulseaudio" ++

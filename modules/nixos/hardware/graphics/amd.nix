@@ -34,4 +34,15 @@ lib.mkIf amd
   };
 
   services.xserver.videoDrivers = lib.mkIf desktop [ "modesetting" ];
+
+  environment.persistence."/persist".users.${username} = {
+    directories = [
+      ".cache/AMD"
+      ".cache/mesa_shader_cache"
+    ];
+    files = [
+      ".cache/radv_builtin_shaders32"
+      ".cache/radv_builtin_shaders64"
+    ];
+  };
 }

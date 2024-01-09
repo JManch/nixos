@@ -14,7 +14,7 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
     enable = true;
     settings = {
       global = with desktopCfg.style; {
-        monitor = "0";
+        monitor = builtins.toString cfg.monitorNumber;
         follow = "none";
         enable_posix_regex = true;
         font = "${desktopCfg.style.font.family} 13";

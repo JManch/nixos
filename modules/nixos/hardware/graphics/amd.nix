@@ -1,6 +1,7 @@
 { lib
 , pkgs
 , config
+, username
 , ...
 }:
 let
@@ -35,6 +36,11 @@ lib.mkIf amd
     extraPackages32 = with pkgs; [
       pkgs.driversi686Linux.amdvlk
     ];
+  };
+
+  environment.sessionVariables = {
+    # Make radv the default driver as just installed amdvlk makes it default
+    AMD_VULKAN_ICD = "RADV";
   };
 
   services.xserver.videoDrivers = lib.mkIf desktop [ "modesetting" ];

@@ -10,6 +10,7 @@
 
   home.packages = with pkgs; [
     mpv
+    chatterino2
   ];
 
   modules = {

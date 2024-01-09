@@ -91,10 +91,11 @@ in
     desktop.hyprland.settings =
       let
         modKey = config.modules.desktop.hyprland.modKey;
+        anyrun = config.programs.anyrun.package;
       in
       lib.mkIf (config.modules.desktop.windowManager == "hyprland") {
         bindr = [
-          "${modKey}, ${modKey}_L, exec, anyrun"
+          "${modKey}, ${modKey}_L, exec, ${pkgs.procps}/bin/pkill anyrun || ${anyrun}/bin/anyrun"
         ];
         layerrule = [
           "blur, anyrun"

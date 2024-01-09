@@ -1,5 +1,3 @@
 {
-  imports = [
-    ./fans.nix
-  ];
+  imports = [ ];
 }

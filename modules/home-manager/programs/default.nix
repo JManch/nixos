@@ -16,6 +16,7 @@ in
     ./obs.nix
     ./vscode.nix
     ./stremio.nix
+    ./steam.nix
   ];
 
   options.modules.programs = {

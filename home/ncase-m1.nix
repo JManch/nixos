@@ -18,6 +18,8 @@
     desktop = {
       windowManager = "hyprland";
 
+      hyprland.tearing = true;
+
       style = {
         font = {
           family = "BerkeleyMono Nerd Font";

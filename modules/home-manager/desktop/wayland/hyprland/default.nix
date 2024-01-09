@@ -14,6 +14,7 @@ with lib; {
         description = "The modifier key to use for bindings";
         default = "SUPER";
       };
+      tearing = mkEnableOption "allow tearing";
     };
   };
 }

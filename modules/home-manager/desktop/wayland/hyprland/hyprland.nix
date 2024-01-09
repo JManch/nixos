@@ -6,12 +6,14 @@
 , ...
 }:
 let
-  hyprlandPackages = inputs.hyprland.packages.${pkgs.system};
+  cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
+  hyprlandPackages = inputs.hyprland.packages.${pkgs.system};
   colors = config.colorscheme.colors;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+  inherit (lib) mkIf;
 in
-lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
+mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
   home.packages = with pkgs; [
     hyprshot
     wl-clipboard
@@ -40,7 +42,7 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
         "__GL_GSYNC_ALLOWED,0"
         "__GL_VRR_ALLOWED,0"
-      ];
+      ] ++ lib.lists.optional cfg.tearing "WLR_DRM_NO_ATOMIC,1";
 
       monitor = (lib.lists.map
         (
@@ -77,7 +79,12 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         "col.active_border" = "0xff${colors.base0D}";
         "col.inactive_border" = "0xff${colors.base00}";
         cursor_inactive_timeout = 0;
+        allow_tearing = cfg.tearing;
       };
+
+      windowrulev2 = mkIf cfg.tearing [
+        "immediate, class:^(steam_app.*|cs2)$"
+      ];
 
       decoration = {
         # Hyprland corner radius seems slightly stronger than CSS

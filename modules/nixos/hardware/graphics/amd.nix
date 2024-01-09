@@ -9,6 +9,10 @@ let
 in
 lib.mkIf amd
 {
+  environment.systemPackages = [
+    pkgs.amdgpu_top
+  ];
+
   boot.initrd.kernelModules = lib.mkBefore [ "amdgpu" ];
 
   # AMD Driver Explanation

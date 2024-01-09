@@ -158,6 +158,10 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         movefocus_cycles_fullscreen = false;
       };
 
+      debug = {
+        disable_logs = !cfg.logging;
+      };
+
       workspace = lib.lists.concatMap
         (
           m:

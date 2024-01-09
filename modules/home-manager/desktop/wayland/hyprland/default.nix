@@ -15,6 +15,7 @@ with lib; {
         default = "SUPER";
       };
       tearing = mkEnableOption "allow tearing";
+      logging = mkEnableOption "logging";
     };
   };
 }

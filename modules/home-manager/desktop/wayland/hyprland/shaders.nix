@@ -19,11 +19,20 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
       precision mediump float;
       varying vec2 v_texcoord;
       uniform sampler2D tex;
-      uniform int output;
+      uniform int monitor;
 
       void main() {
           // Apply gamma adjustment to monitor
-          if (output == 1) {
+
+          // NOTE: Had to apply a patch to hyprland which renames output to
+          // monitor The issue coincided with my GPU upgrade from NVIDIA -> AMD
+          // so that might be related
+
+          // LOG ERROR
+          // [wlr] [GLES2] 0:4(13): error: illegal use of reserved word `output'
+          // [wlr] [GLES2] 0:4(13): error: syntax error, unexpected ERROR_TOK, expecting ',' or ';'
+
+          if (monitor == 1) {
               vec4 pixColor = texture2D(tex, v_texcoord);
               pixColor.rgb = pow(pixColor.rgb, vec3(1.0 / 0.75));
               gl_FragColor = pixColor;

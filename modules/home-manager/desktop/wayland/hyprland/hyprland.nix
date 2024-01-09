@@ -27,7 +27,9 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
 
   wayland.windowManager.hyprland = {
     enable = true;
-    package = hyprlandPackages.hyprland;
+    package = hyprlandPackages.hyprland.overrideAttrs (oldAttrs: {
+      patches = (oldAttrs.patches or [ ]) ++ [ ../../../../../overlays/hyprlandOutputRename.diff ];
+    });
     settings = {
       env = [
         "NIXOS_OZONE_WL,1"

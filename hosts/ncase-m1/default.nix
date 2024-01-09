@@ -6,12 +6,12 @@
   device = {
     type = "desktop";
     cpu = "amd";
-    gpu = "nvidia";
+    gpu = "amd";
     monitors = [
       {
-        name = "DP-2";
+        name = "DP-1";
         number = 1;
-        refreshRate = 120.0;
+        refreshRate = 144.0;
         width = 2560;
         height = 1440;
         position = "2560x0";
@@ -25,13 +25,6 @@
         height = 1440;
         position = "0x0";
         workspaces = [ 2 4 6 8 ];
-      }
-      {
-        name = "DP-3";
-        number = 3;
-        width = 2560;
-        height = 1440;
-        enabled = false;
       }
     ];
   };

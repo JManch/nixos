@@ -1,14 +1,18 @@
 { username
+, hostname
+, outputs
 , config
 , pkgs
 , lib
 , ...
 }:
+let
+  homeConfig = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username};
+in
 lib.mkIf (config.modules.programs.steam.enable) {
 
   environment.systemPackages = [
     pkgs.libnotify
-    pkgs.mangohud
     pkgs.steam-run
   ];
 
@@ -40,8 +44,9 @@ lib.mkIf (config.modules.programs.steam.enable) {
     enable = true;
     settings = {
       custom = {
-        start = "${pkgs.libnotify}/bin/notify-send --urgency=critical -t 3000 'GameMode started'";
-        end = "${pkgs.libnotify}/bin/notify-send --urgency=critical -t 3000 'GameMode ended'";
+        # TODO: Make this modular
+        start = "${homeConfig.wayland.windowManager.hyprland.package}/bin/hyprctl keyword monitor DP-1,2560x1440@165,2560x0,1 && ${pkgs.libnotify}/bin/notify-send --urgency=critical -t 3000 'GameMode started'";
+        end = "${homeConfig.wayland.windowManager.hyprland.package}/bin/hyprctl keyword monitor DP-1,2560x1440@144,2560x0,1 && ${pkgs.libnotify}/bin/notify-send --urgency=critical -t 3000 'GameMode ended'";
       };
     };
   };

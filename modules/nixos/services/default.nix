@@ -1,4 +1,5 @@
 { lib
+, config
 , ...
 }:
 let
@@ -43,5 +44,11 @@ in
       };
     };
 
+    udisks2.enable = mkEnableOption "udisks2";
+
+  };
+
+  config = {
+    services.udisks2.enable = config.modules.services.udisks2.enable;
   };
 }

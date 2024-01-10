@@ -49,15 +49,29 @@ in
       description = "The type/purpose of the device";
     };
 
-    cpu = mkOption {
-      type = with types; nullOr (enum [ "intel" "vm-intel" "amd" "vm-amd" ]);
-      description = "The device's CPU manufacturer";
+    cpu = {
+      type = mkOption {
+        type = with types; nullOr (enum [ "intel" "vm-intel" "amd" "vm-amd" ]);
+        description = "The device's CPU manufacturer";
+      };
+      name = mkOption {
+        type = types.str;
+        default = "";
+        description = "The CPU name, not critical";
+      };
     };
 
-    gpu = mkOption {
-      type = with types; nullOr (enum [ "nvidia" "amd" ]);
-      default = null;
-      description = "The device's GPU manufacturer";
+    gpu = {
+      type = mkOption {
+        type = with types; nullOr (enum [ "nvidia" "amd" ]);
+        default = null;
+        description = "The device's GPU manufacturer";
+      };
+      name = mkOption {
+        type = types.str;
+        default = "";
+        description = "The GPU name, not critical";
+      };
     };
 
     monitors = mkOption {

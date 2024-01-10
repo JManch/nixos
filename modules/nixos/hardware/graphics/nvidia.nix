@@ -7,7 +7,7 @@
 , ...
 }:
 let
-  nvidia = config.device.gpu == "nvidia";
+  nvidia = config.device.gpu.type == "nvidia";
   desktop = config.usrEnv.desktop.enable;
   homeManagerConfig = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username};
 in

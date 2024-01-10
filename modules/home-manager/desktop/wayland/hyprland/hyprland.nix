@@ -38,7 +38,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         "XDG_SESSION_DESKTOP=Hyprland"
         "WLR_NO_HARDWARE_CURSORS,1"
         "HYPRSHOT_DIR,${config.xdg.userDirs.pictures}/screenshots"
-      ] ++ lib.lists.optionals (nixosConfig.device.gpu == "nvidia") [
+      ] ++ lib.lists.optionals (nixosConfig.device.gpu.type == "nvidia") [
         "LIBVA_DRIVER_NAME,nvidia"
         "GBM_BACKEND,nvidia-drm"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"

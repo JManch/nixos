@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  amd = config.device.gpu == "amd";
+  amd = config.device.gpu.type == "amd";
   desktop = config.usrEnv.desktop.enable;
 in
 lib.mkIf amd

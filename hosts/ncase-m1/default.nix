@@ -5,8 +5,14 @@
 
   device = {
     type = "desktop";
-    cpu = "amd";
-    gpu = "amd";
+    cpu = {
+      name = "R7 3700x";
+      type = "amd";
+    };
+    gpu = {
+      name = "RX 7900XT";
+      type = "amd";
+    };
     monitors = [
       {
         name = "DP-1";

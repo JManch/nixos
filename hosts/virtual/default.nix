@@ -5,8 +5,8 @@
 
   device = {
     type = "vm";
-    cpu = "vm-amd";
-    gpu = null;
+    cpu.type = "vm-amd";
+    gpu.type = null;
     monitors = [
       {
         name = "DP-1";

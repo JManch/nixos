@@ -1,9 +1,9 @@
-{ config
-, lib
+{ lib
+, config
 , ...
 }:
 let
-  binary = "${config.programs.alacritty.package}/bin/alacritty";
+  alacritty = config.programs.alacritty.package;
   cfg = config.modules.programs.alacritty;
   desktopCfg = config.modules.desktop;
   colors = config.colorscheme.colors;
@@ -62,5 +62,5 @@ lib.mkIf cfg.enable {
     };
   };
   desktop.hyprland.binds = lib.mkIf (desktopCfg.windowManager == "hyprland")
-    [ "${desktopCfg.hyprland.modKey}, Return, exec, ${binary}" ];
+    [ "${desktopCfg.hyprland.modKey}, Return, exec, ${alacritty}/bin/alacritty" ];
 }

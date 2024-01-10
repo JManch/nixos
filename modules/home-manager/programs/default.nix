@@ -17,6 +17,7 @@ in
     ./vscode.nix
     ./stremio.nix
     ./steam.nix
+    ./mangohud.nix
   ];
 
   options.modules.programs = {

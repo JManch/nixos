@@ -50,9 +50,5 @@ lib.mkIf amd
       ".cache/AMD"
       ".cache/mesa_shader_cache"
     ];
-    files = [
-      ".cache/radv_builtin_shaders32"
-      ".cache/radv_builtin_shaders64"
-    ];
   };
 }

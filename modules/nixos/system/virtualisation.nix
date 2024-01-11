@@ -1,6 +1,7 @@
-{ username
-, lib
+{ lib
+, pkgs
 , config
+, username
 , ...
 }:
 lib.mkIf config.modules.system.virtualisation.enable {

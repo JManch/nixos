@@ -3,6 +3,7 @@
 , ...
 }:
 let
+  lib = inputs.nixpkgs.lib;
   addPatches = pkg: patches: pkg.overrideAttrs (oldAttrs: {
     patches = (oldAttrs.patches or [ ]) ++ patches;
   });
@@ -43,6 +44,16 @@ in
         substituteInPlace $out/share/applications/amdgpu_top.desktop \
           --replace "Name=AMDGPU TOP (GUI)" "Name=AMDGPU TOP"
       '';
+    });
+
+    # Commit with new feature https://github.com/Gustash/Hyprshot/pull/19
+    hyprshot = prev.hyprshot.overrideAttrs (oldAttrs: {
+      src = final.fetchFromGitHub {
+        owner = "Gustash";
+        repo = "Hyprshot";
+        rev = "36dbe2e6e97fb96bf524193bf91f3d172e9011a5";
+        hash = "sha256-n1hDJ4Bi0zBI/Gp8iP9w9rt1nbGSayZ4V75CxOzSfFg=";
+      };
     });
 
   };

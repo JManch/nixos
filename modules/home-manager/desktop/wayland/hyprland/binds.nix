@@ -13,8 +13,18 @@ let
   modShift = "${cfg.modKey}SHIFT";
   modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
   getMonitorByNumber = number: lib.fetchers.getMonitorByNumber nixosConfig number;
+  primaryMonitor = lib.fetchers.primaryMonitor nixosConfig;
   hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
   getOption = option: type: "${hyprctl} getoption ${option} -j | ${pkgs.jaq}/bin/jaq -r '.${type}'";
+
+  disableShaderCommand =
+    let
+      shaderDir = "${config.xdg.configHome}/hypr/shaders";
+      disableShader = "${hyprctl} keyword decoration:screen_shader ${shaderDir}/blank.frag";
+      enableShader = "${hyprctl} keyword decoration:screen_shader ${shaderDir}/monitor1_gamma.frag";
+    in
+    command: "${disableShader} && ${command} && ${enableShader}";
+
 in
 lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland")
 {
@@ -59,9 +69,10 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland")
         "${mod}, M, exec, ${hyprctl} keyword dwindle:no_gaps_when_only $(($(${getOption "dwindle:no_gaps_when_only" "int"}) ^ 1))"
 
         # Hyprshot
-        ", Print, exec, ${hyprshot} -m region --clipboard-only"
-        "${mod}, Print, exec, ${hyprshot} -m region"
-        "${modShift}, Print, exec, ${hyprshot} -m output"
+        ", Print, exec, ${disableShaderCommand "${hyprshot} -m region --clipboard-only"}"
+        "${mod}, I, exec, ${disableShaderCommand "${hyprshot} -m output -m active --clipboard-only"}"
+        "${modShift}, Print, exec, ${disableShaderCommand "${hyprshot} -m region"}"
+        "${modShift}, I, exec, ${disableShaderCommand "${hyprshot} -m output -m active"}"
 
         # Workspaces other
         "${mod}, N, workspace, previous"

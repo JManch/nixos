@@ -21,6 +21,7 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
         icon_theme = config.gtk.iconTheme.name;
         show_indicators = true;
         format = "<b>%s</b>\\n<span font='10'>%b</span>";
+        layer = "overlay";
 
         corner_radius = cornerRadius;
         width = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).width * 0.15);

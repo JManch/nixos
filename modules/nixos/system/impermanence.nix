@@ -1,11 +1,10 @@
-{ inputs
-, outputs
+{ lib
+, inputs
 , username
-, hostname
 , ...
-}:
+} @ args:
 let
-  homeManagerImpermanence = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username}.impermanence;
+  homeManagerImpermanence = (lib.utils.homeConfig args).impermanence;
 in
 {
   imports = [

@@ -7,4 +7,6 @@ in
     (mkIf p yes)
     (mkIf (!p) no)
   ];
+
+  homeConfig = args: args.outputs.nixosConfigurations.${args.hostname}.config.home-manager.users.${args.username};
 }

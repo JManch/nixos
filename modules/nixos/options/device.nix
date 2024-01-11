@@ -25,6 +25,14 @@ let
         type = types.float;
         default = 60;
       };
+      gamingRefreshRate = mkOption {
+        type = types.float;
+        default = null;
+        description = ''
+          Gaming refresh rate to switch to when starting gamemode.
+          Only affects the primary monitor.
+        '';
+      };
       position = mkOption {
         type = types.str;
         default = "0x0";

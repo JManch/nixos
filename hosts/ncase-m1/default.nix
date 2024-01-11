@@ -18,6 +18,7 @@
         name = "DP-1";
         number = 1;
         refreshRate = 144.0;
+        gamingRefreshRate = 165.0;
         width = 2560;
         height = 1440;
         position = "2560x0";

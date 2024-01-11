@@ -10,6 +10,7 @@ lib.mkIf cfg.enable {
   home.packages = with pkgs; [
     discord
     webcord
+    discord-screenaudio
   ];
 
   impermanence.directories = [

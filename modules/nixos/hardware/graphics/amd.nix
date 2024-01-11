@@ -29,13 +29,17 @@ lib.mkIf amd
     enable = true;
     driSupport = true;
     driSupport32Bit = true;
-    extraPackages = [
-      # Might need to add extra hardware acceleration packages here
-      pkgs.amdvlk
-    ];
-    extraPackages32 = with pkgs; [
-      pkgs.driversi686Linux.amdvlk
-    ];
+
+    # NOTE: Completely removing amdvlk for now because it seems that gamescope
+    # does not adhere to AMD_VULKAN_ICD and uses amdvlk regardless, causing it
+    # to not launch
+
+    # extraPackages = [
+    #   pkgs.amdvlk
+    # ];
+    # extraPackages32 = with pkgs; [
+    #   pkgs.driversi686Linux.amdvlk
+    # ];
   };
 
   environment.sessionVariables = {

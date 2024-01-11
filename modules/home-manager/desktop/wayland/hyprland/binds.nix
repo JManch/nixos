@@ -78,6 +78,7 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland")
         "${mod}, N, workspace, previous"
         "${mod}, S, togglespecialworkspace,"
         "${modShift}, S, movetoworkspacesilent, special"
+        "${mod}, G, workspace, name:GAME"
       ] ++ (
         # Workspaces
         let

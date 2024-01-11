@@ -58,7 +58,9 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
                 "${builtins.toString m.width}x${builtins.toString m.height}@${builtins.toString m.refreshRate}, ${m.position}, 1"
             )
         )
-        nixosConfig.device.monitors) ++ [
+        nixosConfig.device.monitors
+      )
+      ++ [
         ",preferred,auto,1" # automatic monitor detection
       ];
 
@@ -86,6 +88,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
 
       windowrulev2 = mkIf cfg.tearing [
         "immediate, class:^(steam_app.*|cs2)$"
+        "workspace name:GAME, class:^(steam_app.*|cs2)$"
       ];
 
       decoration = {
@@ -164,7 +167,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         disable_logs = !cfg.logging;
       };
 
-      workspace = lib.lists.concatMap
+      workspace = (lib.lists.concatMap
         (
           m:
           let
@@ -179,7 +182,11 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
               m.workspaces
           )
         )
-        nixosConfig.device.monitors;
+        nixosConfig.device.monitors
+      )
+      ++ [
+        "name:GAME,monitor:${(lib.fetchers.primaryMonitor nixosConfig).name},border:false" # automatic monitor detection
+      ];
     };
   };
 }

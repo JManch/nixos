@@ -56,7 +56,7 @@
     programs = {
       wine.enable = false;
       winbox.enable = true;
-      steam.enable = true;
+      gaming.enable = true;
     };
 
     services = {

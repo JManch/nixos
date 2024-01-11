@@ -8,9 +8,9 @@ let
   cfg = config.modules.programs.mangohud;
   device = nixosConfig.device;
   colors = config.colorscheme.colors;
-  steam = nixosConfig.modules.programs.steam;
+  gaming = nixosConfig.modules.programs.gaming;
 in
-lib.mkIf steam.enable {
+lib.mkIf gaming.enable {
   programs.mangohud = {
     enable = true;
     # Launch for all applications

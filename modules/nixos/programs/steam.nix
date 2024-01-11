@@ -9,7 +9,7 @@
 let
   homeConfig = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username};
 in
-lib.mkIf (config.modules.programs.steam.enable) {
+lib.mkIf (config.modules.programs.gaming.enable) {
 
   environment.systemPackages = [
     pkgs.libnotify

@@ -7,6 +7,7 @@ in
     ./wine.nix
     ./winbox.nix
     ./steam.nix
+    ./gamemode.nix
   ];
 
   options.modules.programs = {

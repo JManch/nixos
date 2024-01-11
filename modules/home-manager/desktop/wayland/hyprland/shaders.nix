@@ -60,12 +60,18 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
   wayland.windowManager.hyprland.settings.bind =
     let
       hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
-      blankShader = "${config.xdg.configHome}/hypr/shaders/blank.frag";
-      shader = "${config.xdg.configHome}/hypr/shaders/monitor1_gamma.frag";
-      getShader = "$(${hyprctl} getoption decoration:screen_shader -j | ${pkgs.jaq}/bin/jaq -r '.str')";
-      shaderToggle = "if [[ ${getShader} == \"${shader}\" ]]; then ${pkgs.coreutils}/bin/echo \"${blankShader}\"; else ${pkgs.coreutils}/bin/echo \"${shader}\"; fi";
+      shaderDir = "${config.xdg.configHome}/hypr/shaders";
+
+      toggleShader = pkgs.writeShellScript "hypr-toggle-shader" ''
+        shader=$(${hyprctl} getoption decoration:screen_shader -j | ${pkgs.jaq}/bin/jaq -r '.str')
+        if [[ $shader == "${shaderDir}/monitor1_gamma.frag" ]]; then
+            ${hyprctl} keyword decoration:screen_shader "${shaderDir}/blank.frag"
+        else
+            ${hyprctl} keyword decoration:screen_shader "${shaderDir}/monitor1_gamma.frag"
+        fi
+      '';
     in
     [
-      "${cfg.modKey}, O, exec, ${hyprctl} keyword decoration:screen_shader $(${shaderToggle})"
+      "${cfg.modKey}, O, exec, ${toggleShader.outPath}"
     ];
 }

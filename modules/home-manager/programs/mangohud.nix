@@ -14,16 +14,13 @@ lib.mkIf gaming.enable {
   programs.mangohud = {
     enable = true;
     settings = {
-
       # Performance
       fps_limit = "0,60,144,165";
       show_fps_limit = true;
 
       # UI
-      # full = true; # show all available parameters
       legacy_layout = 0;
       no_display = true; # Whether to hide the HUD by default
-      custom_text_center = "${hostname}";
       font_size = 20;
       round_corners = "${builtins.toString config.modules.desktop.style.cornerRadius}";
       hud_compact = true;
@@ -34,7 +31,7 @@ lib.mkIf gaming.enable {
       ram_color = "${colors.base0C}";
       engine_color = "${colors.base0F}";
       io_color = "${colors.base0D}";
-      frametime_color = "${colors.base0E}";
+      frametime_color = "${colors.base0B}";
       background_color = "${colors.base00}";
 
       # GPU

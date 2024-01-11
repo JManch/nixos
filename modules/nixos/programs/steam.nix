@@ -1,24 +1,33 @@
-{ username
-, hostname
-, outputs
-, config
+{ lib
 , pkgs
-, lib
+, config
+, username
 , ...
-}:
+} @ args:
 let
-  homeConfig = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username};
+  homeConfig = lib.utils.homeConfig args;
 in
 lib.mkIf (config.modules.programs.gaming.enable) {
 
-  environment.systemPackages = [
-    pkgs.libnotify
-    pkgs.steam-run
+  # -- Common steam launch commands --
+  # Standard:
+  # - mangohud gamemoderun %command%
+  # FPS Limit:
+  # - MANGOHUD_CONFIG=read_cfg,fps_limit=200 mangohud gamemoderun %command%
+
+  environment.systemPackages = with pkgs; [
+    steam-run
+    r2modman
   ];
 
-  nixpkgs.config.packageOverrides = pkgs: {
-    steam = pkgs.steam.override {
-      extraPkgs = pkgs: with pkgs; [
+  programs.steam = {
+    enable = true;
+    package = pkgs.steam.override {
+      extraPkgs = (pkgs: with pkgs; [
+        # gamemode # fixes libgamemode.so: cannot open shared object file 
+        # mangohud
+        # gamescope
+        # These fix gamescope
         xorg.libXcursor
         xorg.libXi
         xorg.libXinerama
@@ -29,33 +38,19 @@ lib.mkIf (config.modules.programs.gaming.enable) {
         stdenv.cc.cc.lib
         libkrb5
         keyutils
-      ];
+      ]);
     };
-  };
-
-  programs.steam = {
-    enable = true;
     gamescopeSession.enable = true;
   };
 
   programs.gamescope.enable = true;
-
-  programs.gamemode = {
-    enable = true;
-    settings = {
-      custom = {
-        # TODO: Make this modular
-        start = "${homeConfig.wayland.windowManager.hyprland.package}/bin/hyprctl keyword monitor DP-1,2560x1440@165,2560x0,1 && ${pkgs.libnotify}/bin/notify-send --urgency=critical -t 3000 'GameMode started'";
-        end = "${homeConfig.wayland.windowManager.hyprland.package}/bin/hyprctl keyword monitor DP-1,2560x1440@144,2560x0,1 && ${pkgs.libnotify}/bin/notify-send --urgency=critical -t 3000 'GameMode ended'";
-      };
-    };
-  };
 
   environment.persistence."/persist".users.${username} = {
     directories = [
       ".steam"
       ".local/share/Steam"
       ".factorio"
+      ".config/r2modman"
     ];
   };
 }

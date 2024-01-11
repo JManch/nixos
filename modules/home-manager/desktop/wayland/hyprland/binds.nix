@@ -25,6 +25,18 @@ let
     in
     command: "${disableShader} && ${command} && ${enableShader}";
 
+  toggleFloating =
+    let
+      floatWidth = builtins.toString (primaryMonitor.width / 2);
+      floatHeight = builtins.toString (primaryMonitor.height / 2);
+    in
+    pkgs.writeShellScript "hypr-toggle-floating" ''
+      if [[ $(${hyprctl} activewindow -j | ${pkgs.jaq}/bin/jaq -r '.floating') == "false" ]]; then
+        ${hyprctl} --batch 'dispatch togglefloating; dispatch resizeactive exact ${floatWidth} ${floatHeight}; dispatch centerwindow;'
+      else
+        ${hyprctl} dispatch togglefloating
+      fi
+    '';
 in
 lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland")
 {
@@ -36,7 +48,7 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland")
         # General
         "${modShiftCtrl}, Q, exit,"
         "${mod}, W, killactive,"
-        "${mod}, C, togglefloating,"
+        "${mod}, C, exec, ${toggleFloating.outPath}"
         "${mod}, E, fullscreen, 1"
         "${modShift}, E, fullscreen, 0"
         "${mod}, Z, pin, active"

@@ -35,5 +35,15 @@ in
       };
     };
 
+    # https://github.com/flightlessmango/MangoHud/issues/444
+    mangohud = addPatches prev.mangohud [ ./mangoHud.diff ];
+
+    amdgpu_top = prev.amdgpu_top.overrideAttrs (oldAttrs: {
+      postInstall = oldAttrs.postInstall + ''
+        substituteInPlace $out/share/applications/amdgpu_top.desktop \
+          --replace "Name=AMDGPU TOP (GUI)" "Name=AMDGPU TOP"
+      '';
+    });
+
   };
 }

@@ -1,6 +1,6 @@
-{ config
-, inputs
-, lib
+{ lib
+, config
+, nixosConfig
 , ...
 }:
 let
@@ -27,7 +27,13 @@ lib.mkIf cfg.enable {
           # General
           "general.autoScroll" = true;
           "extensions.pocket.enabled" = false;
-          "toolkit.legacyUserProfileCustomizations.stylesheets" = true; # Enable userChrome.css modifications
+          # Enable userChrome.css modifications
+          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+          # Enable hardware acceleration
+          # Firefox only support VAAPI acceleration. This is natively supported
+          # by AMD cards but NVIDIA cards need a translation library to go from
+          # VDPAU to VAAPI.
+          "media.ffmpeg.vaapi.enabled" = (nixosConfig.device.gpu.type != null);
 
           # Scrolling
           "mousewheel.default.delta_multiplier_x" = 95;

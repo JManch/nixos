@@ -1,4 +1,5 @@
 { config
+, inputs
 , pkgs
 , lib
 , ...
@@ -12,6 +13,13 @@ lib.mkIf cfg.enable {
     webcord
     discord-screenaudio
   ];
+
+  programs.firefox.package =
+    pkgs.firefox.override {
+      nativeMessagingHosts = [
+        inputs.pipewire-screenaudio.packages.${pkgs.system}.default
+      ];
+    };
 
   impermanence.directories = [
     ".config/WebCord"

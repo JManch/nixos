@@ -43,7 +43,7 @@ lib.mkIf amd
   };
 
   environment.sessionVariables = {
-    # Make radv the default driver as just installed amdvlk makes it default
+    # Make radv the default driver
     AMD_VULKAN_ICD = "RADV";
   };
 

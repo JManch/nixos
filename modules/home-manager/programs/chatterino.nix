@@ -23,7 +23,7 @@ let
         WINDOW_ADDRESS="''${args[0]#*>>}";
         WORKSPACE_NAME="''${args[1]}";
         WINDOW_CLASS="''${args[2]}";
-        if [[ "$WORKSPACE_NAME" == "TWITCH" ]]; then
+        if [[ "$WORKSPACE_NAME" =~ ^(name:|)TWITCH$ ]]; then
           if [[ "$WINDOW_CLASS" == "mpv" || "$WINDOW_CLASS" == "firefox" ]]; then
             ${hyprctl} --batch "dispatch focuswindow address:0x$WINDOWADDRESS; dispatch movewindow l"
           fi
@@ -70,7 +70,9 @@ lib.mkIf cfg.enable {
       "${config.modules.desktop.hyprland.modKey}, T, workspace, name:TWITCH"
     ];
     windowrulev2 = [
-      "workspace TWITCH,class:mpv,title:^(twitch\.tv.*)$"
+      # Not using "name:" here does work however it causes my current workspace
+      # to unexpectedly switch so it's needed
+      "workspace name:TWITCH,class:mpv,title:^(twitch\.tv.*)$"
     ];
   };
 }

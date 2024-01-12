@@ -76,11 +76,11 @@ lib.mkIf gaming.enable {
       frametime = true;
       frame_timing = true;
       histogram = true;
-      fps_metrics = "avg,0.01";
+      # fps_metrics = "avg,0.01"; # need to wait for new stable version
 
       # Gamescope
       fsr = true;
-      refresh_rate = true;
+      # refresh_rate = true; # need to wait for new stable version
 
       # Bindings
       toggle_fps_limit = "Shift_L+F1";

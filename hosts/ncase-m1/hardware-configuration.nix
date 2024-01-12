@@ -1,5 +1,5 @@
-{ config
-, lib
+{ lib
+, config
 , modulesPath
 , ...
 }: {

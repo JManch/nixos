@@ -88,7 +88,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
 
       windowrulev2 = mkIf cfg.tearing [
         "immediate, class:^(steam_app.*|cs2|\.gamescope.*)$"
-        "workspace GAME, class:^(steam_app.*|cs2|\.gamescope.*)$"
+        "workspace name:GAME, class:^(steam_app.*|cs2|\.gamescope.*)$"
       ];
 
       decoration = {

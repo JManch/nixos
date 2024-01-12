@@ -14,6 +14,8 @@ lib.mkIf (config.modules.programs.gaming.enable) {
   # - mangohud gamemoderun %command%
   # FPS Limit:
   # - MANGOHUD_CONFIG=read_cfg,fps_limit=200 mangohud gamemoderun %command%
+  # Gamescope:
+  # - gamescope -W 2560 -H 1440 -f -r 165 -- mangohud gamemoderun %command%
 
   environment.systemPackages = with pkgs; [
     steam-run
@@ -24,9 +26,7 @@ lib.mkIf (config.modules.programs.gaming.enable) {
     enable = true;
     package = pkgs.steam.override {
       extraPkgs = (pkgs: with pkgs; [
-        # gamemode # fixes libgamemode.so: cannot open shared object file 
-        # mangohud
-        # gamescope
+        # Steam runs in it's own FHS environment
         # These fix gamescope
         xorg.libXcursor
         xorg.libXi

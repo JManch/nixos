@@ -311,6 +311,26 @@
         "type": "github"
       }
     },
+    "pipewire-screenaudio": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1704699011,
+        "narHash": "sha256-CI3kAiKAC9r5qDI/uDgWJIBtRK4QvjKkFvk/wzfKLVA=",
+        "owner": "IceDBorn",
+        "repo": "pipewire-screenaudio",
+        "rev": "2e82ca5c266bfbce19419ef16c1af3a4717f31b6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "IceDBorn",
+        "repo": "pipewire-screenaudio",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "agenix": "agenix",
@@ -321,6 +341,7 @@
         "nix-colors": "nix-colors",
         "nix-resources": "nix-resources",
         "nixpkgs": "nixpkgs_2",
+        "pipewire-screenaudio": "pipewire-screenaudio",
         "spicetify-nix": "spicetify-nix"
       }
     },

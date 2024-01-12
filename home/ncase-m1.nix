@@ -8,10 +8,7 @@
     ./core.nix
   ];
 
-  home.packages = with pkgs; [
-    mpv
-    chatterino2
-  ];
+  home.packages = with pkgs; [ ];
 
   modules = {
     shell.enable = true;
@@ -70,6 +67,7 @@
       vscode.enable = true;
       stremio.enable = true;
       mpv.enable = true;
+      chatterino.enable = true;
     };
 
     services = {

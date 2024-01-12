@@ -19,6 +19,7 @@ in
     ./steam.nix
     ./mangohud.nix
     ./mpv.nix
+    ./chatterino.nix
   ];
 
   options.modules.programs = {
@@ -42,5 +43,6 @@ in
     vscode.enable = mkEnableOption "vscode";
     stremio.enable = mkEnableOption "stremio";
     mpv.enable = mkEnableOption "mpv";
+    chatterino.enable = mkEnableOption "chatterino";
   };
 }

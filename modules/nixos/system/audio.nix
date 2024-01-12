@@ -37,6 +37,7 @@ lib.mkMerge [
     environment.persistence."/persist".users.${username} = {
       directories = [
         ".config/rncbc.org"
+        ".local/state/wireplumber"
       ];
     };
   })

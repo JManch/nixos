@@ -18,6 +18,7 @@ in
     ./stremio.nix
     ./steam.nix
     ./mangohud.nix
+    ./mpv.nix
   ];
 
   options.modules.programs = {
@@ -40,5 +41,6 @@ in
     obs.enable = mkEnableOption "Obs";
     vscode.enable = mkEnableOption "vscode";
     stremio.enable = mkEnableOption "stremio";
+    mpv.enable = mkEnableOption "mpv";
   };
 }

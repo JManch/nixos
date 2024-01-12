@@ -69,6 +69,7 @@
       obs.enable = true;
       vscode.enable = true;
       stremio.enable = true;
+      mpv.enable = true;
     };
 
     services = {

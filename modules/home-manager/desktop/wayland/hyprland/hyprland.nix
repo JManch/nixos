@@ -87,8 +87,8 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
       };
 
       windowrulev2 = mkIf cfg.tearing [
-        "immediate, class:^(steam_app.*|cs2)$"
-        "workspace name:GAME, class:^(steam_app.*|cs2)$"
+        "immediate, class:^(steam_app.*|cs2|\.gamescope.*)$"
+        "workspace name:GAME, class:^(steam_app.*|cs2|\.gamescope.*)$"
       ];
 
       decoration = {
@@ -185,7 +185,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         nixosConfig.device.monitors
       )
       ++ [
-        "name:GAME,monitor:${(lib.fetchers.primaryMonitor nixosConfig).name},border:false" # automatic monitor detection
+        "name:GAME,monitor:${(lib.fetchers.primaryMonitor nixosConfig).name}"
       ];
     };
   };

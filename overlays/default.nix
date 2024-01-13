@@ -44,7 +44,7 @@ in
     amdgpu_top = prev.amdgpu_top.overrideAttrs (oldAttrs: {
       postInstall = oldAttrs.postInstall + ''
         substituteInPlace $out/share/applications/amdgpu_top.desktop \
-          --replace "Name=AMDGPU TOP (GUI)" "Name=AMDGPU TOP"
+          --replace "Name=AMDGPU TOP (GUI)" "Name=AMDGPU Top"
       '';
     });
 

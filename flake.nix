@@ -43,6 +43,11 @@
       url = "github:IceDBorn/pipewire-screenaudio";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nix-matlab = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "gitlab:doronbehar/nix-matlab";
+    };
   };
 
   outputs =

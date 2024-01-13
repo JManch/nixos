@@ -58,6 +58,7 @@
       wine.enable = false;
       winbox.enable = true;
       gaming.enable = true;
+      matlab.enable = true;
     };
 
     services = {

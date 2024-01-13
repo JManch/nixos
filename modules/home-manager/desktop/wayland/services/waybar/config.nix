@@ -90,8 +90,10 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
             };
           };
           pulseaudio = lib.mkIf audio.enable {
-            format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%";
+            format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%{format_source}";
             "format-muted" = "<span color='#${colors.base08}' size='large'>󰖁</span> {volume:2}%";
+            "format-source" = "";
+            "format-source-muted" = "<span color='#${colors.base08}' size='large'> 󰍭</span>";
             "format-icons" = {
               headphone = "";
               hdmi = "󰍹";
@@ -101,7 +103,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
                 "<span size='large'></span>"
               ];
             };
-            "on-click" = "${pkgs.pulseaudio}/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle";
+            "on-click" = "${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
             tooltip = false;
           };
           network = {

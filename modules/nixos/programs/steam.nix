@@ -8,6 +8,8 @@ let
   homeConfig = lib.utils.homeConfig args;
 in
 lib.mkIf (config.modules.programs.gaming.enable) {
+  # TODO: Split up this functionality into a gaming module
+  # Consider moving to home manager, but having programs.steam is nice
 
   # -- Common steam launch commands --
   # Standard:
@@ -20,6 +22,16 @@ lib.mkIf (config.modules.programs.gaming.enable) {
   environment.systemPackages = with pkgs; [
     steam-run
     r2modman
+    protontricks
+    # install lutris games in ~/files/games
+    (pkgs.lutris.override {
+      extraPkgs = pkgs: with pkgs; [
+        # I use wine-ge which comes packaged with Lutris. Without a system wine
+        # install lutris complains for some reason so we have to add it here,
+        # even though it won't be used.
+        wineWowPackages.stable
+      ];
+    })
   ];
 
   programs.steam = {
@@ -49,6 +61,7 @@ lib.mkIf (config.modules.programs.gaming.enable) {
     directories = [
       ".steam"
       ".local/share/Steam"
+      ".local/share/lutris"
       ".factorio"
       ".config/r2modman"
     ];

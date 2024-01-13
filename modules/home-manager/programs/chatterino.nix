@@ -36,7 +36,7 @@ let
         WORKSPACE_NAME="''${1#*>>}"
         if [[ "$WORKSPACE_NAME" == "TWITCH" ]]; then
           ${chatterino} > /dev/null 2>&1 &
-          ${firefox} --new-window twitch.tv > /dev/null 2>&1 &
+          ${firefox} --new-window twitch.tv/directory > /dev/null 2>&1 &
         fi
       }
 

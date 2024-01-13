@@ -54,5 +54,13 @@ lib.mkIf amd
       ".cache/AMD"
       ".cache/mesa_shader_cache"
     ];
+    files = [
+      # NOTE: These can be problematic if the file does not already exists in
+      # the persist location as in that case they will symlink instead of bind
+      # mounting. May need manual setup by copying generated cache file to
+      # persist.
+      ".cache/radv_builtin_shaders32"
+      ".cache/radv_builtin_shaders64"
+    ];
   };
 }

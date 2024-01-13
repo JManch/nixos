@@ -41,6 +41,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
             "on-click" = "activate";
             "sort-by-number" = true;
             "active-only" = false;
+            # TODO: Assign custom icons to TWITCH and GAME workspaces
             # TODO: Configure this modularly
             "persistent-workspaces" = {
               "1" = [

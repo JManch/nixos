@@ -24,7 +24,7 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
         layer = "overlay";
 
         corner_radius = cornerRadius;
-        width = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).width * 0.15);
+        width = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).width * 0.14);
         height = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).height * 0.25);
         offset = "${builtins.toString (gapSize * 2)}x${builtins.toString (gapSize * 2)}";
         gap_size = gapSize;
@@ -41,7 +41,7 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
         markup = "full";
       };
 
-      fullscreen_delay_everything = { fullscreen = "delay"; };
+      fullscreen_delay_everything = { fullscreen = "show"; };
 
       urgency_critical = {
         background = "#${colors.base00}b3";

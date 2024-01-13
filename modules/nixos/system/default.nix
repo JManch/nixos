@@ -32,6 +32,12 @@ in
     audio = {
       enable = mkEnableOption "Pipewire audio";
       extraAudioTools = mkEnableOption "extra audio tools including Easyeffects and Helvum";
+      scripts = {
+        toggleMic = mkOption {
+          type = types.str;
+          description = "Script for toggling microphone mute";
+        };
+      };
     };
 
     virtualisation = {

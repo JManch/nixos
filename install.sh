@@ -120,5 +120,5 @@ cp /mnt/persist/etc/ssh/ssh_host_ed25519_key ~/.ssh/id_ed25519
 
 # Install
 mkdir -p /mnt/etc/nixos
-git clone https://github.com/JManch/dotfiles /mnt/etc/nixos
+git clone https://github.com/JManch/nixos /mnt/etc/nixos
 nixos-install --no-root-passwd --flake /mnt/etc/nixos#$HOST

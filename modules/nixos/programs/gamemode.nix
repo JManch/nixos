@@ -27,7 +27,7 @@ let
       height = toString monitor.height;
       isEnd = m: boolToString (m == "end");
       refreshRate = m: toString (
-        if (m == "start" && monitor.gamingRefreshRate != null) then
+        if (m == "start") then
           monitor.gamingRefreshRate
         else
           monitor.refreshRate

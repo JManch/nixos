@@ -27,7 +27,7 @@ let
       };
       gamingRefreshRate = mkOption {
         type = types.float;
-        default = null;
+        default = (lib.fetchers.primaryMonitor config).refreshRate;
         description = ''
           Gaming refresh rate to switch to when starting gamemode.
           Only affects the primary monitor.

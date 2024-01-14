@@ -43,22 +43,17 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
             on-click = "activate";
             sort-by-number = true;
             active-only = false;
-            # TODO: Assign custom icons to TWITCH and GAME workspaces
-            # TODO: Configure this modularly
-            persistent-workspaces = {
-              "1" = [
-                "DP-1"
-              ];
-              "3" = [
-                "DP-1"
-              ];
-              "2" = [
-                "HDMI-A-1"
-              ];
-              "4" = [
-                "HDMI-A-1"
-              ];
-            };
+            # Persists the first two workspaces from each monitor
+            persistent-workspaces = lib.attrsets.mergeAttrsList (lib.lists.map (l: builtins.listToAttrs l)
+              (lib.lists.map
+                (m:
+                  (lib.lists.map
+                    (w: {
+                      name = (builtins.toString w);
+                      value = [ m.name ];
+                    })
+                    (lib.lists.take 2 m.workspaces)))
+                nixosConfig.device.monitors));
             format = "{icon}";
             format-icons = {
               TWITCH = "󰕃";

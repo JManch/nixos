@@ -31,7 +31,7 @@ let
 
   toggleFloating = pkgs.writeShellScript "hypr-toggle-floating" ''
     if [[ $(${hyprctl} activewindow -j | ${pkgs.jaq}/bin/jaq -r '.floating') == "false" ]]; then
-      ${hyprctl} --batch 'dispatch togglefloating; dispatch resizeactive exact 50% 50%; dispatch centerwindow;'
+      ${hyprctl} --batch 'dispatch togglefloating; dispatch resizeactive exact 75% 75%; dispatch centerwindow;'
     else
       ${hyprctl} dispatch togglefloating
     fi
@@ -123,6 +123,8 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
         ", XF86AudioLowerVolume, exec, ${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 5%-"
       ];
       # Order-sensitive config has to go here
+
+      # TODO: Change resize bindings to SUPERSHIFTCTRL hjkl
       extraConfig = ''
         bind = ${mod}, R, submap, resize
         submap = resize

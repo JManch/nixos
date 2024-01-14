@@ -98,9 +98,9 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           pulseaudio = lib.mkIf audio.enable {
             format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%{format_source}";
             "format-muted" = "<span color='#${colors.base08}' size='large'>󰖁</span> {volume:2}%";
-            "format-source" = "";
-            "format-source-muted" = "<span color='#${colors.base08}' size='large'> 󰍭</span>";
             "format-icons" = {
+            format-source = "";
+            format-source-muted = "<span color='#${colors.base08}' size='large'> 󰍭</span> Muted";
               headphone = "";
               hdmi = "󰍹";
               default = [

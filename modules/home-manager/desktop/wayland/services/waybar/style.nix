@@ -116,9 +116,5 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
       #custom-vpn {
           margin-right: 3px;
       }
-
-      #pulseaudio.source-muted {
-          margin-right: 2px;
-      }
     '';
 }

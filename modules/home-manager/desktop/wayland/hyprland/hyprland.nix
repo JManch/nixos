@@ -78,7 +78,8 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         gaps_in = gapSize / 2;
         gaps_out = gapSize;
         border_size = borderWidth;
-        resize_on_border = true;
+        # True causes cursor to render over gamescope, I don't use it much anyway
+        resize_on_border = false;
         hover_icon_on_border = false;
         "col.active_border" = "0xff${colors.base0D}";
         "col.inactive_border" = "0xff${colors.base00}";

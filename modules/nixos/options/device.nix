@@ -96,19 +96,13 @@ in
       assertions = with lib; [
         {
           assertion =
-            ((length monitors) != 0)
-            -> ((length (filter (m: m.number == 1) monitors)) == 1);
-          message = "Exactly one monitor must be set to primary (number 1).";
+            let
+              sorted = lists.sort (a: b: a < b) (map (m: m.number) monitors);
+              diff = lists.zipListsWith (a: b: b - a) (lists.init sorted) (lists.tail sorted);
+            in
+            (lists.all (a: a == 1) diff) && ((lists.head sorted) == 1);
+          message = "Monitor numbers must be sequential and start from 1 (the primary monitor)";
         }
-        {
-          assertion = allUnique (map (m: m.number) monitors);
-          message = "Monitor numbers must be unique.";
-        }
-        # TODO: Fix this
-        # {
-        #   assertion = lists.all (x: y: x + 1 == y) (lists.sort (a: b: a > b) (map (m: m.number) monitors));
-        #   message = "Monitor numbers must be sequential.";
-        # }
       ];
     };
 }

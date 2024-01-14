@@ -156,6 +156,16 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
             tooltip = false;
             interval = 5;
           };
+          gamemode = lib.mkIf gaming.enable {
+            format = "{glyph} Gamemode";
+            format-alt = "{glyph} Gamemode";
+            glyph = "<span color='#${colors.base04}'>󰊴</span>";
+            hide-not-running = true;
+            use-icon = false;
+            icon-size = 0;
+            icon-spacing = 0;
+            tooltip = false;
+          };
           modules-left = [
             "custom/fullscreen"
             "hyprland/workspaces"
@@ -171,6 +181,8 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
               "network"
               "cpu"
               "custom/gpu"
+            optional gaming.enable "gamemode" ++
+            [
               "memory"
             ] ++
             optional audio.enable "pulseaudio" ++

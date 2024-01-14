@@ -160,7 +160,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
       };
 
       dwindle = {
-        preserve_split = false;
+        preserve_split = true;
         force_split = 2;
         no_gaps_when_only = 1;
         special_scale_factor = 0.9;

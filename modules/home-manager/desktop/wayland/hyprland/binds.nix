@@ -84,6 +84,7 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${mod}, P, pseudo,"
           # TODO: Move this into a script
           "${mod}, M, exec, ${hyprctl} keyword dwindle:no_gaps_when_only $(($(${getOption "dwindle:no_gaps_when_only" "int"}) ^ 1))"
+          "${mod}, X, layoutmsg, togglesplit"
 
           # Hyprshot
           ", Print, exec, ${disableShaderCommand "${hyprshot} -m region --clipboard-only"}"

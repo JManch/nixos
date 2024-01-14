@@ -16,6 +16,8 @@ let
 
   audio = nixosConfig.modules.system.audio;
   wgnord = nixosConfig.modules.services.wgnord;
+  gaming = nixosConfig.modules.programs.gaming;
+  gpu = nixosConfig.device.gpu.type;
   easyeffects = config.modules.services.easyeffects;
 in
 lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
@@ -38,12 +40,12 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           margin = "0";
           spacing = 17;
           "hyprland/workspaces" = {
-            "on-click" = "activate";
-            "sort-by-number" = true;
-            "active-only" = false;
+            on-click = "activate";
+            sort-by-number = true;
+            active-only = false;
             # TODO: Assign custom icons to TWITCH and GAME workspaces
             # TODO: Configure this modularly
-            "persistent-workspaces" = {
+            persistent-workspaces = {
               "1" = [
                 "DP-1"
               ];
@@ -65,23 +67,23 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           };
           "hyprland/submap" = {
             format = "{}";
-            "max-length" = 8;
+            max-length = 8;
             tooltip = false;
           };
           "hyprland/window" = {
-            "max-length" = 59;
-            "separate-outputs" = true;
+            max-length = 59;
+            separate-outputs = true;
           };
           clock = {
             interval = 1;
             format = "{:%H:%M:%S}";
-            "format-alt" = "{:%e %B %Y}";
-            "tooltip-format" = "<tt><small>{calendar}</small></tt>";
+            format-alt = "{:%e %B %Y}";
+            tooltip-format = "<tt><small>{calendar}</small></tt>";
             calendar = {
               mode = "month";
-              "mode-mon-col" = 3;
-              "weeks-pos" = "";
-              "on-scroll" = 1;
+              mode-mon-col = 3;
+              weeks-pos = "";
+              on-scroll = 1;
               format = {
                 months = "<span color='#${colors.base07}'><b>{}</b></span>";
                 days = "<span color='#${colors.base07}'><b>{}</b></span>";
@@ -90,17 +92,17 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
               };
             };
             actions = {
-              "on-click-right" = "mode";
-              "on-scroll-up" = "shift_up";
-              "on-scroll-down" = "shift_down";
+              on-click-right = "mode";
+              on-scroll-up = "shift_up";
+              on-scroll-down = "shift_down";
             };
           };
           pulseaudio = lib.mkIf audio.enable {
             format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%{format_source}";
-            "format-muted" = "<span color='#${colors.base08}' size='large'>󰖁</span> {volume:2}%";
-            "format-icons" = {
+            format-muted = "<span color='#${colors.base08}' size='large'>󰖁</span> {volume:2}%";
             format-source = "";
             format-source-muted = "<span color='#${colors.base08}' size='large'> 󰍭</span> Muted";
+            format-icons = {
               headphone = "";
               hdmi = "󰍹";
               default = [
@@ -109,14 +111,14 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
                 "<span size='large'></span>"
               ];
             };
-            "on-click" = "${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+            on-click = "${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
             tooltip = false;
           };
           network = {
             interval = 5;
             format = "<span color='#${colors.base04}'>󰈀</span> {bandwidthTotalBytes}";
-            "tooltip-format" = "<span color='#${colors.base0D}'>󰇚</span>{bandwidthDownBytes:>} <span color='#59c2ff'>󰕒</span>{bandwidthUpBytes:>}";
-            "max-length" = 50;
+            tooltip-format = "<span color='#${colors.base0D}'>󰇚</span>{bandwidthDownBytes:>} <span color='#59c2ff'>󰕒</span>{bandwidthUpBytes:>}";
+            max-length = 50;
           };
           cpu = {
             interval = 5;
@@ -133,19 +135,19 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
             format = "<span color='#${colors.base04}'></span> {used:0.1f}GiB";
           };
           "network#hostname" = {
-            "format-ethernet" = "${lib.toUpper hostname}";
-            "format-disconnected" = "<span color='#${colors.base08}'>${lib.toUpper hostname}</span>";
-            "tooltip-format-ethernet" = "<span color='#${colors.base0B}'>{ipaddr}</span>";
-            "tooltip-format-disconnected" = "<span color='#${colors.base08}'>Disconnected</span>";
+            format-ethernet = "${lib.toUpper hostname}";
+            format-disconnected = "<span color='#${colors.base08}'>${lib.toUpper hostname}</span>";
+            tooltip-format-ethernet = "<span color='#${colors.base0B}'>{ipaddr}</span>";
+            tooltip-format-disconnected = "<span color='#${colors.base08}'>Disconnected</span>";
           };
           tray = {
-            "icon-size" = 19;
-            "show-passive-items" = true;
+            icon-size = 19;
+            show-passive-items = true;
             spacing = 17;
           };
           "custom/poweroff" = {
             format = "⏻";
-            "on-click-middle" = "${pkgs.systemd}/bin/systemctl poweroff";
+            on-click-middle = "${pkgs.systemd}/bin/systemctl poweroff";
             tooltip = "Shutdown";
           };
           "custom/vpn" = lib.mkIf wgnord.enable {
@@ -176,11 +178,14 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
             "clock"
           ];
           modules-right =
-            optional wgnord.enable "custom/vpn" ++
             [
               "network"
+            ] ++
+            optional wgnord.enable "custom/vpn" ++
+            [
               "cpu"
-              "custom/gpu"
+            ] ++
+            optional (gpu != null) "custom/gpu" ++
             optional gaming.enable "gamemode" ++
             [
               "memory"

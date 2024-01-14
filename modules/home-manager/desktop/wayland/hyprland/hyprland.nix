@@ -1,8 +1,8 @@
-{ config
-, nixosConfig
-, inputs
+{ lib
 , pkgs
-, lib
+, config
+, inputs
+, nixosConfig
 , ...
 }:
 let

@@ -26,20 +26,15 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
     enable = true;
     systemdTarget = sessionTarget;
     timeouts = [
-      {
+      (lib.mkIf desktopCfg.swaylock.enable {
         timeout = cfg.lockTime;
         command = swaylockCfg.lockScript;
-      }
+      })
       {
         timeout = cfg.screenOffTime;
         command = "${hyprctl} dispatch dpms off";
         resumeCommand = "${hyprctl} dispatch dpms on";
       }
-      (mkIf (desktopCfg.swaylock.enable) {
-        timeout = cfg.lockedScreenOffTime;
-        command = "${pgrep} swaylock && ${hyprctl} dispatch dpms off";
-        resumeCommand = "${hyprctl} dispatch dpms on";
-      })
     ];
     events = [
       {

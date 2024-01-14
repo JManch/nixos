@@ -33,13 +33,8 @@ with lib; {
       };
       screenOffTime = mkOption {
         type = types.int;
-        default = 5 * 60;
+        default = 4 * 60;
         description = "Turn off screen after this many idle seconds";
-      };
-      lockedScreenOffTime = mkOption {
-        type = types.int;
-        default = 2 * 60;
-        description = "Turn off screen after this many idle seconds locked";
       };
     };
     anyrun.enable = mkEnableOption "Anyrun";

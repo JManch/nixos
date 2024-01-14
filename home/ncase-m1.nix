@@ -52,7 +52,7 @@
       swayidle = {
         enable = true;
         lockTime = 3 * 60;
-        lockedScreenOffTime = 2 * 60;
+        screenOffTime = 4 * 60;
       };
 
       anyrun.enable = true;

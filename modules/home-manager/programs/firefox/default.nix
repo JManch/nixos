@@ -11,7 +11,11 @@ let
   #   inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorscheme.colors.${base};
 in
 lib.mkIf cfg.enable {
-  # TODO: Move firefox into a folder and add my extension config files in there
+  # TODO: Add extension config files
+  # - res
+  # - ffz
+  # - vimium
+  # - ublock?
   programs.firefox = {
     enable = true;
     profiles = {

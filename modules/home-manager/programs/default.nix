@@ -7,7 +7,7 @@ in
     ./alacritty.nix
     ./btop.nix
     ./cava.nix
-    ./firefox.nix
+    ./firefox
     ./git.nix
     ./neovim.nix
     ./spotify.nix

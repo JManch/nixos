@@ -28,8 +28,6 @@ lib.mkIf config.modules.shell.enable {
     };
     enableAutosuggestions = true;
     enableCompletion = true;
-    # TODO: Fix this, .zcompdump is going to .config/zsh/.zcompdump instead
-    completionInit = "autoload -U compinit -d ${config.xdg.cacheHome}/zsh/zcompdump-$ZSH_VERSION && compinit";
     history = {
       path = "${config.xdg.stateHome}/zsh/zsh_history";
       extended = true;
@@ -52,8 +50,13 @@ lib.mkIf config.modules.shell.enable {
     '';
   };
 
-  impermanence.directories = [
-    ".local/state/zsh"
-    ".cache/zsh"
-  ];
+  impermanence = {
+    directories = [
+      ".local/state/zsh"
+      ".cache/zsh"
+    ];
+    files = [
+      ".config/zsh/.zcompdump"
+    ];
+  };
 }

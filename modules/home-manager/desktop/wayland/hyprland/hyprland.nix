@@ -6,18 +6,20 @@
 , ...
 }:
 let
+  inherit (lib) mkIf;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
   hyprlandPackages = inputs.hyprland.packages.${pkgs.system};
   colors = config.colorscheme.colors;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
-  inherit (lib) mkIf;
+
+  hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+  wlPaste = "${pkgs.wl-clipboard}/bin/wl-paste";
+  xclip = "${pkgs.xclip}/bin/xclip";
 in
 mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
   home.packages = with pkgs; [
     hyprshot
-    wl-clipboard
-    xclip # For xwayland apps
   ];
 
   xdg.portal = {
@@ -71,7 +73,8 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         # Can remove xclip package once this is fixed
         # https://github.com/hyprwm/Hyprland/issues/2319
         # https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4359
-        "wl-paste -t text -w sh -c 'v=$(cat); cmp -s <(xclip -selection clipboard -o)  <<< \"$v\" || xclip -selection clipboard <<< \"$v\"'"
+        # FIX: This is causing an extra linespace to be inserted on paste
+        "${wlPaste} -t text -w sh -c 'v=$(${pkgs.coreutils}/bin/cat); ${pkgs.diffutils}/bin/cmp -s <(${xclip} -selection clipboard -o)  <<< \"$v\" || ${xclip} -selection clipboard <<< \"$v\"'"
       ];
 
       general = with desktopCfg.style; {

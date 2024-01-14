@@ -20,14 +20,14 @@ let
       # splitratio and move firefox and MPV windows to the left
       open_window() {
         IFS=',' read -r -a args <<< "$1"
-        WINDOW_ADDRESS="''${args[0]#*>>}";
-        WORKSPACE_NAME="''${args[1]}";
-        WINDOW_CLASS="''${args[2]}";
+        WINDOW_ADDRESS="''${args[0]#*>>}"
+        WORKSPACE_NAME="''${args[1]}"
+        WINDOW_CLASS="''${args[2]}"
         if [[ "$WORKSPACE_NAME" =~ ^(name:|)TWITCH$ ]]; then
           if [[ "$WINDOW_CLASS" == "mpv" || "$WINDOW_CLASS" == "firefox" ]]; then
             ${hyprctl} --batch "dispatch focuswindow address:0x$WINDOWADDRESS; dispatch movewindow l"
           fi
-          ${hyprctl} dispatch splitratio exact ${builtins.toString chatterinoRatio};
+          ${hyprctl} dispatch splitratio exact ${builtins.toString chatterinoRatio}
         fi
       }
 

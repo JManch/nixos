@@ -7,7 +7,6 @@ let
   colors = config.colorscheme.colors;
 in
 lib.mkIf cfg.enable {
-  # TODO: Consider replacing this with bottom (btm)
   programs.btop = {
     enable = true;
     settings = {

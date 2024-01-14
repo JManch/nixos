@@ -9,10 +9,8 @@ let
   cfg = config.modules.desktop.swaylock;
   desktopCfg = config.modules.desktop;
   isWayland = lib.fetchers.isWayland config;
-  lockScript = pkgs.writeShellScript "lock-script" config.modules.desktop.swaylock.lockScript;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 in
-# TODO: Try and fix swaylock not locking sometimes
 lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   programs.swaylock = {
     enable = true;
@@ -66,5 +64,5 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
 
   desktop.hyprland.binds =
     lib.mkIf (config.modules.desktop.windowManager == "hyprland")
-      [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${lockScript.outPath}" ];
+      [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${cfg.lockScript}" ];
 }

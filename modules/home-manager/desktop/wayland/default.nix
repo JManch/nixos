@@ -1,5 +1,7 @@
 { lib
+, pkgs
 , config
+, nixosConfig
 , ...
 }:
 with lib; {
@@ -16,10 +18,10 @@ with lib; {
       enable = mkEnableOption "Swaylock";
       lockScript = mkOption {
         type = types.str;
-        description = "Script to run to lock the screen";
-        default = ''
+        description = "Path to script that locks the screen";
+        default = (pkgs.writeShellScript "swaylock-lock" ''
           ${config.swaylock.package}/bin/swaylock -f
-        '';
+        '').outPath;
       };
     };
     swayidle = {

@@ -69,6 +69,8 @@ lib.mkIf (config.modules.programs.gaming.enable) {
       ".steam"
       ".local/share/Steam"
       ".local/share/lutris"
+      ".config/lutris"
+      ".cache/lutris"
       ".factorio"
       ".config/r2modman"
     ];

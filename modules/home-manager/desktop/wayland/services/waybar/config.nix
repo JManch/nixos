@@ -57,6 +57,11 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
                 "HDMI-A-1"
               ];
             };
+            format = "{icon}";
+            format-icons = {
+              TWITCH = "󰕃";
+              GAME = "󱎓";
+            };
           };
           "hyprland/submap" = {
             format = "{}";

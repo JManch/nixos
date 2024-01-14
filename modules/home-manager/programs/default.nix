@@ -20,6 +20,7 @@ in
     ./mangohud.nix
     ./mpv.nix
     ./chatterino.nix
+    ./images.nix
   ];
 
   options.modules.programs = {
@@ -44,5 +45,6 @@ in
     stremio.enable = mkEnableOption "stremio";
     mpv.enable = mkEnableOption "mpv";
     chatterino.enable = mkEnableOption "chatterino";
+    images.enable = mkEnableOption "images";
   };
 }

@@ -70,6 +70,7 @@
       stremio.enable = true;
       mpv.enable = true;
       chatterino.enable = true;
+      images.enable = true;
     };
 
     services = {

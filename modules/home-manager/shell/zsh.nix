@@ -52,11 +52,9 @@ lib.mkIf config.modules.shell.enable {
 
   impermanence = {
     directories = [
+      ".config/zsh" # for zcompdump
       ".local/state/zsh"
       ".cache/zsh"
-    ];
-    files = [
-      ".config/zsh/.zcompdump"
     ];
   };
 }

@@ -8,7 +8,9 @@
     ./core.nix
   ];
 
-  home.packages = with pkgs; [ ];
+  home.packages = with pkgs; [
+    feh
+  ];
 
   modules = {
     shell.enable = true;

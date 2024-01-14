@@ -8,32 +8,39 @@
 let
   homeManagerConfig = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username};
   desktopCfg = config.usrEnv.desktop;
+  desktopManager = desktopCfg.desktopManager;
 in
 lib.mkIf config.usrEnv.desktop.enable {
-  # TODO: I think it would be a good idea to split this file up into multiple
-  # nix files for each desktop manager, just to make things cleaner
-  services.xserver = {
-    # Enable regardless of wayland for xwayland support
-    enable = true;
-    layout = "us";
-
-    displayManager = {
-      defaultSession = lib.mkIf (desktopCfg.desktopManager != null) desktopCfg.desktopManager;
-
+  services.xserver = lib.mkMerge [
+    {
+      # Enable regardless of wayland for xwayland support
+      enable = true;
+      layout = "us";
       # Disable default login GUI if we're using wayland
-      lightdm.enable = !lib.fetchers.isWayland homeManagerConfig;
-      sddm.enable = desktopCfg.desktopManager == "plasma";
-    };
+      displayManager.lightdm.enable = !lib.fetchers.isWayland homeManagerConfig;
+    }
 
-    desktopManager = {
-      xfce = {
-        enable = desktopCfg.desktopManager == "xfce";
-        noDesktop = !desktopCfg.desktopManagerWindowManager;
+    (lib.mkIf (desktopManager == "plasma") {
+      displayManager = {
+        defaultSession = "plasma";
+        sddm.enable = true;
       };
-      # KDE Plasma5
-      plasma5.enable = desktopCfg.desktopManager == "plasma";
-    };
-  };
+      desktopManager = {
+        plasma5.enable = true;
+      };
+    })
+
+    (lib.mkIf (desktopManager == "xfce") {
+      displayManager.defaultSession = "xfce";
+      desktopManager = {
+        xterm.enable = false;
+        xfce = {
+          enable = true;
+          noDesktop = !desktopCfg.desktopManagerWindowManager;
+        };
+      };
+    })
+  ];
 
   programs = {
     dconf.enable = true;

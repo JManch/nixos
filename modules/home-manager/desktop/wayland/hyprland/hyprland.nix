@@ -81,7 +81,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         # True causes cursor to render over gamescope, I don't use it much anyway
         resize_on_border = false;
         hover_icon_on_border = false;
-        "col.active_border" = "0xff${colors.base0D}";
+        "col.active_border" = "0xff${colors.base0D} 0xff${colors.base0E} 45deg";
         "col.inactive_border" = "0xff${colors.base00}";
         cursor_inactive_timeout = 0;
         allow_tearing = cfg.tearing;

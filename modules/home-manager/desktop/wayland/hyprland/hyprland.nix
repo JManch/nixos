@@ -132,6 +132,8 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
           "easeInOutQuart,0.76,0,0.24,1"
         ];
         animation = [
+          # TODO: Animations don't look great cause of the warping effect
+
           # Windows
           "windowsIn,1,3,easeOutQuart"
           "windowsOut,1,3,easeInQuart"
@@ -158,6 +160,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         preserve_split = false;
         force_split = 2;
         no_gaps_when_only = 1;
+        special_scale_factor = 0.9;
       };
 
       binds = {

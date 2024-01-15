@@ -27,6 +27,7 @@ in
       tcpOptimisations = mkEnableOption "TCP optimisations";
       firewall.enable = mkEnableOption "firewall";
       resolved.enable = mkEnableOption "Resolved";
+      wireless.enable = mkEnableOption "wireless";
     };
 
     audio = {

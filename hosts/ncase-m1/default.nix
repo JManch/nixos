@@ -78,6 +78,7 @@
         tcpOptimisations = true;
         firewall.enable = true;
         resolved.enable = true;
+        wireless.enable = true;
       };
       audio = {
         enable = true;

@@ -1,23 +1,54 @@
-{ hostname
+{ lib
+, pkgs
 , config
-, lib
+, username
+, hostname
 , ...
 }:
 let
-  inherit (lib) mkMerge mkIf;
+  inherit (lib) mkMerge mkIf lists;
   cfg = config.modules.system.networking;
 in
 {
+  age.secrets.wirelessNetworks.file = ../../../secrets/wireless-networks.age;
+
   networking = {
     hostName = hostname;
     networkmanager = {
       enable = true;
       wifi.powersave = true;
+      unmanaged = lists.optionals cfg.wireless.enable [
+        # Tell network manager not to manage wireless interfaces
+        "*"
+        "except:type:wwan"
+        "except:type:gsm"
+      ];
     };
     firewall = {
       enable = cfg.firewall.enable;
     };
+    wireless = {
+      enable = cfg.wireless.enable;
+      environmentFile = config.age.secrets.wirelessNetworks.path;
+      scanOnLowSignal = config.device.type == "laptop";
+      networks = {
+        "Pixel 5" = {
+          pskRaw = "@PIXEL_5@";
+        };
+      };
+
+      # Allow imperative network config
+      allowAuxiliaryImperativeNetworks = true;
+      userControlled = {
+        enable = true;
+        group = "networkmanager";
+      };
+    };
   };
+
+  users.users.${username}.extraGroups = [ "networkmanager" ];
+  environment.systemPackages = lists.optional cfg.wireless.enable pkgs.wpa_supplicant_gui;
+  systemd.services.wpa_supplicant.preStart = "${pkgs.coreutils}/bin/touch /etc/wpa_supplicant.conf";
 
   boot = {
     kernel.sysctl = mkMerge [
@@ -53,7 +84,7 @@ in
       })
     ];
 
-    kernelModules = lib.lists.optional cfg.tcpOptimisations "tcp_bbr";
+    kernelModules = lists.optional cfg.tcpOptimisations "tcp_bbr";
   };
 
   services.resolved = {

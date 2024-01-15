@@ -169,6 +169,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
       binds = {
         workspace_back_and_forth = true;
         movefocus_cycles_fullscreen = false;
+        workspace_center_on = 1;
       };
 
       debug = {

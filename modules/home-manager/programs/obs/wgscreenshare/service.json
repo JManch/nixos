@@ -1,0 +1,1 @@
+{"type":"rtmp_custom","settings":{"server":"srt://10.0.0.2:5201?mode=listener&latency=30000","use_auth":false,"bwtest":false,"key":""}}

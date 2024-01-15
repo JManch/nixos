@@ -143,7 +143,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           "custom/poweroff" = {
             format = "⏻";
             on-click-middle = "${pkgs.systemd}/bin/systemctl poweroff";
-            tooltip = "Shutdown";
+            tooltip = false;
           };
           "custom/vpn" = lib.mkIf wgnord.enable {
             format = "<span color='#${colors.base04}'></span> {}";

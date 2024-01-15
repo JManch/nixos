@@ -21,7 +21,7 @@
   };
 
   nix = {
-    # Allows referring to flakes with nixpkgs#flake
+    # Populates the nix registry with all our flake inputs `nix registry list`
     registry = (lib.mapAttrs (_: flake: { inherit flake; })) ((lib.filterAttrs (_: lib.isType "flake")) inputs);
     settings = {
       experimental-features = "nix-command flakes";

@@ -23,10 +23,15 @@ in
       };
       trim = mkEnableOption "ZFS automatic trimming";
       rootTmpfsSize = mkOption {
-        type = types.str;
-        description = "Size of the volatile root tmpfs partition";
-        example = "4G";
-        default = "1G";
+        type = types.nullOr types.str;
+        description = ''
+          Maximum size of the volatile root tmpfs partition. Default is to not
+          specific size which will allocated 50% of system memory to the tmpfs.
+          Memory is dynamically allocated so will not effect system memory
+          unless necessary.
+        '';
+        example = "8G";
+        default = null;
       };
     };
   };

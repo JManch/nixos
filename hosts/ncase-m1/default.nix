@@ -48,7 +48,6 @@
     hardware = {
       fileSystem = {
         trim = true;
-        rootTmpfsSize = "4G";
         zpoolName = "zpool";
         bootLabel = "boot";
       };

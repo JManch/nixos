@@ -1,4 +1,4 @@
-{ config, ... }:
+{ lib, config, ... }:
 let
   cfg = config.modules.hardware.fileSystem;
 in
@@ -16,7 +16,10 @@ in
     "/" = {
       device = "none";
       fsType = "tmpfs";
-      options = [ "size=${cfg.rootTmpfsSize}" "mode=755" ];
+      options = [
+        "defaults"
+        "mode=755"
+      ] ++ lib.lists.optional (cfg.rootTmpfsSize != null) "size=${cfg.rootTmpfsSize}";
     };
 
     "/nix" = {
@@ -33,7 +36,7 @@ in
     "/boot" = {
       device = "/dev/disk/by-label/${cfg.bootLabel}";
       fsType = "vfat";
-      options = [ "umask=0077" "defaults" ];
+      options = [ "defaults" "umask=0077" ];
     };
   };
 

@@ -16,8 +16,8 @@ lib.mkIf cfg.enable
 
   programs.zsh = {
     shellAliases = {
-      vpn-connect = "sudo systemctl start wgnord";
-      vpn-disconnect = "sudo systemctl stop wgnord";
+      vpn-up = "sudo systemctl start wgnord";
+      vpn-down = "sudo systemctl stop wgnord";
     };
   };
 }

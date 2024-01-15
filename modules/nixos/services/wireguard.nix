@@ -44,8 +44,8 @@ lib.mkIf cfg.enable
 
   programs.zsh = {
     shellAliases = {
-      wg-discord-connect = "sudo systemctl start wg-quick-wg-discord";
-      wg-discord-disconnect = "sudo systemctl stop wg-quick-wg-discord";
+      wg-discord-up = "sudo systemctl start wg-quick-wg-discord";
+      wg-discord-down = "sudo systemctl stop wg-quick-wg-discord";
     };
   };
 }

@@ -17,6 +17,6 @@ lib.mkIf config.modules.system.windowsBootEntry.enable {
   };
 
   programs.zsh.shellAliases = {
-    bootwindows = "systemctl reboot --boot-loader-entry=windows.conf";
+    boot-windows = "systemctl reboot --boot-loader-entry=windows.conf";
   };
 }

@@ -36,7 +36,7 @@ let
     m: pkgs.writeShellScript "gamemode-${m}" ''
       export PATH=$PATH:${scriptPrograms}
       ${optionalString hyprland /*bash*/ ''
-        export HYPRLAND_INSTANCE_SIGNATURE=$(ls -1 /tmp/hypr | cut -d '.' -f 1 | head -1)
+        export HYPRLAND_INSTANCE_SIGNATURE=$(ls -1 -t /tmp/hypr | cut -d '.' -f 1 | head -1)
         hyprctl --batch "\
           keyword decoration:blur:enabled ${isEnd m};\
           keyword animations:enabled ${isEnd m};\

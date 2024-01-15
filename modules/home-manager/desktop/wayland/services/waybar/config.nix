@@ -112,7 +112,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           network = {
             interval = 5;
             format = "<span color='#${colors.base04}'>󰈀</span> {bandwidthTotalBytes}";
-            tooltip-format = "<span color='#${colors.base0D}'>󰇚</span>{bandwidthDownBytes:>} <span color='#59c2ff'>󰕒</span>{bandwidthUpBytes:>}";
+            tooltip-format = "<span color='#${colors.base0D}'>󰇚</span>{bandwidthDownBytes:>} <span color='#${colors.base0D}'>󰕒</span>{bandwidthUpBytes:>}";
             max-length = 50;
           };
           cpu = {

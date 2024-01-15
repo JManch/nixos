@@ -34,8 +34,20 @@ lib.mkIf cfg.enable {
     player-args=--loop-playlist=inf --loop-file=inf --cache=yes --demuxer-max-back-bytes=1073741824
   '';
 
+  # NOTE: Streamlink config does not include the authentication key. This needs
+  # to be manually added as an argument, most commonly in Chatterino
   xdg.configFile."streamlink/config.twitch".text = ''
     twitch-low-latency
     twitch-disable-ads
+  '';
+
+  programs.zsh.initExtra = /* bash */ ''
+    screenshare () {
+      if [[ -z "$1" ]]; then
+          echo "Usage: screenshare <ip:port>"
+          return 1
+      fi
+      eval "mpv 'srt://$1?mode=caller' --no-cache --profile=low-latency --untimed"
+    };
   '';
 }

@@ -5,7 +5,6 @@
     # NOTE: Use the `nix flake metadata <flake_url>` command to check if a
     # flake needs nixpkgs.follows defined
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-master.url = "github:nixos/nixpkgs";
     nix-colors.url = "github:misterio77/nix-colors";
     impermanence.url = "github:nix-community/impermanence";
 

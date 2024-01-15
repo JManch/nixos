@@ -135,15 +135,15 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
           "easeInOutQuart,0.76,0,0.24,1"
         ];
         animation = [
-          # TODO: Animations don't look great cause of the warping effect
+          # TODO: Window animations don't look great cause of the warping effect
 
           # Windows
-          "windowsIn,1,3,easeOutQuart"
-          "windowsOut,1,3,easeInQuart"
-          "windowsMove,1,3,easeInOutQuart"
+          # "windowsIn,1,3,easeOutQuart"
+          # "windowsOut,1,3,easeInQuart"
+          # "windowsMove,1,3,easeInOutQuart"
           # Fade
-          "fade,1,1,easeInQuart"
-          "fadeOut,1,5,easeOutExpo"
+          # "fade,1,1,easeInQuart"
+          # "fadeOut,1,5,easeOutExpo"
           # Workspaces
           "workspaces,1,2,easeInOutQuart,slidevert"
         ];

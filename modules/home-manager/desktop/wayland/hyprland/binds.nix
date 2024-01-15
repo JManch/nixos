@@ -123,21 +123,12 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
         "${mod}ALT, ALT_L, exec, ${audio.scripts.toggleMic}"
       ];
       settings.binde = optionals audio.enable [
+        "${modShiftCtrl}, L, resizeactive, 20 0"
+        "${modShiftCtrl}, H, resizeactive, -20 0"
+        "${modShiftCtrl}, K, resizeactive, 0 -20"
+        "${modShiftCtrl}, J, resizeactive, 0 20"
         ", XF86AudioRaiseVolume, exec, ${wpctl} set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+"
         ", XF86AudioLowerVolume, exec, ${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 5%-"
       ];
-      # Order-sensitive config has to go here
-
-      # TODO: Change resize bindings to SUPERSHIFTCTRL hjkl
-      extraConfig = ''
-        bind = ${mod}, R, submap, resize
-        submap = resize
-        binde=, L, resizeactive, 20 0
-        binde=, H, resizeactive, -20 0
-        binde=, K, resizeactive, 0 -20
-        binde=, J, resizeactive, 0 20
-        bind= , Escape, submap, reset
-        submap = reset
-      '';
     };
 }

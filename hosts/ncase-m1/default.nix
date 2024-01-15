@@ -70,6 +70,7 @@
       syncthing.enable = false;
       wgnord.enable = true;
       udisks2.enable = true;
+      wireguard.enable = true;
     };
 
     system = {

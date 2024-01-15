@@ -9,4 +9,5 @@ in
   "syncthing/ncase-m1/cert.age".publicKeys = [ ncase-m1 joshua ];
   "syncthing/ncase-m1/key.age".publicKeys = [ ncase-m1 joshua ];
   "nordvpn/token.age".publicKeys = [ ncase-m1 joshua ];
+  "wireguard/ncase-m1/key.age".publicKeys = [ ncase-m1 joshua ];
 }

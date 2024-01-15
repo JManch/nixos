@@ -10,6 +10,7 @@ in
     ./greetd.nix
     ./syncthing.nix
     ./wgnord.nix
+    ./wireguard.nix
   ];
 
   options.modules.services = {
@@ -45,6 +46,8 @@ in
     };
 
     udisks2.enable = mkEnableOption "udisks2";
+
+    wireguard.enable = mkEnableOption "wireguard";
 
   };
 

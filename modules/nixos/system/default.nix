@@ -9,6 +9,7 @@ in
     ./audio.nix
     ./windows.nix
     ./networking.nix
+    ./bluetooth.nix
     ./impermanence.nix
     ./virtualisation.nix
   ];
@@ -29,6 +30,8 @@ in
       resolved.enable = mkEnableOption "Resolved";
       wireless.enable = mkEnableOption "wireless";
     };
+
+    bluetooth.enable = mkEnableOption "bluetooth";
 
     audio = {
       enable = mkEnableOption "Pipewire audio";

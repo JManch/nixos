@@ -80,6 +80,7 @@
         resolved.enable = true;
         wireless.enable = true;
       };
+      bluetooth.enable = true;
       audio = {
         enable = true;
         extraAudioTools = true;

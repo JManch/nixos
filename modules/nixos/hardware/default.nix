@@ -6,7 +6,6 @@ in
   imports = [
     ./graphics
     ./filesystem.nix
-    # ./bluetooth.nix TODO:
   ];
 
   options.modules.hardware = {

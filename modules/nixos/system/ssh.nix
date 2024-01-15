@@ -23,7 +23,12 @@
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
   };
 
-  security.pam.enableSSHAgentAuth = true;
+  security.pam.sshAgentAuth = {
+    enable = true;
+    authorizedKeysFiles = [
+      "/etc/ssh/authorized_keys.d/%u"
+    ];
+  };
 
   environment.persistence."/persist".users.${username}.directories =
     [

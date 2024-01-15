@@ -10,7 +10,6 @@ let
   desktopCfg = config.modules.desktop;
   swaylockCfg = desktopCfg.swaylock;
   isWayland = lib.fetchers.isWayland config;
-  sessionTarget = lib.fetchers.getDesktopSessionTarget config;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 
   pgrep = "${pkgs.procps}/bin/pgrep";
@@ -24,7 +23,6 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
 
   services.swayidle = {
     enable = true;
-    systemdTarget = sessionTarget;
     timeouts = [
       (lib.mkIf desktopCfg.swaylock.enable {
         timeout = cfg.lockTime;
@@ -58,7 +56,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
     };
 
     Install = {
-      WantedBy = [ sessionTarget ];
+      WantedBy = [ "graphical-session.target" ];
     };
   };
 }

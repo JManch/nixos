@@ -11,7 +11,6 @@ let
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
   isWayland = lib.fetchers.isWayland config;
   colors = config.colorscheme.colors;
-  sessionTarget = lib.fetchers.getDesktopSessionTarget config;
   optional = lib.lists.optional;
 
   audio = nixosConfig.modules.system.audio;
@@ -26,7 +25,6 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
     enable = true;
     systemd = {
       enable = true;
-      target = sessionTarget;
     };
     settings = {
       bar =

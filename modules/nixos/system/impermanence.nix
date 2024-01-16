@@ -23,7 +23,6 @@ in
       "/var/tmp"
       "/var/lib/systemd"
       "/var/lib/nixos"
-      "/var/lib/bluetooth"
       "/var/db/sudo/lectured"
     ];
     files = [

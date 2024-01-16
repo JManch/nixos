@@ -1,7 +1,9 @@
-{ inputs
-, config
+{ lib
 , pkgs
-, lib
+, config
+, inputs
+, hostname
+, nixosConfig
 , ...
 }:
 let
@@ -16,8 +18,76 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
+
+    assertions = [
+      {
+        assertion = cfg.enable -> nixosConfig.modules.system.audio.enable;
+        message = "Why enable spotify with no system audio?";
+      }
+    ];
+
+    home.packages = with pkgs; [
+      spotify
+      spotify-tui
+      playerctl
+    ];
+
+    age.secrets.spotify.file = ../../../secrets/spotify.age;
+
+    services = {
+      spotifyd = {
+        enable = true;
+        package = pkgs.spotifyd.override { withMpris = true; };
+        settings.global =
+          let
+            creds = config.age.secrets.spotify.path;
+          in
+          {
+            username_cmd = "${pkgs.coreutils}/bin/head -1 $(echo ${creds})";
+            password_cmd = "${pkgs.coreutils}/bin/tail -1 $(echo ${creds})";
+            autoplay = true;
+            use_mpris = true;
+            backend = "alsa";
+            device_name = hostname;
+            device_type = "computer";
+            bitrate = 320;
+            cache_path = "${config.xdg.cacheHome}/spotifyd";
+            volume_normalisation = false;
+          };
+      };
+    };
+
+    # TODO: Switch to spotify_player https://github.com/aome510/spotify-player
+    xdg.configFile."spotify-tui/config.yml".text = /* yaml */ ''
+      theme:
+        active: Blue
+        banner: Green
+        error_border: Red
+        error_text: Red
+        hint: Yellow
+        hovered: LightGreen
+        inactive: Gray
+        playbar_progress: Green
+        playbar_progress_text: Black
+        playbar_text: White
+        selected: Green
+        text: White
+        header: White
+      behavior:
+        enable_text_emphasis: false
+        volume_increment: 5
+        liked_icon: 
+        shuffle_icon: 󰒟
+        repeat_track_icon: 󰑘
+        repeat_context_icon: 󰑖
+        playing_icon: 
+        paused_icon: 
+        set_window_title: true
+    '';
+
+    # Spicetify is broken for now
     programs.spicetify = {
-      enable = true;
+      enable = false;
       theme = {
         name = "text";
         src = pkgs.fetchgit {
@@ -27,7 +97,7 @@ in
         injectCss = true;
         replaceColors = true;
         overwriteAssets = true;
-        sidebarConfig = true;
+        siebarConfig = true;
       };
       colorScheme = "custom";
       customColorScheme = {
@@ -69,13 +139,36 @@ in
       ];
     };
 
-    impermanence.directories = [
-      ".cache/spotify"
-      ".config/spotify"
-    ];
+    impermanence = {
+      directories = [
+        ".cache/spotify"
+        ".cache/spotifyd"
+        ".config/spotify"
+      ];
+      files = [
+        ".config/spotify-tui/.spotify_token_cache.json"
+        ".config/spotify-tui/client.yml"
+      ];
+    };
 
-    desktop.hyprland.settings.windowrulev2 =
-      lib.mkIf (desktopCfg.windowManager == "hyprland")
-        [ "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$" ];
+    desktop.hyprland.settings =
+      let
+        modKey = config.modules.desktop.hyprland.modKey;
+        playerctl = "${pkgs.playerctl}/bin/playerctl --player=spotifyd,spotify,%any";
+      in
+      {
+        windowrulev2 =
+          lib.mkIf (desktopCfg.windowManager == "hyprland")
+            [ "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$" ];
+        bindr = [
+          "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause"
+        ];
+        bind = [
+          "${modKey}, Comma, exec, ${playerctl} previous"
+          "${modKey}, Period, exec, ${playerctl} next"
+          # "${modKey}, XF86AudioRaiseVolume, exec, ${pkgs.libsForQt5.qt5.qttools.bin}/bin/qdbus --literal org.mpris.MediaPlayer2.spotifyd /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.VolumeUp"
+          # "${modKey}, XF86AudioLowerVolume, exec, ${pkgs.libsForQt5.qt5.qttools.bin}/bin/qdbus --literal org.mpris.MediaPlayer2.spotifyd /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.VolumeDown"
+        ];
+      };
   };
 }

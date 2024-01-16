@@ -58,6 +58,7 @@ in
         directories = [
           ".config/rncbc.org"
           ".local/state/wireplumber"
+          ".config/qpwgraph" # just for manually saved configs
         ];
       };
     })

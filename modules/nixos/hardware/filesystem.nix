@@ -7,6 +7,7 @@ in
     loader.systemd-boot = {
       enable = true;
       consoleMode = "auto";
+      configurationLimit = 10;
     };
     loader.efi.canTouchEfiVariables = true;
     supportedFilesystems = [ "zfs" ];

@@ -130,5 +130,11 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
         ", XF86AudioRaiseVolume, exec, ${wpctl} set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+"
         ", XF86AudioLowerVolume, exec, ${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 5%-"
       ];
+      extraConfig = ''
+        bind = ${mod}, Delete, submap, Grab
+        submap = Grab
+        bind = ${mod}SHIFT, Delete, submap, reset
+        submap = reset
+      '';
     };
 }

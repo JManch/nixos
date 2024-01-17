@@ -8,11 +8,15 @@
 
   modules = {
     desktop = {
-      dunst.enable = true;
+      windowManager = "hyprland";
+      hyprland.modKey = "ALT";
       style.font = {
         family = "BerkeleyMono Nerd Font";
         package = inputs.nix-resources.packages.${pkgs.system}.berkeley-mono-nerdfont;
       };
+      anyrun.enable = true;
+      waybar.enable = true;
+      dunst.enable = true;
     };
     shell.enable = true;
 

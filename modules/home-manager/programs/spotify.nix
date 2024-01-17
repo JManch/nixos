@@ -8,14 +8,7 @@ let
   cfg = config.modules.programs.spotify;
 in
 {
-  config = lib.mkIf cfg.enable {
-
-    assertions = [
-      {
-        assertion = cfg.enable -> nixosConfig.modules.system.audio.enable;
-        message = "Why enable spotify with no system audio?";
-      }
-    ];
+  config = lib.mkIf (cfg.enable && nixosConfig.modules.system.audio.enable) {
 
     home.packages = with pkgs; [
       spotify # need this for the spotify-player desktop icon

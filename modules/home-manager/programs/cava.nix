@@ -1,5 +1,6 @@
-{ config
-, lib
+{ lib
+, pkgs
+, config
 , ...
 }:
 let
@@ -38,5 +39,14 @@ lib.mkIf cfg.enable {
         waves = 0;
       };
     };
+  };
+
+  xdg.desktopEntries."cava" = {
+    name = "Cava";
+    genericName = "Audio Visualizer";
+    exec = "${pkgs.alacritty}/bin/alacritty --title Cava -e ${config.programs.cava.package}/bin/cava";
+    terminal = false;
+    type = "Application";
+    categories = [ "Audio" ];
   };
 }

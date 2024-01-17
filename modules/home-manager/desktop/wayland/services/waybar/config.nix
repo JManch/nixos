@@ -129,7 +129,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           };
           "network#hostname" = {
             format-ethernet = "${lib.toUpper hostname}";
-            format-disconnected = "<span color='#${colors.base08}'>${lib.toUpper hostname}</span>";
+            format-disconnected = "${lib.toUpper hostname}";
             tooltip-format-ethernet = "<span color='#${colors.base0B}'>{ipaddr}</span>";
             tooltip-format-disconnected = "<span color='#${colors.base08}'>Disconnected</span>";
           };

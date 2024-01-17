@@ -54,7 +54,7 @@
       # cd here because I once had a bad experience where I accidentally built
       # in the nix store and it broke my entire install
       rebuild-switch = "cd && sudo nixos-rebuild switch --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-build = "cd && sudo nixos-rebuild build --flake /home/${username}/.config/nixos#${hostname}";
+      rebuild-build = "cd && nixos-rebuild build --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-boot = "cd && sudo nixos-rebuild boot --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-vm = "cd && nixos-rebuild build-vm --flake /home/${username}/.config/nixos#virtual";
       inspect-nix-config = "nix --extra-experimental-features repl-flake repl '/home/${username}/.config/nixos#nixosConfigurations.${hostname}'";

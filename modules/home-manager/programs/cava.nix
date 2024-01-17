@@ -1,12 +1,13 @@
 { lib
 , pkgs
 , config
+, nixosConfig
 , ...
 }:
 let
   cfg = config.modules.programs.cava;
 in
-lib.mkIf cfg.enable {
+lib.mkIf (cfg.enable && nixosConfig.modules.system.audio.enable) {
   programs.cava = {
     enable = true;
     settings = {

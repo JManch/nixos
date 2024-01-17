@@ -6,8 +6,7 @@
 let
   cfg = config.modules.programs.images;
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   home.packages = with pkgs; [
     feh # simple image viewer
     gthumb # image editor

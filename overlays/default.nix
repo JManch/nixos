@@ -48,6 +48,12 @@ in
       '';
     });
 
+    spotify = prev.spotify.overrideAttrs (oldAttrs: {
+      postInstall = ''
+        rm "$out/share/applications/spotify.desktop"
+      '';
+    });
+
     # Commit with new feature https://github.com/Gustash/Hyprshot/pull/19
     hyprshot = prev.hyprshot.overrideAttrs (oldAttrs: {
       src = final.fetchFromGitHub {

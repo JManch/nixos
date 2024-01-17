@@ -21,5 +21,4 @@ in
   "wireguard/ncase-m1/key.age".publicKeys = [ ncase-m1 ];
 
   # Home-manager secrets can only be decrypted by the "joshua" key
-  "spotify.age".publicKeys = [ joshua ];
 }

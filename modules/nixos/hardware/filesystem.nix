@@ -9,6 +9,8 @@ in
       consoleMode = "auto";
       configurationLimit = 10;
     };
+    # Faster but also needed for build-vm to work with impermanence
+    initrd.systemd.enable = true;
     loader.efi.canTouchEfiVariables = true;
     supportedFilesystems = [ "zfs" ];
   };

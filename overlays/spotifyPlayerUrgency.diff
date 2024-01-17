@@ -1,0 +1,14 @@
+diff --git a/spotify_player/src/client/mod.rs b/spotify_player/src/client/mod.rs
+index 413072d..2586243 100644
+--- a/spotify_player/src/client/mod.rs
++++ b/spotify_player/src/client/mod.rs
+@@ -1432,7 +1432,8 @@ impl Client {
+             ))
+             .body(&get_text_from_format_str(
+                 &state.configs.app_config.notify_format.body,
+-            ));
++            ))
++            .urgency(notify_rust::Urgency::Low);
+ 
+         n.show()?;
+ 

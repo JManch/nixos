@@ -54,6 +54,8 @@ in
       '';
     });
 
+    spotify-player = addPatches prev.spotify-player [ ./spotifyPlayerUrgency.diff ];
+
     # Commit with new feature https://github.com/Gustash/Hyprshot/pull/19
     hyprshot = prev.hyprshot.overrideAttrs (oldAttrs: {
       src = final.fetchFromGitHub {

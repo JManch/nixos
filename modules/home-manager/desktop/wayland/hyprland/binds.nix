@@ -76,8 +76,8 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${mod}, Right, workspace, r+1"
 
           # Monitors
-          "${mod}, Comma, movecurrentworkspacetomonitor, ${(getMonitorByNumber 2).name}"
-          "${mod}, Period, movecurrentworkspacetomonitor, ${(getMonitorByNumber 1).name}"
+          "${modShift}, Comma, movecurrentworkspacetomonitor, ${(getMonitorByNumber 2).name}"
+          "${modShift}, Period, movecurrentworkspacetomonitor, ${(getMonitorByNumber 1).name}"
           # TODO: Change this so that it move the cursor in any direction after
           # switching monitors. This is so that when playing games in workspace
           # the cursor doesn't go missing.

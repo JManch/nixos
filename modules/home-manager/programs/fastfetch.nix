@@ -3,8 +3,10 @@
 , pkgs
 , ...
 }:
-lib.mkIf config.modules.programs.fastfetch.enable {
-
+let
+  cfg = config.modules.programs.fastfetch;
+in
+lib.mkIf cfg.enable {
   home.packages = [ pkgs.fastfetch ];
   programs.zsh.shellAliases = {
     neofetch = "fastfetch";

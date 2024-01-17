@@ -50,6 +50,6 @@ in
   };
 
   programs.zsh.shellAliases = {
-    bootbios = "systemctl reboot --firmware-setup";
+    boot-bios = "systemctl reboot --firmware-setup";
   };
 }

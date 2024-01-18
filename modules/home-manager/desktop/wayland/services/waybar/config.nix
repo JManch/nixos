@@ -120,7 +120,9 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           # TODO: Make this modular. Only works on AMD, just assume it is always hwmon0
           "custom/gpu" = {
             format = "<span color='#${colors.base04}' size='large'>󰾲</span> {}%";
-            exec = "${pkgs.coreutils}/bin/cat /sys/class/hwmon/hwmon0/device/gpu_busy_percent";
+            # WARN: This hwmon number can change depending on the order devices are loaded during initr
+            # Should make this configurable per host
+            exec = "${pkgs.coreutils}/bin/cat /sys/class/hwmon/hwmon2/device/gpu_busy_percent";
             interval = 5;
           };
           memory = {

@@ -45,7 +45,7 @@ lib.mkIf (cfg.enable && nixosConfig.modules.system.audio.enable) {
   xdg.desktopEntries."cava" = {
     name = "Cava";
     genericName = "Audio Visualizer";
-    exec = "${pkgs.alacritty}/bin/alacritty --title Cava -e ${config.programs.cava.package}/bin/cava";
+    exec = "${config.programs.alacritty.package}/bin/alacritty --title Cava -e ${config.programs.cava.package}/bin/cava";
     terminal = false;
     type = "Application";
     categories = [ "Audio" ];

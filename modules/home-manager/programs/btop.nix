@@ -1,4 +1,5 @@
 { lib
+, pkgs
 , config
 , ...
 }:
@@ -7,6 +8,7 @@ let
   colors = config.colorscheme.colors;
 in
 lib.mkIf cfg.enable {
+
   programs.btop = {
     enable = true;
     settings = {
@@ -14,6 +16,7 @@ lib.mkIf cfg.enable {
     };
 
   };
+
   xdg.configFile."btop/themes/custom.theme".text = ''
     theme[main_bg]="#${colors.base00}"
     theme[main_fg]="#${colors.base05}"
@@ -58,4 +61,14 @@ lib.mkIf cfg.enable {
     theme[process_mid]="#${colors.base0A}"
     theme[process_end]="#${colors.base09}"
   '';
+
+  xdg.desktopEntries."btop" = {
+    name = "btop";
+    genericName = "Resource Monitor";
+    exec = "${config.programs.alacritty.package}/bin/alacritty --title btop -e ${config.programs.btop.package}/bin/btop";
+    terminal = false;
+    type = "Application";
+    categories = [ "System" ];
+  };
+
 }

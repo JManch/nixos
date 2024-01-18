@@ -60,7 +60,7 @@ in
     xdg.desktopEntries."spotify-player" = {
       name = "Spotify";
       genericName = "Music Player";
-      exec = "${pkgs.alacritty}/bin/alacritty --title Spotify --option font.size=11 -e ${pkgs.spotify-player}/bin/spotify_player";
+      exec = "${config.programs.alacritty.package}/bin/alacritty --title Spotify --option font.size=11 -e ${pkgs.spotify-player}/bin/spotify_player";
       terminal = false;
       type = "Application";
       categories = [ "Audio" ];

@@ -1,6 +1,8 @@
 { lib
-, nixosConfig
+, pkgs
 , config
+, inputs
+, nixosConfig
 , ...
 }:
 let
@@ -13,11 +15,18 @@ in
     ./gtk.nix
     ./font.nix
   ];
+
   options.modules.desktop = {
+
     windowManager = mkOption {
       type = with types; nullOr (enum [ "hyprland" ]);
       default = null;
       description = "The window manager to use";
+    };
+    wallpaper = mkOption {
+      type = types.package;
+      default = inputs.nix-resources.packages.${pkgs.system}.wallpapers.rx7;
+      description = "Desktop wallpaper image";
     };
     style = {
       font = {

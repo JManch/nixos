@@ -3,7 +3,11 @@
 , lib
 , inputs
 , ...
-}: {
+}:
+let
+  nix-resources = inputs.nix-resources.packages.${pkgs.system};
+in
+{
   imports = [
     ./core.nix
   ];
@@ -20,10 +24,12 @@
 
       hyprland.tearing = true;
 
+      wallpaper = nix-resources.wallpapers.purple-landscape;
+
       style = {
         font = {
           family = "BerkeleyMono Nerd Font";
-          package = inputs.nix-resources.packages.${pkgs.system}.berkeley-mono-nerdfont;
+          package = nix-resources.berkeley-mono-nerdfont;
         };
         cursorSize = 24;
         cornerRadius = 10;
@@ -53,7 +59,6 @@
       anyrun.enable = true;
       waybar.enable = true;
       dunst.enable = true;
-      swww.enable = true;
     };
 
     programs = {

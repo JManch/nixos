@@ -39,7 +39,6 @@ with lib; {
     };
     anyrun.enable = mkEnableOption "Anyrun";
     waybar.enable = mkEnableOption "Waybar";
-    swww.enable = mkEnableOption "Swww";
   };
 
   config =

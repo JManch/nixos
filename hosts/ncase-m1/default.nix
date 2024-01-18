@@ -19,6 +19,7 @@
         number = 1;
         refreshRate = 144.0;
         gamingRefreshRate = 165.0;
+        gamma = 0.75;
         width = 2560;
         height = 1440;
         position = "2560x0";

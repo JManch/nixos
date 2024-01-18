@@ -33,6 +33,12 @@ let
           Only affects the primary monitor.
         '';
       };
+      gamma = mkOption {
+        type = types.float;
+        default = 1.0;
+        description = "Custom gamma level to apply to the monitor";
+        example = 0.75;
+      };
       position = mkOption {
         type = types.str;
         default = "0x0";

@@ -21,13 +21,9 @@ let
   hyprshot = "${pkgs.hyprshot}/bin/hyprshot";
   hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
 
-  disableShaderCommand =
-    let
-      shaderDir = "${config.xdg.configHome}/hypr/shaders";
-      disableShader = "${hyprctl} keyword decoration:screen_shader ${shaderDir}/blank.frag";
-      enableShader = "${hyprctl} keyword decoration:screen_shader ${shaderDir}/monitor1_gamma.frag";
-    in
-    command: "${disableShader} && ${command} && ${enableShader}";
+  disableShadersCommand =
+    with config.modules.desktop.util;
+    command: "${disableShaders} && ${command} && ${enableShaders}";
 
   toggleFloating = pkgs.writeShellScript "hypr-toggle-floating" ''
     if [[ $(${hyprctl} activewindow -j | ${pkgs.jaq}/bin/jaq -r '.floating') == "false" ]]; then
@@ -90,10 +86,10 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${mod}, X, layoutmsg, togglesplit"
 
           # Hyprshot
-          ", Print, exec, ${disableShaderCommand "${hyprshot} -m region --clipboard-only"}"
-          "${mod}, I, exec, ${disableShaderCommand "${hyprshot} -m output -m active --clipboard-only"}"
-          "${modShift}, Print, exec, ${disableShaderCommand "${hyprshot} -m region"}"
-          "${modShift}, I, exec, ${disableShaderCommand "${hyprshot} -m output -m active"}"
+          ", Print, exec, ${disableShadersCommand "${hyprshot} -m region --clipboard-only"}"
+          "${mod}, I, exec, ${disableShadersCommand "${hyprshot} -m output -m active --clipboard-only"}"
+          "${modShift}, Print, exec, ${disableShadersCommand "${hyprshot} -m region"}"
+          "${modShift}, I, exec, ${disableShadersCommand "${hyprshot} -m output -m active"}"
 
           # Workspaces other
           "${mod}, N, workspace, previous"

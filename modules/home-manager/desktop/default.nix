@@ -54,8 +54,22 @@ in
         default = 24;
       };
     };
+    util = {
+      enableShaders = mkOption {
+        type = types.str;
+        default = "";
+        description = "Command to enable screen shaders";
+      };
+      disableShaders = mkOption {
+        type = types.str;
+        default = "";
+        description = "Command to disable screen shaders";
+      };
+    };
   };
+
   config = {
+
     assertions =
       let
         windowManager = config.modules.desktop.windowManager;
@@ -77,5 +91,6 @@ in
       ];
 
     xdg.portal.enable = nixosConfig.usrEnv.desktop.enable;
+
   };
 }

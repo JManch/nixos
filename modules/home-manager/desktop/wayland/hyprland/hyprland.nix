@@ -109,8 +109,6 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         };
 
         drop_shadow = false;
-
-        screen_shader = "${config.xdg.configHome}/hypr/shaders/monitor1_gamma.frag";
       };
 
       input = {

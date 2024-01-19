@@ -32,6 +32,7 @@ mkIf (osDesktopEnabled && isWayland) {
       ];
 
   home.activation."swww-set-wallpaper" = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    $DRY_RUN_CMD ${setWallpaperCmd}
+    # Need to exit with a success code
+    $DRY_RUN_CMD ${swww} query && ${setWallpaperCmd} || exit 0
   '';
 }

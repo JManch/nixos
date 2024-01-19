@@ -9,6 +9,7 @@ let
   colors = config.colorscheme.colors;
 in
 lib.mkIf nixosConfig.usrEnv.desktop.enable {
+
   gtk = {
     enable = true;
     theme = {
@@ -42,4 +43,5 @@ lib.mkIf nixosConfig.usrEnv.desktop.enable {
       "hyprctl setcursor ${config.gtk.cursorTheme.name} ${builtins.toString desktopCfg.style.cursorSize}"
     ];
   };
+
 }

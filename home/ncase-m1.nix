@@ -1,6 +1,6 @@
-{ pkgs
+{ lib
+, pkgs
 , config
-, lib
 , inputs
 , ...
 }:
@@ -24,7 +24,10 @@ in
 
       hyprland.tearing = true;
 
-      wallpaper = nix-resources.wallpapers.purple-landscape;
+      wallpaper = {
+        randomise = true;
+        randomiseFrequency = "daily";
+      };
 
       style = {
         font = {

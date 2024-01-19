@@ -42,6 +42,8 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
     ];
   };
 
+  # TODO: Fix inhibit always being active when spotify_player is open
+  # (regardless of whether or not music is playing)
   systemd.user.services.sway-audio-idle-inhibit = {
     Unit = {
       Description = "Prevents swayidle from sleeping while any application is outputting or receiving audio";
@@ -51,7 +53,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
 
     Service = {
       Restart = "always";
-      RestartSec = 3;
+      RestartSec = 10;
       ExecStart = "${pkgs.sway-audio-idle-inhibit}/bin/sway-audio-idle-inhibit";
     };
 

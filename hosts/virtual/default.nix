@@ -39,7 +39,10 @@
     };
 
     services = {
-      greetd.enable = false;
+      greetd = {
+        enable = true;
+        launchCmd = "Hyprland";
+      };
     };
 
     system = {

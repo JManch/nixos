@@ -94,6 +94,11 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         # TODO: Move this regex definition to gaming module config
         "immediate, class:^(steam_app.*|cs2|\.gamescope.*)$"
         "workspace name:GAME, class:^(steam_app.*|cs2|\.gamescope.*)$"
+
+        "workspace name:VM, class:^qemu$"
+        "float, class:^qemu$"
+        "size 75% 75%, class:^qemu$"
+        "center, class:^qemu$"
       ];
 
       decoration = {
@@ -174,26 +179,33 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         disable_logs = !cfg.logging;
       };
 
-      workspace = (lib.lists.concatMap
-        (
-          m:
-          let
-            default = builtins.head m.workspaces;
-          in
+      workspace =
+        let
+          primaryMonitor = lib.fetchers.primaryMonitor nixosConfig;
+        in
+        (lib.lists.concatMap
           (
-            lib.lists.map
-              (
-                w: "${builtins.toString w}, monitor:${m.name}" +
+            m:
+            let
+              default = builtins.head m.workspaces;
+            in
+            (
+              lib.lists.map
+                (
+                  w: "${builtins.toString w}, monitor:${m.name}" +
                   (if w == default then ", default:true" else "")
-              )
-              m.workspaces
+                )
+                m.workspaces
+            )
           )
+          nixosConfig.device.monitors
         )
-        nixosConfig.device.monitors
-      )
-      ++ [
-        "name:GAME,monitor:${(lib.fetchers.primaryMonitor nixosConfig).name}"
-      ];
+        ++ [
+          "name:GAME,monitor:${primaryMonitor.name}"
+        ]
+        ++ [
+          "name:VM,monitor:${primaryMonitor.name}"
+        ];
     };
   };
 }

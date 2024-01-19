@@ -1,7 +1,7 @@
-{ config
-, nixosConfig
+{ lib
 , pkgs
-, lib
+, config
+, nixosConfig
 , ...
 }:
 let
@@ -96,6 +96,7 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${mod}, S, togglespecialworkspace,"
           "${modShift}, S, movetoworkspacesilent, special"
           "${mod}, G, workspace, name:GAME"
+          "${mod}, V, workspace, name:VM"
         ] ++ (
           # Workspaces
           let

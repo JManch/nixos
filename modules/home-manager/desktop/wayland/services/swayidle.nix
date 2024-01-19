@@ -17,7 +17,6 @@ let
 in
 mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   home.packages = with pkgs; [
-    procps # provides pgrep
     sway-audio-idle-inhibit
   ];
 
@@ -26,7 +25,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
     timeouts = [
       (lib.mkIf desktopCfg.swaylock.enable {
         timeout = cfg.lockTime;
-        command = swaylockCfg.lockScript;
+        command = "${pkgs.procps}/bin/pgrep -x swaylock || swaylockCfg.lockScript";
       })
       {
         timeout = cfg.screenOffTime;

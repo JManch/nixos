@@ -101,7 +101,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         rounding = desktopCfg.style.cornerRadius - 2;
 
         blur = {
-          enabled = true;
+          enabled = cfg.blur;
           size = 2;
           passes = 3; # drop to 2 or 3 for weaker blur
           xray = true;

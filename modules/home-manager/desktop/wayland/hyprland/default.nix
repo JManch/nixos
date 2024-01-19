@@ -15,6 +15,7 @@ with lib; {
         default = "SUPER";
       };
       tearing = mkEnableOption "allow tearing";
+      blur = lib.overrideExisting (mkEnableOption "enable blur") { default = true; };
       logging = mkEnableOption "logging";
     };
   };

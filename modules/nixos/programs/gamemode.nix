@@ -22,6 +22,7 @@ let
       inherit (lib.trivial) boolToString;
       inherit (builtins) toString;
       hyprland = homeConfig.modules.desktop.windowManager == "hyprland";
+      blur = homeConfig.modules.desktop.hyprland.blur;
       monitor = lib.fetchers.primaryMonitor config;
       width = toString monitor.width;
       height = toString monitor.height;
@@ -38,7 +39,7 @@ let
       ${optionalString hyprland /*bash*/ ''
         export HYPRLAND_INSTANCE_SIGNATURE=$(ls -1 -t /tmp/hypr | cut -d '.' -f 1 | head -1)
         hyprctl --batch "\
-          keyword decoration:blur:enabled ${isEnd m};\
+          ${optionalString blur "keyword decoration:blur:enabled ${isEnd m};\\"}
           keyword animations:enabled ${isEnd m};\
           keyword monitor ${monitor.name},${width}x${height}@${refreshRate m},${monitor.position},1"
       ''

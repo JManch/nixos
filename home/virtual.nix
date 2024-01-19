@@ -1,5 +1,5 @@
-{ inputs
-, pkgs
+{ pkgs
+, inputs
 , ...
 }: {
   imports = [
@@ -8,8 +8,14 @@
 
   modules = {
     desktop = {
+      wallpaper = {
+        randomise = true;
+      };
       windowManager = "hyprland";
-      hyprland.modKey = "ALT";
+      hyprland = {
+        modKey = "ALT";
+        blur = false;
+      };
       style.font = {
         family = "BerkeleyMono Nerd Font";
         package = inputs.nix-resources.packages.${pkgs.system}.berkeley-mono-nerdfont;

@@ -1,38 +1,32 @@
 { lib
 , pkgs
 , config
-, inputs
 , nixosConfig
 , ...
 }:
 let
   inherit (lib) mkIf;
-  cfg = config.modules.desktop.swww;
+  desktopCfg = config.modules.desktop;
+  cfg = desktopCfg.swww;
   isWayland = lib.fetchers.isWayland config;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
-  wallpapers = inputs.nix-resources.packages.${pkgs.system}.wallpapers;
+
   swww = "${pkgs.swww}/bin/swww";
-  setWallpaperCmd = "${swww} img ${transition} ${config.modules.desktop.wallpaper}";
   primaryMonitor = lib.fetchers.primaryMonitor nixosConfig;
   refreshRate = "${builtins.toString (builtins.floor primaryMonitor.refreshRate)}";
-  transition = "--transition-type center --transition-step 90 --transition-fps ${refreshRate}";
+  transition =
+    "--transition-bezier .43,1.19,1,.4 --transition-type center --transition-duration 1 --transition-fps ${refreshRate}";
 in
 mkIf (osDesktopEnabled && isWayland) {
 
   home.packages = [ pkgs.swww ];
 
-  impermanence.directories = [
-    ".cache/swww"
-  ];
+  modules.desktop.wallpaper.setWallpaperCmd = "${swww} img ${transition}";
 
   wayland.windowManager.hyprland.settings.exec-once =
     mkIf (config.modules.desktop.windowManager == "hyprland")
       [
-        "sleep 1 && ${swww} init --no-cache && ${setWallpaperCmd}"
+        "${swww} init --no-cache"
       ];
 
-  home.activation."swww-set-wallpaper" = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    # Need to exit with a success code
-    $DRY_RUN_CMD ${swww} query && ${setWallpaperCmd} || exit 0
-  '';
 }

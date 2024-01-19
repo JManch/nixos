@@ -12,7 +12,6 @@ in
   imports = [
     ./wayland
     ./common
-    ./gtk.nix
     ./font.nix
   ];
 
@@ -22,11 +21,6 @@ in
       type = with types; nullOr (enum [ "hyprland" ]);
       default = null;
       description = "The window manager to use";
-    };
-    wallpaper = mkOption {
-      type = types.package;
-      default = inputs.nix-resources.packages.${pkgs.system}.wallpapers.rx7;
-      description = "Desktop wallpaper image";
     };
     style = {
       font = {

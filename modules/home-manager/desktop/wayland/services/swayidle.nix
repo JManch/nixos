@@ -20,6 +20,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
     sway-audio-idle-inhibit
   ];
 
+  # TODO: Look into swayidle turning off display before locking
   services.swayidle = {
     enable = true;
     timeouts = [
@@ -48,6 +49,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
       Description = "Prevents swayidle from sleeping while any application is outputting or receiving audio";
       After = [ "swayidle.service" ];
       Requires = [ "swayidle.service" ];
+      X-SwitchMethod = "keep-old";
     };
 
     Service = {

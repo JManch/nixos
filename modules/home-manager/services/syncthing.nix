@@ -19,6 +19,7 @@ lib.mkIf cfg.enable {
     Unit = {
       Requires = [ "home-joshua-.config-syncthing.mount" ];
       After = [ "home-joshua-.config-syncthing.mount" ];
+      X-SwitchMethod = "keep-old";
     };
   };
 

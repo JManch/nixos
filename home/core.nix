@@ -63,7 +63,8 @@
   # base0E: "#D4BFFF"
   # base0F: "#F29E74"
 
-  # Nicely reload system units when changing configs
+  # Reload systemd services on home-manager restart
+  # Add [Unit] X-SwitchMethod=(reload|restart|stop-start|keep-old) to control service behaviour
   systemd.user.startServices = "sd-switch";
   home.stateVersion = "23.05";
 }

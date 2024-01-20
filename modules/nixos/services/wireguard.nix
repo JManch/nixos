@@ -21,7 +21,6 @@ lib.mkIf cfg.enable
   networking.firewall.interfaces.wg-discord =
     {
       # For OBS screensharing
-      allowedTCPPorts = [ 5201 ];
       allowedUDPPorts = [ 5201 ];
     };
 
@@ -37,12 +36,12 @@ lib.mkIf cfg.enable
       address = [ "10.0.0.2/24" ];
       autostart = false;
       privateKeyFile = config.age.secrets.wireguardKey.path;
-      listenPort = 13232;
       peers = [
         {
           publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
-          allowedIPs = [ "10.0.0.1/24" ];
+          allowedIPs = [ "10.0.0.0/24" ];
           endpoint = "ddns.manch.tech:13232";
+          persistentKeepalive = 25;
         }
       ];
     };

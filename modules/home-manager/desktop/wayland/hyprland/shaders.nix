@@ -22,10 +22,10 @@ let
   monitorGammaConditionals = (lib.lists.concatMap
     (m:
       if m.gamma == 1.0 then [ ] else [
+        # WARNING: The monitor number here can be weird sometimes so might
+        # need to manually set it for specific hosts
         /* glsl */
         ''
-          // WARNING: The monitor number here can be weird sometimes so might
-          // need to manually set it for specific hosts
           if (monitor == ${builtins.toString (m.number - 1)}) {
               vec4 pixColor = texture2D(tex, v_texcoord);
               pixColor.rgb = pow(pixColor.rgb, vec3(1.0 / ${builtins.toString m.gamma}));

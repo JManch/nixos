@@ -106,7 +106,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
         network = {
           interval = 5;
           format = "<span color='#${colors.base04}'>󰈀</span> {bandwidthTotalBytes}";
-          tooltip-format = "<span color='#${colors.base0D}'>󰇚</span>{bandwidthDownBytes:>} <span color='#${colors.base0D}'>󰕒</span>{bandwidthUpBytes:>}";
+          tooltip-format = "<span color='#${colors.base04}'>󰇚</span>{bandwidthDownBytes:>} <span color='#${colors.base04}'>󰕒</span>{bandwidthUpBytes:>}";
           max-length = 50;
         };
         cpu = {
@@ -117,15 +117,17 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           format = "<span color='#${colors.base04}' size='large'>󰾲</span> {}%";
           exec = "${pkgs.coreutils}/bin/cat /sys/class/hwmon/hwmon${builtins.toString gpu.hwmonId}/device/gpu_busy_percent";
           interval = 5;
+          tooltip = false;
         };
         memory = {
           interval = 30;
           format = "<span color='#${colors.base04}'></span> {used:0.1f}GiB";
+          tooltip = false;
         };
         "network#hostname" = {
           format-ethernet = "${lib.toUpper hostname}";
           format-disconnected = "${lib.toUpper hostname}";
-          tooltip-format-ethernet = "<span color='#${colors.base0B}'>{ipaddr}</span>";
+          tooltip-format-ethernet = "{ipaddr}";
           tooltip-format-disconnected = "<span color='#${colors.base08}'>Disconnected</span>";
         };
         tray = {

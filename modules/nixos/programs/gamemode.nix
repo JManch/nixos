@@ -44,7 +44,7 @@ let
           keyword monitor ${monitor.name},${width}x${height}@${refreshRate m},${monitor.position},1"
       ''
       }
-      notify-send --urgency=critical -t 5000 'GameMode ${m}ed'
+      notify-send --urgency=critical -t 5000 'GameMode' '${m}ed'
     '';
 in
 lib.mkIf gaming.enable {

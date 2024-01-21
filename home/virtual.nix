@@ -10,6 +10,7 @@
     desktop = {
       wallpaper = {
         randomise = true;
+        # randomiseFrequency = "*-*-* *:*:00"; # every minute for debug
       };
       windowManager = "hyprland";
       hyprland = {
@@ -29,7 +30,6 @@
     programs = {
       alacritty.enable = true;
       btop.enable = true;
-      cava.enable = true;
       firefox.enable = true;
       git.enable = true;
       neovim.enable = true;

@@ -17,6 +17,8 @@ let
   gaming = nixosConfig.modules.programs.gaming;
   gpu = nixosConfig.device.gpu.type;
   easyeffects = config.modules.services.easyeffects;
+
+  gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
 in
 lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
 {
@@ -111,12 +113,9 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           interval = 5;
           format = "<span color='#${colors.base04}'></span> {usage}%";
         };
-        # TODO: Make this modular. Only works on AMD, just assume it is always hwmon0
-        "custom/gpu" = {
+        "custom/gpu" = lib.mkIf gpuModuleEnabled {
           format = "<span color='#${colors.base04}' size='large'>󰾲</span> {}%";
-          # WARN: This hwmon number can change depending on the order devices are loaded during initr
-          # Should make this configurable per host
-          exec = "${pkgs.coreutils}/bin/cat /sys/class/hwmon/hwmon2/device/gpu_busy_percent";
+          exec = "${pkgs.coreutils}/bin/cat /sys/class/hwmon/hwmon${builtins.toString gpu.hwmonId}/device/gpu_busy_percent";
           interval = 5;
         };
         memory = {
@@ -174,7 +173,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           [
             "cpu"
           ] ++
-          optional (gpu != null) "custom/gpu" ++
+          optional gpuModuleEnabled "custom/gpu" ++
           optional gaming.enable "gamemode" ++
           [
             "memory"

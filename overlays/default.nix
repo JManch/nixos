@@ -54,7 +54,8 @@ in
       '';
     });
 
-    spotify-player = addPatches prev.spotify-player [ ./spotifyPlayerUrgency.diff ];
+    # Change notification priority and make notifications replace themselves
+    spotify-player = addPatches prev.spotify-player [ ./spotifyPlayerNotifs.diff ];
 
     # Commit with new feature https://github.com/Gustash/Hyprshot/pull/19
     hyprshot = prev.hyprshot.overrideAttrs (oldAttrs: {

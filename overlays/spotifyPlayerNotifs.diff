@@ -1,14 +1,15 @@
 diff --git a/spotify_player/src/client/mod.rs b/spotify_player/src/client/mod.rs
-index 413072d..2586243 100644
+index 413072d..916ac49 100644
 --- a/spotify_player/src/client/mod.rs
 +++ b/spotify_player/src/client/mod.rs
-@@ -1432,7 +1432,8 @@ impl Client {
+@@ -1432,7 +1432,9 @@ impl Client {
              ))
              .body(&get_text_from_format_str(
                  &state.configs.app_config.notify_format.body,
 -            ));
 +            ))
-+            .urgency(notify_rust::Urgency::Low);
++            .urgency(notify_rust::Urgency::Low)
++            .hint(notify_rust::Hint::Custom("x-canonical-private-synchronous".to_string(),"anything".to_string()));
  
          n.show()?;
  

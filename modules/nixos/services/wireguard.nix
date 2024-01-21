@@ -18,11 +18,10 @@ lib.mkIf cfg.enable
 
   age.secrets.wireguardKey.file = ../../../secrets/wireguard/${hostname}/key.age;
 
-  networking.firewall.interfaces.wg-discord =
-    {
-      # For OBS screensharing
-      allowedUDPPorts = [ 5201 ];
-    };
+  networking.firewall.interfaces.wg-discord = {
+    # For OBS screensharing
+    allowedUDPPorts = [ 5202 ];
+  };
 
   networking.wg-quick.interfaces = {
     wg-discord = {

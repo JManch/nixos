@@ -42,9 +42,9 @@ mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
   {
     systemd.user.services.set-wallpaper = {
       Unit = {
-        Description = "Set the desktop wallpaper on graphical session start";
+        Description = "Set the desktop wallpaper";
         After = lists.optional cfg.randomise "randomise-wallpaper.service" ++ [ "graphical-session.target" ];
-        Requires = [ "graphical-session.target" ];
+        Requisite = [ "graphical-session.target" ];
         X-SwitchMethod = "keep-old";
       };
       Service = {
@@ -74,7 +74,7 @@ mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
         Unit = {
           Description = "Randomise the desktop wallpaper";
           Before = [ "set-wallpaper.service" ];
-          Wants = [ "set-wallpaper.service" ]; # trigger wallpaper-set after this service
+          Wants = [ "set-wallpaper.service" ];
           X-SwitchMethod = "keep-old";
         };
         Service = {
@@ -86,7 +86,6 @@ mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
       timers.randomise-wallpaper = {
         Unit = {
           Description = "Timer for randomising the desktop wallpaper";
-          After = "graphical-session.target";
           X-SwitchMethod = "keep-old";
         };
         Timer = {

@@ -86,6 +86,14 @@ in
         default = "";
         description = "The GPU name, not critical";
       };
+      hwmonId = mkOption {
+        type = types.nullOr types.int;
+        default = null;
+        description = ''
+          The hwmon id of the GPU. Run `cat /sys/class/hwmon/*/name` to list
+          devices. Id is position in list - 1.
+        '';
+      };
     };
 
     monitors = mkOption {

@@ -202,8 +202,6 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         )
         ++ [
           "name:GAME,monitor:${primaryMonitor.name}"
-        ]
-        ++ [
           "name:VM,monitor:${primaryMonitor.name}"
         ];
     };

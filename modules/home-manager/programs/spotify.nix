@@ -6,13 +6,22 @@
 }:
 let
   cfg = config.modules.programs.spotify;
+  spotifyPlayer = "${pkgs.spotify-player}/bin/spotify_player";
+  modifySpotifyVolume = pkgs.writeShellScript "spotify-modify-volume" ''
+    ${spotifyPlayer} playback volume --offset -- $1
+    ${pkgs.coreutils}/bin/sleep 0.2 # volume takes some time to update
+    new_volume=$(${spotifyPlayer} get key playback | ${pkgs.jaq}/bin/jaq -r '.device.volume_percent')
+    ${pkgs.libnotify}/bin/notify-send --urgency=low -h 'string:x-canonical-private-synchronous:anything' 'Spotify' "Volume ''${new_volume}%"
+  '';
 in
 {
   config = lib.mkIf (cfg.enable && nixosConfig.modules.system.audio.enable) {
 
     home.packages = with pkgs; [
       spotify # need this for the spotify-player desktop icon
-      spotify-player
+      (spotify-player.override {
+        withDaemon = false;
+      })
     ];
 
     xdg.configFile = {
@@ -111,22 +120,22 @@ in
 
     desktop.hyprland.settings =
       let
+        colors = config.colorscheme.colors;
+        desktopCfg = config.modules.desktop;
         modKey = config.modules.desktop.hyprland.modKey;
-        spotifyPlayer = "${pkgs.spotify-player}/bin/spotify_player playback";
       in
       {
-        # windowrulev2 =
-        #   lib.mkIf (desktopCfg.windowManager == "hyprland")
-        #     [ "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$" ];
+        windowrulev2 =
+          lib.mkIf (desktopCfg.windowManager == "hyprland")
+            [ "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$" ];
         bindr = [
-          "${modKey}, ${modKey}_R, exec, ${spotifyPlayer} play-pause"
+          "${modKey}, ${modKey}_R, exec, ${spotifyPlayer} playback play-pause"
         ];
         bind = [
-          "${modKey}, Comma, exec, ${spotifyPlayer} previous"
-          "${modKey}, Period, exec, ${spotifyPlayer} next"
-          # TODO: Display current volume in notification by parsing "spotify_player get key playback"
-          "${modKey}, XF86AudioRaiseVolume, exec, ${spotifyPlayer} volume --offset 5"
-          "${modKey}, XF86AudioLowerVolume, exec, ${spotifyPlayer} volume --offset -- -5"
+          "${modKey}, Comma, exec, ${spotifyPlayer} playback previous"
+          "${modKey}, Period, exec, ${spotifyPlayer} playback next"
+          "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume.outPath} 5"
+          "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume.outPath} -5"
         ];
       };
   };

@@ -12,6 +12,7 @@
     gpu = {
       name = "RX 7900XT";
       type = "amd";
+      hwmonId = 2;
     };
     monitors = [
       {

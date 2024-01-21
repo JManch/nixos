@@ -1,7 +1,13 @@
-{ config
+{ lib
+, config
+, outputs
 , username
+, hostname
 , ...
 }:
+let
+  hosts = builtins.attrNames outputs.nixosConfigurations;
+in
 {
   services.openssh = {
     enable = true;
@@ -15,6 +21,17 @@
         type = "ed25519";
       }
     ];
+  };
+
+  users.users.${username} = {
+    # Authorise all other hosts except our own
+    openssh.authorizedKeys.keys = lib.lists.concatMap
+      (
+        host:
+        if host == hostname then [ ] else
+        [ "${(import ../../../hosts/${host}/key.nix).key}" ]
+      )
+      hosts;
   };
 
   programs.ssh = {

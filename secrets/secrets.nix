@@ -1,7 +1,8 @@
 let
+  hostKey = host: (import ../hosts/${host}/key.nix).key;
   joshua = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIObU6Fxl5fshbiTZ53wkuvWT3lainInWSdfk/FXQYIxv joshua";
-  ncase-m1 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGmso00Sb3ab0dURSMJGAYN10OQQQ3VlPxHtNz092a8s root@ncase-m1";
-  virtual = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIRMA3ZtwZr/w9QG7iFfWFFSCAIjxw0XSejZPGHdYCzW root@virtual";
+  ncase-m1 = hostKey "ncase-m1";
+  virtual = hostKey "virtual";
   allHosts = [ ncase-m1 virtual ];
 in
 {

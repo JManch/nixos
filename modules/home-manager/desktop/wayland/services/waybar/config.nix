@@ -15,7 +15,7 @@ let
   audio = nixosConfig.modules.system.audio;
   wgnord = nixosConfig.modules.services.wgnord;
   gaming = nixosConfig.modules.programs.gaming;
-  gpu = nixosConfig.device.gpu.type;
+  gpu = nixosConfig.device.gpu;
   easyeffects = config.modules.services.easyeffects;
 
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);

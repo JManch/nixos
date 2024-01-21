@@ -51,7 +51,7 @@ in
       [device]
       name = "spotify-player"
       device_type = "computer"
-      volume = 80
+      volume = 70
       bitrate = 320
       audio_cache = true
       normalization = false

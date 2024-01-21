@@ -27,7 +27,7 @@ lib.mkIf config.modules.system.virtualisation.enable {
     variables = {
       # Allows nixos-rebuild build-vm graphical session
       # https://github.com/NixOS/nixpkgs/issues/59219
-      QEMU_OPTS = "-device virtio-vga-gl -display gtk,gl=on";
+      QEMU_OPTS = "-device virtio-vga-gl -display gtk,show-menubar=off,gl=on";
     };
   };
 }

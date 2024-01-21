@@ -20,7 +20,7 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
         font = "${desktopCfg.style.font.family} 13";
         icon_theme = config.gtk.iconTheme.name;
         show_indicators = true;
-        format = "<b>%s</b>\\n<span font='10'>%b</span>";
+        format = "<b>%s</b>\\n<span font='11'>%b</span>";
         layer = "overlay";
 
         corner_radius = cornerRadius;

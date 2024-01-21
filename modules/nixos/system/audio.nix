@@ -15,9 +15,9 @@ let
     ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle
     status=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@)
     if [[ $status == *MUTED* ]]; then
-      ${notifySend} -u critical -t 5000 "Microphone Muted"
+      ${notifySend} -u critical -t 3000 "Microphone" "Muted"
     else
-      ${notifySend} -u critical -t 5000 "Microphone Unmuted"
+      ${notifySend} -u critical -t 3000 "Microphone" "Unmuted"
     fi
   '';
 in

@@ -74,9 +74,6 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           # Monitors
           "${modShift}, Comma, movecurrentworkspacetomonitor, ${(getMonitorByNumber 2).name}"
           "${modShift}, Period, movecurrentworkspacetomonitor, ${(getMonitorByNumber 1).name}"
-          # TODO: Change this so that it move the cursor in any direction after
-          # switching monitors. This is so that when playing games in workspace
-          # the cursor doesn't go missing.
           "${mod}, TAB, focusmonitor, +1"
 
           # Dwindle
@@ -98,6 +95,14 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${mod}, G, workspace, name:GAME"
           "${mod}, V, workspace, name:VM"
         ] ++ (
+          # Go to empty workspace on all monitors
+          lib.lists.concatMap
+            (m: [
+              "${mod}, D, focusmonitor, ${m.name}"
+              "${mod}, D, workspace, name:DESKTOP-${builtins.toString m.number}"
+            ])
+            nixosConfig.device.monitors
+        ) ++ (
           # Workspaces
           let
             workspaceNumbers = lib.lists.map (w: builtins.toString w) (lib.lists.range 1 9);

@@ -50,6 +50,7 @@ in
 
     windowsBootEntry = {
       enable = mkEnableOption "Windows boot menu entry";
+      bootstrap = mkEnableOption "enable bootstrapping of the windows boot entry by adding an edk2 shell boot entry";
     };
 
   };

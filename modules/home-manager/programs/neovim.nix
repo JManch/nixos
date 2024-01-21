@@ -29,6 +29,10 @@ lib.mkIf cfg.enable {
     vimAlias = true;
   };
 
+  home.sessionVariables = {
+    EDITOR = "nvim";
+  };
+
   impermanence.directories = [
     ".config/nvim"
     ".local/share/nvim"

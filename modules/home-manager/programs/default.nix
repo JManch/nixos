@@ -13,7 +13,7 @@ in
     ./spotify.nix
     ./fastfetch.nix
     ./discord.nix
-    ./obs
+    ./obs.nix
     ./vscode.nix
     ./stremio.nix
     ./steam.nix

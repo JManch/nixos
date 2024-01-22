@@ -1,7 +1,6 @@
-{ outputs
-, config
+{ lib
 , pkgs
-, lib
+, config
 , ...
 } @ args:
 let
@@ -22,11 +21,17 @@ let
       inherit (lib.trivial) boolToString;
       inherit (builtins) toString;
       hyprland = homeConfig.modules.desktop.windowManager == "hyprland";
-      blur = homeConfig.modules.desktop.hyprland.blur;
+      hyprlandConfig = homeConfig.modules.desktop.hyprland;
+      blur = hyprlandConfig.blur;
       monitor = lib.fetchers.primaryMonitor config;
       width = toString monitor.width;
       height = toString monitor.height;
       isEnd = m: boolToString (m == "end");
+      # In gamemode remap the killactive key to use the shift modifier
+      killactiveUnbind = isEnd:
+        "keyword unbind ${hyprlandConfig.modKey}${optionalString isEnd "SHIFT"},W";
+      killactiveBind = isEnd:
+        "keyword bind ${hyprlandConfig.modKey}${optionalString (!isEnd) "SHIFT"},W,killactive";
       refreshRate = m: toString (
         if (m == "start") then
           monitor.gamingRefreshRate
@@ -41,7 +46,9 @@ let
         hyprctl --batch "\
           ${optionalString blur "keyword decoration:blur:enabled ${isEnd m};\\"}
           keyword animations:enabled ${isEnd m};\
-          keyword monitor ${monitor.name},${width}x${height}@${refreshRate m},${monitor.position},1"
+          keyword monitor ${monitor.name},${width}x${height}@${refreshRate m},${monitor.position},1;\
+          ${killactiveUnbind (isEnd m)};\
+          ${killactiveBind (isEnd m)};\"
       ''
       }
       notify-send --urgency=critical -t 5000 'GameMode' '${m}ed'

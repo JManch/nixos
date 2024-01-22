@@ -99,7 +99,7 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           lib.lists.concatMap
             (m: [
               "${mod}, D, focusmonitor, ${m.name}"
-              "${mod}, D, workspace, name:DESKTOP-${builtins.toString m.number}"
+              "${mod}, D, workspace, name:DESKTOP ${builtins.toString m.number}"
             ])
             nixosConfig.device.monitors
         ) ++ (

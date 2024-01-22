@@ -1,5 +1,8 @@
 { lib, ... }:
-with lib; {
+let
+  inherit (lib) mkAliasOptionModule mkEnableOption mkOption types;
+in
+{
   imports = [
     ./hyprland.nix
     ./shaders.nix

@@ -4,7 +4,10 @@
 , nixosConfig
 , ...
 }:
-with lib; {
+let
+  inherit (lib) mkEnableOption mkOption types;
+in
+{
   imports = [
     ./hyprland
     ./programs/anyrun.nix

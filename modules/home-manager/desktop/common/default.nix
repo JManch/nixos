@@ -1,9 +1,12 @@
 { lib
-, config
+, pkgs
 , inputs
 , ...
 }:
-with lib; {
+let
+  inherit (lib) mkEnableOption mkOption types;
+in
+{
   imports = [
     ./services/dunst.nix
     ./services/wallpaper.nix

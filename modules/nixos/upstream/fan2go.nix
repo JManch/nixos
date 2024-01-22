@@ -1,9 +1,10 @@
-{ config
-, lib
+{ lib
 , pkgs
+, config
 , ...
 }:
-with lib; let
+let
+  inherit (lib) mkIf mkMerge mkEnableOption mkOption types;
   cfg = config.programs.fan2go;
   yamlFormat = pkgs.formats.yaml { };
   configFile = yamlFormat.generate "fan2go.yaml" cfg.settings;
@@ -16,7 +17,7 @@ in
       package = mkOption {
         type = types.package;
         default = pkgs.fan2go;
-        defaultText = literalExpression "pkgs.fan2go";
+        defaultText = lib.literalExpression "pkgs.fan2go";
         description = "The fan2go package to install";
       };
 

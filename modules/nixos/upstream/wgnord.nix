@@ -3,7 +3,8 @@
 , pkgs
 , ...
 }:
-with lib; let
+let
+  inherit (lib) mkIf mkEnableOption mkOption types;
   cfg = config.services.wgnord;
 in
 {

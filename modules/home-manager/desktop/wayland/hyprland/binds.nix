@@ -48,12 +48,12 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
         [
           # General
           "${modShiftCtrl}, Q, exit,"
-          "${mod}, W, killactive,"
+          "${mod}, ${cfg.killActiveKey}, killactive,"
           "${mod}, C, exec, ${toggleFloating.outPath}"
           "${mod}, E, fullscreen, 1"
           "${modShift}, E, fullscreen, 0"
           "${mod}, Z, pin, active"
-          "${modShift}, R, exec, ${hyprctl} dispatch splitratio exact 1"
+          "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
 
           # Movement
           "${mod}, H, movefocus, l"

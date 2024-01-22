@@ -14,6 +14,11 @@ with lib; {
         description = "The modifier key to use for bindings";
         default = "SUPER";
       };
+      killActiveKey = mkOption {
+        type = types.str;
+        description = "The key to use for killing active window. Has to be set here because gamemode config uses it.";
+        default = "W";
+      };
       tearing = mkEnableOption "allow tearing";
       blur = lib.overrideExisting (mkEnableOption "enable blur") { default = true; };
       logging = mkEnableOption "logging";

@@ -72,7 +72,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         # Can remove xclip package once this is fixed
         # https://github.com/hyprwm/Hyprland/issues/2319
         # https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4359
-        # FIX: This is causing an extra linespace to be inserted on paste
+        # FIX: This is sometimes causing an extra linespace to be inserted on paste
         "${wlPaste} -t text -w sh -c 'v=$(${pkgs.coreutils}/bin/cat); ${pkgs.diffutils}/bin/cmp -s <(${xclip} -selection clipboard -o)  <<< \"$v\" || ${xclip} -selection clipboard <<< \"$v\"'"
       ];
 

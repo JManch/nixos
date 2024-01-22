@@ -13,7 +13,6 @@ let
   colors = config.colorscheme.colors;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 
-  hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
   wlPaste = "${pkgs.wl-clipboard}/bin/wl-paste";
   xclip = "${pkgs.xclip}/bin/xclip";
 in

@@ -29,15 +29,16 @@ let
       isEnd = m: boolToString (m == "end");
       # In gamemode remap the killactive key to use the shift modifier
       killactiveUnbind = isEnd:
-        "keyword unbind ${hyprlandConfig.modKey}${optionalString isEnd "SHIFT"},W";
+        "keyword unbind ${hyprlandConfig.modKey}${optionalString isEnd "ALTSHIFTCONTROL"}, W";
       killactiveBind = isEnd:
-        "keyword bind ${hyprlandConfig.modKey}${optionalString (!isEnd) "SHIFT"},W,killactive";
+        "keyword bind ${hyprlandConfig.modKey}${optionalString (!isEnd) "ALTSHIFTCONTROL"}, W, killactive";
       refreshRate = m: toString (
         if (m == "start") then
           monitor.gamingRefreshRate
         else
           monitor.refreshRate
       );
+      notifBody = with builtins; m: ((lib.strings.toUpper (substring 0 1 m)) + (substring 1 ((stringLength m) - 1) m));
     in
     m: pkgs.writeShellScript "gamemode-${m}" ''
       export PATH=$PATH:${scriptPrograms}
@@ -51,7 +52,7 @@ let
           ${killactiveBind (m == "end")};"
       ''
       }
-      notify-send --urgency=critical -t 5000 'GameMode' '${m}ed'
+      notify-send --urgency=critical -t 5000 'GameMode' '${notifBody m}ed'
     '';
 in
 lib.mkIf gaming.enable {

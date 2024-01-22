@@ -11,7 +11,7 @@ let
     ${spotifyPlayer} playback volume --offset -- $1
     ${pkgs.coreutils}/bin/sleep 0.2 # volume takes some time to update
     new_volume=$(${spotifyPlayer} get key playback | ${pkgs.jaq}/bin/jaq -r '.device.volume_percent')
-    ${pkgs.libnotify}/bin/notify-send --urgency=low -t 2000 -h 'string:x-canonical-private-synchronous:anything' 'Spotify' "Volume ''${new_volume}%"
+    ${pkgs.libnotify}/bin/notify-send --urgency=low -t 2000 -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${new_volume}%"
   '';
 in
 {
@@ -60,7 +60,7 @@ in
         [device]
         name = "spotify-player"
         device_type = "computer"
-        volume = 70
+        volume = 60
         bitrate = 320
         audio_cache = true
         normalization = false

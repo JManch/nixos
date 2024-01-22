@@ -45,7 +45,7 @@ let
     };
   };
 in
-lib.mkIf (cfg.enable) {
+lib.mkIf cfg.enable {
 
   # --- Deployment Instructions ---
   # 1. For a new device, generate cert and key with `syncthing generate` then

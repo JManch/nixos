@@ -20,16 +20,16 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
     sway-audio-idle-inhibit
   ];
 
-  # TODO: Look into swayidle turning off display before locking
   services.swayidle = {
     enable = true;
     timeouts = [
       (lib.mkIf desktopCfg.swaylock.enable {
         timeout = cfg.lockTime;
-        command = "${pkgs.procps}/bin/pgrep -x swaylock || swaylockCfg.lockScript";
+        command = "${pgrep} -x swaylock || ${swaylockCfg.lockScript}";
       })
       {
         timeout = cfg.screenOffTime;
+        # TODO: Modularise the monitor off command (shouldn't just be hyprland)
         command = "${hyprctl} dispatch dpms off";
         resumeCommand = "${hyprctl} dispatch dpms on";
       }

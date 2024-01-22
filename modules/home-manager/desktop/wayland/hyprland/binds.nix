@@ -75,6 +75,8 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${modShift}, Comma, movecurrentworkspacetomonitor, ${(getMonitorByNumber 2).name}"
           "${modShift}, Period, movecurrentworkspacetomonitor, ${(getMonitorByNumber 1).name}"
           "${mod}, TAB, focusmonitor, +1"
+          "${mod}, TAB, movefocus, u" # Cycle focus to get out of game cursor capture
+          "${mod}, TAB, movefocus, d"
 
           # Dwindle
           "${mod}, P, pseudo,"

@@ -52,7 +52,7 @@ let
           ${killactiveBind (m == "end")};"
       ''
       }
-      notify-send --urgency=critical -t 5000 'GameMode' '${notifBody m}ed'
+      notify-send --urgency=critical -t 2000 -h 'string:x-canonical-private-synchronous:gamemode-toggle' 'GameMode' '${notifBody m}ed'
     '';
 in
 lib.mkIf gaming.enable {

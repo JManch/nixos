@@ -80,6 +80,7 @@ in
       mpv.enable = true;
       chatterino.enable = true;
       images.enable = true;
+      anki.enable = true;
     };
 
     services = {

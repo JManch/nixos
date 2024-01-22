@@ -21,6 +21,7 @@ in
     ./mpv.nix
     ./chatterino.nix
     ./images.nix
+    ./anki.nix
   ];
 
   options.modules.programs = {
@@ -46,5 +47,6 @@ in
     mpv.enable = mkEnableOption "mpv";
     chatterino.enable = mkEnableOption "chatterino";
     images.enable = mkEnableOption "images";
+    anki.enable = mkEnableOption "anki";
   };
 }

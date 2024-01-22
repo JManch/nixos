@@ -9,6 +9,7 @@ let
   colors = config.colorscheme.colors;
 in
 lib.mkIf nixosConfig.usrEnv.desktop.enable {
+  # TODO: Consider settings home.pointerCursor
 
   gtk = {
     enable = true;

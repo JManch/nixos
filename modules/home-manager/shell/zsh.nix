@@ -8,6 +8,7 @@ lib.mkIf config.modules.shell.enable {
   home.packages = with pkgs; [
     fd
     bat
+    tokei
   ];
 
   home.sessionVariables = {
@@ -35,6 +36,7 @@ lib.mkIf config.modules.shell.enable {
       expireDuplicatesFirst = true;
     };
     shellAliases = {
+      cat = "bat -pp --theme=base16";
       reload = "exec ${config.programs.zsh.package}/bin/zsh";
       rebuild-home = "home-manager switch --flake ~/.config/nixos#${username}";
     };

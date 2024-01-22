@@ -24,7 +24,7 @@
     homeManager.enable = true;
     desktop = {
       enable = true;
-      desktopManager = null;
+      desktopEnvironment = null;
     };
   };
 

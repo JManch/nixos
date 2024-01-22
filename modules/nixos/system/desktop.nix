@@ -1,55 +1,77 @@
 { lib
 , config
-, outputs
-, hostname
-, username
+, inputs
 , ...
-}:
+} @ args:
 let
-  homeManagerConfig = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username};
+  inherit (lib) mkIf mkMerge;
   desktopCfg = config.usrEnv.desktop;
-  desktopManager = desktopCfg.desktopManager;
+  desktopEnvironment = desktopCfg.desktopEnvironment;
+  homeConfig = lib.utils.homeConfig args;
+  homeDesktopCfg = homeConfig.modules.desktop;
+  windowManager = homeConfig.modules.desktop.windowManager;
+  isWayland = lib.fetchers.isWayland homeConfig;
 in
-lib.mkIf config.usrEnv.desktop.enable {
-  services.xserver = lib.mkMerge [
+{
+  imports = [
+    inputs.hyprland.nixosModules.default
+  ];
+
+  # TODO: Improve the isWayland function to take desktopEnvironment into account
+  # TODO: 
+  config = mkIf config.usrEnv.desktop.enable (mkMerge [
     {
-      # Enable regardless of wayland for xwayland support
-      enable = true;
-      layout = "us";
-      # Disable default login GUI if we're using wayland
-      displayManager.lightdm.enable = !lib.fetchers.isWayland homeManagerConfig;
+      services.xserver.layout = "us";
+
+      # Needed for swaylock authentication
+      security.pam.services.swaylock = mkIf (isWayland && homeDesktopCfg.swaylock.enable) { };
+
+      # We configure xdg portal in home-manager
+      # TODO: Configure xdg portal in home-manager for each of these desktopEnvironments
+      xdg.portal.enable = lib.mkForce false;
     }
 
-    (lib.mkIf (desktopManager == "plasma") {
-      displayManager = {
-        defaultSession = "plasma";
-        sddm.enable = true;
-      };
-      desktopManager = {
-        plasma5.enable = true;
-      };
-    })
-
-    (lib.mkIf (desktopManager == "xfce") {
-      displayManager.defaultSession = "xfce";
-      desktopManager = {
-        xterm.enable = false;
-        xfce = {
-          enable = true;
-          noDesktop = !desktopCfg.desktopManagerWindowManager;
+    (mkIf (desktopEnvironment == "xfce") {
+      services.xserver = {
+        enable = true;
+        displayManager.defaultSession = "xfce";
+        desktopManager = {
+          xterm.enable = false;
+          xfce = {
+            enable = true;
+            noDesktop = false;
+          };
         };
       };
     })
-  ];
 
-  programs = {
-    dconf.enable = true;
-    xwayland.enable = true;
-  };
-  security.polkit.enable = true;
+    (mkIf (desktopEnvironment == "plasma") {
+      services.xserver = {
+        displayManager = {
+          defaultSession = "plasma";
+          sddm.enable = true;
+        };
+        desktopManager = {
+          plasma5.enable = true;
+        };
+      };
+    })
 
-  fonts.enableDefaultPackages = true;
+    (mkIf (desktopEnvironment == "gnome") {
+      services.xserver = {
+        enable = true;
+        displayManager.gdm.enable = true;
+        desktopManager.gnome.enable = true;
+      };
+    })
 
-  # Needed for swaylock authentication
-  security.pam.services.swaylock = lib.mkIf (homeManagerConfig.modules.desktop.swaylock.enable) { };
+    (mkIf (windowManager == "hyprland") {
+      programs.hyprland.enable = true;
+    })
+
+    (mkIf (windowManager == "sway") {
+      programs.sway.enable = true;
+    })
+  ]
+  );
 }

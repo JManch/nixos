@@ -88,11 +88,14 @@ in
           message = "Device monitors must be configured to use the ${windowManager} window manager";
         }
         {
-          assertion = (lib.fetchers.isWayland config) -> (nixosDesktop.desktopManager == null);
-          message = "If a usrEnv desktop manager (${nixosDesktop.desktopManager}) is set, you cannot use a wayland window manager (${windowManager})";
+          assertion =
+            (windowManager == "hyprland" || windowManager == "sway")
+            -> (nixosDesktop.desktopEnvironment == null);
+          message = "Cannot use a desktop environment with window manager ${windowManager}";
         }
       ];
 
+    # TODO: Verify that every desktopEnvironment/windowManager really wants this enabled (I doubt it)
     xdg.portal.enable = nixosConfig.usrEnv.desktop.enable;
 
   };

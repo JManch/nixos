@@ -81,6 +81,7 @@ in
       chatterino.enable = true;
       images.enable = true;
       anki.enable = true;
+      zathura.enable = true;
     };
 
     services = {

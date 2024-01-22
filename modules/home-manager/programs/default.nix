@@ -22,6 +22,7 @@ in
     ./chatterino.nix
     ./images.nix
     ./anki.nix
+    ./zathura.nix
   ];
 
   options.modules.programs = {
@@ -48,5 +49,6 @@ in
     chatterino.enable = mkEnableOption "chatterino";
     images.enable = mkEnableOption "images";
     anki.enable = mkEnableOption "anki";
+    zathura.enable = mkEnableOption "zathura";
   };
 }

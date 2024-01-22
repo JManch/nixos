@@ -47,8 +47,8 @@ let
           ${optionalString blur "keyword decoration:blur:enabled ${isEnd m};\\"}
           keyword animations:enabled ${isEnd m};\
           keyword monitor ${monitor.name},${width}x${height}@${refreshRate m},${monitor.position},1;\
-          ${killactiveUnbind (isEnd m)};\
-          ${killactiveBind (isEnd m)};\"
+          ${killactiveUnbind (m == "end")};\
+          ${killactiveBind (m == "end")};"
       ''
       }
       notify-send --urgency=critical -t 5000 'GameMode' '${m}ed'

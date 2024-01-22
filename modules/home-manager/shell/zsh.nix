@@ -1,7 +1,7 @@
 { lib
+, pkgs
 , config
 , username
-, pkgs
 , ...
 }:
 lib.mkIf config.modules.shell.enable {

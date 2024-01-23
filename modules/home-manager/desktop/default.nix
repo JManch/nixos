@@ -71,7 +71,7 @@ in
     };
   };
 
-  config = {
+  config = lib.mkIf nixosConfig.usrEnv.desktop.enable {
 
     assertions =
       let
@@ -95,8 +95,11 @@ in
         }
       ];
 
-    # TODO: Verify that every desktopEnvironment/windowManager really wants this enabled (I doubt it)
-    xdg.portal.enable = nixosConfig.usrEnv.desktop.enable;
+    # Many applications need this for xdg-open url opening however package
+    # managers rarely include is as a dependency for some reason
+    home.packages = [ pkgs.xdg-utils ];
 
+    # TODO: Verify that every desktopEnvironment/windowManager really wants this enabled (I doubt it)
+    xdg.portal.enable = true;
   };
 }

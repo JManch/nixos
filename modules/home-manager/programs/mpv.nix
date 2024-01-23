@@ -49,5 +49,8 @@ lib.mkIf cfg.enable {
       fi
       eval "mpv 'srt://$1?mode=caller' --no-cache --profile=low-latency --untimed"
     };
+    yt-dlp-audio () {
+      eval "yt-dlp --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s' '$1'"
+    }
   '';
 }

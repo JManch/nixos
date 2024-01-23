@@ -14,9 +14,6 @@ lib.mkIf cfg.enable {
 
   programs.vscode = {
     enable = true;
-    # Add xdg-utils to vscode fhs environment so that authentication and other
-    # urls can be opened
-    package = pkgs.vscode.fhsWithPackages (f: [ f.xdg-utils ]);
     mutableExtensionsDir = false;
     enableExtensionUpdateCheck = false;
     enableUpdateCheck = false;

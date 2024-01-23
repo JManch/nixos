@@ -1,8 +1,9 @@
-{ inputs
+{ lib
+, inputs
 , config
+, outputs
 , username
 , hostname
-, lib
 , ...
 }: {
   imports = [
@@ -11,7 +12,7 @@
 
   config = lib.mkIf config.usrEnv.homeManager.enable {
     home-manager = {
-      extraSpecialArgs = { inherit inputs username hostname; };
+      extraSpecialArgs = { inherit inputs outputs username hostname; };
       useGlobalPkgs = true;
       useUserPackages = true;
       users = {

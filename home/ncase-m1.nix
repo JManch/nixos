@@ -82,6 +82,7 @@ in
       images.enable = true;
       anki.enable = true;
       zathura.enable = true;
+      qbittorrent.enable = true;
     };
 
     services = {

@@ -23,6 +23,7 @@ in
     ./images.nix
     ./anki.nix
     ./zathura.nix
+    ./qbittorrent.nix
   ];
 
   options.modules.programs = {
@@ -50,5 +51,6 @@ in
     images.enable = mkEnableOption "images";
     anki.enable = mkEnableOption "anki";
     zathura.enable = mkEnableOption "zathura";
+    qbittorrent.enable = mkEnableOption "qbittorrent";
   };
 }

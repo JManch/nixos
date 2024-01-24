@@ -26,7 +26,7 @@ in
 
       wallpaper = {
         randomise = true;
-        randomiseFrequency = "daily";
+        randomiseFrequency = "*-*-* 05:00:00"; # 5am everyday
       };
 
       style = {

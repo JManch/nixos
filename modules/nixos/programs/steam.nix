@@ -31,6 +31,7 @@ lib.mkIf (config.modules.programs.gaming.enable) {
         # install lutris complains for some reason so we have to add it here,
         # even though it won't be used.
         wineWowPackages.stable
+        wineWowPackages.staging
       ];
     })
   ];

@@ -92,7 +92,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
       windowrulev2 = mkIf cfg.tearing [
         # TODO: Move this regex definition to gaming module config
         "immediate, class:^(steam_app.*|cs2|\.gamescope.*)$"
-        "workspace name:GAME, class:^(steam_app.*|cs2|\.gamescope.*)$"
+        "workspace name:GAME, class:^(steam_app.*|cs2|\.gamescope.*|bfv\.exe)$"
 
         "workspace name:VM, class:^qemu$"
         "float, class:^qemu$"

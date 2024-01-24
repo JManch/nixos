@@ -43,6 +43,7 @@
     "files"
     ".config/nixos"
     ".cache/nix"
+    ".local/share/systemd" # needed for persistent user timers to work properly
   ];
 
   colorscheme = inputs.nix-colors.colorSchemes.ayu-mirage;

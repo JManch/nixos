@@ -28,14 +28,6 @@ let
     echo "$NEW_WALLPAPER" > "$CACHE_FILE"
   '';
 
-  randomiseInit = pkgs.writeShellScript "random-wallpaper-init" /*bash*/ ''
-    if [[ -f "${config.xdg.cacheHome}/wallpaper" ]]; then
-      exit 0
-    else
-      ${randomiseWallpaper.outPath}
-    fi
-  '';
-
   wallpaperToSet = if cfg.randomise then "\"$(<${config.xdg.cacheHome}/wallpaper)\"" else cfg.default;
 in
 mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
@@ -52,7 +44,7 @@ mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
         ExecStartPre = [ "${pkgs.coreutils}/bin/sleep 1" ]
           # If this is a fresh install and the wallpaper cache does not exist,
           # randomise straight away. This is because daily / weekly timers
-          # won't necessarily trigger on first boot. 
+          # won't necessarily trigger on the very first boot
           ++ lib.lists.optional cfg.randomise
           "${pkgs.bash}/bin/sh -c '[[ -f \"${config.xdg.cacheHome}/wallpaper\" ]] || ${randomiseWallpaper.outPath}'";
         ExecStart = "${pkgs.bash}/bin/sh -c '${cfg.setWallpaperCmd} ${wallpaperToSet}'";

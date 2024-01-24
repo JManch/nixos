@@ -9,6 +9,7 @@ lib.mkIf config.modules.shell.enable {
     fd
     bat
     tokei
+    rename
   ];
 
   home.sessionVariables = {

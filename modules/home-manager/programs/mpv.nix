@@ -1,10 +1,10 @@
 { lib
 , pkgs
 , config
-, nixosConfig
 , ...
 }:
-let cfg = config.modules.programs.mpv;
+let
+  cfg = config.modules.programs.mpv;
 in
 lib.mkIf cfg.enable {
   home.packages = [
@@ -15,9 +15,18 @@ lib.mkIf cfg.enable {
   programs.mpv = {
     enable = true;
     config = {
+      # high quality settings from arch wiki
       profile = "gpu-hq";
+      scale = "ewa_lanczossharp";
+      cscale = "ewa_lanczossharp";
+      video-sync = "display-resample";
+      interpolation = true;
+      tscale = "oversample";
       ytdl-format = "bestvideo+bestaudio";
       hwdec = "auto";
+      save-position-on-quit = true;
+      sub-font = config.modules.desktop.style.font.family;
+      sub-pos = 95;
     };
     bindings = {
       WHEEL_UP = "add volume 5";
@@ -28,6 +37,11 @@ lib.mkIf cfg.enable {
       F1 = "af toggle acompressor=ratio=4; af toggle loudnorm";
     };
   };
+
+  impermanence.directories = [
+    # contains state for save-position-on-quit
+    ".local/state/mpv"
+  ];
 
   xdg.configFile."streamlink/config".text = ''
     player=mpv

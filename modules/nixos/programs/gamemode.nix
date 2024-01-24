@@ -29,9 +29,9 @@ let
       isEnd = m: boolToString (m == "end");
       # In gamemode remap the killactive key to use the shift modifier
       killactiveUnbind = isEnd:
-        "keyword unbind ${hyprlandConfig.modKey}${optionalString isEnd "ALTSHIFTCONTROL"}, W";
+        "keyword unbind ${hyprlandConfig.modKey}${optionalString isEnd "SHIFTCONTROL"}, W";
       killactiveBind = isEnd:
-        "keyword bind ${hyprlandConfig.modKey}${optionalString (!isEnd) "ALTSHIFTCONTROL"}, W, killactive";
+        "keyword bind ${hyprlandConfig.modKey}${optionalString (!isEnd) "SHIFTCONTROL"}, W, killactive";
       refreshRate = m: toString (
         if (m == "start") then
           monitor.gamingRefreshRate

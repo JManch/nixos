@@ -4,34 +4,34 @@
 , ...
 } @ args:
 let
+  cfg = config.modules.programs.gaming.gamemode;
   homeConfig = lib.utils.homeConfig args;
-  gaming = config.modules.programs.gaming;
+  isHyprland = homeConfig.modules.desktop.windowManager == "hyprland";
 
-  scriptPrograms = lib.makeBinPath [
-    homeConfig.wayland.windowManager.hyprland.package
+  scriptPrograms = lib.makeBinPath ([
     pkgs.coreutils
     pkgs.libnotify
-  ];
+    homeConfig.wayland.windowManager.hyprland.package
+  ] ++ lib.lists.optional isHyprland homeConfig.wayland.windowManager.hyprland.package);
 
   # Because the script will be called from steam's FHS environment we have to
   # explicity set environment variables
   script =
     let
       inherit (lib) optionalString;
-      inherit (lib.trivial) boolToString;
       inherit (builtins) toString;
-      hyprland = homeConfig.modules.desktop.windowManager == "hyprland";
-      hyprlandConfig = homeConfig.modules.desktop.hyprland;
-      blur = hyprlandConfig.blur;
+
+      hyprConf = homeConfig.modules.desktop.hyprland;
       monitor = lib.fetchers.primaryMonitor config;
-      width = toString monitor.width;
-      height = toString monitor.height;
-      isEnd = m: boolToString (m == "end");
+      isEnd = m: lib.trivial.boolToString (m == "end");
+
       # In gamemode remap the killactive key to use the shift modifier
       killactiveUnbind = isEnd:
-        "keyword unbind ${hyprlandConfig.modKey}${optionalString isEnd "SHIFTCONTROL"}, W";
+        "keyword unbind ${hyprConf.modKey}${optionalString isEnd "SHIFTCONTROL"}, W";
+
       killactiveBind = isEnd:
-        "keyword bind ${hyprlandConfig.modKey}${optionalString (!isEnd) "SHIFTCONTROL"}, W, killactive";
+        "keyword bind ${hyprConf.modKey}${optionalString (!isEnd) "SHIFTCONTROL"}, W, killactive";
+
       refreshRate = m: toString (
         if (m == "start") then
           monitor.gamingRefreshRate
@@ -42,12 +42,12 @@ let
     in
     m: pkgs.writeShellScript "gamemode-${m}" ''
       export PATH=$PATH:${scriptPrograms}
-      ${optionalString hyprland /*bash*/ ''
+      ${optionalString isHyprland /*bash*/ ''
         export HYPRLAND_INSTANCE_SIGNATURE=$(ls -1 -t /tmp/hypr | cut -d '.' -f 1 | head -1)
         hyprctl --batch "\
-          ${optionalString blur "keyword decoration:blur:enabled ${isEnd m};\\"}
+          ${optionalString hyprConf.blur "keyword decoration:blur:enabled ${isEnd m};\\"}
           keyword animations:enabled ${isEnd m};\
-          keyword monitor ${monitor.name},${width}x${height}@${refreshRate m},${monitor.position},1;\
+          keyword monitor ${monitor.name},${toString monitor.width}x${toString monitor.height}@${refreshRate m},${monitor.position},1;\
           ${killactiveUnbind (m == "end")};\
           ${killactiveBind (m == "end")};"
       ''
@@ -55,7 +55,7 @@ let
       notify-send --urgency=critical -t 2000 -h 'string:x-canonical-private-synchronous:gamemode-toggle' 'GameMode' '${notifBody m}ed'
     '';
 in
-lib.mkIf gaming.enable {
+lib.mkIf cfg.enable {
   programs.gamemode = {
     enable = true;
     settings = {

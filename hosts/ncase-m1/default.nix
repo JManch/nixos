@@ -53,12 +53,20 @@
         zpoolName = "zpool";
         bootLabel = "boot";
       };
+      # Not ready yet
+      vr = false;
     };
 
     programs = {
       wine.enable = false;
       winbox.enable = true;
-      gaming.enable = true;
+      gaming = {
+        enable = true;
+        windowClassRegex = "^(steam_app.*|cs2|\.gamescope.*|bfv\.exe)$";
+        steam.enable = true;
+        gamescope.enable = true;
+        gamemode.enable = true;
+      };
       matlab.enable = true;
     };
 

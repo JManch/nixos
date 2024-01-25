@@ -83,6 +83,12 @@ in
       anki.enable = true;
       zathura.enable = true;
       qbittorrent.enable = true;
+
+      gaming = {
+        mangohud.enable = true;
+        r2modman.enable = true;
+        lutris.enable = true;
+      };
     };
 
     services = {

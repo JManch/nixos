@@ -14,7 +14,7 @@ let
 
   audio = nixosConfig.modules.system.audio;
   wgnord = nixosConfig.modules.services.wgnord;
-  gaming = nixosConfig.modules.programs.gaming;
+  gamemode = nixosConfig.modules.programs.gaming.gamemode;
   gpu = nixosConfig.device.gpu;
   easyeffects = config.modules.services.easyeffects;
 
@@ -148,7 +148,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           tooltip = false;
           interval = 5;
         };
-        gamemode = lib.mkIf gaming.enable {
+        gamemode = lib.mkIf gamemode.enable {
           format = "{glyph} Gamemode";
           format-alt = "{glyph} Gamemode";
           glyph = "<span color='#${colors.base04}'>󰊴</span>";
@@ -176,7 +176,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
             "cpu"
           ] ++
           optional gpuModuleEnabled "custom/gpu" ++
-          optional gaming.enable "gamemode" ++
+          optional gamemode.enable "gamemode" ++
           [
             "memory"
           ] ++

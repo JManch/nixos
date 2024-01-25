@@ -28,9 +28,7 @@ in
 
   config = lib.mkMerge [
     (lib.mkIf cfg.enable {
-      environment.systemPackages = with pkgs; [
-        pkgs.pavucontrol
-      ];
+      environment.systemPackages = [ pkgs.pavucontrol ];
       services.pipewire = {
         enable = true;
         alsa.enable = true;

@@ -1,16 +1,14 @@
 { lib
 , config
-, hostname
 , nixosConfig
 , ...
 }:
 let
-  cfg = config.modules.programs.mangohud;
+  cfg = config.modules.programs.gaming.mangohud;
   device = nixosConfig.device;
   colors = config.colorscheme.colors;
-  gaming = nixosConfig.modules.programs.gaming;
 in
-lib.mkIf gaming.enable {
+lib.mkIf cfg.enable {
   programs.mangohud = {
     enable = true;
     settings = {

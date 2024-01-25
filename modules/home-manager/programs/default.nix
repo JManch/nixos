@@ -16,14 +16,13 @@ in
     ./obs.nix
     ./vscode.nix
     ./stremio.nix
-    ./steam.nix
-    ./mangohud.nix
     ./mpv.nix
     ./chatterino.nix
     ./images.nix
     ./anki.nix
     ./zathura.nix
     ./qbittorrent.nix
+    ./gaming
   ];
 
   options.modules.programs = {

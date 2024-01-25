@@ -33,5 +33,7 @@ in
         default = null;
       };
     };
+
+    vr = mkEnableOption "virtual reality";
   };
 }

@@ -1,6 +1,7 @@
 { lib
 , pkgs
 , config
+, outputs
 , ...
 }:
 let
@@ -14,6 +15,21 @@ lib.mkIf cfg.enable {
 
   programs.mpv = {
     enable = true;
+    scripts = with pkgs.mpvScripts; [
+      thumbfast
+      sponsorblock-minimal
+      outputs.packages.${pkgs.system}.modernx
+    ];
+    scriptOpts = {
+      osc = {
+        scalewindowed = 0.75;
+        scalefullscreen = 0.75;
+        fadeduration = 100;
+        showtitle = false;
+        windowcontrols = false;
+        volumecontrol = false;
+      };
+    };
     config = {
       # high quality settings from arch wiki
       profile = "gpu-hq";
@@ -26,7 +42,9 @@ lib.mkIf cfg.enable {
       hwdec = "auto";
       save-position-on-quit = true;
       sub-font = config.modules.desktop.style.font.family;
-      sub-pos = 95;
+      sub-font-size = 25;
+      sub-border-size = 1.5;
+      sub-pos = 90;
     };
     bindings = {
       WHEEL_UP = "add volume 5";

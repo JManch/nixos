@@ -21,30 +21,53 @@ lib.mkIf cfg.enable {
       outputs.packages.${pkgs.system}.modernx
     ];
     scriptOpts = {
-      osc = {
-        scalewindowed = 0.75;
-        scalefullscreen = 0.75;
-        fadeduration = 100;
-        showtitle = false;
+      modernx = {
+        scalewindowed = 1;
+        scalefullscreen = 1;
+        fadeduration = 150;
+        hidetimeout = 5000;
+        donttimeoutonpause = true;
+        OSCfadealpha = 75;
+        showtitle = true;
+        showinfo = true;
         windowcontrols = false;
-        volumecontrol = false;
+        volumecontrol = true;
+        compactmode = false;
+        bottomhover = true;
+        showontop = false;
+        raisesubswithosc = false;
       };
     };
     config = {
-      # high quality settings from arch wiki
+      # Quality
       profile = "gpu-hq";
+      hwdec = "auto";
+      vo = "gpu-next";
       scale = "ewa_lanczossharp";
       cscale = "ewa_lanczossharp";
       video-sync = "display-resample";
       interpolation = true;
       tscale = "oversample";
       ytdl-format = "bestvideo+bestaudio";
-      hwdec = "auto";
+
+      # General
       save-position-on-quit = true;
+      osc = "no"; # we use modernx osc
+
+      # Subs
       sub-font = config.modules.desktop.style.font.family;
-      sub-font-size = 25;
+      sub-font-size = 20;
       sub-border-size = 1.5;
-      sub-pos = 90;
+      sub-pos = 95;
+      sub-auto = "fuzzy";
+
+      # Screenshots
+      screenshot-format = "webp";
+      screenshot-webp-lossless = true;
+      screenshot-high-bit-depth = true;
+      screenshot-sw = false;
+      screenshot-directory = "${config.xdg.userDirs.pictures}/screenshots/mpv";
+      screenshot-template = "%f-%wH.%wM.%wS.%wT-#%#00n";
     };
     bindings = {
       WHEEL_UP = "add volume 5";

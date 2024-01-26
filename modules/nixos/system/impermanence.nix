@@ -1,4 +1,5 @@
 { lib
+, pkgs
 , inputs
 , username
 , ...
@@ -12,8 +13,21 @@ in
   ];
 
   programs.zsh.shellAliases = {
-    # List all files that will be lost on shutdown
-    impermanence = ''sudo fd --base-directory / -a -tf -H -E "{$(findmnt -n -o TARGET --list -t zfs | sed 's/^.//' | tr '\n' ',' | sed 's/.$//'),proc,sys,run,dev,tmp,boot}"'';
+    # Form a list of all files of the system and exclude file paths that
+    # contain ZFS mounts. Remaining files will just be those that are not
+    # mounted in someway to /persist
+    impermanence =
+      let
+        fd = "${pkgs.fd}/bin/fd";
+        findmnt = "${pkgs.util-linux}/bin/findmnt";
+        sed = "${pkgs.gnused}/bin/sed";
+        tr = "${pkgs.coreutils}/bin/tr";
+        excludeDirs = "proc,sys,run,dev,tmp,boot,root/.cache/nix";
+      in
+      ''
+        sudo ${fd} --base-directory / -a -tf -H -E \
+        "{$(${findmnt} -n -o TARGET --list -t zfs | ${sed} 's/^.//' | ${tr} '\n' ',' | ${sed} 's/.$//'),${excludeDirs}}"
+      '';
   };
 
   environment.persistence."/persist" = {

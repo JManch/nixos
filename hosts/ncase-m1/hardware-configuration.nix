@@ -9,7 +9,7 @@
     initrd.availableKernelModules = [ "nvme" "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" ];
     initrd.kernelModules = [ ];
     kernelModules = [ "kvm-amd" ];
-    kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
+
     # Should set this to false after initial setup. May cause import to break
     # so be prepared to set zfs_force=1 kernel param in boot menu.
     zfs.forceImportRoot = false;

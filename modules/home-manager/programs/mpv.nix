@@ -43,8 +43,8 @@ lib.mkIf cfg.enable {
       profile = "gpu-hq";
       hwdec = "auto";
       vo = "gpu-next";
-      scale = "ewa_lanczossharp";
-      cscale = "ewa_lanczossharp";
+      scale = "ewa_lanczos";
+      scale-blur = "0.981251";
       video-sync = "display-resample";
       interpolation = true;
       tscale = "oversample";

@@ -22,7 +22,10 @@ in
     ./anki.nix
     ./zathura.nix
     ./qbittorrent.nix
-    ./gaming
+    ./mangohud.nix
+    ./r2modman.nix
+    ./lutris.nix
+    ./steam.nix
   ];
 
   options.modules.programs = {
@@ -51,5 +54,8 @@ in
     anki.enable = mkEnableOption "anki";
     zathura.enable = mkEnableOption "zathura";
     qbittorrent.enable = mkEnableOption "qbittorrent";
+    mangohud.enable = mkEnableOption "mangohud";
+    r2modman.enable = mkEnableOption "r2modman";
+    lutris.enable = mkEnableOption "lutris";
   };
 }

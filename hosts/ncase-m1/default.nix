@@ -80,6 +80,10 @@
       wgnord.enable = true;
       udisks2.enable = true;
       wireguard.enable = true;
+      jellyfin = {
+        enable = true;
+        autostart = false;
+      };
     };
 
     system = {

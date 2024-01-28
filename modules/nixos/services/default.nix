@@ -11,6 +11,7 @@ in
     ./syncthing.nix
     ./wgnord.nix
     ./wireguard.nix
+    ./jellyfin.nix
   ];
 
   options.modules.services = {
@@ -45,8 +46,15 @@ in
       };
     };
 
-    udisks2.enable = mkEnableOption "udisks2";
+    jellyfin = {
+      enable = mkEnableOption "jellyfin";
+      autostart = mkOption {
+        type = types.bool;
+        default = true;
+      };
+    };
 
+    udisks2.enable = mkEnableOption "udisks2";
     wireguard.enable = mkEnableOption "wireguard";
 
   };

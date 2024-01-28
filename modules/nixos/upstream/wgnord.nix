@@ -73,7 +73,7 @@ in
     environment.etc."wgnord/template.conf".text = cfg.template;
 
     systemd.tmpfiles.rules = [
-      "d /etc/wireguard/ 755 root root"
+      "d /etc/wireguard 755 root root"
       "f /etc/wireguard/wgnord.conf 600 root root"
     ];
   };

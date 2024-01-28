@@ -4,7 +4,7 @@
 , ...
 }:
 let
-  cfg = config.modules.programs.gaming.mangohud;
+  cfg = config.modules.programs.mangohud;
   device = nixosConfig.device;
   colors = config.colorscheme.colors;
 in

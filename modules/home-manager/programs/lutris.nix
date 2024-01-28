@@ -1,6 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  cfg = config.modules.programs.gaming.lutris;
+  cfg = config.modules.programs.lutris;
   lutris = pkgs.lutris.override {
     extraPkgs = pkgs: with pkgs; [
       wineWowPackages.stable

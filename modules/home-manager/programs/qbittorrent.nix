@@ -8,5 +8,6 @@ lib.mkIf cfg.enable
 
   impermanence.directories = [
     ".config/qBittorrent"
+    ".local/share/qBittorrent"
   ];
 }

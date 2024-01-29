@@ -32,7 +32,6 @@
     hardware = {
       fileSystem = {
         trim = false;
-        rootTmpfsSize = "1G";
         zpoolName = "zpool";
         bootLabel = "boot";
       };

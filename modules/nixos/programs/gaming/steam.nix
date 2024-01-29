@@ -41,6 +41,11 @@ lib.mkIf cfg.enable
     };
   };
 
+  # So that protontricks can find proton-ge
+  environment.sessionVariables = {
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS = proton-ge;
+  };
+
   environment.persistence."/persist".users.${username} = {
     directories = [
       ".steam"

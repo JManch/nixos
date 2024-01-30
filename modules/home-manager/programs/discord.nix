@@ -10,8 +10,7 @@ in
 lib.mkIf cfg.enable {
   home.packages = with pkgs; [
     discord
-    webcord
-    discord-screenaudio
+    vesktop
   ];
 
   programs.firefox.package = pkgs.firefox.override {
@@ -21,7 +20,7 @@ lib.mkIf cfg.enable {
   };
 
   impermanence.directories = [
-    ".config/WebCord"
     ".config/discord"
+    ".config/vesktop"
   ];
 }

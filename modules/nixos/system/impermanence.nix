@@ -12,23 +12,25 @@ in
     inputs.impermanence.nixosModules.impermanence
   ];
 
-  programs.zsh.shellAliases = {
-    # Form a list of all files of the system and exclude file paths that
-    # contain ZFS mounts. Remaining files will just be those that are not
-    # mounted in someway to /persist
-    impermanence =
-      let
-        fd = "${pkgs.fd}/bin/fd";
-        findmnt = "${pkgs.util-linux}/bin/findmnt";
-        sed = "${pkgs.gnused}/bin/sed";
-        tr = "${pkgs.coreutils}/bin/tr";
-        excludeDirs = "proc,sys,run,dev,tmp,boot,root/.cache/nix";
-      in
-      ''
-        sudo ${fd} --base-directory / -a -tf -H -E \
-        "{$(${findmnt} -n -o TARGET --list -t zfs | ${sed} 's/^.//' | ${tr} '\n' ',' | ${sed} 's/.$//'),${excludeDirs}}"
-      '';
-  };
+  programs.zsh.shellInit =
+    let
+      fd = "${pkgs.fd}/bin/fd";
+      findmnt = "${pkgs.util-linux}/bin/findmnt";
+      sed = "${pkgs.gnused}/bin/sed";
+      tr = "${pkgs.coreutils}/bin/tr";
+      extraExcludeDirs = "proc,sys,run,dev,tmp,boot,root/.cache/nix";
+    in
+      /* bash */ ''
+      impermanence() {
+        # Prints a list of all files that are not persisted by impermanence so will be lost on shutdown
+
+        # Get comma seperated list of zfs mounted directories and remove leading /
+        exclude_dirs=$(${findmnt} -n -o TARGET --list -t zfs | ${sed} 's/^.//' | ${tr} '\n' ',' | ${sed} 's/.$//')
+        exclude_dirs="$exclude_dirs,${extraExcludeDirs}"
+        # Get list of all files, excluding those with zfs mounted paths
+        sudo ${fd} --base-directory / -a -tf -H -E "{$exclude_dirs}"
+      }
+    '';
 
   environment.persistence."/persist" = {
     hideMounts = true;

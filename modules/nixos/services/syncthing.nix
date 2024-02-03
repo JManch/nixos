@@ -148,14 +148,12 @@ lib.mkIf cfg.enable {
     };
   };
 
-  environment.persistence."/persist" = {
-    directories = [
-      {
-        directory = syncthingDir;
-        user = "syncthing";
-        group = "syncthing";
-        mode = "u=rwx,g=rwx,o=";
-      }
-    ];
-  };
+  environment.persistence."/persist".directories = [
+    {
+      directory = syncthingDir;
+      user = "syncthing";
+      group = "syncthing";
+      mode = "u=rwx,g=rwx,o=";
+    }
+  ];
 }

@@ -3,12 +3,7 @@ let
   inherit (lib) mkEnableOption;
 in
 {
-  imports = [
-    ./wine.nix
-    ./winbox.nix
-    ./matlab.nix
-    ./gaming
-  ];
+  imports = lib.utils.scanPaths ./.;
 
   options.modules.programs = {
     winbox.enable = mkEnableOption "Winbox";

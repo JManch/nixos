@@ -9,11 +9,7 @@ let
   inherit (lib) mkOption types;
 in
 {
-  imports = [
-    ./wayland
-    ./common
-    ./font.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
 
   options.modules.desktop = {
 

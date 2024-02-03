@@ -1,5 +1,3 @@
-{
-  imports = [
-    ./impermanence.nix
-  ];
+{ lib, ... }: {
+  imports = lib.utils.scanPaths ./.;
 }

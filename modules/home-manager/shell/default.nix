@@ -1,10 +1,6 @@
-{ lib, ... }: {
-  imports = [
-    ./eza.nix
-    ./starship.nix
-    ./fzf.nix
-    ./zsh.nix
-  ];
+{ lib, ... }:
+{
+  imports = lib.utils.scanPaths ./.;
 
   options.modules.shell = {
     enable = lib.mkEnableOption "enable custom shell";

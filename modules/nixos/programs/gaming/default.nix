@@ -3,11 +3,7 @@ let
   inherit (lib) mkEnableOption mkOption types;
 in
 {
-  imports = [
-    ./steam.nix
-    ./gamemode.nix
-    ./gamescope.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
 
   options.modules.programs.gaming = {
     enable = mkEnableOption "enable system gaming optimisations";

@@ -3,16 +3,7 @@ let
   inherit (lib) mkEnableOption mkOption types;
 in
 {
-  imports = [
-    ./ssh.nix
-    ./desktop.nix
-    ./audio.nix
-    ./windows.nix
-    ./networking.nix
-    ./bluetooth.nix
-    ./impermanence.nix
-    ./virtualisation.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
 
   options.modules.system = {
 

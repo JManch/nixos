@@ -7,11 +7,7 @@
 , username
 , ...
 }: {
-  imports = [
-    ./agenix.nix
-    ./users.nix
-    ./home-manager.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
 
   nixpkgs = {
     overlays = builtins.attrValues outputs.overlays;

@@ -3,10 +3,7 @@ let
   inherit (lib) mkOption mkEnableOption types;
 in
 {
-  imports = [
-    ./graphics
-    ./filesystem.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
 
   options.modules.hardware = {
     fileSystem = {

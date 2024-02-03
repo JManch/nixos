@@ -1,5 +1,3 @@
-{
-  imports = [
-    ./virtualisation.nix
-  ];
+{ lib, ... }: {
+  imports = lib.utils.scanPaths ./.;
 }

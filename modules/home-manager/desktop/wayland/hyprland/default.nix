@@ -3,13 +3,11 @@ let
   inherit (lib) mkAliasOptionModule mkEnableOption mkOption types;
 in
 {
-  imports = [
-    ./hyprland.nix
-    ./shaders.nix
-    ./binds.nix
+  imports = lib.utils.scanPaths ./. ++ [
     (mkAliasOptionModule [ "desktop" "hyprland" "binds" ] [ "wayland" "windowManager" "hyprland" "settings" "bind" ])
     (mkAliasOptionModule [ "desktop" "hyprland" "settings" ] [ "wayland" "windowManager" "hyprland" "settings" ])
   ];
+
   options.modules.desktop = {
     hyprland = {
       modKey = mkOption {

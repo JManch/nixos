@@ -6,13 +6,7 @@ let
   inherit (lib) mkEnableOption mkOption types;
 in
 {
-  imports = [
-    ./greetd.nix
-    ./syncthing.nix
-    ./wgnord.nix
-    ./wireguard.nix
-    ./jellyfin.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
 
   options.modules.services = {
 

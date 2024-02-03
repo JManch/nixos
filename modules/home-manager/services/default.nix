@@ -22,10 +22,7 @@ let
   };
 in
 {
-  imports = [
-    ./syncthing.nix
-    ./easyeffects.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
 
   options.modules.services = {
     syncthing.enable = mkEnableOption "Syncthing";

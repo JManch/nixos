@@ -1,6 +1,3 @@
-{
-  imports = [
-    ./device.nix
-    ./usrEnv.nix
-  ];
+{ lib, ... }: {
+  imports = lib.utils.scanPaths ./.;
 }

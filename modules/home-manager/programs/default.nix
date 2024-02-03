@@ -3,30 +3,7 @@ let
   inherit (lib) mkEnableOption mkOption types;
 in
 {
-  imports = [
-    ./alacritty.nix
-    ./btop.nix
-    ./cava.nix
-    ./firefox
-    ./git.nix
-    ./neovim.nix
-    ./spotify.nix
-    ./fastfetch.nix
-    ./discord.nix
-    ./obs.nix
-    ./vscode.nix
-    ./stremio.nix
-    ./mpv.nix
-    ./chatterino.nix
-    ./images.nix
-    ./anki.nix
-    ./zathura.nix
-    ./qbittorrent.nix
-    ./mangohud.nix
-    ./r2modman.nix
-    ./lutris.nix
-    ./steam.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
 
   options.modules.programs = {
     alacritty = {

@@ -8,14 +8,8 @@ let
   inherit (lib) mkEnableOption mkOption types;
 in
 {
-  imports = [
-    ./hyprland
-    ./programs/anyrun.nix
-    ./programs/swaylock.nix
-    ./services/waybar
-    ./services/swww.nix
-    ./services/swayidle.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
+
   options.modules.desktop = {
     swaylock = {
       enable = mkEnableOption "Swaylock";

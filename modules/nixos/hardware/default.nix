@@ -31,6 +31,6 @@ in
       };
     };
 
-    vr = mkEnableOption "virtual reality";
+    vr.enable = mkEnableOption "virtual reality";
   };
 }

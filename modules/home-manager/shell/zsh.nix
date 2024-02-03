@@ -57,11 +57,11 @@ lib.mkIf config.modules.shell.enable {
           return 1
         fi
 
-        file_path="$1"
-        dir_path=$(dirname "$file_path")
-        file_name=$(basename -- "$file_path")
+        local file_path="$1"
+        local dir_path=$(dirname "$file_path")
+        local file_name=$(basename -- "$file_path")
 
-        copy_path="$dir_path/''${file_name%.*}.copy.''${file_name##*.}"
+        local copy_path="$dir_path/''${file_name%.*}.copy.''${file_name##*.}"
         cat "$file_path" > "$copy_path" && rm "$file_path" && mv "$copy_path" "$file_path"
         $EDITOR "$file_path"
       }

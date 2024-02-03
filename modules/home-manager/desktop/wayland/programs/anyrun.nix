@@ -28,7 +28,6 @@ in
           plugins = with inputs.anyrun.packages.${pkgs.system}; [
             applications
             websearch
-            shell
           ];
           width.fraction = 0.2;
           y.fraction = 0.35;

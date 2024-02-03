@@ -44,10 +44,19 @@ in
         group = "networkmanager";
       };
     };
+    dhcpcd = {
+      enable = true;
+      extraConfig = ''
+        ssid Pixel 5
+        metric 100
+      '';
+    };
   };
 
   users.users.${username}.extraGroups = [ "networkmanager" ];
-  environment.systemPackages = lists.optional cfg.wireless.enable pkgs.wpa_supplicant_gui;
+  environment.systemPackages = [
+    pkgs.ifmetric # change metric in emergencies
+  ] ++ lists.optional cfg.wireless.enable pkgs.wpa_supplicant_gui;
   systemd.services.wpa_supplicant.preStart = "${pkgs.coreutils}/bin/touch /etc/wpa_supplicant.conf";
 
   boot = {

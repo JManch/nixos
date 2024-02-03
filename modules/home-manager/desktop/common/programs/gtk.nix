@@ -10,10 +10,10 @@ let
 in
 lib.mkIf nixosConfig.usrEnv.desktop.enable {
   # TODO: Consider settings home.pointerCursor
-
   gtk = {
     enable = true;
     theme = {
+      # TODO: Consider generating the GTK theme from nix-colors
       name = "Plata-Noir-Compact";
       package = pkgs.plata-theme.override {
         selectionColor = "#${colors.base01}";

@@ -125,8 +125,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           tooltip = false;
         };
         "network#hostname" = {
-          format-ethernet = "${lib.toUpper hostname}";
-          format-disconnected = "${lib.toUpper hostname}";
+          format = "${lib.toUpper hostname}";
           tooltip-format-ethernet = "{ipaddr}";
           tooltip-format-disconnected = "<span color='#${colors.base08}'>Disconnected</span>";
         };

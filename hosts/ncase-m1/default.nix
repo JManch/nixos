@@ -54,7 +54,7 @@
         bootLabel = "boot";
       };
       # Not ready yet
-      vr = false;
+      vr.enable = false;
     };
 
     programs = {

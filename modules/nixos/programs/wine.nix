@@ -4,7 +4,11 @@
 , config
 , ...
 }:
-lib.mkIf (config.modules.programs.wine.enable) {
+let
+  cfg = config.modules.programs.wine;
+in
+lib.mkIf cfg.enable
+{
   environment.systemPackages = with pkgs; [
     # Support 64 bit only
     # Unstable native wayland support

@@ -1,8 +1,11 @@
 { lib, ... }:
+let
+  inherit (lib) mkEnableOption;
+in
 {
   imports = lib.utils.scanPaths ./.;
 
   options.modules.shell = {
-    enable = lib.mkEnableOption "enable custom shell";
+    enable = mkEnableOption "enable custom shell";
   };
 }

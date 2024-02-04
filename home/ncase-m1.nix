@@ -24,11 +24,6 @@ in
 
       hyprland.tearing = true;
 
-      wallpaper = {
-        randomise = true;
-        randomiseFrequency = "*-*-* 05:00:00"; # 5am everyday
-      };
-
       style = {
         font = {
           family = "BerkeleyMono Nerd Font";
@@ -40,28 +35,36 @@ in
         gapSize = 10;
       };
 
-      swaylock = {
-        enable = true;
-        lockScript = with config.modules.desktop.util;
-          lib.mkIf (config.modules.desktop.windowManager == "hyprland") /*bash*/
-            (pkgs.writeShellScript "swaylock-lock" ''
-              # Temporarily disable shader for screenshot
-              ${disableShaders}
-              ${config.programs.swaylock.package}/bin/swaylock -f
-              ${pkgs.coreutils}/bin/sleep 0.1
-              ${enableShaders}
-            '').outPath;
+      programs = {
+        swaylock = {
+          enable = true;
+          lockScript = with config.modules.desktop.util;
+            lib.mkIf (config.modules.desktop.windowManager == "hyprland") /*bash*/
+              (pkgs.writeShellScript "swaylock-lock" ''
+                # Temporarily disable shader for screenshot
+                ${disableShaders}
+                ${config.programs.swaylock.package}/bin/swaylock -f
+                ${pkgs.coreutils}/bin/sleep 0.1
+                ${enableShaders}
+              '').outPath;
+        };
+        anyrun.enable = true;
       };
 
-      swayidle = {
-        enable = true;
-        lockTime = 3 * 60;
-        screenOffTime = 4 * 60;
+      services = {
+        swayidle = {
+          enable = true;
+          lockTime = 3 * 60;
+          screenOffTime = 4 * 60;
+        };
+        waybar.enable = true;
+        dunst.enable = true;
+        wallpaper = {
+          randomise = true;
+          randomiseFrequency = "*-*-* 05:00:00"; # 5am everyday
+        };
+        wlsunset.enable = true;
       };
-
-      anyrun.enable = true;
-      waybar.enable = true;
-      dunst.enable = true;
     };
 
     programs = {

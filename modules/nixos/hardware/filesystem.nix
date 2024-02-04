@@ -7,7 +7,7 @@ in
     loader.systemd-boot = {
       enable = true;
       consoleMode = "auto";
-      configurationLimit = 10;
+      configurationLimit = 20;
     };
 
     # Faster but also needed for build-vm to work with impermanence

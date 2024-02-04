@@ -26,7 +26,7 @@ let
         # need to manually set it for specific hosts
         /* glsl */
         ''
-          if (monitor == ${builtins.toString (m.number - 1)}) {
+          if (wl_output == ${builtins.toString (m.number - 1)}) {
               vec4 pixColor = texture2D(tex, v_texcoord);
               pixColor.rgb = pow(pixColor.rgb, vec3(1.0 / ${builtins.toString m.gamma}));
               gl_FragColor = pixColor;
@@ -53,7 +53,7 @@ let
       precision mediump float;
       varying vec2 v_texcoord;
       uniform sampler2D tex;
-      uniform int monitor;
+      uniform int wl_output;
 
       void main() {
         ${builtins.concatStringsSep ("\n") monitorGammaConditionals}

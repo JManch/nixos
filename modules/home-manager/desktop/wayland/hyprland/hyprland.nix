@@ -10,7 +10,7 @@ let
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
   hyprlandPackages = inputs.hyprland.packages.${pkgs.system};
-  colors = config.colorscheme.colors;
+  colors = config.colorscheme.palette;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 
   wlPaste = "${pkgs.wl-clipboard}/bin/wl-paste";
@@ -28,9 +28,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
 
   wayland.windowManager.hyprland = {
     enable = true;
-    package = hyprlandPackages.hyprland.overrideAttrs (oldAttrs: {
-      patches = (oldAttrs.patches or [ ]) ++ [ ../../../../../overlays/hyprlandOutputRename.diff ];
-    });
+    package = hyprlandPackages.hyprland;
     settings = {
       env = [
         "NIXOS_OZONE_WL,1"

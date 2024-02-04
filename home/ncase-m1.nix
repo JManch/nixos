@@ -53,7 +53,7 @@ in
 
       services = {
         swayidle = {
-          enable = true;
+          enable = false;
           lockTime = 3 * 60;
           screenOffTime = 4 * 60;
         };

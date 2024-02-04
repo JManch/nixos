@@ -8,10 +8,6 @@
 
   modules = {
     desktop = {
-      wallpaper = {
-        randomise = true;
-        # randomiseFrequency = "*-*-* *:*:00"; # every minute for debug
-      };
       windowManager = "hyprland";
       hyprland = {
         modKey = "ALT";
@@ -21,9 +17,17 @@
         family = "BerkeleyMono Nerd Font";
         package = inputs.nix-resources.packages.${pkgs.system}.berkeley-mono-nerdfont;
       };
-      anyrun.enable = true;
-      waybar.enable = true;
-      dunst.enable = true;
+      programs = {
+        anyrun.enable = true;
+      };
+      services = {
+        wallpaper = {
+          randomise = true;
+          # randomiseFrequency = "*-*-* *:*:00"; # every minute for debug
+        };
+        waybar.enable = true;
+        dunst.enable = true;
+      };
     };
     shell.enable = true;
 

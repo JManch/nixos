@@ -1,5 +1,6 @@
 { lib
 , config
+, nixosConfig
 , ...
 }:
 let
@@ -61,7 +62,7 @@ lib.mkIf cfg.enable {
     theme[process_end]="#${colors.base09}"
   '';
 
-  xdg.desktopEntries."btop" = {
+  xdg.desktopEntries."btop" = lib.mkIf nixosConfig.usrEnv.desktop.enable {
     name = "btop";
     genericName = "Resource Monitor";
     exec = "${config.programs.alacritty.package}/bin/alacritty --title btop -e ${config.programs.btop.package}/bin/btop";

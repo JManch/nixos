@@ -89,12 +89,5 @@ in
           message = "Cannot use a desktop environment with window manager ${windowManager}";
         }
       ];
-
-    # Many applications need this for xdg-open url opening however package
-    # managers rarely include is as a dependency for some reason
-    home.packages = [ pkgs.xdg-utils ];
-
-    # TODO: Verify that every desktopEnvironment/windowManager really wants this enabled (I doubt it)
-    xdg.portal.enable = true;
   };
 }

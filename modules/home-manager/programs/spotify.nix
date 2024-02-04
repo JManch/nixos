@@ -101,7 +101,7 @@ in
       '';
     };
 
-    xdg.desktopEntries."spotify-player" = {
+    xdg.desktopEntries."spotify-player" = lib.mkIf nixosConfig.usrEnv.desktop.enable {
       name = "Spotify";
       genericName = "Music Player";
       exec = "${config.programs.alacritty.package}/bin/alacritty --title Spotify --option font.size=11 -e ${pkgs.spotify-player}/bin/spotify_player";

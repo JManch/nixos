@@ -5,11 +5,11 @@
 , ...
 }:
 let
-  inherit (config.colorscheme) colors;
-  cfg = config.modules.desktop.swaylock;
+  cfg = config.modules.desktop.programs.swaylock;
   desktopCfg = config.modules.desktop;
   isWayland = lib.fetchers.isWayland config;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+  colors = config.colorscheme.palette;
 in
 lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   programs.swaylock = {

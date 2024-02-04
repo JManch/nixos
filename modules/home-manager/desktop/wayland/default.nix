@@ -4,39 +4,8 @@
 , nixosConfig
 , ...
 }:
-let
-  inherit (lib) mkEnableOption mkOption types;
-in
 {
   imports = lib.utils.scanPaths ./.;
-
-  options.modules.desktop = {
-    swaylock = {
-      enable = mkEnableOption "Swaylock";
-      lockScript = mkOption {
-        type = types.str;
-        description = "Path to script that locks the screen";
-        default = (pkgs.writeShellScript "swaylock-lock" ''
-          ${config.swaylock.package}/bin/swaylock -f
-        '').outPath;
-      };
-    };
-    swayidle = {
-      enable = mkEnableOption "Swayidle";
-      lockTime = mkOption {
-        type = types.int;
-        default = 3 * 60;
-        description = "Lock screen after this many idle seconds";
-      };
-      screenOffTime = mkOption {
-        type = types.int;
-        default = 4 * 60;
-        description = "Turn off screen after this many idle seconds";
-      };
-    };
-    anyrun.enable = mkEnableOption "Anyrun";
-    waybar.enable = mkEnableOption "Waybar";
-  };
 
   config =
     let

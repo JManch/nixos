@@ -4,9 +4,9 @@
 , ...
 }:
 let
-  cfg = config.modules.desktop.waybar;
+  cfg = config.modules.desktop.services.waybar;
   desktopCfg = config.modules.desktop;
-  colors = config.colorscheme.colors;
+  colors = config.colorscheme.palette;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
   isWayland = lib.fetchers.isWayland config;
 in

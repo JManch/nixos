@@ -7,7 +7,7 @@
 }:
 let
   isWayland = lib.fetchers.isWayland config;
-  cfg = config.modules.desktop.anyrun;
+  cfg = config.modules.desktop.programs.anyrun;
   desktopCfg = config.modules.desktop;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 in
@@ -20,7 +20,7 @@ in
     programs.anyrun =
       let
         color = base:
-          inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorscheme.colors.${base};
+          inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorscheme.palette.${base};
       in
       {
         enable = true;

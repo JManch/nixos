@@ -5,8 +5,8 @@
 }:
 let
   desktopCfg = config.modules.desktop;
-  cfg = config.modules.desktop.dunst;
-  colors = config.colorscheme.colors;
+  cfg = config.modules.desktop.services.dunst;
+  colors = config.colorscheme.palette;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 in
 lib.mkIf (osDesktopEnabled && cfg.enable) {

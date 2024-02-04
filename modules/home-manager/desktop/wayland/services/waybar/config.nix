@@ -6,10 +6,10 @@
 , ...
 }:
 let
-  cfg = config.modules.desktop.waybar;
+  cfg = config.modules.desktop.services.waybar;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
   isWayland = lib.fetchers.isWayland config;
-  colors = config.colorscheme.colors;
+  colors = config.colorscheme.palette;
   optional = lib.lists.optional;
 
   audio = nixosConfig.modules.system.audio;

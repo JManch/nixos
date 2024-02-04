@@ -6,8 +6,6 @@
 }:
 let
   inherit (lib) mkIf;
-  desktopCfg = config.modules.desktop;
-  cfg = desktopCfg.swww;
   isWayland = lib.fetchers.isWayland config;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 
@@ -21,7 +19,7 @@ mkIf (osDesktopEnabled && isWayland) {
 
   home.packages = [ pkgs.swww ];
 
-  modules.desktop.wallpaper.setWallpaperCmd = "${swww} img ${transition}";
+  modules.desktop.services.wallpaper.setWallpaperCmd = "${swww} img ${transition}";
 
   wayland.windowManager.hyprland.settings.exec-once =
     mkIf (config.modules.desktop.windowManager == "hyprland")

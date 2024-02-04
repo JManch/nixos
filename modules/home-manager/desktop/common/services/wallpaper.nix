@@ -7,7 +7,7 @@
 }:
 let
   inherit (lib) mkIf mkMerge lists;
-  cfg = config.modules.desktop.wallpaper;
+  cfg = config.modules.desktop.services.wallpaper;
   allWallpapers = inputs.nix-resources.packages.${pkgs.system}.wallpapers.all-wallpapers;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 

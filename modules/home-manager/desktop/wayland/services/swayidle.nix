@@ -6,9 +6,9 @@
 }:
 let
   inherit (lib) mkIf;
-  cfg = config.modules.desktop.swayidle;
+  cfg = config.modules.desktop.services.swayidle;
   desktopCfg = config.modules.desktop;
-  swaylockCfg = desktopCfg.swaylock;
+  swaylockCfg = desktopCfg.programs.swaylock;
   isWayland = lib.fetchers.isWayland config;
   osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
 
@@ -23,7 +23,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   services.swayidle = {
     enable = true;
     timeouts = [
-      (lib.mkIf desktopCfg.swaylock.enable {
+      (lib.mkIf swaylockCfg.enable {
         timeout = cfg.lockTime;
         command = "${pgrep} -x swaylock || ${swaylockCfg.lockScript}";
       })

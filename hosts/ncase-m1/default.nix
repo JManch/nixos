@@ -48,6 +48,7 @@
 
   modules = {
     hardware = {
+      secureBoot.enable = true;
       fileSystem = {
         trim = true;
         zpoolName = "zpool";
@@ -87,7 +88,7 @@
     };
 
     system = {
-      windowsBootEntry.enable = true;
+      windowsBootEntry.enable = false;
       networking = {
         tcpOptimisations = true;
         firewall.enable = true;

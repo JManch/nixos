@@ -13,12 +13,6 @@ lib.mkIf cfg.enable {
     vesktop
   ];
 
-  programs.firefox.package = pkgs.firefox.override {
-    nativeMessagingHosts = [
-      inputs.pipewire-screenaudio.packages.${pkgs.system}.default
-    ];
-  };
-
   impermanence.directories = [
     ".config/discord"
     ".config/vesktop"

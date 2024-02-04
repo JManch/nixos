@@ -45,6 +45,12 @@ mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
           # If this is a fresh install and the wallpaper cache does not exist,
           # randomise straight away. This is because daily / weekly timers
           # won't necessarily trigger on the very first boot
+
+          # TODO: Minor issue but if full garbage collection is run and a
+          # randomise is not triggered before the next boot the wallpaper path
+          # inside the cache file will be invalidated and the wallpaper will
+          # not be applied. Can maybe add a check that runs randomiseWallpaper
+          # if the wallpaper file does not exist.
           ++ lib.lists.optional cfg.randomise
           "${pkgs.bash}/bin/sh -c '[[ -f \"${config.xdg.cacheHome}/wallpaper\" ]] || ${randomiseWallpaper.outPath}'";
         ExecStart = "${pkgs.bash}/bin/sh -c '${cfg.setWallpaperCmd} ${wallpaperToSet}'";

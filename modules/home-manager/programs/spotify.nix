@@ -6,6 +6,7 @@
 }:
 let
   cfg = config.modules.programs.spotify;
+  desktopCfg = config.modules.desktop;
   spotifyPlayer = "${pkgs.spotify-player}/bin/spotify_player";
   modifySpotifyVolume = pkgs.writeShellScript "spotify-modify-volume" ''
     ${spotifyPlayer} playback volume --offset -- $1
@@ -121,22 +122,22 @@ in
     desktop.hyprland.settings =
       let
         colors = config.colorscheme.palette;
-        desktopCfg = config.modules.desktop;
         modKey = config.modules.desktop.hyprland.modKey;
       in
-      {
-        windowrulev2 =
-          lib.mkIf (desktopCfg.windowManager == "hyprland")
-            [ "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$" ];
-        bindr = [
-          "${modKey}, ${modKey}_R, exec, ${spotifyPlayer} playback play-pause"
-        ];
-        bind = [
-          "${modKey}, Comma, exec, ${spotifyPlayer} playback previous"
-          "${modKey}, Period, exec, ${spotifyPlayer} playback next"
-          "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume.outPath} 5"
-          "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume.outPath} -5"
-        ];
-      };
+      lib.mkIf (desktopCfg.windowManager == "hyprland")
+        {
+          windowrulev2 = [
+            "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
+          ];
+          bindr = [
+            "${modKey}, ${modKey}_R, exec, ${spotifyPlayer} playback play-pause"
+          ];
+          bind = [
+            "${modKey}, Comma, exec, ${spotifyPlayer} playback previous"
+            "${modKey}, Period, exec, ${spotifyPlayer} playback next"
+            "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume.outPath} 5"
+            "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume.outPath} -5"
+          ];
+        };
   };
 }

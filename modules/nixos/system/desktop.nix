@@ -20,10 +20,10 @@ in
   # TODO: Improve the isWayland function to take desktopEnvironment into account
   config = mkIf config.usrEnv.desktop.enable (mkMerge [
     {
-      services.xserver.layout = "us";
+      services.xserver.xkb.layout = "us";
 
       # Needed for swaylock authentication
-      security.pam.services.swaylock = mkIf (isWayland && homeDesktopCfg.swaylock.enable) { };
+      security.pam.services.swaylock = mkIf (isWayland && homeDesktopCfg.programs.swaylock.enable) { };
 
       # We configure xdg portal in home-manager
       # TODO: Configure xdg portal in home-manager for each of these desktopEnvironments

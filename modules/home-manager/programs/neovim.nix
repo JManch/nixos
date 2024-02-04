@@ -1,6 +1,7 @@
-{ config
+{ lib
 , pkgs
-, lib
+, config
+, nixosConfig
 , ...
 }:
 let
@@ -33,11 +34,17 @@ lib.mkIf cfg.enable {
     EDITOR = "nvim";
   };
 
+  xdg.mimeApps = lib.mkIf nixosConfig.usrEnv.desktop.enable {
+    defaultApplications = {
+      "text/plain" = [ "nvim.desktop" ];
+    };
+  };
+
   impermanence.directories = [
+    ".cache/nvim"
     ".config/nvim"
     ".local/share/nvim"
     ".local/state/nvim"
-    ".cache/nvim"
   ];
 
   home.sessionVariables.NIX_NEOVIM = 1;

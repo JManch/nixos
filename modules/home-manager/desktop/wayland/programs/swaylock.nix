@@ -63,6 +63,41 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   };
 
   desktop.hyprland.binds =
+    let
+      # Turn off screen after 30 seconds if swaylock is still running
+      lockBindScript =
+        let
+          hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+          sleep = "${pkgs.coreutils}/bin/sleep";
+          grep = "${pkgs.gnugrep}/bin/grep";
+          pgrep = "${pkgs.procps}/bin/pgrep";
+          echo = "${pkgs.coreutils}/bin/echo";
+          kill = "${pkgs.coreutils}/bin/kill";
+          realpath = "${pkgs.coreutils}/bin/realpath";
+          bash = "${pkgs.bash}/bin/bash";
+          tr = "${pkgs.coreutils}/bin/tr";
+        in
+        pkgs.writeShellScript "hypr-lock-script" ''
+          # Abort if swaylock is already running
+          ${pgrep} -x swaylock && exit 1
+
+          # Get PIDs of existing instances of script
+          pids=$(${pgrep} -fx "${bash} $(${realpath} "$0")")
+
+          # Exlude this script's pid from the pids
+          pids=$(${echo} "$pids" | ${grep} -v "$$")
+
+          if [ ! -z "$pids" ]; then
+            # Kill all existing instances of the script
+            pid_list=$(${echo} "$pids" | ${tr} '\n' ' ')
+            ${kill} $pid_list
+          fi
+
+          ${cfg.lockScript}
+          ${sleep} 30
+          ${pgrep} -x swaylock && ${hyprctl} dispatch dpms off
+        '';
+    in
     lib.mkIf (config.modules.desktop.windowManager == "hyprland")
-      [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${cfg.lockScript}" ];
+      [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${lockBindScript.outPath}" ];
 }

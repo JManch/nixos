@@ -26,14 +26,14 @@ lib.mkIf (cfg.enable && nixosConfig.modules.system.audio.enable) {
         channels = "mono";
         alacritty_sync = 1;
       };
-      color = {
+      color = let colors = config.colorscheme.palette; in {
         gradient = 1;
         gradient_count = 5;
-        gradient_color_1 = "'#${config.colorscheme.colors.base0C}'";
-        gradient_color_2 = "'#${config.colorscheme.colors.base0B}'";
-        gradient_color_3 = "'#${config.colorscheme.colors.base0A}'";
-        gradient_color_4 = "'#${config.colorscheme.colors.base09}'";
-        gradient_color_5 = "'#${config.colorscheme.colors.base08}'";
+        gradient_color_1 = "'#${colors.base0C}'";
+        gradient_color_2 = "'#${colors.base0B}'";
+        gradient_color_3 = "'#${colors.base0A}'";
+        gradient_color_4 = "'#${colors.base09}'";
+        gradient_color_5 = "'#${colors.base08}'";
       };
       smoothing = {
         monstercat = 0;

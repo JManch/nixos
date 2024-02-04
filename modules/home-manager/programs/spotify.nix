@@ -120,7 +120,7 @@ in
 
     desktop.hyprland.settings =
       let
-        colors = config.colorscheme.colors;
+        colors = config.colorscheme.palette;
         desktopCfg = config.modules.desktop;
         modKey = config.modules.desktop.hyprland.modKey;
       in

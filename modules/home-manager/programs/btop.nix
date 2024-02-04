@@ -1,11 +1,10 @@
 { lib
-, pkgs
 , config
 , ...
 }:
 let
   cfg = config.modules.programs.btop;
-  colors = config.colorscheme.colors;
+  colors = config.colorscheme.palette;
 in
 lib.mkIf cfg.enable {
 

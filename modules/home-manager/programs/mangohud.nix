@@ -6,7 +6,7 @@
 let
   cfg = config.modules.programs.mangohud;
   device = nixosConfig.device;
-  colors = config.colorscheme.colors;
+  colors = config.colorscheme.palette;
 in
 lib.mkIf cfg.enable {
   programs.mangohud = {

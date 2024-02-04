@@ -1,7 +1,7 @@
 { lib, pkgs, config, ... }:
 let
   cfg = config.modules.programs.zathura;
-  colors = config.colorscheme.colors;
+  colors = config.colorscheme.palette;
 in
 lib.mkIf cfg.enable
 {

@@ -6,7 +6,7 @@
 }:
 let
   desktopCfg = config.modules.desktop;
-  colors = config.colorscheme.colors;
+  colors = config.colorscheme.palette;
 in
 lib.mkIf nixosConfig.usrEnv.desktop.enable {
   # TODO: Consider settings home.pointerCursor

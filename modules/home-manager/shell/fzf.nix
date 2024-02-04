@@ -6,7 +6,7 @@
 let
   fd = "${pkgs.fd}/bin/fd";
   bat = "${pkgs.bat}/bin/bat";
-  colors = config.colorscheme.colors;
+  colors = config.colorscheme.palette;
 in
 lib.mkIf config.modules.shell.enable {
   programs.fzf = {

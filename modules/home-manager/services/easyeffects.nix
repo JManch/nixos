@@ -6,7 +6,7 @@
 }:
 let
   cfg = config.modules.services.easyeffects;
-  waybar = config.modules.desktop.waybar;
+  waybar = config.modules.desktop.services.waybar;
   dconf = nixosConfig.programs.dconf;
   audio = nixosConfig.modules.system.audio;
 
@@ -41,7 +41,7 @@ lib.mkIf (cfg.enable && audio.enable && dconf.enable) {
     settings.bar =
       with pkgs;
       let
-        colors = config.colorscheme.colors;
+        colors = config.colorscheme.palette;
       in
       {
         pulseaudio = {

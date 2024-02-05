@@ -49,10 +49,20 @@ lib.mkIf amd
 
   services.xserver.videoDrivers = lib.mkIf desktop [ "modesetting" ];
 
+  programs.corectrl = {
+    enable = true;
+    # WARN: Disable this if you experience flickering or general instability
+    # https://wiki.archlinux.org/title/AMDGPU#Boot_parameter
+    gpuOverclock.enable = true;
+    gpuOverclock.ppfeaturemask = "0xffffffff";
+  };
+  users.users.${username}.extraGroups = [ "corectrl" ];
+
   environment.persistence."/persist".users.${username} = {
     directories = [
       ".cache/AMD"
       ".cache/mesa_shader_cache"
+      ".config/corectrl"
     ];
     files = [
       # NOTE: These can be problematic if the file does not already exists in

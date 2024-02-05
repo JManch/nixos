@@ -40,8 +40,9 @@
       })
       config.nix.registry;
 
-  environment.systemPackages = [
-    pkgs.git
+  environment.systemPackages = with pkgs; [
+    git
+    nurl # tool for generating nix fetcher calls from urls
   ];
 
   programs.zsh = {

@@ -71,6 +71,8 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${mod}, mouse_down, workspace, r-1"
           "${mod}, Left, workspace, r-1"
           "${mod}, Right, workspace, r+1"
+          "${modShift}, Left, movetoworkspace, r-1"
+          "${modShift}, Right, movetoworkspace, r+1"
 
           # Monitors
           "${modShift}, Comma, movecurrentworkspacetomonitor, ${(getMonitorByNumber 2).name}"

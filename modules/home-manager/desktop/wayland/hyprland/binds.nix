@@ -16,6 +16,7 @@ let
 
   audio = nixosConfig.modules.system.audio;
   osDesktop = nixosConfig.usrEnv.desktop;
+  monitors = nixosConfig.device.monitors;
 
   wpctl = "${pkgs.wireplumber}/bin/wpctl";
   hyprshot = "${pkgs.hyprshot}/bin/hyprshot";
@@ -103,7 +104,7 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
               "${mod}, D, focusmonitor, ${m.name}"
               "${mod}, D, workspace, name:DESKTOP ${builtins.toString m.number}"
             ])
-            nixosConfig.device.monitors
+            monitors
         ) ++ (
           # Workspaces
           let
@@ -141,4 +142,51 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
         submap = reset
       '';
     };
+
+  programs.zsh.initExtra =
+    let
+      echo = "${pkgs.coreutils}/bin/echo";
+      jaq = "${pkgs.jaq}/bin/jaq";
+    in
+      /* bash */ ''
+      toggle-monitor() {
+        if [ -z "$1" ]; then
+          ${echo} "Usage: toggle-monitor <monitor_number>"
+          return 1
+        fi
+
+        declare -A monitorNumToName
+        ${builtins.concatStringsSep "\n  "
+          (lib.lists.map (m: "monitorNumToName[${builtins.toString m.number}]='${m.name}'") monitors)
+        }
+
+        declare -A monitorNameToCfg
+        ${builtins.concatStringsSep "\n  "
+          (lib.lists.map (m: "monitorNameToCfg[${m.name}]='${lib.fetchers.getMonitorHyprlandCfgStr m}'") monitors)
+        }
+
+        if [[ ! -v monitorNumToName[$1] ]]; then
+          ${echo} "Error: monitor with number '$1' does not exist"
+          return 1
+        fi
+
+        local monitorName=''${monitorNumToName[$1]}
+
+        # Check if the monitor is already disabled
+        ${hyprctl} monitors -j | ${jaq} -e 'first(.[] | select(.name == "'"$monitorName"'"))' > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+          disabled=true
+        else
+          disabled=false
+        fi
+
+        if [[ $disabled == true ]]; then
+          ${hyprctl} keyword monitor ''${monitorNameToCfg[$monitorName]} > /dev/null
+          ${echo} "Enabled monitor $monitorName"
+        else
+          ${hyprctl} keyword monitor $monitorName,disable > /dev/null
+          ${echo} "Disabled monitor $monitorName"
+        fi
+      }
+    '';
 }

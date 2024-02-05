@@ -14,9 +14,19 @@ in
     initrd.systemd.enable = true;
     loader.efi.canTouchEfiVariables = true;
 
+    # ZFS does not necessarily support the latest kernel
     kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
     supportedFilesystems = [ "zfs" ];
+
+    # To get kernel 6.7 support until zfs 2.2.3 is released https://github.com/openzfs/zfs/pull/15836
+    zfs.enableUnstable = true;
   };
+
+  # TODO: Enable ZFS zfs.autoSnapshot at an infrequent interval (maybe once a
+  # week?) in addition to zfs.autoReplication to backup onto my home server?
+  # Requirements
+  # - Finish home server nix config
+  # - Create a seperate zfs dataset for .local/share/Steam so games don't bloat snapshots
 
   fileSystems = {
     "/" = {

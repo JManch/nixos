@@ -15,9 +15,10 @@ in
         description = "The modifier key to use for bindings";
         default = "SUPER";
       };
+      # Used by gamemode config
       killActiveKey = mkOption {
         type = types.str;
-        description = "The key to use for killing active window. Has to be set here because gamemode config uses it.";
+        description = "The key to use for killing active window";
         default = "W";
       };
       tearing = mkEnableOption "allow tearing";

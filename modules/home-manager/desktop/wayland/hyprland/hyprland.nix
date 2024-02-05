@@ -48,14 +48,10 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
       monitor = (lib.lists.map
         (
           m:
-          "${m.name}, " +
-            (
-              if !m.enabled
-              then
-                "disable"
-              else
-                "${builtins.toString m.width}x${builtins.toString m.height}@${builtins.toString m.refreshRate}, ${m.position}, 1"
-            )
+          if !m.enabled then
+            "${m.name},disable"
+          else
+            lib.fetchers.getMonitorHyprlandCfgStr m
         )
         nixosConfig.device.monitors
       )

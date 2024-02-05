@@ -21,16 +21,16 @@ let
       inherit (lib) optionalString;
       inherit (builtins) toString;
 
-      hyprConf = homeConfig.modules.desktop.hyprland;
+      hyprCfg = homeConfig.modules.desktop.hyprland;
       monitor = lib.fetchers.primaryMonitor config;
       isEnd = m: lib.trivial.boolToString (m == "end");
 
       # In gamemode remap the killactive key to use the shift modifier
       killactiveUnbind = isEnd:
-        "keyword unbind ${hyprConf.modKey}${optionalString isEnd "SHIFTCONTROL"}, W";
+        "keyword unbind ${hyprCfg.modKey}${optionalString isEnd "SHIFTCONTROL"}, W";
 
       killactiveBind = isEnd:
-        "keyword bind ${hyprConf.modKey}${optionalString (!isEnd) "SHIFTCONTROL"}, W, killactive";
+        "keyword bind ${hyprCfg.modKey}${optionalString (!isEnd) "SHIFTCONTROL"}, W, killactive";
 
       refreshRate = m: toString (
         if (m == "start") then
@@ -45,9 +45,9 @@ let
       ${optionalString isHyprland /*bash*/ ''
         export HYPRLAND_INSTANCE_SIGNATURE=$(ls -1 -t /tmp/hypr | cut -d '.' -f 1 | head -1)
         hyprctl --batch "\
-          ${optionalString hyprConf.blur "keyword decoration:blur:enabled ${isEnd m};\\"}
+          ${optionalString hyprCfg.blur "keyword decoration:blur:enabled ${isEnd m};\\"}
           keyword animations:enabled ${isEnd m};\
-          keyword monitor ${monitor.name},${toString monitor.width}x${toString monitor.height}@${refreshRate m},${monitor.position},1;\
+          keyword monitor ${lib.fetchers.getMonitorHyprlandCfgStr (monitor // {refreshRate = refreshRate m;})};\
           ${killactiveUnbind (m == "end")};\
           ${killactiveBind (m == "end")};"
       ''

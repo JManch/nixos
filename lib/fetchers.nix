@@ -11,4 +11,5 @@ lib:
       ];
     in
     homeConfig: builtins.elem homeConfig.modules.desktop.windowManager waylandWindowManagers;
+  getMonitorHyprlandCfgStr = m: "${m.name},${builtins.toString m.width}x${builtins.toString m.height}@${builtins.toString m.refreshRate},${m.position},1";
 }

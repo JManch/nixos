@@ -1,5 +1,4 @@
-{ pkgs
-, config
+{ config
 , inputs
 , username
 , ...
@@ -16,12 +15,6 @@
   home = {
     username = "${username}";
     homeDirectory = "/home/${username}";
-    packages = with pkgs; [
-      unzip
-      zip
-      tree
-      wget
-    ];
   };
 
   impermanence.directories = [

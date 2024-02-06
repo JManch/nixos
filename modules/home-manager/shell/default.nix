@@ -1,11 +1,34 @@
-{ lib, ... }:
+{ lib, pkgs, config, ... }:
 let
   inherit (lib) mkEnableOption;
+  cfg = config.modules.shell;
 in
 {
   imports = lib.utils.scanPaths ./.;
 
   options.modules.shell = {
     enable = mkEnableOption "enable custom shell";
+    sillyTools = mkEnableOption "install silly command-line tools";
+  };
+
+  config = lib.mkIf cfg.enable {
+    home.packages = with pkgs; [
+      unzip
+      zip
+      tree
+      wget
+      fd
+      bat
+      tokei
+      rename
+    ] ++ lib.lists.optionals cfg.sillyTools [
+      fortune
+      cowsay
+      lolcat
+    ];
+
+    home.sessionVariables = {
+      COLORTERM = "truecolor";
+    };
   };
 }

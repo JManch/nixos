@@ -4,17 +4,10 @@
 , username
 , ...
 }:
-lib.mkIf config.modules.shell.enable {
-  home.packages = with pkgs; [
-    fd
-    bat
-    tokei
-    rename
-  ];
-
-  home.sessionVariables = {
-    COLORTERM = "truecolor";
-  };
+let
+  cfg = config.modules.shell;
+in
+lib.mkIf cfg.enable {
 
   programs.zsh = {
     enable = true;
@@ -75,4 +68,5 @@ lib.mkIf config.modules.shell.enable {
       ".cache/zsh"
     ];
   };
+
 }

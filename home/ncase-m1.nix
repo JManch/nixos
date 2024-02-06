@@ -17,7 +17,10 @@ in
   ];
 
   modules = {
-    shell.enable = true;
+    shell = {
+      enable = true;
+      sillyTools = true;
+    };
 
     desktop = {
       windowManager = "hyprland";

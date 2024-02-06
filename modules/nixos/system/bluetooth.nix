@@ -1,8 +1,4 @@
-{ lib
-, config
-, username
-, ...
-}:
+{ lib, config, ... }:
 let
   cfg = config.modules.system.bluetooth;
 in

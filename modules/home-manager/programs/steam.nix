@@ -1,5 +1,6 @@
 { lib
 , pkgs
+, config
 , nixosConfig
 , ...
 }:
@@ -49,4 +50,18 @@ lib.mkIf cfg.enable
       ${echo} "XP per second: $xp_per_second"
     }
   '';
+
+  desktop.hyprland.settings.windowrulev2 = lib.mkIf (config.modules.desktop.windowManager == "hyprland") [
+    # Main steam window
+    "workspace 5,class:^(steam)$,title:^(Steam)$"
+
+    # Steam sign-in window
+    "noinitialfocus,class:^(steam)$,title:^(Sign in to Steam)$"
+    "workspace 5 silent,class:^(steam)$,title:^(Sign in to Steam)$"
+
+    # Friends list
+    "float,class:^(steam)$,title:^(Friends List)$"
+    "size 360 700,class:^(steam)$,title:^(Friends List)$"
+    "center,class:^(steam)$,title:^(Friends List)$"
+  ];
 }

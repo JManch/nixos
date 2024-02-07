@@ -65,7 +65,7 @@ in
 
     cpu = {
       type = mkOption {
-        type = with types; nullOr (enum [ "intel" "vm-intel" "amd" "vm-amd" ]);
+        type = with types; nullOr (enum [ "intel" "amd" ]);
         description = "The device's CPU manufacturer";
       };
       name = mkOption {

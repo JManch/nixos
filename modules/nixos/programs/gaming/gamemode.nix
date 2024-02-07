@@ -38,6 +38,10 @@ let
         else
           monitor.refreshRate
       );
+
+      blur = m: if hyprCfg.blur then isEnd m else false;
+      animate = m: if hyprCfg.animations then isEnd m else false;
+
       notifBody = with builtins; m: ((lib.strings.toUpper (substring 0 1 m)) + (substring 1 ((stringLength m) - 1) m));
     in
     m: pkgs.writeShellScript "gamemode-${m}" ''
@@ -45,8 +49,8 @@ let
       ${optionalString isHyprland /*bash*/ ''
         export HYPRLAND_INSTANCE_SIGNATURE=$(ls -1 -t /tmp/hypr | cut -d '.' -f 1 | head -1)
         hyprctl --batch "\
-          ${optionalString hyprCfg.blur "keyword decoration:blur:enabled ${isEnd m};\\"}
-          keyword animations:enabled ${isEnd m};\
+          ${optionalString hyprCfg.blur "keyword decoration:blur:enabled ${blur m};\\"}
+          keyword animations:enabled ${animate m};\
           keyword monitor ${lib.fetchers.getMonitorHyprlandCfgStr (monitor // {refreshRate = refreshRate m;})};\
           ${killactiveUnbind (m == "end")};\
           ${killactiveBind (m == "end")};"

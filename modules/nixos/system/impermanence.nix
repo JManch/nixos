@@ -12,7 +12,7 @@ in
     inputs.impermanence.nixosModules.impermanence
   ];
 
-  programs.zsh.shellInit =
+  programs.zsh.interactiveShellInit =
     let
       fd = "${pkgs.fd}/bin/fd";
       findmnt = "${pkgs.util-linux}/bin/findmnt";

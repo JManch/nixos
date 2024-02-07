@@ -1,13 +1,13 @@
-{ config
-, username
+{ lib
 , pkgs
-, lib
+, config
+, username
 , ...
 }:
 let
   cfg = config.modules.services.greetd;
 in
-lib.mkIf cfg.enable
+lib.mkIf (cfg.enable && config.usrEnv.desktop.enable)
 {
   services.greetd = {
     enable = true;

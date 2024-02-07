@@ -2,7 +2,8 @@
 , inputs
 , username
 , ...
-}: {
+}:
+{
   imports = [
     ../modules/home-manager
     inputs.nix-colors.homeManagerModules.default

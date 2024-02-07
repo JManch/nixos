@@ -11,6 +11,7 @@
 
     nix-resources = {
       url = "git+ssh://git@github.com/JManch/nix-resources";
+      # url = "git+file:///home/joshua/repos/nix-resources";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

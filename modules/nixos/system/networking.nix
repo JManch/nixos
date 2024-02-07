@@ -96,7 +96,5 @@ in
     kernelModules = lists.optional cfg.tcpOptimisations "tcp_bbr";
   };
 
-  services.resolved = {
-    enable = cfg.resolved.enable;
-  };
+  services.resolved.enable = cfg.resolved.enable;
 }

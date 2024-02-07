@@ -79,7 +79,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         hover_icon_on_border = false;
         "col.active_border" = "0xff${colors.base0D} 0xff${colors.base0E} 45deg";
         "col.inactive_border" = "0xff${colors.base00}";
-        cursor_inactive_timeout = 0;
+        cursor_inactive_timeout = 5;
         allow_tearing = cfg.tearing;
       };
 

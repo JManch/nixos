@@ -24,8 +24,9 @@ in
 
     desktop = {
       windowManager = "hyprland";
-
       hyprland.tearing = true;
+
+      terminal = "${config.programs.alacritty.package}/bin/alacritty";
 
       style = {
         font = {

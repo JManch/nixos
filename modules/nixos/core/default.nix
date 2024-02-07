@@ -6,7 +6,8 @@
 , hostname
 , username
 , ...
-}: {
+}:
+{
   imports = lib.utils.scanPaths ./.;
 
   nixpkgs = {
@@ -54,7 +55,6 @@
       # in the nix store and it broke my entire install
       rebuild-build = "cd && nixos-rebuild build --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-boot = "sudo nixos-rebuild boot --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-vm = "cd && nixos-rebuild build-vm --flake /home/${username}/.config/nixos#virtual";
       inspect-nix-config = "nix --extra-experimental-features repl-flake repl '/home/${username}/.config/nixos#nixosConfigurations.${hostname}'";
     };
   };

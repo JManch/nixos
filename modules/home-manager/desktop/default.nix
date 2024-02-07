@@ -17,6 +17,11 @@ in
       default = null;
       description = "The window manager to use";
     };
+    terminal = mkOption {
+      type = with types; nullOr types.str;
+      default = null;
+      description = "Path to the default terminal executable";
+    };
     style = {
       font = {
         family = mkOption {
@@ -71,11 +76,12 @@ in
     assertions =
       let
         windowManager = config.modules.desktop.windowManager;
+        terminal = config.modules.desktop.terminal;
         nixosDesktop = nixosConfig.usrEnv.desktop;
       in
       [
         {
-          assertion = (windowManager != null) -> (nixosDesktop.enable);
+          assertion = (windowManager != null) -> nixosDesktop.enable;
           message = "You cannot select a window manager if usrEnv desktop is not enabled";
         }
         {
@@ -87,6 +93,10 @@ in
             (windowManager == "hyprland" || windowManager == "sway")
             -> (nixosDesktop.desktopEnvironment == null);
           message = "Cannot use a desktop environment with window manager ${windowManager}";
+        }
+        {
+          assertion = nixosDesktop.enable -> (terminal != null);
+          message = "`config.modules.desktop.terminal` must be declared if desktop environment is enabled";
         }
       ];
   };

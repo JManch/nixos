@@ -1,6 +1,7 @@
 { lib
 , pkgs
 , config
+, vmVariant
 , nixosConfig
 , ...
 }:
@@ -37,6 +38,9 @@ in
 lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
 {
   home.packages = [ pkgs.jaq ];
+
+  # Force modKey to ALT on VM variant because binds are repeated on host
+  modules.desktop.hyprland.modKey = lib.mkIf vmVariant (lib.mkVMOverride "ALT");
 
   wayland.windowManager.hyprland =
     let

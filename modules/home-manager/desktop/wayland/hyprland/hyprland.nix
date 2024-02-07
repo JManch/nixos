@@ -2,6 +2,7 @@
 , pkgs
 , config
 , inputs
+, vmVariant
 , nixosConfig
 , ...
 }:
@@ -20,6 +21,13 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
   home.packages = with pkgs; [
     hyprshot
   ];
+
+  # Optimise for performance in VM variant
+  modules.desktop.hyprland = lib.mkIf vmVariant (lib.mkVMOverride {
+    tearing = false;
+    blur = false;
+    animations = false;
+  });
 
   xdg.portal = {
     extraPortals = [ hyprlandPackages.xdg-desktop-portal-hyprland ];
@@ -87,10 +95,11 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         "immediate, class:${nixosConfig.modules.programs.gaming.windowClassRegex}"
         "workspace name:GAME, class:${nixosConfig.modules.programs.gaming.windowClassRegex}"
 
-        "workspace name:VM, class:^qemu$"
-        "float, class:^qemu$"
-        "size 75% 75%, class:^qemu$"
-        "center, class:^qemu$"
+        "workspace name:VM silent, class:^(qemu)$"
+        "float, class:^(qemu)$, title:^(QEMU.*)$"
+        "size 75% 75%, class:^(qemu)$, title:^(QEMU.*)$"
+        "center, class:^(qemu)$, title:^(QEMU.*)$"
+        "keepaspectratio, class:^(qemu)$, title:^(QEMU.*)$"
       ];
 
       decoration = {

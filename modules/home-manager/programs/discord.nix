@@ -11,8 +11,7 @@ lib.mkIf cfg.enable {
 
   desktop.hyprland.settings = lib.mkIf (desktopCfg.windowManager == "hyprland") {
     windowrulev2 = [
-      "noinitialfocus,class:^(vesktop|discord)$"
-      "workspace 4 silent,class:^(vesktop|discord)$"
+      "workspace special silent, class:^(vesktop|discord)$"
     ];
   };
 

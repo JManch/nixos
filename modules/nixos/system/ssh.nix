@@ -21,17 +21,20 @@ in
         type = "ed25519";
       }
     ];
+    # TODO: Make this configurable. i.e. don't allow certain hosts
+    knownHosts = builtins.mapAttrs
+      (host: _: {
+        publicKey = "${(import ../../../hosts/${host}/key.nix).key}";
+        extraHostNames = (lib.lists.optional (host == hostname) "localhost");
+      })
+      outputs.nixosConfigurations;
   };
 
   users.users.${username} = {
-    # Authorise all other hosts except our own
-    openssh.authorizedKeys.keys = lib.lists.concatMap
-      (
-        host:
-        if host == hostname then [ ] else
-        [ "${(import ../../../hosts/${host}/key.nix).key}" ]
-      )
-      hosts;
+    # TODO: Make this better. Maybe store public keys in file.
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
+    ];
   };
 
   programs.ssh = {

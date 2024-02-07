@@ -158,7 +158,6 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         preserve_split = true;
         force_split = 2;
         no_gaps_when_only = 1;
-        special_scale_factor = 0.9;
       };
 
       binds = {
@@ -193,8 +192,9 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
           nixosConfig.device.monitors
         )
         ++ [
-          "name:GAME,monitor:${primaryMonitor.name}"
-          "name:VM,monitor:${primaryMonitor.name}"
+          "name:GAME, monitor:${primaryMonitor.name}"
+          "name:VM, monitor:${primaryMonitor.name}"
+          "special, gapsin:20, gapsout:40"
         ];
     };
   };

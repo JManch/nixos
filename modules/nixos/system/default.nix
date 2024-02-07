@@ -39,9 +39,9 @@ in
       enable = mkEnableOption "virtualisation";
     };
 
-    windowsBootEntry = {
-      enable = mkEnableOption "Windows boot menu entry";
-      bootstrap = mkEnableOption "enable bootstrapping of the windows boot entry by adding an edk2 shell boot entry";
+    windows = {
+      enable = mkEnableOption "enable features for systems dual-booting windows";
+      bootEntry = mkEnableOption "create a windows systemd-boot boot entry";
     };
 
   };

@@ -88,7 +88,7 @@
     };
 
     system = {
-      windowsBootEntry.enable = false;
+      windows.enable = true;
       networking = {
         tcpOptimisations = true;
         firewall.enable = true;

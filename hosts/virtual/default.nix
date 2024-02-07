@@ -5,7 +5,7 @@
 
   device = {
     type = "vm";
-    cpu.type = "vm-amd";
+    cpu.type = null;
     gpu.type = null;
     monitors = [
       {
@@ -23,7 +23,7 @@
   usrEnv = {
     homeManager.enable = true;
     desktop = {
-      enable = true;
+      enable = false;
       desktopEnvironment = null;
     };
   };

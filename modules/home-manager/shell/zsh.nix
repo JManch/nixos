@@ -37,7 +37,7 @@ lib.mkIf cfg.enable {
     initExtra = /* bash */ ''
       setopt interactivecomments
 
-      reboot () {
+      reboot() {
         read -q "REPLY?Are you sure you want to reboot? (y/n)"
         if [[ $REPLY =~ ^[Yy]$ ]]; then
           ${pkgs.systemd}/bin/reboot

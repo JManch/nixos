@@ -121,7 +121,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
       };
 
       animations = {
-        enabled = true;
+        enabled = cfg.animations;
         # Curves
         bezier = [
           "easeOutExpo,0.16,1,0.3,1"

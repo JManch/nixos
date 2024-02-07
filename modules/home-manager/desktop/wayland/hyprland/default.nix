@@ -21,8 +21,9 @@ in
         description = "The key to use for killing active window";
         default = "W";
       };
-      tearing = mkEnableOption "allow tearing";
+      tearing = mkEnableOption "enable tearing";
       blur = lib.overrideExisting (mkEnableOption "enable blur") { default = true; };
+      animations = lib.overrideExisting (mkEnableOption "enable animations") { default = true; };
       logging = mkEnableOption "logging";
     };
   };

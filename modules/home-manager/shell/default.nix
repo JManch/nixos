@@ -21,6 +21,7 @@ in
       bat
       tokei
       rename
+      nurl # tool for generating nix fetcher calls from urls
     ] ++ lib.lists.optionals cfg.sillyTools [
       fortune
       cowsay

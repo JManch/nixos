@@ -67,7 +67,7 @@ in
           randomise = true;
           randomiseFrequency = "*-*-* 05:00:00"; # 5am everyday
         };
-        wlsunset.enable = true;
+        gammastep.enable = true;
       };
     };
 

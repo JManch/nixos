@@ -2,20 +2,20 @@
 , pkgs
 , config
 , hostname
-, nixosConfig
+, osConfig
 , ...
 }:
 let
   cfg = config.modules.desktop.services.waybar;
-  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
   isWayland = lib.fetchers.isWayland config;
   colors = config.colorscheme.palette;
   optional = lib.lists.optional;
 
-  audio = nixosConfig.modules.system.audio;
-  wgnord = nixosConfig.modules.services.wgnord;
-  gamemode = nixosConfig.modules.programs.gaming.gamemode;
-  gpu = nixosConfig.device.gpu;
+  audio = osConfig.modules.system.audio;
+  wgnord = osConfig.modules.services.wgnord;
+  gamemode = osConfig.modules.programs.gaming.gamemode;
+  gpu = osConfig.device.gpu;
   easyeffects = config.modules.services.easyeffects;
 
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
@@ -47,7 +47,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
                     value = [ m.name ];
                   })
                   (lib.lists.take 2 m.workspaces)))
-              nixosConfig.device.monitors));
+              osConfig.device.monitors));
           format = "{icon}";
           format-icons = {
             TWITCH = "󰕃";

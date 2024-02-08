@@ -1,7 +1,6 @@
 { lib
-, pkgs
 , config
-, nixosConfig
+, osConfig
 , ...
 }:
 let
@@ -71,13 +70,13 @@ in
     };
   };
 
-  config = lib.mkIf nixosConfig.usrEnv.desktop.enable {
+  config = lib.mkIf osConfig.usrEnv.desktop.enable {
 
     assertions =
       let
         windowManager = config.modules.desktop.windowManager;
         terminal = config.modules.desktop.terminal;
-        nixosDesktop = nixosConfig.usrEnv.desktop;
+        nixosDesktop = osConfig.usrEnv.desktop;
       in
       [
         {
@@ -85,7 +84,7 @@ in
           message = "You cannot select a window manager if usrEnv desktop is not enabled";
         }
         {
-          assertion = (windowManager != null) -> (lib.length nixosConfig.device.monitors != 0);
+          assertion = (windowManager != null) -> (lib.length osConfig.device.monitors != 0);
           message = "Device monitors must be configured to use the ${windowManager} window manager";
         }
         {

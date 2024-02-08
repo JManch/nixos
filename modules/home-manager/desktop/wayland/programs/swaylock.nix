@@ -1,14 +1,14 @@
-{ pkgs
+{ lib
+, pkgs
 , config
-, nixosConfig
-, lib
+, osConfig
 , ...
 }:
 let
   cfg = config.modules.desktop.programs.swaylock;
   desktopCfg = config.modules.desktop;
   isWayland = lib.fetchers.isWayland config;
-  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
   colors = config.colorscheme.palette;
 in
 lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
@@ -33,8 +33,8 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
 
       indicator = true;
       indicator-caps-lock = true;
-      indicator-y-position = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).height * 0.5);
-      indicator-radius = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).width * 0.04);
+      indicator-y-position = builtins.floor ((lib.fetchers.primaryMonitor osConfig).height * 0.5);
+      indicator-radius = builtins.floor ((lib.fetchers.primaryMonitor osConfig).width * 0.04);
 
       text-color = "#${colors.base07}";
 

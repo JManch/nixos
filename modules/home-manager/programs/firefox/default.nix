@@ -1,8 +1,4 @@
-{ lib
-, config
-, nixosConfig
-, ...
-}:
+{ lib, config, osConfig, ... }:
 let
   binary = "${config.programs.firefox.package}/bin/firefox";
   cfg = config.modules.programs.firefox;
@@ -37,7 +33,7 @@ lib.mkIf cfg.enable {
           # Firefox only support VAAPI acceleration. This is natively supported
           # by AMD cards but NVIDIA cards need a translation library to go from
           # VDPAU to VAAPI.
-          "media.ffmpeg.vaapi.enabled" = (nixosConfig.device.gpu.type != null);
+          "media.ffmpeg.vaapi.enabled" = (osConfig.device.gpu.type != null);
 
           # Scrolling
           "mousewheel.default.delta_multiplier_x" = 95;

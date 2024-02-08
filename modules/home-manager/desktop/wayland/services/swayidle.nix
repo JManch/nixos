@@ -1,7 +1,7 @@
-{ pkgs
+{ lib
+, pkgs
 , config
-, nixosConfig
-, lib
+, osConfig
 , ...
 }:
 let
@@ -10,7 +10,7 @@ let
   desktopCfg = config.modules.desktop;
   swaylockCfg = desktopCfg.programs.swaylock;
   isWayland = lib.fetchers.isWayland config;
-  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 
   pgrep = "${pkgs.procps}/bin/pgrep";
   hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";

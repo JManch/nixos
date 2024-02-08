@@ -1,16 +1,16 @@
 { lib
 , pkgs
 , config
-, nixosConfig
+, osConfig
 , ...
 }:
 let
   inherit (lib) mkIf;
   isWayland = lib.fetchers.isWayland config;
-  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 
   swww = "${pkgs.swww}/bin/swww";
-  primaryMonitor = lib.fetchers.primaryMonitor nixosConfig;
+  primaryMonitor = lib.fetchers.primaryMonitor osConfig;
   refreshRate = "${builtins.toString (builtins.floor primaryMonitor.refreshRate)}";
   transition =
     "--transition-bezier .43,1.19,1,.4 --transition-type center --transition-duration 1 --transition-fps ${refreshRate}";

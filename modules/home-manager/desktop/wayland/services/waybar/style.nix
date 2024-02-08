@@ -1,13 +1,9 @@
-{ lib
-, config
-, nixosConfig
-, ...
-}:
+{ lib, config, osConfig, ... }:
 let
   cfg = config.modules.desktop.services.waybar;
   desktopCfg = config.modules.desktop;
   colors = config.colorscheme.palette;
-  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
   isWayland = lib.fetchers.isWayland config;
 in
 lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)

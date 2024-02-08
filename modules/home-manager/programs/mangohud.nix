@@ -1,11 +1,7 @@
-{ lib
-, config
-, nixosConfig
-, ...
-}:
+{ lib, config, osConfig, ... }:
 let
   cfg = config.modules.programs.mangohud;
-  device = nixosConfig.device;
+  device = osConfig.device;
   colors = config.colorscheme.palette;
 in
 lib.mkIf cfg.enable {

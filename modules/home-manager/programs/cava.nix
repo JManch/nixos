@@ -1,12 +1,12 @@
 { lib
 , config
-, nixosConfig
+, osConfig
 , ...
 }:
 let
   cfg = config.modules.programs.cava;
 in
-lib.mkIf (cfg.enable && nixosConfig.modules.system.audio.enable) {
+lib.mkIf (cfg.enable && osConfig.modules.system.audio.enable) {
   programs.cava = {
     enable = true;
     settings = {
@@ -41,7 +41,7 @@ lib.mkIf (cfg.enable && nixosConfig.modules.system.audio.enable) {
     };
   };
 
-  xdg.desktopEntries."cava" = lib.mkIf nixosConfig.usrEnv.desktop.enable {
+  xdg.desktopEntries."cava" = lib.mkIf osConfig.usrEnv.desktop.enable {
     name = "Cava";
     genericName = "Audio Visualizer";
     exec = "${config.programs.alacritty.package}/bin/alacritty --title Cava -e ${config.programs.cava.package}/bin/cava";

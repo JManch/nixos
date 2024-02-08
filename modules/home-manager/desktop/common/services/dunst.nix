@@ -1,13 +1,9 @@
-{ config
-, nixosConfig
-, lib
-, ...
-}:
+{ lib, config, osConfig, ... }:
 let
   desktopCfg = config.modules.desktop;
   cfg = config.modules.desktop.services.dunst;
   colors = config.colorscheme.palette;
-  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 in
 lib.mkIf (osDesktopEnabled && cfg.enable) {
   services.dunst = {
@@ -24,8 +20,8 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
         layer = "overlay";
 
         corner_radius = cornerRadius;
-        width = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).width * 0.14);
-        height = builtins.floor ((lib.fetchers.primaryMonitor nixosConfig).height * 0.25);
+        width = builtins.floor ((lib.fetchers.primaryMonitor osConfig).width * 0.14);
+        height = builtins.floor ((lib.fetchers.primaryMonitor osConfig).height * 0.25);
         offset = "${builtins.toString (gapSize * 2)}x${builtins.toString (gapSize * 2)}";
         gap_size = gapSize;
         frame_width = borderWidth;

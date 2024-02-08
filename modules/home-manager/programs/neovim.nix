@@ -1,7 +1,7 @@
 { lib
 , pkgs
 , config
-, nixosConfig
+, osConfig
 , ...
 }:
 let
@@ -34,7 +34,7 @@ lib.mkIf cfg.enable {
     EDITOR = "nvim";
   };
 
-  xdg.mimeApps = lib.mkIf nixosConfig.usrEnv.desktop.enable {
+  xdg.mimeApps = lib.mkIf osConfig.usrEnv.desktop.enable {
     defaultApplications = {
       "text/plain" = [ "nvim.desktop" ];
     };

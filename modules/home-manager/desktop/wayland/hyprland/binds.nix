@@ -2,7 +2,7 @@
 , pkgs
 , config
 , vmVariant
-, nixosConfig
+, osConfig
 , ...
 }:
 let
@@ -12,12 +12,12 @@ let
   cfg = config.modules.desktop.hyprland;
   desktopCfg = config.modules.desktop;
 
-  getMonitorByNumber = number: lib.fetchers.getMonitorByNumber nixosConfig number;
+  getMonitorByNumber = number: lib.fetchers.getMonitorByNumber osConfig number;
   getOption = option: type: "${hyprctl} getoption ${option} -j | ${pkgs.jaq}/bin/jaq -r '.${type}'";
 
-  audio = nixosConfig.modules.system.audio;
-  osDesktop = nixosConfig.usrEnv.desktop;
-  monitors = nixosConfig.device.monitors;
+  audio = osConfig.modules.system.audio;
+  osDesktop = osConfig.usrEnv.desktop;
+  monitors = osConfig.device.monitors;
 
   wpctl = "${pkgs.wireplumber}/bin/wpctl";
   hyprshot = "${pkgs.hyprshot}/bin/hyprshot";

@@ -1,14 +1,14 @@
 { lib
 , pkgs
 , config
-, nixosConfig
+, osConfig
 , ...
 }:
 let
   desktopCfg = config.modules.desktop;
   cfg = config.modules.desktop.hyprland;
-  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
-  isGammaCustom = lib.fetchers.isGammaCustom nixosConfig;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
+  isGammaCustom = lib.fetchers.isGammaCustom osConfig;
   hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
   shaderDir = "${config.xdg.configHome}/hypr/shaders";
 
@@ -35,7 +35,7 @@ let
         ''
       ]
     )
-    nixosConfig.device.monitors) ++ [ "gl_FragColor = texture2D(tex, v_texcoord);" ];
+    osConfig.device.monitors) ++ [ "gl_FragColor = texture2D(tex, v_texcoord);" ];
 
   blankShader = /* glsl */ ''
     precision mediump float;

@@ -1,14 +1,14 @@
 { lib
 , pkgs
 , config
-, nixosConfig
+, osConfig
 , ...
 }:
 let
   desktopCfg = config.modules.desktop;
   colors = config.colorscheme.palette;
 in
-lib.mkIf nixosConfig.usrEnv.desktop.enable {
+lib.mkIf osConfig.usrEnv.desktop.enable {
   # TODO: Consider settings home.pointerCursor
   gtk = {
     enable = true;

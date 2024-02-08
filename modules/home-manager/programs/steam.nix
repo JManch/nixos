@@ -1,11 +1,11 @@
 { lib
 , pkgs
 , config
-, nixosConfig
+, osConfig
 , ...
 }:
 let
-  cfg = nixosConfig.modules.programs.gaming.steam;
+  cfg = osConfig.modules.programs.gaming.steam;
   echo = "${pkgs.coreutils}/bin/echo";
 in
 lib.mkIf cfg.enable

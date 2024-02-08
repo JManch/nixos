@@ -1,8 +1,8 @@
 { lib
-, nixosConfig
+, osConfig
 , ...
 }:
-lib.mkIf nixosConfig.modules.system.virtualisation.enable
+lib.mkIf osConfig.modules.system.virtualisation.enable
 {
   dconf.settings = {
     "org/virt-manager/virt-manager/connections" = {

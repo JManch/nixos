@@ -3,7 +3,7 @@
 , config
 , inputs
 , vmVariant
-, nixosConfig
+, osConfig
 , ...
 }:
 let
@@ -12,7 +12,7 @@ let
   desktopCfg = config.modules.desktop;
   hyprlandPackages = inputs.hyprland.packages.${pkgs.system};
   colors = config.colorscheme.palette;
-  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 
   wlPaste = "${pkgs.wl-clipboard}/bin/wl-paste";
   xclip = "${pkgs.xclip}/bin/xclip";
@@ -45,7 +45,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         "XDG_SESSION_DESKTOP=Hyprland"
         "WLR_NO_HARDWARE_CURSORS,1"
         "HYPRSHOT_DIR,${config.xdg.userDirs.pictures}/screenshots"
-      ] ++ lib.lists.optionals (nixosConfig.device.gpu.type == "nvidia") [
+      ] ++ lib.lists.optionals (osConfig.device.gpu.type == "nvidia") [
         "LIBVA_DRIVER_NAME,nvidia"
         "GBM_BACKEND,nvidia-drm"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
@@ -61,7 +61,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
           else
             lib.fetchers.getMonitorHyprlandCfgStr m
         )
-        nixosConfig.device.monitors
+        osConfig.device.monitors
       )
       ++ [
         ",preferred,auto,1" # automatic monitor detection
@@ -69,7 +69,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
 
       # Launch apps
       exec-once = [
-        "hyprctl dispatch focusmonitor ${(lib.fetchers.getMonitorByNumber nixosConfig 1).name}"
+        "hyprctl dispatch focusmonitor ${(lib.fetchers.getMonitorByNumber osConfig 1).name}"
         # Temporary and buggy fix for fixing pasting into wine applications
         # Can remove xclip package once this is fixed
         # https://github.com/hyprwm/Hyprland/issues/2319
@@ -91,16 +91,20 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         allow_tearing = cfg.tearing;
       };
 
-      windowrulev2 = mkIf cfg.tearing [
-        "immediate, class:${nixosConfig.modules.programs.gaming.windowClassRegex}"
-        "workspace name:GAME, class:${nixosConfig.modules.programs.gaming.windowClassRegex}"
+      windowrulev2 =
+        let
+          gameRegex = osConfig.modules.programs.gaming.windowClassRegex;
+        in
+        [
+          "workspace name:GAME, class:${gameRegex}"
 
-        "workspace name:VM silent, class:^(qemu)$"
-        "float, class:^(qemu)$, title:^(QEMU.*)$"
-        "size 75% 75%, class:^(qemu)$, title:^(QEMU.*)$"
-        "center, class:^(qemu)$, title:^(QEMU.*)$"
-        "keepaspectratio, class:^(qemu)$, title:^(QEMU.*)$"
-      ];
+          "workspace name:VM silent, class:^(qemu)$"
+          "float, class:^(qemu)$, title:^(QEMU.*)$"
+          "size 75% 75%, class:^(qemu)$, title:^(QEMU.*)$"
+          "center, class:^(qemu)$, title:^(QEMU.*)$"
+          "keepaspectratio, class:^(qemu)$, title:^(QEMU.*)$"
+        ] ++ lib.lists.optional cfg.tearing
+          "immediate, class:${gameRegex}";
 
       decoration = {
         # Hyprland corner radius seems slightly stronger than CSS
@@ -182,7 +186,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
 
       workspace =
         let
-          primaryMonitor = lib.fetchers.primaryMonitor nixosConfig;
+          primaryMonitor = lib.fetchers.primaryMonitor osConfig;
         in
         (lib.lists.concatMap
           (
@@ -199,7 +203,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
                 m.workspaces
             )
           )
-          nixosConfig.device.monitors
+          osConfig.device.monitors
         )
         ++ [
           "name:GAME, monitor:${primaryMonitor.name}"

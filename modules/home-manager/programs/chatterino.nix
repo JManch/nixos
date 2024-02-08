@@ -1,7 +1,7 @@
 { lib
 , pkgs
 , config
-, nixosConfig
+, osConfig
 , ...
 }:
 let
@@ -64,7 +64,7 @@ lib.mkIf cfg.enable {
       "${twitchWorkspaceScript.outPath}"
     ];
     workspace = [
-      "name:TWITCH,monitor:${(lib.fetchers.getMonitorByNumber nixosConfig 2).name},gapsin:0,gapsout:0,rounding:false,border:false}"
+      "name:TWITCH,monitor:${(lib.fetchers.getMonitorByNumber osConfig 2).name},gapsin:0,gapsout:0,rounding:false,border:false}"
     ];
     bind = [
       "${config.modules.desktop.hyprland.modKey}, T, workspace, name:TWITCH"

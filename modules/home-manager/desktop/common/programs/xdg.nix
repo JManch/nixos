@@ -1,10 +1,10 @@
 { lib
 , pkgs
 , config
-, nixosConfig
+, osConfig
 , ...
 }:
-lib.mkIf nixosConfig.usrEnv.desktop.enable
+lib.mkIf osConfig.usrEnv.desktop.enable
 {
   # Many applications need this for xdg-open url opening however package
   # managers rarely include is as a dependency for some reason

@@ -1,7 +1,7 @@
 { lib
 , pkgs
 , config
-, nixosConfig
+, osConfig
 , ...
 }:
 {
@@ -10,7 +10,7 @@
   config =
     let
       isWayland = lib.fetchers.isWayland config;
-      osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+      osDesktopEnabled = osConfig.usrEnv.desktop.enable;
     in
     lib.mkIf (osDesktopEnabled && isWayland) {
       home.packages = with pkgs; [

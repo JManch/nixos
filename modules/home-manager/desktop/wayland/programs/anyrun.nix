@@ -1,15 +1,15 @@
-{ inputs
+{ lib
 , pkgs
+, inputs
 , config
-, nixosConfig
-, lib
+, osConfig
 , ...
 }:
 let
   isWayland = lib.fetchers.isWayland config;
   cfg = config.modules.desktop.programs.anyrun;
   desktopCfg = config.modules.desktop;
-  osDesktopEnabled = nixosConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 in
 {
   imports = [

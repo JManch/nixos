@@ -1,14 +1,14 @@
 { lib
 , config
-, nixosConfig
+, osConfig
 , pkgs
 , ...
 }:
 let
   cfg = config.modules.services.easyeffects;
   waybar = config.modules.desktop.services.waybar;
-  dconf = nixosConfig.programs.dconf;
-  audio = nixosConfig.modules.system.audio;
+  dconf = osConfig.programs.dconf;
+  audio = osConfig.modules.system.audio;
 
   autoloadDeviceConfigs = builtins.listToAttrs
     (builtins.map

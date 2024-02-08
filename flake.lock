@@ -513,16 +513,17 @@
         ]
       },
       "locked": {
-        "dirtyRev": "e2656cc5004541abb3ad12b09cb25cb4f94489b1-dirty",
-        "dirtyShortRev": "e2656cc-dirty",
-        "lastModified": 1705683083,
+        "lastModified": 1707344675,
         "narHash": "sha256-pRGMbd35LNFnlcQmEBDZdMmikin9dyTiQlTqsnwirLY=",
+        "ref": "refs/heads/main",
+        "rev": "6267770997a0bee682f80e22d550836eab961a25",
+        "revCount": 18,
         "type": "git",
-        "url": "file:///home/joshua/repos/nix-resources"
+        "url": "ssh://git@github.com/JManch/nix-resources"
       },
       "original": {
         "type": "git",
-        "url": "file:///home/joshua/repos/nix-resources"
+        "url": "ssh://git@github.com/JManch/nix-resources"
       }
     },
     "nixpkgs": {

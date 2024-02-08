@@ -1,18 +1,16 @@
 { lib, config, nixosConfig, ... }:
 let
-  cfg = config.modules.desktop.services.gammastep;
+  cfg = config.modules.desktop.services.wlsunset;
 in
 lib.mkIf (cfg.enable && nixosConfig.device.gpu.type == "amd")
 {
-  # We use gammastep instead of wlsunset because wlsunset would often disable
-  # itself after using dpms
-  services.gammastep = {
+  services.wlsunset = {
     enable = true;
     latitude = "50.8";
     longitude = "-0.1";
     temperature = {
       day = 6500;
-      night = 3700;
+      night = 4000;
     };
   };
 }

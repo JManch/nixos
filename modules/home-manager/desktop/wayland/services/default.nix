@@ -20,6 +20,6 @@ in
       };
     };
     waybar.enable = mkEnableOption "Waybar";
-    gammastep.enable = mkEnableOption "gammastep";
+    wlsunset.enable = mkEnableOption "wlsunset";
   };
 }

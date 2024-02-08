@@ -3,8 +3,8 @@
 , ...
 }:
 let
-  alacritty = config.programs.alacritty.package;
   cfg = config.modules.programs.alacritty;
+  alacritty = config.programs.alacritty.package;
   desktopCfg = config.modules.desktop;
   colors = config.colorscheme.palette;
 in
@@ -19,7 +19,7 @@ lib.mkIf cfg.enable {
         };
         dynamic_padding = true;
         decorations = "none";
-        opacity = cfg.opacity;
+        opacity = 1; # used to use 0.7
         dynamic_title = true;
       };
       scrolling = {

@@ -6,14 +6,7 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.programs = {
-    alacritty = {
-      enable = mkEnableOption "Alacritty";
-      opacity = mkOption {
-        type = types.float;
-        default = 0.7;
-      };
-    };
-
+    alacritty.enable = mkEnableOption "Alacritty";
     btop.enable = mkEnableOption "btop";
     cava.enable = mkEnableOption "cava";
     firefox.enable = mkEnableOption "Firefox";

@@ -128,7 +128,7 @@ in
         {
           windowrulev2 = [
             "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
-            "workspace special silent, initialTitle:^(Spotify( Premium)?)$"
+            "workspace special silent, title:^(Spotify( Premium)?)$"
           ];
           bindr = [
             "${modKey}, ${modKey}_R, exec, ${spotifyPlayer} playback play-pause"

@@ -19,7 +19,7 @@ lib.mkIf cfg.enable {
         };
         dynamic_padding = true;
         decorations = "none";
-        opacity = 1; # used to use 0.7
+        opacity = 0.7;
         dynamic_title = true;
       };
       scrolling = {

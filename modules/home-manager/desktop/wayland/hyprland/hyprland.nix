@@ -157,7 +157,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
       misc = {
         disable_hyprland_logo = true;
         focus_on_activate = false;
-        mouse_move_enables_dpms = true;
+        mouse_move_enables_dpms = false;
         key_press_enables_dpms = true;
         background_color = "0xff${colors.base00}";
         new_window_takes_over_fullscreen = 2;

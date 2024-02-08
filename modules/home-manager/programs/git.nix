@@ -33,11 +33,8 @@ lib.mkIf cfg.enable {
       lg = "lazygit";
     };
     initExtra = ''
-      lazygit () {
-        local KEYS=$(${pkgs.openssh}/bin/ssh-add -l)
-        if [[ "$KEYS" == "The agent has no identities." ]]; then
-          ${pkgs.openssh}/bin/ssh-add
-        fi
+      lazygit() {
+        ssh-add-quiet
         command ${config.programs.lazygit.package}/bin/lazygit "$@"
       }
     '';

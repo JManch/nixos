@@ -66,6 +66,13 @@ lib.mkIf cfg.enable {
         cat "$file_path" > "$copy_path" && rm "$file_path" && mv "$copy_path" "$file_path"
         $EDITOR "$file_path"
       }
+
+      ssh-add-quiet() {
+        local KEYS=$(${pkgs.openssh}/bin/ssh-add -l)
+        if [[ "$KEYS" == "The agent has no identities." ]]; then
+          ${pkgs.openssh}/bin/ssh-add
+        fi
+      }
     '';
   };
 

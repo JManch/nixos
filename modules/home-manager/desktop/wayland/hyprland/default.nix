@@ -25,6 +25,7 @@ in
       blur = lib.overrideExisting (mkEnableOption "enable blur") { default = true; };
       animations = lib.overrideExisting (mkEnableOption "enable animations") { default = true; };
       logging = mkEnableOption "logging";
+      directScanout = mkEnableOption "enable direct scanout";
     };
   };
 }

@@ -24,7 +24,10 @@ in
 
     desktop = {
       windowManager = "hyprland";
-      hyprland.tearing = true;
+      hyprland = {
+        tearing = true;
+        directScanout = true;
+      };
 
       terminal = "${config.programs.alacritty.package}/bin/alacritty";
 

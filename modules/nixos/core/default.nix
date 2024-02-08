@@ -3,8 +3,6 @@
 , config
 , inputs
 , outputs
-, hostname
-, username
 , ...
 }:
 {
@@ -43,21 +41,9 @@
 
   environment.systemPackages = with pkgs; [
     git
-    nurl # tool for generating nix fetcher calls from urls
   ];
 
-  programs.zsh = {
-    enable = true;
-    shellAliases = {
-      rebuild-switch = "sudo nixos-rebuild switch --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-test = "sudo nixos-rebuild test --flake /home/${username}/.config/nixos#${hostname}";
-      # cd here because I once had a bad experience where I accidentally built
-      # in the nix store and it broke my entire install
-      rebuild-build = "cd && nixos-rebuild build --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-boot = "sudo nixos-rebuild boot --flake /home/${username}/.config/nixos#${hostname}";
-      inspect-nix-config = "nix --extra-experimental-features repl-flake repl '/home/${username}/.config/nixos#nixosConfigurations.${hostname}'";
-    };
-  };
+  programs.zsh.enable = true;
 
   environment.sessionVariables = {
     XDG_CACHE_HOME = "$HOME/.cache";

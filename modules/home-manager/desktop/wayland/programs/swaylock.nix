@@ -99,5 +99,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
         '';
     in
     lib.mkIf (config.modules.desktop.windowManager == "hyprland")
+      # TODO: Add lock and unlock scripts ran before and after locking to mute
+      # system audio and mic
       [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${lockBindScript.outPath}" ];
 }

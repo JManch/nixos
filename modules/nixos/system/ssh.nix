@@ -50,11 +50,17 @@ in
     ];
   };
 
-  environment.persistence."/persist".users.${username}.directories =
-    [
-      {
-        directory = ".ssh";
-        mode = "0700";
-      }
+  environment.persistence."/persist" = {
+    files = [
+      "/etc/ssh/ssh_host_ed25519_key"
+      "/etc/ssh/ssh_host_ed25519_key.pub"
     ];
+    users.${username}.directories =
+      [
+        {
+          directory = ".ssh";
+          mode = "0700";
+        }
+      ];
+  };
 }

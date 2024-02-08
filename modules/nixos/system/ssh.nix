@@ -5,9 +5,6 @@
 , hostname
 , ...
 }:
-let
-  hosts = builtins.attrNames outputs.nixosConfigurations;
-in
 {
   services.openssh = {
     enable = true;
@@ -21,13 +18,6 @@ in
         type = "ed25519";
       }
     ];
-    # TODO: Make this configurable. i.e. don't allow certain hosts
-    knownHosts = builtins.mapAttrs
-      (host: _: {
-        publicKey = "${(import ../../../hosts/${host}/key.nix).key}";
-        extraHostNames = (lib.lists.optional (host == hostname) "localhost");
-      })
-      outputs.nixosConfigurations;
   };
 
   users.users.${username} = {
@@ -41,6 +31,15 @@ in
     startAgent = true;
     agentTimeout = "1h";
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
+    # TODO: Make this configurable. i.e. don't allow certain hosts
+    knownHosts = builtins.mapAttrs
+      (host: _: {
+        publicKey = "${(import ../../../hosts/${host}/key.nix).key}";
+        extraHostNames = (lib.lists.optional (host == hostname) "localhost");
+      })
+      outputs.nixosConfigurations // {
+      "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+    };
   };
 
   security.pam.sshAgentAuth = {

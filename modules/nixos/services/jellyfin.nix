@@ -10,7 +10,7 @@ lib.mkIf cfg.enable
   };
 
   systemd.services.jellyfin = {
-    wantedBy = lib.mkForce (lib.lists.optional cfg.autostart [ "multi-user.target" ]);
+    wantedBy = lib.mkForce (lib.lists.optional cfg.autoStart [ "multi-user.target" ]);
     # Bind mount home media directories so jellyfin can access them
     serviceConfig = {
       BindReadOnlyPaths = [

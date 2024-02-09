@@ -83,7 +83,7 @@
       wireguard.enable = true;
       jellyfin = {
         enable = true;
-        autostart = false;
+        autoStart = false;
       };
     };
 

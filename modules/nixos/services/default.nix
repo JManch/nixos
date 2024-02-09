@@ -42,8 +42,9 @@ in
 
     jellyfin = {
       enable = mkEnableOption "jellyfin";
-      autostart = mkOption {
+      autoStart = mkOption {
         type = types.bool;
+        description = "jellyfin service autostart";
         default = true;
       };
     };

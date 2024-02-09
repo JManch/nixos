@@ -4,9 +4,9 @@ let
 in
 {
   options.usrEnv = {
-    homeManager.enable = mkEnableOption "use home manager";
+    homeManager.enable = mkEnableOption "home manager";
     desktop = {
-      enable = mkEnableOption "enable desktop functionality";
+      enable = mkEnableOption "desktop functionality";
       desktopEnvironment = mkOption {
         type = with types; nullOr (enum [ "xfce" "plasma" "gnome" ]);
         default = null;

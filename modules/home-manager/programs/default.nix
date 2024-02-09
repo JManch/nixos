@@ -6,16 +6,16 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.programs = {
-    alacritty.enable = mkEnableOption "Alacritty";
+    alacritty.enable = mkEnableOption "alacritty";
     btop.enable = mkEnableOption "btop";
     cava.enable = mkEnableOption "cava";
-    firefox.enable = mkEnableOption "Firefox";
+    firefox.enable = mkEnableOption "firefox";
     git.enable = mkEnableOption "git and lazygit";
-    neovim.enable = mkEnableOption "Neovim";
-    spotify.enable = mkEnableOption "Spotify";
-    fastfetch.enable = mkEnableOption "Fastfetch";
-    discord.enable = mkEnableOption "Discord";
-    obs.enable = mkEnableOption "Obs";
+    neovim.enable = mkEnableOption "neovim";
+    spotify.enable = mkEnableOption "spotify";
+    fastfetch.enable = mkEnableOption "fastfetch";
+    discord.enable = mkEnableOption "discord";
+    obs.enable = mkEnableOption "obs";
     vscode.enable = mkEnableOption "vscode";
     stremio.enable = mkEnableOption "stremio";
     mpv.enable = mkEnableOption "mpv";

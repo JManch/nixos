@@ -7,8 +7,8 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.shell = {
-    enable = mkEnableOption "enable custom shell";
-    sillyTools = mkEnableOption "install silly command-line tools";
+    enable = mkEnableOption "custom shell";
+    sillyTools = mkEnableOption "install of silly command-line tools";
   };
 
   config = lib.mkIf cfg.enable {

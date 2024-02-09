@@ -33,6 +33,6 @@ in
 
     vr.enable = mkEnableOption "virtual reality";
 
-    secureBoot.enable = mkEnableOption "secureboot";
+    secureBoot.enable = mkEnableOption "secure boot";
   };
 }

@@ -52,6 +52,11 @@ in
     udisks2.enable = mkEnableOption "udisks2";
     wireguard.enable = mkEnableOption "wireguard";
 
+    ollama = {
+      enable = mkEnableOption "ollama";
+      autoStart = mkEnableOption "ollama service autostart";
+    };
+
   };
 
   config = {

@@ -85,6 +85,7 @@
         enable = true;
         autoStart = false;
       };
+      ollama.enable = true;
     };
 
     system = {

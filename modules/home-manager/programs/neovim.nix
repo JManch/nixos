@@ -1,5 +1,6 @@
 { lib
 , pkgs
+, inputs
 , config
 , osConfig
 , ...
@@ -26,7 +27,7 @@ lib.mkIf cfg.enable {
 
   programs.neovim = {
     enable = true;
-    # package = pkgs.neovim-nightly;
+    package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
     vimAlias = true;
   };
 

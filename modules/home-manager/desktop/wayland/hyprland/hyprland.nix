@@ -166,6 +166,8 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         key_press_enables_dpms = true;
         background_color = "0xff${colors.base00}";
         new_window_takes_over_fullscreen = 2;
+        enable_swallow = true;
+        swallow_regex = "^(${desktopCfg.terminal.class})$";
       };
 
       dwindle = {

@@ -34,6 +34,17 @@ let
       ${hyprctl} dispatch togglefloating
     fi
   '';
+
+  toggleSwallowing = pkgs.writeShellScript "hypr-toggle-swallowing" ''
+    if [[ $(${hyprctl} getoption -j misc:enable_swallow | ${pkgs.jaq}/bin/jaq -r '.int') == "0" ]]; then
+      ${hyprctl} keyword misc:enable_swallow true
+      status="enabled"
+    else
+      ${hyprctl} keyword misc:enable_swallow false
+      status="disabled"
+    fi
+    ${pkgs.libnotify}/bin/notify-send --urgency=low -t 2000 -h 'string:x-canonical-private-synchronous:hypr-swallow' 'Hyprland' "Window swallowing ''$status"
+  '';
 in
 lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
 {
@@ -59,6 +70,7 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${modShift}, E, fullscreen, 0"
           "${mod}, Z, pin, active"
           "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
+          "${mod}, A, exec, ${toggleSwallowing.outPath}"
 
           # Movement
           "${mod}, H, movefocus, l"

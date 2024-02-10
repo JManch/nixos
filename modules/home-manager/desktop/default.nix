@@ -5,6 +5,19 @@
 }:
 let
   inherit (lib) mkOption types;
+  terminalSubmodule = {
+    options = {
+      binPath = mkOption {
+        type = types.str;
+        example = "${config.programs.alacritty.package}/bin/alacritty";
+      };
+      class = mkOption {
+        type = types.str;
+        example = "Alacritty";
+        description = "The window class of the terminal";
+      };
+    };
+  };
 in
 {
   imports = lib.utils.scanPaths ./.;
@@ -17,9 +30,9 @@ in
       description = "The window manager to use";
     };
     terminal = mkOption {
-      type = with types; nullOr types.str;
+      type = with types; nullOr (types.submodule terminalSubmodule);
       default = null;
-      description = "Path to the default terminal executable";
+      description = "Information about the default terminal";
     };
     style = {
       font = {

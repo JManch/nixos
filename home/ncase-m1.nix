@@ -29,7 +29,10 @@ in
         directScanout = true;
       };
 
-      terminal = "${config.programs.alacritty.package}/bin/alacritty";
+      terminal = {
+        binPath = "${config.programs.alacritty.package}/bin/alacritty";
+        class = "Alacritty";
+      };
 
       style = {
         font = {
@@ -79,6 +82,7 @@ in
       btop.enable = true;
       cava.enable = true;
       firefox.enable = true;
+      torBrowser.enable = true;
       git.enable = true;
       neovim.enable = true;
       spotify.enable = true;

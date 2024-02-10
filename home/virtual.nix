@@ -1,7 +1,4 @@
-{ pkgs
-, inputs
-, ...
-}: {
+{ pkgs, inputs, config, ... }: {
   imports = [
     ./core.nix
   ];
@@ -12,6 +9,10 @@
       hyprland = {
         modKey = "ALT";
         blur = false;
+      };
+      terminal = {
+        binPath = "${config.programs.alacritty.package}/bin/alacritty";
+        class = "Alacritty";
       };
       style.font = {
         family = "BerkeleyMono Nerd Font";

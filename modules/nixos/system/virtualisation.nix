@@ -118,7 +118,7 @@ mkMerge [
           # Run non-graphical session in a new terminal window
           if grep -q -- "-nographic" "$runscript"; then
             ${if config.usrEnv.desktop.enable then
-              "${(lib.utils.homeConfig args).modules.desktop.terminal} --class qemu -e $runscript"
+              "${(lib.utils.homeConfig args).modules.desktop.terminal.binPath} --class qemu -e $runscript"
             else "$runscript"}
           else
             $runscript

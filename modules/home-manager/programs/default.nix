@@ -10,6 +10,7 @@ in
     btop.enable = mkEnableOption "btop";
     cava.enable = mkEnableOption "cava";
     firefox.enable = mkEnableOption "firefox";
+    torBrowser.enable = mkEnableOption "tor browser";
     git.enable = mkEnableOption "git and lazygit";
     neovim.enable = mkEnableOption "neovim";
     spotify.enable = mkEnableOption "spotify";

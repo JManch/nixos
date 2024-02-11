@@ -17,7 +17,8 @@
 
   nix = {
     # Populates the nix registry with all our flake inputs `nix registry list`
-    registry = (lib.mapAttrs (_: flake: { inherit flake; })) ((lib.filterAttrs (_: lib.isType "flake")) inputs);
+    registry = (lib.mapAttrs (_: flake: { inherit flake; })) ((lib.filterAttrs (_: lib.isType "flake")) inputs)
+      // { n.flake = inputs.nixpkgs; };
     settings = {
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;

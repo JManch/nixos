@@ -92,9 +92,10 @@ mkMerge [
   (mkIf cfg.enable {
     virtualisation = {
       libvirtd.enable = true;
+      docker.enable = true;
     };
     programs.virt-manager.enable = true;
-    users.users."${username}".extraGroups = [ "libvirtd" ];
+    users.users."${username}".extraGroups = [ "libvirtd" "docker" ];
 
     programs.zsh.interactiveShellInit =
       let

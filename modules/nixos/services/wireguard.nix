@@ -21,6 +21,8 @@ lib.mkIf cfg.enable
   networking.firewall.interfaces.wg-discord = {
     # For OBS screensharing
     allowedUDPPorts = [ 5202 ];
+    # For ollama
+    allowedTCPPorts = [ 11434 8000 ];
   };
 
   networking.wg-quick.interfaces = {

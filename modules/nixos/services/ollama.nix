@@ -12,9 +12,14 @@ lib.mkIf cfg.enable
   services.ollama = {
     enable = true;
     package = inputs.ollama.packages.${pkgs.system}.rocm;
+    listenAddress = "0.0.0.0:11434";
   };
   systemd.services.ollama = {
     wantedBy = lib.mkForce (lib.lists.optional cfg.autoStart [ "multi-user.target" ]);
+    environment = {
+      # For ollama-ui to work
+      OLLAMA_ORIGINS = "http://10.0.0.2:8000";
+    };
   };
   environment.systemPackages = [ pkgs.oterm ];
 

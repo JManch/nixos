@@ -443,11 +443,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1707175763,
-        "narHash": "sha256-0MKHC6tQ4KEuM5rui6DjKZ/VNiSANB4E+DJ/+wPS1PU=",
+        "lastModified": 1707607386,
+        "narHash": "sha256-hj/RgQMTvCWQVInkZwiMMieumkfOjHXhtWhfuXHop/8=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "f99eace7c167b8a6a0871849493b1c613d0f1b80",
+        "rev": "bfd0ae29a86eff4603098683b516c67e22184511",
         "type": "github"
       },
       "original": {
@@ -467,11 +467,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1707176359,
-        "narHash": "sha256-h6BkgPOewfefG40E0KhEIqub207lUsfA84VfETb1m7c=",
+        "lastModified": 1707586793,
+        "narHash": "sha256-Vdf5QGzkZe6UUdVZ80YT78id7Yw5ww9Fku0rEyPAkCg=",
         "owner": "hyprwm",
         "repo": "Hyprland",
-        "rev": "ded174d6e5d14bc376919194cbc52c238a07f640",
+        "rev": "e4bb5fa4af1a6c36aab1c28651b5403dc4952f93",
         "type": "github"
       },
       "original": {
@@ -643,11 +643,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1707095568,
-        "narHash": "sha256-6zZifK7cs9eWiC+3MQvlMsq2JeyH7hPSP0qZ6sTny68=",
+        "lastModified": 1707614138,
+        "narHash": "sha256-xdmNhDnlDF5H/yT1wLGqwVyphjj03lmA/e3SGXyC3DU=",
         "owner": "fufexan",
         "repo": "nix-gaming",
-        "rev": "9bde4efca9e4750ed691520d68c4c6eb308015e7",
+        "rev": "a5de885438ecce695b4b7a110974c33f0eb507e3",
         "type": "github"
       },
       "original": {
@@ -664,11 +664,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1707231712,
-        "narHash": "sha256-T4hViKRd/xa8gaF6sQnF9kitm0QSIrSTRPCYD4h5Dso=",
+        "lastModified": 1707490901,
+        "narHash": "sha256-jpmbzQs1sOU6nxMA9XgB5EhPRH+gi+mcMe8l+56TMxY=",
         "owner": "doronbehar",
         "repo": "nix-matlab",
-        "rev": "60fc6e351d801e81d6e6db5a502cbce241a0728a",
+        "rev": "11e9ead52c3a6164b31ab46a77be4af93a77d624",
         "type": "gitlab"
       },
       "original": {
@@ -699,11 +699,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1707092692,
-        "narHash": "sha256-ZbHsm+mGk/izkWtT4xwwqz38fdlwu7nUUKXTOmm4SyE=",
+        "lastModified": 1707268954,
+        "narHash": "sha256-2en1kvde3cJVc3ZnTy8QeD2oKcseLFjYPLKhIGDanQ0=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "faf912b086576fd1a15fca610166c98d47bc667e",
+        "rev": "f8e2ebd66d097614d51a56a755450d4ae1632df1",
         "type": "github"
       },
       "original": {
@@ -793,11 +793,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1707204466,
-        "narHash": "sha256-pDuEtBji3eSmo+cW6uLKC+AP4IEUpwk0aLxhwBoi5yw=",
+        "lastModified": 1707551872,
+        "narHash": "sha256-pIl3neGU4ApxKf+WycHsAtnhpY79l3KFxZ1xv5qRu44=",
         "owner": "nix-community",
         "repo": "nixpkgs-xr",
-        "rev": "1ce2b8afaff0f4b3abe4a144f192f68a36b7e6be",
+        "rev": "dc124de46d4f13ebb85c5f6daed87d6c1e102ac4",
         "type": "github"
       },
       "original": {
@@ -817,11 +817,11 @@
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1707359139,
-        "narHash": "sha256-cIRNDIxhmX15XGzHX0ypVc+LXWc/ZZcS3uHWGSfaq1k=",
+        "lastModified": 1707569792,
+        "narHash": "sha256-ThjsyFspI4MquANx2Mym1d6K16ey0qvSlk+FGbD4fX0=",
         "owner": "abysssol",
         "repo": "ollama-flake",
-        "rev": "d1a433d16f432d9eeb37b05300a1bb59a0e8ba91",
+        "rev": "615b52feeec783ae6b713ac20e4847e4ab496793",
         "type": "github"
       },
       "original": {
@@ -833,16 +833,17 @@
     "ollama_2": {
       "flake": false,
       "locked": {
-        "lastModified": 1706905044,
-        "narHash": "sha256-+DABF5c/QpoCdu9aQvUE1kDP+sG7PssPSgvH8YfLycE=",
-        "ref": "refs/heads/main",
-        "rev": "f0e9496c85f67cdcba03a6e518117a93c69ae8f0",
-        "revCount": 1944,
+        "lastModified": 1707357331,
+        "narHash": "sha256-GwZA1QUH8I8m2bGToIcMMaB5MBnioQP4+n1SauUJYP8=",
+        "ref": "refs/tags/v0.1.24",
+        "rev": "69f392c9b7ea7c5cc3d46c29774e37fdef51abd8",
+        "revCount": 1967,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/jmorganca/ollama"
       },
       "original": {
+        "ref": "refs/tags/v0.1.24",
         "submodules": true,
         "type": "git",
         "url": "https://github.com/jmorganca/ollama"

@@ -136,6 +136,10 @@ in
           bind = [
             "${modKey}, Comma, exec, ${spotifyPlayer} playback previous"
             "${modKey}, Period, exec, ${spotifyPlayer} playback next"
+            ", XF86AudioNext, exec, ${spotifyPlayer} playback next"
+            ", XF86AudioPrev, exec, ${spotifyPlayer} playback prev"
+            ", XF86AudioPlay, exec, ${spotifyPlayer} playback play"
+            ", XF86AudioPause, exec, ${spotifyPlayer} playback pause"
             "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume.outPath} 5"
             "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume.outPath} -5"
           ];

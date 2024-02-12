@@ -1,6 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf mkEnableOption mkOption types;
+  inherit (lib) mkIf mkEnableOption mkPackageOption mkOption types;
   cfg = config.services.broadcast-box;
 in
 {
@@ -33,7 +33,6 @@ in
       serviceConfig = {
         DynamicUser = true;
         ExecStart = "${cfg.package}/bin/broadcast-box-unwrapped";
-        WorkingDirectory = "${cfg.package}/share";
         Restart = "always";
         RestartSec = "10s";
       };
@@ -49,15 +48,7 @@ in
   options.services.broadcast-box = {
 
     enable = mkEnableOption "broadcast box";
-
-    package = mkOption {
-      type = types.nullOr types.package;
-      default = null;
-      defaultText = pkgs.literalExpression "pkgs.broadcast-box";
-      description = lib.mdDoc ''
-        Broadcast box package to use.
-      '';
-    };
+    package = mkPackageOption pkgs "broadcast-box" { };
 
     tcpPort = mkOption {
       type = types.int;
@@ -70,6 +61,7 @@ in
     udpMuxPort = mkOption {
       type = types.nullOr types.int;
       default = null;
+      example = 3000;
       description = lib.mdDoc ''
         The UDP port to serve all WebRTC traffic over. If `null`, a random UDP
         port will be used. The `openFirewall` option will *not* open the random
@@ -113,8 +105,10 @@ in
     httpServerAddress = mkOption {
       type = types.str;
       default = "";
+      example = "0.0.0.0";
       description = lib.mkDoc ''
-        The HTTP server address.
+        The HTTP server address excluding the port. See
+        https://pkg.go.dev/net#Dial for details of the address format.
       '';
     };
 
@@ -146,7 +140,7 @@ in
       type = types.str;
       default = "";
       description = lib.mkDoc ''
-        If behind a NAT use this to auto insert your public IP.
+        If behind a NAT use this to auto-insert your public IP.
       '';
     };
 
@@ -161,6 +155,10 @@ in
     extraEnv = mkOption {
       type = types.attrsOf types.str;
       default = { };
+      example = {
+        DISABLE_STATUS = "yes";
+        UDP_MUX_PORT_WHEP = "3000";
+      };
       description = lib.mdDoc ''
         Extra environment variables for Broadcast Box.
       '';

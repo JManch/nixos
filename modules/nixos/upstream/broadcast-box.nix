@@ -5,6 +5,7 @@ let
 in
 {
   config = mkIf cfg.enable {
+
     systemd.services.broadcast-box = {
       description = "Broadcast Box";
       after = [ "network-online.target" ];
@@ -42,6 +43,7 @@ in
       allowedTCPPorts = [ cfg.tcpPort ];
       allowedUDPPorts = lib.optional (cfg.udpMuxPort != null) cfg.udpMuxPort;
     };
+
   };
 
   options.services.broadcast-box = {
@@ -110,7 +112,7 @@ in
 
     httpServerAddress = mkOption {
       type = types.str;
-      default = "0.0.0.0";
+      default = "";
       description = lib.mkDoc ''
         The HTTP server address.
       '';

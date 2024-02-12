@@ -22,6 +22,7 @@ let
     src = "${src}/web";
     npmDepsHash = "sha256-3wO9d2WlPONimXXfU0W17Vg9u4IBAGZC9UV00kVst7s=";
     installPhase = ''
+      mkdir -p $out/build
       cp -r build $out
     '';
   };
@@ -42,11 +43,11 @@ stdenvNoCC.mkDerivation {
   installPhase = ''
     runHook preInstall
 
+    mkdir -p $out/share/web
+    cp -r ${frontend}/build $out/share/web
+
     mkdir -p $out/bin
     cp ${backend}/bin/broadcast-box $out/bin/broadcast-box-unwrapped
-
-    mkdir -p $out/share/web/build
-    cp -r ${frontend}/* $out/share/web/build
 
     makeWrapper $out/bin/broadcast-box-unwrapped $out/bin/broadcast-box \
       --set HTTP_ADDRESS :8080 \

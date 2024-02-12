@@ -15,7 +15,7 @@ lib.mkIf cfg.enable
     tcpPort = 8081;
     udpMuxPort = 3000;
     autoStart = false;
-    openFirewall = false;
+    openFirewall = true;
   };
 
   networking.firewall.interfaces.wg-discord = {

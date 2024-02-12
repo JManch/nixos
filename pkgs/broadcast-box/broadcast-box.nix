@@ -1,5 +1,4 @@
 { lib
-, stdenvNoCC
 , makeWrapper
 , buildGoModule
 , buildNpmPackage
@@ -30,34 +29,35 @@ let
       cp -r build $out
     '';
   };
-
-  backend = buildGoModule {
-    pname = pname;
-    inherit version src;
-    patches = [ ./ignore-env-file.patch ];
-    vendorHash = "sha256-WDWlxeREp9iWK/wvH5guuoyThOQmCqeeM25ySEcpbkE=";
-  };
 in
-stdenvNoCC.mkDerivation {
-  pname = pname;
-  inherit version src;
-  vendorHash = "sha256-8iIQ4gv6P8CvNdAaeOOiQTsyduykMzmjLbZJzPaABBg=";
+buildGoModule {
+  inherit pname version src;
+  vendorHash = "sha256-WDWlxeREp9iWK/wvH5guuoyThOQmCqeeM25ySEcpbkE=";
+
+  patches = [ ./ignore-env-file.patch ];
+  postPatch = ''
+    substituteInPlace main.go \
+      --replace-fail './web/build' '${placeholder "out"}/share'
+  '';
+
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/share/web
-    cp -r ${frontend}/build $out/share/web
+    mkdir -p $out/share
+    cp -r ${frontend}/build/* $out/share
 
     mkdir -p $out/bin
-    cp ${backend}/bin/broadcast-box $out/bin/broadcast-box-unwrapped
+    cp "$GOPATH/bin/broadcast-box" $out/bin/broadcast-box-unwrapped
 
+    runHook postInstall
+  '';
+
+  preFixup = ''
     makeWrapper $out/bin/broadcast-box-unwrapped $out/bin/broadcast-box \
       --set HTTP_ADDRESS :8080 \
       --set REACT_APP_API_PATH /api
-
-    runHook postInstall
   '';
 
   meta = with lib; {

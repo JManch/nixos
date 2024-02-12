@@ -1,7 +1,4 @@
-{ lib
-, config
-, ...
-}:
+{ lib, config, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
 in
@@ -55,6 +52,11 @@ in
     ollama = {
       enable = mkEnableOption "ollama";
       autoStart = mkEnableOption "ollama service autostart";
+    };
+
+    broadcast-box = {
+      enable = mkEnableOption "broadcast box";
+      autoStart = mkEnableOption "broadcast box service autostart";
     };
 
   };

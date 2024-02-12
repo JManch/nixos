@@ -1,0 +1,33 @@
+diff --git a/main.go b/main.go
+index 336fa70..5102ad4 100644
+--- a/main.go
++++ b/main.go
+@@ -16,7 +16,6 @@ import (
+ 
+ 	"github.com/glimesh/broadcast-box/internal/networktest"
+ 	"github.com/glimesh/broadcast-box/internal/webrtc"
+-	"github.com/joho/godotenv"
+ )
+ 
+ const (
+@@ -166,20 +165,6 @@ func corsHandler(next func(w http.ResponseWriter, r *http.Request)) http.Handler
+ }
+ 
+ func main() {
+-	if os.Getenv("APP_ENV") == "production" {
+-		log.Println("Loading `" + envFileProd + "`")
+-
+-		if err := godotenv.Load(envFileProd); err != nil {
+-			log.Fatal(err)
+-		}
+-	} else {
+-		log.Println("Loading `" + envFileDev + "`")
+-
+-		if err := godotenv.Load(envFileDev); err != nil {
+-			log.Fatal(err)
+-		}
+-	}
+-
+ 	webrtc.Configure()
+ 
+ 	if os.Getenv("NETWORK_TEST_ON_START") == "true" {

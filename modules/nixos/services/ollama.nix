@@ -23,6 +23,11 @@ lib.mkIf cfg.enable
   };
   environment.systemPackages = [ pkgs.oterm ];
 
+  networking.firewall.interfaces.wg-discord = {
+    # For ollama
+    allowedTCPPorts = [ 11434 8000 ];
+  };
+
   environment.persistence."/persist".directories = [
     # Can't actually be defined because it's a DynamicUser service.
     # /var/lib/private is persisted instead.

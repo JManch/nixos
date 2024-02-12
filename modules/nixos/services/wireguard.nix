@@ -1,6 +1,7 @@
 { lib
 , pkgs
 , config
+, inputs
 , hostname
 , ...
 }:
@@ -19,10 +20,10 @@ lib.mkIf cfg.enable
   age.secrets.wireguardKey.file = ../../../secrets/wireguard/${hostname}/key.age;
 
   networking.firewall.interfaces.wg-discord = {
+    # TODO:Make some home-manager options so that firewall rules for interfaces can be defined there
+
     # For OBS screensharing
     allowedUDPPorts = [ 5202 ];
-    # For ollama
-    allowedTCPPorts = [ 11434 8000 ];
   };
 
   networking.wg-quick.interfaces = {
@@ -41,7 +42,7 @@ lib.mkIf cfg.enable
         {
           publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
           allowedIPs = [ "10.0.0.0/24" ];
-          endpoint = "ddns.manch.tech:13232";
+          endpoint = "${inputs.nix-resources.secrets.ddns}:13232";
           persistentKeepalive = 25;
         }
       ];

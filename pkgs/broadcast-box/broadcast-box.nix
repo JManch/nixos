@@ -21,6 +21,10 @@ let
     inherit version;
     src = "${src}/web";
     npmDepsHash = "sha256-3wO9d2WlPONimXXfU0W17Vg9u4IBAGZC9UV00kVst7s=";
+    preBuild = ''
+      # The REACT_APP_API_PATH environment variable is needed
+      cp "${src}/.env.production" ../
+    '';
     installPhase = ''
       mkdir -p $out/build
       cp -r build $out

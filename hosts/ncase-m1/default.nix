@@ -59,7 +59,7 @@
     };
 
     programs = {
-      wine.enable = false;
+      wine.enable = true;
       winbox.enable = true;
       gaming = {
         enable = true;
@@ -86,6 +86,7 @@
         autoStart = false;
       };
       ollama.enable = true;
+      broadcast-box.enable = true;
     };
 
     system = {

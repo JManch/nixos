@@ -12,14 +12,14 @@ lib.mkIf cfg.enable
   services.broadcast-box = {
     enable = true;
     package = outputs.packages.${pkgs.system}.broadcast-box;
-    tcpPort = 8081;
+    tcpPort = 8080;
     udpMuxPort = 3000;
     autoStart = false;
     openFirewall = true;
   };
 
   networking.firewall.interfaces.wg-discord = {
-    allowedTCPPorts = [ 8081 ];
+    allowedTCPPorts = [ 8080 ];
     allowedUDPPorts = [ 3000 ];
   };
 }

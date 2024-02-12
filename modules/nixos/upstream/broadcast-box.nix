@@ -17,7 +17,6 @@ in
           inherit (lib) concatStringsSep boolToString;
         in
         {
-          APP_ENV = "production";
           REACT_APP_API_PATH = "/api";
           HTTP_ADDRESS = "${cfg.httpServerAddress}:${toString cfg.tcpPort}";
           UDP_MUX_PORT = mkIf (cfg.udpMuxPort != null) "${toString cfg.udpMuxPort}";

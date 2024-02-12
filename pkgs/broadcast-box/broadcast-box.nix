@@ -29,10 +29,8 @@ let
   backend = buildGoModule {
     pname = pname;
     inherit version src;
-    patches = [
-      ./patch.diff
-    ];
-    vendorHash = "sha256-8iIQ4gv6P8CvNdAaeOOiQTsyduykMzmjLbZJzPaABBg=";
+    patches = [ ./ignore-env-file.patch ];
+    vendorHash = "sha256-WDWlxeREp9iWK/wvH5guuoyThOQmCqeeM25ySEcpbkE=";
   };
 in
 stdenvNoCC.mkDerivation {

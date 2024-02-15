@@ -19,11 +19,13 @@ lib.mkIf cfg.enable
 
   age.secrets.wireguardKey.file = ../../../secrets/wireguard/${hostname}/key.age;
 
-  networking.firewall.interfaces.wg-discord = {
-    # TODO:Make some home-manager options so that firewall rules for interfaces can be defined there
+  networking.firewall.interfaces = {
+    wg-discord = {
+      # TODO:Make some home-manager options so that firewall rules for interfaces can be defined there
 
-    # For OBS screensharing
-    allowedUDPPorts = [ 5202 ];
+      # For OBS screensharing
+      allowedUDPPorts = [ 5202 ];
+    };
   };
 
   networking.wg-quick.interfaces = {

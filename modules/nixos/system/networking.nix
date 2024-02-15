@@ -26,6 +26,7 @@ in
     };
     firewall = {
       enable = cfg.firewall.enable;
+      defaultInterfaces = cfg.firewall.defaultInterfaces;
     };
     wireless = {
       enable = cfg.wireless.enable;

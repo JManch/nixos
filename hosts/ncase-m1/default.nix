@@ -93,7 +93,10 @@
       windows.enable = true;
       networking = {
         tcpOptimisations = true;
-        firewall.enable = true;
+        firewall = {
+          enable = true;
+          defaultInterfaces = [ "eno1" ];
+        };
         resolved.enable = true;
         wireless.enable = true;
       };

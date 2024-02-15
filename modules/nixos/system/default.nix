@@ -17,7 +17,17 @@ in
 
     networking = {
       tcpOptimisations = mkEnableOption "TCP optimisations";
-      firewall.enable = mkEnableOption "firewall";
+      firewall = {
+        enable = mkEnableOption "firewall";
+        defaultInterfaces = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          example = [ "eno1" "wlp6s0" ];
+          description = ''
+            List of interfaces to which default firewall rules should be applied.
+          '';
+        };
+      };
       resolved.enable = mkEnableOption "Resolved";
       wireless.enable = mkEnableOption "wireless";
     };

@@ -5,7 +5,8 @@
     # NOTE: Use the `nix flake metadata <flake_url>` command to check if a
     # flake needs nixpkgs.follows defined
     # Update individual inputs using `nix flake lock --update-input <INPUT_NAME>`
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "git+file:///home/joshua/repos/nixpkgs";
     nix-colors.url = "github:misterio77/nix-colors";
     impermanence.url = "github:nix-community/impermanence";
 

@@ -12,8 +12,16 @@ in
     hyprland = {
       modKey = mkOption {
         type = types.str;
-        description = "The modifier key to use for bindings";
         default = "SUPER";
+        description = "The modifier key to use for bindings";
+      };
+      secondaryModKey = mkOption {
+        type = types.str;
+        default = "ALT";
+        description = ''
+          Modifier key used for virtual machines or nested instances of
+          hyprland to avoid clashes.
+        '';
       };
       # Used by gamemode config
       killActiveKey = mkOption {

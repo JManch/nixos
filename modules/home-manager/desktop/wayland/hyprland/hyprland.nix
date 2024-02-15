@@ -29,6 +29,14 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
     animations = false;
   });
 
+  # Generate hyprland debug config
+  home.activation.hyprlandDebugConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] /*bash*/ ''
+    DEBUG_ARG=$([ -z "$VERBOSE_ARG" ] && echo "" || echo "--debug")
+    run cat ${config.xdg.configHome}/hypr/hyprland.conf > ${config.xdg.configHome}/hypr/hyprlandd.conf \
+      && ${lib.getExe pkgs.gnused} -i $DEBUG_ARG -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
+      -e '/^exec-once/d' ${config.xdg.configHome}/hypr/hyprlandd.conf
+  '';
+
   xdg.portal = {
     extraPortals = [ hyprlandPackages.xdg-desktop-portal-hyprland ];
     configPackages = [ hyprlandPackages.hyprland ];

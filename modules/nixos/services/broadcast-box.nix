@@ -1,7 +1,6 @@
 { lib
 , pkgs
 , config
-, outputs
 , ...
 }:
 let
@@ -9,12 +8,12 @@ let
 in
 lib.mkIf cfg.enable
 {
+  environment.systemPackages = [ pkgs.broadcast-box ];
+
   services.broadcast-box = {
     enable = true;
-    package = outputs.packages.${pkgs.system}.broadcast-box;
-    tcpPort = 8080;
-    udpMuxPort = 3000;
-    autoStart = false;
+    http.port = 8080;
+    udpMux.port = 3000;
     openFirewall = true;
   };
 

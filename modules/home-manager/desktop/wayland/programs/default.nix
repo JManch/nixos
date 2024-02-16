@@ -1,4 +1,4 @@
-{ lib, pkgs, config, ... }:
+{ lib, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
 in
@@ -8,14 +8,26 @@ in
   options.modules.desktop.programs = {
     swaylock = {
       enable = mkEnableOption "swaylock";
-      lockScript = mkOption {
-        type = types.str;
-        description = "Path to script that locks the screen";
-        default = (pkgs.writeShellScript "swaylock-lock" ''
-          ${config.swaylock.package}/bin/swaylock -f
-        '').outPath;
+
+      preLockScript = mkOption {
+        type = types.lines;
+        default = "";
+        description = "Bash script run before screen locks";
+      };
+
+      postLockScript = mkOption {
+        type = types.lines;
+        default = "";
+        description = "Bash script run after screen locks";
+      };
+
+      postUnlockScript = mkOption {
+        type = types.lines;
+        default = "";
+        description = "Bash script run after screen unlocks";
       };
     };
+
     anyrun.enable = mkEnableOption "anyrun";
   };
 }

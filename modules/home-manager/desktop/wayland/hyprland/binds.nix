@@ -24,8 +24,7 @@ let
   hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
 
   disableShadersCommand =
-    with config.modules.desktop.util;
-    command: "${disableShaders} && ${command} && ${enableShaders}";
+    command: "${cfg.disableShaders} && ${command} && ${cfg.enableShaders}";
 
   toggleFloating = pkgs.writeShellScript "hypr-toggle-floating" ''
     if [[ $(${hyprctl} activewindow -j | ${pkgs.jaq}/bin/jaq -r '.floating') == "false" ]]; then

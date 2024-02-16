@@ -46,18 +46,7 @@ in
       };
 
       programs = {
-        swaylock = {
-          enable = true;
-          lockScript = with config.modules.desktop.util;
-            lib.mkIf (config.modules.desktop.windowManager == "hyprland") /*bash*/
-              (pkgs.writeShellScript "swaylock-lock" ''
-                # Temporarily disable shader for screenshot
-                ${disableShaders}
-                ${config.programs.swaylock.package}/bin/swaylock -f
-                ${pkgs.coreutils}/bin/sleep 0.1
-                ${enableShaders}
-              '').outPath;
-        };
+        swaylock.enable = true;
         anyrun.enable = true;
       };
 

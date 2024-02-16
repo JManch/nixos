@@ -69,18 +69,6 @@ in
         default = 24;
       };
     };
-    util = {
-      enableShaders = mkOption {
-        type = types.str;
-        default = "";
-        description = "Command to enable screen shaders";
-      };
-      disableShaders = mkOption {
-        type = types.str;
-        default = "";
-        description = "Command to disable screen shaders";
-      };
-    };
   };
 
   config = lib.mkIf osConfig.usrEnv.desktop.enable {

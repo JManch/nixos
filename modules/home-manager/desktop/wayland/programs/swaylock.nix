@@ -5,13 +5,83 @@
 , ...
 }:
 let
+  inherit (lib) mkIf optionalString;
   cfg = config.modules.desktop.programs.swaylock;
   desktopCfg = config.modules.desktop;
   isWayland = lib.fetchers.isWayland config;
-  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
   colors = config.colorscheme.palette;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
+
+  lockScript =
+    let
+      isHyprland = (desktopCfg.windowManager == "hyprland");
+      hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+      osAudio = osConfig.modules.system.audio;
+      wpctl = "${pkgs.wireplumber}/bin/wpctl";
+      hyprCfg = config.modules.desktop.hyprland;
+      sleep = "${pkgs.coreutils}/bin/sleep";
+      grep = "${pkgs.gnugrep}/bin/grep";
+      pgrep = "${pkgs.procps}/bin/pgrep";
+      echo = "${pkgs.coreutils}/bin/echo";
+      cut = "${pkgs.coreutils}/bin/cut";
+      kill = "${pkgs.coreutils}/bin/kill";
+      realpath = "${pkgs.coreutils}/bin/realpath";
+      bash = "${pkgs.bash}/bin/bash";
+      tr = "${pkgs.coreutils}/bin/tr";
+
+      preLock = /*bash*/ ''
+
+        # Store audio volumes and mute 
+        ${optionalString osAudio.enable ''
+          SINK_VOLUME=$(${wpctl} get-volume @DEFAULT_AUDIO_SINK@ | ${cut} -c 9-)
+          SOURCE_VOLUME=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@ | ${cut} -c 9-)
+          ${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 0
+          ${wpctl} set-volume @DEFAULT_AUDIO_SOURCE@ 0
+        ''}
+
+        ${cfg.preLockScript}
+
+      '';
+
+      postLock = cfg.postLockScript;
+
+      postUnlock = /*bash*/ ''
+
+        # Restore audio volumes
+        ${optionalString osAudio.enable ''
+          ${wpctl} set-volume @DEFAULT_AUDIO_SINK@ $SINK_VOLUME
+          ${wpctl} set-volume @DEFAULT_AUDIO_SOURCE@ $SOURCE_VOLUME
+        ''}
+
+        ${cfg.postUnlockScript}
+
+      '';
+    in
+    pkgs.writeShellScript "lock-script" /*bash*/ ''
+      # Abort if swaylock is already running
+      ${pgrep} -x swaylock && exit 1
+
+      # Get PIDs of existing instances of script
+      pids=$(${pgrep} -fx "${bash} $(${realpath} "$0")")
+
+      # Exlude this script's pid from the pids
+      pids=$(${echo} "$pids" | ${grep} -v "$$")
+
+      if [ ! -z "$pids" ]; then
+        # Kill all existing instances of the script
+        pid_list=$(${echo} "$pids" | ${tr} '\n' ' ')
+        ${kill} $pid_list
+      fi
+
+      ${preLock}
+      ${config.programs.swaylock.package}/bin/swaylock &
+      SWAYLOCK_PID=$!
+      ${postLock}
+      wait $SWAYLOCK_PID
+      ${postUnlock}
+    '';
 in
-lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
+mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   programs.swaylock = {
     enable = true;
     package = pkgs.swaylock-effects;
@@ -63,43 +133,6 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   };
 
   desktop.hyprland.binds =
-    let
-      # Turn off screen after 30 seconds if swaylock is still running
-      lockBindScript =
-        let
-          hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
-          sleep = "${pkgs.coreutils}/bin/sleep";
-          grep = "${pkgs.gnugrep}/bin/grep";
-          pgrep = "${pkgs.procps}/bin/pgrep";
-          echo = "${pkgs.coreutils}/bin/echo";
-          kill = "${pkgs.coreutils}/bin/kill";
-          realpath = "${pkgs.coreutils}/bin/realpath";
-          bash = "${pkgs.bash}/bin/bash";
-          tr = "${pkgs.coreutils}/bin/tr";
-        in
-        pkgs.writeShellScript "hypr-lock-script" ''
-          # Abort if swaylock is already running
-          ${pgrep} -x swaylock && exit 1
-
-          # Get PIDs of existing instances of script
-          pids=$(${pgrep} -fx "${bash} $(${realpath} "$0")")
-
-          # Exlude this script's pid from the pids
-          pids=$(${echo} "$pids" | ${grep} -v "$$")
-
-          if [ ! -z "$pids" ]; then
-            # Kill all existing instances of the script
-            pid_list=$(${echo} "$pids" | ${tr} '\n' ' ')
-            ${kill} $pid_list
-          fi
-
-          ${cfg.lockScript}
-          ${sleep} 30
-          ${pgrep} -x swaylock && ${hyprctl} dispatch dpms off
-        '';
-    in
     lib.mkIf (config.modules.desktop.windowManager == "hyprland")
-      # TODO: Add lock and unlock scripts ran before and after locking to mute
-      # system audio and mic
-      [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${lockBindScript.outPath}" ];
+      [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${lockScript.outPath}" ];
 }

@@ -66,23 +66,16 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
   xdg.configFile."hypr/shaders/monitorGamma.frag".text = gammaShader;
   xdg.configFile."hypr/shaders/blank.frag".text = blankShader;
 
-  modules.desktop.util =
-    {
-      enableShaders = "${hyprctl} keyword decoration:screen_shader ${shaderDir}/monitorGamma.frag";
-      disableShaders = "${hyprctl} keyword decoration:screen_shader ${shaderDir}/blank.frag";
-    };
-
   wayland.windowManager.hyprland.settings =
     let
-      toggleShader = with config.modules.desktop.util;
-        pkgs.writeShellScript "hypr-toggle-shader" ''
-          shader=$(${hyprctl} getoption decoration:screen_shader -j | ${pkgs.jaq}/bin/jaq -r '.str')
-          if [[ $shader == "${shaderDir}/monitorGamma.frag" ]]; then
-              ${disableShaders};
-          else
-              ${enableShaders};
-          fi
-        '';
+      toggleShader = pkgs.writeShellScript "hypr-toggle-shader" ''
+        shader=$(${hyprctl} getoption decoration:screen_shader -j | ${pkgs.jaq}/bin/jaq -r '.str')
+        if [[ $shader == "${shaderDir}/monitorGamma.frag" ]]; then
+            ${cfg.disableShaders};
+        else
+            ${cfg.enableShaders};
+        fi
+      '';
     in
     lib.mkIf isGammaCustom {
       bind =
@@ -91,4 +84,14 @@ lib.mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         ];
       decoration.screen_shader = "${config.xdg.configHome}/hypr/shaders/monitorGamma.frag";
     };
+
+  modules.desktop.programs.swaylock = {
+    preLockScript = ''
+      ${cfg.disableShaders}
+    '';
+
+    postLockScript = ''
+      (${pkgs.coreutils}/bin/sleep 0.1; ${cfg.enableShaders};) &
+    '';
+  };
 }

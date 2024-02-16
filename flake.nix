@@ -6,7 +6,7 @@
     # flake needs nixpkgs.follows defined
     # Update individual inputs using `nix flake lock --update-input <INPUT_NAME>`
     # nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs.url = "git+file:///home/joshua/repos/nixpkgs";
+    nixpkgs.url = "git+file:///home/joshua/repos/nixpkgs?ref=nixos-unstable-personal";
     nix-colors.url = "github:misterio77/nix-colors";
     impermanence.url = "github:nix-community/impermanence";
 
@@ -61,11 +61,6 @@
     # `lib.makeScope`) has been renamed to `overrideScope`' error
     lanzaboote = {
       url = "github:nix-community/lanzaboote";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    ollama = {
-      url = "github:abysssol/ollama-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

@@ -229,4 +229,16 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
         ];
     };
   };
+
+  modules.desktop.programs.swaylock =
+    let
+      hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+      sleep = "${pkgs.coreutils}/bin/sleep";
+      pgrep = "${pkgs.procps}/bin/pgrep";
+    in
+    {
+      postLockScript = ''
+        (${sleep} 30; ${pgrep} -x swaylock && ${hyprctl} dispatch dpms off) &
+      '';
+    };
 }

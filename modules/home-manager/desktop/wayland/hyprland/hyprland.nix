@@ -34,7 +34,13 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
     DEBUG_ARG=$([ -z "$VERBOSE_ARG" ] && echo "" || echo "--debug")
     run cat ${config.xdg.configHome}/hypr/hyprland.conf > ${config.xdg.configHome}/hypr/hyprlandd.conf \
       && ${lib.getExe pkgs.gnused} -i $DEBUG_ARG -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
-      -e '/^exec-once/d' ${config.xdg.configHome}/hypr/hyprlandd.conf
+      -e '/^exec-once/d' -e '/^monitor/d' -e 's/, monitor:(.*),//g' \
+      ${lib.concatStringsSep " " (lib.lists.map (m: "-e 's/${m.name}/WL-${toString m.number}/g'") osConfig.device.monitors)} \
+      ${config.xdg.configHome}/hypr/hyprlandd.conf \
+      ${lib.concatStringsSep " " 
+        (lib.lists.map 
+          (m: "&& echo \"monitor=WL-${toString m.number},preferred,auto,1\" >> ${config.xdg.configHome}/hypr/hyprlandd.conf")
+          osConfig.device.monitors)}
   '';
 
   xdg.portal = {

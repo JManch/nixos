@@ -1,12 +1,9 @@
-{ lib
-, pkgs
-, config
-, ...
-}:
+{ lib, pkgs, config, ... }:
 let
+  inherit (lib) mkIf mkForce optional;
   cfg = config.modules.services.broadcast-box;
 in
-lib.mkIf cfg.enable
+mkIf cfg.enable
 {
   environment.systemPackages = [ pkgs.broadcast-box ];
 
@@ -16,6 +13,10 @@ lib.mkIf cfg.enable
     udpMux.port = 3000;
     openFirewall = true;
   };
+
+  systemd.services.broadcast-box.wantedBy = mkForce (
+    optional cfg.autoStart [ "multi-user.target" ]
+  );
 
   networking.firewall.interfaces.wg-discord = {
     allowedTCPPorts = [ 8080 ];

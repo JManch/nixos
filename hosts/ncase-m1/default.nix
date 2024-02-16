@@ -85,7 +85,8 @@
         enable = true;
         autoStart = false;
       };
-      ollama.enable = true;
+      # Waiting for fixed nixpkgs version to be merged
+      ollama.enable = false;
       broadcast-box.enable = true;
     };
 

@@ -11,7 +11,7 @@ let
 
   swww = "${pkgs.swww}/bin/swww";
   primaryMonitor = lib.fetchers.primaryMonitor osConfig;
-  refreshRate = "${builtins.toString (builtins.floor primaryMonitor.refreshRate)}";
+  refreshRate = "${toString (builtins.floor primaryMonitor.refreshRate)}";
   transition =
     "--transition-bezier .43,1.19,1,.4 --transition-type center --transition-duration 1 --transition-fps ${refreshRate}";
 in

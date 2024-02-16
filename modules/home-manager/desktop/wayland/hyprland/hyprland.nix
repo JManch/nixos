@@ -213,7 +213,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
             (
               lib.lists.map
                 (
-                  w: "${builtins.toString w}, monitor:${m.name}" +
+                  w: "${toString w}, monitor:${m.name}" +
                   (if w == default then ", default:true" else "")
                 )
                 m.workspaces

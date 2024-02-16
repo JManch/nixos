@@ -119,13 +119,13 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           lib.lists.concatMap
             (m: [
               "${mod}, D, focusmonitor, ${m.name}"
-              "${mod}, D, workspace, name:DESKTOP ${builtins.toString m.number}"
+              "${mod}, D, workspace, name:DESKTOP ${toString m.number}"
             ])
             monitors
         ) ++ (
           # Workspaces
           let
-            workspaceNumbers = lib.lists.map (w: builtins.toString w) (lib.lists.range 1 9);
+            workspaceNumbers = lib.lists.map (w: toString w) (lib.lists.range 1 9);
             workspaceBinds = w: [
               "${mod}, ${w}, workspace, ${w}"
               "${modShift}, ${w}, movetoworkspace, ${w}"
@@ -174,7 +174,7 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
 
         declare -A monitorNumToName
         ${builtins.concatStringsSep "\n  "
-          (lib.lists.map (m: "monitorNumToName[${builtins.toString m.number}]='${m.name}'") monitors)
+          (lib.lists.map (m: "monitorNumToName[${toString m.number}]='${m.name}'") monitors)
         }
 
         declare -A monitorNameToCfg

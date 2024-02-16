@@ -38,7 +38,7 @@ in
         };
         extraCss =
           let
-            cornerRadius = builtins.toString desktopCfg.style.cornerRadius;
+            cornerRadius = toString desktopCfg.style.cornerRadius;
           in
             /* css */ ''
             * {

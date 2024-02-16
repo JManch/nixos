@@ -10,8 +10,8 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
 {
   programs.waybar.style =
     let
-      halfCornerRadius = builtins.toString (desktopCfg.style.cornerRadius / 2);
-      borderWidth = builtins.toString desktopCfg.style.borderWidth;
+      halfCornerRadius = toString (desktopCfg.style.cornerRadius / 2);
+      borderWidth = toString desktopCfg.style.borderWidth;
       gapSize = desktopCfg.style.gapSize;
     in
       /* css */ ''
@@ -52,7 +52,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
       }
 
       #workspaces {
-          margin: 5px 0px 5px ${builtins.toString (gapSize + 2)}px;
+          margin: 5px 0px 5px ${toString (gapSize + 2)}px;
           padding: 0px 0px;
           border-radius: ${halfCornerRadius}px;
           background: @blue;
@@ -102,7 +102,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
       }
 
       #network.hostname {
-          margin: 5px ${builtins.toString (gapSize + 2)}px 5px 0px;
+          margin: 5px ${toString (gapSize + 2)}px 5px 0px;
           padding: 0px 7px;
           border-radius: ${halfCornerRadius}px;
           background: @blue;

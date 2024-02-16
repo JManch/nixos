@@ -16,7 +16,7 @@ lib.mkIf cfg.enable {
       legacy_layout = 0;
       no_display = true; # Whether to hide the HUD by default
       font_size = 20;
-      round_corners = "${builtins.toString config.modules.desktop.style.cornerRadius}";
+      round_corners = "${toString config.modules.desktop.style.cornerRadius}";
       hud_compact = true;
       text_color = "${colors.base07}";
       gpu_color = "${colors.base08}";

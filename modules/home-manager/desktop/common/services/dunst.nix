@@ -10,7 +10,7 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
     enable = true;
     settings = {
       global = with desktopCfg.style; {
-        monitor = builtins.toString cfg.monitorNumber;
+        monitor = toString cfg.monitorNumber;
         follow = "none";
         enable_posix_regex = true;
         font = "${desktopCfg.style.font.family} 13";
@@ -22,7 +22,7 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
         corner_radius = cornerRadius;
         width = builtins.floor ((lib.fetchers.primaryMonitor osConfig).width * 0.14);
         height = builtins.floor ((lib.fetchers.primaryMonitor osConfig).height * 0.25);
-        offset = "${builtins.toString (gapSize * 2)}x${builtins.toString (gapSize * 2)}";
+        offset = "${toString (gapSize * 2)}x${toString (gapSize * 2)}";
         gap_size = gapSize;
         frame_width = borderWidth;
         transparency = 100;

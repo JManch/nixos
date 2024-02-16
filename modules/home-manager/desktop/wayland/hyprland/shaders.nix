@@ -26,9 +26,9 @@ let
         # need to manually set it for specific hosts
         /* glsl */
         ''
-          if (wl_output == ${builtins.toString (m.number - 1)}) {
+          if (wl_output == ${toString (m.number - 1)}) {
               vec4 pixColor = texture2D(tex, v_texcoord);
-              pixColor.rgb = pow(pixColor.rgb, vec3(1.0 / ${builtins.toString m.gamma}));
+              pixColor.rgb = pow(pixColor.rgb, vec3(1.0 / ${toString m.gamma}));
               gl_FragColor = pixColor;
               return;
           }

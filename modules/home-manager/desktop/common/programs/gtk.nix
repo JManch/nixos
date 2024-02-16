@@ -38,10 +38,10 @@ lib.mkIf osConfig.usrEnv.desktop.enable {
   desktop.hyprland.settings = lib.mkIf (desktopCfg.windowManager == "hyprland") {
     env = [
       "XCURSOR_THEME,${config.gtk.cursorTheme.name}"
-      "XCURSOR_SIZE,${builtins.toString desktopCfg.style.cursorSize}"
+      "XCURSOR_SIZE,${toString desktopCfg.style.cursorSize}"
     ];
     exec-once = [
-      "hyprctl setcursor ${config.gtk.cursorTheme.name} ${builtins.toString desktopCfg.style.cursorSize}"
+      "hyprctl setcursor ${config.gtk.cursorTheme.name} ${toString desktopCfg.style.cursorSize}"
     ];
   };
 

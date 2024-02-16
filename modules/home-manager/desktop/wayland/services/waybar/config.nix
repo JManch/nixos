@@ -43,7 +43,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
               (m:
                 (lib.lists.map
                   (w: {
-                    name = (builtins.toString w);
+                    name = (toString w);
                     value = [ m.name ];
                   })
                   (lib.lists.take 2 m.workspaces)))
@@ -115,7 +115,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
         };
         "custom/gpu" = lib.mkIf gpuModuleEnabled {
           format = "<span color='#${colors.base04}' size='large'>󰾲</span> {}%";
-          exec = "${pkgs.coreutils}/bin/cat /sys/class/hwmon/hwmon${builtins.toString gpu.hwmonId}/device/gpu_busy_percent";
+          exec = "${pkgs.coreutils}/bin/cat /sys/class/hwmon/hwmon${toString gpu.hwmonId}/device/gpu_busy_percent";
           interval = 5;
           tooltip = false;
         };

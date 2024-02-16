@@ -41,7 +41,7 @@ in
       enable = mkEnableOption "jellyfin";
       autoStart = mkOption {
         type = types.bool;
-        description = "jellyfin service autostart";
+        description = "jellyfin service auto start";
         default = true;
       };
     };
@@ -51,12 +51,12 @@ in
 
     ollama = {
       enable = mkEnableOption "ollama";
-      autoStart = mkEnableOption "ollama service autostart";
+      autoStart = mkEnableOption "ollama service auto start";
     };
 
     broadcast-box = {
       enable = mkEnableOption "broadcast box";
-      autoStart = mkEnableOption "broadcast box service autostart";
+      autoStart = mkEnableOption "broadcast box service auto start";
     };
 
   };

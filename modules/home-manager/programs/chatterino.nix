@@ -7,6 +7,7 @@
 let
   cfg = config.modules.programs.chatterino;
   desktopCfg = config.modules.desktop;
+  mpv = config.modules.programs.mpv;
   hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
   chatterinoRatio = 1.65;
   twitchWorkspaceScript =
@@ -51,28 +52,37 @@ let
     '';
 in
 lib.mkIf cfg.enable {
-  home.packages = with pkgs; [
-    chatterino2
-  ];
+  home.packages = with pkgs; [ chatterino2 ]
+    ++ lib.optional mpv.enable streamlink;
 
-  impermanence.directories = [
-    ".local/share/chatterino"
-  ];
+  xdg.configFile = lib.mkIf mpv.enable {
+    "streamlink/config".text = ''
+      player=${lib.getExe pkgs.mpv-unwrapped}
+      player-args=--load-scripts=no --osc --loop-playlist=inf --loop-file=inf --cache=yes --demuxer-max-back-bytes=1073741824
+    '';
+
+    # NOTE: Streamlink config does not include the authentication key. This needs
+    # to be manually added as an argument, most commonly in Chatterino
+    "streamlink/config.twitch".text = ''
+      twitch-low-latency
+      twitch-disable-ads
+    '';
+  };
 
   desktop.hyprland.settings = lib.mkIf (desktopCfg.windowManager == "hyprland") {
-    exec-once = [
-      "${twitchWorkspaceScript.outPath}"
-    ];
+    exec-once = [ "${twitchWorkspaceScript.outPath}" ];
     workspace = [
       "name:TWITCH,monitor:${(lib.fetchers.getMonitorByNumber osConfig 2).name},gapsin:0,gapsout:0,rounding:false,border:false}"
     ];
-    bind = [
-      "${config.modules.desktop.hyprland.modKey}, T, workspace, name:TWITCH"
-    ];
+    bind = [ "${desktopCfg.hyprland.modKey}, T, workspace, name:TWITCH" ];
     windowrulev2 = [
       # Not using "name:" here does work however it causes my current workspace
       # to unexpectedly switch so it's needed
       "workspace name:TWITCH,class:mpv,title:^(twitch\.tv.*)$"
     ];
   };
+
+  impermanence.directories = [
+    ".local/share/chatterino"
+  ];
 }

@@ -8,10 +8,7 @@ let
   cfg = config.modules.programs.mpv;
 in
 lib.mkIf cfg.enable {
-  home.packages = [
-    pkgs.yt-dlp
-    pkgs.streamlink
-  ];
+  home.packages = [ pkgs.yt-dlp ];
 
   programs.mpv = {
     enable = true;
@@ -79,23 +76,6 @@ lib.mkIf cfg.enable {
     };
   };
 
-  impermanence.directories = [
-    # contains state for save-position-on-quit
-    ".local/state/mpv"
-  ];
-
-  xdg.configFile."streamlink/config".text = ''
-    player=mpv
-    player-args=--loop-playlist=inf --loop-file=inf --cache=yes --demuxer-max-back-bytes=1073741824
-  '';
-
-  # NOTE: Streamlink config does not include the authentication key. This needs
-  # to be manually added as an argument, most commonly in Chatterino
-  xdg.configFile."streamlink/config.twitch".text = ''
-    twitch-low-latency
-    twitch-disable-ads
-  '';
-
   programs.zsh.initExtra = /* bash */ ''
     screenshare () {
       if [[ -z "$1" ]]; then
@@ -108,4 +88,9 @@ lib.mkIf cfg.enable {
       eval "yt-dlp --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s' '$1'"
     }
   '';
+
+  impermanence.directories = [
+    # contains state for save-position-on-quit
+    ".local/state/mpv"
+  ];
 }

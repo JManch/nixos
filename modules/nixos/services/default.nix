@@ -16,18 +16,6 @@ in
       };
     };
 
-    syncthing = {
-      enable = mkEnableOption "syncthing";
-      server = mkOption {
-        type = types.bool;
-        description = ''
-          Whether to act as the main syncthing server and share folders. Only
-          one device in a syncthing network should have this enabled.
-        '';
-        default = false;
-      };
-    };
-
     wgnord = {
       enable = mkEnableOption "wgnord";
       country = mkOption {

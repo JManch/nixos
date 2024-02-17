@@ -76,8 +76,6 @@
         enable = true;
         launchCmd = "Hyprland";
       };
-      # Broken cause of syncthing-init service
-      syncthing.enable = false;
       wgnord.enable = true;
       udisks2.enable = true;
       wireguard.enable = true;

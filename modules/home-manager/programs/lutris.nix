@@ -16,7 +16,7 @@ lib.mkIf cfg.enable
 
   # Install lutris games to ~/files/games
 
-  impermanence.directories = [
+  persistence.directories = [
     ".local/share/lutris"
     ".config/lutris"
     ".cache/lutris"

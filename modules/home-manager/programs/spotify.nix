@@ -7,11 +7,10 @@
 let
   cfg = config.modules.programs.spotify;
   desktopCfg = config.modules.desktop;
-  spotifyPlayer = "${pkgs.spotify-player}/bin/spotify_player";
   modifySpotifyVolume = pkgs.writeShellScript "spotify-modify-volume" ''
-    ${spotifyPlayer} playback volume --offset -- $1
-    ${pkgs.coreutils}/bin/sleep 0.2 # volume takes some time to update
-    new_volume=$(${spotifyPlayer} get key playback | ${pkgs.jaq}/bin/jaq -r '.device.volume_percent')
+    spotify_player playback volume --offset -- $1
+    sleep 0.2 # volume takes some time to update
+    new_volume=$(spotify_player get key playback | ${pkgs.jaq}/bin/jaq -r '.device.volume_percent')
     ${pkgs.libnotify}/bin/notify-send --urgency=low -t 2000 -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${new_volume}%"
   '';
 in
@@ -24,6 +23,8 @@ in
         withDaemon = false;
       })
     ];
+
+    services.playerctld.enable = true;
 
     xdg.configFile = {
       "spotify-player/app.toml".text = /* toml */ ''
@@ -111,35 +112,34 @@ in
       icon = "spotify";
     };
 
-    impermanence = {
-      directories = [
-        ".config/spotify"
-        ".cache/spotify"
-        ".cache/spotify-player"
-      ];
-    };
+    persistence.directories = [
+      ".config/spotify"
+      ".cache/spotify"
+      ".cache/spotify-player"
+    ];
 
     desktop.hyprland.settings =
       let
         colors = config.colorscheme.palette;
         modKey = config.modules.desktop.hyprland.modKey;
+        playerctl = lib.getExe pkgs.playerctl;
       in
-      lib.mkIf (desktopCfg.windowManager == "hyprland")
+      lib.mkIf (desktopCfg.windowManager == "Hyprland")
         {
           windowrulev2 = [
             "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
             "workspace special silent, title:^(Spotify( Premium)?)$"
           ];
           bindr = [
-            "${modKey}, ${modKey}_R, exec, ${spotifyPlayer} playback play-pause"
+            "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause"
           ];
           bind = [
-            "${modKey}, Comma, exec, ${spotifyPlayer} playback previous"
-            "${modKey}, Period, exec, ${spotifyPlayer} playback next"
-            ", XF86AudioNext, exec, ${spotifyPlayer} playback next"
-            ", XF86AudioPrev, exec, ${spotifyPlayer} playback prev"
-            ", XF86AudioPlay, exec, ${spotifyPlayer} playback play"
-            ", XF86AudioPause, exec, ${spotifyPlayer} playback pause"
+            "${modKey}, Period, exec, ${playerctl} next"
+            "${modKey}, Comma, exec, ${playerctl} previous"
+            ", XF86AudioNext, exec, ${playerctl} next"
+            ", XF86AudioPrev, exec, ${playerctl} previous"
+            ", XF86AudioPlay, exec, ${playerctl} play"
+            ", XF86AudioPause, exec, ${playerctl} pause"
             "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume.outPath} 5"
             "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume.outPath} -5"
           ];

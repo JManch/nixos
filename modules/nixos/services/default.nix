@@ -1,55 +1,63 @@
 { lib, config, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
+  cfg = config.modules.services;
 in
 {
   imports = lib.utils.scanPaths ./.;
 
   options.modules.services = {
+    udisks.enable = mkEnableOption "udisks";
+    wireguard.enable = mkEnableOption "WireGuard";
 
     greetd = {
-      enable = mkEnableOption "greetd with tuigreet";
+      enable = mkEnableOption "Greetd with TUIgreet";
+
       launchCmd = mkOption {
         type = types.str;
+        default = "";
         description = "Login launch command";
         example = "Hyprland";
       };
     };
 
     wgnord = {
-      enable = mkEnableOption "wgnord";
+      enable = mkEnableOption "Wireguard NordVPN";
+
       country = mkOption {
         type = types.str;
-        description = "The country to VPN to";
         default = "Switzerland";
+        description = "The country to VPN to";
       };
     };
 
     jellyfin = {
-      enable = mkEnableOption "jellyfin";
+      enable = mkEnableOption "Jellyfin";
+
       autoStart = mkOption {
         type = types.bool;
-        description = "jellyfin service auto start";
         default = true;
+        description = "Jellyfin service auto start";
       };
     };
 
-    udisks2.enable = mkEnableOption "udisks2";
-    wireguard.enable = mkEnableOption "wireguard";
-
     ollama = {
-      enable = mkEnableOption "ollama";
-      autoStart = mkEnableOption "ollama service auto start";
+      enable = mkEnableOption "Ollama";
+      autoStart = mkEnableOption "Ollama service auto start";
     };
 
     broadcast-box = {
-      enable = mkEnableOption "broadcast box";
-      autoStart = mkEnableOption "broadcast box service auto start";
+      enable = mkEnableOption "Broadcast Box";
+      autoStart = mkEnableOption "Broadcast Box service auto start";
     };
-
   };
 
   config = {
-    services.udisks2.enable = config.modules.services.udisks2.enable;
+    services.udisks2.enable = config.modules.services.udisks.enable;
+
+    assertions = [{
+      assertion = cfg.greetd.enable -> (cfg.greetd.launchCmd != "");
+      message = "Greetd launch command must be set";
+    }];
   };
 }

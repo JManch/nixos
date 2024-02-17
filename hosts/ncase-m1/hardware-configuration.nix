@@ -1,17 +1,13 @@
-{ lib, config, modulesPath, ... }: {
+{ modulesPath, ... }:
+{
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+
+  networking.useDHCP = true;
+  hardware.cpu.amd.updateMicrocode = true;
+  nixpkgs.hostPlatform = "x86_64-linux";
 
   boot = {
     initrd.availableKernelModules = [ "nvme" "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" ];
-    initrd.kernelModules = [ ];
     kernelModules = [ "kvm-amd" ];
-
-    # Should set this to false after initial setup. May cause import to break
-    # so be prepared to set zfs_force=1 kernel param in boot menu.
-    zfs.forceImportRoot = false;
   };
-
-  networking.useDHCP = lib.mkDefault true;
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

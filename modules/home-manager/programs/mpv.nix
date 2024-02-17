@@ -89,7 +89,7 @@ lib.mkIf cfg.enable {
     }
   '';
 
-  impermanence.directories = [
+  persistence.directories = [
     # contains state for save-position-on-quit
     ".local/state/mpv"
   ];

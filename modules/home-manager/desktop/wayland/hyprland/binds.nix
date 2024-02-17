@@ -1,54 +1,69 @@
 { lib
 , pkgs
 , config
-, vmVariant
 , osConfig
+, vmVariant
 , ...
 }:
 let
-  # TODO: Need to clean this up by moving script and module specific
-  # functionality into options
-  inherit (lib) optionals optional;
-  cfg = config.modules.desktop.hyprland;
+  inherit (lib)
+    mkIf
+    optionals
+    optional
+    getExe
+    range
+    concatMap
+    fetchers
+    concatStringsSep;
+  inherit (osConfig.modules.system) audio;
+  inherit (osConfig.device) monitors;
+  cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
-
-  getMonitorByNumber = number: lib.fetchers.getMonitorByNumber osConfig number;
-  getOption = option: type: "${hyprctl} getoption ${option} -j | ${pkgs.jaq}/bin/jaq -r '.${type}'";
-
-  audio = osConfig.modules.system.audio;
   osDesktop = osConfig.usrEnv.desktop;
-  monitors = osConfig.device.monitors;
 
-  wpctl = "${pkgs.wireplumber}/bin/wpctl";
-  hyprshot = "${pkgs.hyprshot}/bin/hyprshot";
-  hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+  jaq = getExe pkgs.jaq;
+  notifySend = getExe pkgs.libnotify;
+  hyprshot = getExe pkgs.hyprshot;
+
+  getMonitorByNumber = number: fetchers.getMonitorByNumber osConfig number;
 
   disableShadersCommand =
     command: "${cfg.disableShaders} && ${command} && ${cfg.enableShaders}";
 
+  toggleDwindleGaps = pkgs.writeShellScript "hypr-toggle-dwindle-gaps" ''
+
+    new_value=$(($(hyprctl getoption -j dwindle:no_gaps_when_only | ${jaq} -r '.int') ^ 1))
+    hyprctl keyword dwindle:no_gaps_when_only $new_value
+    message=$( [[ $new_value == "1" ]] && echo "Dwindle gaps disabled" || echo "Dwindle gaps enabled" )
+    ${notifySend} --urgency=low -t 2000 -h \
+      'string:x-canonical-private-synchronous:hypr-dwindle-gaps' 'Hyprland' "$message"
+
+  '';
+
   toggleFloating = pkgs.writeShellScript "hypr-toggle-floating" ''
-    if [[ $(${hyprctl} activewindow -j | ${pkgs.jaq}/bin/jaq -r '.floating') == "false" ]]; then
-      ${hyprctl} --batch 'dispatch togglefloating; dispatch resizeactive exact 75% 75%; dispatch centerwindow;'
+
+    if [[ $(hyprctl activewindow -j | ${jaq} -r '.floating') == "false" ]]; then
+      hyprctl --batch 'dispatch togglefloating; dispatch resizeactive exact 75% 75%; dispatch centerwindow;'
     else
-      ${hyprctl} dispatch togglefloating
+      hyprctl dispatch togglefloating
     fi
+
   '';
 
   toggleSwallowing = pkgs.writeShellScript "hypr-toggle-swallowing" ''
-    if [[ $(${hyprctl} getoption -j misc:enable_swallow | ${pkgs.jaq}/bin/jaq -r '.int') == "0" ]]; then
-      ${hyprctl} keyword misc:enable_swallow true
-      status="enabled"
-    else
-      ${hyprctl} keyword misc:enable_swallow false
-      status="disabled"
-    fi
-    ${pkgs.libnotify}/bin/notify-send --urgency=low -t 2000 -h 'string:x-canonical-private-synchronous:hypr-swallow' 'Hyprland' "Window swallowing ''$status"
+
+    new_value=$(($(hyprctl getoption -j misc:enable_swallow | ${jaq} -r '.int') ^ 1))
+    hyprctl keyword misc:enable_swallow $new_value
+    message=$( [[ $new_value == "1" ]] && echo "Window swallowing enabled" || echo "Window swallowing disabled" )
+    ${notifySend} --urgency=low -t 2000 -h \
+      'string:x-canonical-private-synchronous:hypr-swallow' 'Hyprland' "$message"
+
   '';
 in
-lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
+mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
 {
   # Force secondaryModKey VM variant because binds are repeated on host
-  modules.desktop.hyprland.modKey = lib.mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);
+  modules.desktop.hyprland.modKey = mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);
 
   wayland.windowManager.hyprland =
     let
@@ -66,7 +81,7 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${mod}, E, fullscreen, 1"
           "${modShift}, E, fullscreen, 0"
           "${mod}, Z, pin, active"
-          "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
+          "${mod}, R, exec, hyprctl dispatch splitratio exact 1"
           "${mod}, A, exec, ${toggleSwallowing.outPath}"
 
           # Movement
@@ -80,28 +95,25 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${modShift}, J, movewindow, d"
           "${mod}, mouse:276, workspace, r-1"
           "${mod}, mouse:275, workspace, r+1"
-          "${mod}, mouse_up, workspace, r+1"
-          "${mod}, mouse_down, workspace, r-1"
-          "${mod}, Left, workspace, r-1"
-          "${mod}, Right, workspace, r+1"
           "${modShift}, Left, movetoworkspace, r-1"
           "${modShift}, Right, movetoworkspace, r+1"
+          "${modShiftCtrl}, J, workspace, r-1"
+          "${modShiftCtrl}, K, workspace, r+1"
 
           # Monitors
           "${modShift}, Comma, movecurrentworkspacetomonitor, ${(getMonitorByNumber 2).name}"
           "${modShift}, Period, movecurrentworkspacetomonitor, ${(getMonitorByNumber 1).name}"
+          "${modShiftCtrl}, H, focusmonitor, l"
+          "${modShiftCtrl}, L, focusmonitor, r"
           "${mod}, TAB, focusmonitor, +1"
-          "${mod}, TAB, movefocus, u" # Cycle focus to get out of game cursor capture
-          "${mod}, TAB, movefocus, d"
 
           # Dwindle
           "${mod}, P, pseudo,"
-          # TODO: Move this into a script
-          "${mod}, M, exec, ${hyprctl} keyword dwindle:no_gaps_when_only $(($(${getOption "dwindle:no_gaps_when_only" "int"}) ^ 1))"
+          "${mod}, M, exec, ${toggleDwindleGaps.outPath}"
           "${mod}, X, layoutmsg, togglesplit"
           "${modShift}, X, layoutmsg, swapsplit"
 
-          # Hyprshot
+          # Screenshots
           ", Print, exec, ${disableShadersCommand "${hyprshot} -m region --clipboard-only"}"
           "${mod}, I, exec, ${disableShadersCommand "${hyprshot} -m output -m active --clipboard-only"}"
           "${modShift}, Print, exec, ${disableShadersCommand "${hyprshot} -m region"}"
@@ -115,7 +127,7 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
           "${mod}, V, workspace, name:VM"
         ] ++ (
           # Go to empty workspace on all monitors
-          lib.lists.concatMap
+          concatMap
             (m: [
               "${mod}, D, focusmonitor, ${m.name}"
               "${mod}, D, workspace, name:DESKTOP ${toString m.number}"
@@ -124,33 +136,38 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
         ) ++ (
           # Workspaces
           let
-            workspaceNumbers = lib.lists.map (w: toString w) (lib.lists.range 1 9);
+            workspaceNumbers = builtins.map (w: toString w) (range 1 9);
             workspaceBinds = w: [
               "${mod}, ${w}, workspace, ${w}"
               "${modShift}, ${w}, movetoworkspace, ${w}"
               "${modShiftCtrl}, ${w}, movetoworkspacesilent, ${w}"
             ];
           in
-          lib.lists.concatMap workspaceBinds workspaceNumbers
+          concatMap workspaceBinds workspaceNumbers
         ) ++ (optional audio.enable (
-          ", XF86AudioMute, exec, ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle"
+          ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
         ));
+
       settings.bindm = [
         # Mouse window interaction
         "${mod}, mouse:272, movewindow"
         "${mod}, mouse:273, resizewindow"
       ];
+
       settings.bindr = optionals audio.enable [
         "${mod}ALT, ALT_L, exec, ${audio.scripts.toggleMic}"
       ];
+
       settings.binde = optionals audio.enable [
-        "${modShiftCtrl}, L, resizeactive, 20 0"
-        "${modShiftCtrl}, H, resizeactive, -20 0"
-        "${modShiftCtrl}, K, resizeactive, 0 -20"
-        "${modShiftCtrl}, J, resizeactive, 0 20"
-        ", XF86AudioRaiseVolume, exec, ${wpctl} set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+"
-        ", XF86AudioLowerVolume, exec, ${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+        "${mod}, Right, resizeactive, 20 0"
+        "${mod}, Left, resizeactive, -20 0"
+        "${mod}, Up, resizeactive, 0 -20"
+        "${mod}, Down, resizeactive, 0 20"
+      ] ++ optionals audio.enable [
+        ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"
+        ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
       ];
+
       extraConfig = ''
         bind = ${mod}, Delete, submap, Grab
         submap = Grab
@@ -159,50 +176,42 @@ lib.mkIf (osDesktop.enable && desktopCfg.windowManager == "hyprland")
       '';
     };
 
-  programs.zsh.initExtra =
-    let
-      echo = "${pkgs.coreutils}/bin/echo";
-      jaq = "${pkgs.jaq}/bin/jaq";
-    in
-      /* bash */ ''
-      toggle-monitor() {
-        if [ -z "$1" ]; then
-          ${echo} "Usage: toggle-monitor <monitor_number>"
-          return 1
-        fi
+  programs.zsh.initExtra = /* bash */ ''
 
-        declare -A monitorNumToName
-        ${builtins.concatStringsSep "\n  "
-          (lib.lists.map (m: "monitorNumToName[${toString m.number}]='${m.name}'") monitors)
-        }
+    toggle-monitor() {
+      if [ -z "$1" ]; then
+        echo "Usage: toggle-monitor <monitor_number>"
+        return 1
+      fi
 
-        declare -A monitorNameToCfg
-        ${builtins.concatStringsSep "\n  "
-          (lib.lists.map (m: "monitorNameToCfg[${m.name}]='${lib.fetchers.getMonitorHyprlandCfgStr m}'") monitors)
-        }
-
-        if [[ ! -v monitorNumToName[$1] ]]; then
-          ${echo} "Error: monitor with number '$1' does not exist"
-          return 1
-        fi
-
-        local monitorName=''${monitorNumToName[$1]}
-
-        # Check if the monitor is already disabled
-        ${hyprctl} monitors -j | ${jaq} -e 'first(.[] | select(.name == "'"$monitorName"'"))' > /dev/null 2>&1
-        if [ $? -ne 0 ]; then
-          disabled=true
-        else
-          disabled=false
-        fi
-
-        if [[ $disabled == true ]]; then
-          ${hyprctl} keyword monitor ''${monitorNameToCfg[$monitorName]} > /dev/null
-          ${echo} "Enabled monitor $monitorName"
-        else
-          ${hyprctl} keyword monitor $monitorName,disable > /dev/null
-          ${echo} "Disabled monitor $monitorName"
-        fi
+      declare -A monitor_num_to_name
+      ${concatStringsSep "\n  "
+        (builtins.map (m: "monitor_num_to_name[${toString m.number}]='${m.name}'") monitors)
       }
-    '';
+
+      declare -A monitor_name_to_cfg
+      ${concatStringsSep "\n  "
+        (builtins.map (m: "monitor_name_to_cfg[${m.name}]='${fetchers.getMonitorHyprlandCfgStr m}'") monitors)
+      }
+
+      if [[ ! -v monitor_num_to_name[$1] ]]; then
+        echo "Error: monitor with number '$1' does not exist"
+        return 1
+      fi
+
+      local monitor_name=''${monitor_num_to_name[$1]}
+
+      # Check if the monitor is already disabled
+      hyprctl monitors -j | ${jaq} -e 'first(.[] | select(.name == "'"$monitor_name"'"))' > /dev/null 2>&1
+
+      if [ $? -ne 0 ]; then
+        hyprctl keyword monitor ''${monitor_name_to_cfg[$monitor_name]} > /dev/null
+        echo "Enabled monitor $monitor_name"
+      else
+        hyprctl keyword monitor $monitor_name,disable > /dev/null
+        echo "Disabled monitor $monitor_name"
+      fi
+    }
+
+  '';
 }

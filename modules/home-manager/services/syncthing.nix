@@ -36,7 +36,7 @@ lib.mkIf cfg.enable {
   # xdg.configFile."syncthing/cert.pem".source = /. + config.age.secrets.syncthingCert.path;
   # xdg.configFile."syncthing/key.pem".source = /. + config.age.secrets.syncthingKey.path;
 
-  impermanence.directories = [
+  persistence.directories = [
     ".config/syncthing"
   ];
 }

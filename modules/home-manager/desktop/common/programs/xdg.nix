@@ -6,24 +6,26 @@
 }:
 lib.mkIf osConfig.usrEnv.desktop.enable
 {
-  # Many applications need this for xdg-open url opening however package
-  # managers rarely include is as a dependency for some reason
+  # Many applications need this for xdg-open url opening however packages
+  # rarely include is as a dependency for some reason
   home.packages = [ pkgs.xdg-utils ];
 
-  # TODO: Verify that every desktopEnvironment/windowManager really wants this enabled (I doubt it)
+  # TODO: Verify that every desktopEnvironment/windowManager really wants this
+  # enabled (I doubt it)
   xdg.portal.enable = true;
 
-  xdg.userDirs = {
+  xdg.userDirs = let home = config.home.homeDirectory; in {
     enable = true;
-    desktop = "${config.home.homeDirectory}/desktop";
-    documents = "${config.home.homeDirectory}/documents";
-    download = "${config.home.homeDirectory}/downloads";
-    music = "${config.home.homeDirectory}/music";
-    pictures = "${config.home.homeDirectory}/pictures";
-    videos = "${config.home.homeDirectory}/videos";
+    desktop = "${home}/desktop";
+    documents = "${home}/documents";
+    download = "${home}/downloads";
+    music = "${home}/music";
+    pictures = "${home}/pictures";
+    videos = "${home}/videos";
   };
 
   xdg.mime.enable = true;
+
   xdg.mimeApps = {
     enable = true;
   };

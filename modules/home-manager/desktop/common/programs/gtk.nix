@@ -7,11 +7,15 @@
 let
   desktopCfg = config.modules.desktop;
   colors = config.colorscheme.palette;
+  cursorName = "Bibata-Modern-Classic";
 in
-lib.mkIf osConfig.usrEnv.desktop.enable {
-  # TODO: Consider settings home.pointerCursor
+lib.mkIf osConfig.usrEnv.desktop.enable
+{
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+
   gtk = {
     enable = true;
+
     theme = {
       # TODO: Consider generating the GTK theme from nix-colors
       name = "Plata-Noir-Compact";
@@ -22,27 +26,29 @@ lib.mkIf osConfig.usrEnv.desktop.enable {
         destructionColor = "#${colors.base08}";
       };
     };
+
     iconTheme = {
       name = "Papirus-Dark";
       package = pkgs.papirus-icon-theme;
     };
-    cursorTheme = {
-      name = "Bibata-Modern-Classic";
-      package = pkgs.bibata-cursors;
-      size = desktopCfg.style.cursorSize;
-    };
   };
 
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  # Also sets gtk.cursorTheme
+  home.pointerCursor = {
+    gtk.enable = true;
+    name = cursorName;
+    package = pkgs.bibata-cursors;
+    size = desktopCfg.style.cursorSize;
+  };
 
-  desktop.hyprland.settings = lib.mkIf (desktopCfg.windowManager == "hyprland") {
+  desktop.hyprland.settings = {
     env = [
-      "XCURSOR_THEME,${config.gtk.cursorTheme.name}"
+      "XCURSOR_THEME,${cursorName}"
       "XCURSOR_SIZE,${toString desktopCfg.style.cursorSize}"
     ];
+
     exec-once = [
-      "hyprctl setcursor ${config.gtk.cursorTheme.name} ${toString desktopCfg.style.cursorSize}"
+      "hyprctl setcursor ${cursorName} ${toString desktopCfg.style.cursorSize}"
     ];
   };
-
 }

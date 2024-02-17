@@ -6,7 +6,7 @@
 let
   cfg = config.modules.programs.gaming.gamemode;
   homeConfig = lib.utils.homeConfig args;
-  isHyprland = homeConfig.modules.desktop.windowManager == "hyprland";
+  isHyprland = homeConfig.modules.desktop.windowManager == "Hyprland";
 
   scriptPrograms = lib.makeBinPath ([
     pkgs.coreutils

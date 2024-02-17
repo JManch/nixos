@@ -50,7 +50,7 @@ lib.mkIf cfg.enable {
         };
       };
       mouse = {
-        hide_when_typing = true;
+        hide_when_typing = false;
       };
       cursor = {
         style = {
@@ -61,6 +61,7 @@ lib.mkIf cfg.enable {
       };
     };
   };
-  desktop.hyprland.binds = lib.mkIf (desktopCfg.windowManager == "hyprland")
+  # TODO: Add bind for toggling between small/large alacritty font
+  desktop.hyprland.binds = lib.mkIf (desktopCfg.windowManager == "Hyprland")
     [ "${desktopCfg.hyprland.modKey}, Return, exec, ${alacritty}/bin/alacritty" ];
 }

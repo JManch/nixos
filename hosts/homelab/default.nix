@@ -1,7 +1,5 @@
 {
-  imports = [
-    ./hardware-configuration.nix
-  ];
+  imports = [ ./hardware-configuration.nix ];
 
   device = {
     type = "server";

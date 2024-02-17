@@ -11,7 +11,7 @@ lib.mkIf cfg.enable
     };
   };
 
-  impermanence.directories = [
+  persistence.directories = [
     ".local/share/Anki2"
   ];
 }

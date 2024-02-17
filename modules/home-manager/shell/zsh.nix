@@ -40,6 +40,8 @@ lib.mkIf cfg.enable {
       # in the nix store and it broke my entire install
       rebuild-build = "cd && nixos-rebuild build --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-boot = "sudo nixos-rebuild boot --flake /home/${username}/.config/nixos#${hostname}";
+      rebuild-dry-build = "nixos-rebuild dry-build --flake /home/${username}/.config/nixos#${hostname}";
+      rebuild-dry-activate = "sudo nixos-rebuild dry-activate --flake /home/${username}/.config/nixos#${hostname}";
       inspect-nix-config = "nix --extra-experimental-features repl-flake repl '/home/${username}/.config/nixos#nixosConfigurations.${hostname}'";
     };
     initExtra = /* bash */ ''
@@ -76,12 +78,10 @@ lib.mkIf cfg.enable {
     '';
   };
 
-  impermanence = {
-    directories = [
-      ".config/zsh" # for zcompdump
-      ".local/state/zsh"
-      ".cache/zsh"
-    ];
-  };
+  persistence.directories = [
+    ".config/zsh" # for zcompdump
+    ".local/state/zsh"
+    ".cache/zsh"
+  ];
 
 }

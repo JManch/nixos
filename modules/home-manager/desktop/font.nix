@@ -1,14 +1,9 @@
-{ lib
-, config
-, osConfig
-, ...
-}:
-lib.mkIf osConfig.usrEnv.desktop.enable {
-  home.packages = [ config.modules.desktop.style.font.package ];
-
+{ lib, config, osConfig, ... }:
+lib.mkIf osConfig.usrEnv.desktop.enable
+{
   fonts.fontconfig.enable = true;
 
-  impermanence.directories = [
-    ".cache/fontconfig"
-  ];
+  home.packages = [ config.modules.desktop.style.font.package ];
+
+  persistence.directories = [ ".cache/fontconfig" ];
 }

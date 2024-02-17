@@ -6,6 +6,8 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.desktop.programs = {
+    anyrun.enable = mkEnableOption "anyrun";
+
     swaylock = {
       enable = mkEnableOption "swaylock";
 
@@ -27,7 +29,5 @@ in
         description = "Bash script run after screen unlocks";
       };
     };
-
-    anyrun.enable = mkEnableOption "anyrun";
   };
 }

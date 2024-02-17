@@ -7,7 +7,7 @@ in
 {
   # Custom impermanence options for home-manager so that we can use the nixos
   # impermanence config from home-manager
-  options.impermanence = {
+  options.persistence = {
     directories = mkOption {
       type = with types; listOf (coercedTo str (d: { directory = d; }) attrs);
       default = [ ];

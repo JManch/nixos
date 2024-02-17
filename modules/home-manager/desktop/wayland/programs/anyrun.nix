@@ -6,17 +6,18 @@
 , ...
 }:
 let
-  isWayland = lib.fetchers.isWayland config;
-  cfg = config.modules.desktop.programs.anyrun;
+  inherit (lib) mkIf fetchers utils;
+  cfg = desktopCfg.programs.anyrun;
   desktopCfg = config.modules.desktop;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
+  isWayland = fetchers.isWayland config;
 in
 {
   imports = [
     inputs.anyrun.homeManagerModules.default
   ];
 
-  config = lib.mkIf (osDesktopEnabled && isWayland && cfg.enable) {
+  config = mkIf (osDesktopEnabled && isWayland && cfg.enable) {
     programs.anyrun =
       let
         color = base:
@@ -24,23 +25,26 @@ in
       in
       {
         enable = true;
+
         config = {
-          plugins = with inputs.anyrun.packages.${pkgs.system}; [
-            applications
-            websearch
-          ];
           width.fraction = 0.2;
           y.fraction = 0.35;
           hidePluginInfo = true;
           closeOnClick = true;
           # Blur background over waybar
           ignoreExclusiveZones = true;
+
+          plugins = with utils.flakePkgs { inherit pkgs inputs; } "anyrun"; [
+            applications
+            websearch
+          ];
         };
         extraCss =
           let
             cornerRadius = toString desktopCfg.style.cornerRadius;
           in
-            /* css */ ''
+            /*css*/ ''
+
             * {
               all: unset;
               font-size: 2rem;
@@ -64,12 +68,7 @@ in
               margin-bottom: 0.6rem;
             }
 
-            /* #match:selected { */
-            /*   background: rgb(${color "base01"}); */
-            /* } */
-
             #match:selected label {
-              /* text-decoration: underline; */
               font-weight: 600;
             }
 
@@ -84,18 +83,19 @@ in
               border-radius: ${cornerRadius}px;
               padding: 0.3rem;
             }
+
           '';
       };
 
     desktop.hyprland.settings =
       let
-        modKey = config.modules.desktop.hyprland.modKey;
-        anyrun = config.programs.anyrun.package;
+        inherit (desktopCfg.hyprland) modKey;
       in
-      lib.mkIf (config.modules.desktop.windowManager == "hyprland") {
+      {
         bindr = [
-          "${modKey}, ${modKey}_L, exec, ${pkgs.procps}/bin/pkill anyrun || ${anyrun}/bin/anyrun"
+          "${modKey}, ${modKey}_L, exec, pkill anyrun || anyrun"
         ];
+
         layerrule = [
           "blur, anyrun"
           "xray 0, anyrun"

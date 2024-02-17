@@ -1,20 +1,9 @@
-{ lib
-, pkgs
-, config
-, inputs
-, ...
-}:
+{ pkgs, config, inputs, ... }:
 let
   nix-resources = inputs.nix-resources.packages.${pkgs.system};
 in
 {
-  imports = [
-    ./core.nix
-  ];
-
-  home.packages = with pkgs; [
-    feh
-  ];
+  imports = [ ./core.nix ];
 
   modules = {
     shell = {
@@ -23,26 +12,28 @@ in
     };
 
     desktop = {
-      windowManager = "hyprland";
+      windowManager = "Hyprland";
+
       hyprland = {
         tearing = true;
         directScanout = true;
       };
 
       terminal = {
-        binPath = "${config.programs.alacritty.package}/bin/alacritty";
+        exePath = "${config.programs.alacritty.package}/bin/alacritty";
         class = "Alacritty";
       };
 
       style = {
-        font = {
-          family = "BerkeleyMono Nerd Font";
-          package = nix-resources.berkeley-mono-nerdfont;
-        };
         cursorSize = 24;
         cornerRadius = 10;
         borderWidth = 2;
         gapSize = 10;
+
+        font = {
+          family = "BerkeleyMono Nerd Font";
+          package = nix-resources.berkeley-mono-nerdfont;
+        };
       };
 
       programs = {
@@ -51,18 +42,20 @@ in
       };
 
       services = {
+        waybar.enable = true;
+        dunst.enable = true;
+        wlsunset.enable = true;
+
         swayidle = {
           enable = false;
           lockTime = 3 * 60;
           screenOffTime = 4 * 60;
         };
-        waybar.enable = true;
-        dunst.enable = true;
+
         wallpaper = {
           randomise = true;
           randomiseFrequency = "*-*-* 05:00:00"; # 5am everyday
         };
-        wlsunset.enable = true;
       };
     };
 
@@ -93,22 +86,21 @@ in
 
     services = {
       syncthing.enable = true;
+
       easyeffects = {
         enable = true;
-        autoloadDevices = [
-          {
-            deviceName = "blue-snowball";
-            deviceType = "input";
-            config = /* json */ ''
-              {
-                "device": "alsa_input.usb-BLUE_MICROPHONE_Blue_Snowball_201306-00.mono-fallback",
-                "device-description": "Blue Snowball Mono",
-                "device-profile": "analog-input-mic",
-                "preset-name": "improved-microphone"
-              }
-            '';
+
+        autoloadDevices = [{
+          deviceName = "blue-snowball";
+          deviceType = "input";
+          config = /*json*/ '' {
+            "device": "alsa_input.usb-BLUE_MICROPHONE_Blue_Snowball_201306-00.mono-fallback",
+            "device-description": "Blue Snowball Mono",
+            "device-profile": "analog-input-mic",
+            "preset-name": "improved-microphone"
           }
-        ];
+          '';
+        }];
       };
     };
   };

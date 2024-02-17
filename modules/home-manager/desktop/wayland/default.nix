@@ -4,17 +4,15 @@
 , osConfig
 , ...
 }:
+let
+  inherit (lib) mkIf utils fetchers;
+  isWayland = fetchers.isWayland config;
+  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
+in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = utils.scanPaths ./.;
 
-  config =
-    let
-      isWayland = lib.fetchers.isWayland config;
-      osDesktopEnabled = osConfig.usrEnv.desktop.enable;
-    in
-    lib.mkIf (osDesktopEnabled && isWayland) {
-      home.packages = with pkgs; [
-        wl-clipboard
-      ];
-    };
+  config = mkIf (osDesktopEnabled && isWayland) {
+    home.packages = [ pkgs.wl-clipboard ];
+  };
 }

@@ -1,19 +1,23 @@
 {
-  imports = [
-    ./hardware-configuration.nix
-  ];
+  imports = [ ./hardware-configuration.nix ];
+
+  networking.hostId = "625ec505";
+  system.stateVersion = "23.05";
 
   device = {
     type = "desktop";
+
     cpu = {
       name = "R7 3700x";
       type = "amd";
     };
+
     gpu = {
       name = "RX 7900XT";
       type = "amd";
       hwmonId = 2;
     };
+
     monitors = [
       {
         name = "DP-1";
@@ -40,6 +44,7 @@
 
   usrEnv = {
     homeManager.enable = true;
+
     desktop = {
       enable = true;
       desktopEnvironment = null;
@@ -49,18 +54,21 @@
   modules = {
     hardware = {
       secureBoot.enable = true;
+      vr.enable = false; # FIX: nixpkgs not ready yet
+
       fileSystem = {
         trim = true;
-        zpoolName = "zpool";
         bootLabel = "boot";
+        zpoolName = "zpool";
+        forceImportRoot = false;
       };
-      # Not ready yet
-      vr.enable = false;
     };
 
     programs = {
       wine.enable = true;
       winbox.enable = true;
+      matlab.enable = true;
+
       gaming = {
         enable = true;
         windowClassRegex = "^(steam_app.*|cs2|\.gamescope.*|bfv\.exe)$";
@@ -68,47 +76,46 @@
         gamescope.enable = true;
         gamemode.enable = true;
       };
-      matlab.enable = true;
     };
 
     services = {
+      wgnord.enable = true;
+      udisks.enable = true;
+      wireguard.enable = true;
+      ollama.enable = false; # FIX: waiting for nixpkgs update
+      broadcast-box.enable = true;
+
       greetd = {
         enable = true;
         launchCmd = "Hyprland";
       };
-      wgnord.enable = true;
-      udisks2.enable = true;
-      wireguard.enable = true;
+
       jellyfin = {
         enable = true;
         autoStart = false;
       };
-      # Waiting for fixed nixpkgs version to be merged
-      ollama.enable = false;
-      broadcast-box.enable = true;
     };
 
     system = {
       windows.enable = true;
+      bluetooth.enable = true;
+      virtualisation.enable = true;
+
       networking = {
         tcpOptimisations = true;
+        resolved.enable = true;
+        wireless.enable = true;
+
         firewall = {
           enable = true;
           defaultInterfaces = [ "eno1" ];
         };
-        resolved.enable = true;
-        wireless.enable = true;
       };
-      bluetooth.enable = true;
+
       audio = {
         enable = true;
         extraAudioTools = true;
       };
-      virtualisation.enable = true;
     };
   };
-
-  networking.hostId = "625ec505";
-
-  system.stateVersion = "23.05";
 }

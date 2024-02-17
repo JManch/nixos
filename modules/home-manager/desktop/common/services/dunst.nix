@@ -1,27 +1,30 @@
 { lib, config, osConfig, ... }:
 let
-  desktopCfg = config.modules.desktop;
+  inherit (lib) mkIf;
   cfg = config.modules.desktop.services.dunst;
+  desktopCfg = config.modules.desktop;
   colors = config.colorscheme.palette;
+  primaryMonitor = lib.fetchers.primaryMonitor osConfig;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 in
-lib.mkIf (osDesktopEnabled && cfg.enable) {
+mkIf (osDesktopEnabled && cfg.enable) {
   services.dunst = {
     enable = true;
+
     settings = {
       global = with desktopCfg.style; {
         monitor = toString cfg.monitorNumber;
         follow = "none";
         enable_posix_regex = true;
-        font = "${desktopCfg.style.font.family} 13";
+        font = "${font.family} 13";
         icon_theme = config.gtk.iconTheme.name;
         show_indicators = true;
         format = "<b>%s</b>\\n<span font='11'>%b</span>";
         layer = "overlay";
 
         corner_radius = cornerRadius;
-        width = builtins.floor ((lib.fetchers.primaryMonitor osConfig).width * 0.14);
-        height = builtins.floor ((lib.fetchers.primaryMonitor osConfig).height * 0.25);
+        width = builtins.floor (primaryMonitor.width * 0.14);
+        height = builtins.floor (primaryMonitor.height * 0.25);
         offset = "${toString (gapSize * 2)}x${toString (gapSize * 2)}";
         gap_size = gapSize;
         frame_width = borderWidth;
@@ -44,11 +47,13 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
         foreground = "#${colors.base07}";
         frame_color = "#${colors.base08}";
       };
+
       urgency_normal = {
         background = "#${colors.base00}b3";
         foreground = "#${colors.base07}";
         frame_color = "#${colors.base0E}";
       };
+
       urgency_low = {
         background = "#${colors.base00}b3";
         foreground = "#${colors.base07}";
@@ -57,14 +62,10 @@ lib.mkIf (osDesktopEnabled && cfg.enable) {
     };
   };
 
-  desktop.hyprland.settings =
-    lib.mkIf (desktopCfg.windowManager == "hyprland") {
-      exec-once = [
-        "${config.services.dunst.package}/bin/dunst"
-      ];
-      layerrule = [
-        "blur, notifications"
-        "xray 0, notifications"
-      ];
-    };
+  systemd.user.services.dunst.Install.WantedBy = [ "graphical-session.target" ];
+
+  desktop.hyprland.settings.layerrule = [
+    "blur, notifications"
+    "xray 0, notifications"
+  ];
 }

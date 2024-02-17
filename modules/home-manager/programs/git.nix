@@ -40,7 +40,7 @@ lib.mkIf cfg.enable {
     '';
   };
 
-  impermanence.files = [
+  persistence.files = [
     ".config/lazygit/state.yml"
   ];
 }

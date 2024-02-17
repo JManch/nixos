@@ -6,7 +6,7 @@ lib.mkIf cfg.enable
 {
   home.packages = [ pkgs.r2modman ];
 
-  impermanence.directories = [
+  persistence.directories = [
     ".config/r2modman"
   ];
 }

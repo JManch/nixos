@@ -14,7 +14,7 @@ let
 
   lockScript =
     let
-      isHyprland = (desktopCfg.windowManager == "hyprland");
+      isHyprland = (desktopCfg.windowManager == "Hyprland");
       hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
       osAudio = osConfig.modules.system.audio;
       wpctl = "${pkgs.wireplumber}/bin/wpctl";
@@ -133,6 +133,6 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   };
 
   desktop.hyprland.binds =
-    lib.mkIf (config.modules.desktop.windowManager == "hyprland")
+    lib.mkIf (config.modules.desktop.windowManager == "Hyprland")
       [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${lockScript.outPath}" ];
 }

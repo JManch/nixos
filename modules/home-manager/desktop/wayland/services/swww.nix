@@ -22,7 +22,7 @@ mkIf (osDesktopEnabled && isWayland) {
   modules.desktop.services.wallpaper.setWallpaperCmd = "${swww} img ${transition}";
 
   wayland.windowManager.hyprland.settings.exec-once =
-    mkIf (config.modules.desktop.windowManager == "hyprland")
+    mkIf (config.modules.desktop.windowManager == "Hyprland")
       [
         "${swww} init --no-cache"
       ];

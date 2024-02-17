@@ -5,7 +5,7 @@
 , ...
 } @ args:
 let
-  homeManagerImpermanence = (lib.utils.homeConfig args).impermanence;
+  homeManagerPersistence = (lib.utils.homeConfig args).persistence;
 in
 {
   imports = [
@@ -54,6 +54,6 @@ in
       "/etc/adjtime"
     ];
     # Take this config from our home-manager module
-    users.${username} = homeManagerImpermanence;
+    users.${username} = homeManagerPersistence;
   };
 }

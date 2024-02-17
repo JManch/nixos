@@ -3,6 +3,7 @@ let
   cfg = config.modules.hardware.fileSystem;
 in
 {
+  # TODO: Set up SSD health monitoring with smartd or something
   boot = {
     loader.systemd-boot = {
       enable = true;
@@ -20,6 +21,7 @@ in
 
     # To get kernel 6.7 support until zfs 2.2.3 is released https://github.com/openzfs/zfs/pull/15836
     zfs.enableUnstable = true;
+    zfs.forceImportRoot = cfg.forceImportRoot;
   };
 
   # TODO: Enable ZFS zfs.autoSnapshot at an infrequent interval (maybe once a

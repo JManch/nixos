@@ -41,7 +41,7 @@ lib.mkIf cfg.enable {
     };
   };
 
-  impermanence.directories = [
+  persistence.directories = [
     ".cache/nvim"
     ".config/nvim"
     ".local/share/nvim"

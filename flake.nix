@@ -57,8 +57,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # FIX: Lanzeboote is causing a 'warning: `overrideScope'` (from
-    # `lib.makeScope`) has been renamed to `overrideScope`' error
     lanzaboote = {
       url = "github:nix-community/lanzaboote";
       inputs.nixpkgs.follows = "nixpkgs";

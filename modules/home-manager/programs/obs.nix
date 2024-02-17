@@ -12,7 +12,7 @@ lib.mkIf cfg.enable {
   # For P2P wireguard screensharing use
   # srt://10.0.0.2:5201?mode=listener&latency=30000 as the stream address
 
-  impermanence.directories = [
+  persistence.directories = [
     ".config/obs-studio"
   ];
 }

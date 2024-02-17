@@ -12,6 +12,14 @@ in
         description = "Name of the zpool to mount";
         default = "zpool";
       };
+      forceImportRoot = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          Should set to false after initial setup. May cause ZFS import to
+          break so be prepared to set `zfs_force=1` kernel param in boot menu.
+        '';
+      };
       bootLabel = mkOption {
         type = types.str;
         description = "Label of the boot partition";

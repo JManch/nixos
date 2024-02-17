@@ -254,13 +254,13 @@ lib.mkIf cfg.enable {
     };
   };
 
-  impermanence.directories = [
+  persistence.directories = [
     ".mozilla"
     ".cache/mozilla"
   ];
 
   desktop.hyprland.binds =
-    lib.mkIf (desktopCfg.windowManager == "hyprland")
+    lib.mkIf (desktopCfg.windowManager == "Hyprland")
       [ "${desktopCfg.hyprland.modKey}, Backspace, exec, ${binary}" ];
 }
 # TODO: Either theme firefox with this or figure out how to change theme through GTK

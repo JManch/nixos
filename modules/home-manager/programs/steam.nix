@@ -51,7 +51,7 @@ lib.mkIf cfg.enable
     }
   '';
 
-  desktop.hyprland.settings.windowrulev2 = lib.mkIf (config.modules.desktop.windowManager == "hyprland") [
+  desktop.hyprland.settings.windowrulev2 = lib.mkIf (config.modules.desktop.windowManager == "Hyprland") [
     # Main steam window
     "workspace 5,class:^(steam)$,title:^(Steam)$"
 

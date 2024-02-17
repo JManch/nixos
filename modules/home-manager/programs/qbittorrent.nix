@@ -6,7 +6,7 @@ lib.mkIf cfg.enable
 {
   home.packages = [ pkgs.qbittorrent ];
 
-  impermanence.directories = [
+  persistence.directories = [
     ".config/qBittorrent"
     ".local/share/qBittorrent"
   ];

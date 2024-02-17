@@ -674,10 +674,10 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1708051978,
-        "narHash": "sha256-wzg8FSs0qoHdibwwtXYlErIbi2kL73hnNn7EvQ7jeSA=",
+        "lastModified": 1708122347,
+        "narHash": "sha256-JW7c2/Zq+zFxhC/I743AdG+1CZUmxiGKe7Mm5U8YEzs=",
         "ref": "nixos-unstable-personal",
-        "rev": "284599e526de2053bc63245f6bb22cf944d2714b",
+        "rev": "0470c8d6bcd39ef2530570bb1786575405818d83",
         "revCount": 584427,
         "type": "git",
         "url": "file:///home/joshua/repos/nixpkgs"

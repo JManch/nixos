@@ -1,8 +1,7 @@
 { lib, config, ... }:
 let
   inherit (lib) mkAliasOptionModule mkEnableOption mkOption types;
-  hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
-  shaderDir = "${config.xdg.configHome}/hypr/shaders";
+  cfg = config.modules.desktop.hyprland;
 in
 {
   imports = lib.utils.scanPaths ./. ++ [
@@ -11,11 +10,31 @@ in
   ];
 
   options.modules.desktop.hyprland = {
+    logging = mkEnableOption "logging";
+    tearing = mkEnableOption "enable tearing";
+    directScanout = mkEnableOption ''
+      enable direct scanout. Direct scanout reduces input lag for fullscreen
+      applications however might cause graphical glitches.
+    '';
+
+    blur = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Whether to enable blur";
+    };
+
+    animations = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Whether to enable blur";
+    };
+
     modKey = mkOption {
       type = types.str;
       default = "SUPER";
       description = "The modifier key to use for bindings";
     };
+
     secondaryModKey = mkOption {
       type = types.str;
       default = "ALT";
@@ -24,26 +43,28 @@ in
         hyprland to avoid clashes.
       '';
     };
-    # Used by gamemode config
+
     killActiveKey = mkOption {
       type = types.str;
-      description = "The key to use for killing active window";
       default = "W";
+      description = "Key to use for killing the active window";
     };
+
+    shaderDir = mkOption {
+      type = types.str;
+      default = "${config.xdg.configHome}/hypr/shaders";
+    };
+
     enableShaders = mkOption {
       type = types.str;
-      default = "${hyprctl} keyword decoration:screen_shader ${shaderDir}/monitorGamma.frag";
+      default = "hyprctl keyword decoration:screen_shader ${cfg.shaderDir}/monitorGamma.frag";
       description = "Command to enable Hyprland screen shaders";
     };
+
     disableShaders = mkOption {
       type = types.str;
-      default = "${hyprctl} keyword decoration:screen_shader ${shaderDir}/blank.frag";
+      default = "hyprctl keyword decoration:screen_shader ${cfg.shaderDir}/blank.frag";
       description = "Command to disable Hyprland screen shaders";
     };
-    tearing = mkEnableOption "enable tearing";
-    blur = lib.overrideExisting (mkEnableOption "enable blur") { default = true; };
-    animations = lib.overrideExisting (mkEnableOption "enable animations") { default = true; };
-    logging = mkEnableOption "logging";
-    directScanout = mkEnableOption "enable direct scanout";
   };
 }

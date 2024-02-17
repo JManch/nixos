@@ -69,7 +69,7 @@ lib.mkIf cfg.enable {
     '';
   };
 
-  desktop.hyprland.settings = lib.mkIf (desktopCfg.windowManager == "hyprland") {
+  desktop.hyprland.settings = lib.mkIf (desktopCfg.windowManager == "Hyprland") {
     exec-once = [ "${twitchWorkspaceScript.outPath}" ];
     workspace = [
       "name:TWITCH,monitor:${(lib.fetchers.getMonitorByNumber osConfig 2).name},gapsin:0,gapsout:0,rounding:false,border:false}"
@@ -82,7 +82,7 @@ lib.mkIf cfg.enable {
     ];
   };
 
-  impermanence.directories = [
+  persistence.directories = [
     ".local/share/chatterino"
   ];
 }

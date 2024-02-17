@@ -33,7 +33,7 @@ lib.mkIf config.modules.shell.enable {
     };
   };
 
-  impermanence.directories = [
+  persistence.directories = [
     ".cache/starship"
   ];
 }

@@ -1,47 +1,58 @@
 { lib
 , pkgs
 , config
-, inputs
-, vmVariant
 , osConfig
+, vmVariant
 , ...
-}:
+} @ args:
 let
-  inherit (lib) mkIf;
+  inherit (lib)
+    mkIf
+    utils
+    mkVMOverride
+    getExe
+    concatStringsSep
+    concatMap
+    head
+    optional
+    optionals
+    fetchers;
+  inherit (osConfig.device) monitors;
+
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
-  hyprlandPackages = inputs.hyprland.packages.${pkgs.system};
   colors = config.colorscheme.palette;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 
-  wlPaste = "${pkgs.wl-clipboard}/bin/wl-paste";
-  xclip = "${pkgs.xclip}/bin/xclip";
+  hyprlandPackages = utils.flakePkgs args "hyprland";
 in
-mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
-  home.packages = with pkgs; [
-    hyprshot
-  ];
-
+mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
   # Optimise for performance in VM variant
-  modules.desktop.hyprland = lib.mkIf vmVariant (lib.mkVMOverride {
+  modules.desktop.hyprland = mkIf vmVariant (mkVMOverride {
     tearing = false;
     blur = false;
     animations = false;
   });
 
   # Generate hyprland debug config
-  home.activation.hyprlandDebugConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] /*bash*/ ''
-    DEBUG_ARG=$([ -z "$VERBOSE_ARG" ] && echo "" || echo "--debug")
-    run cat ${config.xdg.configHome}/hypr/hyprland.conf > ${config.xdg.configHome}/hypr/hyprlandd.conf \
-      && ${lib.getExe pkgs.gnused} -i $DEBUG_ARG -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
-      -e '/^exec-once/d' -e '/^monitor/d' -e 's/, monitor:(.*),//g' \
-      ${lib.concatStringsSep " " (lib.lists.map (m: "-e 's/${m.name}/WL-${toString m.number}/g'") osConfig.device.monitors)} \
-      ${config.xdg.configHome}/hypr/hyprlandd.conf \
-      ${lib.concatStringsSep " " 
-        (lib.lists.map 
-          (m: "&& echo \"monitor=WL-${toString m.number},preferred,auto,1\" >> ${config.xdg.configHome}/hypr/hyprlandd.conf")
-          osConfig.device.monitors)}
-  '';
+  home.activation.hyprlandDebugConfig =
+    let
+      hyprDir = "${config.xdg.configHome}/hypr";
+    in
+    lib.hm.dag.entryAfter [ "writeBoundary" ] /*bash*/ ''
+
+      DEBUG_ARG=$([ -z "$VERBOSE_ARG" ] && echo "" || echo "--debug")
+      run cat ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf \
+        && sed -i $DEBUG_ARG -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
+        -e '/^exec-once/d' -e '/^monitor/d' -e 's/, monitor:(.*),//g' \
+        ${concatStringsSep " " (builtins.map (m: "-e 's/${m.name}/WL-${toString m.number}/g'") monitors)} \
+        ${hyprDir}/hyprlandd.conf \
+        ${concatStringsSep " " 
+          (builtins.map 
+            (m: "&& echo \"monitor=WL-${toString m.number},preferred,auto,1\" >> ${hyprDir}/hyprlandd.conf")
+            monitors)}
+
+    '';
 
   xdg.portal = {
     extraPortals = [ hyprlandPackages.xdg-desktop-portal-hyprland ];
@@ -51,57 +62,58 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprlandPackages.hyprland;
+
     settings = {
       env = [
         "NIXOS_OZONE_WL,1"
         "XDG_CURRENT_DESKTOP=Hyprland"
         "XDG_SESSION_TYPE,wayland"
         "XDG_SESSION_DESKTOP=Hyprland"
-        "WLR_NO_HARDWARE_CURSORS,1"
         "HYPRSHOT_DIR,${config.xdg.userDirs.pictures}/screenshots"
-      ] ++ lib.lists.optionals (osConfig.device.gpu.type == "nvidia") [
+      ] ++ optionals (osConfig.device.gpu.type == "nvidia") [
+        "WLR_NO_HARDWARE_CURSORS,1"
         "LIBVA_DRIVER_NAME,nvidia"
         "GBM_BACKEND,nvidia-drm"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
         "__GL_GSYNC_ALLOWED,0"
         "__GL_VRR_ALLOWED,0"
-      ] ++ lib.lists.optional cfg.tearing "WLR_DRM_NO_ATOMIC,1";
+      ] ++ optional cfg.tearing "WLR_DRM_NO_ATOMIC,1";
 
-      monitor = (lib.lists.map
+      monitor = (builtins.map
         (
           m:
           if !m.enabled then
             "${m.name},disable"
           else
-            lib.fetchers.getMonitorHyprlandCfgStr m
+            fetchers.getMonitorHyprlandCfgStr m
         )
-        osConfig.device.monitors
-      )
-      ++ [
+        monitors
+      ) ++ [
         ",preferred,auto,1" # automatic monitor detection
       ];
 
-      # Launch apps
-      exec-once = [
-        "hyprctl dispatch focusmonitor ${(lib.fetchers.getMonitorByNumber osConfig 1).name}"
-        # Temporary and buggy fix for fixing pasting into wine applications
-        # Can remove xclip package once this is fixed
-        # https://github.com/hyprwm/Hyprland/issues/2319
-        # https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4359
-        # FIX: This is sometimes causing an extra linespace to be inserted on paste
-        "${wlPaste} -t text -w sh -c 'v=$(${pkgs.coreutils}/bin/cat); ${pkgs.diffutils}/bin/cmp -s <(${xclip} -selection clipboard -o)  <<< \"$v\" || ${xclip} -selection clipboard <<< \"$v\"'"
-      ];
+      exec-once =
+        let
+          xclip = getExe pkgs.xclip;
+        in
+        [
+          "hyprctl dispatch focusmonitor ${(fetchers.getMonitorByNumber osConfig 1).name}"
+          # Temporary and buggy fix for pasting into wine applications
+          # https://github.com/hyprwm/Hyprland/issues/2319
+          # https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4359
+          # FIX: This is sometimes causing an extra linespace to be inserted on paste
+          "wl-paste -t text -w sh -c 'v=$(cat); cmp -s <(${xclip} -selection clipboard -o)  <<< \"$v\" || ${xclip} -selection clipboard <<< \"$v\"'"
+        ];
 
       general = with desktopCfg.style; {
         gaps_in = gapSize / 2;
         gaps_out = gapSize;
         border_size = borderWidth;
-        # True causes cursor to render over gamescope, I don't use it much anyway
-        resize_on_border = false;
+        resize_on_border = true;
         hover_icon_on_border = false;
         "col.active_border" = "0xff${colors.base0D} 0xff${colors.base0E} 45deg";
         "col.inactive_border" = "0xff${colors.base00}";
-        cursor_inactive_timeout = 5;
+        cursor_inactive_timeout = 3;
         allow_tearing = cfg.tearing;
       };
 
@@ -121,44 +133,40 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
           "immediate, class:${gameRegex}";
 
       decoration = {
-        # Hyprland corner radius seems slightly stronger than CSS
         rounding = desktopCfg.style.cornerRadius - 2;
+        drop_shadow = false;
 
         blur = {
           enabled = cfg.blur;
           size = 2;
-          passes = 3; # drop to 2 or 3 for weaker blur
+          passes = 3;
           xray = true;
-          special = true; # blur special workspace background
+          special = true;
         };
-
-        drop_shadow = false;
       };
 
       input = {
         follow_mouse = 1;
         mouse_refocus = false;
+        accel_profile = "flat";
+        sensitivity = 0;
 
         kb_layout = "us";
         repeat_delay = 500;
         repeat_rate = 30;
-
-        accel_profile = "flat";
-        sensitivity = 0;
       };
 
       animations = {
         enabled = cfg.animations;
-        # Curves
+
         bezier = [
-          "easeOutExpo,0.16,1,0.3,1"
-          "easeInQuart,0.5,0,0.75,0"
-          "easeOutQuart,0.25,1,0.5,1"
+          # "easeOutExpo,0.16,1,0.3,1"
+          # "easeInQuart,0.5,0,0.75,0"
+          # "easeOutQuart,0.25,1,0.5,1"
           "easeInOutQuart,0.76,0,0.24,1"
         ];
         animation = [
-          # TODO: Window animations don't look great cause of the warping effect
-
+          # TODO: Add better animations
           # Windows
           # "windowsIn,1,3,easeOutQuart"
           # "windowsOut,1,3,easeInQuart"
@@ -169,7 +177,6 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
           # Workspaces
           "workspaces,1,2,easeInOutQuart,slidevert"
         ];
-
       };
 
       misc = {
@@ -203,16 +210,17 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
 
       workspace =
         let
-          primaryMonitor = lib.fetchers.primaryMonitor osConfig;
+          inherit (desktopCfg.style) gapSize;
+          primaryMonitor = fetchers.primaryMonitor osConfig;
         in
-        (lib.lists.concatMap
+        (concatMap
           (
             m:
             let
-              default = builtins.head m.workspaces;
+              default = head m.workspaces;
             in
             (
-              lib.lists.map
+              builtins.map
                 (
                   w: "${toString w}, monitor:${m.name}" +
                   (if w == default then ", default:true" else "")
@@ -220,25 +228,18 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "hyprland") {
                 m.workspaces
             )
           )
-          osConfig.device.monitors
-        )
-        ++ [
+          monitors
+        ) ++ [
           "name:GAME, monitor:${primaryMonitor.name}"
           "name:VM, monitor:${primaryMonitor.name}"
-          "special, gapsin:20, gapsout:40"
+          "special, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
         ];
     };
   };
 
-  modules.desktop.programs.swaylock =
-    let
-      hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
-      sleep = "${pkgs.coreutils}/bin/sleep";
-      pgrep = "${pkgs.procps}/bin/pgrep";
-    in
-    {
-      postLockScript = ''
-        (${sleep} 30; ${pgrep} -x swaylock && ${hyprctl} dispatch dpms off) &
-      '';
-    };
+  modules.desktop.programs.swaylock = {
+    postLockScript = ''
+      (sleep 30; pgrep -x swaylock && hyprctl dispatch dpms off) &
+    '';
+  };
 }

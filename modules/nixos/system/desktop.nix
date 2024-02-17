@@ -64,7 +64,7 @@ in
       };
     })
 
-    (mkIf (windowManager == "hyprland") {
+    (mkIf (windowManager == "Hyprland") {
       # The purpose of enabling hyprland here (in addition to enabling it in
       # home-manager) is to create the hyprland.desktop session file which
       # enables login GUI managers to launch hyprland. However we use greetd

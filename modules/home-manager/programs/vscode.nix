@@ -28,7 +28,7 @@ lib.mkIf cfg.enable {
     };
   };
 
-  impermanence.directories = [
+  persistence.directories = [
     ".config/Code"
     ".vscode"
   ];

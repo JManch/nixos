@@ -9,12 +9,6 @@ let
   waybar = config.modules.desktop.services.waybar;
   dconf = osConfig.programs.dconf;
   audio = osConfig.modules.system.audio;
-
-  autoloadDeviceConfigs = builtins.listToAttrs
-    (builtins.map
-      (autoload: { name = "easyeffects/autoload/${autoload.deviceType}/${autoload.deviceName}.json"; value = { text = autoload.config; }; })
-      cfg.autoloadDevices
-    );
 in
 # easyeffects requires dconf
 lib.mkIf (cfg.enable && audio.enable && dconf.enable) {
@@ -63,7 +57,7 @@ lib.mkIf (cfg.enable && audio.enable && dconf.enable) {
       };
   };
 
-  xdg.configFile = autoloadDeviceConfigs // {
+  xdg.configFile = {
     "easyeffects/input/improved-microphone.json".text = /* json */ ''
       {
         "input": {

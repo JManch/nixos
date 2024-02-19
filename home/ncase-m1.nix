@@ -46,10 +46,10 @@ in
         dunst.enable = true;
         wlsunset.enable = true;
 
-        swayidle = {
-          enable = false;
+        hypridle = {
+          enable = true;
           lockTime = 3 * 60;
-          screenOffTime = 4 * 60;
+          screenOffTime = (3 * 60) + 30;
         };
 
         wallpaper = {

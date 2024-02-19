@@ -1,43 +1,43 @@
-{ lib
-, config
-, ...
-}:
+{ lib, config, ... }:
 let
   cfg = config.modules.programs.alacritty;
-  alacritty = config.programs.alacritty.package;
   desktopCfg = config.modules.desktop;
   colors = config.colorscheme.palette;
+  normalFontSize = 12;
+  largeFontSize = 17;
 in
 lib.mkIf cfg.enable {
   programs.alacritty = {
     enable = true;
+
     settings = {
       window = {
-        padding = {
-          x = 5;
-          y = 5;
-        };
+        padding = { x = 5; y = 5; };
         dynamic_padding = true;
         decorations = "none";
         opacity = 0.7;
         dynamic_title = true;
       };
+
       scrolling = {
         history = 10000;
       };
+
       font = {
-        size = 12;
+        size = normalFontSize;
         normal = {
           family = "${desktopCfg.style.font.family}";
           style = "Regular";
         };
       };
+
       colors = {
         primary = {
           background = "#${colors.base00}";
           foreground = "#${colors.base05}";
           bright_foreground = "#${colors.base06}";
         };
+
         normal = {
           black = "#${colors.base02}";
           red = "#${colors.base08}";
@@ -49,19 +49,25 @@ lib.mkIf cfg.enable {
           white = "#${colors.base07}";
         };
       };
+
       mouse = {
         hide_when_typing = false;
       };
+
       cursor = {
+        blink_interval = 500;
         style = {
           shape = "Beam";
           blinking = "On";
         };
-        blink_interval = 500;
       };
     };
   };
-  # TODO: Add bind for toggling between small/large alacritty font
-  desktop.hyprland.binds = lib.mkIf (desktopCfg.windowManager == "Hyprland")
-    [ "${desktopCfg.hyprland.modKey}, Return, exec, ${alacritty}/bin/alacritty" ];
+
+  programs.zsh.shellAliases = {
+    alacritty-large-font = "alacritty msg config font.size=${toString largeFontSize}";
+    alacritty-normal-font = "alacritty msg config font.size=${toString normalFontSize}";
+  };
+
+  desktop.hyprland.binds = [ "${desktopCfg.hyprland.modKey}, Return, exec, alacritty" ];
 }

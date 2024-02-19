@@ -4,9 +4,7 @@ let
 in
 lib.mkIf cfg.enable
 {
-  age.secrets = {
-    nordToken.file = ../../../secrets/nordvpn/token.age;
-  };
+  age.secrets.nordToken.file = ../../../secrets/nordvpn/token.age;
 
   services.wgnord = {
     enable = true;

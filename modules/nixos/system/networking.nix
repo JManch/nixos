@@ -6,45 +6,59 @@
 , ...
 }:
 let
-  inherit (lib) mkMerge mkIf lists;
+  inherit (lib) mkMerge mkIf optional optionals;
   cfg = config.modules.system.networking;
 in
 {
+  environment.systemPackages = with pkgs; [
+    ifmetric # for changing metric in emergencies
+  ] ++ optional cfg.wireless.enable wpa_supplicant_gui;
+
+  users.users.${username}.extraGroups = [ "networkmanager" ];
   age.secrets.wirelessNetworks.file = ../../../secrets/wireless-networks.age;
+
+  systemd.services.wpa_supplicant.preStart = "${pkgs.coreutils}/bin/touch /etc/wpa_supplicant.conf";
+  services.resolved.enable = cfg.resolved.enable;
 
   networking = {
     hostName = hostname;
+
     networkmanager = {
       enable = true;
       wifi.powersave = true;
-      unmanaged = lists.optionals cfg.wireless.enable [
-        # Tell network manager not to manage wireless interfaces
+
+      # Tell network manager not to manage wireless interfaces
+      unmanaged = optionals cfg.wireless.enable [
         "*"
         "except:type:wwan"
         "except:type:gsm"
       ];
     };
+
     firewall = {
       enable = cfg.firewall.enable;
       defaultInterfaces = cfg.firewall.defaultInterfaces;
     };
+
     wireless = {
       enable = cfg.wireless.enable;
       environmentFile = config.age.secrets.wirelessNetworks.path;
       scanOnLowSignal = config.device.type == "laptop";
+      # Allow imperative network config
+      allowAuxiliaryImperativeNetworks = true;
+
       networks = {
         "Pixel 5" = {
           pskRaw = "@PIXEL_5@";
         };
       };
 
-      # Allow imperative network config
-      allowAuxiliaryImperativeNetworks = true;
       userControlled = {
         enable = true;
         group = "networkmanager";
       };
     };
+
     dhcpcd = {
       enable = true;
       extraConfig = ''
@@ -54,13 +68,9 @@ in
     };
   };
 
-  users.users.${username}.extraGroups = [ "networkmanager" ];
-  environment.systemPackages = [
-    pkgs.ifmetric # change metric in emergencies
-  ] ++ lists.optional cfg.wireless.enable pkgs.wpa_supplicant_gui;
-  systemd.services.wpa_supplicant.preStart = "${pkgs.coreutils}/bin/touch /etc/wpa_supplicant.conf";
-
   boot = {
+    kernelModules = optional cfg.tcpOptimisations "tcp_bbr";
+
     kernel.sysctl = mkMerge [
       {
         "net.ipv4.icmp_ignore_bogus_error_responses" = 1;
@@ -85,6 +95,7 @@ in
         # Incomplete protection again TIME-WAIT assassination
         "net.ipv4.tcp_rfc1337" = 1;
       }
+
       (mkIf cfg.tcpOptimisations {
         # Enables data to be exchanged during the initial TCP SYN
         "net.ipv4.tcp_fastopen" = 3;
@@ -93,9 +104,5 @@ in
         "net.core.default_qdisc" = "cake";
       })
     ];
-
-    kernelModules = lists.optional cfg.tcpOptimisations "tcp_bbr";
   };
-
-  services.resolved.enable = cfg.resolved.enable;
 }

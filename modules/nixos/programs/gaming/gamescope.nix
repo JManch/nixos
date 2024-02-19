@@ -1,4 +1,4 @@
-{ lib, pkgs, config, ... }:
+{ lib, config, ... }:
 let
   inherit (lib) mkIf;
   cfg = config.modules.programs.gaming.gamescope;

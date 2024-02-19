@@ -1,17 +1,16 @@
 { lib, pkgs, config, ... }:
 let
+  inherit (lib) mkIf fetchers;
   cfg = config.modules.programs.anki;
 in
-lib.mkIf cfg.enable
+mkIf cfg.enable
 {
   home = {
     packages = [ pkgs.anki-bin ];
-    sessionVariables = lib.mkIf (lib.fetchers.isWayland config) {
+    sessionVariables = mkIf (fetchers.isWayland config) {
       ANKI_WAYLAND = 1;
     };
   };
 
-  persistence.directories = [
-    ".local/share/Anki2"
-  ];
+  persistence.directories = [ ".local/share/Anki2" ];
 }

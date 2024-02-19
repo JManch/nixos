@@ -1,12 +1,12 @@
 { lib, config, osConfig, ... }:
 let
-  binary = "${config.programs.firefox.package}/bin/firefox";
+  inherit (lib) mkIf getExe;
   cfg = config.modules.programs.firefox;
   desktopCfg = config.modules.desktop;
   # color = base:
   #   inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorscheme.colors.${base};
 in
-lib.mkIf cfg.enable {
+mkIf cfg.enable {
   # TODO: Add extension config files
   # - res
   # - ffz
@@ -14,15 +14,18 @@ lib.mkIf cfg.enable {
   # - ublock?
   programs.firefox = {
     enable = true;
+
     profiles = {
       default = {
         id = 0;
         name = "default";
         isDefault = true;
+
         search = {
           force = true;
           default = "Google";
         };
+
         settings = {
           # General
           "general.autoScroll" = true;
@@ -104,6 +107,7 @@ lib.mkIf cfg.enable {
           "network.captive-portal-service.enabled" = false;
           "network.connectivity-service.enabled" = false;
         };
+
         userChrome = /* css */ ''
           /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/autohide_toolbox.css made available under Mozilla Public License v. 2.0
           See the above repository for updates as well as full license text. */
@@ -189,6 +193,7 @@ lib.mkIf cfg.enable {
           #titlebar{ order: 2 }
           */
         '';
+
         userContent = /*css*/ ''
           @-moz-document url-prefix(http://lore.kernel.org/) { /* moz-only */
             /*
@@ -254,14 +259,18 @@ lib.mkIf cfg.enable {
     };
   };
 
+  desktop.hyprland.binds =
+    let
+      firefox = getExe config.programs.firefox.package;
+    in
+    [
+      "${desktopCfg.hyprland.modKey}, Backspace, exec, ${firefox}"
+    ];
+
   persistence.directories = [
     ".mozilla"
     ".cache/mozilla"
   ];
-
-  desktop.hyprland.binds =
-    lib.mkIf (desktopCfg.windowManager == "Hyprland")
-      [ "${desktopCfg.hyprland.modKey}, Backspace, exec, ${binary}" ];
 }
 # TODO: Either theme firefox with this or figure out how to change theme through GTK
 

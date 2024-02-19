@@ -1,9 +1,4 @@
-{ pkgs
-, username
-, lib
-, config
-, ...
-}:
+{ lib, pkgs, config, ... }:
 let
   cfg = config.modules.programs.wine;
 in
@@ -18,10 +13,6 @@ lib.mkIf cfg.enable
     winetricks
   ];
 
-  environment.persistence."/persist".users.${username} = {
-    directories = [
-      ".local/share/wineprefixes"
-    ];
-  };
   environment.sessionVariables.WINEPREFIX = "$HOME/.local/share/wineprefixes/default";
+  persistenceHome.directories = [ ".local/share/wineprefixes" ];
 }

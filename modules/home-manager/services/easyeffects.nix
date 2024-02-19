@@ -1,18 +1,16 @@
 { lib
+, pkgs
 , config
 , osConfig
-, pkgs
 , ...
 }:
 let
+  inherit (lib) mkIf getExe;
+  inherit (osConfig.programs) dconf;
+  inherit (osConfig.modules.system) audio;
   cfg = config.modules.services.easyeffects;
-  waybar = config.modules.desktop.services.waybar;
-  dconf = osConfig.programs.dconf;
-  audio = osConfig.modules.system.audio;
 in
-# easyeffects requires dconf
-lib.mkIf (cfg.enable && audio.enable && dconf.enable) {
-
+mkIf (cfg.enable && audio.enable && dconf.enable) {
   home.packages = [ pkgs.easyeffects ];
 
   systemd.user.services.easyeffects = {
@@ -31,34 +29,34 @@ lib.mkIf (cfg.enable && audio.enable && dconf.enable) {
     };
   };
 
-  programs.waybar = lib.mkIf waybar.enable {
-    settings.bar =
-      with pkgs;
-      let
-        colors = config.colorscheme.palette;
-      in
-      {
-        pulseaudio = {
-          "on-click-middle" = /* bash */ ''
-            ${systemd}/bin/systemctl status --user easyeffects > /dev/null 2>&1 && {
-              ${systemd}/bin/systemctl stop --user easyeffects
-              ${libnotify}/bin/notify-send --urgency=low -t 3000 'Easyeffects disabled'
-            } || {
-              ${systemd}/bin/systemctl start --user easyeffects
-              ${libnotify}/bin/notify-send --urgency=low -t 3000 'Easyeffects enabled'
-            }
-          '';
-        };
-        "custom/easyeffects" = {
-          format = "<span color='#${colors.base04}' size='large'>󰤽</span> Easyeffects";
-          exec = "${systemd}/bin/systemctl status --user easyeffects";
-          interval = 5;
-        };
+  programs.waybar.settings.bar =
+    let
+      colors = config.colorscheme.palette;
+      systemctl = "${pkgs.systemd}/bin/systemctl";
+      notifySend = getExe pkgs.libnotify;
+    in
+    {
+      pulseaudio = {
+        "on-click-middle" = /* bash */ ''
+          ${systemctl} status --user easyeffects > /dev/null 2>&1 && {
+            ${systemctl} stop --user easyeffects
+            ${notifySend} --urgency=low -t 3000 'Easyeffects disabled'
+          } || {
+            ${systemctl} start --user easyeffects
+            ${notifySend} --urgency=low -t 3000 'Easyeffects enabled'
+          }
+        '';
       };
-  };
+      "custom/easyeffects" = {
+        format = "<span color='#${colors.base04}' size='large'>󰤽</span> Easyeffects";
+        exec = "${systemctl} status --user easyeffects";
+        interval = 5;
+      };
+    };
 
   xdg.configFile = {
-    "easyeffects/input/improved-microphone.json".text = /* json */ ''
+    "easyeffects/input/improved-microphone.json".text = /*json*/ ''
+
       {
         "input": {
           "blocklist": [],
@@ -304,6 +302,7 @@ lib.mkIf (cfg.enable && audio.enable && dconf.enable) {
           }
         }
       }
+
     '';
   };
 }

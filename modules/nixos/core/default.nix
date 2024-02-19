@@ -5,24 +5,32 @@
 , outputs
 , ...
 }:
+let
+  inherit (lib) mapAttrs mapAttrs' filterAttrs isType;
+in
 {
   imports = lib.utils.scanPaths ./.;
 
+  programs.zsh.enable = true;
+  environment.systemPackages = [ pkgs.git ];
+  time.timeZone = "Europe/London";
+  system.stateVersion = "23.05";
+
   nixpkgs = {
     overlays = builtins.attrValues outputs.overlays;
-    config = {
-      allowUnfree = true;
-    };
+    config.allowUnfree = true;
   };
 
   nix = {
     # Populates the nix registry with all our flake inputs `nix registry list`
-    registry = (lib.mapAttrs (_: flake: { inherit flake; })) ((lib.filterAttrs (_: lib.isType "flake")) inputs)
+    registry = (mapAttrs (_: flake: { inherit flake; })) ((filterAttrs (_: isType "flake")) inputs)
       // { n.flake = inputs.nixpkgs; };
+
     settings = {
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;
     };
+
     gc = {
       automatic = true;
       dates = "weekly";
@@ -33,18 +41,12 @@
   # Add flake inputs to the system's legacy channels
   nix.nixPath = [ "/etc/nix/path" ];
   environment.etc =
-    lib.mapAttrs'
+    mapAttrs'
       (name: value: {
         name = "nix/path/${name}";
         value.source = value.flake;
       })
       config.nix.registry;
-
-  environment.systemPackages = with pkgs; [
-    git
-  ];
-
-  programs.zsh.enable = true;
 
   environment.sessionVariables = {
     XDG_CACHE_HOME = "$HOME/.cache";
@@ -52,6 +54,4 @@
     XDG_DATA_HOME = "$HOME/.local/share";
     XDG_STATE_HOME = "$HOME/.local/state";
   };
-
-  time.timeZone = "Europe/London";
 }

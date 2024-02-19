@@ -32,5 +32,7 @@ in
           }
         ];
     };
+
+    systemd.user.services.hypridle.Install.WantedBy = lib.mkForce [ "graphical-session.target" ];
   };
 }

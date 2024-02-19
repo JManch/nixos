@@ -1,12 +1,13 @@
 { lib, config, osConfig, ... }:
 let
+  inherit (osConfig) device;
   cfg = config.modules.programs.mangohud;
-  device = osConfig.device;
   colors = config.colorscheme.palette;
 in
 lib.mkIf cfg.enable {
   programs.mangohud = {
     enable = true;
+
     settings = {
       # Performance
       fps_limit = "0,60,144,165";

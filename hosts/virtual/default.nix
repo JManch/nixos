@@ -1,8 +1,12 @@
+{ lib, ... } @ args:
+let
+  inherit (lib) utils getExe;
+  homeConfig = utils.homeConfig args;
+in
 {
   imports = [ ./hardware-configuration.nix ];
 
   networking.hostId = "8d4ed64c";
-  system.stateVersion = "23.05";
 
   device = {
     type = "vm";
@@ -41,7 +45,7 @@
     services = {
       greetd = {
         enable = true;
-        launchCmd = "Hyprland";
+        launchCmd = getExe homeConfig.wayland.windowManager.hyprland.package;
       };
     };
 

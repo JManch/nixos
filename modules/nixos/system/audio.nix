@@ -2,23 +2,26 @@
 , pkgs
 , config
 , inputs
-, username
 , ...
 }:
 let
+  inherit (lib) mkMerge mkIf getExe mkForce;
+  inherit (config.modules.programs) gaming;
   cfg = config.modules.system.audio;
-  wpctl = "${pkgs.wireplumber}/bin/wpctl";
-  notifySend = "${pkgs.libnotify}/bin/notify-send";
-  gaming = config.modules.programs.gaming;
 
-  toggleMic = pkgs.writeShellScript "toggle-mic" ''
-    ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle
-    status=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@)
-    if [[ $status == *MUTED* ]]; then
-      ${notifySend} -u critical -t 2000 -h 'string:x-canonical-private-synchronous:microphone-toggle' 'Microphone' 'Muted'
-    else
-      ${notifySend} -u critical -t 2000 -h 'string:x-canonical-private-synchronous:microphone-toggle' 'Microphone' 'Unmuted'
-    fi
+  toggleMic =
+    let
+      wpctl = "${pkgs.wireplumber}/bin/wpctl";
+      notifySend = getExe pkgs.libnotify;
+    in
+    pkgs.writeShellScript "toggle-mic" ''
+
+      ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+      status=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@)
+      message=$([[ "$status" == *MUTED* ]] && echo "Muted" || echo "Unmuted")
+      ${notifySend} -u critical -t 2000 \
+        -h 'string:x-canonical-private-synchronous:microphone-toggle' 'Microphone' "$message"
+
   '';
 in
 {
@@ -26,9 +29,15 @@ in
     inputs.nix-gaming.nixosModules.pipewireLowLatency
   ];
 
-  config = lib.mkMerge [
-    (lib.mkIf cfg.enable {
+  config = mkMerge [
+    (mkIf cfg.enable {
       environment.systemPackages = [ pkgs.pavucontrol ];
+      hardware.pulseaudio.enable = mkForce false;
+      modules.system.audio.scripts.toggleMic = toggleMic.outPath;
+
+      # Make pipewire realtime-capable
+      security.rtkit.enable = true;
+
       services.pipewire = {
         enable = true;
         alsa.enable = true;
@@ -37,28 +46,19 @@ in
         wireplumber.enable = true;
         lowLatency.enable = gaming.enable;
       };
-
-      hardware.pulseaudio.enable = lib.mkForce false;
-
-      # Make pipewire realtime-capable
-      security.rtkit.enable = true;
-
-      modules.system.audio.scripts.toggleMic = toggleMic.outPath;
     })
 
-    (lib.mkIf (cfg.enable && cfg.extraAudioTools) {
+    (mkIf (cfg.enable && cfg.extraAudioTools) {
       environment.systemPackages = with pkgs; [
         helvum
         qpwgraph
       ];
 
-      environment.persistence."/persist".users.${username} = {
-        directories = [
-          ".config/rncbc.org"
-          ".local/state/wireplumber"
-          ".config/qpwgraph" # just for manually saved configs
-        ];
-      };
+      persistenceHome.directories = [
+        ".config/rncbc.org"
+        ".local/state/wireplumber"
+        ".config/qpwgraph" # just for manually saved configs
+      ];
     })
   ];
 }

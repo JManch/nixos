@@ -2,11 +2,17 @@
 let
   inherit (lib) mkAliasOptionModule mkEnableOption mkOption types;
   cfg = config.modules.desktop.hyprland;
+  hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
 in
 {
   imports = lib.utils.scanPaths ./. ++ [
-    (mkAliasOptionModule [ "desktop" "hyprland" "binds" ] [ "wayland" "windowManager" "hyprland" "settings" "bind" ])
-    (mkAliasOptionModule [ "desktop" "hyprland" "settings" ] [ "wayland" "windowManager" "hyprland" "settings" ])
+    (mkAliasOptionModule
+      [ "desktop" "hyprland" "binds" ]
+      [ "wayland" "windowManager" "hyprland" "settings" "bind" ])
+
+    (mkAliasOptionModule
+      [ "desktop" "hyprland" "settings" ]
+      [ "wayland" "windowManager" "hyprland" "settings" ])
   ];
 
   options.modules.desktop.hyprland = {
@@ -52,18 +58,21 @@ in
 
     shaderDir = mkOption {
       type = types.str;
+      readOnly = true;
       default = "${config.xdg.configHome}/hypr/shaders";
     };
 
     enableShaders = mkOption {
       type = types.str;
-      default = "hyprctl keyword decoration:screen_shader ${cfg.shaderDir}/monitorGamma.frag";
+      readOnly = true;
+      default = "'${hyprctl}' keyword decoration:screen_shader \"${cfg.shaderDir}/monitorGamma.frag\"";
       description = "Command to enable Hyprland screen shaders";
     };
 
     disableShaders = mkOption {
       type = types.str;
-      default = "hyprctl keyword decoration:screen_shader ${cfg.shaderDir}/blank.frag";
+      readOnly = true;
+      default = "'${hyprctl}' keyword decoration:screen_shader \"${cfg.shaderDir}/blank.frag\"";
       description = "Command to disable Hyprland screen shaders";
     };
   };

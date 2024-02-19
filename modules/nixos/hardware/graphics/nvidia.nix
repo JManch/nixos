@@ -1,38 +1,36 @@
 { lib
 , pkgs
 , config
-, outputs
-, username
-, hostname
 , ...
-}:
+} @ args:
 let
+  inherit (lib) utils mkIf fetchers;
   nvidia = config.device.gpu.type == "nvidia";
   desktop = config.usrEnv.desktop.enable;
-  homeManagerConfig = outputs.nixosConfigurations.${hostname}.config.home-manager.users.${username};
+  homeConfig = utils.homeConfig args;
 in
-lib.mkIf nvidia
+mkIf nvidia
 {
   hardware.opengl = {
     enable = true;
     driSupport = true;
     driSupport32Bit = true;
-    extraPackages = [
-      pkgs.vaapiVdpau # hardware acceleration
-      pkgs.nvidia-vaapi-driver
+    extraPackages = with pkgs; [
+      vaapiVdpau
+      nvidia-vaapi-driver
     ];
   };
 
-  services.xserver.videoDrivers = lib.mkIf desktop [ "nvidia" ];
+  services.xserver.videoDrivers = mkIf desktop [ "nvidia" ];
 
   hardware.nvidia = {
     # Major issues if this is disabled
     modesetting.enable = true;
     open = true;
-    nvidiaSettings = !(lib.fetchers.isWayland homeManagerConfig);
+    nvidiaSettings = !(fetchers.isWayland homeConfig);
   };
 
-  environment.persistence."/persist".users.${username}.directories = [
+  persistenceHome.directories = [
     ".cache/nvidia"
   ];
 }

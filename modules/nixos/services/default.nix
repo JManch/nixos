@@ -1,6 +1,6 @@
 { lib, config, ... }:
 let
-  inherit (lib) mkEnableOption mkOption types;
+  inherit (lib) mkEnableOption mkOption types literalExpression;
   cfg = config.modules.services;
 in
 {
@@ -17,7 +17,7 @@ in
         type = types.str;
         default = "";
         description = "Login launch command";
-        example = "Hyprland";
+        example = literalExpression "lib.getExe pkgs.hyprland";
       };
     };
 

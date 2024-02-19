@@ -12,11 +12,13 @@ lib.mkIf cfg.enable {
 
   programs.mpv = {
     enable = true;
+
     scripts = with pkgs.mpvScripts; [
       thumbfast
       sponsorblock-minimal
       outputs.packages.${pkgs.system}.modernx
     ];
+
     scriptOpts = {
       modernx = {
         scalewindowed = 1;
@@ -35,6 +37,7 @@ lib.mkIf cfg.enable {
         raisesubswithosc = false;
       };
     };
+
     config = {
       # Quality
       profile = "gpu-hq";
@@ -66,6 +69,7 @@ lib.mkIf cfg.enable {
       screenshot-directory = "${config.xdg.userDirs.pictures}/screenshots/mpv";
       screenshot-template = "%f-%wH.%wM.%wS.%wT-#%#00n";
     };
+
     bindings = {
       WHEEL_UP = "add volume 5";
       WHEEL_DOWN = "add volume -5";
@@ -76,21 +80,28 @@ lib.mkIf cfg.enable {
     };
   };
 
-  programs.zsh.initExtra = /* bash */ ''
-    screenshare () {
-      if [[ -z "$1" ]]; then
-          echo "Usage: screenshare <ip:port>"
-          return 1
-      fi
-      eval "mpv 'srt://$1?mode=caller' --no-cache --profile=low-latency --untimed"
-    };
-    yt-dlp-audio () {
-      eval "yt-dlp --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s' '$1'"
-    }
-  '';
+  programs.zsh.initExtra =
+    let
+      mpv = lib.getExe config.programs.mpv.package;
+      ytDlp = lib.getExe pkgs.yt-dlp;
+    in
+      /*bash*/ ''
+
+      screenshare () {
+        if [[ -z "$1" ]]; then
+            echo "Usage: screenshare <ip:port>"
+            return 1
+        fi
+        eval "${mpv} 'srt://$1?mode=caller' --no-cache --profile=low-latency --untimed"
+      };
+
+      yt-dlp-audio () {
+        eval "${ytDlp} --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s' '$1'"
+      }
+
+    '';
 
   persistence.directories = [
-    # contains state for save-position-on-quit
-    ".local/state/mpv"
+    ".local/state/mpv" # contains state for save-position-on-quit
   ];
 }

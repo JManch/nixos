@@ -1,18 +1,16 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
+{ lib, pkgs, config, ... }:
 let
   cfg = config.modules.programs.fastfetch;
 in
 lib.mkIf cfg.enable {
   home.packages = [ pkgs.fastfetch ];
+
   programs.zsh.shellAliases = {
     neofetch = "fastfetch";
   };
 
-  xdg.configFile."fastfetch/config.jsonc".text = /* jsonc */ ''
+  xdg.configFile."fastfetch/config.jsonc".text = /*jsonc*/ ''
+
     {
       "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
       "modules": [
@@ -57,5 +55,6 @@ lib.mkIf cfg.enable {
           "colors"
       ]
     }
+
   '';
 }

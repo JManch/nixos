@@ -5,14 +5,16 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf mkMerge mkVMOverride;
+  inherit (lib) mkIf mkMerge mkVMOverride mod getExe;
   cfg = config.modules.system.virtualisation;
 in
 mkMerge [
   {
     # We configure the vmVariant regardless of whether or not the host has
-    # virtualisation enabled because it is possible to create a vm of any host
+    # virtualisation enabled because it should be possible to create a VM of any host
     virtualisation.vmVariant = {
+      home-manager.extraSpecialArgs = { vmVariant = true; };
+
       device = mkVMOverride {
         monitors = [{
           name = "Virtual-1";
@@ -44,8 +46,6 @@ mkMerge [
         hashedPasswordFile = mkVMOverride null;
       };
 
-      home-manager.extraSpecialArgs = mkIf config.usrEnv.homeManager.enable { vmVariant = true; };
-
       virtualisation =
         let
           desktopEnabled = config.usrEnv.desktop.enable;
@@ -71,38 +71,43 @@ mkMerge [
           };
           # Forward all TCP and UDP ports that are opened in the firewall
           # Should make the majority of the VMs services accessible from host
+          # TODO: Make this compatible with the defaultInterfaces firewall option
           forwardPorts =
             let
               forward = proto: port: {
                 from = "host";
                 # Attempt to map host port to a unique value between 50000-65000
                 # Might need manual intervention
-                host = { port = (lib.trivial.mod port 15001) + 50000; address = "127.0.0.1"; };
+                host = { port = (mod port 15001) + 50000; address = "127.0.0.1"; };
                 guest.port = port;
                 proto = proto;
               };
             in
-            lib.lists.map (forward "tcp") config.networking.firewall.allowedTCPPorts
+            map (forward "tcp") config.networking.firewall.allowedTCPPorts
             ++
-            lib.lists.map (forward "udp") config.networking.firewall.allowedUDPPorts;
+            map (forward "udp") config.networking.firewall.allowedUDPPorts;
         };
     };
   }
 
   (mkIf cfg.enable {
-    virtualisation = {
-      libvirtd.enable = true;
-      docker.enable = true;
-    };
     programs.virt-manager.enable = true;
     users.users."${username}".extraGroups = [ "libvirtd" "docker" ];
 
+    virtualisation = {
+      libvirtd.enable = true;
+      # TODO: Properly configure docker
+      docker.enable = false;
+    };
+
     programs.zsh.interactiveShellInit =
       let
-        grep = "${pkgs.gnugrep}/bin/grep";
-        sed = "${pkgs.gnused}/bin/sed";
+        inherit (lib) utils;
+        grep = getExe pkgs.gnugrep;
+        sed = getExe pkgs.gnused;
       in
-        /* bash */ ''
+        /*bash*/ ''
+
         run-vm() {
           if [ -z "$1" ]; then
             echo "Usage: build-vm <hostname>"
@@ -119,18 +124,15 @@ mkMerge [
           # Run non-graphical session in a new terminal window
           if grep -q -- "-nographic" "$runscript"; then
             ${if config.usrEnv.desktop.enable then
-              "${(lib.utils.homeConfig args).modules.desktop.terminal.exePath} --class qemu -e $runscript"
+              "${(utils.homeConfig args).modules.desktop.terminal.exePath} --class qemu -e $runscript"
             else "$runscript"}
           else
             $runscript
           fi
         }
+
       '';
 
-    environment = {
-      persistence."/persist".directories = [
-        "/var/lib/libvirt"
-      ];
-    };
+    persistence.directories = [ "/var/lib/libvirt" ];
   })
 ]

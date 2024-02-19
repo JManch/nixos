@@ -1,6 +1,8 @@
 {
   imports = [ ./hardware-configuration.nix ];
 
+  networking.hostId = "8d4ed64c";
+
   device = {
     type = "server";
     cpu.type = "amd";
@@ -42,8 +44,4 @@
       cores = 8;
     };
   };
-
-  networking.hostId = "8d4ed64c";
-
-  system.stateVersion = "23.05";
 }

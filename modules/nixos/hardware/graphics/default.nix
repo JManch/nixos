@@ -1,6 +1,4 @@
+{ lib, ... }:
 {
-  imports = [
-    ./nvidia.nix
-    ./amd.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
 }

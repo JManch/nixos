@@ -1,23 +1,17 @@
-{ lib
-, config
-, osConfig
-, ...
-}:
+{ lib, config, osConfig, ... }:
 let
+  inherit (lib) mkIf getExe;
   cfg = config.modules.programs.btop;
   colors = config.colorscheme.palette;
 in
-lib.mkIf cfg.enable {
-
+mkIf cfg.enable {
   programs.btop = {
     enable = true;
-    settings = {
-      color_theme = "custom";
-    };
-
+    settings.color_theme = "custom";
   };
 
   xdg.configFile."btop/themes/custom.theme".text = ''
+
     theme[main_bg]="#${colors.base00}"
     theme[main_fg]="#${colors.base05}"
     theme[title]="#${colors.base06}"
@@ -60,15 +54,20 @@ lib.mkIf cfg.enable {
     theme[process_start]="#${colors.base0A}"
     theme[process_mid]="#${colors.base0A}"
     theme[process_end]="#${colors.base09}"
+
   '';
 
-  xdg.desktopEntries."btop" = lib.mkIf osConfig.usrEnv.desktop.enable {
-    name = "btop";
-    genericName = "Resource Monitor";
-    exec = "${config.programs.alacritty.package}/bin/alacritty --title btop -e ${config.programs.btop.package}/bin/btop";
-    terminal = false;
-    type = "Application";
-    categories = [ "System" ];
-  };
-
+  xdg.desktopEntries."btop" =
+    let
+      btop = getExe config.programs.btop.package;
+      terminal = config.modules.desktop.terminal.exePath;
+    in
+    mkIf osConfig.usrEnv.desktop.enable {
+      name = "btop";
+      genericName = "Resource Monitor";
+      exec = "${terminal} --title btop -e ${btop}";
+      terminal = false;
+      type = "Application";
+      categories = [ "System" ];
+    };
 }

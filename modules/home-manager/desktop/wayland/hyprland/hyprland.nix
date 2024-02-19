@@ -43,12 +43,12 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
       DEBUG_ARG=$([ -z "$VERBOSE_ARG" ] && echo "" || echo "--debug")
       run cat ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf \
-        && sed -i $DEBUG_ARG -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
+        && ${getExe pkgs.gnused} -i $DEBUG_ARG -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
         -e '/^exec-once/d' -e '/^monitor/d' -e 's/, monitor:(.*),//g' \
-        ${concatStringsSep " " (builtins.map (m: "-e 's/${m.name}/WL-${toString m.number}/g'") monitors)} \
+        ${concatStringsSep " " (map (m: "-e 's/${m.name}/WL-${toString m.number}/g'") monitors)} \
         ${hyprDir}/hyprlandd.conf \
         ${concatStringsSep " " 
-          (builtins.map 
+          (map 
             (m: "&& echo \"monitor=WL-${toString m.number},preferred,auto,1\" >> ${hyprDir}/hyprlandd.conf")
             monitors)}
 
@@ -79,7 +79,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         "__GL_VRR_ALLOWED,0"
       ] ++ optional cfg.tearing "WLR_DRM_NO_ATOMIC,1";
 
-      monitor = (builtins.map
+      monitor = (map
         (
           m:
           if !m.enabled then
@@ -95,14 +95,18 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
       exec-once =
         let
           xclip = getExe pkgs.xclip;
+          hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+          wlPaste = "${pkgs.wl-clipboard}/bin/wl-paste";
+          cat = "${pkgs.coreutils}/bin/cat";
+          cmp = "${pkgs.diffutils}/bin/cmp";
         in
         [
-          "hyprctl dispatch focusmonitor ${(fetchers.getMonitorByNumber osConfig 1).name}"
+          "${hyprctl} dispatch focusmonitor ${(fetchers.getMonitorByNumber osConfig 1).name}"
           # Temporary and buggy fix for pasting into wine applications
           # https://github.com/hyprwm/Hyprland/issues/2319
           # https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4359
           # FIX: This is sometimes causing an extra linespace to be inserted on paste
-          "wl-paste -t text -w sh -c 'v=$(cat); cmp -s <(${xclip} -selection clipboard -o)  <<< \"$v\" || ${xclip} -selection clipboard <<< \"$v\"'"
+          "${wlPaste} -t text -w sh -c 'v=$(${cat}); ${cmp} -s <(${xclip} -selection clipboard -o)  <<< \"$v\" || ${xclip} -selection clipboard <<< \"$v\"'"
         ];
 
       general = with desktopCfg.style; {
@@ -220,7 +224,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
               default = head m.workspaces;
             in
             (
-              builtins.map
+              map
                 (
                   w: "${toString w}, monitor:${m.name}" +
                   (if w == default then ", default:true" else "")
@@ -235,11 +239,5 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
           "special, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
         ];
     };
-  };
-
-  modules.desktop.programs.swaylock = {
-    postLockScript = ''
-      (sleep 30; pgrep -x swaylock && hyprctl dispatch dpms off) &
-    '';
   };
 }

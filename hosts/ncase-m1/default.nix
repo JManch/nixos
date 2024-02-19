@@ -1,8 +1,12 @@
+{ lib, ... } @ args:
+let
+  inherit (lib) utils getExe;
+  homeConfig = utils.homeConfig args;
+in
 {
   imports = [ ./hardware-configuration.nix ];
 
   networking.hostId = "625ec505";
-  system.stateVersion = "23.05";
 
   device = {
     type = "desktop";
@@ -87,7 +91,7 @@
 
       greetd = {
         enable = true;
-        launchCmd = "Hyprland";
+        launchCmd = getExe homeConfig.wayland.windowManager.hyprland.package;
       };
 
       jellyfin = {

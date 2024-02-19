@@ -6,12 +6,18 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.hardware = {
+    vr.enable = mkEnableOption "virtual reality";
+    secureBoot.enable = mkEnableOption "secure boot";
+
     fileSystem = {
+      trim = mkEnableOption "ZFS automatic trimming";
+
       zpoolName = mkOption {
         type = types.str;
-        description = "Name of the zpool to mount";
         default = "zpool";
+        description = "Name of the zpool to mount";
       };
+
       forceImportRoot = mkOption {
         type = types.bool;
         default = true;
@@ -20,27 +26,23 @@ in
           break so be prepared to set `zfs_force=1` kernel param in boot menu.
         '';
       };
+
       bootLabel = mkOption {
         type = types.str;
-        description = "Label of the boot partition";
         default = "boot";
+        description = "Label of the boot partition";
       };
-      trim = mkEnableOption "ZFS automatic trimming";
+
       rootTmpfsSize = mkOption {
         type = types.nullOr types.str;
-        description = ''
-          Maximum size of the volatile root tmpfs partition. Default is to not
-          specific size which will allocated 50% of system memory to the tmpfs.
-          Memory is dynamically allocated so will not effect system memory
-          unless necessary.
-        '';
-        example = "8G";
         default = null;
+        example = "8G";
+        description = ''
+          Maximum size of the volatile root tmpfs partition. By default, will
+          allocated 50% of system memory to the tmpfs. Memory is dynamically
+          allocated so will not use system memory unless necessary.
+        '';
       };
     };
-
-    vr.enable = mkEnableOption "virtual reality";
-
-    secureBoot.enable = mkEnableOption "secure boot";
   };
 }

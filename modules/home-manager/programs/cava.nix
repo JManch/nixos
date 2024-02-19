@@ -1,14 +1,12 @@
-{ lib
-, config
-, osConfig
-, ...
-}:
+{ lib, config, osConfig, ... }:
 let
+  inherit (lib) mkIf getExe;
   cfg = config.modules.programs.cava;
 in
-lib.mkIf (cfg.enable && osConfig.modules.system.audio.enable) {
+mkIf (cfg.enable && osConfig.modules.system.audio.enable) {
   programs.cava = {
     enable = true;
+
     settings = {
       general = {
         framerate = 60;
@@ -17,14 +15,17 @@ lib.mkIf (cfg.enable && osConfig.modules.system.audio.enable) {
         bar_width = 2;
         bar_spacing = 1;
       };
+
       input = {
         method = "pulse";
         source = "auto";
       };
+
       output = {
         channels = "mono";
         alacritty_sync = 1;
       };
+
       color = let colors = config.colorscheme.palette; in {
         gradient = 1;
         gradient_count = 5;
@@ -34,6 +35,7 @@ lib.mkIf (cfg.enable && osConfig.modules.system.audio.enable) {
         gradient_color_4 = "'#${colors.base09}'";
         gradient_color_5 = "'#${colors.base08}'";
       };
+
       smoothing = {
         monstercat = 0;
         waves = 0;
@@ -41,12 +43,17 @@ lib.mkIf (cfg.enable && osConfig.modules.system.audio.enable) {
     };
   };
 
-  xdg.desktopEntries."cava" = lib.mkIf osConfig.usrEnv.desktop.enable {
-    name = "Cava";
-    genericName = "Audio Visualizer";
-    exec = "${config.programs.alacritty.package}/bin/alacritty --title Cava -e ${config.programs.cava.package}/bin/cava";
-    terminal = false;
-    type = "Application";
-    categories = [ "Audio" ];
-  };
+  xdg.desktopEntries."cava" =
+    let
+      cava = getExe config.programs.cava.package;
+      terminal = config.modules.desktop.terminal.exePath;
+    in
+    mkIf osConfig.usrEnv.desktop.enable {
+      name = "Cava";
+      genericName = "Audio Visualizer";
+      exec = "${terminal} --title Cava -e ${cava}";
+      terminal = false;
+      type = "Application";
+      categories = [ "Audio" ];
+    };
 }

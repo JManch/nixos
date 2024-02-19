@@ -93,7 +93,7 @@ in
       in
       {
         bindr = [
-          "${modKey}, ${modKey}_L, exec, pkill anyrun || anyrun"
+          "${modKey}, ${modKey}_L, exec, ${pkgs.procps}/bin/pkill anyrun || anyrun"
         ];
 
         layerrule = [

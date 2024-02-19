@@ -1,5 +1,5 @@
-{ pkgs ? import <nixpkgs> { } }: rec {
+{ pkgs ? import <nixpkgs> { } }:
+{
   pomo = pkgs.callPackage ./pomo.nix { };
   modernx = pkgs.callPackage ./modernx.nix { };
-  broadcast-box = pkgs.callPackage ./broadcast-box/broadcast-box.nix { };
 }

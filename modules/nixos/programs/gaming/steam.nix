@@ -1,16 +1,11 @@
-{ lib
-, pkgs
-, config
-, inputs
-, username
-, ...
-}:
+{ lib, pkgs, config, ... } @ args:
 let
+  inherit (lib) mkIf utils optionals;
   cfg = config.modules.programs.gaming.steam;
   gamingCfg = config.modules.programs.gaming;
-  proton-ge = inputs.nix-gaming.packages.${pkgs.system}.proton-ge;
+  protonGe = (utils.flakePkgs args "nix-gaming").proton-ge;
 in
-lib.mkIf cfg.enable
+mkIf cfg.enable
 {
   # -- Common steam launch commands --
   # Standard  : mangohud gamemoderun %command%
@@ -24,8 +19,8 @@ lib.mkIf cfg.enable
   programs.steam = {
     enable = true;
     package = pkgs.steam.override {
-      extraPkgs = (pkgs: with pkgs; lib.lists.optionals gamingCfg.gamescope.enable [
-        # These fix gamescope in steam's FSH environment 
+      extraPkgs = (pkgs: with pkgs; optionals gamingCfg.gamescope.enable [
+        # These fix gamescope in steam's FSH environment
         xorg.libXcursor
         xorg.libXi
         xorg.libXinerama
@@ -37,20 +32,16 @@ lib.mkIf cfg.enable
         libkrb5
         keyutils
       ]);
-      extraProfile = "export STEAM_EXTRA_COMPAT_TOOLS_PATHS='${proton-ge}'";
+      extraProfile = "export STEAM_EXTRA_COMPAT_TOOLS_PATHS='${protonGe}'";
     };
   };
 
   # So that protontricks can find proton-ge
-  environment.sessionVariables = {
-    STEAM_EXTRA_COMPAT_TOOLS_PATHS = proton-ge;
-  };
+  environment.sessionVariables.STEAM_EXTRA_COMPAT_TOOLS_PATHS = protonGe;
 
-  environment.persistence."/persist".users.${username} = {
-    directories = [
-      ".steam"
-      ".local/share/Steam"
-      ".factorio"
-    ];
-  };
+  persistenceHome.directories = [
+    ".steam"
+    ".local/share/Steam"
+    ".factorio"
+  ];
 }

@@ -1,32 +1,32 @@
 { lib, ... }:
 let
-  inherit (lib) mkEnableOption mkOption types;
+  inherit (lib) mkEnableOption;
 in
 {
   imports = lib.utils.scanPaths ./.;
 
   options.modules.programs = {
-    alacritty.enable = mkEnableOption "alacritty";
+    alacritty.enable = mkEnableOption "Alacritty";
     btop.enable = mkEnableOption "btop";
     cava.enable = mkEnableOption "cava";
-    firefox.enable = mkEnableOption "firefox";
-    torBrowser.enable = mkEnableOption "tor browser";
-    git.enable = mkEnableOption "git and lazygit";
-    neovim.enable = mkEnableOption "neovim";
-    spotify.enable = mkEnableOption "spotify";
-    fastfetch.enable = mkEnableOption "fastfetch";
-    discord.enable = mkEnableOption "discord";
-    obs.enable = mkEnableOption "obs";
-    vscode.enable = mkEnableOption "vscode";
-    stremio.enable = mkEnableOption "stremio";
+    firefox.enable = mkEnableOption "Firefox";
+    torBrowser.enable = mkEnableOption "Tor Browser";
+    git.enable = mkEnableOption "Git and Lazygit";
+    neovim.enable = mkEnableOption "Neovim";
+    spotify.enable = mkEnableOption "Spotify";
+    fastfetch.enable = mkEnableOption "Fastfetch";
+    discord.enable = mkEnableOption "Discord";
+    obs.enable = mkEnableOption "OBS";
+    vscode.enable = mkEnableOption "VSCode";
+    stremio.enable = mkEnableOption "Stremio";
     mpv.enable = mkEnableOption "mpv";
-    chatterino.enable = mkEnableOption "chatterino";
-    images.enable = mkEnableOption "images";
-    anki.enable = mkEnableOption "anki";
-    zathura.enable = mkEnableOption "zathura";
-    qbittorrent.enable = mkEnableOption "qbittorrent";
-    mangohud.enable = mkEnableOption "mangohud";
+    chatterino.enable = mkEnableOption "Chatterino";
+    images.enable = mkEnableOption "image tools";
+    anki.enable = mkEnableOption "Anki";
+    zathura.enable = mkEnableOption "Zathura";
+    qbittorrent.enable = mkEnableOption "qBitorrent";
+    mangohud.enable = mkEnableOption "MangoHud";
     r2modman.enable = mkEnableOption "r2modman";
-    lutris.enable = mkEnableOption "lutris";
+    lutris.enable = mkEnableOption "Lutris";
   };
 }

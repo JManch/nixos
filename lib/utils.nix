@@ -10,7 +10,7 @@ in
 
   # Get list of all nix files and directories in path for easy importing
   scanPaths = path:
-    builtins.map (f: (path + "/${f}"))
+    map (f: (path + "/${f}"))
       (attrNames
         (filterAttrs
           (path: _type:

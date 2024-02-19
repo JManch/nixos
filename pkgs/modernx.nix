@@ -1,5 +1,8 @@
-{ lib, fetchFromGitHub, makeFontsConf, stdenvNoCC }:
-
+{ lib
+, fetchFromGitHub
+, makeFontsConf
+, stdenvNoCC
+}:
 stdenvNoCC.mkDerivation (finalAttrs: rec {
   pname = "mpv-modernx";
   version = "0.2.6";
@@ -30,10 +33,10 @@ stdenvNoCC.mkDerivation (finalAttrs: rec {
     }))
   ];
 
-  meta = {
+  meta = with lib; {
     description = "A fork of modernX (a replacement for MPV that retains the functionality of the default OSC), adding additional features";
     homepage = "https://github.com/zydezu/ModernX";
-    license = lib.licenses.free;
-    maintainers = with lib.maintainers; [ JManch ];
+    license = licenses.free;
+    maintainers = with maintainers; [ jmanch ];
   };
 })

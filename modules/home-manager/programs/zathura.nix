@@ -7,8 +7,8 @@ lib.mkIf cfg.enable
 {
   programs.zathura = {
     enable = true;
-    # recolor-reverse-video does not work with mupdf so disable it
-    # poppler is slower though
+    # recolor-reverse-video does not work with mupdf so disable it. Poppler is
+    # slower though
     package = (pkgs.zathuraPkgs.override { useMupdf = false; }).zathuraWrapper;
     options = {
       default-bg = "#${colors.base00}";

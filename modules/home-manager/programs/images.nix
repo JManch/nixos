@@ -1,8 +1,4 @@
-{ lib
-, pkgs
-, config
-, ...
-}:
+{ lib, pkgs, config, ... }:
 let
   cfg = config.modules.programs.images;
 in

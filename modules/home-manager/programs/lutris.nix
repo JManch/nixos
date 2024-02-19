@@ -1,6 +1,7 @@
 { lib, pkgs, config, ... }:
 let
   cfg = config.modules.programs.lutris;
+
   lutris = pkgs.lutris.override {
     extraPkgs = pkgs: with pkgs; [
       wineWowPackages.stable
@@ -10,12 +11,9 @@ let
 in
 lib.mkIf cfg.enable
 {
-  home.packages = [
-    lutris
-  ];
+  home.packages = [ lutris ];
 
   # Install lutris games to ~/files/games
-
   persistence.directories = [
     ".local/share/lutris"
     ".config/lutris"

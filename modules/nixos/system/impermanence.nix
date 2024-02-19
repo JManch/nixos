@@ -5,35 +5,47 @@
 , ...
 } @ args:
 let
-  homeManagerPersistence = (lib.utils.homeConfig args).persistence;
+  inherit (lib) utils mkAliasOptionModule;
+  homeManagerPersistence = (utils.homeConfig args).persistence;
 in
 {
   imports = [
     inputs.impermanence.nixosModules.impermanence
+
+    (mkAliasOptionModule
+      [ "persistenceHome" ]
+      [ "environment" "persistence" "/persist" "users" username ])
+
+    (mkAliasOptionModule
+      [ "persistence" ]
+      [ "environment" "persistence" "/persist" ])
   ];
 
   programs.zsh.interactiveShellInit =
     let
-      fd = "${pkgs.fd}/bin/fd";
-      findmnt = "${pkgs.util-linux}/bin/findmnt";
-      sed = "${pkgs.gnused}/bin/sed";
+      inherit (lib) getExe;
+      fd = getExe pkgs.fd;
+      sed = getExe pkgs.gnused;
       tr = "${pkgs.coreutils}/bin/tr";
+      findmnt = "${pkgs.util-linux}/bin/findmnt";
       extraExcludeDirs = "proc,sys,run,dev,tmp,boot,root/.cache/nix";
     in
-      /* bash */ ''
-      impermanence() {
-        # Prints a list of all files that are not persisted by impermanence so will be lost on shutdown
+      /*bash*/ ''
 
+      # Prints a list of all ephemeral system files
+      impermanence() {
         # Get comma seperated list of zfs mounted directories and remove leading /
         exclude_dirs=$(${findmnt} -n -o TARGET --list -t zfs | ${sed} 's/^.//' | ${tr} '\n' ',' | ${sed} 's/.$//')
         exclude_dirs="$exclude_dirs,${extraExcludeDirs}"
         # Get list of all files, excluding those with zfs mounted paths
         sudo ${fd} --base-directory / -a -tf -H -E "{$exclude_dirs}"
       }
+
     '';
 
-  environment.persistence."/persist" = {
+  persistence = {
     hideMounts = true;
+
     directories = [
       "/var/log"
       "/var/tmp"
@@ -49,11 +61,12 @@ in
       # still documented.
       { directory = "/var/lib/private"; mode = "0700"; }
     ];
+
     files = [
       "/etc/machine-id"
       "/etc/adjtime"
     ];
-    # Take this config from our home-manager module
+
     users.${username} = homeManagerPersistence;
   };
 }

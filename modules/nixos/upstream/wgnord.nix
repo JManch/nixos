@@ -1,8 +1,4 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
+{ lib, pkgs, config, ... }:
 let
   inherit (lib) mkIf mkEnableOption mkOption types;
   cfg = config.services.wgnord;
@@ -10,21 +6,25 @@ in
 {
   options.services.wgnord = {
     enable = mkEnableOption "wgnord";
+
     package = mkOption {
       type = types.package;
       default = pkgs.wgnord;
       description = "The wgnord package to install";
     };
+
     tokenFile = mkOption {
       type = types.path;
       default = null;
       description = "Path to a file containing your NordVPN authentication token";
     };
+
     country = mkOption {
       type = types.str;
       default = "United States";
       description = "The country which wgnord will try to connect to from https://github.com/phirecc/wgnord/blob/master/countries.txt";
     };
+
     template = mkOption {
       type = types.str;
       default = ''
@@ -52,6 +52,7 @@ in
         Description = "Nord Wireguard VPN";
         After = [ "network.target" ];
       };
+
       serviceConfig = {
         Type = "oneshot";
         # https://discourse.nixos.org/t/creating-directories-and-files-declararively/9349/2

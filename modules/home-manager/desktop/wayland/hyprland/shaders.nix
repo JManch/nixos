@@ -66,9 +66,11 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
   wayland.windowManager.hyprland.settings =
     let
+      hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+      jaq = getExe pkgs.jaq;
       toggleShader = pkgs.writeShellScript "hypr-toggle-shader" ''
 
-        shader=$(hyprctl getoption decoration:screen_shader -j | ${getExe pkgs.jaq} -r '.str')
+        shader=$(${hyprctl} getoption decoration:screen_shader -j | ${jaq} -r '.str')
         if [[ $shader == "${cfg.shaderDir}/monitorGamma.frag" ]]; then
             ${cfg.disableShaders};
         else
@@ -88,7 +90,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     '';
 
     postLockScript = ''
-      (sleep 0.1; ${cfg.enableShaders};) &
+      (${pkgs.coreutils}/bin/sleep 0.1; ${cfg.enableShaders}) &
     '';
   };
 }

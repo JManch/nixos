@@ -68,7 +68,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     let
       hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
       jaq = getExe pkgs.jaq;
-      toggleShader = pkgs.writeShellScript "hypr-toggle-shader" ''
+      toggleShader = pkgs.writeShellScript "hypr-toggle-shader" /*bash*/ ''
 
         shader=$(${hyprctl} getoption decoration:screen_shader -j | ${jaq} -r '.str')
         if [[ $shader == "${cfg.shaderDir}/monitorGamma.frag" ]]; then

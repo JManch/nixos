@@ -1,7 +1,4 @@
-{ inputs
-, outputs
-, ...
-}:
+{ inputs, ... }:
 let
   lib = inputs.nixpkgs.lib;
   addPatches = pkg: patches: pkg.overrideAttrs (oldAttrs: {
@@ -9,8 +6,8 @@ let
   });
 in
 {
+  # TODO: Go through these and update/remove where appropriate
   modifications = final: prev: {
-
     eza = prev.eza.overrideAttrs (oldAttrs: rec {
       version = "0.10.7";
       src = final.fetchFromGitHub {
@@ -76,6 +73,5 @@ in
         sha256 = "sha256-fN4dX0Ya2DvPEkuwtKIw1zT+JEbC2zyJKtcGwLVdAUs=";
       };
     });
-
   };
 }

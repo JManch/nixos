@@ -9,10 +9,12 @@ let
   cfg = config.modules.shell;
 in
 lib.mkIf cfg.enable {
-
   programs.zsh = {
     enable = true;
+    enableAutosuggestions = true;
+    enableCompletion = true;
     dotDir = ".config/zsh";
+
     syntaxHighlighting = {
       enable = true;
       styles = {
@@ -22,14 +24,14 @@ lib.mkIf cfg.enable {
         precommand = "fg=green";
       };
     };
-    enableAutosuggestions = true;
-    enableCompletion = true;
+
     history = {
       path = "${config.xdg.stateHome}/zsh/zsh_history";
       extended = true;
       ignoreDups = true;
       expireDuplicatesFirst = true;
     };
+
     shellAliases = {
       cat = "bat -pp --theme=base16";
       reload = "exec ${config.programs.zsh.package}/bin/zsh";
@@ -37,18 +39,20 @@ lib.mkIf cfg.enable {
       rebuild-switch = "sudo nixos-rebuild switch --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-test = "sudo nixos-rebuild test --flake /home/${username}/.config/nixos#${hostname}";
       # cd here because I once had a bad experience where I accidentally built
-      # in the nix store and it broke my entire install
+      # in /nix/store and it irrepairably corrupted the store
       rebuild-build = "cd && nixos-rebuild build --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-boot = "sudo nixos-rebuild boot --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-dry-build = "nixos-rebuild dry-build --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-dry-activate = "sudo nixos-rebuild dry-activate --flake /home/${username}/.config/nixos#${hostname}";
       inspect-nix-config = "nix --extra-experimental-features repl-flake repl '/home/${username}/.config/nixos#nixosConfigurations.${hostname}'";
     };
-    initExtra = /* bash */ ''
+
+    initExtra = /*bash*/ ''
+
       setopt interactivecomments
 
       reboot() {
-        read -q "REPLY?Are you sure you want to reboot? (y/n)"
+        read -q "REPLY?Are you sure you want to reboot? (y/N)"
         if [[ $REPLY =~ ^[Yy]$ ]]; then
           ${pkgs.systemd}/bin/reboot
         fi
@@ -60,21 +64,22 @@ lib.mkIf cfg.enable {
           return 1
         fi
 
-        local file_path="$1"
-        local dir_path=$(dirname "$file_path")
-        local file_name=$(basename -- "$file_path")
+        file_path="$1"
+        dir_path=$(dirname "$file_path")
+        file_name=$(basename -- "$file_path")
 
-        local copy_path="$dir_path/''${file_name%.*}.copy.''${file_name##*.}"
+        copy_path="$dir_path/''${file_name%.*}.copy.''${file_name##*.}"
         cat "$file_path" > "$copy_path" && rm "$file_path" && mv "$copy_path" "$file_path"
         $EDITOR "$file_path"
       }
 
       ssh-add-quiet() {
-        local KEYS=$(${pkgs.openssh}/bin/ssh-add -l)
-        if [[ "$KEYS" == "The agent has no identities." ]]; then
+        keys=$(${pkgs.openssh}/bin/ssh-add -l)
+        if [[ "$keys" == "The agent has no identities." ]]; then
           ${pkgs.openssh}/bin/ssh-add
         fi
       }
+
     '';
   };
 
@@ -83,5 +88,4 @@ lib.mkIf cfg.enable {
     ".local/state/zsh"
     ".cache/zsh"
   ];
-
 }

@@ -1,7 +1,4 @@
-{ lib
-, osConfig
-, ...
-}:
+{ lib, osConfig, ... }:
 lib.mkIf osConfig.modules.system.virtualisation.enable
 {
   dconf.settings = {

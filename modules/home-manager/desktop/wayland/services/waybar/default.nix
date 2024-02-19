@@ -1,6 +1,4 @@
+{ lib, ... }:
 {
-  imports = [
-    ./style.nix
-    ./config.nix
-  ];
+  imports = lib.utils.scanPaths ./.;
 }

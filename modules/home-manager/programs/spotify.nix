@@ -5,29 +5,40 @@
 , ...
 }:
 let
+  inherit (lib) mkIf getExe;
   cfg = config.modules.programs.spotify;
   desktopCfg = config.modules.desktop;
-  modifySpotifyVolume = pkgs.writeShellScript "spotify-modify-volume" ''
-    spotify_player playback volume --offset -- $1
-    sleep 0.2 # volume takes some time to update
-    new_volume=$(spotify_player get key playback | ${pkgs.jaq}/bin/jaq -r '.device.volume_percent')
-    ${pkgs.libnotify}/bin/notify-send --urgency=low -t 2000 -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${new_volume}%"
-  '';
+  spotifyPlayerPkg = (pkgs.spotify-player.override {
+    withDaemon = false;
+  });
+
+  modifySpotifyVolume =
+    let
+      spotifyPlayer = getExe spotifyPlayerPkg;
+      jaq = getExe pkgs.jaq;
+      notifySend = getExe pkgs.libnotify;
+      sleep = "${pkgs.coreutils}/bin/sleep";
+    in
+    pkgs.writeShellScript "spotify-modify-volume" ''
+      ${spotifyPlayer} playback volume --offset -- $1
+      ${sleep} 0.2 # volume takes some time to update
+      new_volume=$(${spotifyPlayer} get key playback | ${jaq} -r '.device.volume_percent')
+      ${notifySend} --urgency=low -t 2000 \
+        -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${new_volume}%"
+    '';
 in
+mkIf (cfg.enable && osConfig.modules.system.audio.enable)
 {
-  config = lib.mkIf (cfg.enable && osConfig.modules.system.audio.enable) {
+  home.packages = with pkgs; [
+    spotify # need this for the spotify-player desktop icon
+    spotifyPlayerPkg
+  ];
 
-    home.packages = with pkgs; [
-      spotify # need this for the spotify-player desktop icon
-      (spotify-player.override {
-        withDaemon = false;
-      })
-    ];
+  services.playerctld.enable = true;
 
-    services.playerctld.enable = true;
+  xdg.configFile = {
+    "spotify-player/app.toml".text = /* toml */ ''
 
-    xdg.configFile = {
-      "spotify-player/app.toml".text = /* toml */ ''
         theme = "default2"
         playback_format = """
         {track}
@@ -66,8 +77,11 @@ in
         bitrate = 320
         audio_cache = true
         normalization = false
+
       '';
-      "spotify-player/theme.toml".text = /* toml */ ''
+
+    "spotify-player/theme.toml".text = /* toml */ ''
+
         [[themes]]
         name = "default2"
         [themes.palette]
@@ -99,50 +113,49 @@ in
         page_desc = { fg = "Blue", modifiers = ["Bold"] }
         table_header = { fg = "Blue" }
         selection = { modifiers = ["Bold", "Reversed"] }
+
       '';
-    };
-
-    xdg.desktopEntries."spotify-player" = lib.mkIf osConfig.usrEnv.desktop.enable {
-      name = "Spotify";
-      genericName = "Music Player";
-      exec = "${config.programs.alacritty.package}/bin/alacritty --title Spotify --option font.size=11 -e ${pkgs.spotify-player}/bin/spotify_player";
-      terminal = false;
-      type = "Application";
-      categories = [ "Audio" ];
-      icon = "spotify";
-    };
-
-    persistence.directories = [
-      ".config/spotify"
-      ".cache/spotify"
-      ".cache/spotify-player"
-    ];
-
-    desktop.hyprland.settings =
-      let
-        colors = config.colorscheme.palette;
-        modKey = config.modules.desktop.hyprland.modKey;
-        playerctl = lib.getExe pkgs.playerctl;
-      in
-      lib.mkIf (desktopCfg.windowManager == "Hyprland")
-        {
-          windowrulev2 = [
-            "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
-            "workspace special silent, title:^(Spotify( Premium)?)$"
-          ];
-          bindr = [
-            "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause"
-          ];
-          bind = [
-            "${modKey}, Period, exec, ${playerctl} next"
-            "${modKey}, Comma, exec, ${playerctl} previous"
-            ", XF86AudioNext, exec, ${playerctl} next"
-            ", XF86AudioPrev, exec, ${playerctl} previous"
-            ", XF86AudioPlay, exec, ${playerctl} play"
-            ", XF86AudioPause, exec, ${playerctl} pause"
-            "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume.outPath} 5"
-            "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume.outPath} -5"
-          ];
-        };
   };
+
+  xdg.desktopEntries."spotify-player" = mkIf osConfig.usrEnv.desktop.enable {
+    name = "Spotify";
+    genericName = "Music Player";
+    exec = "${desktopCfg.terminal.exePath} --title Spotify --option font.size=11 -e ${spotifyPlayerPkg}";
+    terminal = false;
+    type = "Application";
+    categories = [ "Audio" ];
+    icon = "spotify";
+  };
+
+  desktop.hyprland.settings =
+    let
+      inherit (config.modules.desktop.hyprland) modKey;
+      colors = config.colorscheme.palette;
+      playerctl = lib.getExe pkgs.playerctl;
+    in
+    {
+      windowrulev2 = [
+        "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
+        "workspace special silent, title:^(Spotify( Premium)?)$"
+      ];
+
+      bindr = [ "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause" ];
+
+      bind = [
+        "${modKey}, Period, exec, ${playerctl} next"
+        "${modKey}, Comma, exec, ${playerctl} previous"
+        ", XF86AudioNext, exec, ${playerctl} next"
+        ", XF86AudioPrev, exec, ${playerctl} previous"
+        ", XF86AudioPlay, exec, ${playerctl} play"
+        ", XF86AudioPause, exec, ${playerctl} pause"
+        "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume.outPath} 5"
+        "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume.outPath} -5"
+      ];
+    };
+
+  persistence.directories = [
+    ".config/spotify"
+    ".cache/spotify"
+    ".cache/spotify-player"
+  ];
 }

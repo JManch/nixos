@@ -13,14 +13,15 @@
 # only applied to the configured 'default interfaces'.
 
 let
+  inherit (lib) mkIf listToAttrs head;
   cfg = config.modules.system.networking.firewall;
   firewallCfg = config.networking.firewall;
 in
 # NOTE: My PR https://github.com/NixOS/nixpkgs/pull/288926 can hopefully replace this
-lib.mkIf (false)
+mkIf (false)
 {
   assertions = [{
-    assertion = (cfg.defaultInterfaces != null) && ((builtins.head cfg.defaultInterfaces) != [ ]);
+    assertion = (cfg.defaultInterfaces != null) && ((head cfg.defaultInterfaces) != [ ]);
     message = "Default firewall interfaces must be defined.";
   }];
 
@@ -37,7 +38,7 @@ lib.mkIf (false)
   } // firewallCfg.interfaces;
 
   # Apply the default firewall rules to our configured defaultInterfaces
-  networking.firewall.interfaces = lib.listToAttrs (lib.lists.map
+  networking.firewall.interfaces = listToAttrs (map
     (
       interface: {
         name = interface;

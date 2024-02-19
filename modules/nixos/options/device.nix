@@ -1,53 +1,60 @@
-{ lib
-, config
-, ...
-}:
+{ lib, config, ... }:
 let
   inherit (lib) mkOption types;
+
   monitorSubmodule = {
     options = {
+      enabled = mkOption {
+        type = types.bool;
+        default = true;
+      };
+
       name = mkOption {
         type = types.str;
         example = "DP-1";
       };
+
       number = mkOption {
         type = types.int;
       };
+
       width = mkOption {
         type = types.int;
         example = 2560;
       };
+
       height = mkOption {
         type = types.int;
         example = 1440;
       };
+
       refreshRate = mkOption {
         type = types.float;
-        default = 60;
+        default = 60.0;
       };
+
       gamingRefreshRate = mkOption {
         type = types.float;
         default = (lib.fetchers.primaryMonitor config).refreshRate;
         description = ''
-          Gaming refresh rate to switch to when starting gamemode.
-          Only affects the primary monitor.
+          Higher refresh to use during gaming and any other scenario where
+          smoothness is preferred. Only affects the primary monitor.
         '';
       };
+
       gamma = mkOption {
         type = types.float;
         default = 1.0;
-        description = "Custom gamma level to apply to the monitor";
         example = 0.75;
+        description = "Custom gamma level";
       };
+
       position = mkOption {
         type = types.str;
         default = "0x0";
         description = "Relative position of the monitor from the top left corner";
       };
-      enabled = mkOption {
-        type = types.bool;
-        default = true;
-      };
+
       workspaces = mkOption {
         type = types.listOf types.int;
         default = [ ];
@@ -59,15 +66,16 @@ in
 {
   options.device = {
     type = mkOption {
-      type = with types; nullOr (enum [ "laptop" "desktop" "server" "vm" ]);
+      type = types.enum [ "laptop" "desktop" "server" "vm" ];
       description = "The type/purpose of the device";
     };
 
     cpu = {
       type = mkOption {
-        type = with types; nullOr (enum [ "intel" "amd" ]);
+        type = types.enum [ "intel" "amd" ];
         description = "The device's CPU manufacturer";
       };
+
       name = mkOption {
         type = types.str;
         default = "";
@@ -79,13 +87,18 @@ in
       type = mkOption {
         type = with types; nullOr (enum [ "nvidia" "amd" ]);
         default = null;
-        description = "The device's GPU manufacturer";
+        description = ''
+          The device's GPU manufacturer. Leave null if device does not have a
+          dedicated GPU.
+        '';
       };
+
       name = mkOption {
         type = types.str;
         default = "";
         description = "The GPU name, not critical";
       };
+
       hwmonId = mkOption {
         type = types.nullOr types.int;
         default = null;
@@ -104,18 +117,19 @@ in
 
   config =
     let
-      monitors = config.device.monitors;
+      inherit (lib) sort zipListsWith init tail head all;
+      inherit (config.device) monitors;
     in
     {
-      assertions = with lib; [
+      assertions = [
         {
           assertion =
             let
-              sorted = lists.sort (a: b: a < b) (map (m: m.number) monitors);
-              diff = lists.zipListsWith (a: b: b - a) (lists.init sorted) (lists.tail sorted);
+              sorted = sort (a: b: a < b) (map (m: m.number) monitors);
+              diff = zipListsWith (a: b: b - a) (init sorted) (tail sorted);
             in
-            (lists.all (a: a == 1) diff) && ((lists.head sorted) == 1);
-          message = "Monitor numbers must be sequential and start from 1 (the primary monitor)";
+            (all (a: a == 1) diff) && ((head sorted) == 1);
+          message = "Monitor numbers must be sequential and start from 1";
         }
       ];
     };

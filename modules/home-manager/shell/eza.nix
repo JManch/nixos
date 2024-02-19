@@ -1,8 +1,6 @@
-{ lib
-, config
-, ...
-}:
-lib.mkIf config.modules.shell.enable {
+{ lib, config, ... }:
+lib.mkIf config.modules.shell.enable
+{
   programs.eza = {
     enable = true;
     enableAliases = false;

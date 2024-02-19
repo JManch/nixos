@@ -24,9 +24,11 @@ mkIf cfg.enable
     allowedTCPPorts = [ 11434 8000 ];
   };
 
-  environment.persistence."/persist".directories = [
-    # Can't actually be defined because it's a DynamicUser service.
+  persistence.directories = [
+    # NOTE: Can't be persisted because Ollama is a DynamicUser service so the
+    # bind mount cannot match permissions. More info in impermanence.nix.
     # /var/lib/private is persisted instead.
+
     # "/var/lib/private/ollama"
   ];
 }

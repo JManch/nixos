@@ -1,16 +1,12 @@
-{ lib
-, config
-, inputs
-, ...
-} @ args:
+{ lib, config, inputs, ... } @ args:
 let
-  inherit (lib) mkIf mkMerge;
+  inherit (lib) mkIf mkMerge fetchers utils mkForce;
+  inherit (desktopCfg) desktopEnvironment;
+  inherit (homeDesktopCfg) windowManager;
   desktopCfg = config.usrEnv.desktop;
-  desktopEnvironment = desktopCfg.desktopEnvironment;
-  homeConfig = lib.utils.homeConfig args;
+  homeConfig = utils.homeConfig args;
   homeDesktopCfg = homeConfig.modules.desktop;
-  windowManager = homeConfig.modules.desktop.windowManager;
-  isWayland = lib.fetchers.isWayland homeConfig;
+  isWayland = fetchers.isWayland homeConfig;
 in
 {
   imports = [
@@ -27,13 +23,14 @@ in
 
       # We configure xdg portal in home-manager
       # TODO: Configure xdg portal in home-manager for each of these desktopEnvironments
-      xdg.portal.enable = lib.mkForce false;
+      xdg.portal.enable = mkForce false;
     }
 
     (mkIf (desktopEnvironment == "xfce") {
       services.xserver = {
         enable = true;
         displayManager.defaultSession = "xfce";
+
         desktopManager = {
           xterm.enable = false;
           xfce = {
@@ -50,6 +47,7 @@ in
           defaultSession = "plasma";
           sddm.enable = true;
         };
+
         desktopManager = {
           plasma5.enable = true;
         };
@@ -82,6 +80,5 @@ in
     (mkIf (windowManager == "sway") {
       programs.sway.enable = true;
     })
-  ]
-  );
+  ]);
 }

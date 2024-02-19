@@ -6,6 +6,8 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.system = {
+    bluetooth.enable = mkEnableOption "bluetooth";
+    virtualisation.enable = mkEnableOption "virtualisation";
 
     ssh = {
       allowPasswordAuth = mkOption {
@@ -17,8 +19,11 @@ in
 
     networking = {
       tcpOptimisations = mkEnableOption "TCP optimisations";
+      resolved.enable = mkEnableOption "Resolved";
+      wireless.enable = mkEnableOption "wireless";
+
       firewall = {
-        enable = mkEnableOption "firewall";
+        enable = mkEnableOption "Firewall";
         defaultInterfaces = mkOption {
           type = types.listOf types.str;
           default = [ ];
@@ -28,11 +33,7 @@ in
           '';
         };
       };
-      resolved.enable = mkEnableOption "Resolved";
-      wireless.enable = mkEnableOption "wireless";
     };
-
-    bluetooth.enable = mkEnableOption "bluetooth";
 
     audio = {
       enable = mkEnableOption "Pipewire audio";
@@ -40,19 +41,15 @@ in
       scripts = {
         toggleMic = mkOption {
           type = types.str;
+          readOnly = true;
           description = "Script for toggling microphone mute";
         };
       };
     };
 
-    virtualisation = {
-      enable = mkEnableOption "virtualisation";
-    };
-
     windows = {
-      enable = mkEnableOption "enable features for systems dual-booting windows";
-      bootEntry = mkEnableOption "create a windows systemd-boot boot entry";
+      enable = mkEnableOption "features for systems dual-booting Window";
+      bootEntry = mkEnableOption "Windows systemd-boot boot entry";
     };
-
   };
 }

@@ -1,8 +1,9 @@
 { lib, config, username, ... }:
 let
+  inherit (lib) mkIf optional mkForce;
   cfg = config.modules.services.jellyfin;
 in
-lib.mkIf cfg.enable
+mkIf cfg.enable
 {
   services.jellyfin = {
     enable = true;
@@ -10,9 +11,10 @@ lib.mkIf cfg.enable
   };
 
   systemd.services.jellyfin = {
-    wantedBy = lib.mkForce (lib.lists.optional cfg.autoStart [ "multi-user.target" ]);
-    # Bind mount home media directories so jellyfin can access them
+    wantedBy = mkForce (optional cfg.autoStart [ "multi-user.target" ]);
+
     serviceConfig = {
+      # Bind mount home media directories so jellyfin can access them
       BindReadOnlyPaths = [
         "/home/${username}/videos/shows:/var/lib/jellyfin/media/shows"
         "/home/${username}/videos/movies:/var/lib/jellyfin/media/movies"
@@ -25,7 +27,5 @@ lib.mkIf cfg.enable
     "d /var/lib/jellyfin/media/movies 755 root root"
   ];
 
-  environment.persistence."/persist".directories = [
-    "/var/lib/jellyfin"
-  ];
+  persistence.directories = [ "/var/lib/jellyfin" ];
 }

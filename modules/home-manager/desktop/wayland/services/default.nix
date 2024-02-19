@@ -6,17 +6,25 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.desktop.services = {
+    waybar.enable = mkEnableOption "Waybar";
+    wlsunset.enable = mkEnableOption "wlsunset";
+
     swayidle = {
       enable = mkEnableOption "Swayidle";
+
       lockTime = mkOption {
         type = types.int;
         default = 3 * 60;
-        description = "Lock screen after this many idle seconds";
+        description = "Idle seconds to lock screen";
       };
+
       screenOffTime = mkOption {
         type = types.int;
         default = 4 * 60;
-        description = "Turn off screen after this many idle seconds";
+        description = "Idle seconds to turn off screen";
+      };
+    };
+
     hypridle = {
       enable = mkEnableOption "Hypridle";
 
@@ -32,7 +40,5 @@ in
         description = "Idle seconds to turn off screen";
       };
     };
-    waybar.enable = mkEnableOption "Waybar";
-    wlsunset.enable = mkEnableOption "wlsunset";
   };
 }

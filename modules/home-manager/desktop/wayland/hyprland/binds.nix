@@ -23,38 +23,38 @@ let
 
   jaq = getExe pkgs.jaq;
   notifySend = getExe pkgs.libnotify;
-  hyprshot = getExe pkgs.hyprshot;
+  hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
 
   getMonitorByNumber = number: fetchers.getMonitorByNumber osConfig number;
 
   disableShadersCommand =
     command: "${cfg.disableShaders} && ${command} && ${cfg.enableShaders}";
 
-  toggleDwindleGaps = pkgs.writeShellScript "hypr-toggle-dwindle-gaps" ''
+  toggleDwindleGaps = pkgs.writeShellScript "hypr-toggle-dwindle-gaps" /*bash*/ ''
 
-    new_value=$(($(hyprctl getoption -j dwindle:no_gaps_when_only | ${jaq} -r '.int') ^ 1))
-    hyprctl keyword dwindle:no_gaps_when_only $new_value
-    message=$( [[ $new_value == "1" ]] && echo "Dwindle gaps disabled" || echo "Dwindle gaps enabled" )
+    new_value=$(($(${hyprctl} getoption -j dwindle:no_gaps_when_only | ${jaq} -r '.int') ^ 1))
+    ${hyprctl} keyword dwindle:no_gaps_when_only $new_value
+    message=$([[ $new_value == "1" ]] && echo "Dwindle gaps disabled" || echo "Dwindle gaps enabled")
     ${notifySend} --urgency=low -t 2000 -h \
       'string:x-canonical-private-synchronous:hypr-dwindle-gaps' 'Hyprland' "$message"
 
   '';
 
-  toggleFloating = pkgs.writeShellScript "hypr-toggle-floating" ''
+  toggleFloating = pkgs.writeShellScript "hypr-toggle-floating" /*bash*/ ''
 
-    if [[ $(hyprctl activewindow -j | ${jaq} -r '.floating') == "false" ]]; then
-      hyprctl --batch 'dispatch togglefloating; dispatch resizeactive exact 75% 75%; dispatch centerwindow;'
+    if [[ $(${hyprctl} activewindow -j | ${jaq} -r '.floating') == "false" ]]; then
+      ${hyprctl} --batch 'dispatch togglefloating; dispatch resizeactive exact 75% 75%; dispatch centerwindow;'
     else
-      hyprctl dispatch togglefloating
+      ${hyprctl} dispatch togglefloating
     fi
 
   '';
 
-  toggleSwallowing = pkgs.writeShellScript "hypr-toggle-swallowing" ''
+  toggleSwallowing = pkgs.writeShellScript "hypr-toggle-swallowing" /*bash*/ ''
 
-    new_value=$(($(hyprctl getoption -j misc:enable_swallow | ${jaq} -r '.int') ^ 1))
-    hyprctl keyword misc:enable_swallow $new_value
-    message=$( [[ $new_value == "1" ]] && echo "Window swallowing enabled" || echo "Window swallowing disabled" )
+    new_value=$(($(${hyprctl} getoption -j misc:enable_swallow | ${jaq} -r '.int') ^ 1))
+    ${hyprctl} keyword misc:enable_swallow $new_value
+    message=$([[ $new_value == "1" ]] && echo "Window swallowing enabled" || echo "Window swallowing disabled")
     ${notifySend} --urgency=low -t 2000 -h \
       'string:x-canonical-private-synchronous:hypr-swallow' 'Hyprland' "$message"
 
@@ -70,6 +70,9 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
       mod = cfg.modKey;
       modShift = "${cfg.modKey}SHIFT";
       modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
+
+      hyprshot = getExe pkgs.hyprshot;
+      wpctl = "${pkgs.wireplumber}/bin/wpctl";
     in
     {
       settings.bind =
@@ -81,7 +84,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
           "${mod}, E, fullscreen, 1"
           "${modShift}, E, fullscreen, 0"
           "${mod}, Z, pin, active"
-          "${mod}, R, exec, hyprctl dispatch splitratio exact 1"
+          "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
           "${mod}, A, exec, ${toggleSwallowing.outPath}"
 
           # Movement
@@ -136,7 +139,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
         ) ++ (
           # Workspaces
           let
-            workspaceNumbers = builtins.map (w: toString w) (range 1 9);
+            workspaceNumbers = map (w: toString w) (range 1 9);
             workspaceBinds = w: [
               "${mod}, ${w}, workspace, ${w}"
               "${modShift}, ${w}, movetoworkspace, ${w}"
@@ -145,7 +148,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
           in
           concatMap workspaceBinds workspaceNumbers
         ) ++ (optional audio.enable (
-          ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+          ", XF86AudioMute, exec, ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle"
         ));
 
       settings.bindm = [
@@ -164,8 +167,8 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
         "${mod}, Up, resizeactive, 0 -20"
         "${mod}, Down, resizeactive, 0 20"
       ] ++ optionals audio.enable [
-        ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"
-        ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+        ", XF86AudioRaiseVolume, exec, ${wpctl} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"
+        ", XF86AudioLowerVolume, exec, ${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 5%-"
       ];
 
       extraConfig = ''
@@ -176,7 +179,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
       '';
     };
 
-  programs.zsh.initExtra = /* bash */ ''
+  programs.zsh.initExtra = /*bash*/ ''
 
     toggle-monitor() {
       if [ -z "$1" ]; then
@@ -186,12 +189,12 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
 
       declare -A monitor_num_to_name
       ${concatStringsSep "\n  "
-        (builtins.map (m: "monitor_num_to_name[${toString m.number}]='${m.name}'") monitors)
+        (map (m: "monitor_num_to_name[${toString m.number}]='${m.name}'") monitors)
       }
 
       declare -A monitor_name_to_cfg
       ${concatStringsSep "\n  "
-        (builtins.map (m: "monitor_name_to_cfg[${m.name}]='${fetchers.getMonitorHyprlandCfgStr m}'") monitors)
+        (map (m: "monitor_name_to_cfg[${m.name}]='${fetchers.getMonitorHyprlandCfgStr m}'") monitors)
       }
 
       if [[ ! -v monitor_num_to_name[$1] ]]; then
@@ -202,13 +205,13 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
       local monitor_name=''${monitor_num_to_name[$1]}
 
       # Check if the monitor is already disabled
-      hyprctl monitors -j | ${jaq} -e 'first(.[] | select(.name == "'"$monitor_name"'"))' > /dev/null 2>&1
+      ${hyprctl} monitors -j | ${jaq} -e 'first(.[] | select(.name == "'"$monitor_name"'"))' > /dev/null 2>&1
 
       if [ $? -ne 0 ]; then
-        hyprctl keyword monitor ''${monitor_name_to_cfg[$monitor_name]} > /dev/null
+        ${hyprctl} keyword monitor ''${monitor_name_to_cfg[$monitor_name]} > /dev/null
         echo "Enabled monitor $monitor_name"
       else
-        hyprctl keyword monitor $monitor_name,disable > /dev/null
+        ${hyprctl} keyword monitor $monitor_name,disable > /dev/null
         echo "Disabled monitor $monitor_name"
       fi
     }

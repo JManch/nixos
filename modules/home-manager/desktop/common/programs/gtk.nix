@@ -41,14 +41,18 @@ lib.mkIf osConfig.usrEnv.desktop.enable
     size = desktopCfg.style.cursorSize;
   };
 
-  desktop.hyprland.settings = {
-    env = [
-      "XCURSOR_THEME,${cursorName}"
-      "XCURSOR_SIZE,${toString desktopCfg.style.cursorSize}"
-    ];
+  desktop.hyprland.settings =
+    let
+      hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+    in
+    {
+      env = [
+        "XCURSOR_THEME,${cursorName}"
+        "XCURSOR_SIZE,${toString desktopCfg.style.cursorSize}"
+      ];
 
-    exec-once = [
-      "hyprctl setcursor ${cursorName} ${toString desktopCfg.style.cursorSize}"
-    ];
-  };
+      exec-once = [
+        "${hyprctl} setcursor ${cursorName} ${toString desktopCfg.style.cursorSize}"
+      ];
+    };
 }

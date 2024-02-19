@@ -6,10 +6,10 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.desktop.programs = {
-    anyrun.enable = mkEnableOption "anyrun";
+    anyrun.enable = mkEnableOption "Anyrun";
 
     swaylock = {
-      enable = mkEnableOption "swaylock";
+      enable = mkEnableOption "Swaylock";
 
       preLockScript = mkOption {
         type = types.lines;
@@ -27,6 +27,12 @@ in
         type = types.lines;
         default = "";
         description = "Bash script run after screen unlocks";
+      };
+
+      lockScript = mkOption {
+        type = types.str;
+        readOnly = true;
+        description = "Path to lock script";
       };
     };
   };

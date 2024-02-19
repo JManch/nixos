@@ -1,18 +1,16 @@
 { lib
 , pkgs
-, inputs
 , config
 , osConfig
 , ...
-}:
+} @ args:
 let
+  inherit (lib) mkIf utils;
   cfg = config.modules.programs.neovim;
 in
-lib.mkIf cfg.enable {
+mkIf (cfg.enable && config.modules.shell.enable) {
   home.packages = with pkgs; [
     neovide
-    # Tools
-    fd
     # Language servers
     lua-language-server
     nil
@@ -27,15 +25,16 @@ lib.mkIf cfg.enable {
 
   programs.neovim = {
     enable = true;
-    package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+    package = (utils.flakePkgs args "neovim-nightly-overlay").default;
     vimAlias = true;
   };
 
   home.sessionVariables = {
     EDITOR = "nvim";
+    NIX_NEOVIM = 1;
   };
 
-  xdg.mimeApps = lib.mkIf osConfig.usrEnv.desktop.enable {
+  xdg.mimeApps = mkIf osConfig.usrEnv.desktop.enable {
     defaultApplications = {
       "text/plain" = [ "nvim.desktop" ];
     };
@@ -47,6 +46,4 @@ lib.mkIf cfg.enable {
     ".local/share/nvim"
     ".local/state/nvim"
   ];
-
-  home.sessionVariables.NIX_NEOVIM = 1;
 }

@@ -1,20 +1,22 @@
 { lib, config, osConfig, ... }:
 let
-  cfg = config.modules.desktop.services.waybar;
+  inherit (lib) mkIf;
+  cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
   colors = config.colorscheme.palette;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
   isWayland = lib.fetchers.isWayland config;
 in
-lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
+mkIf (osDesktopEnabled && isWayland && cfg.enable)
 {
   programs.waybar.style =
     let
-      halfCornerRadius = toString (desktopCfg.style.cornerRadius / 2);
-      borderWidth = toString desktopCfg.style.borderWidth;
-      gapSize = desktopCfg.style.gapSize;
+      inherit (desktopCfg.style) cornerRadius borderWidth gapSize font;
+      halfCornerRadius = toString (cornerRadius / 2);
+      borderWidthStr = toString borderWidth;
     in
-      /* css */ ''
+      /*css*/ ''
+
       @define-color background #${colors.base00};
       @define-color border #${colors.base05};
       @define-color text-dark #${colors.base00};
@@ -27,7 +29,7 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
       @define-color transparent rgba(0,0,0,0);
 
       * {
-          font-family: '${desktopCfg.style.font.family}';
+          font-family: '${font.family}';
           font-size: 16px;
           font-weight: 600;
           min-height: 0px;
@@ -37,18 +39,18 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
           background: @background;
           color: @text-light;
           border-radius: ${halfCornerRadius}px;
-          border: ${borderWidth}px solid @background;
+          border: ${borderWidthStr}px solid @background;
       }
 
       window#waybar {
           background: @background;
           color: @text-light;
           border-radius: 0px;
-          border: ${borderWidth}px solid @background;
+          border: ${borderWidthStr}px solid @background;
       }
 
       window#waybar.fullscreen {
-          border-bottom: ${borderWidth}px solid @blue;
+          border-bottom: ${borderWidthStr}px solid @blue;
       }
 
       #workspaces {
@@ -74,24 +76,22 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
 
       #workspaces button label {
           border-radius: ${halfCornerRadius}px;
-          border: ${borderWidth}px solid @transparent;
-
+          border: ${borderWidthStr}px solid @transparent;
           padding: 0px 0.4em;
-
           color: @text-dark;
           font-weight: 500;
       }
 
       #workspaces button.visible label {
           background: @transparent;
-          border: ${borderWidth}px solid @background;
+          border: ${borderWidthStr}px solid @background;
           color: @text-dark;
           font-weight: 900;
       }
 
       #workspaces button.active label {
           background: @background;
-          border: ${borderWidth}px solid @background;
+          border: ${borderWidthStr}px solid @background;
           color: @text-light;
           font-weight: 900;
       }
@@ -112,5 +112,6 @@ lib.mkIf (osDesktopEnabled && isWayland && cfg.enable)
       #custom-vpn {
           margin-right: 3px;
       }
+
     '';
 }

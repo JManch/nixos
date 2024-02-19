@@ -10,9 +10,7 @@ let
 in
 lib.mkIf cfg.enable
 {
-  environment.systemPackages = with pkgs; [
-    wireguard-tools
-  ];
+  environment.systemPackages = [ pkgs.wireguard-tools ];
 
   # Public keys
   # NCASE-M1 PlNilozIZ0FCYMOs1nVxVph33USmwh+o6nSouslvnU8=

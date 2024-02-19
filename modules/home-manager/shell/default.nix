@@ -1,17 +1,17 @@
 { lib, pkgs, config, ... }:
 let
-  inherit (lib) mkEnableOption;
+  inherit (lib) mkEnableOption mkIf optionals;
   cfg = config.modules.shell;
 in
 {
   imports = lib.utils.scanPaths ./.;
 
   options.modules.shell = {
-    enable = mkEnableOption "custom shell";
-    sillyTools = mkEnableOption "install of silly command-line tools";
+    enable = mkEnableOption "custom shell environment";
+    sillyTools = mkEnableOption "installation of silly shell tools";
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     home.packages = with pkgs; [
       unzip
       zip
@@ -22,14 +22,12 @@ in
       tokei
       rename
       nurl # tool for generating nix fetcher calls from urls
-    ] ++ lib.lists.optionals cfg.sillyTools [
+    ] ++ optionals cfg.sillyTools [
       fortune
       cowsay
       lolcat
     ];
 
-    home.sessionVariables = {
-      COLORTERM = "truecolor";
-    };
+    home.sessionVariables.COLORTERM = "truecolor";
   };
 }

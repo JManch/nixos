@@ -1,7 +1,4 @@
-{ config
-, lib
-, ...
-}:
+{ lib, config, ... }:
 let
   cfg = config.modules.services.syncthing;
 in
@@ -14,7 +11,6 @@ lib.mkIf cfg.enable {
     ];
   };
 
-  # Start after persist mount
   systemd.user.services.syncthing = {
     Unit = {
       Requires = [ "home-joshua-.config-syncthing.mount" ];
@@ -36,7 +32,5 @@ lib.mkIf cfg.enable {
   # xdg.configFile."syncthing/cert.pem".source = /. + config.age.secrets.syncthingCert.path;
   # xdg.configFile."syncthing/key.pem".source = /. + config.age.secrets.syncthingKey.path;
 
-  persistence.directories = [
-    ".config/syncthing"
-  ];
+  persistence.directories = [ ".config/syncthing" ];
 }

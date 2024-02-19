@@ -5,40 +5,25 @@
 , ...
 }:
 let
-  inherit (lib) mkIf optionalString;
-  cfg = config.modules.desktop.programs.swaylock;
+  inherit (lib) mkIf optionalString fetchers getExe;
+  cfg = desktopCfg.programs.swaylock;
   desktopCfg = config.modules.desktop;
-  isWayland = lib.fetchers.isWayland config;
+  isWayland = fetchers.isWayland config;
   colors = config.colorscheme.palette;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 
   lockScript =
     let
-      isHyprland = (desktopCfg.windowManager == "Hyprland");
-      hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
       osAudio = osConfig.modules.system.audio;
-      wpctl = "${pkgs.wireplumber}/bin/wpctl";
-      hyprCfg = config.modules.desktop.hyprland;
-      sleep = "${pkgs.coreutils}/bin/sleep";
-      grep = "${pkgs.gnugrep}/bin/grep";
-      pgrep = "${pkgs.procps}/bin/pgrep";
-      echo = "${pkgs.coreutils}/bin/echo";
-      cut = "${pkgs.coreutils}/bin/cut";
-      kill = "${pkgs.coreutils}/bin/kill";
-      realpath = "${pkgs.coreutils}/bin/realpath";
-      bash = "${pkgs.bash}/bin/bash";
-      tr = "${pkgs.coreutils}/bin/tr";
-
       preLock = /*bash*/ ''
 
         # Store audio volumes and mute 
         ${optionalString osAudio.enable ''
-          SINK_VOLUME=$(${wpctl} get-volume @DEFAULT_AUDIO_SINK@ | ${cut} -c 9-)
-          SOURCE_VOLUME=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@ | ${cut} -c 9-)
-          ${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 0
-          ${wpctl} set-volume @DEFAULT_AUDIO_SOURCE@ 0
+          sink_volume=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | cut -c 9-)
+          source_volume=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | cut -c 9-)
+          wpctl set-volume @DEFAULT_AUDIO_SINK@ 0
+          wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 0
         ''}
-
         ${cfg.preLockScript}
 
       '';
@@ -49,42 +34,57 @@ let
 
         # Restore audio volumes
         ${optionalString osAudio.enable ''
-          ${wpctl} set-volume @DEFAULT_AUDIO_SINK@ $SINK_VOLUME
-          ${wpctl} set-volume @DEFAULT_AUDIO_SOURCE@ $SOURCE_VOLUME
+          wpctl set-volume @DEFAULT_AUDIO_SINK@ "$sink_volume"
+          wpctl set-volume @DEFAULT_AUDIO_SOURCE@ "$source_volume"
         ''}
-
         ${cfg.postUnlockScript}
 
       '';
     in
-    pkgs.writeShellScript "lock-script" /*bash*/ ''
-      # Abort if swaylock is already running
-      ${pgrep} -x swaylock && exit 1
+    pkgs.writeShellApplication {
+      name = "swaylock-lock-script";
 
-      # Get PIDs of existing instances of script
-      pids=$(${pgrep} -fx "${bash} $(${realpath} "$0")")
+      runtimeInputs = with pkgs; [
+        wireplumber
+        gnugrep
+        procps
+        coreutils
+      ];
 
-      # Exlude this script's pid from the pids
-      pids=$(${echo} "$pids" | ${grep} -v "$$")
+      text = /*bash*/ ''
 
-      if [ ! -z "$pids" ]; then
-        # Kill all existing instances of the script
-        pid_list=$(${echo} "$pids" | ${tr} '\n' ' ')
-        ${kill} $pid_list
-      fi
+        # Abort if swaylock is already running
+        pgrep -x swaylock && exit 1
 
-      ${preLock}
-      ${config.programs.swaylock.package}/bin/swaylock &
-      SWAYLOCK_PID=$!
-      ${postLock}
-      wait $SWAYLOCK_PID
-      ${postUnlock}
-    '';
+        # Get PIDs of existing instances of script
+        pids=$(pgrep -fx "${pkgs.bash}/bin/bash $(realpath "$0")" || true)
+
+        # Exlude this script's pid from the pids
+        pids=$(echo "$pids" | grep -v "$$")
+
+        if [ -n "$pids" ]; then
+          # Kill all existing instances of the script
+          pid_list=$(echo "$pids" | tr '\n' ' ')
+          kill "$pid_list" || true
+        fi
+
+        ${preLock}
+        ${config.programs.swaylock.package}/bin/swaylock &
+        SWAYLOCK_PID=$!
+        ${postLock}
+        wait $SWAYLOCK_PID
+        ${postUnlock}
+
+      '';
+    };
 in
 mkIf (osDesktopEnabled && isWayland && cfg.enable) {
+  modules.desktop.programs.swaylock.lockScript = getExe lockScript;
+
   programs.swaylock = {
     enable = true;
     package = pkgs.swaylock-effects;
+
     settings = {
       screenshots = true;
       line-uses-inside = true;
@@ -133,6 +133,8 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable) {
   };
 
   desktop.hyprland.binds =
-    lib.mkIf (config.modules.desktop.windowManager == "Hyprland")
-      [ "${config.modules.desktop.hyprland.modKey}, Space, exec, ${lockScript.outPath}" ];
+    let
+      inherit (config.modules.desktop.hyprland) modKey;
+    in
+    [ "${modKey}, Space, exec, ${getExe lockScript}" ];
 }

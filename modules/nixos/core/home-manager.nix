@@ -16,10 +16,14 @@ in
 
   config = lib.mkIf cfg.enable {
     home-manager = {
-      extraSpecialArgs = { inherit inputs outputs username hostname; vmVariant = false; };
       useGlobalPkgs = true;
       useUserPackages = true;
       users.${username} = import ../../../home/${hostname}.nix;
+
+      extraSpecialArgs = {
+        inherit inputs outputs username hostname;
+        vmVariant = false;
+      };
     };
   };
 }

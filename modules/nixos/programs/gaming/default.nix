@@ -6,14 +6,15 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.programs.gaming = {
-    enable = mkEnableOption "enable system gaming optimisations";
+    enable = mkEnableOption "gaming optimisations";
+    steam.enable = mkEnableOption "Steam";
+    gamescope.enable = mkEnableOption "Gamescope";
+    gamemode.enable = mkEnableOption "Gamemode";
+
     windowClassRegex = mkOption {
       type = types.str;
       default = "^(steam_app.*|\.gamescope.*)$";
       description = "Regex to match game window classes";
     };
-    steam.enable = mkEnableOption "steam";
-    gamescope.enable = mkEnableOption "gamescope";
-    gamemode.enable = mkEnableOption "gamemode";
   };
 }

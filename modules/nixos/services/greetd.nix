@@ -31,7 +31,7 @@ lib.mkIf (cfg.enable && config.usrEnv.desktop.enable)
     TTYVTDisallocate = true;
   };
 
-  # Enable gnome keyring for saving login credentials in apps such as vscode
+  # Enable gnome keyring for saving login credentials in apps such as VSCode
   # Works with greetd through pam
   services.gnome.gnome-keyring.enable = true;
   security.pam.services.greetd = {
@@ -39,7 +39,5 @@ lib.mkIf (cfg.enable && config.usrEnv.desktop.enable)
     enableGnomeKeyring = true;
   };
 
-  environment.persistence."/persist".users.${username}.directories = [
-    ".local/share/keyrings"
-  ];
+  persistenceHome.directories = [ ".local/share/keyrings" ];
 }

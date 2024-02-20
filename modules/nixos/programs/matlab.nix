@@ -5,16 +5,15 @@
 , ...
 }:
 let
+  inherit (lib) mkIf utils;
   cfg = config.modules.programs.matlab;
 in
-lib.mkIf cfg.enable
+mkIf cfg.enable
 {
   # Install instructions: https://gitlab.com/doronbehar/nix-matlab
-
-  # This overlay just adds the linux-x86_64 matlab packages to pkgs
-  nixpkgs.overlays = [ inputs.nix-matlab.overlay ];
-
-  environment.systemPackages = [ pkgs.matlab ];
+  environment.systemPackages = [
+    (utils.flakePkgs { inherit pkgs inputs; } "nix-matlab").matlab
+  ];
 
   persistenceHome.directories = [ ".config/matlab" ];
 }

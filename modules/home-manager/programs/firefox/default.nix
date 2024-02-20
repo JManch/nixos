@@ -13,7 +13,6 @@ let
   #   inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorscheme.colors.${base};
 in
 mkIf cfg.enable {
-
   # Use systemd to synchronise Firefox data with persistent storage. Allows for
   # running Firefox on tmpfs with improved performance.
   systemd.user =
@@ -109,6 +108,7 @@ mkIf cfg.enable {
           "mousewheel.default.delta_multiplier_x" = 95;
           "mousewheel.default.delta_multiplier_y" = 95;
           "mousewheel.default.delta_multiplier_z" = 95;
+          "general.smoothScroll" = true;
           "general.smoothScroll.lines.durationMaxMS" = 125;
           "general.smoothScroll.lines.durationMinMS" = 125;
           "general.smoothScroll.mouseWheel.durationMaxMS" = 200;

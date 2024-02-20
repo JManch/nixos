@@ -1,4 +1,10 @@
-{ lib, config, osConfig, ... }:
+{ lib
+, pkgs
+, config
+, osConfig
+, username
+, ...
+}:
 let
   inherit (lib) mkIf getExe;
   cfg = config.modules.programs.firefox;
@@ -7,6 +13,67 @@ let
   #   inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorscheme.colors.${base};
 in
 mkIf cfg.enable {
+
+  # Use systemd to synchronise Firefox data with persistent storage. Allows for
+  # running Firefox on tmpfs with improved performance.
+  systemd.user =
+    let
+      rsync = getExe pkgs.rsync;
+      syncToTmpfs = "${rsync} -auvh '/persist/home/${username}/.mozilla/' '/home/${username}/.mozilla/'";
+      syncToPersist = "${rsync} -avh '/home/${username}/.mozilla/' '/persist/home/${username}/.mozilla/'";
+    in
+    {
+      services.firefox-persist-init = {
+        Unit = {
+          Description = "Firefox persist restore on boot and backup on shutdown";
+          X-SwitchMethod = "keep-old";
+          Requires = [ "graphical-session.target" ];
+          After = [ "graphical-session.target" ];
+        };
+
+        Service = {
+          Type = "oneshot";
+          ExecStart = [
+            "${pkgs.coreutils}/bin/mkdir -p /persist/home/${username}/.mozilla"
+            syncToTmpfs
+          ];
+          ExecStop = syncToPersist;
+          RemainAfterExit = "yes";
+        };
+
+        Install.WantedBy = [ "graphical-session.target" ];
+      };
+
+      services.firefox-persist = {
+        Unit = {
+          Description = "Firefox persist sync";
+          X-SwitchMethod = "keep-old";
+          Requires = [ "firefox-persist-init.service" ];
+          After = [ "firefox-persist-init.service" ];
+        };
+
+        Service = {
+          CPUSchedulingPolicy = "idle";
+          IOSchedulingClass = "idle";
+          ExecStart = syncToPersist;
+        };
+      };
+
+      timers.firefox-persist = {
+        Unit = {
+          Description = "Firefox persist periodic sync timer";
+          X-SwitchMethod = "keep-old";
+        };
+
+        Timer = {
+          Unit = "firefox-persist.service";
+          OnCalendar = "*:0/15";
+        };
+
+        Install.WantedBy = [ "timers.target" ];
+      };
+    };
+
   # TODO: Add extension config files
   # - res
   # - ffz
@@ -266,11 +333,6 @@ mkIf cfg.enable {
     [
       "${desktopCfg.hyprland.modKey}, Backspace, exec, ${firefox}"
     ];
-
-  persistence.directories = [
-    ".mozilla"
-    ".cache/mozilla"
-  ];
 }
 # TODO: Either theme firefox with this or figure out how to change theme through GTK
 

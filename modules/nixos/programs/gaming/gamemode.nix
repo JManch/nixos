@@ -5,7 +5,7 @@ let
 
   startStopScript =
     let
-      inherit (lib) optionalString fetchers boolToString substring stringLength;
+      inherit (lib) optionalString fetchers boolToString substring stringLength toUpper;
       inherit (homeConfig.modules.desktop) hyprland;
       homeConfig = utils.homeConfig args;
       isHyprland = homeConfig.modules.desktop.windowManager == "Hyprland";
@@ -27,7 +27,7 @@ let
       isEnd = m: boolToString (m == "end");
       blur = m: if hyprland.blur then isEnd m else "false";
       animate = m: if hyprland.animations then isEnd m else "false";
-      notifBody = m: ((lib.strings.toUpper (substring 0 1 m)) + (substring 1 ((stringLength m) - 1) m));
+      notifBody = m: ((toUpper (substring 0 1 m)) + (substring 1 ((stringLength m) - 1) m));
     in
     mode: pkgs.writeShellApplication {
       name = "gamemode-${mode}";

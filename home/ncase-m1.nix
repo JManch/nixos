@@ -38,6 +38,7 @@ in
 
       programs = {
         swaylock.enable = true;
+        hyprlock.enable = true;
         anyrun.enable = true;
       };
 

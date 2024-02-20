@@ -35,5 +35,9 @@ in
         description = "Path to lock script";
       };
     };
+
+    hyprlock = {
+      enable = mkEnableOption "Hyprlock";
+    };
   };
 }

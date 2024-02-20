@@ -11,10 +11,10 @@ let
   spotifyPlayerPkg = (pkgs.spotify-player.override {
     withDaemon = false;
   });
+  spotifyPlayer = getExe spotifyPlayerPkg;
 
   modifySpotifyVolume =
     let
-      spotifyPlayer = getExe spotifyPlayerPkg;
       jaq = getExe pkgs.jaq;
       notifySend = getExe pkgs.libnotify;
       sleep = "${pkgs.coreutils}/bin/sleep";
@@ -120,7 +120,7 @@ mkIf (cfg.enable && osConfig.modules.system.audio.enable)
   xdg.desktopEntries."spotify-player" = mkIf osConfig.usrEnv.desktop.enable {
     name = "Spotify";
     genericName = "Music Player";
-    exec = "${desktopCfg.terminal.exePath} --title Spotify --option font.size=11 -e ${spotifyPlayerPkg}";
+    exec = "${desktopCfg.terminal.exePath} --title Spotify --option font.size=11 -e ${spotifyPlayer}";
     terminal = false;
     type = "Application";
     categories = [ "Audio" ];

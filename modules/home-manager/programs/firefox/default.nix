@@ -18,13 +18,13 @@ mkIf cfg.enable {
   systemd.user =
     let
       rsync = getExe pkgs.rsync;
-      syncToTmpfs = "${rsync} -auvh '/persist/home/${username}/.mozilla/' '/home/${username}/.mozilla/'";
-      syncToPersist = "${rsync} -avh '/home/${username}/.mozilla/' '/persist/home/${username}/.mozilla/'";
+      syncToTmpfs = "${rsync} -auh --info=stats1 '/persist/home/${username}/.mozilla/' '/home/${username}/.mozilla/'";
+      syncToPersist = "${rsync} -ah --info=stats1 '/home/${username}/.mozilla/' '/persist/home/${username}/.mozilla/'";
     in
     {
       services.firefox-persist-init = {
         Unit = {
-          Description = "Firefox persist restore on boot and backup on shutdown";
+          Description = "Firefox persist initialiser";
           X-SwitchMethod = "keep-old";
           Requires = [ "graphical-session.target" ];
           After = [ "graphical-session.target" ];
@@ -36,6 +36,7 @@ mkIf cfg.enable {
             "${pkgs.coreutils}/bin/mkdir -p /persist/home/${username}/.mozilla"
             syncToTmpfs
           ];
+          # Backup on shutdown
           ExecStop = syncToPersist;
           RemainAfterExit = "yes";
         };
@@ -43,9 +44,9 @@ mkIf cfg.enable {
         Install.WantedBy = [ "graphical-session.target" ];
       };
 
-      services.firefox-persist = {
+      services.firefox-persist-sync = {
         Unit = {
-          Description = "Firefox persist sync";
+          Description = "Firefox persist synchroniser";
           X-SwitchMethod = "keep-old";
           Requires = [ "firefox-persist-init.service" ];
           After = [ "firefox-persist-init.service" ];
@@ -58,14 +59,14 @@ mkIf cfg.enable {
         };
       };
 
-      timers.firefox-persist = {
+      timers.firefox-persist-sync = {
         Unit = {
-          Description = "Firefox persist periodic sync timer";
+          Description = "Firefox persist synchroniser timer";
           X-SwitchMethod = "keep-old";
         };
 
         Timer = {
-          Unit = "firefox-persist.service";
+          Unit = "firefox-persist-sync.service";
           OnCalendar = "*:0/15";
         };
 
@@ -105,9 +106,9 @@ mkIf cfg.enable {
           "media.ffmpeg.vaapi.enabled" = (osConfig.device.gpu.type != null);
 
           # Scrolling
-          "mousewheel.default.delta_multiplier_x" = 95;
-          "mousewheel.default.delta_multiplier_y" = 95;
-          "mousewheel.default.delta_multiplier_z" = 95;
+          "mousewheel.default.delta_multiplier_x" = 99;
+          "mousewheel.default.delta_multiplier_y" = 99;
+          "mousewheel.default.delta_multiplier_z" = 99;
           "general.smoothScroll" = true;
           "general.smoothScroll.lines.durationMaxMS" = 125;
           "general.smoothScroll.lines.durationMinMS" = 125;

@@ -6,7 +6,8 @@ let
   });
 in
 {
-  # TODO: Go through these and update/remove where appropriate
+  # TODO: Where possible, replace overlays with package specific overrides.
+  # Overlays can cause a system-wide butterfly effect on dependencies.
   modifications = final: prev: {
     eza = prev.eza.overrideAttrs (oldAttrs: rec {
       version = "0.10.7";

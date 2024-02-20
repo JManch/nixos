@@ -1,10 +1,12 @@
-{ lib, config, ... }:
+{ lib, pkgs, config, ... }:
 let
   inherit (lib) mkIf mkForce optional;
   cfg = config.modules.services.broadcast-box;
 in
 mkIf cfg.enable
 {
+  environment.systemPackages = [ pkgs.broadcast-box ];
+
   services.broadcast-box = {
     enable = true;
     http.port = 8080;

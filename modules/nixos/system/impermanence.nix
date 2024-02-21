@@ -5,7 +5,7 @@
 , ...
 } @ args:
 let
-  inherit (lib) utils mkAliasOptionModule;
+  inherit (lib) utils mkAliasOptionModule concatStringsSep;
   homeManagerPersistence = (utils.homeConfig args).persistence;
 in
 {
@@ -28,7 +28,17 @@ in
       sed = getExe pkgs.gnused;
       tr = "${pkgs.coreutils}/bin/tr";
       findmnt = "${pkgs.util-linux}/bin/findmnt";
-      extraExcludeDirs = "proc,sys,run,dev,tmp,boot,root/.cache/nix";
+      extraExcludeDirs = [
+        "proc"
+        "sys"
+        "run"
+        "dev"
+        "tmp"
+        "boot"
+        "root/.cache/nix"
+        "home/${username}/.mozilla"
+        "home/${username}/.cache/mozilla"
+      ];
     in
       /*bash*/ ''
 
@@ -36,7 +46,7 @@ in
       impermanence() {
         # Get comma seperated list of zfs mounted directories and remove leading /
         exclude_dirs=$(${findmnt} -n -o TARGET --list -t zfs | ${sed} 's/^.//' | ${tr} '\n' ',' | ${sed} 's/.$//')
-        exclude_dirs="$exclude_dirs,${extraExcludeDirs}"
+        exclude_dirs="$exclude_dirs,${concatStringsSep "," extraExcludeDirs}"
         # Get list of all files, excluding those with zfs mounted paths
         sudo ${fd} --base-directory / -a -tf -H -E "{$exclude_dirs}"
       }

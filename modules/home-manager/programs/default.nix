@@ -28,5 +28,6 @@ in
     mangohud.enable = mkEnableOption "MangoHud";
     r2modman.enable = mkEnableOption "r2modman";
     lutris.enable = mkEnableOption "Lutris";
+    filenDesktop.enable = mkEnableOption "Filen Desktop";
   };
 }

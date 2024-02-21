@@ -17,6 +17,7 @@ in
       hyprland = {
         tearing = true;
         directScanout = true;
+        logging = false;
       };
 
       terminal = {
@@ -83,6 +84,7 @@ in
       mangohud.enable = true;
       r2modman.enable = true;
       lutris.enable = true;
+      filenDesktop.enable = true;
     };
 
     services = {

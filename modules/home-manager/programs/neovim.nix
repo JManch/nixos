@@ -29,16 +29,20 @@ mkIf (cfg.enable && config.modules.shell.enable) {
       lua-language-server
       nil
       nixd
-      clang-tools
-      ltex-ls
-      omnisharp-roslyn
-      matlab-language-server
 
       # Formatters
-      stylua
-      prettierd
-      black
       nixpkgs-fmt
+      stylua
+
+      # NOTE: These 'extra' lsp and formatters should be installed on a
+      # per-project basis using nix shell
+
+      # clang-tools
+      # ltex-ls
+      # omnisharp-roslyn
+      # matlab-language-server
+      # prettierd
+      # black
     ];
   };
 

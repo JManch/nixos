@@ -27,8 +27,6 @@ mkIf (cfg.enable && osDesktop.enable) {
         Unit = {
           Description = "Firefox persist initialiser";
           X-SwitchMethod = "keep-old";
-          PartOf = [ "graphical-session.target" ];
-          After = [ "graphical-session-pre.target" ];
         };
 
         Service = {
@@ -42,7 +40,12 @@ mkIf (cfg.enable && osDesktop.enable) {
           RemainAfterExit = "yes";
         };
 
-        Install.WantedBy = [ "graphical-session.target" ];
+        # default.target is reached at roughly the same time as the system
+        # multi-user target. This is BEFORE logging in. This service cannot
+        # start with graphical-session.target because the large initial copy
+        # (about 1GB) significantly slows down the start-up of desktop services
+        # like waybar.
+        Install.WantedBy = [ "default.target" ];
       };
 
       services.firefox-persist-sync = {
@@ -50,10 +53,11 @@ mkIf (cfg.enable && osDesktop.enable) {
           Description = "Firefox persist synchroniser";
           X-SwitchMethod = "keep-old";
           After = [ "firefox-persist-init.service" ];
-          Requisite = [ "firefox-persist-init.service" ];
+          Requisite = [ "firefox-persist-init.service" "graphical-session.target" ];
         };
 
         Service = {
+          Type = "oneshot";
           CPUSchedulingPolicy = "idle";
           IOSchedulingClass = "idle";
           ExecStart = syncToPersist;

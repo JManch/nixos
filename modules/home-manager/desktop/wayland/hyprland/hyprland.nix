@@ -58,11 +58,6 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
     '';
 
-  xdg.portal = {
-    extraPortals = [ hyprlandPackages.xdg-desktop-portal-hyprland ];
-    configPackages = [ hyprlandPackages.hyprland ];
-  };
-
   wayland.windowManager.hyprland = {
     enable = true;
     # By default Hyprland adds stdenv.cc, binutils and pciutils to path. I

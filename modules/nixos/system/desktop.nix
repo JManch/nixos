@@ -1,6 +1,6 @@
 { lib, config, inputs, ... } @ args:
 let
-  inherit (lib) mkIf mkMerge fetchers utils mkForce;
+  inherit (lib) mkIf mkMerge fetchers utils;
   inherit (desktopCfg) desktopEnvironment;
   inherit (homeDesktopCfg) windowManager;
   desktopCfg = config.usrEnv.desktop;
@@ -22,9 +22,8 @@ in
       security.pam.services.swaylock = mkIf (isWayland && homeDesktopCfg.programs.swaylock.enable) { };
       security.pam.services.hyprlock = mkIf (isWayland && homeDesktopCfg.programs.hyprlock.enable) { };
 
-      # We configure xdg portal in home-manager
-      # TODO: Configure xdg portal in home-manager for each of these desktopEnvironments
-      xdg.portal.enable = mkForce false;
+      # https://github.com/NixOS/nixpkgs/issues/160923
+      xdg.portal.xdgOpenUsePortal = true;
     }
 
     (mkIf (desktopEnvironment == "xfce") {

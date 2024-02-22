@@ -11,8 +11,6 @@ let
 in
 lib.mkIf osConfig.usrEnv.desktop.enable
 {
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-
   gtk = {
     enable = true;
 

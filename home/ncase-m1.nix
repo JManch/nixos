@@ -21,7 +21,7 @@ in
 
       hyprland = {
         tearing = true;
-        directScanout = true;
+        directScanout = false;
         logging = false;
       };
 

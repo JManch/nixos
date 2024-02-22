@@ -26,7 +26,7 @@ lib.mkIf cfg.enable {
       font = {
         size = normalFontSize;
         normal = {
-          family = "${desktopCfg.style.font.family}";
+          family = desktopCfg.style.font.family;
           style = "Regular";
         };
       };

@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf concatMap fetchers getExe;
+  inherit (lib) mkIf concatMap fetchers getExe getExe';
   inherit (osConfig.device) monitors;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
@@ -66,7 +66,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
   wayland.windowManager.hyprland.settings =
     let
-      hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+      hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
       jaq = getExe pkgs.jaq;
       toggleShader = pkgs.writeShellScript "hypr-toggle-shader" /*bash*/ ''
 
@@ -90,7 +90,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     '';
 
     postLockScript = ''
-      (${pkgs.coreutils}/bin/sleep 0.1; ${cfg.enableShaders}) &
+      (${getExe' pkgs.coreutils "sleep"} 0.1; ${cfg.enableShaders}) &
     '';
   };
 }

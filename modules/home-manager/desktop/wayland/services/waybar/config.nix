@@ -11,6 +11,7 @@ let
     fetchers
     optional
     take
+    getExe'
     listToAttrs
     attrsets
     toUpper;
@@ -119,13 +120,13 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
             ];
           };
 
-          on-click = "${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          on-click = "${getExe' pkgs.wireplumber "wpctl"} set-mute @DEFAULT_AUDIO_SINK@ toggle";
           tooltip = false;
         };
 
         network = {
           interval = 5;
-          format = "<span color='#${colors.base04}'>󰈀</span> {bandwidthTotalBytes}";
+          format = " < span color='#${colors.base04}'>󰈀</span> {bandwidthTotalBytes}";
           tooltip-format = "<span color='#${colors.base04}'>󰇚</span>{bandwidthDownBytes:>} <span color='#${colors.base04}'>󰕒</span>{bandwidthUpBytes:>}";
           max-length = 50;
         };
@@ -137,7 +138,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
 
         "custom/gpu" = mkIf gpuModuleEnabled {
           format = "<span color='#${colors.base04}' size='large'>󰾲</span> {}%";
-          exec = "${pkgs.coreutils}/bin/cat /sys/class/hwmon/hwmon${toString gpu.hwmonId}/device/gpu_busy_percent";
+          exec = "${getExe' pkgs.coreutils "cat"} /sys/class/hwmon/hwmon${toString gpu.hwmonId}/device/gpu_busy_percent";
           interval = 5;
           tooltip = false;
         };
@@ -149,7 +150,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
         };
 
         "network#hostname" = {
-          format = "${toUpper hostname}";
+          format = toUpper hostname;
           tooltip-format-ethernet = "{ipaddr}";
           tooltip-format-disconnected = "<span color='#${colors.base08}'>Disconnected</span>";
         };
@@ -162,14 +163,14 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
 
         "custom/poweroff" = {
           format = "⏻";
-          on-click-middle = "${pkgs.systemd}/bin/systemctl poweroff";
+          on-click-middle = "${getExe' pkgs.systemd "systemctl"} poweroff";
           tooltip = false;
         };
 
         "custom/vpn" = mkIf wgnord.enable {
           format = "<span color='#${colors.base04}'></span> {}";
           exec = "echo '{\"text\": \"${wgnord.country}\"}'";
-          exec-if = "${pkgs.iproute2}/bin/ip link show wgnord > /dev/null 2>&1";
+          exec-if = "${getExe' pkgs.iproute2 "ip"} link show wgnord > /dev/null 2>&1";
           return-type = "json";
           tooltip = false;
           interval = 5;

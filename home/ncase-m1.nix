@@ -1,4 +1,9 @@
-{ pkgs, config, inputs, ... }:
+{ lib
+, pkgs
+, config
+, inputs
+, ...
+}:
 let
   nix-resources = inputs.nix-resources.packages.${pkgs.system};
 in
@@ -21,7 +26,7 @@ in
       };
 
       terminal = {
-        exePath = "${config.programs.alacritty.package}/bin/alacritty";
+        exePath = lib.getExe config.programs.alacritty.package;
         class = "Alacritty";
       };
 

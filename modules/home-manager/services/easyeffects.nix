@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) mkIf getExe getExe';
   inherit (osConfig.programs) dconf;
   inherit (osConfig.modules.system) audio;
   cfg = config.modules.services.easyeffects;
@@ -22,8 +22,8 @@ mkIf (cfg.enable && audio.enable && dconf.enable) {
     };
 
     Service = {
-      ExecStart = "${pkgs.easyeffects}/bin/easyeffects --gapplication-service";
-      ExecStop = "${pkgs.easyeffects}/bin/easyeffects --quit";
+      ExecStart = "${getExe pkgs.easyeffects} --gapplication-service";
+      ExecStop = "${getExe pkgs.easyeffects} --quit";
       Restart = "on-failure";
       RestartSec = 5;
     };
@@ -32,7 +32,7 @@ mkIf (cfg.enable && audio.enable && dconf.enable) {
   programs.waybar.settings.bar =
     let
       colors = config.colorscheme.palette;
-      systemctl = "${pkgs.systemd}/bin/systemctl";
+      systemctl = getExe' pkgs.systemd "systemctl";
       notifySend = getExe pkgs.libnotify;
     in
     {

@@ -1,6 +1,7 @@
 { lib, config, osConfig, ... }:
 let
   inherit (osConfig) device;
+  inherit (config.modules.desktop.style) cornerRadius;
   cfg = config.modules.programs.mangohud;
   colors = config.colorscheme.palette;
 in
@@ -17,17 +18,17 @@ lib.mkIf cfg.enable {
       legacy_layout = 0;
       no_display = true; # Whether to hide the HUD by default
       font_size = 20;
-      round_corners = "${toString config.modules.desktop.style.cornerRadius}";
+      round_corners = "${toString cornerRadius}";
       hud_compact = true;
-      text_color = "${colors.base07}";
-      gpu_color = "${colors.base08}";
-      cpu_color = "${colors.base09}";
-      vram_color = "${colors.base0E}";
-      ram_color = "${colors.base0C}";
-      engine_color = "${colors.base0F}";
-      io_color = "${colors.base0D}";
-      frametime_color = "${colors.base0B}";
-      background_color = "${colors.base00}";
+      text_color = colors.base07;
+      gpu_color = colors.base08;
+      cpu_color = colors.base09;
+      vram_color = colors.base0E;
+      ram_color = colors.base0C;
+      engine_color = colors.base0F;
+      io_color = colors.base0D;
+      frametime_color = colors.base0B;
+      background_color = colors.base00;
 
       # GPU
       vram = true;

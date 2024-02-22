@@ -43,7 +43,7 @@ lib.mkIf osConfig.usrEnv.desktop.enable
 
   desktop.hyprland.settings =
     let
-      hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+      hyprctl = lib.getExe' config.wayland.windowManager.hyprland.package "hyprctl";
     in
     {
       env = [

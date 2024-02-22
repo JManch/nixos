@@ -1,6 +1,6 @@
 { lib, pkgs, osConfig, ... }:
 let
-  inherit (lib) mkIf getExe fetchers;
+  inherit (lib) mkIf getExe getExe' fetchers;
   cfg = osConfig.modules.programs.gaming.steam;
 in
 mkIf cfg.enable
@@ -14,8 +14,8 @@ mkIf cfg.enable
     let
       hyprshot = getExe pkgs.hyprshot;
       tesseract = getExe pkgs.tesseract;
-      tr = "${pkgs.coreutils}/bin/tr";
-      bc = "${pkgs.bc}/bin/bc";
+      tr = getExe' pkgs.coreutils "tr";
+      bc = getExe' pkgs.bc "bc";
       primaryMonitor = fetchers.primaryMonitor osConfig;
     in
       /* bash */ ''

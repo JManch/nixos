@@ -1,8 +1,8 @@
 { lib, config, ... }:
 let
-  inherit (lib) mkAliasOptionModule mkEnableOption mkOption types;
+  inherit (lib) mkAliasOptionModule mkEnableOption mkOption types getExe';
   cfg = config.modules.desktop.hyprland;
-  hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+  hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 in
 {
   imports = lib.utils.scanPaths ./. ++ [

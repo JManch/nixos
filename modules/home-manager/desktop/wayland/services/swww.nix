@@ -13,7 +13,7 @@ let
   transition =
     let
       primaryMonitor = fetchers.primaryMonitor osConfig;
-      refreshRate = "${toString (builtins.floor primaryMonitor.refreshRate)}";
+      refreshRate = toString (builtins.floor primaryMonitor.refreshRate);
     in
     "--transition-bezier .43,1.19,1,.4 --transition-type center --transition-duration 1 --transition-fps ${refreshRate}";
 in

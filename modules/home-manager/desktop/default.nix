@@ -7,7 +7,7 @@ let
       exePath = mkOption {
         type = types.str;
         default = null;
-        example = literalExpression "${config.programs.alacritty.package}/bin/alacritty";
+        example = literalExpression "${lib.getExe config.programs.alacritty.package}";
       };
 
       class = mkOption {

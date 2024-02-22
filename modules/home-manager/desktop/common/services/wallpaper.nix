@@ -5,7 +5,7 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf mkMerge lists getExe utils;
+  inherit (lib) mkIf mkMerge lists getExe getExe' utils;
   cfg = config.modules.desktop.services.wallpaper;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
   allWallpapers = (utils.flakePkgs args "nix-resources").wallpapers.all-wallpapers;
@@ -15,15 +15,16 @@ let
     runtimeInputs = with pkgs; [ coreutils findutils ];
     text = /*bash*/ ''
 
-      DIR="${allWallpapers}/wallpapers"
-      CACHE_FILE="${config.xdg.cacheHome}/wallpaper"
-      [[ -f "$CACHE_FILE" ]] && PREVIOUS_WALLPAPER=$(<"$CACHE_FILE")
+      dir="${allWallpapers}/wallpapers"
+      cache_file="${config.xdg.cacheHome}/wallpaper"
+      previous_wallpaper=""
+      [[ -f "$cache_file" ]] && previous_wallpaper=$(<"$cache_file")
       # Randomly select a wallpaper excluding the previous
-      NEW_WALLPAPER=$(
-        find "$DIR" -type f ! -wholename "$PREVIOUS_WALLPAPER" -print0 |
+      new_wallpaper=$(
+        find "$dir" -type f ! -wholename "$previous_wallpaper" -print0 |
         shuf -z -n 1 | tr -d '\0'
       )
-      echo "$NEW_WALLPAPER" > "$CACHE_FILE"
+      echo "$new_wallpaper" > "$cache_file"
 
     '';
   };
@@ -43,10 +44,11 @@ mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
       Service =
         let
           wallpaperToSet = if cfg.randomise then "\"$(<${config.xdg.cacheHome}/wallpaper)\"" else cfg.default;
+          sh = getExe' pkgs.bash "sh";
         in
         {
           Type = "oneshot";
-          ExecStartPre = [ "${pkgs.coreutils}/bin/sleep 1" ]
+          ExecStartPre = [ "${getExe' pkgs.coreutils "sleep"} 1" ]
             # If this is a fresh install and the wallpaper cache does not exist,
             # randomise straight away. This is because daily / weekly timers
             # won't necessarily trigger on the very first boot
@@ -57,8 +59,8 @@ mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
             # not be applied. Can maybe add a check that runs randomiseWallpaper
             # if the wallpaper file pointed to in the cache does not exist.
             ++ lib.lists.optional cfg.randomise
-            "${pkgs.bash}/bin/sh -c '[[ -f \"${config.xdg.cacheHome}/wallpaper\" ]] || ${getExe randomiseWallpaper}'";
-          ExecStart = "${pkgs.bash}/bin/sh -c '${cfg.setWallpaperCmd} ${wallpaperToSet}'";
+            "${sh} -c '[[ -f \"${config.xdg.cacheHome}/wallpaper\" ]] || ${getExe randomiseWallpaper}'";
+          ExecStart = "${sh} -c '${cfg.setWallpaperCmd} ${wallpaperToSet}'";
         };
 
       Install.WantedBy = [ "graphical-session.target" ];
@@ -81,7 +83,7 @@ mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
 
         Service = {
           Type = "oneshot";
-          ExecStart = [ "${getExe randomiseWallpaper}" ];
+          ExecStart = [ (getExe randomiseWallpaper) ];
         };
       };
 

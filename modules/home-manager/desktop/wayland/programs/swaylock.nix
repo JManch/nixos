@@ -57,7 +57,7 @@ let
         pgrep -x swaylock && exit 1
 
         # Get PIDs of existing instances of script
-        pids=$(pgrep -fx "${pkgs.bash}/bin/bash $(realpath "$0")" || true)
+        pids=$(pgrep -fx "${getExe pkgs.bash} $(realpath "$0")" || true)
 
         # Exlude this script's pid from the pids
         pids=$(echo "$pids" | grep -v "$$")
@@ -69,7 +69,7 @@ let
         fi
 
         ${preLock}
-        ${config.programs.swaylock.package}/bin/swaylock &
+        ${getExe config.programs.swaylock.package} &
         SWAYLOCK_PID=$!
         ${postLock}
         wait $SWAYLOCK_PID

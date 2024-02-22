@@ -5,16 +5,17 @@
 , ...
 }:
 let
+  inherit (lib) mkIf getExe';
   cfg = config.modules.services.greetd;
 in
-lib.mkIf (cfg.enable && config.usrEnv.desktop.enable)
+mkIf (cfg.enable && config.usrEnv.desktop.enable)
 {
   services.greetd = {
     enable = true;
     settings = {
       default_session = {
         user = username;
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${cfg.launchCmd}";
+        command = "${getExe' pkgs.greetd.tuigreet "tuigreet"} --time --cmd ${cfg.launchCmd}";
       };
     };
   };

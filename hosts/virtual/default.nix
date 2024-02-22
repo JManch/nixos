@@ -28,7 +28,7 @@ in
     homeManager.enable = true;
 
     desktop = {
-      enable = false;
+      enable = true;
       desktopEnvironment = null;
     };
   };

@@ -6,9 +6,10 @@
 , ...
 }:
 let
+  inherit (lib) mkIf getExe getExe';
   cfg = config.modules.shell;
 in
-lib.mkIf cfg.enable {
+mkIf cfg.enable {
   programs.zsh = {
     enable = true;
     enableAutosuggestions = true;
@@ -34,7 +35,7 @@ lib.mkIf cfg.enable {
 
     shellAliases = {
       cat = "bat -pp --theme=base16";
-      reload = "exec ${config.programs.zsh.package}/bin/zsh";
+      reload = "exec ${getExe config.programs.zsh.package}";
       rebuild-home = "home-manager switch --flake ~/.config/nixos#${username}";
       rebuild-switch = "sudo nixos-rebuild switch --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-test = "sudo nixos-rebuild test --flake /home/${username}/.config/nixos#${hostname}";
@@ -47,14 +48,19 @@ lib.mkIf cfg.enable {
       inspect-nix-config = "nix --extra-experimental-features repl-flake repl '/home/${username}/.config/nixos#nixosConfigurations.${hostname}'";
     };
 
-    initExtra = /*bash*/ ''
+    initExtra =
+      let
+        reboot = getExe' pkgs.systemd "reboot";
+        sshAdd = getExe' pkgs.openssh "ssh-add";
+      in
+        /*bash*/ ''
 
       setopt interactivecomments
 
       reboot() {
         read -q "REPLY?Are you sure you want to reboot? (y/N)"
         if [[ $REPLY =~ ^[Yy]$ ]]; then
-          ${pkgs.systemd}/bin/reboot
+          ${reboot}
         fi
       }
 
@@ -74,9 +80,9 @@ lib.mkIf cfg.enable {
       }
 
       ssh-add-quiet() {
-        keys=$(${pkgs.openssh}/bin/ssh-add -l)
+        keys=$(${sshAdd} -l)
         if [[ "$keys" == "The agent has no identities." ]]; then
-          ${pkgs.openssh}/bin/ssh-add
+          ${sshAdd}
         fi
       }
 

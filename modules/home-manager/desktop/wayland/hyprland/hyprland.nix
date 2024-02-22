@@ -11,6 +11,7 @@ let
     utils
     mkVMOverride
     getExe
+    getExe'
     concatStringsSep
     concatMap
     head
@@ -101,10 +102,10 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
       exec-once =
         let
           xclip = getExe pkgs.xclip;
-          hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
-          wlPaste = "${pkgs.wl-clipboard}/bin/wl-paste";
-          cat = "${pkgs.coreutils}/bin/cat";
-          cmp = "${pkgs.diffutils}/bin/cmp";
+          hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
+          wlPaste = getExe' pkgs.wl-clipboard "wl-paste";
+          cat = getExe' pkgs.coreutils "cat";
+          cmp = getExe' pkgs.diffutils "cmp";
         in
         [
           "${hyprctl} dispatch focusmonitor ${(fetchers.getMonitorByNumber osConfig 1).name}"

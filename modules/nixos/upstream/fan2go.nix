@@ -6,6 +6,7 @@ let
     mkEnableOption
     mkOption
     types
+    getExe'
     literalExpression;
   cfg = config.programs.fan2go;
   yamlFormat = pkgs.formats.yaml { };
@@ -48,7 +49,7 @@ in
         };
 
         serviceConfig = {
-          ExecStart = "${cfg.package}/bin/fan2go -c ${configFile} --no-style";
+          ExecStart = "${getExe' cfg.package "fan2go"} -c ${configFile} --no-style";
           LimitNOFILE = 8192;
           Environment = [ "DISPLAY=:0" ];
           Restart = "always";

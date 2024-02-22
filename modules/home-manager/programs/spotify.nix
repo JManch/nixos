@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) mkIf getExe getExe';
   cfg = config.modules.programs.spotify;
   desktopCfg = config.modules.desktop;
   spotifyPlayerPkg = (pkgs.spotify-player.override {
@@ -17,7 +17,7 @@ let
     let
       jaq = getExe pkgs.jaq;
       notifySend = getExe pkgs.libnotify;
-      sleep = "${pkgs.coreutils}/bin/sleep";
+      sleep = getExe' pkgs.coreutils "sleep";
     in
     pkgs.writeShellScript "spotify-modify-volume" ''
       ${spotifyPlayer} playback volume --offset -- $1
@@ -64,7 +64,7 @@ mkIf (cfg.enable && osConfig.modules.system.audio.enable)
         default_device = "spotify-player"
 
         [copy_command]
-        command = "${pkgs.wl-clipboard}/bin/wl-copy"
+        command = "${getExe' pkgs.wl-clipboard "wl-copy"}"
 
         [notify_format]
         summary = "{track}"

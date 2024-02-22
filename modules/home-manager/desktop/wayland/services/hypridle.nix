@@ -1,6 +1,11 @@
-{ lib, pkgs, inputs, config, ... }:
+{ lib
+, pkgs
+, inputs
+, config
+, ...
+}:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf getExe';
   cfg = desktopCfg.services.hypridle;
   desktopCfg = config.modules.desktop;
   swaylock = desktopCfg.programs.swaylock;
@@ -18,8 +23,8 @@ in
 
       listeners =
         let
-          sleep = "${pkgs.coreutils}/bin/sleep";
-          hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+          sleep = getExe' pkgs.coreutils "sleep";
+          hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
         in
         [
           {

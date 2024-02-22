@@ -38,7 +38,7 @@ in
     # TODO: Don't store host public keys in .nix files
     knownHosts = (mapAttrs
       (host: _: {
-        publicKey = "${(import ../../../hosts/${host}/key.nix).key}";
+        publicKey = (import ../../../hosts/${host}/key.nix).key;
         extraHostNames = (optional (host == hostname) "localhost");
       })
       outputs.nixosConfigurations)

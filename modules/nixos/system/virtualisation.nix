@@ -92,7 +92,7 @@ mkMerge [
 
   (mkIf cfg.enable {
     programs.virt-manager.enable = true;
-    users.users."${username}".extraGroups = [ "libvirtd" "docker" ];
+    users.users.${username}.extraGroups = [ "libvirtd" "docker" ];
 
     virtualisation = {
       libvirtd.enable = true;

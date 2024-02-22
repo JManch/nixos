@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkMerge mkIf optional optionals;
+  inherit (lib) mkMerge mkIf optional optionals getExe';
   cfg = config.modules.system.networking;
 in
 {
@@ -17,7 +17,7 @@ in
   users.users.${username}.extraGroups = [ "networkmanager" ];
   age.secrets.wirelessNetworks.file = ../../../secrets/wireless-networks.age;
 
-  systemd.services.wpa_supplicant.preStart = "${pkgs.coreutils}/bin/touch /etc/wpa_supplicant.conf";
+  systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";
   services.resolved.enable = cfg.resolved.enable;
 
   networking = {

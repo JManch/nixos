@@ -11,6 +11,7 @@ let
     optionals
     optional
     getExe
+    getExe'
     range
     concatMap
     fetchers
@@ -23,7 +24,7 @@ let
 
   jaq = getExe pkgs.jaq;
   notifySend = getExe pkgs.libnotify;
-  hyprctl = "${config.wayland.windowManager.hyprland.package}/bin/hyprctl";
+  hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 
   getMonitorByNumber = number: fetchers.getMonitorByNumber osConfig number;
 
@@ -72,7 +73,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
       modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
 
       hyprshot = getExe pkgs.hyprshot;
-      wpctl = "${pkgs.wireplumber}/bin/wpctl";
+      wpctl = getExe' pkgs.wireplumber "wpctl";
     in
     {
       settings.bind =

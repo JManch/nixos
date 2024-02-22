@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf fetchers utils;
+  inherit (lib) mkIf fetchers utils getExe';
   cfg = desktopCfg.programs.anyrun;
   desktopCfg = config.modules.desktop;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
@@ -93,7 +93,7 @@ in
       in
       {
         bindr = [
-          "${modKey}, ${modKey}_L, exec, ${pkgs.procps}/bin/pkill anyrun || anyrun"
+          "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} anyrun || anyrun"
         ];
 
         layerrule = [

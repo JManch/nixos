@@ -1,4 +1,9 @@
-{ pkgs, inputs, config, ... }:
+{ lib
+, pkgs
+, inputs
+, config
+, ...
+}:
 {
   imports = [ ./core.nix ];
 
@@ -9,10 +14,11 @@
       hyprland = {
         modKey = "ALT";
         blur = false;
+        logging = true;
       };
 
       terminal = {
-        exePath = "${config.programs.alacritty.package}/bin/alacritty";
+        exePath = lib.getExe config.programs.alacritty.package;
         class = "Alacritty";
       };
 
@@ -37,7 +43,7 @@
     programs = {
       alacritty.enable = true;
       btop.enable = true;
-      firefox.enable = true;
+      firefox.enable = false;
       git.enable = true;
       neovim.enable = true;
       fastfetch.enable = true;

@@ -1,8 +1,8 @@
-{ modulesPath, ... }:
+{ lib, modulesPath, ... }:
 {
   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
 
-  networking.useDHCP = true;
+  networking.useDHCP = lib.mkDefault true;
   hardware.cpu.amd.updateMicrocode = true;
   nixpkgs.hostPlatform = "x86_64-linux";
 

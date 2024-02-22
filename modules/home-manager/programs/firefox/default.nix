@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) mkIf getExe getExe';
   cfg = config.modules.programs.firefox;
   desktopCfg = config.modules.desktop;
   # color = base:
@@ -33,7 +33,7 @@ mkIf cfg.enable {
         Service = {
           Type = "oneshot";
           ExecStart = [
-            "${pkgs.coreutils}/bin/mkdir -p /persist/home/${username}/.mozilla"
+            "${getExe' pkgs.coreutils "mkdir"} -p /persist/home/${username}/.mozilla"
             syncToTmpfs
           ];
           # Backup on shutdown

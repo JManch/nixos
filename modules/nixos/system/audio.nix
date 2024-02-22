@@ -5,13 +5,13 @@
 , ...
 }:
 let
-  inherit (lib) mkMerge mkIf getExe mkForce;
+  inherit (lib) mkMerge mkIf getExe getExe' mkForce;
   inherit (config.modules.programs) gaming;
   cfg = config.modules.system.audio;
 
   toggleMic =
     let
-      wpctl = "${pkgs.wireplumber}/bin/wpctl";
+      wpctl = getExe' pkgs.wireplumber "wpctl";
       notifySend = getExe pkgs.libnotify;
     in
     pkgs.writeShellScript "toggle-mic" ''

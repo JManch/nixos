@@ -18,6 +18,7 @@ in
       tree
       wget
       fd
+      ripgrep
       bat
       tokei
       rename

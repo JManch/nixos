@@ -23,11 +23,11 @@ in
 
   programs.zsh.interactiveShellInit =
     let
-      inherit (lib) getExe;
+      inherit (lib) getExe getExe';
       fd = getExe pkgs.fd;
       sed = getExe pkgs.gnused;
-      tr = "${pkgs.coreutils}/bin/tr";
-      findmnt = "${pkgs.util-linux}/bin/findmnt";
+      tr = getExe' pkgs.coreutils "tr";
+      findmnt = getExe' pkgs.util-linux "findmnt";
       extraExcludeDirs = [
         "proc"
         "sys"

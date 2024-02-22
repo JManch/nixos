@@ -52,7 +52,7 @@ in
 
       label = {
         monitor = primaryMonitor.name;
-        text = "${toUpper hostname}";
+        text = toUpper hostname;
         position = { x = 0; y = 30; };
         font_family = config.modules.desktop.style.font.family;
         font_size = 40;

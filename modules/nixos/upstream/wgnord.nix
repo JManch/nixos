@@ -1,6 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf mkEnableOption mkOption types;
+  inherit (lib) mkIf mkEnableOption mkOption types getExe getExe';
   cfg = config.services.wgnord;
 in
 {
@@ -58,13 +58,13 @@ in
         # https://discourse.nixos.org/t/creating-directories-and-files-declararively/9349/2
         StateDirectory = "wgnord";
         ExecStartPre = [
-          "-${pkgs.coreutils}/bin/ln -s /etc/wgnord/template.conf /var/lib/wgnord/template.conf"
+          "-${getExe' pkgs.coreutils "ln"} -s /etc/wgnord/template.conf /var/lib/wgnord/template.conf"
           # The login command is broken, returns exit code 1 even on success
           # We use '-' prefix to ignore this failure
-          "-${pkgs.bash}/bin/sh -c '${cfg.package}/bin/wgnord login \"$(<${cfg.tokenFile})\"'"
+          "-${getExe' pkgs.bash "sh"} -c '${cfg.package}/bin/wgnord login \"$(<${cfg.tokenFile})\"'"
         ];
-        ExecStart = "${cfg.package}/bin/wgnord connect \"${cfg.country}\"";
-        ExecStop = "-${cfg.package}/bin/wgnord disconnect";
+        ExecStart = "${getExe cfg.package} connect \"${cfg.country}\"";
+        ExecStop = "-${getExe cfg.package} disconnect";
         Restart = "on-failure";
         RestartSec = "1s";
         RemainAfterExit = "yes";

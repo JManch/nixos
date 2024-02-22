@@ -34,7 +34,7 @@ in
         color = "0xff${colors.base00}";
       }];
 
-      input_field = {
+      input-fields = [{
         monitor = primaryMonitor.name;
         size.width = 300;
         size.height = 40;
@@ -48,16 +48,16 @@ in
         position = { x = 0; y = -30; };
         halign = "center";
         valign = "center";
-      };
+      }];
 
-      label = {
+      labels = [{
         monitor = primaryMonitor.name;
         text = toUpper hostname;
         position = { x = 0; y = 30; };
         font_family = config.modules.desktop.style.font.family;
         font_size = 40;
         color = "0xff${colors.base07}";
-      };
+      }];
     };
   };
 }

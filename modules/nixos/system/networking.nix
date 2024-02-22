@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkMerge mkIf optional optionals getExe';
+  inherit (lib) mkMerge mkIf optional optionals getExe' mkDefault;
   cfg = config.modules.system.networking;
 in
 {
@@ -22,6 +22,7 @@ in
 
   networking = {
     hostName = hostname;
+    useDHCP = mkDefault true;
 
     networkmanager = {
       enable = true;

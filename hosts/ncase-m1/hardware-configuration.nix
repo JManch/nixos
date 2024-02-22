@@ -2,7 +2,6 @@
 {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
-  networking.useDHCP = true;
   hardware.cpu.amd.updateMicrocode = true;
   nixpkgs.hostPlatform = "x86_64-linux";
 

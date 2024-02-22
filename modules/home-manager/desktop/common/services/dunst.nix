@@ -62,8 +62,6 @@ mkIf (osDesktopEnabled && cfg.enable) {
     };
   };
 
-  systemd.user.services.dunst.Install.WantedBy = [ "graphical-session.target" ];
-
   desktop.hyprland.settings.layerrule = [
     "blur, notifications"
     "xray 0, notifications"

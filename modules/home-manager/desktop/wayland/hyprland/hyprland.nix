@@ -61,7 +61,13 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
   wayland.windowManager.hyprland = {
     enable = true;
-    package = hyprlandPackages.hyprland;
+    # By default Hyprland adds stdenv.cc, binutils and pciutils to path. I
+    # think it's to fix plugin API function hooking.
+    # https://github.com/hyprwm/Hyprland/pull/2292 
+    # Since I don't use plugins I can use the unwrapped package and keep my
+    # path clean.
+    # WARNING: If you ever want to use plugins switch to the wrapped package
+    package = hyprlandPackages.hyprland-unwrapped;
 
     settings = {
       env = [

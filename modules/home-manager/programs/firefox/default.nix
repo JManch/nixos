@@ -19,7 +19,7 @@ mkIf cfg.enable {
     let
       rsync = getExe pkgs.rsync;
       syncToTmpfs = "${rsync} -auh --info=stats1 '/persist/home/${username}/.mozilla/' '/home/${username}/.mozilla/'";
-      syncToPersist = "${rsync} -ah --info=stats1 '/home/${username}/.mozilla/' '/persist/home/${username}/.mozilla/'";
+      syncToPersist = "${rsync} -ah --delete --info=stats1 '/home/${username}/.mozilla/' '/persist/home/${username}/.mozilla/'";
     in
     {
       services.firefox-persist-init = {

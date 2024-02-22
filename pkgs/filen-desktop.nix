@@ -11,14 +11,14 @@ let
   src = fetchurl {
     # They use an annoying system for latest version url
     # Means package will need a hash update whenever upstream updates
-    # https://github.com/FilenCloudDienste/filen-desktop/issues/208when
+    # https://github.com/FilenCloudDienste/filen-desktop/issues/208
     url = "https://cdn.filen.io/desktop/release/filen_x86_64.AppImage";
     hash = "sha256-5vkndT9V/81fUdzS+KTfAjPAGO0IJRx8QhNxBNG8nnU=";
   };
 
   appimageContents = appimageTools.extractType2 { inherit pname version src; };
 
-  # Filen needs this for the tray to function
+  # Needed for the tray to function
   libPath = lib.makeLibraryPath [ libappindicator-gtk3 ];
 in
 appimageTools.wrapType2 rec {

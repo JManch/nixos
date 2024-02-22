@@ -16,7 +16,7 @@ lib.mkIf cfg.enable {
 
       # UI
       legacy_layout = 0;
-      no_display = true; # Whether to hide the HUD by default
+      no_display = true; # hide the HUD by default
       font_size = 20;
       round_corners = "${toString cornerRadius}";
       hud_compact = true;
@@ -72,11 +72,11 @@ lib.mkIf cfg.enable {
       frametime = true;
       frame_timing = true;
       histogram = true;
-      # fps_metrics = "avg,0.01"; # need to wait for new stable version
+      fps_metrics = "avg,0.01";
 
       # Gamescope
       fsr = true;
-      # refresh_rate = true; # need to wait for new stable version
+      refresh_rate = true;
 
       # Bindings
       toggle_fps_limit = "Shift_L+F1";

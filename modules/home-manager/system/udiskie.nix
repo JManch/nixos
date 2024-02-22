@@ -1,6 +1,12 @@
-{ lib, pkgs, osConfig, ... }:
-lib.mkIf osConfig.modules.services.udisks.enable
+{ lib
+, pkgs
+, osConfig
+, vmVariant
+, ...
+}:
+lib.mkIf (osConfig.modules.services.udisks.enable && !vmVariant)
 {
+  # Use `udiskie-umount -a` to unmount all
   home.packages = [ pkgs.udiskie ];
 
   services.udiskie = {

@@ -60,6 +60,25 @@ let
       'string:x-canonical-private-synchronous:hypr-swallow' 'Hyprland' "$message"
 
   '';
+
+  # Temporary workaround for https://github.com/hyprwm/Hyprland/issues/3558
+  killHyprland =
+    let
+      pgrep = getExe' pkgs.procps "pgrep";
+      sleep = getExe' pkgs.coreutils "sleep";
+      killall = getExe pkgs.killall;
+    in
+    pkgs.writeShellScript "hypr-kill" /*bash*/ ''
+
+    if ${pgrep} -x Hyprland > /dev/null; then
+      ${hyprctl} dispatch exit 0
+      ${sleep} 5
+      if ${pgrep} -x Hyprland > /dev/null; then
+        ${killall} -9 Hyprland
+      fi
+    fi
+
+  '';
 in
 mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
 {
@@ -79,7 +98,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
       settings.bind =
         [
           # General
-          "${modShiftCtrl}, Q, exit,"
+          "${modShiftCtrl}, Q, exec, ${killHyprland.outPath}"
           "${mod}, ${cfg.killActiveKey}, killactive,"
           "${mod}, C, exec, ${toggleFloating.outPath}"
           "${mod}, E, fullscreen, 1"

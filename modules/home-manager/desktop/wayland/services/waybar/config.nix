@@ -126,7 +126,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
 
         network = {
           interval = 5;
-          format = " < span color='#${colors.base04}'>󰈀</span> {bandwidthTotalBytes}";
+          format = "<span color='#${colors.base04}'>󰈀</span> {bandwidthTotalBytes}";
           tooltip-format = "<span color='#${colors.base04}'>󰇚</span>{bandwidthDownBytes:>} <span color='#${colors.base04}'>󰕒</span>{bandwidthUpBytes:>}";
           max-length = 50;
         };
@@ -216,5 +216,10 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
         ];
       };
     };
+  };
+
+  systemd.user.services.waybar = {
+    # Waybar spams restarts during shutdown otherwise
+    Service.Restart = lib.mkForce "no";
   };
 }

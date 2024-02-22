@@ -28,12 +28,15 @@ let
   hyprlandPackages = utils.flakePkgs args "hyprland";
 in
 mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
-  # Optimise for performance in VM variant
-  modules.desktop.hyprland = mkIf vmVariant (mkVMOverride {
-    tearing = false;
-    blur = false;
-    animations = false;
-  });
+  modules.desktop = {
+    # Optimise for performance in VM variant
+    hyprland = mkIf vmVariant (mkVMOverride {
+      tearing = false;
+      directScanout = false;
+      blur = false;
+      animations = false;
+    });
+  };
 
   # Generate hyprland debug config
   home.activation.hyprlandDebugConfig =
@@ -69,6 +72,22 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     # path clean.
     # WARNING: If you ever want to use plugins switch to the wrapped package
     package = hyprlandPackages.hyprland-unwrapped;
+
+    systemd = {
+      enable = true;
+      # https://github.com/nix-community/home-manager/issues/4484
+      # NOTE: This works because hyprland-session.target BindsTo
+      # graphical-session.target so starting hyprland-session.target also
+      # starts graphical-session.target. We stop graphical-session.target
+      # instead of hyprland-session.target because, by default, home-manager
+      # services bind to graphical-session.target. Also, we basically ignore
+      # hyprland-session.target in our config because we manage modularity in
+      # Nix rather than with systemd.
+      extraCommands = [
+        "systemctl --user stop graphical-session.target"
+        "systemctl --user start hyprland-session.target"
+      ];
+    };
 
     settings = {
       env = [

@@ -6,7 +6,8 @@
 } @ args:
 let
   inherit (lib) mkIf mkMerge lists getExe getExe' utils;
-  cfg = config.modules.desktop.services.wallpaper;
+  cfg = desktopCfg.services.wallpaper;
+  desktopCfg = config.modules.desktop;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
   allWallpapers = (utils.flakePkgs args "nix-resources").wallpapers.all-wallpapers;
 
@@ -35,9 +36,10 @@ mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
       Unit = {
         Description = "Set the desktop wallpaper";
         X-SwitchMethod = "keep-old";
+        PartOf = [ "graphical-session.target" ];
         Requisite = [ "graphical-session.target" ];
         After = [
-          "graphical-session.target"
+          "graphical-session-pre.target"
         ] ++ lists.optional cfg.randomise "randomise-wallpaper.service";
       };
 

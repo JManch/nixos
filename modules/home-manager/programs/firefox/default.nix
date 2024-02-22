@@ -9,10 +9,11 @@ let
   inherit (lib) mkIf getExe getExe';
   cfg = config.modules.programs.firefox;
   desktopCfg = config.modules.desktop;
+  osDesktop = osConfig.usrEnv.desktop;
   # color = base:
   #   inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorscheme.colors.${base};
 in
-mkIf cfg.enable {
+mkIf (cfg.enable && osDesktop.enable) {
   # Use systemd to synchronise Firefox data with persistent storage. Allows for
   # running Firefox on tmpfs with improved performance.
   systemd.user =
@@ -26,8 +27,8 @@ mkIf cfg.enable {
         Unit = {
           Description = "Firefox persist initialiser";
           X-SwitchMethod = "keep-old";
-          Requires = [ "graphical-session.target" ];
-          After = [ "graphical-session.target" ];
+          PartOf = [ "graphical-session.target" ];
+          After = [ "graphical-session-pre.target" ];
         };
 
         Service = {
@@ -48,8 +49,8 @@ mkIf cfg.enable {
         Unit = {
           Description = "Firefox persist synchroniser";
           X-SwitchMethod = "keep-old";
-          Requires = [ "firefox-persist-init.service" ];
           After = [ "firefox-persist-init.service" ];
+          Requisite = [ "firefox-persist-init.service" ];
         };
 
         Service = {

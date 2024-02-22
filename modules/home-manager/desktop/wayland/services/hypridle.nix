@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe';
+  inherit (lib) mkIf mkForce getExe';
   cfg = desktopCfg.services.hypridle;
   desktopCfg = config.modules.desktop;
   swaylock = desktopCfg.programs.swaylock;
@@ -38,6 +38,10 @@ in
         ];
     };
 
-    systemd.user.services.hypridle.Install.WantedBy = lib.mkForce [ "graphical-session.target" ];
+    systemd.user.services.hypridle = {
+      Unit.PartOf = [ "graphical-session.target" ];
+      Unit.After = mkForce [ "graphical-session-pre.target" ];
+      Install.WantedBy = mkForce [ "graphical-session.target" ];
+    };
   };
 }

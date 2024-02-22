@@ -5,29 +5,14 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe getExe';
+  inherit (lib) mkIf getExe mkForce getExe';
   inherit (osConfig.programs) dconf;
   inherit (osConfig.modules.system) audio;
   cfg = config.modules.services.easyeffects;
 in
 mkIf (cfg.enable && audio.enable && dconf.enable) {
-  home.packages = [ pkgs.easyeffects ];
-
-  systemd.user.services.easyeffects = {
-    Unit = {
-      Description = "Easyeffects daemon";
-      Requires = [ "dbus.service" ];
-      After = [ "graphical-session-pre.target" ];
-      PartOf = [ "graphical-session.target" "pipewire.service" ];
-    };
-
-    Service = {
-      ExecStart = "${getExe pkgs.easyeffects} --gapplication-service";
-      ExecStop = "${getExe pkgs.easyeffects} --quit";
-      Restart = "on-failure";
-      RestartSec = 5;
-    };
-  };
+  services.easyeffects.enable = true;
+  systemd.user.services.easyeffects.Install.WantedBy = mkForce [ ];
 
   programs.waybar.settings.bar =
     let

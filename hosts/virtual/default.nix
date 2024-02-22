@@ -43,10 +43,7 @@ in
     };
 
     services = {
-      greetd = {
-        enable = true;
-        launchCmd = getExe homeConfig.wayland.windowManager.hyprland.package;
-      };
+      greetd.enable = true;
     };
 
     system = {

@@ -88,11 +88,7 @@ in
       wireguard.enable = true;
       ollama.enable = false; # FIX: waiting for nixpkgs update
       broadcast-box.enable = true;
-
-      greetd = {
-        enable = true;
-        launchCmd = getExe homeConfig.wayland.windowManager.hyprland.package;
-      };
+      greetd.enable = true;
 
       jellyfin = {
         enable = true;

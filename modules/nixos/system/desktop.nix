@@ -1,12 +1,18 @@
-{ lib, config, inputs, ... } @ args:
+{ lib
+, pkgs
+, config
+, inputs
+, ...
+} @ args:
 let
-  inherit (lib) mkIf mkMerge fetchers utils;
+  inherit (lib) mkIf mkMerge getExe getExe' fetchers utils;
   inherit (desktopCfg) desktopEnvironment;
   inherit (homeDesktopCfg) windowManager;
   desktopCfg = config.usrEnv.desktop;
   homeConfig = utils.homeConfig args;
   homeDesktopCfg = homeConfig.modules.desktop;
   isWayland = fetchers.isWayland homeConfig;
+  hyprlandPackage = homeConfig.wayland.windowManager.hyprland.package;
 in
 {
   imports = [
@@ -75,6 +81,11 @@ in
       # unnecessary if we're using greetd. Regardless, we enable it for
       # compatibility with other login managers.
       programs.hyprland.enable = true;
+      programs.hyprland.package = hyprlandPackage;
+      xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+      modules.services.greetd.sessionDirs = [
+        "${hyprlandPackage}/share/wayland-sessions"
+      ];
     })
 
     (mkIf (windowManager == "sway") {

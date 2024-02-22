@@ -1,6 +1,6 @@
 { lib, config, ... }:
 let
-  inherit (lib) mkEnableOption mkOption types literalExpression;
+  inherit (lib) mkEnableOption mkOption types;
   cfg = config.modules.services;
 in
 {
@@ -13,11 +13,11 @@ in
     greetd = {
       enable = mkEnableOption "Greetd with TUIgreet";
 
-      launchCmd = mkOption {
-        type = types.str;
-        default = "";
-        description = "Login launch command";
-        example = literalExpression "lib.getExe pkgs.hyprland";
+      sessionDirs = mkOption {
+        type = types.listOf types.str;
+        apply = builtins.concatStringsSep ":";
+        default = [ ];
+        description = "Directories that contain .desktop files to be used as session definitions";
       };
     };
 
@@ -56,8 +56,8 @@ in
     services.udisks2.enable = config.modules.services.udisks.enable;
 
     assertions = [{
-      assertion = cfg.greetd.enable -> (cfg.greetd.launchCmd != "");
-      message = "Greetd launch command must be set";
+      assertion = cfg.greetd.enable -> (cfg.greetd.sessionDirs != [ ]);
+      message = "Greetd session dirs must be set";
     }];
   };
 }

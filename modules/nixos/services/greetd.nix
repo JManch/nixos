@@ -15,7 +15,7 @@ mkIf (cfg.enable && config.usrEnv.desktop.enable)
     settings = {
       default_session = {
         user = username;
-        command = "${getExe' pkgs.greetd.tuigreet "tuigreet"} --time --cmd ${cfg.launchCmd}";
+        command = "${getExe' pkgs.greetd.tuigreet "tuigreet"} -t -s ${cfg.sessionDirs}";
       };
     };
   };

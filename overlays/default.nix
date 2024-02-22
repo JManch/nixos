@@ -40,14 +40,14 @@ in
     waybar = addPatches prev.waybar [ ./waybarTraySpacingFix.diff ];
 
     amdgpu_top = prev.amdgpu_top.overrideAttrs (oldAttrs: {
-      postInstall = oldAttrs.postInstall + ''
+      postInstall = oldAttrs.postInstall + /*bash*/ ''
         substituteInPlace $out/share/applications/amdgpu_top.desktop \
           --replace "Name=AMDGPU TOP (GUI)" "Name=AMDGPU Top"
       '';
     });
 
     spotify = prev.spotify.overrideAttrs (oldAttrs: {
-      postInstall = ''
+      postInstall = /*bash*/ ''
         rm "$out/share/applications/spotify.desktop"
       '';
     });

@@ -1,11 +1,6 @@
-{ lib
-, pkgs
-, config
-, inputs
-, ...
-} @ args:
+{ lib, config, inputs, ... } @ args:
 let
-  inherit (lib) mkIf mkMerge getExe getExe' fetchers utils;
+  inherit (lib) mkIf mkMerge mkForce fetchers utils;
   inherit (desktopCfg) desktopEnvironment;
   inherit (homeDesktopCfg) windowManager;
   desktopCfg = config.usrEnv.desktop;
@@ -28,8 +23,8 @@ in
       security.pam.services.swaylock = mkIf (isWayland && homeDesktopCfg.programs.swaylock.enable) { };
       security.pam.services.hyprlock = mkIf (isWayland && homeDesktopCfg.programs.hyprlock.enable) { };
 
-      # https://github.com/NixOS/nixpkgs/issues/160923
-      xdg.portal.xdgOpenUsePortal = true;
+      # We configure xdg portal in home-manager
+      xdg.portal.enable = mkForce false;
     }
 
     (mkIf (desktopEnvironment == "xfce") {
@@ -80,9 +75,11 @@ in
       # Ultimately this means that enabling hyprland on the system-level is
       # unnecessary if we're using greetd. Regardless, we enable it for
       # compatibility with other login managers.
-      programs.hyprland.enable = true;
-      programs.hyprland.package = hyprlandPackage;
-      xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+      programs.hyprland = {
+        enable = true;
+        package = hyprlandPackage;
+      };
+
       modules.services.greetd.sessionDirs = [
         "${hyprlandPackage}/share/wayland-sessions"
       ];

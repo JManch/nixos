@@ -58,6 +58,11 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
     '';
 
+  xdg.portal = {
+    extraPortals = [ hyprlandPackages.xdg-desktop-portal-hyprland ];
+    configPackages = [ hyprlandPackages.hyprland ];
+  };
+
   wayland.windowManager.hyprland = {
     enable = true;
     # By default Hyprland adds stdenv.cc, binutils and pciutils to path. I
@@ -66,19 +71,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     # Since I don't use plugins I can use the unwrapped package and keep my
     # path clean.
     # WARNING: If you ever want to use plugins switch to the wrapped package
-    package = hyprlandPackages.hyprland-unwrapped.overrideAttrs (oldAttrs: {
-      # From what I've tested, using dbus-run-sesssion seems like the best way
-      # to launch Hyprland with the least problems. Without this, xdg-open does
-      # not work (unless the home-manager xdg-portal config is used but that
-      # comes with other problems). Also I've noticed that dbus services do not
-      # auto-start without this. Time will tell if this causes new issues...
-      # (I'm modifying the hyprland.desktop file because it makes config in
-      # login-managers cleaner)
-      postInstall = oldAttrs.postInstall + /*bash*/ ''
-        substituteInPlace $out/share/wayland-sessions/hyprland.desktop \
-          --replace "Exec=Hyprland" "Exec=dbus-run-session Hyprland"
-      '';
-    });
+    package = hyprlandPackages.hyprland-unwrapped;
 
     systemd = {
       enable = true;

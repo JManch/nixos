@@ -31,6 +31,8 @@ lib.mkIf osConfig.usrEnv.desktop.enable
     };
   };
 
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+
   # Also sets gtk.cursorTheme
   home.pointerCursor = {
     gtk.enable = true;

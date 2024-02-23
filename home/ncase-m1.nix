@@ -91,6 +91,7 @@ in
       r2modman.enable = true;
       lutris.enable = true;
       filenDesktop.enable = true;
+      multiviewerF1.enable = true;
     };
 
     services = {

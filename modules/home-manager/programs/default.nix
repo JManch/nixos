@@ -29,5 +29,6 @@ in
     r2modman.enable = mkEnableOption "r2modman";
     lutris.enable = mkEnableOption "Lutris";
     filenDesktop.enable = mkEnableOption "Filen Desktop";
+    multiviewerF1.enable = mkEnableOption "Multiviewer for F1";
   };
 }

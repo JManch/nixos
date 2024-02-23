@@ -1,19 +1,16 @@
 { lib
-, pkgs
 , inputs
 , config
-, hostname
 , osConfig
 , ...
 }:
 let
-  inherit (lib) mkIf utils fetchers toUpper;
+  inherit (lib) mkIf fetchers;
   cfg = config.modules.desktop.programs.hyprlock;
   colors = config.colorscheme.palette;
 
   isWayland = fetchers.isWayland config;
   primaryMonitor = fetchers.primaryMonitor osConfig;
-  wallpapers = (utils.flakePkgs { inherit pkgs inputs; } "nix-resources").wallpapers;
 in
 {
   imports = [
@@ -26,12 +23,18 @@ in
 
       general = {
         disable_loading_bar = false;
+        grace = 3;
         hide_cursor = true;
+        no_fade_in = false;
       };
 
       backgrounds = [{
-        path = wallpapers.rx7.outPath;
+        path = "screenshot";
         color = "0xff${colors.base00}";
+        blur_size = 2;
+        blur_passes = 3;
+        brightness = 1;
+        contrast = 1;
       }];
 
       input-fields = [{
@@ -52,7 +55,7 @@ in
 
       labels = [{
         monitor = primaryMonitor.name;
-        text = toUpper hostname;
+        text = "$TIME";
         position = { x = 0; y = 30; };
         font_family = config.modules.desktop.style.font.family;
         font_size = 40;

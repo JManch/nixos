@@ -4,7 +4,7 @@
 , osConfig
 , username
 , ...
-}:
+} @ args:
 let
   inherit (lib) mkIf getExe getExe';
   cfg = config.modules.programs.firefox;
@@ -86,6 +86,9 @@ mkIf (cfg.enable && osDesktop.enable) {
   # - ublock?
   programs.firefox = {
     enable = true;
+    # NOTE: Firefox idle inhibit is broken, testing if nightly fixes it
+    # https://bugzilla.mozilla.org/show_bug.cgi?id=1877022
+    package = (lib.utils.flakePkgs args "firefox-nightly").firefox-nightly-bin;
 
     profiles = {
       default = {

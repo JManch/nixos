@@ -61,6 +61,33 @@ let
 
   '';
 
+  toggleGaps =
+    let
+      inherit (config.wayland.windowManager.hyprland.settings) general decoration;
+    in
+    pkgs.writeShellScript "hypr-toggle-gaps" /*bash*/ ''
+
+    rounding=$(${hyprctl} getoption -j decoration:rounding | ${jaq} -r '.int')
+    if [[ "$rounding" == "0" ]]; then
+      ${hyprctl} --batch "\
+      keyword general:gaps_in ${toString general.gaps_in}; \
+        keyword general:gaps_out ${toString general.gaps_out}; \
+        keyword decoration:rounding ${toString decoration.rounding} \
+      "
+      message="Gaps enabled"
+    else
+      ${hyprctl} --batch "\
+        keyword general:gaps_in 0; \
+        keyword general:gaps_out 0; \
+        keyword decoration:rounding 0 \
+      "
+      message="Gaps disabled"
+    fi
+    ${notifySend} --urgency=low -t 2000 -h \
+      'string:x-canonical-private-synchronous:hypr-toggle-gaps' 'Hyprland' "$message"
+
+  '';
+
   # Temporary workaround for https://github.com/hyprwm/Hyprland/issues/3558
   killHyprland =
     let
@@ -106,6 +133,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
           "${mod}, Z, pin, active"
           "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
           "${mod}, A, exec, ${toggleSwallowing.outPath}"
+          "${mod}, B, exec, ${toggleGaps.outPath}"
 
           # Movement
           "${mod}, H, movefocus, l"

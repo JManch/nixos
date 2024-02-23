@@ -50,9 +50,6 @@
 
     hyprlock.url = "github:hyprwm/hyprlock";
     hyprlock.inputs.nixpkgs.follows = "nixpkgs";
-
-    firefox-nightly.url = "github:nix-community/flake-firefox-nightly";
-    firefox-nightly.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, home-manager, ... } @ inputs:

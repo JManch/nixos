@@ -14,6 +14,7 @@ let
     getExe'
     listToAttrs
     attrsets
+    utils
     toUpper;
   inherit (osConfig.device) monitors gpu;
   cfg = desktopCfg.services.waybar;
@@ -33,7 +34,11 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
 {
   programs.waybar = {
     enable = true;
+    package = utils.addPatches pkgs.waybar [
+      ../../../../../../patches/waybarTraySpacingFix.diff
+    ];
     systemd.enable = true;
+
     settings = {
       bar = {
         layer = "top";

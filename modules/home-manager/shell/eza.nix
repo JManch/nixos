@@ -1,8 +1,23 @@
-{ lib, config, ... }:
+{ lib, pkgs, config, ... }:
 lib.mkIf config.modules.shell.enable
 {
   programs.eza = {
     enable = true;
+    package = pkgs.eza.overrideAttrs (oldAttrs: rec {
+      version = "0.10.7";
+      src = pkgs.fetchFromGitHub {
+        owner = "eza-community";
+        repo = "eza";
+        rev = "v${version}";
+        hash = "sha256-f8js+zToP61lgmxucz2gyh3uRZeZSnoxS4vuqLNVO7c=";
+      };
+
+      cargoDeps = oldAttrs.cargoDeps.overrideAttrs (lib.const {
+        name = "eza-vendor.tar.gz";
+        inherit src;
+        outputHash = "sha256-OBsXeWxjjunlzd4q1B1NJTm8MrIjicep2KIkydACKqQ=";
+      });
+    });
     enableAliases = false;
     git = true;
     icons = true;

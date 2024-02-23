@@ -8,6 +8,11 @@ in
 
   flakePkgs = args: flake: args.inputs.${flake}.packages.${args.pkgs.system};
 
+  addPatches = pkg: patches: pkg.overrideAttrs
+    (oldAttrs: {
+      patches = (oldAttrs.patches or [ ]) ++ patches;
+    });
+
   # Get list of all nix files and directories in path for easy importing
   scanPaths = path:
     map (f: (path + "/${f}"))

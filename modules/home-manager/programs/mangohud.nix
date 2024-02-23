@@ -1,13 +1,20 @@
-{ lib, config, osConfig, ... }:
+{ lib
+, pkgs
+, config
+, osConfig
+, ...
+}:
 let
+  inherit (lib) mkIf utils;
   inherit (osConfig) device;
   inherit (config.modules.desktop.style) cornerRadius;
   cfg = config.modules.programs.mangohud;
   colors = config.colorscheme.palette;
 in
-lib.mkIf cfg.enable {
+mkIf cfg.enable {
   programs.mangohud = {
     enable = true;
+    package = utils.addPatches pkgs.mangohud [ ../../../patches/mangoHud.diff ];
 
     settings = {
       # Performance

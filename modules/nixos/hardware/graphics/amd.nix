@@ -7,11 +7,18 @@
 let
   inherit (lib) mkIf mkBefore;
   amd = config.device.gpu.type == "amd";
+
+  amdgpu_top = pkgs.amdgpu_top.overrideAttrs (oldAttrs: {
+    postInstall = oldAttrs.postInstall + /*bash*/ ''
+      substituteInPlace $out/share/applications/amdgpu_top.desktop \
+        --replace "Name=AMDGPU TOP (GUI)" "Name=AMDGPU Top"
+    '';
+  });
 in
 mkIf amd
 {
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
-  environment.systemPackages = [ pkgs.amdgpu_top ];
+  environment.systemPackages = [ amdgpu_top ];
   services.xserver.videoDrivers = [ "modesetting" ];
 
   # Make radv the default driver

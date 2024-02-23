@@ -5,13 +5,19 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe getExe';
+  inherit (lib) mkIf utils getExe getExe';
   cfg = config.modules.programs.spotify;
   desktopCfg = config.modules.desktop;
-  spotifyPlayerPkg = (pkgs.spotify-player.override {
+
+  spotify-player = (
+    utils.addPatches
+      pkgs.spotify-player
+      [ ../../../patches/spotifyPlayerNotifs.diff ]
+  ).override {
     withDaemon = false;
-  });
-  spotifyPlayer = getExe spotifyPlayerPkg;
+  };
+
+  spotifyPlayer = getExe spotify-player;
 
   modifySpotifyVolume =
     let
@@ -30,8 +36,13 @@ in
 mkIf (cfg.enable && osConfig.modules.system.audio.enable)
 {
   home.packages = with pkgs; [
-    spotify # need this for the spotify-player desktop icon
-    spotifyPlayerPkg
+    # Need this for the spotify-player desktop icon
+    (spotify.overrideAttrs (oldAttrs: {
+      postInstall = /*bash*/ ''
+        rm "$out/share/applications/spotify.desktop"
+      '';
+    }))
+    spotify-player
   ];
 
   services.playerctld.enable = true;

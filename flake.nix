@@ -70,7 +70,6 @@
     in
     {
       formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
-      overlays = import ./overlays { inherit inputs outputs; };
       packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
 
       nixosConfigurations = {

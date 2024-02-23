@@ -14,8 +14,9 @@ let
     getExe'
     concatStringsSep
     concatMap
-    head
+    imap
     optional
+    optionalString
     optionals
     fetchers;
   inherit (osConfig.device) monitors;
@@ -47,7 +48,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
       DEBUG_ARG=$([ -z "$VERBOSE_ARG" ] && echo "" || echo "--debug")
       run cat ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf \
-        && ${getExe pkgs.gnused} -i $DEBUG_ARG -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
+        && ${getExe pkgs.gnused} -i "$DEBUG_ARG" -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
         -e '/^exec-once/d' -e '/^monitor/d' -e 's/, monitor:(.*),//g' \
         ${concatStringsSep " " (map (m: "-e 's/${m.name}/WL-${toString m.number}/g'") monitors)} \
         ${hyprDir}/hyprlandd.conf \
@@ -245,15 +246,12 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         in
         (concatMap
           (
-            m:
-            let
-              default = head m.workspaces;
-            in
-            (
-              map
+            m: (
+              imap
                 (
-                  w: "${toString w}, monitor:${m.name}" +
-                  (if w == default then ", default:true" else "")
+                  i: w: "${toString w}, monitor:${m.name}" +
+                  optionalString (i == 1) ", default:true" +
+                  optionalString (i < 3) ", persistent:true"
                 )
                 m.workspaces
             )

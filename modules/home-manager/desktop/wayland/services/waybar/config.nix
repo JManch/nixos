@@ -6,17 +6,8 @@
 , ...
 }:
 let
-  inherit (lib)
-    mkIf
-    fetchers
-    optional
-    take
-    getExe'
-    listToAttrs
-    attrsets
-    utils
-    toUpper;
-  inherit (osConfig.device) monitors gpu;
+  inherit (lib) mkIf fetchers optional remove getExe' toUpper;
+  inherit (osConfig.device) gpu;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
@@ -34,10 +25,44 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
 {
   programs.waybar = {
     enable = true;
-    package = utils.addPatches pkgs.waybar [
-      ../../../../../../patches/waybarTraySpacingFix.diff
-    ];
     systemd.enable = true;
+
+    package = (pkgs.waybar.overrideAttrs (o: {
+      version = "2024-02-23";
+      buildInputs = o.buildInputs ++ [ pkgs.pipewire ];
+
+      src = pkgs.fetchFromGitHub {
+        owner = "Alexays";
+        repo = "Waybar";
+        rev = "793394c862b7ed1b2892d8815101a4567373092c";
+        hash = "sha256-VryxmTIxBnLRmpVfYYMl0WyJFLz0OJFaVMFp6W0rSdc=";
+      };
+
+      mesonFlags = (remove "-Dgtk-layer-shell=enabled" o.mesonFlags)
+        ++ lib.mapAttrsToList lib.mesonEnable {
+        "libevdev" = false;
+      };
+    })).override {
+      cavaSupport = false;
+      evdevSupport = false;
+      experimentalPatches = false;
+      hyprlandSupport = true;
+      inputSupport = false;
+      jackSupport = false;
+      mpdSupport = false;
+      mprisSupport = false;
+      nlSupport = true;
+      pulseSupport = true;
+      rfkillSupport = false;
+      runTests = false;
+      sndioSupport = false;
+      swaySupport = false;
+      traySupport = true;
+      udevSupport = false;
+      upowerSupport = false;
+      wireplumberSupport = false;
+      withMediaPlayer = false;
+    };
 
     settings = {
       bar = {
@@ -50,18 +75,6 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
           on-click = "activate";
           sort-by-number = true;
           active-only = false;
-          # Persists the first two workspaces from each monitor
-          persistent-workspaces = attrsets.mergeAttrsList (map (l: listToAttrs l)
-            (map
-              (monitor:
-                (map
-                  (workspace: {
-                    name = (toString workspace);
-                    value = [ monitor.name ];
-                  })
-                  (take 2 monitor.workspaces)))
-              monitors));
-
           format = "{icon}";
 
           format-icons = {
@@ -227,4 +240,14 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
     # Waybar spams restarts during shutdown otherwise
     Service.Restart = lib.mkForce "no";
   };
+
+  desktop.hyprland.settings.bind =
+    let
+      inherit (config.modules.desktop.hyprland) modKey;
+      systemctl = getExe' pkgs.systemd "systemctl";
+    in
+    [
+      # Toggle waybar
+      "${modKey}, B, exec, ${systemctl} kill --user --signal=SIGUSR1 waybar"
+    ];
 }

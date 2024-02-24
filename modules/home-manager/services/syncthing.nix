@@ -1,8 +1,8 @@
-{ lib, config, ... }:
+{ lib, config, vmVariant, ... }:
 let
   cfg = config.modules.services.syncthing;
 in
-lib.mkIf cfg.enable {
+lib.mkIf (cfg.enable && !vmVariant) {
   services.syncthing = {
     enable = true;
     extraOptions = [

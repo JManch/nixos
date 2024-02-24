@@ -18,6 +18,8 @@ mkIf cfg.enable {
       ms-vsliveshare.vsliveshare
       bbenoist.nix
       gruntfuggly.todo-tree
+      ms-vscode.cpptools
+      ms-vscode.cmake-tools
     ];
 
     userSettings = mkIf (fetchers.isWayland config) {

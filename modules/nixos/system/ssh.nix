@@ -35,10 +35,9 @@ in
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
 
     # TODO: Make this configurable. i.e. don't allow certain hosts
-    # TODO: Don't store host public keys in .nix files
     knownHosts = (mapAttrs
       (host: _: {
-        publicKey = (import ../../../hosts/${host}/key.nix).key;
+        publicKeyFile = ../../../hosts/${host}/ssh_host_ed25519_key.pub;
         extraHostNames = (optional (host == hostname) "localhost");
       })
       outputs.nixosConfigurations)

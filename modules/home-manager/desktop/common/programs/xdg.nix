@@ -12,7 +12,11 @@ lib.mkIf osConfig.usrEnv.desktop.enable
 
   xdg.portal = {
     enable = true;
-    # https://github.com/nix-community/home-manager/issues/4740
+    # https://github.com/NixOS/nixpkgs/issues/160923
+    # WARN: This only works if the necessary environment variables (most
+    # importantly PATH and XDG_DATA_DIRS) have been imported using
+    # dbus-update-activation-environment --systemd in the window-manager
+    # start-up.
     xdgOpenUsePortal = true;
   };
 

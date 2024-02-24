@@ -85,6 +85,17 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
       # hyprland-session.target in our config because we manage modularity in
       # Nix rather than with systemd.
       extraCommands = [
+        # The PATH and XDG_DATA_DIRS variables are required in the dbus and
+        # systemd environment for xdg-open to work using portals (the preferred
+        # method). Some more variables might still be needed but it's unclear
+        # which exactly and a consensus doesn't seem to have been reached.
+        # Using `dbus-update-activation-environment --systemd --all` would
+        # definitely fix all potential problems but it seems messy and
+        # potentially insecure to make all env vars accessible...
+        # https://github.com/NixOS/nixpkgs/issues/160923
+        # https://github.com/hyprwm/Hyprland/issues/2800
+        "${getExe' pkgs.dbus "dbus-update-activation-environment"} --systemd PATH XDG_DATA_DIRS"
+
         "systemctl --user stop graphical-session.target"
         "systemctl --user start hyprland-session.target"
       ];

@@ -20,8 +20,8 @@ mkMerge [
           name = "Virtual-1";
           number = 1;
           refreshRate = 60.0;
-          width = 1920;
-          height = 1080;
+          width = 2048;
+          height = 1152;
           position = "0x0";
           workspaces = [ 1 2 3 4 5 6 7 8 9 ];
         }];

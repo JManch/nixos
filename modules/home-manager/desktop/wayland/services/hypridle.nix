@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkForce getExe';
+  inherit (lib) mkIf optional mkForce getExe';
   cfg = desktopCfg.services.hypridle;
   desktopCfg = config.modules.desktop;
   swaylock = desktopCfg.programs.swaylock;
@@ -35,7 +35,10 @@ in
             timeout = cfg.screenOffTime - 1;
             onTimeout = "${sleep} 1 && ${hyprctl} dispatch dpms off";
           }
-        ];
+        ] ++ optional cfg.debug {
+          timeout = 5;
+          onTimeout = "${lib.getExe pkgs.libnotify} 'Hypridle' 'Idle timeout triggered'";
+        };
     };
 
     systemd.user.services.hypridle = {

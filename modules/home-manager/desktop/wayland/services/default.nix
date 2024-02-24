@@ -11,6 +11,7 @@ in
 
     hypridle = {
       enable = mkEnableOption "Hypridle";
+      debug = mkEnableOption "a low timeout idle notification for debugging";
 
       lockTime = mkOption {
         type = types.int;

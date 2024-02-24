@@ -1,9 +1,3 @@
-{ lib
-, pkgs
-, inputs
-, config
-, ...
-}:
 {
   imports = [ ./core.nix ];
 
@@ -15,16 +9,6 @@
         modKey = "ALT";
         blur = false;
         logging = true;
-      };
-
-      terminal = {
-        exePath = lib.getExe config.programs.alacritty.package;
-        class = "Alacritty";
-      };
-
-      style.font = {
-        family = "BerkeleyMono Nerd Font";
-        package = inputs.nix-resources.packages.${pkgs.system}.berkeley-mono-nerdfont;
       };
 
       programs = {

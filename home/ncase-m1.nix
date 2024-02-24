@@ -1,12 +1,3 @@
-{ lib
-, pkgs
-, config
-, inputs
-, ...
-}:
-let
-  nix-resources = inputs.nix-resources.packages.${pkgs.system};
-in
 {
   imports = [ ./core.nix ];
 
@@ -25,23 +16,6 @@ in
         logging = false;
       };
 
-      terminal = {
-        exePath = lib.getExe config.programs.alacritty.package;
-        class = "Alacritty";
-      };
-
-      style = {
-        cursorSize = 24;
-        cornerRadius = 10;
-        borderWidth = 2;
-        gapSize = 10;
-
-        font = {
-          family = "BerkeleyMono Nerd Font";
-          package = nix-resources.berkeley-mono-nerdfont;
-        };
-      };
-
       programs = {
         swaylock.enable = true;
         # Waiting for the nix hm module to mature
@@ -54,11 +28,7 @@ in
         dunst.enable = true;
         wlsunset.enable = true;
 
-        hypridle = {
-          enable = true;
-          lockTime = 3 * 60;
-          screenOffTime = (3 * 60) + 30;
-        };
+        hypridle.enable = true;
 
         wallpaper = {
           randomise = true;

@@ -1,6 +1,12 @@
-{ lib, config, osConfig, ... }:
+{ lib
+, pkgs
+, inputs
+, config
+, osConfig
+, ...
+}:
 let
-  inherit (lib) mkIf mkOption length types literalExpression;
+  inherit (lib) mkIf mkOption getExe length types literalExpression;
 
   terminalSubmodule = {
     options = {
@@ -31,7 +37,10 @@ in
 
     terminal = mkOption {
       type = types.submodule terminalSubmodule;
-      default = null;
+      default = {
+        exePath = getExe config.programs.alacritty.package;
+        class = "Alacritty";
+      };
       description = "Information about the default terminal";
     };
 
@@ -39,14 +48,14 @@ in
       font = {
         family = mkOption {
           type = types.str;
-          default = null;
+          default = "BerkeleyMono Nerd Font";
           description = "Font family name";
           example = "Fira Code";
         };
 
         package = mkOption {
           type = types.package;
-          default = null;
+          default = inputs.nix-resources.packages.${pkgs.system}.berkeley-mono-nerdfont;
           description = "Font package";
           example = literalExpression "pkgs.fira-code";
         };

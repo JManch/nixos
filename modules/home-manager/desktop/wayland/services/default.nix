@@ -20,7 +20,7 @@ in
 
       screenOffTime = mkOption {
         type = types.int;
-        default = 4 * 60;
+        default = (3 * 60) + 30;
         description = "Idle seconds to turn off screen";
       };
     };

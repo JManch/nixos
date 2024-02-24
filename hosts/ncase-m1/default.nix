@@ -1,8 +1,3 @@
-{ lib, ... } @ args:
-let
-  inherit (lib) utils getExe;
-  homeConfig = utils.homeConfig args;
-in
 {
   imports = [ ./hardware-configuration.nix ];
 

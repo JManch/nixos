@@ -40,24 +40,32 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
   };
 
   # Generate hyprland debug config
-  home.activation.hyprlandDebugConfig =
+  xdg.configFile."hypr/hyprland.conf".onChange =
     let
       hyprDir = "${config.xdg.configHome}/hypr";
     in
-    lib.hm.dag.entryAfter [ "writeBoundary" ] /*bash*/ ''
+      /*bash*/ ''
 
-      DEBUG_ARG=$([ -z "$VERBOSE_ARG" ] && echo "" || echo "--debug")
-      run cat ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf \
-        && ${getExe pkgs.gnused} -i "$DEBUG_ARG" -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
-        -e '/^exec-once/d' -e '/^monitor/d' -e 's/, monitor:(.*),//g' \
+      ${getExe pkgs.gnused} \
+        -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
+        -e 's/enable_stdout_logs=false/enable_stdout_logs=true/' \
+        -e 's/disable_hyprland_logo=true/disable_hyprland_logo=false/' \
+        -e '/ALTALT/d' \
+        -e '/screen_shader/d' \
+        -e '/^exec-once/d' \
+        -e '/^monitor/d' \
+        -e 's/, monitor:(.*),//g' \
         ${concatStringsSep " " (map (m: "-e 's/${m.name}/WL-${toString m.number}/g'") monitors)} \
-        ${hyprDir}/hyprlandd.conf \
-        ${concatStringsSep " " 
-          (map 
-            (m: "&& echo \"monitor=WL-${toString m.number},preferred,auto,1\" >> ${hyprDir}/hyprlandd.conf")
-            monitors)}
+        ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf
 
-    '';
+      # Add monitor config
+      ${
+        concatStringsSep "\n" (map (m:
+          "echo \"monitor=WL-${toString m.number},2048x1152,auto,1\" >> ${hyprDir}/hyprlandd.conf")
+          monitors)
+      }
+
+      '';
 
   xdg.portal = {
     extraPortals = [ hyprlandPackages.xdg-desktop-portal-hyprland ];
@@ -166,12 +174,12 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         [
           "workspace name:GAME, class:${gameRegex}"
 
-          "workspace name:VM silent, class:^(qemu)$"
-          "float, class:^(qemu)$, title:^(QEMU.*)$"
-          "size 75% 75%, class:^(qemu)$, title:^(QEMU.*)$"
-          "center, class:^(qemu)$, title:^(QEMU.*)$"
-          "keepaspectratio, class:^(qemu)$, title:^(QEMU.*)$"
-        ] ++ lib.lists.optional cfg.tearing
+          "workspace name:VM silent, class:^(qemu|wlroots)$"
+          "float, class:^(qemu|wlroots)$"
+          "size 80% 80%, class:^(qemu|wlroots)$"
+          "center, class:^(qemu|wlroots)$"
+          "keepaspectratio, class:^(qemu|wlroots)$"
+        ] ++ optional cfg.tearing
           "immediate, class:${gameRegex}";
 
       decoration = {
@@ -248,6 +256,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
       debug = {
         disable_logs = !cfg.logging;
+        enable_stdout_logs = false;
       };
 
       workspace =

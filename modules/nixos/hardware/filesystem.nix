@@ -28,9 +28,7 @@ in
     # ZFS does not always support the latest kernel
     kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
 
-    # To get kernel 6.7 support until zfs 2.2.3 is released
-    # https://github.com/openzfs/zfs/pull/15836
-    zfs.enableUnstable = true;
+    zfs.enableUnstable = false;
 
     supportedFilesystems = [ "zfs" ];
     zfs.forceImportRoot = cfg.forceImportRoot;

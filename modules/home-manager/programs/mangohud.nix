@@ -79,7 +79,6 @@ mkIf cfg.enable {
       frametime = true;
       frame_timing = true;
       histogram = true;
-      fps_metrics = "avg,0.01";
 
       # Gamescope
       fsr = true;

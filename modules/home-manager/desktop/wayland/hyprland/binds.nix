@@ -70,8 +70,9 @@ let
     rounding=$(${hyprctl} getoption -j decoration:rounding | ${jaq} -r '.int')
     if [[ "$rounding" == "0" ]]; then
       ${hyprctl} --batch "\
-      keyword general:gaps_in ${toString general.gaps_in}; \
+        keyword general:gaps_in ${toString general.gaps_in}; \
         keyword general:gaps_out ${toString general.gaps_out}; \
+        keyword general:border_size ${toString general.border_size}; \
         keyword decoration:rounding ${toString decoration.rounding} \
       "
       message="Gaps enabled"
@@ -79,6 +80,7 @@ let
       ${hyprctl} --batch "\
         keyword general:gaps_in 0; \
         keyword general:gaps_out 0; \
+        keyword general:border_size 0; \
         keyword decoration:rounding 0 \
       "
       message="Gaps disabled"
@@ -86,6 +88,11 @@ let
     ${notifySend} --urgency=low -t 2000 -h \
       'string:x-canonical-private-synchronous:hypr-toggle-gaps' 'Hyprland' "$message"
 
+  '';
+
+  make16By9 = pkgs.writeShellScript "hypr-16-by-9" /*bash*/ ''
+    width=$(${hyprctl} activewindow -j | ${jaq} -r '.size[0]')
+    ${hyprctl} dispatch resizeactive exact "$width" "$(( ($width * 9) / 16 ))"
   '';
 in
 mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
@@ -113,6 +120,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
           "${modShift}, E, fullscreen, 0"
           "${mod}, Z, pin, active"
           "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
+          "${modShift}, R, exec, ${make16By9.outPath}"
           "${mod}, A, exec, ${toggleSwallowing.outPath}"
           "${modShift}, B, exec, ${toggleGaps.outPath}"
 

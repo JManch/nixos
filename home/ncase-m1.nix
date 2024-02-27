@@ -20,7 +20,8 @@
         swaylock.enable = true;
         # Waiting for the nix hm module to mature
         hyprlock.enable = false;
-        anyrun.enable = true;
+        anyrun.enable = false;
+        fuzzel.enable = true;
       };
 
       services = {

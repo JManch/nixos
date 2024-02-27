@@ -17,7 +17,7 @@ in
     inputs.anyrun.homeManagerModules.default
   ];
 
-  config = mkIf (osDesktopEnabled && isWayland && cfg.enable) {
+  config = mkIf (cfg.enable && osDesktopEnabled && isWayland) {
     programs.anyrun =
       let
         color = base:
@@ -90,10 +90,11 @@ in
     desktop.hyprland.settings =
       let
         inherit (desktopCfg.hyprland) modKey;
+        anyrun = getExe' config.programs.anyrun.package "anyrun";
       in
       {
         bindr = [
-          "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} anyrun || anyrun"
+          "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} anyrun || ${anyrun}"
         ];
 
         layerrule = [

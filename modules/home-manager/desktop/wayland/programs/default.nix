@@ -7,6 +7,7 @@ in
 
   options.modules.desktop.programs = {
     anyrun.enable = mkEnableOption "Anyrun";
+    fuzzel.enable = mkEnableOption "Fuzzel";
 
     swaylock = {
       enable = mkEnableOption "Swaylock";

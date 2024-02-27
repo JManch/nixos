@@ -4,12 +4,13 @@ let
 in
 lib.mkIf cfg.enable {
   home.packages = with pkgs; [
-    feh # simple image viewer
+    swayimg
     gthumb # image editor
   ];
 
   programs.zsh.shellAliases = {
-    img = "feh";
-    imgedit = "gthumb";
+    img = "swayimg";
+    img-edit = "gthumb";
+    screenshot-edit = "gthumb ${config.xdg.userDirs.pictures}/screenshots/*(.om[1])";
   };
 }

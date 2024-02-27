@@ -48,7 +48,7 @@ let
             hyprctl --batch "\
               ${optionalString hyprland.blur "keyword decoration:blur:enabled ${blur mode};\\"}
               keyword animations:enabled ${animate mode}; \
-              keyword monitor ${lib.fetchers.getMonitorHyprlandCfgStr (monitor // {refreshRate = refreshRate mode;})}; \
+              keyword monitor ${fetchers.getMonitorHyprlandCfgStr (monitor // {refreshRate = refreshRate mode;})}; \
               ${killActiveRebind (mode == "end")}"
           ''
         }

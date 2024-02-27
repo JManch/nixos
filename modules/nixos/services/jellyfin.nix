@@ -23,8 +23,8 @@ mkIf cfg.enable
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/jellyfin/media/shows 755 root root"
-    "d /var/lib/jellyfin/media/movies 755 root root"
+    "d /var/lib/jellyfin/media/shows 700 jellyfin jellyfin"
+    "d /var/lib/jellyfin/media/movies 700 jellyfin jellyfin"
   ];
 
   persistence.directories = [ "/var/lib/jellyfin" ];

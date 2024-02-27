@@ -39,7 +39,7 @@ mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
         PartOf = [ "graphical-session.target" ];
         Requisite = [ "graphical-session.target" ];
         After = [
-          "graphical-session-pre.target"
+          "graphical-session.target"
         ] ++ lists.optional cfg.randomise "randomise-wallpaper.service";
       };
 

@@ -1,12 +1,11 @@
 { lib
 , pkgs
 , config
-, username
 , ...
 }:
 let
   inherit (lib) mkIf mkBefore;
-  amd = config.device.gpu.type == "amd";
+  inherit (config.device) gpu;
 
   amdgpu_top = pkgs.amdgpu_top.overrideAttrs (oldAttrs: {
     postInstall = oldAttrs.postInstall + /*bash*/ ''
@@ -15,7 +14,7 @@ let
     '';
   });
 in
-mkIf amd
+mkIf (gpu.type == "amd")
 {
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
   environment.systemPackages = [ amdgpu_top ];
@@ -48,22 +47,12 @@ mkIf amd
     # ];
   };
 
-  programs.corectrl = {
-    enable = true;
-    # WARN: Disable this if you experience flickering or general instability
-    # https://wiki.archlinux.org/title/AMDGPU#Boot_parameter
-    gpuOverclock.enable = true;
-    gpuOverclock.ppfeaturemask = "0xffffffff";
-  };
-
-  users.users.${username}.extraGroups = [ "corectrl" ];
-
   persistenceHome = {
     directories = [
       ".cache/AMD"
       ".cache/mesa_shader_cache"
-      ".config/corectrl"
     ];
+
     files = [
       ".cache/radv_builtin_shaders32"
       ".cache/radv_builtin_shaders64"

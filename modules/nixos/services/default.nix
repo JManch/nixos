@@ -9,6 +9,7 @@ in
   options.modules.services = {
     udisks.enable = mkEnableOption "udisks";
     wireguard.enable = mkEnableOption "WireGuard";
+    corectrl.enable = mkEnableOption "Corectrl";
 
     greetd = {
       enable = mkEnableOption "Greetd with TUIgreet";

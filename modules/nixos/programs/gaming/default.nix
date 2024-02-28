@@ -9,7 +9,22 @@ in
     enable = mkEnableOption "gaming optimisations";
     steam.enable = mkEnableOption "Steam";
     gamescope.enable = mkEnableOption "Gamescope";
-    gamemode.enable = mkEnableOption "Gamemode";
+
+    gamemode = {
+      enable = mkEnableOption "Gamemode";
+
+      startScript = mkOption {
+        type = types.lines;
+        default = "";
+        description = "Bash script to run when gamemode starts";
+      };
+
+      stopScript = mkOption {
+        type = types.lines;
+        default = "";
+        description = "Bash script to run when gamemode stops";
+      };
+    };
 
     windowClassRegex = mkOption {
       type = types.str;

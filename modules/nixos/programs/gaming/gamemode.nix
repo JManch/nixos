@@ -5,7 +5,7 @@ let
 
   startStopScript =
     let
-      inherit (lib) optionalString fetchers boolToString substring stringLength toUpper;
+      inherit (lib) optionalString fetchers boolToString substring stringLength toUpper optional;
       inherit (homeConfig.modules.desktop) hyprland;
       homeConfig = utils.homeConfig args;
       isHyprland = homeConfig.modules.desktop.windowManager == "Hyprland";
@@ -36,7 +36,7 @@ let
         coreutils
         libnotify
         homeConfig.wayland.windowManager.hyprland.package
-      ] ++ lib.lists.optional isHyprland homeConfig.wayland.windowManager.hyprland.package;
+      ] ++ optional isHyprland homeConfig.wayland.windowManager.hyprland.package;
 
       text = ''
 
@@ -52,6 +52,9 @@ let
               ${killActiveRebind (mode == "end")}"
           ''
         }
+
+        ${if mode == "start" then cfg.startScript else cfg.stopScript}
+
         notify-send --urgency=critical -t 2000 \
           -h 'string:x-canonical-private-synchronous:gamemode-toggle' 'GameMode' '${notifBody mode}ed'
 

@@ -12,7 +12,9 @@
 
       hyprland = {
         tearing = true;
-        directScanout = true;
+        # FIX: Direct scanout doesn't seem to work due to this error:
+        # error: connector D-1: Failed to page-flip output: a page-flip is already pending
+        directScanout = false;
         logging = false;
       };
 

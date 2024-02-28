@@ -164,7 +164,9 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
           "${mod}, S, togglespecialworkspace,"
           "${modShift}, S, movetoworkspacesilent, special"
           "${mod}, G, workspace, name:GAME"
+          "${modShift}, G, movetoworkspace, name:GAME"
           "${mod}, V, workspace, name:VM"
+          "${modShift}, V, movetoworkspace, name:VM"
         ] ++ (
           # Go to empty workspace on all monitors
           concatMap

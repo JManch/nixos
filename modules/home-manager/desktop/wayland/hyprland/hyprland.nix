@@ -50,6 +50,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
         -e 's/enable_stdout_logs=false/enable_stdout_logs=true/' \
         -e 's/disable_hyprland_logo=true/disable_hyprland_logo=false/' \
+        -e 's/no_direct_scanout=false/no_direct_scanout=true/' \
         -e '/ALTALT/d' \
         -e '/screen_shader/d' \
         -e '/^exec-once/d' \
@@ -60,8 +61,8 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
       # Add monitor config
       ${
-        concatStringsSep "\n" (map (m:
-          "echo \"monitor=WL-${toString m.number},2048x1152,auto,1\" >> ${hyprDir}/hyprlandd.conf")
+        concatStringsSep "\n" (map (m: let res = "${toString m.width}x${toString m.height}"; in
+          "echo \"monitor=WL-${toString m.number},${res},${m.position},1\" >> ${hyprDir}/hyprlandd.conf")
           monitors)
       }
 

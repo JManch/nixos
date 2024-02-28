@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe';
+  inherit (lib) mkIf getExe getExe';
   inherit (config.device) gpu;
   cfg = config.modules.services.corectrl;
 in
@@ -44,15 +44,14 @@ mkIf (cfg.enable && (gpu.type == "amd"))
     serviceConfig = {
       Type = "simple";
       ExecStart = getExe' config.programs.corectrl.package "corectrl";
+      ExecStop = "-${getExe pkgs.killall} corectrl";
       # Closing the window fully quits corectrl so we have to force restart
-      Restart = "always";
+      Restart = "on-success";
       RestartSec = 3;
     };
 
     wantedBy = [ "graphical-session.target" ];
   };
 
-  persistenceHome.directories = [
-    ".config/corectrl"
-  ];
+  persistenceHome.directories = [ ".config/corectrl" ];
 }

@@ -170,7 +170,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
       windowrulev2 =
         let
-          gameRegex = osConfig.modules.programs.gaming.windowClassRegex;
+          gameRegex = config.modules.programs.gaming.windowClassRegex;
         in
         [
           "workspace name:GAME, class:${gameRegex}"

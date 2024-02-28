@@ -8,13 +8,13 @@ let
   inherit (lib) mkIf utils;
   inherit (osConfig) device;
   inherit (config.modules.desktop.style) cornerRadius;
-  cfg = config.modules.programs.mangohud;
+  cfg = config.modules.programs.gaming.mangohud;
   colors = config.colorscheme.palette;
 in
 mkIf cfg.enable {
   programs.mangohud = {
     enable = true;
-    package = utils.addPatches pkgs.mangohud [ ../../../patches/mangoHud.diff ];
+    package = utils.addPatches pkgs.mangohud [ ../../../../patches/mangoHud.diff ];
 
     settings = {
       # Performance

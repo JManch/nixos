@@ -70,7 +70,6 @@
 
       gaming = {
         enable = true;
-        windowClassRegex = "^(steam_app.*|cs2|\.gamescope.*|bfv\.exe)$";
         steam.enable = true;
         gamescope.enable = true;
         gamemode.enable = true;

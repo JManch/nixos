@@ -1,6 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  cfg = config.modules.programs.r2modman;
+  cfg = config.modules.programs.gaming.r2modman;
 in
 lib.mkIf cfg.enable
 {

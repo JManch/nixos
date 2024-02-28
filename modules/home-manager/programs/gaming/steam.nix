@@ -10,6 +10,11 @@ mkIf cfg.enable
     @nClientDownloadEnableHTTP2PlatformLinux 0
   '';
 
+  modules.programs.gaming.windowClassRegex = [
+    "steam_app.*"
+    "cs2"
+  ];
+
   programs.zsh.initExtra =
     let
       hyprshot = getExe pkgs.hyprshot;

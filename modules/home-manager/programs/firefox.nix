@@ -4,7 +4,7 @@
 , osConfig
 , username
 , ...
-} @ args:
+}:
 let
   inherit (lib) mkIf getExe getExe';
   cfg = config.modules.programs.firefox;

@@ -1,6 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  cfg = config.modules.programs.lutris;
+  cfg = config.modules.programs.gaming.lutris;
 
   lutris = pkgs.lutris.override {
     extraPkgs = pkgs: with pkgs; [
@@ -12,6 +12,8 @@ in
 lib.mkIf cfg.enable
 {
   home.packages = [ lutris ];
+
+  modules.programs.gaming.windowClassRegex = [ "bfv.exe" ];
 
   # Install lutris games to ~/files/games
   persistence.directories = [

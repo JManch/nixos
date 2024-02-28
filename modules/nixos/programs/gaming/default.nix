@@ -25,11 +25,5 @@ in
         description = "Bash script to run when gamemode stops";
       };
     };
-
-    windowClassRegex = mkOption {
-      type = types.str;
-      default = "^(steam_app.*|\.gamescope.*)$";
-      description = "Regex to match game window classes";
-    };
   };
 }

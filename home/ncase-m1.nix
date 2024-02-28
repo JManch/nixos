@@ -58,11 +58,15 @@
       anki.enable = true;
       zathura.enable = true;
       qbittorrent.enable = true;
-      mangohud.enable = true;
-      r2modman.enable = true;
-      lutris.enable = true;
       filenDesktop.enable = true;
       multiviewerF1.enable = true;
+
+      gaming = {
+        mangohud.enable = true;
+        r2modman.enable = true;
+        lutris.enable = true;
+        prism-launcher.enable = true;
+      };
     };
 
     services = {

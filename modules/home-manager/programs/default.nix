@@ -30,5 +30,6 @@ in
     lutris.enable = mkEnableOption "Lutris";
     filenDesktop.enable = mkEnableOption "Filen Desktop";
     multiviewerF1.enable = mkEnableOption "Multiviewer for F1";
+    prism-launcher.enable = mkEnableOption "Prism Launcher";
   };
 }

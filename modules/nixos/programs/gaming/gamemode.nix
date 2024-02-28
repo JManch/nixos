@@ -13,9 +13,8 @@ let
 
       # Remap the killactive key to use the shift modifier
       killActiveRebind = isEnd: ''
-        "keyword unbind ${hyprland.modKey}${optionalString isEnd "SHIFTCONTROL"}, W"; \
-        "keyword bind ${hyprland.modKey}${optionalString (!isEnd) "SHIFTCONTROL"}, W, killactive";
-      '';
+        keyword unbind ${hyprland.modKey}${optionalString isEnd "SHIFTCONTROL"}, W; \
+        keyword bind ${hyprland.modKey}${optionalString (!isEnd) "SHIFTCONTROL"}, W, killactive;'';
 
       refreshRate = m: toString (
         if (m == "start") then

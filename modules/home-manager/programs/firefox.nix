@@ -37,7 +37,7 @@ mkIf (cfg.enable && osDesktop.enable) {
           ];
           # Backup on shutdown
           ExecStop = syncToPersist;
-          RemainAfterExit = "yes";
+          RemainAfterExit = true;
         };
 
         # default.target is reached at roughly the same time as the system

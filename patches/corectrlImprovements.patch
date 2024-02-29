@@ -1,0 +1,153 @@
+diff --git a/src/app/app.cpp b/src/app/app.cpp
+index 99952d3..af53060 100644
+--- a/src/app/app.cpp
++++ b/src/app/app.cpp
+@@ -118,6 +118,7 @@ int App::exec(int argc, char **argv)
+ 
+     initSysTrayWindowState();
+     handleToggleManualProfileCmd();
++    handleSetManualProfileCmd();
+ 
+     return app.exec();
+   }
+@@ -164,6 +165,7 @@ void App::onNewInstance(QStringList args)
+ 
+   bool runtimeCmds{false};
+   runtimeCmds |= handleToggleManualProfileCmd();
++  runtimeCmds |= handleSetManualProfileCmd();
+   runtimeCmds |= handleWindowVisibilityCmds();
+ 
+   // No runtime commands were used as arguments.
+@@ -211,6 +213,10 @@ void App::setupCmdParser(QCommandLineParser &parser, int minHelperTimeout,
+        "instance of the application is already running, it will toggle "
+        "the manual profile whose name is <\"profile name\">.",
+        "\"profile name\""},
++      {{"s", "set-manual-profile"},
++       "Set the state of the manual profile. Pass <\"profile name\" \"profile state\""
++       "where state is \"enable\" or \"disable\" ",
++       "\"profile name and state\""},
+       {"minimize-systray",
+        "Minimizes the main window either to the system tray (when "
+        "available) or to the taskbar.\nWhen an instance of the application is "
+@@ -227,6 +233,8 @@ void App::setupCmdParser(QCommandLineParser &parser, int minHelperTimeout,
+        "When an instance of the application is already running, it will toggle "
+        "the main window visibility showing or minimizing it, either to the "
+        "taskbar or to system tray."},
++      {"hide-window",
++       "Force the window to be hidden on start-up."},
+   });
+ }
+ 
+@@ -344,6 +352,26 @@ bool App::handleToggleManualProfileCmd()
+   return cmdHandled;
+ }
+ 
++bool App::handleSetManualProfileCmd()
++{
++  auto cmdHandled{false};
++  if (cmdParser_.isSet("set-manual-profile")) {
++
++    auto profileNameAndState = cmdParser_.value("set-manual-profile").split(" ");
++
++    if (!profileNameAndState.isEmpty()) {
++      auto state = profileNameAndState.takeLast().toStdString();
++      if (state == "enable" || state == "disable") {
++        auto profileName = profileNameAndState.join(" ").toStdString();
++        session_->setManualProfile(profileName, state == "enable");
++        cmdHandled = true;
++      }
++    }
++  }
++
++  return cmdHandled;
++}
++
+ bool App::handleWindowVisibilityCmds()
+ {
+   auto cmdHandled{false};
+@@ -364,6 +392,10 @@ bool App::handleWindowVisibilityCmds()
+     show = minimized ? true : !mainWindow_->isVisible();
+     cmdHandled = true;
+   }
++  else if (cmdParser_.isSet("hide-window")) {
++    show = false;
++    cmdHandled = true;
++  }
+ 
+   if (cmdHandled)
+     showMainWindow(show);
+diff --git a/src/app/app.h b/src/app/app.h
+index 4d94703..3c7dffe 100644
+--- a/src/app/app.h
++++ b/src/app/app.h
+@@ -88,6 +88,7 @@ class App final : public QObject
+   void setupMainWindowGeometry();
+   void restoreMainWindowGeometry();
+   bool handleToggleManualProfileCmd();
++  bool handleSetManualProfileCmd();
+   bool handleWindowVisibilityCmds();
+ 
+   AppInfo appInfo_;
+diff --git a/src/core/isession.h b/src/core/isession.h
+index 0ae11c2..f4fe028 100644
+--- a/src/core/isession.h
++++ b/src/core/isession.h
+@@ -27,6 +27,7 @@ class ISession
+ 
+   virtual void init(ISysModel const &model) = 0;
+   virtual void toggleManualProfile(std::string const &profileName) = 0;
++  virtual void setManualProfile(std::string const &profileName, bool active) = 0;
+   virtual IProfileManager &profileManager() const = 0;
+ 
+   virtual ~ISession() = default;
+diff --git a/src/core/session.cpp b/src/core/session.cpp
+index 75b0835..530a0a9 100644
+--- a/src/core/session.cpp
++++ b/src/core/session.cpp
+@@ -163,6 +163,34 @@ void Session::toggleManualProfile(std::string const &profileName)
+   profileApplicator_->apply(*pViews_.back());
+ }
+ 
++void Session::setManualProfile(std::string const &profileName, bool active)
++{
++  std::lock_guard<std::mutex> lock(pViewsMutex_);
++  std::lock_guard<std::mutex> mLock(manualProfileMutex_);
++
++  auto baseView = getBaseView(pViews_, manualProfile_);
++
++  // remove profile view of the active manual profile
++  if (manualProfile_.has_value()) {
++    pViews_.pop_back();
++    notifyManualProfileToggled(*manualProfile_, false);
++  }
++
++  // Update manual profile state
++  if (active)
++    manualProfile_ = profileName;
++  else if (manualProfile_.has_value())
++    manualProfile_ = std::nullopt;
++
++  // Create the profile view
++  if (manualProfile_.has_value()) {
++    createProfileViews(baseView, {*manualProfile_});
++    notifyManualProfileToggled(*manualProfile_, true);
++  }
++
++  profileApplicator_->apply(*pViews_.back());
++}
++
+ IProfileManager &Session::profileManager() const
+ {
+   return *profileManager_;
+diff --git a/src/core/session.h b/src/core/session.h
+index f4e7184..5e2885f 100644
+--- a/src/core/session.h
++++ b/src/core/session.h
+@@ -34,6 +34,7 @@ class Session final : public ISession
+ 
+   void init(ISysModel const &model) override;
+   void toggleManualProfile(std::string const &profileName) override;
++  void setManualProfile(std::string const &profileName, bool active) override;
+   IProfileManager &profileManager() const override;
+ 
+  private:

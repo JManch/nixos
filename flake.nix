@@ -5,6 +5,7 @@
     # NOTE: Use the `nix flake metadata <flake_url>` command to check if a
     # flake needs nixpkgs.follows defined
     # Update individual inputs using `nix flake lock --update-input <INPUT_NAME>`
+
     # nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs.url = "git+file:///home/joshua/repos/nixpkgs?ref=nixos-unstable-personal";
     nix-colors.url = "github:misterio77/nix-colors";
@@ -17,8 +18,7 @@
     anyrun.url = "github:Kirottu/anyrun";
     anyrun.inputs.nixpkgs.follows = "nixpkgs";
 
-    # home-manager.url = "github:nix-community/home-manager";
-    home-manager.url = "git+file:///home/joshua/repos/home-manager";
+    home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     agenix.url = "github:ryantm/agenix";

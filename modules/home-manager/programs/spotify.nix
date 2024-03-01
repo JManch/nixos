@@ -150,11 +150,14 @@ mkIf (cfg.enable && osConfig.modules.system.audio.enable)
         "workspace special silent, title:^(Spotify( Premium)?)$"
       ];
 
-      bindr = [ "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause" ];
+      bindr = [
+        "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause --player spotify_player"
+        "${modKey}SHIFT, ${modKey}_R, exec, ${playerctl} play-pause --ignore-player spotify_player"
+      ];
 
       bind = [
-        "${modKey}, Period, exec, ${playerctl} next"
-        "${modKey}, Comma, exec, ${playerctl} previous"
+        "${modKey}, Period, exec, ${playerctl} next --player spotify_player"
+        "${modKey}, Comma, exec, ${playerctl} previous --player spotify_player"
         ", XF86AudioNext, exec, ${playerctl} next"
         ", XF86AudioPrev, exec, ${playerctl} previous"
         ", XF86AudioPlay, exec, ${playerctl} play"

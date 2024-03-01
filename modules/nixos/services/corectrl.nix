@@ -12,6 +12,11 @@ let
 in
 mkIf (cfg.enable && (gpu.type == "amd"))
 {
+  # TODO: Someday I'd like to replace all of the corectrl functionality with
+  # same basic scripts or a small program. There's way too much complexity in
+  # this application for the basic GPU settings I want to change whilst
+  # gaming...
+
   users.users.${username}.extraGroups = [ "corectrl" ];
 
   programs.corectrl = {
@@ -44,18 +49,21 @@ mkIf (cfg.enable && (gpu.type == "amd"))
     gpuOverclock.ppfeaturemask = "0xffffffff";
   };
 
+  # WARN: If the graphical-session is shutdown in an unclean way the service
+  # will fail to stop cleanly and the corectrl_helper dbus service is left
+  # hanging. This causes subsequent corectl start-ups to fail until
+  # corectrl_helper is manually killed.
   systemd.user.services = {
     corectrl = {
       unitConfig = {
         Description = "Corectrl system hardware tuner";
-        PartOf = [ "graphical-session.target" ];
+        # PartOf = [ "graphical-session.target" ]; pointless because of above issue
         After = [ "graphical-session-pre.target" ];
       };
 
       serviceConfig = {
         Type = "simple";
         ExecStart = "${corectrl} --hide-window";
-        ExecStop = "-${getExe pkgs.killall} corectrl";
         # Closing the window fully quits corectrl so we have to force restart
         Restart = "on-success";
         RestartSec = 3;

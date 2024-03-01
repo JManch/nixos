@@ -11,13 +11,17 @@ in
 mkIf (cfg.enable && config.modules.shell.enable) {
   home.packages = [ pkgs.neovide ];
 
-  programs.neovim = {
+  upstream.programs.neovim = {
     enable = true;
     package = (utils.flakePkgs args "neovim-nightly-overlay").default;
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;
     defaultEditor = true;
+    # Some treesitter parsers need this library. I had to copy and modify the
+    # home-manager module for this because the way neovim is wrapped makes it a
+    # nightmare to override.
+    extraLibraries = [ pkgs.stdenv.cc.cc.lib ];
     extraPackages = with pkgs; [
       # Runtime dependendies
       fzf

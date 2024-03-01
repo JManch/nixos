@@ -14,7 +14,6 @@ let
   isWayland = fetchers.isWayland config;
   isHyprland = desktopCfg.windowManager == "Hyprland";
   colors = config.colorscheme.palette;
-  easyeffects = config.modules.services.easyeffects;
 
   audio = osConfig.modules.system.audio;
   wgnord = osConfig.modules.services.wgnord;
@@ -226,8 +225,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
         optional gamemode.enable "gamemode" ++ [
           "memory"
         ] ++
-        optional audio.enable "pulseaudio" ++
-        optional easyeffects.enable "custom/easyeffects" ++ [
+        optional audio.enable "pulseaudio" ++ [
           "tray"
           "custom/poweroff"
           "network#hostname"

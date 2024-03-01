@@ -32,11 +32,6 @@ mkIf (cfg.enable && audio.enable && dconf.enable) {
           }
         '';
       };
-      "custom/easyeffects" = {
-        format = "<span color='#${colors.base04}' size='large'>󰤽</span> Easyeffects";
-        exec = "${systemctl} status --user easyeffects";
-        interval = 5;
-      };
     };
 
   xdg.configFile = {

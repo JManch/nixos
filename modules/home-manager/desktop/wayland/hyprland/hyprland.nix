@@ -148,7 +148,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
           cmp = getExe' pkgs.diffutils "cmp";
         in
         [
-          "${hyprctl} dispatch focusmonitor ${(fetchers.getMonitorByNumber osConfig 1).name}"
+          "${hyprctl} dispatch focusmonitor ${(fetchers.primaryMonitor osConfig).name}"
           # Temporary and buggy fix for pasting into wine applications
           # https://github.com/hyprwm/Hyprland/issues/2319
           # https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4359

@@ -160,6 +160,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         gaps_in = gapSize / 2;
         gaps_out = gapSize;
         border_size = borderWidth;
+        extend_border_grab_area = gapSize / 2;
         resize_on_border = true;
         hover_icon_on_border = false;
         "col.active_border" = "0xff${colors.base0D}";
@@ -238,7 +239,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         key_press_enables_dpms = true;
         background_color = "0xff${colors.base00}";
         new_window_takes_over_fullscreen = 2;
-        enable_swallow = true;
+        enable_swallow = false;
         swallow_regex = "^(${desktopCfg.terminal.class})$";
       };
 

@@ -8,6 +8,7 @@ in
   options.modules.desktop.services = {
     waybar.enable = mkEnableOption "Waybar";
     wlsunset.enable = mkEnableOption "wlsunset";
+    wayvnc.enable = mkEnableOption "WayVNC";
 
     hypridle = {
       enable = mkEnableOption "Hypridle";

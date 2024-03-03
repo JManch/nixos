@@ -115,7 +115,7 @@ let
               hyprctl_cmd+="dispatch movetoworkspacesilent name:F1-1,address:$address;"
               hyprctl_cmd+="dispatch resizewindowpixel exact $res_x $res_y,address:$address;"
               hyprctl_cmd+="dispatch movewindowpixel exact $((m1_pos_x + m1_res_x - res_x)) $((m1_pos_y + (m1_res_y * 3 / 4) - (res_y + 60))),address:$address;"
-              hyprctl_cmd+="dispatch alterzorder top,address:$address;"
+              hyprctl_cmd+="dispatch pin,address:$address;"
               ;;
             "Radio Transcriptions"*|"Race Control"*)
               res_x=$((m1_res_x * 1 / 4))
@@ -187,8 +187,6 @@ lib.mkIf cfg.enable
     {
       workspace = (map
         (
-          # FIX: These workspace rules don't always apply to multiviewer
-          # windows for some reason. Might be a hyprland bug.
           m: "name:F1-${toString m.number}, monitor:${m.name}, gapsin:0, gapsout:0, decorate:false, rounding:false, border:false"
         )
         (take 2 monitors))
@@ -208,12 +206,11 @@ lib.mkIf cfg.enable
 
       windowrulev2 =
         [
-          "workspace name:F1-1, class:^(MultiViewer for F1)$"
-          "noinitialfocus, class:^(MultiViewer for F1)$"
           "float, class:^(MultiViewer for F1)$"
-          "xray 0, class:^(MultiViewer for F1)$"
-          # FIX: This noblur rule doesn't work for some reason, hyprland bug?
-          "noblur, class:^(MultiViewer for F1)$"
+          "workspace name:F1-1, class:^(MultiViewer for F1)$"
+
+          "xray 0, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+          "noblur, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
         ];
     };
 

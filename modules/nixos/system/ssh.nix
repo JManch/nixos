@@ -11,14 +11,15 @@ let
 in
 {
   services.openssh = {
-    enable = true;
+    enable = cfg.enable;
 
     # Some devices are weird with port 22
     ports = [ 2222 ];
 
     settings = {
-      PasswordAuthentication = cfg.allowPasswordAuth;
+      PasswordAuthentication = false;
       PermitRootLogin = "no";
+      AllowUsers = [ username ];
     };
 
     hostKeys = [{

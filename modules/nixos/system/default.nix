@@ -9,12 +9,10 @@ in
     bluetooth.enable = mkEnableOption "bluetooth";
     virtualisation.enable = mkEnableOption "virtualisation";
 
-    ssh = {
-      allowPasswordAuth = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable ssh password authentication";
-      };
+    ssh.enable = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Whether to enable ssh server";
     };
 
     networking = {

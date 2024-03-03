@@ -65,10 +65,14 @@ mkIf (cfg.enable && config.modules.shell.enable) {
       inherit (config.programs.alacritty.settings.window) opacity;
     in
     optionalString alacritty.enable /*bash*/ ''
+
+      # TODO: Change this alias so that it works in TTY and just generally in
+      # envs without alacritty
       nvim() {
         alacritty msg config window.opacity=1 && \
           command nvim "$@" && alacritty msg config window.opacity=${toString opacity}
       }
+
     ''
   ;
 

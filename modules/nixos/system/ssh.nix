@@ -7,13 +7,17 @@
 }:
 let
   inherit (lib) mapAttrs optional;
+  cfg = config.modules.system.ssh;
 in
 {
   services.openssh = {
     enable = true;
 
+    # Some devices are weird with port 22
+    ports = [ 2222 ];
+
     settings = {
-      PasswordAuthentication = config.modules.system.ssh.allowPasswordAuth;
+      PasswordAuthentication = cfg.allowPasswordAuth;
       PermitRootLogin = "no";
     };
 
@@ -26,6 +30,7 @@ in
   users.users.${username} = {
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDU68qiZQoWPMKZwaNu1CJikH0t4bV8OgjpOkpj6AwPW joshua@pixelbook"
     ];
   };
 
@@ -34,14 +39,15 @@ in
     agentTimeout = "1h";
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
 
-    # TODO: Make this configurable. i.e. don't allow certain hosts
     knownHosts = (mapAttrs
       (host: _: {
         publicKeyFile = ../../../hosts/${host}/ssh_host_ed25519_key.pub;
         extraHostNames = (optional (host == hostname) "localhost");
       })
       outputs.nixosConfigurations)
-    // { "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl"; };
+    // {
+      "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+    };
   };
 
   security.pam.sshAgentAuth = {

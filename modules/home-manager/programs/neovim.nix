@@ -66,15 +66,17 @@ mkIf (cfg.enable && config.modules.shell.enable) {
     in
     optionalString alacritty.enable /*bash*/ ''
 
-      # TODO: Change this alias so that it works in TTY and just generally in
-      # envs without alacritty
+      # Disables alacritty opacity when launching nvim
       nvim() {
-        alacritty msg config window.opacity=1 && \
-          command nvim "$@" && alacritty msg config window.opacity=${toString opacity}
+        if [[ -z "$DISPLAY" ]]; then
+          command nvim "$@"
+        else
+          alacritty msg config window.opacity=1 && \
+            command nvim "$@" && alacritty msg config window.opacity=${toString opacity}
+        fi
       }
 
-    ''
-  ;
+    '';
 
   persistence.directories = [
     ".cache/nvim"

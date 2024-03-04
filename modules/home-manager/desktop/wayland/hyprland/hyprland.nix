@@ -177,10 +177,10 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
           "workspace name:GAME, class:${gameRegex}"
 
           "workspace name:VM silent, class:^(qemu|wlroots)$"
-          "float, class:^(qemu|wlroots)$"
-          "size 80% 80%, class:^(qemu|wlroots)$"
-          "center, class:^(qemu|wlroots)$"
-          "keepaspectratio, class:^(qemu|wlroots)$"
+          "float, class:^(qemu)$"
+          "size 80% 80%, class:^(qemu)$"
+          "center, class:^(qemu)$"
+          "keepaspectratio, class:^(qemu)$"
         ] ++ optional cfg.tearing
           "immediate, class:${gameRegex}";
 

@@ -1,6 +1,7 @@
 { lib, pkgs, config, ... }:
 let
   inherit (lib) mkIf fetchers;
+  inherit (config.modules) desktop;
   cfg = config.modules.programs.vscode;
 in
 mkIf cfg.enable {
@@ -23,11 +24,11 @@ mkIf cfg.enable {
       # Prevents crash on launch
       "window.titleBarStyle" = "custom";
       "window.menuBarVisibility" = "toggle";
-      "editor.fontFamily" = "BerkeleyMono Nerd Font";
-      "cmake.configureOnOpen" = false;
+      "editor.fontFamily" = desktop.style.font.family;
       "git.autofetch" = true;
       "workbench.colorTheme" = "Ayu Mirage Bordered";
       "cmake.showOptionsMovedNotification" = false;
+      "cmake.configureOnOpen" = false;
     };
   };
 

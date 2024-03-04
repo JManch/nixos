@@ -99,7 +99,11 @@
       networking = {
         tcpOptimisations = true;
         resolved.enable = true;
-        wireless.enable = true;
+
+        wireless = {
+          enable = true;
+          disableOnBoot = true;
+        };
 
         firewall = {
           enable = true;

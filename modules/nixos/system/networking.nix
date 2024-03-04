@@ -62,12 +62,34 @@ in
 
     dhcpcd = {
       enable = true;
+      # Make Pixel 5 hotspot take priority over any other active network.
+      # Useful in situations where the ethernet network goes down and hotspot
+      # is used as a backup, but the device still prioritises the broken
+      # ethernet network because of its lower metric.
       extraConfig = ''
         ssid Pixel 5
         metric 100
       '';
     };
   };
+
+  systemd.services."disable-wifi-on-boot" = mkIf
+    (cfg.wireless.enable && cfg.wireless.disableOnBoot)
+    {
+      unitConfig = {
+        restartIfChanged = false;
+        description = "Disable wireless interface on boot";
+        after = [ "NetworkManager.service" ];
+      };
+
+      serviceConfig = {
+        ExecStart = "${getExe' pkgs.util-linux "rfkill"} block wifi";
+        Type = "oneshot";
+        RemainAfterExit = "true";
+      };
+
+      wantedBy = [ "multi-user.target" ];
+    };
 
   boot = {
     kernelModules = optional cfg.tcpOptimisations "tcp_bbr";

@@ -18,7 +18,13 @@ in
     networking = {
       tcpOptimisations = mkEnableOption "TCP optimisations";
       resolved.enable = mkEnableOption "Resolved";
-      wireless.enable = mkEnableOption "wireless";
+
+      wireless = {
+        enable = mkEnableOption "wireless";
+        disableOnBoot = mkEnableOption ''
+          disabling of wireless on boot. Use `rfkill unblock wifi` to manually enable.";
+        '';
+      };
 
       firewall = {
         enable = mkEnableOption "Firewall";

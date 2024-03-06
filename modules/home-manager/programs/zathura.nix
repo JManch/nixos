@@ -30,7 +30,7 @@ lib.mkIf cfg.enable
       notification-bg = "#${colors.base0B}";
       notification-fg = "#${colors.base00}";
 
-      recolor = "true";
+      recolor = "false";
       recolor-lightcolor = "#${colors.base00}";
       recolor-darkcolor = "#${colors.base06}";
       recolor-reverse-video = "true";
@@ -49,6 +49,8 @@ lib.mkIf cfg.enable
       # Map smooth scroll to j and k
       "j feedkeys" = "<C-Down>";
       "k feedkeys" = "<C-Up>";
+      # Toggle dark theme
+      "<C-l>" = "recolor";
     };
   };
 

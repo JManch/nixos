@@ -77,9 +77,9 @@ in
     (cfg.wireless.enable && cfg.wireless.disableOnBoot)
     {
       unitConfig = {
-        restartIfChanged = false;
-        description = "Disable wireless interface on boot";
-        after = [ "NetworkManager.service" ];
+        RestartIfChanged = false;
+        Description = "Disable wireless interface on boot";
+        After = [ "NetworkManager.service" ];
       };
 
       serviceConfig = {

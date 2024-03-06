@@ -31,5 +31,6 @@ in
     filenDesktop.enable = mkEnableOption "Filen Desktop";
     multiviewerF1.enable = mkEnableOption "Multiviewer for F1";
     prism-launcher.enable = mkEnableOption "Prism Launcher";
+    unity.enable = mkEnableOption "Unity Game Engine";
   };
 }

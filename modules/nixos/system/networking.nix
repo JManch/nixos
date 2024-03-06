@@ -4,10 +4,11 @@
 , username
 , hostname
 , ...
-}:
+} @ args:
 let
-  inherit (lib) mkMerge mkIf optional optionals getExe' mkDefault;
+  inherit (lib) mkMerge mkIf utils optional optionals getExe' mkDefault;
   cfg = config.modules.system.networking;
+  homeManagerFirewall = (utils.homeConfig args).firewall;
 in
 {
   environment.systemPackages = with pkgs; [
@@ -39,6 +40,12 @@ in
     firewall = {
       enable = cfg.firewall.enable;
       defaultInterfaces = cfg.firewall.defaultInterfaces;
+      inherit (homeManagerFirewall)
+        allowedTCPPorts
+        allowedTCPPortRanges
+        allowedUDPPorts
+        allowedUDPPortRanges
+        interfaces;
     };
 
     wireless = {

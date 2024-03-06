@@ -8,5 +8,7 @@ lib.mkIf cfg.enable
 
   modules.programs.gaming.windowClassRegex = [ "Minecraft.*" ];
 
+  firewall.interfaces.wg-discord.allowedTCPPorts = [ 25565 ];
+
   persistence.directories = [ ".local/share/PrismLauncher" ];
 }

@@ -26,7 +26,7 @@ let
   colors = config.colorscheme.palette;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 
-  hyprlandPackages = utils.flakePkgs args "hyprland";
+  hyprlandPkgs = utils.flakePkgs args "hyprland";
 in
 mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
   modules.desktop = {
@@ -69,8 +69,8 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
       '';
 
   xdg.portal = {
-    extraPortals = [ hyprlandPackages.xdg-desktop-portal-hyprland ];
-    configPackages = [ hyprlandPackages.hyprland ];
+    extraPortals = [ hyprlandPkgs.xdg-desktop-portal-hyprland ];
+    configPackages = [ hyprlandPkgs.hyprland ];
   };
 
   wayland.windowManager.hyprland = {
@@ -81,7 +81,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     # Since I don't use plugins I can use the unwrapped package and keep my
     # path clean.
     # WARNING: If you ever want to use plugins switch to the wrapped package
-    package = hyprlandPackages.hyprland-unwrapped;
+    package = hyprlandPkgs.hyprland-unwrapped;
 
     systemd = {
       enable = true;

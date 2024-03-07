@@ -53,7 +53,7 @@
   modules = {
     hardware = {
       secureBoot.enable = true;
-      vr.enable = false; # FIX: nixpkgs not ready yet
+      vr.enable = false;
 
       fileSystem = {
         trim = true;

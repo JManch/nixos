@@ -1,6 +1,6 @@
-{ lib, config, ... }:
+{ lib, pkgs, config, ... }:
 let
-  inherit (lib) optional;
+  inherit (lib) optional mkIf;
   cfg = config.modules.hardware.fileSystem;
 in
 {
@@ -27,8 +27,7 @@ in
 
     # ZFS does not always support the latest kernel
     kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
-
-    zfs.enableUnstable = false;
+    zfs.package = mkIf cfg.unstableZfs pkgs.zfs_unstable;
 
     supportedFilesystems = [ "zfs" ];
     zfs.forceImportRoot = cfg.forceImportRoot;

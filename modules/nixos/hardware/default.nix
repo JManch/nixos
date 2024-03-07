@@ -11,6 +11,7 @@ in
 
     fileSystem = {
       trim = mkEnableOption "ZFS automatic trimming";
+      unstableZfs = mkEnableOption "unstable ZFS";
 
       zpoolName = mkOption {
         type = types.str;

@@ -26,7 +26,8 @@ let
 in
 {
   imports = [
-    inputs.nix-gaming.nixosModules.pipewireLowLatency
+    # Waiting on https://github.com/fufexan/nix-gaming/issues/161
+    # inputs.nix-gaming.nixosModules.pipewireLowLatency
   ];
 
   config = mkMerge [
@@ -44,7 +45,7 @@ in
         jack.enable = true;
         pulse.enable = true;
         wireplumber.enable = true;
-        lowLatency.enable = gaming.enable;
+        # lowLatency.enable = gaming.enable;
       };
     })
 

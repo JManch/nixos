@@ -62,7 +62,6 @@
       qbittorrent.enable = true;
       filenDesktop.enable = true;
       multiviewerF1.enable = true;
-      unity.enable = true;
 
       gaming = {
         mangohud.enable = true;

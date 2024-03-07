@@ -43,7 +43,7 @@
     lanzaboote.url = "github:nix-community/lanzaboote";
     lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
 
-    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay?rev=a40f72d64c0336532546ee3760040c1f0a6607cf";
     neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
 
     hypridle.url = "github:hyprwm/hypridle";

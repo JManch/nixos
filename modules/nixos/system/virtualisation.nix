@@ -98,6 +98,13 @@ mkMerge [
     programs.virt-manager.enable = true;
     users.users.${username}.extraGroups = [ "libvirtd" "docker" ];
 
+    hm.dconf.settings = {
+      "org/virt-manager/virt-manager/connections" = {
+        autoconnect = [ "qemu:///system" ];
+        uris = [ "qemu:///system" ];
+      };
+    };
+
     virtualisation = {
       libvirtd.enable = true;
       # TODO: Properly configure docker

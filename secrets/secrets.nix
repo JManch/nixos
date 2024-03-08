@@ -1,5 +1,5 @@
 let
-  hostKey = host: (import ../hosts/${host}/key.nix).key;
+  hostKey = host: builtins.readFile ../hosts/${host}/ssh_host_ed25519_key.pub;
   joshua = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIObU6Fxl5fshbiTZ53wkuvWT3lainInWSdfk/FXQYIxv joshua";
   ncase-m1 = hostKey "ncase-m1";
   virtual = hostKey "virtual";

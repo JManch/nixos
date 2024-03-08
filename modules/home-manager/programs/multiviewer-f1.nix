@@ -95,7 +95,6 @@ let
         while IFS=, read -r address title; do
           case $title in
             "Live Timing"*|"Replay Live Timing"*)
-              echo "Matched live timing"
               res_x=$((m1_res_x * 1 / 4))
               res_y=$((m1_res_y * 3 / 4))
               hyprctl_cmd+="dispatch movetoworkspacesilent name:F1-1,address:$address;"
@@ -108,6 +107,7 @@ let
               hyprctl_cmd+="dispatch movetoworkspacesilent name:F1-1,address:$address;"
               hyprctl_cmd+="dispatch resizewindowpixel exact $res_x $res_y,address:$address;"
               hyprctl_cmd+="dispatch movewindowpixel exact $((m1_pos_x + (m1_res_x - res_x))) $m1_pos_y,address:$address;"
+              hyprctl_cmd+="dispatch alterzorder bottom,address:$address;"
               ;;
             "Track Map"*)
               res_x="480"
@@ -115,6 +115,7 @@ let
               hyprctl_cmd+="dispatch movetoworkspacesilent name:F1-1,address:$address;"
               hyprctl_cmd+="dispatch resizewindowpixel exact $res_x $res_y,address:$address;"
               hyprctl_cmd+="dispatch movewindowpixel exact $((m1_pos_x + m1_res_x - res_x)) $((m1_pos_y + (m1_res_y * 3 / 4) - (res_y + 60))),address:$address;"
+              hyprctl_cmd+="dispatch alterzorder top,address:$address;"
               hyprctl_cmd+="dispatch pin address:$address;"
               ;;
             "Radio Transcriptions"*|"Race Control"*)
@@ -130,7 +131,12 @@ let
               if [[ $title =~ $regex ]]; then
                 driver=''${BASH_REMATCH[1]}
                 driver="''${driver%?}"
-                drivers+=("''${driver_prio["$driver"]},$address")
+                if [[ -v driver_prio["$driver"] ]]; then
+                  drivers+=("''${driver_prio["$driver"]},$address")
+                else
+                  # Reserve drivers
+                  drivers+=("100,$address")
+                fi
               fi
               ;;
           esac
@@ -196,12 +202,13 @@ lib.mkIf cfg.enable
       ];
 
       bind = (
-        map (m: "${modKey}SHIFT, F, workspace, name:F1-${toString m.number}")
+        map (m: "${modKey}, F, workspace, name:F1-${toString m.number}")
           (take 2 monitors)
       )
       ++ [
-        "${modKey}, F, togglespecialworkspace, multiviewer"
+        "${modKey}SHIFTCONTROL, M, togglespecialworkspace, multiviewer"
         "${modKey}SHIFTCONTROL, F, exec, ${getExe multiviewerWorkspaceScript}"
+        "${modKey}SHIFT, F, movetoworkspace, name:F1-2"
       ];
 
       windowrulev2 =

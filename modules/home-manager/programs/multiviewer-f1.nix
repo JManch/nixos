@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf take fetchers getExe genAttrs listToAttrs;
+  inherit (lib) mkIf take fetchers getExe listToAttrs;
   inherit (osConfig.device) monitors;
   cfg = config.modules.programs.multiviewerF1;
   desktopCfg = config.modules.desktop;
@@ -115,7 +115,7 @@ let
               hyprctl_cmd+="dispatch movetoworkspacesilent name:F1-1,address:$address;"
               hyprctl_cmd+="dispatch resizewindowpixel exact $res_x $res_y,address:$address;"
               hyprctl_cmd+="dispatch movewindowpixel exact $((m1_pos_x + m1_res_x - res_x)) $((m1_pos_y + (m1_res_y * 3 / 4) - (res_y + 60))),address:$address;"
-              hyprctl_cmd+="dispatch pin,address:$address;"
+              hyprctl_cmd+="dispatch pin address:$address;"
               ;;
             "Radio Transcriptions"*|"Race Control"*)
               res_x=$((m1_res_x * 1 / 4))

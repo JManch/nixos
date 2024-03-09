@@ -58,6 +58,7 @@ mkMerge [
           # depending the actual host we are running the vm on. Could work
           # around this by instead modifying the generated launch script in our
           # run-vm zsh function.
+          # We can solve this by storing the currents hosts specs in env vars.
           memorySize = 4096;
           cores = 8;
           graphics = desktopEnabled;

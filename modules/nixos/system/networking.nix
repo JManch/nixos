@@ -16,7 +16,6 @@ in
   ] ++ optional cfg.wireless.enable wpa_supplicant_gui;
 
   users.users.${username}.extraGroups = [ "networkmanager" ];
-  age.secrets.wirelessNetworks.file = ../../../secrets/wireless-networks.age;
 
   systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";
   services.resolved.enable = cfg.resolved.enable;

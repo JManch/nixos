@@ -2,7 +2,6 @@
 , pkgs
 , config
 , inputs
-, hostname
 , ...
 }:
 let
@@ -13,9 +12,7 @@ lib.mkIf cfg.enable
   environment.systemPackages = [ pkgs.wireguard-tools ];
 
   # Public keys
-  # NCASE-M1 PlNilozIZ0FCYMOs1nVxVph33USmwh+o6nSouslvnU8=
-
-  age.secrets.wireguardKey.file = ../../../secrets/wireguard/${hostname}/key.age;
+  # NCASE-M1 y0Yy2rslvqQmkWMyfOwkYoTGcvSODwvsTHmhcWhmtx4=
 
   networking.wg-quick.interfaces = {
     wg-discord = {

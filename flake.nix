@@ -12,7 +12,7 @@
     impermanence.url = "github:nix-community/impermanence";
 
     nix-resources.url = "git+ssh://git@github.com/JManch/nix-resources";
-    # nix-resourcesurl = "git+file:///home/joshua/repos/nix-resources";
+    # nix-resources.url = "git+file:///home/joshua/repos/nix-resources";
     nix-resources.inputs.nixpkgs.follows = "nixpkgs";
 
     anyrun.url = "github:Kirottu/anyrun";

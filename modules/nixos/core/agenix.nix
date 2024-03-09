@@ -2,6 +2,7 @@
 {
   imports = [
     inputs.agenix.nixosModules.default
+    inputs.nix-resources.nixosModules.secrets
   ];
 
   environment.systemPackages = [

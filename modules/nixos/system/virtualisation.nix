@@ -13,8 +13,6 @@ mkMerge [
     # We configure the vmVariant regardless of whether or not the host has
     # virtualisation enabled because it should be possible to create a VM of any host
     virtualisation.vmVariant = {
-      home-manager.extraSpecialArgs = { vmVariant = true; };
-
       device = mkVMOverride {
         monitors = [{
           name = "Virtual-1";
@@ -39,11 +37,6 @@ mkMerge [
           audio.enable = mkVMOverride false;
           virtualisation.enable = mkVMOverride false;
         };
-      };
-
-      users.users.${username} = {
-        password = mkVMOverride "test";
-        hashedPasswordFile = mkVMOverride null;
       };
 
       virtualisation =
@@ -136,7 +129,7 @@ mkMerge [
           # Run non-graphical session in a new terminal window
           if grep -q -- "-nographic" "$runscript"; then
             ${if config.usrEnv.desktop.enable then
-              "${(utils.homeConfig args).modules.desktop.terminal.exePath} --class qemu -e $runscript"
+              "${(utils.homeConfig args).modules.desktop.terminal.exePath} -e $runscript"
             else "$runscript"}
           else
             $runscript

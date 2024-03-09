@@ -26,5 +26,9 @@ in
         vmVariant = false;
       };
     };
+
+    virtualisation.vmVariant = {
+      home-manager.extraSpecialArgs = { vmVariant = true; };
+    };
   };
 }

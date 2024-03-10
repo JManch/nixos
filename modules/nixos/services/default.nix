@@ -51,14 +51,55 @@ in
       enable = mkEnableOption "Broadcast Box";
       autoStart = mkEnableOption "Broadcast Box service auto start";
     };
+
+    dns-server-stack = {
+      enable = mkEnableOption ''
+        a DNS server stack using Ctrld and dnsmasq. Intended for use on server
+        devices to provide DNS services on a network.
+      '';
+      enableIPv6 = mkEnableOption "IPv6 DNS responses";
+
+      listenPort = mkOption {
+        type = types.port;
+        default = 53;
+        description = "Listen port for DNS requests";
+      };
+
+      ctrldListenPort = mkOption {
+        type = types.port;
+        default = 5354;
+        description = "Listen port for the internal Ctrld DNS server";
+      };
+
+      routerAddress = mkOption {
+        type = types.str;
+        default = null;
+        description = ''
+          Local IP address of the router that internal DDNS queries should be
+          pointed to.
+        '';
+      };
+    };
   };
 
   config = {
     services.udisks2.enable = config.modules.services.udisks.enable;
 
-    assertions = [{
-      assertion = cfg.greetd.enable -> (cfg.greetd.sessionDirs != [ ]);
-      message = "Greetd session dirs must be set";
-    }];
+    assertions = [
+      {
+        assertion = cfg.greetd.enable -> (cfg.greetd.sessionDirs != [ ]);
+        message = "Greetd session dirs must be set";
+      }
+
+      {
+        assertion = cfg.dns-server-stack.enable -> (config.device.ipAddress != null);
+        message = "The DNS server stack requires the device to have a static IP address set";
+      }
+
+      # {
+      #   assertion = cfg.dns-server-stack.enable -> (cfg.dns-server-stack.routerAddress != "");
+      #   message = "The DNS server stack requires the device to have a router IP address set";
+      # }
+    ];
   };
 }

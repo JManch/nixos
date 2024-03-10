@@ -18,6 +18,7 @@ in
     networking = {
       tcpOptimisations = mkEnableOption "TCP optimisations";
       resolved.enable = mkEnableOption "Resolved";
+      forceNoDHCP = mkEnableOption "forceful disabling of DHCP";
 
       wireless = {
         enable = mkEnableOption "wireless";

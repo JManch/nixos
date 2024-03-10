@@ -7,6 +7,7 @@
     type = "server";
     cpu.type = "amd";
     gpu.type = null;
+    ipAddress = "192.168.89.2";
   };
 
   usrEnv = {
@@ -25,23 +26,19 @@
 
     services = {
       caddy.enable = true;
+      dns-server-stack = {
+        enable = true;
+        routerAddress = "192.168.88.1";
+        enableIPv6 = false;
+      };
     };
 
     system = {
       networking = {
-        tcpOptimisations = true;
         firewall.enable = true;
-        # TODO: Need to think about this
-        resolved.enable = false;
+        tcpOptimisations = true;
+        forceNoDHCP = true;
       };
-    };
-  };
-
-  virtualisation.vmVariant = {
-    virtualisation = {
-      # TODO: Make this modular based on host spec
-      memorySize = 4096; # Use 2048MiB memory.
-      cores = 8;
     };
   };
 }

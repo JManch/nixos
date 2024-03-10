@@ -63,7 +63,7 @@ in
       "/var/lib/nixos"
       "/var/db/sudo/lectured"
       # Unfortunately it isn't possible to persist individual state folders for
-      # services using DynamicUsers=yes. This is because systemd assigns
+      # services using DynamicUser=yes. This is because systemd assigns
       # dynamic UIDs to users of this service so it's impossible to set the
       # required permissions with impermanence. Services place this dynamic
       # user folder in /var/lib/private/<service>. I will add commented out

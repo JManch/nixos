@@ -6,7 +6,7 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkMerge mkIf utils optional optionals getExe' mkDefault;
+  inherit (lib) mkMerge mkIf utils optional mkForce optionals getExe' mkDefault;
   cfg = config.modules.system.networking;
   homeManagerFirewall = (utils.homeConfig args).firewall;
 in
@@ -22,7 +22,7 @@ in
 
   networking = {
     hostName = hostname;
-    useDHCP = mkDefault true;
+    useDHCP = if cfg.forceNoDHCP then mkForce false else mkDefault true;
 
     networkmanager = {
       enable = true;

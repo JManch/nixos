@@ -113,6 +113,15 @@ in
       type = types.listOf (types.submodule monitorSubmodule);
       default = [ ];
     };
+
+    ipAddress = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+        The local IP address of the device. Must be a static address. Do not
+        set if the device's IP address is dynamic.
+      '';
+    };
   };
 
   config =

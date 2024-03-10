@@ -126,6 +126,9 @@ mkMerge [
           # Print ports mapped to the VM
           echo "\nMapped Ports:\n$(${grep} -o 'hostfwd=[^,]*' $runscript | ${sed} 's/hostfwd=//g')"
 
+          # TODO: On second thought, sshing in is vastly superior to this
+          # configure automatic SSH here instead
+
           # Run non-graphical session in a new terminal window
           if grep -q -- "-nographic" "$runscript"; then
             ${if config.usrEnv.desktop.enable then

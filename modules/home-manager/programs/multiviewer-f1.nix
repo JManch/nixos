@@ -12,10 +12,10 @@ let
 
   multiviewer-for-f1 =
     pkgs.multiviewer-for-f1.overrideAttrs (_: rec {
-      version = "1.31.4";
+      version = "1.31.7";
       src = pkgs.fetchurl {
-        url = "https://releases.multiviewer.app/download/154454223/multiviewer-for-f1_${version}_amd64.deb";
-        sha256 = "sha256-HlKs4GMyHLLfQUGSsX6O8ImJ9GCoSc9KAHEuDESohvw=";
+        url = "https://releases.multiviewer.app/download/155752210/multiviewer-for-f1_${version}_amd64.deb";
+        sha256 = "sha256-Tnr5Lvzoswhbvhs9SOprP2TcPbr6SP1uR3OqtnqiPrA=";
       };
       installPhase = ''
         runHook preInstall

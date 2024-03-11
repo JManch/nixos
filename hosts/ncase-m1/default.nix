@@ -5,6 +5,7 @@
 
   device = {
     type = "desktop";
+    ipAddress = "192.168.88.254";
 
     cpu = {
       name = "R7 3700x";

@@ -1,6 +1,7 @@
 { lib, config, username, ... }:
 let
   inherit (lib) mkIf optional mkForce;
+  inherit (config.modules.system.networking) publicPorts;
   cfg = config.modules.services.jellyfin;
 in
 mkIf cfg.enable
@@ -19,6 +20,7 @@ mkIf cfg.enable
         "/home/${username}/videos/shows:/var/lib/jellyfin/media/shows"
         "/home/${username}/videos/movies:/var/lib/jellyfin/media/movies"
       ];
+      SocketBindDeny = publicPorts;
     };
   };
 

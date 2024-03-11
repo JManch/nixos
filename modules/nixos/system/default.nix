@@ -38,6 +38,16 @@ in
           '';
         };
       };
+
+      publicPorts = mkOption {
+        type = types.listOf types.port;
+        default = [ ];
+        description = ''
+          List of ports that are both exposed in the firewall and port
+          forwarded to the internet. Used to block access to these ports from
+          all systemd services that shouldn't bind to them.
+        '';
+      };
     };
 
     audio = {

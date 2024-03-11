@@ -12,6 +12,7 @@
 }:
 let
   inherit (lib) mkIf mkForce mkVMOverride mapAttrs' nameValuePair filterAttrs;
+  inherit (config.modules.system.networking) publicPorts;
   cfg = config.modules.services.dns-server-stack;
 
   # Patch Ctrld to enable loading endpoints from environment variables
@@ -68,6 +69,7 @@ mkIf cfg.enable
 
   systemd.services.ctrld.serviceConfig = {
     EnvironmentFile = config.age.secrets.ctrldEndpoint.path;
+    SocketBindDeny = publicPorts;
   };
 
   services.dnsmasq = {

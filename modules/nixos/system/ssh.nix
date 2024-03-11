@@ -1,4 +1,5 @@
 { lib
+, pkgs
 , config
 , outputs
 , username
@@ -6,7 +7,7 @@
 , ...
 }:
 let
-  inherit (lib) mapAttrs optional;
+  inherit (lib) mapAttrs optional getExe';
   cfg = config.modules.system.ssh;
 in
 {
@@ -51,6 +52,21 @@ in
       "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
     };
   };
+
+  programs.zsh.interactiveShellInit =
+    let
+      sshAdd = getExe' pkgs.openssh "ssh-add";
+    in
+      /*bash*/ ''
+
+      ssh-add-quiet() {
+        keys=$(${sshAdd} -l)
+        if [[ "$keys" == "The agent has no identities." ]]; then
+          ${sshAdd}
+        fi
+      }
+
+    '';
 
   security.pam.sshAgentAuth = {
     enable = true;

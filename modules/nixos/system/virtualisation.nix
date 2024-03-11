@@ -113,6 +113,8 @@ mkMerge [
     programs.zsh.interactiveShellInit =
       let
         inherit (lib) utils;
+        inherit (homeConfig.modules.desktop) terminal;
+        homeConfig = utils.homeConfig args;
         grep = getExe pkgs.gnugrep;
         sed = getExe pkgs.gnused;
       in
@@ -123,6 +125,7 @@ mkMerge [
             echo "Usage: build-vm <hostname>"
             return 1
           fi
+
           # Build the VM
           runscript="/home/${username}/result/bin/run-$1-vm"
           cd && sudo nixos-rebuild build-vm --flake /home/${username}/.config/nixos#$1
@@ -131,17 +134,29 @@ mkMerge [
           # Print ports mapped to the VM
           echo "\nMapped Ports:\n$(${grep} -o 'hostfwd=[^,]*' $runscript | ${sed} 's/hostfwd=//g')"
 
-          # TODO: On second thought, sshing in is vastly superior to this
-          # configure automatic SSH here instead
-
-          # Run non-graphical session in a new terminal window
+          # For non-graphical VMs, launch VM and start ssh session in new
+          # terminal windows
           if grep -q -- "-nographic" "$runscript"; then
-            ${if config.usrEnv.desktop.enable then
-              "${(utils.homeConfig args).modules.desktop.terminal.exePath} -e $runscript"
+            ${if config.usrEnv.desktop.enable then /*bash*/ ''
+              ${terminal.exePath} -e "zsh" "-i" "-c" "ssh-vm; zsh -i" &
+              ${terminal.exePath} --class qemu -e $runscript
+            ''
             else "$runscript"}
           else
             $runscript
           fi
+        }
+
+        ssh-vm() {
+          ssh-add-quiet
+          echo "Attempting SSH connection to VM..."; 
+          # Extra connection attempts as VM may be starting up
+          ssh \
+            -o "StrictHostKeyChecking=no" \
+            -o "UserKnownHostsFile=/dev/null" \
+            -o "LogLevel=QUIET" \
+            -o "ConnectionAttempts 30" \
+            ${username}@127.0.0.1 -p 50022;
         }
 
       '';

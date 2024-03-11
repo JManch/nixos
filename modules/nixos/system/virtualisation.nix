@@ -5,7 +5,7 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf mkMerge mkVMOverride mod getExe;
+  inherit (lib) mkIf mkMerge mkVMOverride mod getExe optionals;
   cfg = config.modules.system.virtualisation;
 in
 mkMerge [
@@ -56,7 +56,7 @@ mkMerge [
           cores = 8;
           graphics = desktopEnabled;
           qemu = {
-            options = lib.lists.optionals desktopEnabled [
+            options = optionals desktopEnabled [
               # Allows nixos-rebuild build-vm graphical session
               # https://github.com/NixOS/nixpkgs/issues/59219
               "-device virtio-vga-gl"
@@ -72,6 +72,11 @@ mkMerge [
           # multiple times?
           forwardPorts =
             let
+              # It's important to use firewall rules from the vmVariant here
+              inherit (config.virtualisation.vmVariant.networking.firewall)
+                allowedTCPPorts
+                allowedUDPPorts;
+
               forward = proto: port: {
                 from = "host";
                 # Attempt to map host port to a unique value between 50000-65000
@@ -81,9 +86,9 @@ mkMerge [
                 proto = proto;
               };
             in
-            map (forward "tcp") config.networking.firewall.allowedTCPPorts
+            map (forward "tcp") allowedTCPPorts
             ++
-            map (forward "udp") config.networking.firewall.allowedUDPPorts;
+            map (forward "udp") allowedUDPPorts;
         };
     };
   }

@@ -118,8 +118,8 @@ in
       type = types.nullOr types.str;
       default = null;
       description = ''
-        The local IP address of the device. Must be a static address. Do not
-        set if the device's IP address is dynamic.
+        The local IP address of the device on my home network. Must be a static
+        address.
       '';
     };
   };

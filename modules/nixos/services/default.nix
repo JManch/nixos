@@ -134,11 +134,10 @@ in
         message = "The DNS server stack requires the device to have a static IP address set";
       }
 
-      # {
-      #   assertion = cfg.dns-server-stack.enable -> (cfg.dns-server-stack.routerAddress != "");
-      #   message = "The DNS server stack requires the device to have a router IP address set";
-      # }
       {
+        assertion = cfg.dns-server-stack.enable -> (cfg.dns-server-stack.routerAddress != "");
+        message = "The DNS server stack requires the device to have a router IP address set";
+      }
 
       {
         assertion = cfg.frigate.enable -> (cfg.frigate.nvrAddress != "");

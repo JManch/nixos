@@ -7,7 +7,32 @@ in
 
   options.modules.system = {
     bluetooth.enable = mkEnableOption "bluetooth";
-    virtualisation.enable = mkEnableOption "virtualisation";
+
+    virtualisation = {
+      enable = mkEnableOption "virtualisation";
+
+      mappedTCPPorts = mkOption {
+        type = types.listOf (types.attrsOf types.port);
+        default = [ ];
+        example = [{ vmPort = 8999; hostPort = 9003; }];
+        description = ''
+          Map TCP ports from VM to host. Forceful alternative to opening the
+          firewall as it does not attempt to avoid clashes by mapping port into
+          50000-65000 range.
+        '';
+      };
+
+      mappedUDPPorts = mkOption {
+        type = types.listOf (types.attrsOf types.port);
+        default = [ ];
+        example = [{ vmPort = 8999; hostPort = 9003; }];
+        description = ''
+          Map UDP ports from VM to host. Forceful alternative to opening the
+          firewall as it does not attempt to avoid clashes by mapping port into
+          50000-65000 range.
+        '';
+      };
+    };
 
     ssh.enable = mkOption {
       type = types.bool;

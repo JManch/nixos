@@ -28,14 +28,15 @@ mkMerge [
 
       modules = {
         system = {
+          bluetooth.enable = mkVMOverride false;
+          audio.enable = mkVMOverride false;
+          virtualisation.enable = mkVMOverride false;
+
           networking = {
             tcpOptimisations = mkVMOverride false;
             wireless.enable = mkVMOverride false;
             firewall.enable = mkVMOverride false;
           };
-          bluetooth.enable = mkVMOverride false;
-          audio.enable = mkVMOverride false;
-          virtualisation.enable = mkVMOverride false;
         };
       };
 
@@ -76,19 +77,28 @@ mkMerge [
               inherit (config.virtualisation.vmVariant.networking.firewall)
                 allowedTCPPorts
                 allowedUDPPorts;
+              inherit (config.virtualisation.vmVariant.modules.system.virtualisation)
+                mappedTCPPorts
+                mappedUDPPorts;
 
-              forward = proto: port: {
+              forward = proto: mapped: port: {
                 from = "host";
-                # Attempt to map host port to a unique value between 50000-65000
-                # Might need manual intervention
-                host = { port = (mod port 15001) + 50000; address = "127.0.0.1"; };
-                guest.port = port;
+                # If not mapped, attempt to map host port to a unique value between 50000-65000
+                host = {
+                  port = if mapped then port.hostPort else (mod port 15001) + 50000;
+                  address = "127.0.0.1";
+                };
+                guest.port = if mapped then port.vmPort else port;
                 proto = proto;
               };
             in
-            map (forward "tcp") allowedTCPPorts
+            map (forward "tcp" false) allowedTCPPorts
             ++
-            map (forward "udp") allowedUDPPorts;
+            map (forward "udp" false) allowedUDPPorts
+            ++
+            map (forward "tcp" true) mappedTCPPorts
+            ++
+            map (forward "udp" true) mappedUDPPorts;
         };
     };
   }

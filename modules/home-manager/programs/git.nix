@@ -31,7 +31,7 @@ mkIf cfg.enable {
       lg = "lazygit";
     };
 
-    initExtra = ''
+    initExtra = /*bash*/ ''
       lazygit() {
         ssh-add-quiet
         command ${getExe config.programs.lazygit.package} "$@"

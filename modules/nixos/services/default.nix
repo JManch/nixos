@@ -93,6 +93,26 @@ in
         '';
       };
     };
+
+    frigate = {
+      enable = mkEnableOption "Frigate";
+
+      rtspAddress = mkOption {
+        type = types.functionTo types.str;
+        default = _: "";
+        description = ''
+          Function accepting channel and subtype that returns the RTSP address string.
+        '';
+      };
+
+      nvrAddress = mkOption {
+        type = types.str;
+        default = "";
+        description = ''
+          IP address of the NVR on the local network.
+        '';
+      };
+    };
   };
 
   config = {
@@ -118,6 +138,12 @@ in
       #   assertion = cfg.dns-server-stack.enable -> (cfg.dns-server-stack.routerAddress != "");
       #   message = "The DNS server stack requires the device to have a router IP address set";
       # }
+      {
+
+      {
+        assertion = cfg.frigate.enable -> (cfg.frigate.nvrAddress != "");
+        message = "The Frigate service requires nvrAddress to be set";
+      }
     ];
   };
 }

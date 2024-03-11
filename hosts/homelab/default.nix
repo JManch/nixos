@@ -38,6 +38,11 @@
         routerAddress = "192.168.88.1";
         enableIPv6 = false;
       };
+
+      frigate = {
+        enable = true;
+        nvrAddress = "192.168.88.229";
+      };
     };
 
     system = {

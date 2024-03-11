@@ -11,7 +11,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkForce mkVMOverride removePrefix;
+  inherit (lib) mkIf mkForce mkVMOverride mapAttrs' nameValuePair filterAttrs;
   cfg = config.modules.services.dns-server-stack;
 
   # Patch Ctrld to enable loading endpoints from environment variables
@@ -79,10 +79,6 @@ mkIf cfg.enable
     settings = {
       port = cfg.listenPort;
 
-      # Home hosts file declares hostnames for all devices on my local network.
-      # Dnsmasq will resolve hostnames with a .lan postfix using this file.
-      addn-hosts = config.age.secrets.homeHosts.path;
-
       # Never forward dns queries without a domain to upstream nameservers
       domain-needed = true;
 
@@ -115,13 +111,22 @@ mkIf cfg.enable
       server = [ "127.0.0.1#${toString cfg.ctrldListenPort}" ];
       address = with inputs.nix-resources.secrets; [
         # Point DDNS domain to router
-        "/${ddns}/${cfg.routerAddress}"
+        "/ddns.${fqDomain}/${cfg.routerAddress}"
 
         # Point reverse proxy traffic to the device to avoid need for hairpin NAT
-        "/${removePrefix "ddns." ddns}/${config.device.ipAddress}"
+        "/${fqDomain}/${config.device.ipAddress}"
       ];
     };
   };
+
+  # Home hosts file declares hostnames for all devices on my local network
+  networking.hosts = inputs.nix-resources.secrets.homeHosts // {
+    "${cfg.routerAddress}" = [ "router" ];
+  } //
+    # Add all hosts that have a static local address
+    (mapAttrs'
+      (host: v: nameValuePair (v.config.device.ipAddress) ([ host ]))
+      (filterAttrs (host: v: v.config.device.ipAddress != null) outputs.nixosConfigurations));
 
   # Open DNS ports in firewall and set nameserver to localhost
   networking.firewall.allowedTCPPorts = [ cfg.listenPort ];

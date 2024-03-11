@@ -52,6 +52,19 @@ in
       autoStart = mkEnableOption "Broadcast Box service auto start";
     };
 
+    caddy = {
+      enable = mkEnableOption "Caddy";
+
+      lanAddressRanges = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of address ranges defining the local network. Endpoints marked
+          as 'lan_only' will only accept connections from these ranges.
+        '';
+      };
+    };
+
     dns-server-stack = {
       enable = mkEnableOption ''
         a DNS server stack using Ctrld and dnsmasq. Intended for use on server
@@ -89,6 +102,11 @@ in
       {
         assertion = cfg.greetd.enable -> (cfg.greetd.sessionDirs != [ ]);
         message = "Greetd session dirs must be set";
+      }
+
+      {
+        assertion = cfg.caddy.enable -> (cfg.caddy.lanAddressRanges != [ ]);
+        message = "LAN address ranges must be set for Caddy";
       }
 
       {

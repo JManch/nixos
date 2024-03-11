@@ -25,7 +25,14 @@
     };
 
     services = {
-      caddy.enable = true;
+      caddy = {
+        enable = false;
+        lanAddressRanges = [
+          "192.168.0.0/16"
+          "10.20.20.0/24"
+        ];
+      };
+
       dns-server-stack = {
         enable = true;
         routerAddress = "192.168.88.1";

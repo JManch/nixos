@@ -184,7 +184,12 @@ mkIf cfg.enable
       '';
     };
 
-  persistence.directories = [ "/var/lib/frigate" ];
+  persistence.directories = [{
+    directory = "/var/lib/frigate";
+    user = "frigate";
+    group = "frigate";
+    mode = "700";
+  }];
 
   virtualisation.vmVariant = {
     # Ideally I would be able to restream the RTSP feed (or stream a fake RTSP

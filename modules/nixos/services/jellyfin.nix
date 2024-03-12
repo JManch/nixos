@@ -2,6 +2,7 @@
 let
   inherit (lib) mkIf optional mkForce;
   inherit (config.modules.system.networking) publicPorts;
+  inherit (config.services) jellyfin;
   cfg = config.modules.services.jellyfin;
 in
 mkIf cfg.enable
@@ -25,9 +26,14 @@ mkIf cfg.enable
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/jellyfin/media/shows 700 jellyfin jellyfin"
-    "d /var/lib/jellyfin/media/movies 700 jellyfin jellyfin"
+    "d /var/lib/jellyfin/media/shows 700 ${jellyfin.user} ${jellyfin.group}"
+    "d /var/lib/jellyfin/media/movies 700 ${jellyfin.user} ${jellyfin.group}"
   ];
 
-  persistence.directories = [ "/var/lib/jellyfin" ];
+  persistence.directories = [{
+    directory = "/var/lib/jellyfin";
+    user = jellyfin.user;
+    group = jellyfin.group;
+    mode = "700";
+  }];
 }

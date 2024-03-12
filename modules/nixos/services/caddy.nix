@@ -58,8 +58,18 @@ mkIf cfg.enable
     MemoryDenyWriteExecute = true;
   };
 
-  persistence.directories = [
-    "/var/lib/caddy"
-    "/var/log/caddy"
-  ];
+  persistence.directories =
+    let
+      inherit (config.service) caddy;
+      definition = dir: {
+        directory = dir;
+        user = caddy.user;
+        group = caddy.group;
+        mode = "700";
+      };
+    in
+    [
+      (definition "/var/lib/caddy")
+      (definition "/var/log/caddy")
+    ];
 }

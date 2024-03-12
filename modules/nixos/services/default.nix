@@ -10,6 +10,7 @@ in
     udisks.enable = mkEnableOption "udisks";
     wireguard.enable = mkEnableOption "WireGuard";
     corectrl.enable = mkEnableOption "Corectrl";
+    home-assistant.enable = mkEnableOption "Home Assistant";
 
     greetd = {
       enable = mkEnableOption "Greetd with TUIgreet";

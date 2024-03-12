@@ -25,6 +25,8 @@
     };
 
     services = {
+      home-assistant.enable = true;
+
       caddy = {
         enable = false;
         lanAddressRanges = [

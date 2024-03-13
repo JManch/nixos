@@ -8,11 +8,13 @@
 
     nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-personal";
     # nixpkgs.url = "git+file:///home/joshua/repos/nixpkgs?ref=nixos-unstable-personal";
-    nix-colors.url = "github:misterio77/nix-colors";
     impermanence.url = "github:nix-community/impermanence";
 
-    nix-resources.url = "git+ssh://git@github.com/JManch/nix-resources";
+    nix-colors.url = "github:misterio77/nix-colors";
+    nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
+
     # nix-resources.url = "git+file:///home/joshua/repos/nix-resources";
+    nix-resources.url = "git+ssh://git@github.com/JManch/nix-resources";
     nix-resources.inputs.nixpkgs.follows = "nixpkgs";
 
     anyrun.url = "github:Kirottu/anyrun";
@@ -25,32 +27,34 @@
     agenix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.inputs.home-manager.follows = "home-manager";
 
-    spicetify.url = "github:the-argus/spicetify-nix";
-    spicetify.inputs.nixpkgs.follows = "nixpkgs";
-
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
-
-    nix-matlab.url = "gitlab:doronbehar/nix-matlab";
-    nix-matlab.inputs.nixpkgs.follows = "nixpkgs";
-
-    nix-gaming.url = "github:fufexan/nix-gaming";
-    nix-gaming.inputs.nixpkgs.follows = "nixpkgs";
-
-    nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
-    nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
-
-    lanzaboote.url = "github:nix-community/lanzaboote";
-    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
-
-    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay?rev=a40f72d64c0336532546ee3760040c1f0a6607cf";
-    neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
 
     hypridle.url = "github:hyprwm/hypridle";
     hypridle.inputs.nixpkgs.follows = "nixpkgs";
 
     hyprlock.url = "github:hyprwm/hyprlock";
     hyprlock.inputs.nixpkgs.follows = "nixpkgs";
+
+    nix-matlab.url = "gitlab:doronbehar/nix-matlab";
+    nix-matlab.inputs.nixpkgs.follows = "nixpkgs";
+
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+
+    nix-gaming.url = "github:fufexan/nix-gaming";
+    nix-gaming.inputs.nixpkgs.follows = "nixpkgs";
+    nix-gaming.inputs.flake-parts.follows = "flake-parts";
+
+    nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
+    nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
+
+    lanzaboote.url = "github:nix-community/lanzaboote";
+    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
+    lanzaboote.inputs.pre-commit-hooks-nix.follows = "";
+
+    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay?rev=a40f72d64c0336532546ee3760040c1f0a6607cf";
+    neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, home-manager, ... } @ inputs:

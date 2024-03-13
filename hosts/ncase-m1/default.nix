@@ -84,7 +84,8 @@
       ollama.enable = false; # FIX: waiting for nixpkgs update
       broadcast-box.enable = true;
       greetd.enable = true;
-      corectrl.enable = true;
+      corectrl.enable = false;
+      lact.enable = true;
 
       jellyfin = {
         enable = true;

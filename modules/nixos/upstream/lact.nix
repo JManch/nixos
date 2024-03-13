@@ -5,10 +5,9 @@ let
     getExe
     mkEnableOption
     mkOption
+    types
     mkPackageOption;
   cfg = config.services.lact;
-  yamlFormat = pkgs.formats.yaml { };
-  configFile = yamlFormat.generate "config.yaml" cfg.settings;
 in
 {
   options = {
@@ -17,8 +16,8 @@ in
       package = mkPackageOption pkgs "lact" { };
 
       settings = mkOption {
-        type = yamlFormat.type;
-        default = { };
+        type = types.str;
+        default = "";
       };
     };
   };
@@ -26,8 +25,8 @@ in
   config = mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
 
-    environment.etc."lact/config.yaml" = mkIf (cfg.settings != { }) {
-      source = configFile;
+    environment.etc."lact/config.yaml" = mkIf (cfg.settings != "") {
+      text = cfg.settings;
     };
 
     systemd.services.lact = {
@@ -38,8 +37,6 @@ in
 
       serviceConfig = {
         ExecStart = "${getExe cfg.package} daemon";
-        Restart = "always";
-        RestartSec = "3s";
       };
 
       wantedBy = [ "multi-user.target" ];

@@ -75,13 +75,14 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
   wayland.windowManager.hyprland = {
     enable = true;
-    # By default Hyprland adds stdenv.cc, binutils and pciutils to path. I
-    # think it's to fix plugin API function hooking.
-    # https://github.com/hyprwm/Hyprland/pull/2292 
-    # Since I don't use plugins I can use the unwrapped package and keep my
-    # path clean.
-    # WARNING: If you ever want to use plugins switch to the wrapped package
-    package = hyprlandPkgs.hyprland-unwrapped;
+    # By default Hyprland adds stdenv.cc, binutils and pciutils to path with
+    # propagatedBuildInputs. I think it's to fix plugin API function hooking.
+    # https://github.com/hyprwm/Hyprland/pull/2292 Since I don't use plugins I
+    # can remove them and keep my path clean.
+    # WARNING: If you ever want to use plugins remove this override
+    package = hyprlandPkgs.hyprland.overrideAttrs (oldAttrs: {
+      propagatedBuildInputs = [ ];
+    });
 
     systemd = {
       enable = true;

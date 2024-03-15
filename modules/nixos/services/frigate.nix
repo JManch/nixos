@@ -108,6 +108,8 @@ mkIf cfg.enable
   systemd.services.frigate.serviceConfig = {
     EnvironmentFile = config.age.secrets.cctvVars.path;
     SocketBindDeny = publicPorts;
+    # WARN: The upstream module tries to set a read only bind path with BindPaths
+    # which is invalid, I'm not sure if it affects functionality?
   };
 
   systemd.services.nginx.serviceConfig = {

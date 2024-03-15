@@ -5,8 +5,77 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf mkMerge mkVMOverride mod getExe optionals;
+  inherit (lib) utils mkIf mkMerge mkVMOverride mod optionals;
+  inherit (homeConfig.modules.desktop) terminal;
+  homeConfig = utils.homeConfig args;
   cfg = config.modules.system.virtualisation;
+
+  runVMScript = pkgs.writeShellApplication {
+    name = "run-vm";
+    runtimeInputs = with pkgs; [
+      gnugrep
+      gnused
+      gnutar
+      age
+      openssh
+    ];
+    text = /*bash*/ ''
+
+      if [ -z "$1" ]; then
+        echo "Usage: build-vm <hostname>"
+        exit 1
+      fi
+      hostname=$1
+
+      # Build the VM
+      runscript="/home/${username}/result/bin/run-$hostname-vm"
+      cd
+      sudo nixos-rebuild build-vm --flake "/home/${username}/.config/nixos#$hostname"
+
+      # Print ports mapped to the VM
+      printf '\nMapped Ports:\n%s' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
+
+      if [[ ! -e "/home/${username}/$hostname.qcow2" ]]; then
+        # Decrypt the relevant secrets from kit
+        kit_path="/home/${username}/files/secrets/ssh-bootstrap-kit"
+        if [[ ! -e "$kit_path" ]]; then
+          echo "Error: SSH bootstrap kit is not in the expected path '$kit_path'" >&2
+          exit 1
+        fi
+
+        temp=$(mktemp -d)
+        cleanup() {
+          rm -rf "$temp"
+        }
+        trap cleanup EXIT
+
+        echo
+        age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
+        tar -xf "$temp/ssh-bootstrap-kit.tar" --strip-components=1 -C "$temp" "$hostname"
+        rm -f "$temp/ssh-bootstrap-kit.tar"
+
+        # Copy keys to VM
+        printf "Copying SSH keys to VM...\nNOTE: Secret decryption will not work on the first VM launch"
+        (scp -P 50022 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+          -o LogLevel=QUIET -o ConnectionAttempts=30 \
+          "$temp/ssh_host_ed25519_key" "$temp/ssh_host_ed25519_key.pub" \
+          root@127.0.0.1:/persist/etc/ssh; rm -rf "$temp") &
+      fi
+
+      # For non-graphical VMs, launch VM and start ssh session in new
+      # terminal windows
+      if grep -q -- "-nographic" "$runscript"; then
+        ${if config.usrEnv.desktop.enable then /*bash*/ ''
+          ${terminal.exePath} -e "zsh" "-i" "-c" "ssh-vm; zsh -i" &
+          ${terminal.exePath} --class qemu -e "$runscript"
+        ''
+        else "$runscript"}
+      else
+        $runscript
+      fi
+
+    '';
+  };
 in
 mkMerge [
   {
@@ -104,6 +173,7 @@ mkMerge [
   }
 
   (mkIf cfg.enable {
+    environment.systemPackages = [ runVMScript ];
     programs.virt-manager.enable = true;
     users.users.${username}.extraGroups = [ "libvirtd" "docker" ];
 
@@ -120,56 +190,21 @@ mkMerge [
       docker.enable = false;
     };
 
-    programs.zsh.interactiveShellInit =
-      let
-        inherit (lib) utils;
-        inherit (homeConfig.modules.desktop) terminal;
-        homeConfig = utils.homeConfig args;
-        grep = getExe pkgs.gnugrep;
-        sed = getExe pkgs.gnused;
-      in
-        /*bash*/ ''
+    programs.zsh.interactiveShellInit = /*bash*/ ''
 
-        run-vm() {
-          if [ -z "$1" ]; then
-            echo "Usage: build-vm <hostname>"
-            return 1
-          fi
+      ssh-vm() {
+        ssh-add-quiet
+        echo "Attempting SSH connection to VM..."; 
+        # Extra connection attempts as VM may be starting up
+        ssh \
+          -o "StrictHostKeyChecking=no" \
+          -o "UserKnownHostsFile=/dev/null" \
+          -o "LogLevel=QUIET" \
+          -o "ConnectionAttempts=30" \
+          ${username}@127.0.0.1 -p 50022;
+      }
 
-          # Build the VM
-          runscript="/home/${username}/result/bin/run-$1-vm"
-          cd && sudo nixos-rebuild build-vm --flake /home/${username}/.config/nixos#$1
-          if [ $? -ne 0 ]; then return 1; fi
-
-          # Print ports mapped to the VM
-          echo "\nMapped Ports:\n$(${grep} -o 'hostfwd=[^,]*' $runscript | ${sed} 's/hostfwd=//g')"
-
-          # For non-graphical VMs, launch VM and start ssh session in new
-          # terminal windows
-          if grep -q -- "-nographic" "$runscript"; then
-            ${if config.usrEnv.desktop.enable then /*bash*/ ''
-              ${terminal.exePath} -e "zsh" "-i" "-c" "ssh-vm; zsh -i" &
-              ${terminal.exePath} --class qemu -e $runscript
-            ''
-            else "$runscript"}
-          else
-            $runscript
-          fi
-        }
-
-        ssh-vm() {
-          ssh-add-quiet
-          echo "Attempting SSH connection to VM..."; 
-          # Extra connection attempts as VM may be starting up
-          ssh \
-            -o "StrictHostKeyChecking=no" \
-            -o "UserKnownHostsFile=/dev/null" \
-            -o "LogLevel=QUIET" \
-            -o "ConnectionAttempts 30" \
-            ${username}@127.0.0.1 -p 50022;
-        }
-
-      '';
+    '';
 
     persistence.directories = [ "/var/lib/libvirt" ];
   })

@@ -47,8 +47,8 @@ in
         interfaces;
     };
 
-    wireless = {
-      enable = cfg.wireless.enable;
+    wireless = mkIf cfg.wireless.enable {
+      enable = true;
       environmentFile = config.age.secrets.wirelessNetworks.path;
       scanOnLowSignal = config.device.type == "laptop";
       # Allow imperative network config

@@ -69,6 +69,9 @@ in
   };
 
   nix = {
+    # Add flake inputs to the system's legacy channels
+    nixPath = [ "/etc/nix/path" ];
+
     # Populates the nix registry with all our flake inputs `nix registry list`
     registry = (mapAttrs (_: flake: { inherit flake; })) ((filterAttrs (_: isType "flake")) inputs)
       // { n.flake = inputs.nixpkgs; };
@@ -85,8 +88,6 @@ in
     };
   };
 
-  # Add flake inputs to the system's legacy channels
-  nix.nixPath = [ "/etc/nix/path" ];
   environment.etc =
     mapAttrs'
       (name: value: {

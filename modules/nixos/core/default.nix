@@ -11,6 +11,7 @@ in
   imports = lib.utils.scanPaths ./.;
 
   environment.systemPackages = [ pkgs.git ];
+  security.sudo.extraConfig = "Defaults lecture=never";
   time.timeZone = "Europe/London";
   system.stateVersion = "23.05";
 

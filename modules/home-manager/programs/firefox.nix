@@ -7,11 +7,10 @@
 }:
 let
   inherit (lib) mkIf getExe getExe';
+  inherit (config.modules) desktop;
   cfg = config.modules.programs.firefox;
   desktopCfg = config.modules.desktop;
   osDesktop = osConfig.usrEnv.desktop;
-  # color = base:
-  #   inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorscheme.colors.${base};
 in
 mkIf (cfg.enable && osDesktop.enable) {
   # Use systemd to synchronise Firefox data with persistent storage. Allows for
@@ -182,6 +181,11 @@ mkIf (cfg.enable && osDesktop.enable) {
         };
 
         userChrome = /* css */ ''
+          * {
+            font-family: "${desktop.style.font.family}" !important;
+            font-size: 14px !important; 
+          }
+
           /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/autohide_toolbox.css made available under Mozilla Public License v. 2.0
           See the above repository for updates as well as full license text. */
 
@@ -340,48 +344,3 @@ mkIf (cfg.enable && osDesktop.enable) {
       "${desktopCfg.hyprland.modKey}, Backspace, exec, ${firefox}"
     ];
 }
-# TODO: Either theme firefox with this or figure out how to change theme through GTK
-
-# /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/color_variable_template.css made available under Mozilla Public License v. 2.0
-# See the above repository for updates as well as full license text. */
-#
-# /* You should enable any non-default theme for these to apply properly. Built-in dark and light themes should work */
-# :root{
-#   /* Popup panels */
-#   --arrowpanel-background: rgb(${color "base02"}) !important;
-#   --arrowpanel-border-color: rgb(${color "base00"}) !important;
-#   --arrowpanel-color: rgb(${color "base05"}) !important;
-#   --arrowpanel-dimmed: rgb(${color "base00"}) !important;
-#   /* window and toolbar background */
-#   --lwt-accent-color: rgb(${color "base02"}) !important;
-#   --lwt-accent-color-inactive: rgb(${color "base03"}) !important;
-#   --toolbar-bgcolor: rgb(${color "base00"}) !important;  
-#   /* tabs with system theme - text is not controlled by variable */
-#   --tab-selected-bgcolor: rgb(${color "base00"}) !important;
-#   /* tabs with any other theme */
-#   --lwt-text-color: rgb(${color "base05"}) !important;
-#   --lwt-selected-tab-background-color: rgb(${color "base02"}) !important;
-#   /* toolbar area */
-#   --toolbarbutton-icon-fill: rgb(${color "base05"}) !important;
-#   --lwt-toolbarbutton-hover-background: rgb(${color "base02"}) !important;
-#   --lwt-toolbarbutton-active-background: rgb(${color "base03"}) !important;
-#   /* urlbar */
-#   --toolbar-field-border-color: rgb(${color "base02"}) !important;
-#   --toolbar-field-focus-border-color: rgb(${color "base00"}) !important;
-#   --urlbar-popup-url-color: rgb(${color "base02"}) !important;
-#   /* urlbar Firefox 92+ */
-#   --toolbar-field-background-color: rgb(${color "base05"}) !important;
-#   --toolbar-field-focus-background-color: rgb(${color "base04"}) !important;
-#   --toolbar-field-color: rgb(${color "base02"}) !important;
-#   --toolbar-field-focus-color: rgb(${color "base05"}) !important;
-#   /* sidebar - note the sidebar-box rule for the header-area */
-#   --lwt-sidebar-background-color: rgb(${color "base02"}) !important;
-#   --lwt-sidebar-text-color: rgb(${color "base05"}) !important;
-# }
-# /* line between nav-bar and tabs toolbar,
-#     also fallback color for border around selected tab */
-# #navigator-toolbox{ --lwt-tabs-border-color: rgb(${color "base02"}) !important; }
-# /* Line above tabs */
-# #tabbrowser-tabs{ --lwt-tab-line-color: rgb(${color "base00"}) !important; }
-# /* the header-area of sidebar needs this to work */
-# #sidebar-box{ --sidebar-background-color: rgb(${color "base00"}) !important; }

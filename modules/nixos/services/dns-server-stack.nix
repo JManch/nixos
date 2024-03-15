@@ -11,7 +11,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkForce mkVMOverride mapAttrs' nameValuePair filterAttrs;
+  inherit (lib) mkIf mkForce mkVMOverride mapAttrs' nameValuePair filterAttrs utils;
   inherit (config.modules.system.networking) publicPorts;
   cfg = config.modules.services.dns-server-stack;
 
@@ -128,7 +128,7 @@ mkIf cfg.enable
     # Add all hosts that have a static local address
     (mapAttrs'
       (host: v: nameValuePair (v.config.device.ipAddress) ([ host ]))
-      (filterAttrs (host: v: v.config.device.ipAddress != null) outputs.nixosConfigurations));
+      (filterAttrs (host: v: v.config.device.ipAddress != null) (utils.hosts outputs)));
 
   # Open DNS ports in firewall and set nameserver to localhost
   networking.firewall.allowedTCPPorts = [ cfg.listenPort ];
@@ -136,38 +136,36 @@ mkIf cfg.enable
   networking.nameservers = mkForce [ "127.0.0.1" ];
 
   # Harden the dnsmasq systemd service
-  systemd.services = {
-    dnsmasq = {
-      # The upstream service is very poorly configured
-      preStart = mkForce "dnsmasq --test";
-      restartTriggers = mkForce [ ];
+  systemd.services.dnsmasq = {
+    # The upstream service is very poorly configured
+    preStart = mkForce "dnsmasq --test";
+    restartTriggers = mkForce [ ];
 
-      serviceConfig = {
-        # Because of the '--user dnsmasq' launch flag, dnsmasq effectively runs
-        # as a private user anyway
-        LockPersonality = true;
-        NoNewPrivileges = true;
-        PrivateDevices = true;
-        PrivateMounts = true;
-        PrivateTmp = true;
-        ProtectSystem = mkForce "strict";
-        ProtectHome = true;
-        ProtectClock = true;
-        ProtectHostname = true;
-        ProtectProc = "invisible";
-        ProtectKernelLogs = true;
-        ProtectKernelModules = true;
-        ProtectKernelTunables = true;
-        RemoveIPC = true;
-        RestrictAddressFamilies = [ "AF_UNIX" "AF_NETLINK" "AF_INET" "AF_INET6" ];
-        RestrictNamespaces = true;
-        RestrictRealtime = true;
-        RestrictSUIDSGID = true;
-        SystemCallArchitectures = "native";
-        SocketBindDeny = "any";
-        SocketBindAllow = cfg.listenPort;
-        MemoryDenyWriteExecute = true;
-      };
+    serviceConfig = {
+      # Because of the '--user dnsmasq' launch flag, dnsmasq effectively runs
+      # as a private user anyway
+      LockPersonality = true;
+      NoNewPrivileges = true;
+      PrivateDevices = true;
+      PrivateMounts = true;
+      PrivateTmp = true;
+      ProtectSystem = mkForce "strict";
+      ProtectHome = true;
+      ProtectClock = true;
+      ProtectHostname = true;
+      ProtectProc = "invisible";
+      ProtectKernelLogs = true;
+      ProtectKernelModules = true;
+      ProtectKernelTunables = true;
+      RemoveIPC = true;
+      RestrictAddressFamilies = [ "AF_UNIX" "AF_NETLINK" "AF_INET" "AF_INET6" ];
+      RestrictNamespaces = true;
+      RestrictRealtime = true;
+      RestrictSUIDSGID = true;
+      SystemCallArchitectures = "native";
+      SocketBindDeny = "any";
+      SocketBindAllow = cfg.listenPort;
+      MemoryDenyWriteExecute = true;
     };
   };
 

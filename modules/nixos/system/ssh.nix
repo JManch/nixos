@@ -47,7 +47,7 @@ in
         publicKeyFile = ../../../hosts/${host}/ssh_host_ed25519_key.pub;
         extraHostNames = (optional (host == hostname) "localhost");
       })
-      outputs.nixosConfigurations)
+      (utils.hosts outputs))
     // {
       "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
     };

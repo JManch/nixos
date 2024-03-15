@@ -13,6 +13,8 @@ in
       patches = (oldAttrs.patches or [ ]) ++ patches;
     });
 
+  hosts = outputs: filterAttrs (host: v: (host != "installer")) outputs.nixosConfigurations;
+
   # Get list of all nix files and directories in path for easy importing
   scanPaths = path:
     map (f: (path + "/${f}"))

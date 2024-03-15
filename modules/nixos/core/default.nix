@@ -10,7 +10,6 @@ in
 {
   imports = lib.utils.scanPaths ./.;
 
-  programs.zsh.enable = true;
   environment.systemPackages = [ pkgs.git ];
   time.timeZone = "Europe/London";
   system.stateVersion = "23.05";

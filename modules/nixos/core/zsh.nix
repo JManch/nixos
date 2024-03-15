@@ -24,25 +24,24 @@ let
       hosts=(${lib.concatStringsSep " " (builtins.attrNames (utils.hosts outputs))})
       hostname=$1
       ip_address=$2
+      extra_args=''${3:-}
 
-      if ! [[ "''${hosts[@]}" =~ $hostname ]]; then
+      match=0
+      for host in "''${hosts[@]}"; do
+        if [[ $host = "$hostname" ]]; then
+          match=1
+          break
+        fi
+      done
+      if [[ $match = 0 ]]; then
         echo "Error: Host '$hostname' does not exist" >&2
         exit 1
       fi
 
       kit_path="/home/${username}/files/secrets/ssh-bootstrap-kit"
       if [[ ! -e "$kit_path" ]]; then
-        echo "Could not find ssh bootstrap kit in the expected path"
-        printf "Enter bootstrap kit path: "
-        read -r kit_path
-
-        # Resolve to absolute path if a relative path is provided
-        kit_path=$(cd $(dirname "$kit_path"); pwd -P)/$(basename "$kit_path")
-
-        if [[ ! -e $kit_path ]]; then
-          echo "Error: File does not exist: $kit_path" >&2
-          exit 1
-        fi
+        echo "Error: SSH bootstrap kit is not in the expected path '$kit_path'" >&2
+        exit 1
       fi
 
       temp=$(mktemp -d)
@@ -56,7 +55,7 @@ let
       tar -xf "$temp/ssh-bootstrap-kit.tar" --strip-components=1 -C "$temp/persist/etc/ssh" "$hostname"
       rm "$temp/ssh-bootstrap-kit.tar"
 
-      nixos-anywhere --extra-files "$temp" "$3" --flake "/home/${username}/.config/nixos#$hostname" root@$ip_address
+      nixos-anywhere --extra-files "$temp" "$extra_args" --flake "/home/${username}/.config/nixos#$hostname" "root@$ip_address"
     '';
   };
 in

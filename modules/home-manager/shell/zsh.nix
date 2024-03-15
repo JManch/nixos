@@ -36,14 +36,6 @@ mkIf cfg.enable {
     shellAliases = {
       cat = "bat -pp --theme=base16";
       reload = "exec zsh";
-      rebuild-switch = "sudo nixos-rebuild switch --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-test = "sudo nixos-rebuild test --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-boot = "sudo nixos-rebuild boot --flake /home/${username}/.config/nixos#${hostname}";
-      # cd here because I once had a bad experience where I accidentally built
-      # in /nix/store and it irrepairably corrupted the store
-      rebuild-build = "cd && nixos-rebuild build --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-dry-build = "nixos-rebuild dry-build --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-dry-activate = "sudo nixos-rebuild dry-activate --flake /home/${username}/.config/nixos#${hostname}";
       inspect-nix-config = "nix --extra-experimental-features repl-flake repl '/home/${username}/.config/nixos#nixosConfigurations.${hostname}'";
     };
 

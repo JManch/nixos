@@ -137,7 +137,7 @@ in
               sorted = sort (a: b: a < b) (map (m: m.number) monitors);
               diff = zipListsWith (a: b: b - a) (init sorted) (tail sorted);
             in
-            (all (a: a == 1) diff) && ((head sorted) == 1);
+            (monitors == [ ]) || ((all (a: a == 1) diff) && ((head sorted) == 1));
           message = "Monitor numbers must be sequential and start from 1";
         }
       ];

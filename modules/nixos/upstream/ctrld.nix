@@ -45,6 +45,13 @@ in
   };
 
   config = mkIf cfg.enable {
+    users.users.ctrld = {
+      group = "ctrld";
+      isSystemUser = true;
+    };
+
+    users.groups.ctrld = { };
+
     systemd.services.ctrld = {
       unitConfig = {
         Description = "Multiclient DNS forwarding proxy";
@@ -60,12 +67,27 @@ in
         Restart = "always";
         RestartSec = 10;
 
-        # WARN: DynamicUser breaks the ctrld 'controlServer' because ctrld
-        # tries to write a socket file to /var/run. The 'controlServer'
-        # provides the ctrld start, stop, reload etc... commands. Since we are
-        # running ctrld in a systemd service we don't need these anyway and
-        # would prefer the extra security.
-        DynamicUser = true;
+        # WARN: Running as a custom user breaks the ctrld 'controlServer'
+        # because ctrld tries to write a socket file to /var/run. The
+        # 'controlServer' provides the ctrld start, stop, reload etc...
+        # commands. Since we are running ctrld in a systemd service we don't
+        # need these anyway and would prefer the extra security.
+        User = "ctrld";
+        Group = "ctrld";
+        PrivateDevices = true;
+        PrivateMounts = true;
+        ProtectSystem = "strict";
+        ProtectHome = true;
+        ProtectClock = true;
+        ProtectKernelLogs = true;
+        ProtectKernelModules = true;
+        ProtectKernelTunables = true;
+        LockPersonality = true;
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        RemoveIPC = true;
+        RestrictNamespaces = true;
+        RestrictSUIDSGID = true;
       };
 
       wantedBy = [ "multi-user.target" ];

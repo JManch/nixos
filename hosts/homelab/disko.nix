@@ -49,8 +49,7 @@
         xattr = "sa";
         acltype = "posixacl";
         compression = "lz4";
-        # TODO: Look into this
-        # "com.sun:auto-snapshot" = "true";
+        "com.sun:auto-snapshot" = "false";
       };
 
       options = {
@@ -68,6 +67,7 @@
           type = "zfs_fs";
           mountpoint = "/persist";
           options.mountpoint = "legacy";
+          options."com.sun:auto-snapshot" = "true";
         };
 
         tmp = {

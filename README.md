@@ -10,5 +10,5 @@
 - Opt-in persistence with root dir as tmpfs
 - Customised Hyprland desktop environment
 - System-wide base-16 colorscheme management
-- Install script for fast deployment
+- Disko and nixos-anywhere for fast deployment
 - Secret management using agenix

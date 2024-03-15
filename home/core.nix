@@ -13,6 +13,7 @@
   home = {
     username = username;
     homeDirectory = "/home/${username}";
+    stateVersion = "23.05";
   };
 
   persistence.directories = [
@@ -32,5 +33,4 @@
   # Reload systemd services on home-manager restart
   # Add [Unit] X-SwitchMethod=(reload|restart|stop-start|keep-old) to control service behaviour
   systemd.user.startServices = "sd-switch";
-  home.stateVersion = "23.05";
 }

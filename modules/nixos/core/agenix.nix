@@ -1,11 +1,18 @@
 { inputs, pkgs, ... }:
+let
+  inherit (inputs) agenix nix-resources;
+in
 {
   imports = [
-    inputs.agenix.nixosModules.default
-    inputs.nix-resources.nixosModules.secrets
+    agenix.nixosModules.default
+    nix-resources.nixosModules.secrets
   ];
 
   environment.systemPackages = [
-    inputs.agenix.packages.${pkgs.system}.default
+    agenix.packages.${pkgs.system}.default
   ];
+
+  # Agenix decrypts before impermanence creates mounts so we have to get key
+  # from persist
+  age.identityPaths = [ "/persist/etc/ssh/ssh_host_ed25519_key" ];
 }

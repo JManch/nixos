@@ -13,8 +13,8 @@ mkMerge [
     # We configure the vmVariant regardless of whether or not the host has
     # virtualisation enabled because it should be possible to create a VM of any host
     virtualisation.vmVariant = {
-      device = mkVMOverride {
-        monitors = [{
+      device = {
+        monitors = mkIf (config.device.monitors != [ ]) (mkVMOverride [{
           name = "Virtual-1";
           number = 1;
           refreshRate = 60.0;
@@ -22,8 +22,8 @@ mkMerge [
           height = 1152;
           position = "0x0";
           workspaces = [ 1 2 3 4 5 6 7 8 9 ];
-        }];
-        gpu.type = null;
+        }]);
+        gpu.type = mkVMOverride null;
       };
 
       modules = {

@@ -31,7 +31,7 @@
       home-assistant.enable = true;
 
       caddy = {
-        enable = false;
+        enable = true;
         lanAddressRanges = [
           "192.168.0.0/16"
           "10.20.20.0/24"

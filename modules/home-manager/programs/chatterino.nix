@@ -17,6 +17,7 @@ let
     pkgs.writeShellApplication {
       name = "hypr-twitch-workspace";
       runtimeInputs = with pkgs; [
+        coreutils
         chatterino2
         socat
         config.programs.firefox.package
@@ -34,6 +35,7 @@ let
           if [[ "$workspace_name" =~ ^(name:|)TWITCH$ ]]; then
             if [[ "$window_class" == "mpv" || "$window_class" == "firefox" ]]; then
               hyprctl --batch "dispatch focuswindow address:0x$window_address; dispatch movewindow l"
+              sleep 0.5
             fi
             hyprctl dispatch splitratio exact ${toString chatterinoRatio}
           fi
@@ -44,6 +46,7 @@ let
           workspace_name="''${1#*>>}"
           if [[ "$workspace_name" == "TWITCH" ]]; then
             chatterino > /dev/null 2>&1 &
+            sleep 0.5
             firefox --new-window twitch.tv/directory > /dev/null 2>&1 &
           fi
         }

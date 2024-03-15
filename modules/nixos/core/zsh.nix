@@ -64,6 +64,7 @@ in
 
   programs.zsh = {
     enable = true;
+
     shellAliases = {
       rebuild-switch = "sudo nixos-rebuild switch --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-test = "sudo nixos-rebuild test --flake /home/${username}/.config/nixos#${hostname}";
@@ -73,7 +74,7 @@ in
       rebuild-build = "cd && nixos-rebuild build --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-dry-build = "nixos-rebuild dry-build --flake /home/${username}/.config/nixos#${hostname}";
       rebuild-dry-activate = "sudo nixos-rebuild dry-activate --flake /home/${username}/.config/nixos#${hostname}";
-      build-iso = "nix build /home/${username}/.config/nixos#installer.config.system.build.isoImage";
+      build-iso = "nix build /home/${username}/.config/nixos#nixosConfigurations.installer.config.system.build.isoImage";
     };
   };
 }

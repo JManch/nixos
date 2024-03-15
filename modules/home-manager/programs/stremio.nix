@@ -7,6 +7,5 @@ lib.mkIf cfg.enable {
 
   persistence.directories = [
     ".local/share/Smart Code ltd"
-    ".stremio-server" # Cache is stored here
   ];
 }

@@ -1,10 +1,14 @@
+{ inputs, ... }:
 {
+  imports = [
+    inputs.disko.nixosModules.default
+  ];
+
   disko.devices = {
-    # WARN: Should probably update this name 'x' to something like 1TB-NVME
-    disk.disk1 = {
+    disk."256GB-NVME" = {
       type = "disk";
-      # WARN:The device here actually has to be correct
-      device = "/dev/sdx";
+      # TODO: Change this device
+      device = "/dev/vda";
       content = {
         type = "gpt";
         partitions = {
@@ -16,11 +20,11 @@
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
+              mountOptions = [ "defaults" "umask=0077" ];
             };
           };
           zfs = {
             size = "100%";
-            # WARN: I feel like I need more here for configuring the zpool?
             content = {
               type = "zfs";
               pool = "zroot";
@@ -29,41 +33,52 @@
         };
       };
     };
+
+    nodev."/" = {
+      fsType = "tmpfs";
+      mountOptions = [ "defaults" "mode=755" ];
+    };
+
     zpool.zroot = {
       type = "zpool";
-      mode = "";
+
       rootFsOptions = {
-        # WARN: I don't know if any of these options are correct really...
-        ashift = 12;
+        # TODO: Double check these options
         atime = "off";
         mountpoint = "none";
         xattr = "sa";
         acltype = "posixacl";
-        compression = "lz4"; # double check this
+        compression = "lz4";
+        # TODO: Look into this
+        # "com.sun:auto-snapshot" = "true";
       };
-      # WARN: I don't understand this mountpoint here?
-      mountpoint = "/";
-      postCreateHook = "zfs snapshot zroot@blank";
+
+      options = {
+        ashift = "12";
+      };
 
       datasets = {
         nix = {
           type = "zfs_fs";
-          options.mountpoint = "legacy";
           mountpoint = "/nix";
+          options.mountpoint = "legacy";
         };
 
         persist = {
           type = "zfs_fs";
-          options.mountpoint = "legacy";
           mountpoint = "/persist";
+          options.mountpoint = "legacy";
         };
 
         tmp = {
           type = "zfs_fs";
-          options.mountpoint = "legacy";
           mountpoint = "/tmp";
+          options.mountpoint = "legacy";
         };
       };
     };
   };
+
+  # TODO: These needs to be reworked. Need an option for the persist dir
+  fileSystems."/persist".neededForBoot = true;
 }

@@ -1,5 +1,8 @@
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [
+    ./disko.nix
+    ./hardware-configuration.nix
+  ];
 
   networking.hostId = "8d4ed64c";
 

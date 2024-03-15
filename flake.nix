@@ -109,18 +109,6 @@
           ];
         };
 
-        virtual = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {
-            hostname = "virtual";
-            inherit inputs outputs username lib;
-          };
-          modules = [
-            ./modules/nixos
-            ./hosts/virtual
-          ];
-        };
-
         homelab = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = {

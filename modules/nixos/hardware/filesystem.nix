@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{ lib
+, pkgs
+, config
+, hostname
+, ...
+}:
 let
   inherit (lib) optional mkIf;
   cfg = config.modules.hardware.fileSystem;
@@ -39,7 +44,9 @@ in
     };
   };
 
-  fileSystems = {
+  # This host hasn't been installed using disko
+  # TODO: Eventually remove
+  fileSystems = mkIf (hostname == "ncase-m1") {
     "/" = {
       device = "none";
       fsType = "tmpfs";

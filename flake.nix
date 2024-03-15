@@ -83,6 +83,17 @@
       packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
 
       nixosConfigurations = {
+
+        installer = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            inherit nixpkgs;
+          };
+          modules = [
+            ./hosts/installer
+          ];
+        };
+
         ncase-m1 = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = {

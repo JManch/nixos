@@ -1,8 +1,18 @@
-{ nixpkgs, ... }:
+{ nixpkgs, pkgs, ... }:
 {
   imports = [
     "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
   ];
+
+  environment.systemPackages = with pkgs; [
+    rsync
+    gitMinimal
+  ];
+
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = false;
+  };
 
   users.users.root = {
     openssh.authorizedKeys.keys = [

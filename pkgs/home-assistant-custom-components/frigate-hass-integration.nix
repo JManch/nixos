@@ -22,7 +22,7 @@
 { lib
 , fetchFromGitHub
 , buildHomeAssistantComponent
-, python3
+, python312
 }:
 buildHomeAssistantComponent rec {
   owner = "graham33";
@@ -42,7 +42,7 @@ buildHomeAssistantComponent rec {
       --replace 'pytz==2022.7' 'pytz>=2022.7'
   '';
 
-  propagatedBuildInputs = with python3.pkgs; [
+  propagatedBuildInputs = with python312.pkgs; [
     pytz
   ];
 

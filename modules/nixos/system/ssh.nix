@@ -7,7 +7,7 @@
 , ...
 }:
 let
-  inherit (lib) mapAttrs utils optional getExe';
+  inherit (lib) mapAttrs mkVMOverride utils optional getExe';
   cfg = config.modules.system.ssh;
 in
 {
@@ -88,4 +88,22 @@ in
     directory = ".ssh";
     mode = "0700";
   }];
+
+  virtualisation.vmVariant = {
+    services.openssh = {
+      ports = mkVMOverride [ 22 ];
+
+      # Root access needed for copying SSH keys to VM for secret decryption
+      settings = {
+        PermitRootLogin = mkVMOverride "yes";
+        AllowUsers = mkVMOverride null;
+      };
+    };
+
+    users.users.root = {
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
+      ];
+    };
+  };
 }

@@ -3,9 +3,13 @@ lib.mkIf config.modules.shell.enable
 {
   programs.eza = {
     enable = true;
-    enableAliases = false;
     git = true;
     icons = true;
+    enableBashIntegration = false;
+    enableZshIntegration = false;
+    enableFishIntegration = false;
+    enableIonIntegration = false;
+    enableNushellIntegration = false;
   };
 
   programs.zsh.shellAliases = {

@@ -7,7 +7,7 @@
 , ...
 }:
 let
-  inherit (lib) mapAttrs optional getExe';
+  inherit (lib) mapAttrs utils optional getExe';
   cfg = config.modules.system.ssh;
 in
 {
@@ -24,7 +24,7 @@ in
     };
 
     hostKeys = [{
-      path = "/persist/etc/ssh/ssh_host_ed25519_key";
+      path = "/etc/ssh/ssh_host_ed25519_key";
       type = "ed25519";
     }];
   };
@@ -53,11 +53,16 @@ in
     };
   };
 
-  programs.zsh.interactiveShellInit =
-    let
-      sshAdd = getExe' pkgs.openssh "ssh-add";
-    in
-      /*bash*/ ''
+  programs.zsh = {
+    shellAliases = {
+      "ssh-forget" = "ssh -o UserKnownHostsFile=/dev/null";
+    };
+
+    interactiveShellInit =
+      let
+        sshAdd = getExe' pkgs.openssh "ssh-add";
+      in
+        /*bash*/ ''
 
       ssh-add-quiet() {
         keys=$(${sshAdd} -l)
@@ -67,6 +72,7 @@ in
       }
 
     '';
+  };
 
   security.pam.sshAgentAuth = {
     enable = true;

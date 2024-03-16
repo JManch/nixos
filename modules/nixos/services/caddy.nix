@@ -1,4 +1,4 @@
-{ lib, pkgs, config, ... }:
+{ lib, config, ... }:
 let
   inherit (lib) mkIf concatStringsSep;
   cfg = config.modules.services.caddy;
@@ -7,10 +7,14 @@ mkIf cfg.enable
 {
   services.caddy = {
     enable = true;
-    configFile = pkgs.writeText "Caddyfile" ''
-      {
-        admin off
-      }
+    # Does not work when the admin API is off
+    enableReload = false;
+
+    globalConfig = ''
+      admin off
+    '';
+
+    extraConfig = ''
 
       (lan_only) {
         @block {
@@ -21,11 +25,6 @@ mkIf cfg.enable
         }
       }
 
-      (log) {
-        log {
-          output file /var/log/caddy/access.log
-        }
-      }
     '';
   };
 
@@ -60,7 +59,7 @@ mkIf cfg.enable
 
   persistence.directories =
     let
-      inherit (config.service) caddy;
+      inherit (config.services) caddy;
       definition = dir: {
         directory = dir;
         user = caddy.user;
@@ -72,4 +71,18 @@ mkIf cfg.enable
       (definition "/var/lib/caddy")
       (definition "/var/log/caddy")
     ];
+
+  virtualisation.vmVariant = {
+    modules.services.caddy.lanAddressRanges = [ "10.0.2.2/32" ];
+
+    services.caddy = {
+      # Confusingly auto_https off doesn't actually server all hosts of http
+      # Each virtualhost needs to explicity specify http://
+      # https://caddy.community/t/making-sense-of-auto-https-and-why-disabling-it-still-serves-https-instead-of-http/9761
+      globalConfig = ''
+        debug
+        auto_https off
+      '';
+    };
+  };
 }

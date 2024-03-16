@@ -8,6 +8,7 @@
 let
   inherit (lib) mkIf optional mkVMOverride;
   inherit (config.modules.services) frigate;
+  inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.home-assistant;
   personal-hass-components = outputs.packages.${pkgs.system}.home-assistant-custom-components;
 in
@@ -64,16 +65,10 @@ mkIf cfg.enable
     }];
   };
 
-  services.caddy.virtualHosts =
-    let
-      inherit (inputs.nix-resources.secrets) fqDomain;
-    in
-    {
-      "home.${fqDomain}".extraConfig = ''
-        import log
-        reverse_proxy http://127.0.0.1:8123
-      '';
-    };
+  services.caddy.virtualHosts."home.${fqDomain}".extraConfig = ''
+    import log
+    reverse_proxy http://127.0.0.1:8123
+  '';
 
   persistence.directories = [{
     directory = "/var/lib/hass";
@@ -83,9 +78,17 @@ mkIf cfg.enable
   }];
 
   virtualisation.vmVariant = {
+    networking.firewall.allowedTCPPorts = [ 8123 ];
+
     services.home-assistant.config.http = {
       trusted_proxies = mkVMOverride [ "0.0.0.0/0" ];
     };
-    networking.firewall.allowedTCPPorts = [ 8123 ];
+
+    services.caddy.virtualHosts = {
+      "home.${fqDomain}" = mkVMOverride { };
+      "http://home.${fqDomain}".extraConfig = ''
+        reverse_proxy http://127.0.0.1:8123
+      '';
+    };
   };
 }

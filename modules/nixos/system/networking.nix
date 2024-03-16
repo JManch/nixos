@@ -22,7 +22,13 @@ in
 
   networking = {
     hostName = hostname;
-    useDHCP = if cfg.forceNoDHCP then mkForce false else mkDefault true;
+    useDHCP = if (cfg.staticIPAddress == null) then mkForce false else mkDefault true;
+    defaultGateway = mkIf (cfg.staticIPAddress != null) cfg.defaultGateway;
+
+    interfaces.${cfg.primaryInterface}.ipv4.addresses = mkIf (cfg.staticIPAddress != null) [{
+      address = cfg.staticIPAddress;
+      prefixLength = 24;
+    }];
 
     networkmanager = {
       enable = true;

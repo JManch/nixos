@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, config, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
 in
@@ -10,6 +10,7 @@ in
 
     virtualisation = {
       enable = mkEnableOption "virtualisation";
+
 
       mappedTCPPorts = mkOption {
         type = types.listOf (types.attrsOf types.port);
@@ -43,7 +44,29 @@ in
     networking = {
       tcpOptimisations = mkEnableOption "TCP optimisations";
       resolved.enable = mkEnableOption "Resolved";
-      forceNoDHCP = mkEnableOption "forceful disabling of DHCP";
+
+      primaryInterface = mkOption {
+        type = types.str;
+        default = "";
+        example = "eno1";
+        description = "Primary network interface of the device";
+      };
+
+      staticIPAddress = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = ''
+          Disable DHCP and assign the device a static IPV4 address.
+        '';
+      };
+
+      defaultGateway = mkOption {
+        type = types.str;
+        default = null;
+        description = ''
+          Default gateway of the device. Only applied if a static IP address is set.
+        '';
+      };
 
       wireless = {
         enable = mkEnableOption "wireless";
@@ -56,7 +79,7 @@ in
         enable = mkEnableOption "Firewall";
         defaultInterfaces = mkOption {
           type = types.listOf types.str;
-          default = [ ];
+          default = [ config.modules.system.networking.primaryInterface ];
           example = [ "eno1" "wlp6s0" ];
           description = ''
             List of interfaces to which default firewall rules should be applied.
@@ -92,4 +115,22 @@ in
       bootEntry = mkEnableOption "Windows systemd-boot boot entry";
     };
   };
+
+  config =
+    let
+      cfg = config.modules.system;
+    in
+    {
+      assertions = [
+        {
+          assertion = (cfg.networking.primaryInterface != "");
+          message = "Primary networking interface must be set";
+        }
+
+        {
+          assertion = (cfg.networking.staticIPAddress != null) -> (cfg.networking.defaultGateway != null);
+          message = "Default gateway must be set when using a static IPV4 address";
+        }
+      ];
+    };
 }

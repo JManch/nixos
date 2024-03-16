@@ -29,6 +29,7 @@
 
     services = {
       home-assistant.enable = true;
+      unifi.enable = true;
 
       caddy = {
         enable = true;
@@ -52,9 +53,12 @@
 
     system = {
       networking = {
+        # TODO: Double check this in installer
+        primaryInterface = "enp1s0";
+        staticIPAddress = "192.168.89.2";
+        defaultGateway = "192.168.89.1";
         firewall.enable = true;
         tcpOptimisations = true;
-        forceNoDHCP = true;
       };
     };
   };

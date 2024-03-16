@@ -172,23 +172,14 @@ mkIf cfg.enable
   # Enable extra debugging in our vmVariant and replace secrets
   virtualisation.vmVariant = {
     services.ctrld.settings = {
-      upstream."0".bootstrap_ip = mkVMOverride "76.76.2.11";
       service = {
         log_level = mkVMOverride "debug";
         log_path = "/tmp/ctrld.log";
       };
     };
 
-    systemd.services.ctrld.serviceConfig.EnvironmentFile = mkVMOverride
-      (pkgs.writeText "ctrld-vars" ''
-        SECRET_ENDPOINT=https://freedns.controld.com/p1
-      '').outPath;
-
     services.dnsmasq.settings = {
       log-queries = true;
-      addn-hosts = (pkgs.writeText "home-hosts" ''
-        10.10.10.10 test
-      '').outPath;
     };
   };
 }

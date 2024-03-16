@@ -11,6 +11,11 @@ in
     virtualisation = {
       enable = mkEnableOption "virtualisation";
 
+      vmVariant = mkOption {
+        type = types.bool;
+        internal = true;
+        default = false;
+      };
 
       mappedTCPPorts = mkOption {
         type = types.listOf (types.attrsOf types.port);

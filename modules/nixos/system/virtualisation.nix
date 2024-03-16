@@ -100,8 +100,12 @@ mkMerge [
           bluetooth.enable = mkVMOverride false;
           audio.enable = mkVMOverride false;
           virtualisation.enable = mkVMOverride false;
+          virtualisation.vmVariant = true;
 
           networking = {
+            primaryInterface = mkVMOverride "eth0";
+            staticIPAddress = mkVMOverride null;
+            defaultGateway = mkVMOverride null;
             tcpOptimisations = mkVMOverride false;
             wireless.enable = mkVMOverride false;
             firewall.enable = mkVMOverride false;

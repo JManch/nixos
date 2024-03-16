@@ -66,10 +66,10 @@ mkIf cfg.enable
   };
 
   services.caddy.virtualHosts."home.${fqDomain}".extraConfig = ''
-    import log
     reverse_proxy http://127.0.0.1:8123
   '';
 
+  # TODO: Persist the database
   persistence.directories = [{
     directory = "/var/lib/hass";
     user = "hass";
@@ -82,13 +82,6 @@ mkIf cfg.enable
 
     services.home-assistant.config.http = {
       trusted_proxies = mkVMOverride [ "0.0.0.0/0" ];
-    };
-
-    services.caddy.virtualHosts = {
-      "home.${fqDomain}" = mkVMOverride { };
-      "http://home.${fqDomain}".extraConfig = ''
-        reverse_proxy http://127.0.0.1:8123
-      '';
     };
   };
 }

@@ -186,13 +186,6 @@ mkIf cfg.enable
   }];
 
   virtualisation.vmVariant = {
-    services.caddy.virtualHosts = {
-      "cctv.${fqDomain}" = mkVMOverride { };
-      "http://cctv.${fqDomain}".extraConfig = ''
-        reverse_proxy http://127.0.0.1:5000
-      '';
-    };
-
     services.frigate.settings = {
       mqtt.enabled = mkVMOverride false;
       detect.enabled = mkVMOverride false;

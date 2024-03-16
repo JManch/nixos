@@ -183,7 +183,7 @@ mkIf (cfg.enable && osDesktop.enable) {
         userChrome = /* css */ ''
           * {
             font-family: "${desktop.style.font.family}" !important;
-            font-size: 14px !important; 
+            font-size: 15px !important;
           }
 
           /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/autohide_toolbox.css made available under Mozilla Public License v. 2.0

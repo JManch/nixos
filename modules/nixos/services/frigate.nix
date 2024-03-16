@@ -1,8 +1,9 @@
-{ lib, pkgs, config, inputs, ... }:
+{ lib, config, inputs, ... }:
 let
   inherit (lib) mkIf mkVMOverride optionalString;
   inherit (config.device) gpu ipAddress;
   inherit (config.modules.system.networking) publicPorts;
+  inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.frigate;
 in
 mkIf cfg.enable
@@ -167,24 +168,15 @@ mkIf cfg.enable
   # Because WebRTC port has to be forwarded
   modules.system.networking.publicPorts = [ 8555 ];
 
-  services.nginx.virtualHosts.${config.services.frigate.hostname}.listen =
-    [
-      {
-        addr = "127.0.0.1";
-        port = 5000;
-      }
-    ];
+  services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = [{
+    addr = "127.0.0.1";
+    port = 5000;
+  }];
 
-  services.caddy.virtualHosts =
-    let
-      inherit (inputs.nix-resources.secrets) fqDomain;
-    in
-    {
-      "cctv.${fqDomain}".extraConfig = ''
-        import lan_only
-        reverse_proxy http://127.0.0.1:5000
-      '';
-    };
+  services.caddy.virtualHosts."cctv.${fqDomain}".extraConfig = ''
+    import lan_only
+    reverse_proxy http://127.0.0.1:5000
+  '';
 
   persistence.directories = [{
     directory = "/var/lib/frigate";
@@ -194,42 +186,23 @@ mkIf cfg.enable
   }];
 
   virtualisation.vmVariant = {
-    # Ideally I would be able to restream the RTSP feed (or stream a fake RTSP
-    # feed) for testing but for whatever reason frigate refuses the play
-    # streams from VLC, even the original untouched stream. Instead I'll have
-    # to temporarily add a user to my NVR when I want to test.
-
-    # Method if restream works (it doesn't currently): Use VLC to restream the
-    # CCTV RTSP stream to rtsp://127.0.0.1:8555/test. Make sure you disable
-    # transcoding. 
-    # modules.services.frigate.rtspAddress = mkVMOverride (_: "rtsp://10.0.2.2:8555/test");
-
-    systemd.services.frigate.serviceConfig = {
-      EnvironmentFile = mkVMOverride (pkgs.writeText "frigate-vars" ''
-        FRIGATE_MQTT_USER=test
-        FRIGATE_MQTT_PASSWORD=test
-        FRIGATE_RTSP_USER=test
-        FRIGATE_RTSP_PASSWORD=testing123
-      '').outPath;
+    services.caddy.virtualHosts = {
+      "cctv.${fqDomain}" = mkVMOverride { };
+      "http://cctv.${fqDomain}".extraConfig = ''
+        reverse_proxy http://127.0.0.1:5000
+      '';
     };
 
     services.frigate.settings = {
       mqtt.enabled = mkVMOverride false;
       detect.enabled = mkVMOverride false;
       record.enabled = mkVMOverride false;
-    };
-
-    systemd.services.go2rtc.serviceConfig = {
-      EnvironmentFile = mkVMOverride (pkgs.writeText "go2rtc-vars" ''
-        FRIGATE_RTSP_USER=test
-        FRIGATE_RTSP_PASSWORD=testing123
-      '').outPath;
+      snapshots.enabled = mkVMOverride false;
     };
 
     services.go2rtc.settings = {
       api.listen = mkVMOverride ":1984";
       rtsp.listen = mkVMOverride ":8554";
-      webrtc.candidates = [ "192.168.88.254:8555" "stun:8555" ];
     };
 
     services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = mkVMOverride [{
@@ -238,7 +211,7 @@ mkIf cfg.enable
     }];
 
     # NOTE: I can't get the WebRTC stream to work from the VM
-    networking.firewall.allowedTCPPorts = [ 1984 8554 ];
+    networking.firewall.allowedTCPPorts = [ 5000 1984 8554 ];
     networking.firewall.allowedUDPPorts = [ 8554 ];
   };
 }

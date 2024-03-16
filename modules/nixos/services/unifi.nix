@@ -5,9 +5,8 @@
 , ...
 }:
 let
-  inherit (lib) mkIf optionalString;
+  inherit (lib) mkIf;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.system.virtualisation) vmVariant;
   cfg = config.modules.services.unifi;
 in
 mkIf cfg.enable
@@ -43,7 +42,14 @@ mkIf cfg.enable
     }
   '';
 
-  # TODO: Persist directories
+  persistence.directories = [
+    {
+      directory = "/var/lib/unifi";
+      user = "unifi";
+      group = "unifi";
+      mode = "700";
+    }
+  ];
 
   virtualisation.vmVariant = {
     networking.firewall.allowedTCPPorts = [ 8443 ];

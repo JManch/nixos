@@ -1,6 +1,14 @@
-{ lib, config, ... }:
+{ lib
+, pkgs
+, config
+, inputs
+, ...
+}:
 let
-  inherit (lib) mkIf concatStringsSep;
+  inherit (lib) mkIf mapAttrs getExe concatStringsSep mkVMOverride;
+  inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.modules.system.networking) publicPorts;
+  inherit (config.modules.system.virtualisation) vmVariant;
   cfg = config.modules.services.caddy;
 in
 mkIf cfg.enable
@@ -26,6 +34,18 @@ mkIf cfg.enable
       }
 
     '';
+
+    virtualHosts."logs.${fqDomain}".extraConfig = ''
+      import lan_only
+      root * /var/lib/goaccess/
+      file_server * browse
+
+      @websockets {
+        header Connection *Upgrade*
+        header Upgrade websocket
+      }
+      reverse_proxy @websockets http://127.0.0.1:7890
+    '';
   };
 
   networking.firewall.allowedTCPPorts = [ 443 80 ];
@@ -39,6 +59,7 @@ mkIf cfg.enable
     PrivateDevices = true;
     PrivateMounts = true;
     PrivateTmp = true;
+    ProtectSystem = "strict";
     ProtectHome = true;
     ProtectClock = true;
     ProtectHostname = true;
@@ -47,7 +68,7 @@ mkIf cfg.enable
     ProtectKernelModules = true;
     ProtectKernelTunables = true;
     RemoveIPC = true;
-    RestrictAddressFamilies = [ "AF_UNIX" "AF_NETLINK" "AF_INET" "AF_INET6" ];
+    RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" ];
     RestrictNamespaces = true;
     RestrictRealtime = true;
     RestrictSUIDSGID = true;
@@ -56,6 +77,67 @@ mkIf cfg.enable
     SocketBindAllow = [ 443 80 ];
     MemoryDenyWriteExecute = true;
   };
+
+  systemd.services.goaccess =
+    let
+      runGoAccess = pkgs.writeShellScript "run-caddy-goaccess" ''
+        # Get list of all caddy access logs
+        logs=""
+        # shellcheck disable=SC2044
+        for file in $(${getExe pkgs.findutils} "/var/log/caddy" -type f -name "*.${fqDomain}.log"); do
+          logs+=" $file"
+        done
+
+        exec ${getExe pkgs.goaccess} $logs \
+          --log-format=CADDY \
+          --real-time-html \
+          --ws-url=logs.${fqDomain}:${if vmVariant then "50080" else "443"} \
+          --port=7890 \
+          --real-os \
+          -o /var/lib/goaccess/index.html
+      '';
+    in
+    {
+      unitConfig = {
+        Description = "GoAccess log analyzer";
+        PartOf = [ "caddy.service" ];
+        After = [ "caddy.service" "network.target" ];
+      };
+
+      serviceConfig = {
+        # TODO: Might want to exclude private ip ranges
+        ExecStart = "${runGoAccess.outPath}";
+        Restart = "on-failure";
+        RestartSec = "10s";
+        User = "caddy";
+        Group = "caddy";
+
+        StateDirectory = [ "goaccess" ];
+        LockPersonality = true;
+        NoNewPrivileges = true;
+        PrivateDevices = true;
+        PrivateMounts = true;
+        PrivateTmp = true;
+        ProtectSystem = "strict";
+        ProtectHome = true;
+        ProtectClock = true;
+        ProtectHostname = true;
+        ProtectProc = "invisible";
+        ProtectKernelLogs = true;
+        ProtectKernelModules = true;
+        ProtectKernelTunables = true;
+        RemoveIPC = true;
+        RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" ];
+        RestrictNamespaces = true;
+        RestrictRealtime = true;
+        RestrictSUIDSGID = true;
+        SystemCallArchitectures = "native";
+        SocketBindDeny = publicPorts;
+        MemoryDenyWriteExecute = true;
+      };
+
+      wantedBy = [ "multi-user.target" ];
+    };
 
   persistence.directories =
     let
@@ -83,6 +165,11 @@ mkIf cfg.enable
         debug
         auto_https off
       '';
+
+      # Prefix every hostname with http://
+      virtualHosts = mkVMOverride (
+        mapAttrs (_: value: value // { hostName = ("http://" + value.hostName); }) config.services.caddy.virtualHosts
+      );
     };
   };
 }

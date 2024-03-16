@@ -69,13 +69,20 @@ mkIf cfg.enable
     reverse_proxy http://127.0.0.1:8123
   '';
 
-  # TODO: Persist the database
-  persistence.directories = [{
-    directory = "/var/lib/hass";
-    user = "hass";
-    group = "hass";
-    mode = "700";
-  }];
+  persistence.directories = [
+    {
+      directory = "/var/lib/hass";
+      user = "hass";
+      group = "hass";
+      mode = "700";
+    }
+    {
+      directory = "/var/lib/postgresql";
+      user = "postgres";
+      group = "postgres";
+      mode = "750";
+    }
+  ];
 
   virtualisation.vmVariant = {
     networking.firewall.allowedTCPPorts = [ 8123 ];

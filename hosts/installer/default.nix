@@ -7,9 +7,13 @@
   environment.systemPackages = with pkgs; [
     # nixos-anywhere needs rsync for transfering secrets
     rsync
+    disko
     gitMinimal
     nvim
   ];
+
+  # TODO: Figure out the install procedure using disko when inside the
+  # installer and write a script for it
 
   services.openssh = {
     enable = true;

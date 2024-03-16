@@ -12,6 +12,7 @@ in
     corectrl.enable = mkEnableOption "Corectrl";
     lact.enable = mkEnableOption "Lact";
     home-assistant.enable = mkEnableOption "Home Assistant";
+    unifi.enable = mkEnableOption "Unifi Controller";
 
     greetd = {
       enable = mkEnableOption "Greetd with TUIgreet";

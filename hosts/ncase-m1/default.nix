@@ -99,6 +99,7 @@
       virtualisation.enable = true;
 
       networking = {
+        primaryInterface = "eno1";
         tcpOptimisations = true;
         resolved.enable = true;
 
@@ -107,10 +108,7 @@
           disableOnBoot = true;
         };
 
-        firewall = {
-          enable = true;
-          defaultInterfaces = [ "eno1" ];
-        };
+        firewall.enable = true;
       };
 
       audio = {

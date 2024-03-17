@@ -38,12 +38,6 @@ let
         exit 1
       fi
 
-      kit_path="/home/${username}/files/secrets/ssh-bootstrap-kit"
-      if [[ ! -e "$kit_path" ]]; then
-        echo "Error: SSH bootstrap kit is not in the expected path '$kit_path'" >&2
-        exit 1
-      fi
-
       temp=$(mktemp -d)
       cleanup() {
         rm -rf "$temp"
@@ -51,6 +45,7 @@ let
       trap cleanup EXIT
       install -d -m755 "$temp/persist/etc/ssh"
 
+      kit_path="/home/${username}/.config/nixos/hosts/ssh-bootstrap-kit"
       age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
       tar -xf "$temp/ssh-bootstrap-kit.tar" --strip-components=1 -C "$temp/persist/etc/ssh" "$hostname"
       rm "$temp/ssh-bootstrap-kit.tar"

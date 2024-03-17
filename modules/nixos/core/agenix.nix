@@ -8,6 +8,19 @@ let
     gnutar
   ];
 
+  decryptKit = /*bash*/ ''
+    temp=$(mktemp -d)
+    cleanup() {
+      rm -rf "$temp"
+    }
+    trap cleanup EXIT
+
+    kit_path="/home/${username}/.config/nixos/hosts/ssh-bootstrap-kit"
+    age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
+    tar -xf "$temp/ssh-bootstrap-kit.tar" -C "$temp"
+    rm -f "$temp/ssh-bootstrap-kit.tar";
+  '';
+
   editSecretScript = pkgs.writeShellApplication {
     name = "agenix-edit";
     runtimeInputs = scriptInputs;
@@ -18,21 +31,7 @@ let
         exit 1
       fi
 
-      kit_path="/home/${username}/files/secrets/ssh-bootstrap-kit"
-      if [[ ! -e "$kit_path" ]]; then
-        echo "Error: SSH bootstrap kit is not in the expected path '$kit_path'" >&2
-        exit 1
-      fi
-
-      temp=$(mktemp -d)
-      cleanup() {
-        rm -rf "$temp"
-      }
-      trap cleanup EXIT
-
-      age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
-      tar -xf "$temp/ssh-bootstrap-kit.tar" -C "$temp"
-      rm -f "$temp/ssh-bootstrap-kit.tar";
+      ${decryptKit}
 
       keys=""
       # shellcheck disable=SC2044
@@ -50,21 +49,7 @@ let
     runtimeInputs = scriptInputs;
     text = /*bash*/ ''
 
-      kit_path="/home/${username}/files/secrets/ssh-bootstrap-kit"
-      if [[ ! -e "$kit_path" ]]; then
-        echo "Error: SSH bootstrap kit is not in the expected path '$kit_path'" >&2
-        exit 1
-      fi
-
-      temp=$(mktemp -d)
-      cleanup() {
-        rm -rf "$temp"
-      }
-      trap cleanup EXIT
-
-      age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
-      tar -xf "$temp/ssh-bootstrap-kit.tar" -C "$temp"
-      rm -f "$temp/ssh-bootstrap-kit.tar";
+      ${decryptKit}
 
       keys=""
       # shellcheck disable=SC2044

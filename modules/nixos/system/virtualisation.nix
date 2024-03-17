@@ -37,19 +37,13 @@ let
 
       if [[ ! -e "/home/${username}/$hostname.qcow2" ]]; then
         # Decrypt the relevant secrets from kit
-        kit_path="/home/${username}/files/secrets/ssh-bootstrap-kit"
-        if [[ ! -e "$kit_path" ]]; then
-          echo "Error: SSH bootstrap kit is not in the expected path '$kit_path'" >&2
-          exit 1
-        fi
-
         temp=$(mktemp -d)
         cleanup() {
           rm -rf "$temp"
         }
         trap cleanup EXIT
 
-        echo
+        kit_path="/home/${username}/.config/nixos/hosts/ssh-bootstrap-kit"
         age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
         tar -xf "$temp/ssh-bootstrap-kit.tar" --strip-components=1 -C "$temp" "$hostname"
         rm -f "$temp/ssh-bootstrap-kit.tar"

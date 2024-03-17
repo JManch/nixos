@@ -9,5 +9,7 @@
   boot = {
     initrd.availableKernelModules = [ "ahci" "xhci_pci" "virtio_pci" "sr_mod" "virtio_blk" ];
     kernelModules = [ "kvm-amd" ];
+    # TODO: This is needed to mount in VM, check if it's needed for bare metal
+    zfs.devNodes = "/dev/disk/by-partuuid";
   };
 }

@@ -90,7 +90,7 @@
         installer = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = {
-            inherit nixpkgs;
+            inherit inputs outputs username lib;
           };
           modules = [
             ./hosts/installer

@@ -1,13 +1,20 @@
-{ lib, pkgs, outputs, nixpkgs, username, ... }:
+{ lib, pkgs, inputs, outputs, username, ... }:
 let
   inherit (lib) utils;
   installScript = pkgs.writeShellApplication {
     name = "install-host";
     runtimeInputs = with pkgs; [
+      age
       disko
       gitMinimal
     ];
     text = /*bash*/ ''
+
+      if [ "$(id -u)" != "0" ]; then
+         echo "This script must be run as root" 1>&2
+         exit 1
+      fi
+
       if [ -z "$1" ]; then
         echo "Usage: install-host <hostname>"
         exit 1
@@ -26,9 +33,18 @@ let
         exit 1
       fi
 
-      config="/home/nixos/nixos"
-      rm -rf "$config"
-      git clone https://github.com/JManch/nixos "$config"
+      echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"
+      read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
+      echo
+      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+          echo "Aborting"
+          exit 1
+      fi;
+
+      config="/root/nixos"
+      if [ ! -d "$config" ]; then
+        git clone https://github.com/JManch/nixos "$config"
+      fi
 
       temp=$(mktemp -d)
       cleanup() {
@@ -40,40 +56,55 @@ let
       tar -xf "$temp/ssh-bootstrap-kit.tar" -C "$temp"
       rm -f "$temp/ssh-bootstrap-kit.tar";
 
-      mkdir -p /home/root/.ssh
-      mv "$temp/$hostname/ssh_host_ed25519_key" /home/root/.ssh/id_ed25519
-      mv "$temp/$hostname/ssh_host_ed25519_key.pub" /home/root/.ssh/id_ed25519.pub
-      mv "$temp/${username}" /home/root/.ssh
+      ssh_dir="/root/.ssh"
+      rm -rf "$ssh_dir"
+      mkdir -p "$ssh_dir"
+      mv "$temp/$hostname/ssh_host_ed25519_key" "$ssh_dir/id_ed25519"
+      mv "$temp/$hostname/ssh_host_ed25519_key.pub" "$ssh_dir/id_ed25519.pub"
+      mv "$temp/${username}" "$ssh_dir"
       rm -rf "$temp"
 
-      sudo disko --mode disko --flake "/home/nixos/nixos#$hostname"
+      echo "Starting disko format and mount..."
+      disko --mode disko --flake "$config#$hostname"
+      echo "Disko finished"
 
       mkdir -p /mnt/persist/{etc/ssh,home/${username}/.ssh}
-      cp /home/nixos/.ssh/id_ed25519 /mnt/persist/etc/ssh/ssh_host_ed25519_key
-      cp /home/nixos/.ssh/id_ed25519.pub /mnt/persist/etc/ssh/ssh_host_ed25519_key.pub
-      mv /home/nixos/.ssh/${username}/* /mnt/persist/home/${username}/.ssh/
+      cp "$ssh_dir/id_ed25519" /mnt/persist/etc/ssh/ssh_host_ed25519_key
+      cp "$ssh_dir/id_ed25519.pub" /mnt/persist/etc/ssh/ssh_host_ed25519_key.pub
+      mv "$ssh_dir"/${username}/* /mnt/persist/home/${username}/.ssh/
+      chown -R nixos:users /mnt/persist/home/${username}
 
-      sudo nixos-install --no-root-passwd --flake /home/nixos/nixos#$hostname
-      rm -rf /home/root/.ssh
+      nixos-install --no-root-passwd --flake "$config#$hostname"
+      rm -rf "$ssh_dir"
+
     '';
   };
 in
 {
   imports = [
-    "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+    "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
   ];
 
   environment.systemPackages = with pkgs; [
     # nixos-anywhere needs rsync for transfering secrets
     rsync
     gitMinimal
-    nvim
+    neovim
     installScript
   ];
+
+  nix.settings = {
+    experimental-features = "nix-command flakes";
+    auto-optimise-store = true;
+  };
 
   services.openssh = {
     enable = true;
     settings.PasswordAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
+    knownHosts = {
+      "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+    };
   };
 
   users.users.root = {

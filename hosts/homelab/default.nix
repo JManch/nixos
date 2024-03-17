@@ -19,13 +19,7 @@
   };
 
   modules = {
-    hardware = {
-      fileSystem = {
-        trim = true;
-        zpoolName = "zpool";
-        bootLabel = "boot";
-      };
-    };
+    hardware.fileSystem.trim = true;
 
     services = {
       home-assistant.enable = true;

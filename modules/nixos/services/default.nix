@@ -13,6 +13,7 @@ in
     lact.enable = mkEnableOption "Lact";
     home-assistant.enable = mkEnableOption "Home Assistant";
     unifi.enable = mkEnableOption "Unifi Controller";
+    calibre.enable = mkEnableOption "Calibre E-book Manager";
 
     greetd = {
       enable = mkEnableOption "Greetd with TUIgreet";

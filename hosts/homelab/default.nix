@@ -30,6 +30,7 @@
     services = {
       home-assistant.enable = true;
       unifi.enable = true;
+      calibre.enable = true;
 
       caddy = {
         enable = true;

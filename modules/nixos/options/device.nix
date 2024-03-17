@@ -81,6 +81,16 @@ in
         default = "";
         description = "The CPU name, not critical";
       };
+
+      cores = mkOption {
+        type = types.int;
+        description = "The CPU core count";
+      };
+    };
+
+    memory = mkOption {
+      type = types.int;
+      description = "System memory in MB";
     };
 
     gpu = {

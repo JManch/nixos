@@ -7,6 +7,7 @@
 let
   inherit (lib) utils mkIf mkMerge mkVMOverride mod optionals;
   inherit (homeConfig.modules.desktop) terminal;
+  inherit (config.device) monitors cpu memory;
   homeConfig = utils.homeConfig args;
   cfg = config.modules.system.virtualisation;
 
@@ -77,7 +78,7 @@ mkMerge [
     # virtualisation enabled because it should be possible to create a VM of any host
     virtualisation.vmVariant = {
       device = {
-        monitors = mkIf (config.device.monitors != [ ]) (mkVMOverride [{
+        monitors = mkIf (monitors != [ ]) (mkVMOverride [{
           name = "Virtual-1";
           number = 1;
           refreshRate = 60.0;
@@ -112,16 +113,6 @@ mkMerge [
           desktopEnabled = config.usrEnv.desktop.enable;
         in
         {
-          # TODO: Make this modular based on host spec. Ideally would base this
-          # on the host we are running the VM on but I don't think that's
-          # possible? Could be logical to simulate the exact specs of the host
-          # we are replicating, although that won't always be feasible
-          # depending the actual host we are running the vm on. Could work
-          # around this by instead modifying the generated launch script in our
-          # run-vm zsh function.
-          # We can solve this by storing the currents hosts specs in env vars.
-          memorySize = 4096;
-          cores = 8;
           graphics = desktopEnabled;
           qemu = {
             options = optionals desktopEnabled [
@@ -174,6 +165,15 @@ mkMerge [
     environment.systemPackages = [ runVMScript ];
     programs.virt-manager.enable = true;
     users.users.${username}.extraGroups = [ "libvirtd" "docker" ];
+
+    environment.sessionVariables =
+      let
+        memoryStr = toString (if (memory / 4) >= 4096 then 4096 else builtins.floor (memory / 4));
+        cores = toString (if (cpu.cores / 2) >= 8 then 8 else builtins.floor (cpu.cores / 2));
+      in
+      {
+        QEMU_OPTS = "-m ${memoryStr} -smp ${cores}";
+      };
 
     hm.dconf.settings = {
       "org/virt-manager/virt-manager/connections" = {

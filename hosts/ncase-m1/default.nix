@@ -6,10 +6,12 @@
   device = {
     type = "desktop";
     ipAddress = "192.168.88.254";
+    memory = 32000;
 
     cpu = {
       name = "R7 3700x";
       type = "amd";
+      cores = 16;
     };
 
     gpu = {

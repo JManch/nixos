@@ -1,4 +1,10 @@
-{ lib, pkgs, inputs, outputs, username, ... }:
+{ lib
+, pkgs
+, inputs
+, outputs
+, username
+, ...
+}:
 let
   inherit (lib) utils;
   installScript = pkgs.writeShellApplication {

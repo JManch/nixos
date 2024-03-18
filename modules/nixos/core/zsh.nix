@@ -17,10 +17,14 @@ let
       # 'true' so that we can change certain config options for the very first
       # build of a system. This is useful for options like secure boot that need
       # extra configuration to work.
+      # This patch also preserves the file ownership in the rsync command used
+      # for extra-files transfer. This is needed for deploying secrets to the
+      # home directory.
       (pkgs.nixos-anywhere.overrideAttrs (oldAttrs: {
         patches = (oldAttrs.patches or [ ]) ++ [ ../../../patches/nixosAnywhere.patch ];
       }))
       gnutar
+      sudo
     ];
     text = /*bash*/ ''
       if [ -z "$1" ] || [ -z "$2" ]; then
@@ -44,19 +48,36 @@ let
         exit 1
       fi
 
+      secret_temp=$(mktemp -d)
       temp=$(mktemp -d)
       cleanup() {
-        rm -rf "$temp"
+        rm -rf "$secret_temp"
+        sudo rm -rf "$temp"
       }
       trap cleanup EXIT
       install -d -m755 "$temp/persist/etc/ssh"
+      install -d -m755 "$temp/persist/home"
+      install -d -m700 "$temp/persist/home/${username}"
+      install -d -m700 "$temp/persist/home/${username}/.ssh"
+      install -d -m755 "$temp/persist/home/${username}/.config"
 
       kit_path="/home/${username}/.config/nixos/hosts/ssh-bootstrap-kit"
-      age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
-      tar -xf "$temp/ssh-bootstrap-kit.tar" --strip-components=1 -C "$temp/persist/etc/ssh" "$hostname"
-      rm "$temp/ssh-bootstrap-kit.tar"
+      age -d -o "$secret_temp/ssh-bootstrap-kit.tar" "$kit_path"
+      tar -xf "$secret_temp/ssh-bootstrap-kit.tar" -C "$secret_temp"
+      rm "$secret_temp/ssh-bootstrap-kit.tar"
+      mv "$secret_temp/$hostname"/* "$temp/persist/etc/ssh"
+      mv "$secret_temp/id_ed25519" "$temp/persist/home/${username}/.ssh"
+      mv "$secret_temp/id_ed25519.pub" "$temp/persist/home/${username}/.ssh"
+      mv "$secret_temp"/${username}/* "$temp/persist/home/${username}/.ssh"
+      rm -rf "$secret_temp"
+
+      cp -r /home/${username}/.config/nixos "$temp/persist/home/${username}/.config/nixos"
+
+      sudo chown -R root:root "$temp/persist"
+      sudo chown -R ${username}:users "$temp/persist/home"
 
       exec nixos-anywhere --extra-files "$temp" --flake "/home/${username}/.config/nixos#$hostname" "root@$ip_address"
+      sudo rm -rf "$temp"
     '';
   };
 in

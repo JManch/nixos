@@ -1,14 +1,14 @@
-From 61abbbc99348152747dcd241d2c5b4815095bd29 Mon Sep 17 00:00:00 2001
+From e65cebe831c4c07f8ab26cac2fd6dd58eadee7e5 Mon Sep 17 00:00:00 2001
 From: Joshua Manchester <JManch@protonmail.com>
 Date: Mon, 18 Mar 2024 14:18:20 +0000
-Subject: [PATCH] override firstBoot flake input
+Subject: [PATCH] override firstBoot flake input and preserve permissions
 
 ---
- src/nixos-anywhere.sh | 1 +
- 1 file changed, 1 insertion(+)
+ src/nixos-anywhere.sh | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/nixos-anywhere.sh b/src/nixos-anywhere.sh
-index d5adca2..a60d68e 100755
+index d5adca2..346b181 100755
 --- a/src/nixos-anywhere.sh
 +++ b/src/nixos-anywhere.sh
 @@ -203,6 +203,7 @@ nix_build() {
@@ -19,6 +19,15 @@ index d5adca2..a60d68e 100755
      "${nix_options[@]}" \
      "$@"
  }
+@@ -466,7 +467,7 @@ if [[ -n ${extra_files-} ]]; then
+     extra_files="$extra_files/"
+   fi
+   step Copying extra files
+-  rsync -rlpv -FF \
++  sudo rsync -rlpov -FF \
+     -e "ssh -i \"$ssh_key_dir\"/nixos-anywhere -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${ssh_args[*]}" \
+     "$extra_files" \
+     "${ssh_connection}:/mnt/"
 -- 
 2.43.2
 

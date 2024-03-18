@@ -1,0 +1,24 @@
+From 61abbbc99348152747dcd241d2c5b4815095bd29 Mon Sep 17 00:00:00 2001
+From: Joshua Manchester <JManch@protonmail.com>
+Date: Mon, 18 Mar 2024 14:18:20 +0000
+Subject: [PATCH] override firstBoot flake input
+
+---
+ src/nixos-anywhere.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/nixos-anywhere.sh b/src/nixos-anywhere.sh
+index d5adca2..a60d68e 100755
+--- a/src/nixos-anywhere.sh
++++ b/src/nixos-anywhere.sh
+@@ -203,6 +203,7 @@ nix_build() {
+   NIX_SSHOPTS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $ssh_key_dir/nixos-anywhere ${ssh_args[*]}" nix build \
+     --print-out-paths \
+     --no-link \
++    --override-input firstBoot "github:JManch/true" \
+     "${nix_options[@]}" \
+     "$@"
+ }
+-- 
+2.43.2
+

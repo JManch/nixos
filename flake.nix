@@ -9,6 +9,7 @@
     nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-personal";
     # nixpkgs.url = "git+file:///home/joshua/repos/nixpkgs?ref=nixos-unstable-personal";
     impermanence.url = "github:nix-community/impermanence";
+    firstBoot.url = "github:JManch/false";
 
     nix-colors.url = "github:misterio77/nix-colors";
     nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";

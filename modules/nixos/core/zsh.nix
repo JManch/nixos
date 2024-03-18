@@ -12,19 +12,25 @@ let
     name = "deploy-host";
     runtimeInputs = with pkgs; [
       age
-      nixos-anywhere
+      # nixos-anywhere does not allow passing extra flags to the nix build commands
+      # so we have to patch it. The patch overrides our 'firstBoot' flake input to
+      # 'true' so that we can change certain config options for the very first
+      # build of a system. This is useful for options like secure boot that need
+      # extra configuration to work.
+      (pkgs.nixos-anywhere.overrideAttrs (oldAttrs: {
+        patches = (oldAttrs.patches or [ ]) ++ [ ../../../patches/nixosAnywhere.patch ];
+      }))
       gnutar
     ];
     text = /*bash*/ ''
       if [ -z "$1" ] || [ -z "$2" ]; then
-        echo "Usage: deploy-host <hostname> <ip_address> <extra_args>"
+        echo "Usage: deploy-host <hostname> <ip_address>"
         exit 1
       fi
 
       hosts=(${lib.concatStringsSep " " (builtins.attrNames (utils.hosts outputs))})
       hostname=$1
       ip_address=$2
-      extra_args=''${3:-}
 
       match=0
       for host in "''${hosts[@]}"; do
@@ -50,7 +56,7 @@ let
       tar -xf "$temp/ssh-bootstrap-kit.tar" --strip-components=1 -C "$temp/persist/etc/ssh" "$hostname"
       rm "$temp/ssh-bootstrap-kit.tar"
 
-      nixos-anywhere --extra-files "$temp" "$extra_args" --flake "/home/${username}/.config/nixos#$hostname" "root@$ip_address"
+      exec nixos-anywhere --extra-files "$temp" --flake "/home/${username}/.config/nixos#$hostname" "root@$ip_address"
     '';
   };
 in

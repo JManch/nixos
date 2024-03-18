@@ -74,7 +74,8 @@ let
       mv "$ssh_dir"/${username}/* /mnt/persist/home/${username}/.ssh/
       chown -R nixos:users /mnt/persist/home/${username}
 
-      nixos-install --no-root-passwd --flake "$config#$hostname"
+      nixos-install --no-root-passwd --flake "$config#$hostname" \
+        --override-input firstBoot 'github.com:JManch/true'
       rm -rf "$ssh_dir"
 
     '';

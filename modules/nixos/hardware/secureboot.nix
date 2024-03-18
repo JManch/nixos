@@ -15,7 +15,9 @@ in
     inputs.lanzaboote.nixosModules.lanzaboote
   ];
 
-  config = mkIf cfg.enable {
+  # Secure boot is disabled for the very first build of a newly installed
+  # system so that I can set it up
+  config = mkIf (!inputs.firstBoot.value && cfg.enable) {
     environment.systemPackages = [ pkgs.sbctl ];
 
     # NOTE: Lanzaboote replaces systemd-boot with it's own systemd-boot which

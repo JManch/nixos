@@ -20,6 +20,7 @@ in
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
+      PermitRootLogin = "yes";
       AllowUsers = [ "root" username ];
     };
 

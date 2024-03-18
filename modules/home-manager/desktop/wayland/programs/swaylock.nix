@@ -53,20 +53,8 @@ let
 
       text = /*bash*/ ''
 
-        # Abort if swaylock is already running
+        # Exit if swaylock is running
         pgrep -x swaylock && exit 1
-
-        # Get PIDs of existing instances of script
-        pids=$(pgrep -fx "${getExe pkgs.bash} $(realpath "$0")" || true)
-
-        # Exlude this script's pid from the pids
-        pids=$(echo "$pids" | grep -v "$$")
-
-        if [ -n "$pids" ]; then
-          # Kill all existing instances of the script
-          pid_list=$(echo "$pids" | tr '\n' ' ')
-          kill "$pid_list" || true
-        fi
 
         ${preLock}
         ${getExe config.programs.swaylock.package} &

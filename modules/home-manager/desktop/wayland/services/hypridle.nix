@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf optional mkForce getExe';
+  inherit (lib) mkIf optional mkForce getExe getExe';
   cfg = desktopCfg.services.hypridle;
   desktopCfg = config.modules.desktop;
   swaylock = desktopCfg.programs.swaylock;
@@ -21,25 +21,41 @@ in
       lockCmd = swaylock.lockScript;
       ignoreDbusInhibit = false;
 
-      listeners =
-        let
-          sleep = getExe' pkgs.coreutils "sleep";
-          hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
-        in
-        [
-          {
-            timeout = cfg.lockTime;
-            onTimeout = swaylock.lockScript;
-          }
-          {
-            timeout = cfg.screenOffTime - 1;
-            onTimeout = "${sleep} 1 && ${hyprctl} dispatch dpms off";
-          }
-        ] ++ optional cfg.debug {
-          timeout = 5;
-          onTimeout = "${lib.getExe pkgs.libnotify} 'Hypridle' 'Idle timeout triggered'";
-        };
+      listeners = [{
+        timeout = cfg.lockTime;
+        onTimeout = swaylock.lockScript;
+      }] ++ optional cfg.debug {
+        timeout = 5;
+        onTimeout = "${lib.getExe pkgs.libnotify} 'Hypridle' 'Idle timeout triggered'";
+      };
     };
+
+    modules.desktop.programs.swaylock.postLockScript =
+      let
+        sleep = getExe' pkgs.coreutils "sleep";
+        hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
+        jaq = getExe pkgs.jaq;
+      in
+        /*bash*/ ''
+
+        # Turn off the display after locking. I've found that doing this in the
+        # lock script is more reliable than adding another listener.
+        lockfile="/tmp/dpms-lock-file"
+        touch "$lockfile"
+        trap 'rm -f "$lockfile"' EXIT
+        while true; do
+          # If the display is on, wait screenOffTime seconds then turn off
+          # display. Then wait the full lock time before checking again.
+          if '${hyprctl}' monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" >/dev/null 2>&1; then
+            ${sleep} ${toString cfg.screenOffTime}
+            if [ ! -e "$lockfile" ]; then exit 1; fi
+            '${hyprctl}' dispatch dpms off
+          fi
+          # give screens time to turn off and prolong next countdown
+          ${sleep} ${toString cfg.lockTime}
+        done &
+
+      '';
 
     systemd.user.services.hypridle = {
       Unit.PartOf = [ "graphical-session.target" ];

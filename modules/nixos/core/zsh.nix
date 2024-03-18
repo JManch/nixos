@@ -24,7 +24,6 @@ let
         patches = (oldAttrs.patches or [ ]) ++ [ ../../../patches/nixosAnywhere.patch ];
       }))
       gnutar
-      sudo
     ];
     text = /*bash*/ ''
       if [ -z "$1" ] || [ -z "$2" ]; then
@@ -76,7 +75,7 @@ let
       sudo chown -R root:root "$temp/persist"
       sudo chown -R ${username}:users "$temp/persist/home"
 
-      exec nixos-anywhere --extra-files "$temp" --flake "/home/${username}/.config/nixos#$hostname" "root@$ip_address"
+      nixos-anywhere --extra-files "$temp" --flake "/home/${username}/.config/nixos#$hostname" "root@$ip_address"
       sudo rm -rf "$temp"
     '';
   };

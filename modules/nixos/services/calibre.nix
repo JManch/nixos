@@ -24,6 +24,10 @@ mkIf cfg.enable
   services.caddy.virtualHosts."calibre.${fqDomain}".extraConfig = ''
     import lan_only
     reverse_proxy http://127.0.0.1:8083
+    # Might need this
+    # {
+    #   header_up X-Script-Name /calibre-web
+    # }
   '';
 
   # Expose wireless server for kobo ereader transfers

@@ -80,10 +80,18 @@ let
       cp -r "$config" /mnt/persist/home/${username}/.config/nixos
       chown -R nixos:users /mnt/persist/home/${username}
 
-      nixos-install --no-root-passwd --flake "$config#$hostname" \
-        --override-input firstBoot 'github.com:JManch/true'
-      rm -rf "$ssh_dir"
+      nixos_system=$(
+        nix build \
+          --print-out-paths \
+          --no-link \
+          --extra-experimental-features "nix-command flakes" \
+          --no-write-lock-file \
+          --override-input firstBoot "github:JManch/true" \
+          "$config#nixosConfigurations.\"$hostname\".config.system.build.toplevel"
+      )
 
+      nixos-install --no-root-passwd --no-channel-copy --system "$nixos_system"
+      rm -rf "$ssh_dir"
     '';
   };
 in

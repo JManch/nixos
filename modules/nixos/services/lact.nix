@@ -86,9 +86,16 @@ mkIf (hostname == "ncase-m1" && cfg.enable && (gpu.type == "amd") && !corectrl.e
   modules.programs.gaming.gamemode =
     let
       ncat = getExe' pkgs.nmap "ncat";
+      confirm = ''echo '{"command": "confirm_pending_config", "args": {"command": "confirm"}}' | ${ncat} -U /run/lactd.sock'';
     in
     {
-      startScript = ''echo '{"command": "set_power_profile_mode", "args": {"id": "${gpuId}", "index": 1}}' | ${ncat} -U /run/lactd.sock'';
-      stopScript = ''echo '{"command": "set_power_profile_mode", "args": {"id": "${gpuId}", "index": 0}}' | ${ncat} -U /run/lactd.sock'';
+      startScript = ''
+        echo '{"command": "set_power_profile_mode", "args": {"id": "${gpuId}", "index": 1}}' | ${ncat} -U /run/lactd.sock
+        ${confirm}
+      '';
+      stopScript = ''
+        echo '{"command": "set_power_profile_mode", "args": {"id": "${gpuId}", "index": 0}}' | ${ncat} -U /run/lactd.sock
+        ${confirm}
+      '';
     };
 }

@@ -148,6 +148,21 @@
         "type": "github"
       }
     },
+    "firstBoot": {
+      "locked": {
+        "lastModified": 1657739266,
+        "narHash": "sha256-vLy8GQr0noEcoA+jX24FgUVBA/poV36zDWAUChN3hIY=",
+        "owner": "JManch",
+        "repo": "false",
+        "rev": "d06b4794a134686c70a1325df88a6e6768c6b212",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JManch",
+        "repo": "false",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -866,6 +881,7 @@
         "agenix": "agenix",
         "anyrun": "anyrun",
         "disko": "disko",
+        "firstBoot": "firstBoot",
         "flake-parts": "flake-parts_2",
         "home-manager": "home-manager",
         "hypridle": "hypridle",

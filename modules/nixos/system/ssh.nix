@@ -20,14 +20,19 @@ in
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
-      PermitRootLogin = "no";
-      AllowUsers = [ username ];
+      AllowUsers = [ "root" username ];
     };
 
     hostKeys = [{
       path = "/etc/ssh/ssh_host_ed25519_key";
       type = "ed25519";
     }];
+  };
+
+  users.users.root = {
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
+    ];
   };
 
   users.users.${username} = {

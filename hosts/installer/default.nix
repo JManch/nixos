@@ -1,8 +1,8 @@
 { lib
 , pkgs
-, inputs
 , outputs
 , username
+, modulesPath
 , ...
 }:
 let
@@ -103,7 +103,7 @@ let
 in
 {
   imports = [
-    "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+    "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix"
   ];
 
   environment.systemPackages = with pkgs; [

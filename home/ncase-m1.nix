@@ -1,6 +1,4 @@
 {
-  imports = [ ./core.nix ];
-
   modules = {
     shell = {
       enable = true;

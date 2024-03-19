@@ -20,6 +20,7 @@ in
       useGlobalPkgs = true;
       useUserPackages = true;
       users.${username} = import ../../../home/${hostname}.nix;
+      sharedModules = [ ../../home-manager ];
 
       extraSpecialArgs = {
         inherit inputs outputs username hostname;

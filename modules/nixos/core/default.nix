@@ -5,10 +5,10 @@
 , ...
 }:
 let
-  inherit (lib) mapAttrs mapAttrs' filterAttrs isType;
+  inherit (lib) utils mapAttrs mapAttrs' filterAttrs isType;
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = utils.scanPaths ./.;
 
   environment.systemPackages = [ pkgs.git ];
   security.sudo.extraConfig = "Defaults lecture=never";

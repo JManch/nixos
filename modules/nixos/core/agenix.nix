@@ -1,4 +1,4 @@
-{ pkgs, inputs, username, ... }:
+{ pkgs, inputs, ... }:
 let
   inherit (inputs) agenix nix-resources;
   scriptInputs = with pkgs; [
@@ -15,7 +15,7 @@ let
     }
     trap cleanup EXIT
 
-    kit_path="/home/${username}/.config/nixos/hosts/ssh-bootstrap-kit"
+    kit_path="${../../../hosts/ssh-bootstrap-kit}"
     age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
     tar -xf "$temp/ssh-bootstrap-kit.tar" -C "$temp"
     rm -f "$temp/ssh-bootstrap-kit.tar";

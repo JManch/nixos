@@ -60,7 +60,7 @@ let
       install -d -m700 "$temp/persist/home/${username}/.ssh"
       install -d -m755 "$temp/persist/home/${username}/.config"
 
-      kit_path="/home/${username}/.config/nixos/hosts/ssh-bootstrap-kit"
+      kit_path="${../../../hosts/ssh-bootstrap-kit}"
       age -d -o "$secret_temp/ssh-bootstrap-kit.tar" "$kit_path"
       tar -xf "$secret_temp/ssh-bootstrap-kit.tar" -C "$secret_temp"
       rm "$secret_temp/ssh-bootstrap-kit.tar"

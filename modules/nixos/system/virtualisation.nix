@@ -44,7 +44,7 @@ let
         }
         trap cleanup EXIT
 
-        kit_path="/home/${username}/.config/nixos/hosts/ssh-bootstrap-kit"
+        kit_path="${../../../hosts/ssh-bootstrap-kit}"
         age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
         tar -xf "$temp/ssh-bootstrap-kit.tar" --strip-components=1 -C "$temp" "$hostname"
         rm -f "$temp/ssh-bootstrap-kit.tar"

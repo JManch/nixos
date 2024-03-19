@@ -10,10 +10,16 @@ mkIf cfg.enable
     @nClientDownloadEnableHTTP2PlatformLinux 0
   '';
 
-  modules.programs.gaming.windowClassRegex = [
-    "steam_app.*"
-    "cs2"
-  ];
+  modules.programs.gaming = {
+    gameClasses = [
+      "steam_app.*"
+      "cs2"
+    ];
+
+    tearingExcludedClasses = [
+      "steam_app_1174180" # RDR2 - half-vsync without tearing is preferrable
+    ];
+  };
 
   programs.zsh.initExtra =
     let

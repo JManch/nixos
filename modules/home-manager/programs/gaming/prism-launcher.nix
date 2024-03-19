@@ -6,7 +6,7 @@ lib.mkIf cfg.enable
 {
   home.packages = [ pkgs.prismlauncher ];
 
-  modules.programs.gaming.windowClassRegex = [ "Minecraft.*" ];
+  modules.programs.gaming.gameClasses = [ "Minecraft.*" ];
 
   firewall.interfaces.wg-discord.allowedTCPPorts = [ 25565 ];
 

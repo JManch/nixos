@@ -171,7 +171,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
       windowrulev2 =
         let
-          gameRegex = config.modules.programs.gaming.windowClassRegex;
+          inherit (config.modules.programs.gaming) gameRegex tearingRegex;
         in
         [
           "workspace name:GAME, class:${gameRegex}"
@@ -182,7 +182,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
           "center, class:^(qemu)$"
           "keepaspectratio, class:^(qemu)$"
         ] ++ optional cfg.tearing
-          "immediate, class:${gameRegex}";
+          "immediate, class:${tearingRegex}";
 
       decoration = {
         rounding = desktopCfg.style.cornerRadius - 2;

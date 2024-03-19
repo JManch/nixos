@@ -1,4 +1,4 @@
-{ lib, osConfig, ... }:
+{ lib, config, osConfig, ... }:
 let
   inherit (lib)
     mkIf
@@ -7,6 +7,7 @@ let
     mkOption
     types
     concatStringsSep
+    concatStrings
     optional;
 in
 {
@@ -18,11 +19,48 @@ in
     lutris.enable = mkEnableOption "Lutris";
     prism-launcher.enable = mkEnableOption "Prism Launcher";
 
-    windowClassRegex = mkOption {
-      type = types.listOf types.str;
+    gameClasses = mkOption {
+      type = with types; listOf str;
       default = [ ];
-      apply = v: "^(${concatStringsSep "|" v})$";
-      description = "List of regex matches for game window classes";
+      description = ''
+        List of game window classes that will be automatically moved to the
+        gaming workspace and have tearing enabled. To disable tearing for a
+        specific game add it to tearingExcludedClasses.
+      '';
+    };
+
+    gameRegex = mkOption {
+      type = types.str;
+      internal = true;
+      readOnly = true;
+      apply = with config.modules.programs.gaming; _: "^(${concatStringsSep "|" gameClasses})$";
+    };
+
+    tearingExcludedClasses = mkOption {
+      type = with types; listOf str;
+      default = [ ];
+      description = ''
+        List of game window classes that should be excluded from tearing.
+      '';
+    };
+
+    tearingRegex = mkOption {
+      type = types.str;
+      internal = true;
+      readOnly = true;
+      apply =
+        let
+          inherit (config.modules.programs.gaming) tearingExcludedClasses gameClasses;
+          tearingRegex = concatStringsSep "|" gameClasses;
+          tearingExcludedRegex = concatStrings (
+            map (class: "(?!${class}$)") tearingExcludedClasses
+          );
+        in
+        _: "^${tearingExcludedRegex}(${tearingRegex})$";
+      description = ''
+        The complete regex expression for tearing that matches all game classes
+        and excludes all excluded tearing classes.
+      '';
     };
   };
 
@@ -31,7 +69,7 @@ in
       inherit (osConfig.modules.programs) gaming;
     in
     mkIf gaming.enable {
-      modules.programs.gaming.windowClassRegex =
+      modules.programs.gaming.gameClasses =
         optional gaming.gamescope.enable "\\.gamescope.*";
     };
 }

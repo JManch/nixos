@@ -33,6 +33,7 @@ in
     modules.desktop.programs.swaylock.postLockScript =
       let
         sleep = getExe' pkgs.coreutils "sleep";
+        date = getExe' pkgs.coreutils "date";
         hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
         jaq = getExe pkgs.jaq;
       in
@@ -40,7 +41,7 @@ in
 
         # Turn off the display after locking. I've found that doing this in the
         # lock script is more reliable than adding another listener.
-        lockfile="/tmp/dpms-lock-file"
+        lockfile="/tmp/dpms-lock-$$-$(${date} +%s)"
         touch "$lockfile"
         trap 'rm -f "$lockfile"' EXIT
         while true; do

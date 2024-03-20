@@ -9,7 +9,6 @@ in
   options.modules.services = {
     udisks.enable = mkEnableOption "udisks";
     wireguard.enable = mkEnableOption "WireGuard";
-    corectrl.enable = mkEnableOption "Corectrl";
     lact.enable = mkEnableOption "Lact";
     home-assistant.enable = mkEnableOption "Home Assistant";
     unifi.enable = mkEnableOption "Unifi Controller";

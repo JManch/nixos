@@ -7,12 +7,11 @@
 let
   inherit (lib) mkIf getExe';
   inherit (config.device) gpu;
-  inherit (config.modules.services) corectrl;
   cfg = config.modules.services.lact;
   gpuId = "1002:744C-1EAE:7905-0000:09:00.0";
 in
 # This module is specifically for 7900XT on NCASE-M1 host
-mkIf (hostname == "ncase-m1" && cfg.enable && (gpu.type == "amd") && !corectrl.enable)
+mkIf (hostname == "ncase-m1" && cfg.enable && (gpu.type == "amd"))
 {
   # WARN: Disable this if you experience flickering or general instability
   # https://wiki.archlinux.org/title/AMDGPU#Boot_parameter

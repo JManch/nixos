@@ -20,21 +20,6 @@ mkIf (hostname == "ncase-m1" && cfg.enable && (gpu.type == "amd") && !corectrl.e
 
   services.lact = {
     enable = true;
-    package = pkgs.lact.overrideAttrs (oldAttrs: rec {
-      version = "0.5.3";
-      src = pkgs.fetchFromGitHub {
-        owner = "ilya-zlobintsev";
-        repo = "LACT";
-        rev = "v${version}";
-        hash = "sha256-Ts2byWYn1MwQCJPQfwTxezsa/fnwlgVOZyNDUXWgZ0s=";
-      };
-
-      cargoDeps = oldAttrs.cargoDeps.overrideAttrs (lib.const {
-        name = "lact-vendor.tar.gz";
-        inherit src;
-        outputHash = "sha256-ULPZ2kHDvGnx2K//ieQ01Zo7Q9QVgMhObrPQwxDM00s=";
-      });
-    });
 
     # Can't use nix yaml because the keys for fan curve have to be integers
     settings = /*yaml*/ ''

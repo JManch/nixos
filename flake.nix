@@ -57,11 +57,6 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay?rev=a40f72d64c0336532546ee3760040c1f0a6607cf";
     neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
 
-    # Needed until https://github.com/nix-community/nixd/issues/357 is closed
-    nixd.url = "github:nix-community/nixd";
-    nixd.inputs.nixpkgs.follows = "nixpkgs";
-    nixd.inputs.flake-parts.follows = "flake-parts";
-
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
   };

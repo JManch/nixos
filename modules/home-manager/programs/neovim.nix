@@ -32,7 +32,7 @@ mkIf (cfg.enable && config.modules.shell.enable) {
       # Language servers
       lua-language-server
       nil
-      (utils.flakePkgs args "nixd").default
+      nixd
 
       # Formatters
       nixpkgs-fmt

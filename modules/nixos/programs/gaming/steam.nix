@@ -1,9 +1,9 @@
-{ lib, pkgs, config, ... } @ args:
+{ lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf utils optionals;
+  inherit (lib) mkIf optionals;
   cfg = config.modules.programs.gaming.steam;
   gamingCfg = config.modules.programs.gaming;
-  protonGe = (utils.flakePkgs args "nix-gaming").proton-ge;
+  proton-ge = pkgs.proton-ge-bin;
 in
 mkIf cfg.enable
 {
@@ -32,12 +32,12 @@ mkIf cfg.enable
         libkrb5
         keyutils
       ]);
-      extraProfile = "export STEAM_EXTRA_COMPAT_TOOLS_PATHS='${protonGe}'";
     };
+    extraCompatPackages = [ proton-ge ];
   };
 
   # So that protontricks can find proton-ge
-  environment.sessionVariables.STEAM_EXTRA_COMPAT_TOOLS_PATHS = protonGe;
+  environment.sessionVariables.STEAM_EXTRA_COMPAT_TOOLS_PATHS = proton-ge;
 
   persistenceHome.directories = [
     ".steam"

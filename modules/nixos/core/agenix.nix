@@ -35,7 +35,7 @@ let
 
       keys=""
       # shellcheck disable=SC2044
-      for file in $(find "$temp" -type f -name "ssh_host_ed25519_key"); do
+      for file in $(find "$temp" -type f ! -name "*.pub"); do
         keys+=" -i $file"
       done
 
@@ -53,7 +53,7 @@ let
 
       keys=""
       # shellcheck disable=SC2044
-      for file in $(find "$temp" -type f -name "ssh_host_ed25519_key"); do
+      for file in $(find "$temp" -type f ! -name "*.pub"); do
         keys+=" -i $file"
       done
 

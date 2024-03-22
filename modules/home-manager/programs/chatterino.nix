@@ -46,9 +46,8 @@ let
           if [[ "$workspace_name" =~ ^(name:|)TWITCH$ ]]; then
             if [[ "$window_class" == "mpv" || "$window_class" == "firefox" ]]; then
               hyprctl --batch "dispatch focuswindow address:0x$window_address; dispatch movewindow l"
-              sleep 0.5
+              hyprctl dispatch splitratio exact ${toString chatterinoRatio}
             fi
-            hyprctl dispatch splitratio exact ${toString chatterinoRatio}
           fi
         }
 
@@ -79,6 +78,7 @@ mkIf cfg.enable {
     chatterino2
   ] ++ optional mpv.enable streamlink;
 
+  # WARNING: Enabling the MPV audio compression adds 4 seconds of latency
   xdg.configFile = mkIf mpv.enable {
     "streamlink/config".text = ''
       player=${getExe pkgs.mpv-unwrapped}

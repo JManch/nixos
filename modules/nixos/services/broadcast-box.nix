@@ -44,7 +44,7 @@ mkIf cfg.enable
     http.port = 8080;
     udpMux.port = 3000;
     openFirewall = true;
-    # This breaks local streaming because I do not use hairpin NAT
+    # This breaks local streaming without hairpin NAT
     nat.autoConfigure = true;
     statusAPI = false;
   };

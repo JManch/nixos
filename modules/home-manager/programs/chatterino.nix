@@ -2,6 +2,7 @@
 , pkgs
 , config
 , osConfig
+, username
 , ...
 }:
 let
@@ -9,6 +10,16 @@ let
   inherit (config.modules.programs) mpv;
   cfg = config.modules.programs.chatterino;
   desktopCfg = config.modules.desktop;
+
+  # This is the only way to load the twitch auth secret from agenix
+  streamlink = pkgs.streamlink.overrideAttrs (oldAttrs: {
+    nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.makeWrapper ];
+    postInstall = ''
+      wrapProgram $out/bin/streamlink \
+        --add-flags "--config /home/${username}/.config/streamlink/config" \
+        --add-flags '--config "${config.age.secrets.streamlinkTwitchAuth.path}"'
+    '';
+  });
 
   twitchWorkspaceScript =
     let
@@ -71,13 +82,7 @@ mkIf cfg.enable {
   xdg.configFile = mkIf mpv.enable {
     "streamlink/config".text = ''
       player=${getExe pkgs.mpv-unwrapped}
-      player-args=--load-scripts=no --osc --loop-playlist=inf --loop-file=inf --cache=yes --demuxer-max-back-bytes=1073741824
-    '';
-
-    # NOTE: Streamlink config does not include the authentication key. This needs
-    # to be manually added as an argument, most commonly in Chatterino
-    # TODO: Try using home activation script to insert secret into this file
-    "streamlink/config.twitch".text = ''
+      player-args=--save-position-on-quit=no --load-scripts=no --osc --loop-playlist=inf --loop-file=inf --cache=yes --demuxer-max-back-bytes=1073741824
       twitch-low-latency
       twitch-disable-ads
     '';

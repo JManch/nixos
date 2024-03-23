@@ -1,6 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf optionals;
+  inherit (lib) mkIf optionals optional;
   cfg = config.modules.programs.gaming.steam;
   gamingCfg = config.modules.programs.gaming;
   proton-ge = pkgs.proton-ge-bin;
@@ -19,19 +19,23 @@ mkIf cfg.enable
   programs.steam = {
     enable = true;
     package = pkgs.steam.override {
-      extraPkgs = (pkgs: with pkgs; optionals gamingCfg.gamescope.enable [
-        # These fix gamescope in steam's FSH environment
-        xorg.libXcursor
-        xorg.libXi
-        xorg.libXinerama
-        xorg.libXScrnSaver
-        libpng
-        libpulseaudio
-        libvorbis
-        stdenv.cc.cc.lib
-        libkrb5
-        keyutils
-      ]);
+      extraPkgs = (pkgs: with pkgs;
+        optionals gamingCfg.gamescope.enable [
+          # These fix gamescope in steam's FSH environment
+          xorg.libXcursor
+          xorg.libXi
+          xorg.libXinerama
+          xorg.libXScrnSaver
+          libpng
+          libpulseaudio
+          libvorbis
+          stdenv.cc.cc.lib
+          libkrb5
+          keyutils
+        ]);
+      extraLibraries = (pkgs:
+        optional gamingCfg.gamemode.enable pkgs.gamemode.lib
+      );
     };
     extraCompatPackages = [ proton-ge ];
   };

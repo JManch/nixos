@@ -155,7 +155,7 @@ mkIf cfg.enable
   virtualisation.vmVariant = {
     services.ctrld.settings = {
       service = {
-        log_level = mkVMOverride "debug";
+        log_level = mkVMOverride "trace";
         log_path = "/tmp/ctrld.log";
       };
     };

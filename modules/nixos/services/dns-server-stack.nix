@@ -12,7 +12,6 @@
 }:
 let
   inherit (lib) mkIf mkForce mkVMOverride mapAttrs' nameValuePair filterAttrs utils;
-  inherit (config.modules.system.networking) publicPorts;
   cfg = config.modules.services.dns-server-stack;
 
   # Patch Ctrld to enable loading endpoints from environment variables
@@ -67,9 +66,8 @@ mkIf cfg.enable
     };
   };
 
-  systemd.services.ctrld.serviceConfig = {
+  systemd.services.ctrld.serviceConfig = utils.hardeningBaseline config {
     EnvironmentFile = config.age.secrets.ctrldEndpoint.path;
-    SocketBindDeny = publicPorts;
   };
 
   services.dnsmasq = {
@@ -141,31 +139,15 @@ mkIf cfg.enable
     preStart = mkForce "dnsmasq --test";
     restartTriggers = mkForce [ ];
 
-    serviceConfig = {
-      # Because of the '--user dnsmasq' launch flag, dnsmasq effectively runs
-      # as a private user anyway
-      LockPersonality = true;
-      NoNewPrivileges = true;
-      PrivateDevices = true;
-      PrivateMounts = true;
-      PrivateTmp = true;
+    serviceConfig = utils.hardeningBaseline config {
+      DynamicUser = false;
+      PrivateUsers = false;
       ProtectSystem = mkForce "strict";
-      ProtectHome = true;
-      ProtectClock = true;
-      ProtectHostname = true;
-      ProtectProc = "invisible";
-      ProtectKernelLogs = true;
-      ProtectKernelModules = true;
-      ProtectKernelTunables = true;
-      RemoveIPC = true;
       RestrictAddressFamilies = [ "AF_UNIX" "AF_NETLINK" "AF_INET" "AF_INET6" ];
-      RestrictNamespaces = true;
-      RestrictRealtime = true;
-      RestrictSUIDSGID = true;
-      SystemCallArchitectures = "native";
+      CapabilityBoundingSet = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
+      AmbientCapabilities = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
       SocketBindDeny = "any";
       SocketBindAllow = cfg.listenPort;
-      MemoryDenyWriteExecute = true;
     };
   };
 

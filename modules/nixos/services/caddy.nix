@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mapAttrs getExe concatStringsSep mkVMOverride;
+  inherit (lib) mkIf utils mapAttrs getExe concatStringsSep mkVMOverride;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.system.virtualisation) vmVariant;
@@ -53,29 +53,13 @@ mkIf cfg.enable
   modules.system.networking.publicPorts = [ 443 80 ];
 
   # Extra hardening
-  systemd.services.caddy.serviceConfig = {
-    LockPersonality = true;
-    NoNewPrivileges = true;
-    PrivateDevices = true;
-    PrivateMounts = true;
-    PrivateTmp = true;
-    ProtectSystem = "strict";
-    ProtectHome = true;
-    ProtectClock = true;
-    ProtectHostname = true;
-    ProtectProc = "invisible";
-    ProtectKernelLogs = true;
-    ProtectKernelModules = true;
-    ProtectKernelTunables = true;
-    RemoveIPC = true;
-    RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" ];
-    RestrictNamespaces = true;
-    RestrictRealtime = true;
-    RestrictSUIDSGID = true;
-    SystemCallArchitectures = "native";
+  systemd.services.caddy.serviceConfig = utils.hardeningBaseline config {
+    DynamicUser = false;
+    PrivateUsers = false;
+    CapabilityBoundingSet = [ "CAP_NET_BIND_SERVICE" ];
+    AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
     SocketBindDeny = "any";
     SocketBindAllow = [ 443 80 ];
-    MemoryDenyWriteExecute = true;
   };
 
   systemd.services.goaccess =
@@ -111,29 +95,9 @@ mkIf cfg.enable
         RestartSec = "10s";
         User = "caddy";
         Group = "caddy";
-
         StateDirectory = [ "goaccess" ];
-        LockPersonality = true;
-        NoNewPrivileges = true;
-        PrivateDevices = true;
-        PrivateMounts = true;
-        PrivateTmp = true;
-        ProtectSystem = "strict";
-        ProtectHome = true;
-        ProtectClock = true;
-        ProtectHostname = true;
-        ProtectProc = "invisible";
-        ProtectKernelLogs = true;
-        ProtectKernelModules = true;
-        ProtectKernelTunables = true;
-        RemoveIPC = true;
-        RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" ];
-        RestrictNamespaces = true;
-        RestrictRealtime = true;
-        RestrictSUIDSGID = true;
-        SystemCallArchitectures = "native";
-        SocketBindDeny = publicPorts;
-        MemoryDenyWriteExecute = true;
+      } // utils.hardeningBaseline config {
+        DynamicUser = false;
       };
 
       wantedBy = [ "multi-user.target" ];

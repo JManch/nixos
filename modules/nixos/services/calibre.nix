@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkBefore mkVMOverride getExe';
+  inherit (lib) mkIf mkBefore mkVMOverride getExe' utils;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.calibre;
 in
@@ -19,6 +19,10 @@ mkIf cfg.enable
       enableBookUploading = true;
       calibreLibrary = "/var/lib/calibre-library";
     };
+  };
+
+  systemd.services.calibre-web.serviceConfig = utils.hardeningBaseline config {
+    DynamicUser = false;
   };
 
   services.caddy.virtualHosts."calibre.${fqDomain}".extraConfig = ''

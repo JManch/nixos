@@ -74,20 +74,34 @@ in
         # need these anyway and would prefer the extra security.
         User = "ctrld";
         Group = "ctrld";
+        LockPersonality = true;
+        NoNewPrivileges = true;
+        PrivateUsers = true;
         PrivateDevices = true;
         PrivateMounts = true;
+        PrivateTmp = true;
         ProtectSystem = "strict";
         ProtectHome = true;
+        ProtectControlGroups = true;
         ProtectClock = true;
+        ProtectProc = "invisible";
+        ProtectHostname = true;
         ProtectKernelLogs = true;
         ProtectKernelModules = true;
         ProtectKernelTunables = true;
-        LockPersonality = true;
-        NoNewPrivileges = true;
-        PrivateTmp = true;
+        ProcSubset = "pid";
         RemoveIPC = true;
+        RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
         RestrictNamespaces = true;
+        RestrictRealtime = true;
         RestrictSUIDSGID = true;
+        SystemCallArchitectures = "native";
+        SystemCallFilter = [ "@system-service" "~@privileged" ];
+        CapabilityBoundingSet = "";
+        AmbientCapabilities = "";
+        DeviceAllow = "";
+        MemoryDenyWriteExecute = true;
+        UMask = "0077";
       };
 
       wantedBy = [ "multi-user.target" ];

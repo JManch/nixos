@@ -77,6 +77,7 @@ lib.mkIf cfg.enable {
       "Ctrl+WHEEL_DOWN" = "add speed -0.1";
       "MBTN_MID" = "cycle mute";
       F1 = "af toggle acompressor=ratio=4; af toggle loudnorm";
+      "Shift+RIGHT" = "seek 0.1 exact"; # for catching-up livestreams
     };
   };
 

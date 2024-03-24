@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf optional mkVMOverride;
+  inherit (lib) mkIf optional utils mkVMOverride;
   inherit (config.modules.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.home-assistant;
@@ -29,6 +29,17 @@ mkIf cfg.enable
     configWritable = true;
     extraComponents = [
       "google_translate"
+      "hue"
+      "forecast_solar"
+      "homekit_controller"
+      "powerwall"
+      "mqtt"
+      "webostv"
+      "sun"
+      "mobile_app"
+      "profiler"
+      "met" # weather
+      "co2signal"
     ];
     customComponents = with pkgs.home-assistant-custom-components; [
       # TODO: Update these
@@ -51,10 +62,9 @@ mkIf cfg.enable
 
       automation = { };
     };
-
-    # TODO: Figure out a way to configure the lovelace dashboard. Not sure if I
-    # want it be declarative or encrypted?
   };
+
+  # Home assistant module has good systemd hardening
 
   services.postgresql = {
     enable = true;
@@ -63,6 +73,11 @@ mkIf cfg.enable
       name = "hass";
       ensureDBOwnership = true;
     }];
+  };
+
+  systemd.services.postgresql.serviceConfig = utils.hardeningBaseline config {
+    DynamicUser = false;
+    PrivateUsers = false;
   };
 
   services.caddy.virtualHosts."home.${fqDomain}".extraConfig = ''

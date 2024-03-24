@@ -25,6 +25,8 @@ mkIf cfg.enable
     };
   };
 
+  # Jellyfin module has good default hardening
+
   systemd.tmpfiles.rules = [
     "d /var/lib/jellyfin/media/shows 700 ${jellyfin.user} ${jellyfin.group}"
     "d /var/lib/jellyfin/media/movies 700 ${jellyfin.user} ${jellyfin.group}"

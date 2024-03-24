@@ -144,6 +144,7 @@ mkIf cfg.enable
       PrivateUsers = false;
       ProtectSystem = mkForce "strict";
       RestrictAddressFamilies = [ "AF_UNIX" "AF_NETLINK" "AF_INET" "AF_INET6" ];
+      SystemCallFilter = [ "@system-service" "~@resources" ];
       CapabilityBoundingSet = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
       AmbientCapabilities = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
       SocketBindDeny = "any";

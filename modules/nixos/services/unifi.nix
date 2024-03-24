@@ -30,6 +30,8 @@ mkIf cfg.enable
     ];
   };
 
+  # Unifi module has good default hardening
+
   services.caddy.virtualHosts."unifi.${fqDomain}".extraConfig = ''
     import lan_only
     reverse_proxy https://127.0.0.1:8443 {

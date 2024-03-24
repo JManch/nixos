@@ -19,11 +19,11 @@ in
     DynamicUser = true;
     LockPersonality = true;
     NoNewPrivileges = true;
-    PrivateUsers = true; # this has to be false for CAP_NET_BIND_SERVICE
+    PrivateUsers = true; # has to be false for CAP_NET_BIND_SERVICE
     PrivateDevices = true;
     PrivateMounts = true;
     PrivateTmp = true;
-    ProtectSystem = "strict"; # this does not apply to service directories like StateDirectory
+    ProtectSystem = "strict"; # does not apply to service directories like StateDirectory
     ProtectHome = true;
     ProtectControlGroups = true;
     ProtectClock = true;
@@ -39,12 +39,11 @@ in
     RestrictRealtime = true;
     RestrictSUIDSGID = true;
     SystemCallArchitectures = "native";
-    # SystemCallFilter = [ "@system-service" "~@privileged" "~@resources" ];
+    SystemCallFilter = [ "@system-service" "~@privileged" "~@resources" ];
     CapabilityBoundingSet = "";
     AmbientCapabilities = "";
     DeviceAllow = "";
     SocketBindDeny = config.modules.system.networking.publicPorts;
-    SocketBindAllow = "all";
     MemoryDenyWriteExecute = true;
     UMask = "0077";
   } // overrides;

@@ -1,6 +1,6 @@
 { lib, config, inputs, ... }:
 let
-  inherit (lib) mkIf mkVMOverride optionalString;
+  inherit (lib) mkIf mkVMOverride optionalString utils;
   inherit (config.device) gpu ipAddress;
   inherit (config.modules.system.networking) publicPorts;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -106,11 +106,15 @@ mkIf cfg.enable
     };
   };
 
-  systemd.services.frigate.serviceConfig = {
-    EnvironmentFile = config.age.secrets.cctvVars.path;
-    SocketBindDeny = publicPorts;
+  systemd.services.frigate.serviceConfig = utils.hardeningBaseline config {
     # WARN: The upstream module tries to set a read only bind path with BindPaths
     # which is invalid, I'm not sure if it affects functionality?
+    DynamicUser = false;
+    ProtectProc = "default";
+    ProcSubset = "all";
+    SystemCallFilter = [ "@system-service" "~@privileged" ];
+    UMask = "0027";
+    EnvironmentFile = config.age.secrets.cctvVars.path;
   };
 
   systemd.services.nginx.serviceConfig = {

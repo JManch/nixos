@@ -28,4 +28,11 @@ mkIf cfg.enable
       }
     ];
   };
+
+  persistence.directories = [{
+    directory = "/var/lib/mosquitto";
+    user = "mosquitto";
+    group = "mosquitto";
+    mode = "700";
+  }];
 }

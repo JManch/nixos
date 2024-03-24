@@ -66,7 +66,7 @@ in
         ExecStart = "${getExe cfg.package} connect \"${cfg.country}\"";
         ExecStop = "-${getExe cfg.package} disconnect";
         Restart = "on-failure";
-        RestartSec = "1s";
+        RestartSec = 3;
         RemainAfterExit = "yes";
       };
     };

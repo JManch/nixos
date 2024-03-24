@@ -441,11 +441,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1711035742,
-        "narHash": "sha256-5vvhCSUGG9TA2G1eIRgokuYizhRnZu0ZbcU1MXfHsUE=",
+        "lastModified": 1710257359,
+        "narHash": "sha256-43re5pzE/cswFAgw92/ugsB3+d5ufDaCcLtl9ztKfBo=",
         "owner": "hyprwm",
         "repo": "hyprcursor",
-        "rev": "6a92473237f430399a417e1c2da9d7fcd4970086",
+        "rev": "1761f6cefd77f4fcd2039d930c88d6716ddc4974",
         "type": "github"
       },
       "original": {
@@ -489,15 +489,16 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1711152198,
-        "narHash": "sha256-wT8UTS22HIm+Sbkim+IMqESW9SP+EB0FAjroyPnAovY=",
+        "lastModified": 1710816831,
+        "narHash": "sha256-8PyLk/gfMo4asjbqsoXw1I3zfnkCPSSX0r6UCJP3ctw=",
         "owner": "hyprwm",
         "repo": "Hyprland",
-        "rev": "0dfdb6678f5362fda449694639e8fee806ca1ae4",
+        "rev": "05c84304ccb1169b550504830139e07e28500a3b",
         "type": "github"
       },
       "original": {
         "owner": "hyprwm",
+        "ref": "05c84304ccb1169b550504830139e07e28500a3b",
         "repo": "Hyprland",
         "type": "github"
       }
@@ -583,11 +584,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1710960526,
-        "narHash": "sha256-tt0UgVKWeLQ+tFzvqrm4uAZbzONwdGshpfiLHAQ1P2c=",
+        "lastModified": 1709914708,
+        "narHash": "sha256-bR4o3mynoTa1Wi4ZTjbnsZ6iqVcPGriXp56bZh5UFTk=",
         "owner": "hyprwm",
         "repo": "hyprlang",
-        "rev": "a2f39421144d42541c057be235154ce21b76c0f6",
+        "rev": "a685493fdbeec01ca8ccdf1f3655c044a8ce2fe2",
         "type": "github"
       },
       "original": {
@@ -801,11 +802,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1711076069,
-        "narHash": "sha256-e1HVO9T5lmQacWGjQhB47ya5ITAyvbec77FOL+9wNxI=",
+        "lastModified": 1711241449,
+        "narHash": "sha256-npn6ECtIWA5Y8EMbZ7SxctW8DJJ91HpNd+mNgVpbRn0=",
         "ref": "refs/heads/main",
-        "rev": "99b8d8f4844ca0181c98a18771f5ba1aa0feab5a",
-        "revCount": 28,
+        "rev": "ab6d316f1139025ef389d001dd9d350b2e49a3eb",
+        "revCount": 33,
         "type": "git",
         "url": "ssh://git@github.com/JManch/nix-resources"
       },

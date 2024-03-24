@@ -7,8 +7,7 @@
   disko.devices = {
     disk."256GB-NVME" = {
       type = "disk";
-      # TODO: Change this device
-      device = "/dev/vda";
+      device = "/dev/nvme0n1";
       content = {
         type = "gpt";
         partitions = {

@@ -34,7 +34,7 @@ let
       sudo nixos-rebuild build-vm --flake "/home/${username}/.config/nixos#$hostname"
 
       # Print ports mapped to the VM
-      printf '\nMapped Ports:\n%s' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
+      printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
 
       if [[ ! -e "/home/${username}/$hostname.qcow2" ]]; then
         # Decrypt the relevant secrets from kit
@@ -158,6 +158,8 @@ mkMerge [
             ++
             map (forward "udp" true) mappedUDPPorts;
         };
+
+      programs.zsh.shellAliases.p = "sudo systemctl poweroff";
     };
   }
 

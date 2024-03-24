@@ -11,13 +11,32 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkForce mkVMOverride mapAttrs' nameValuePair filterAttrs utils;
+  inherit (lib)
+    mkIf
+    mkForce
+    mkVMOverride
+    mapAttrs'
+    mapAttrs
+    attrValues
+    nameValuePair
+    filterAttrs
+    utils;
+  inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.dns-server-stack;
 
   # Patch Ctrld to enable loading endpoints from environment variables
   ctrld = outputs.packages.${pkgs.system}.ctrld.overrideAttrs (oldAttrs: {
     patches = (oldAttrs.patches or [ ]) ++ [ ../../../patches/ctrldSecretEndpoint.patch ];
   });
+
+  # Declares hostnames for all devices on my local network
+  homeHosts = inputs.nix-resources.secrets.homeHosts // {
+    "${cfg.routerAddress}" = "router";
+  } //
+    # Add all hosts that have a static local address
+    mapAttrs'
+      (host: v: nameValuePair v.config.device.ipAddress host)
+      (filterAttrs (host: v: v.config.device.ipAddress != null) (utils.hosts outputs));
 in
 mkIf cfg.enable
 {
@@ -70,6 +89,9 @@ mkIf cfg.enable
     EnvironmentFile = config.age.secrets.ctrldEndpoint.path;
   };
 
+  # Populate hosts file for ctrld host discovery
+  networking.hosts = mapAttrs (_: v: [ v ]) homeHosts;
+
   services.dnsmasq = {
     enable = true;
     alwaysKeepRunning = true;
@@ -78,6 +100,12 @@ mkIf cfg.enable
 
     settings = {
       port = cfg.listenPort;
+
+      # Do not read from hosts because it contains an entry that points
+      # ${hostname}.lan to ::1 and 127.0.0.2. Don't want this in responses so
+      # instead we define hosts using the dnsmasq host-record option and keep
+      # /etc/hosts for ctrld.
+      no-hosts = true;
 
       # Never forward dns queries without a domain to upstream nameservers
       domain-needed = true;
@@ -95,12 +123,6 @@ mkIf cfg.enable
       no-resolv = true;
       no-poll = true;
 
-      # Define local domain whose queries should never be forwarded upstream.
-      # Expand hosts adds .lan to host file entries.
-      local = "/lan/";
-      domain = "lan";
-      expand-hosts = true;
-
       # Send the entire source ip to the Ctrld DNS server. Otherwise Ctrld DNS
       # server sees all source requests coming from localhost. Note that this
       # disables dnsmasq caching so we instead cache with Ctrld.
@@ -109,24 +131,22 @@ mkIf cfg.enable
 
       # Send all queries to the Ctrld DNS server
       server = [ "127.0.0.1#${toString cfg.ctrldListenPort}" ];
-      address = with inputs.nix-resources.secrets; [
+
+      address = [
         # Point DDNS domain to router
         "/ddns.${fqDomain}/${cfg.routerAddress}"
 
         # Point reverse proxy traffic to the device to avoid need for hairpin NAT
         "/${fqDomain}/${config.device.ipAddress}"
       ];
+
+      # Host records create PTR entries as well. Using addn-hosts created
+      # duplicate entries for some reason so using this instead.
+      host-record =
+        attrValues
+          (mapAttrs (address: hostname: "${hostname}.lan,${address}") homeHosts);
     };
   };
-
-  # Home hosts file declares hostnames for all devices on my local network
-  networking.hosts = inputs.nix-resources.secrets.homeHosts // {
-    "${cfg.routerAddress}" = [ "router" ];
-  } //
-    # Add all hosts that have a static local address
-    (mapAttrs'
-      (host: v: nameValuePair (v.config.device.ipAddress) ([ host ]))
-      (filterAttrs (host: v: v.config.device.ipAddress != null) (utils.hosts outputs)));
 
   # Open DNS ports in firewall and set nameserver to localhost
   networking.firewall.allowedTCPPorts = [ cfg.listenPort ];

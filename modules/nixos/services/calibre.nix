@@ -23,6 +23,7 @@ mkIf cfg.enable
 
   systemd.services.calibre-web.serviceConfig = utils.hardeningBaseline config {
     DynamicUser = false;
+    ReadWritePaths = [ "/var/lib/calibre-library" ];
   };
 
   services.caddy.virtualHosts."calibre.${fqDomain}".extraConfig = ''

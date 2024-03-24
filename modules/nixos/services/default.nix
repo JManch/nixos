@@ -13,6 +13,7 @@ in
     home-assistant.enable = mkEnableOption "Home Assistant";
     unifi.enable = mkEnableOption "Unifi Controller";
     calibre.enable = mkEnableOption "Calibre E-book Manager";
+    mosquitto.enable = mkEnableOption "Mosquitto MQTT Broker";
 
     greetd = {
       enable = mkEnableOption "Greetd with TUIgreet";

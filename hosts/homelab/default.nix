@@ -27,6 +27,7 @@
       home-assistant.enable = true;
       unifi.enable = true;
       calibre.enable = true;
+      mosquitto.enable = true;
 
       caddy = {
         enable = true;

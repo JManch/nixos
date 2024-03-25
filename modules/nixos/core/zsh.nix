@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) utils;
+  inherit (lib) utils concatStrings;
 
   deployScript = pkgs.writeShellApplication {
     name = "deploy-host";
@@ -83,19 +83,53 @@ in
 {
   environment.systemPackages = [ deployScript ];
 
-  programs.zsh = {
-    enable = true;
+  programs.zsh =
+    let
+      configDir = "/home/${username}/.config/nixos";
+    in
+    {
+      enable = true;
 
-    shellAliases = {
-      rebuild-switch = "sudo nixos-rebuild switch --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-test = "sudo nixos-rebuild test --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-boot = "sudo nixos-rebuild boot --flake /home/${username}/.config/nixos#${hostname}";
-      # cd here because I once had a bad experience where I accidentally built
-      # in /nix/store and it irrepairably corrupted the store
-      rebuild-build = "cd && nixos-rebuild build --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-dry-build = "nixos-rebuild dry-build --flake /home/${username}/.config/nixos#${hostname}";
-      rebuild-dry-activate = "sudo nixos-rebuild dry-activate --flake /home/${username}/.config/nixos#${hostname}";
-      build-iso = "nix build /home/${username}/.config/nixos#nixosConfigurations.installer.config.system.build.isoImage";
+      shellAliases = {
+        rebuild-switch = "sudo nixos-rebuild switch --flake ${configDir}#${hostname}";
+        rebuild-test = "sudo nixos-rebuild test --flake ${configDir}#${hostname}";
+        rebuild-boot = "sudo nixos-rebuild boot --flake ${configDir}#${hostname}";
+        # cd here because I once had a bad experience where I accidentally built
+        # in /nix/store and it irrepairably corrupted the store
+        rebuild-build = "cd && nixos-rebuild build --flake ${configDir}#${hostname}";
+        rebuild-dry-build = "nixos-rebuild dry-build --flake ${configDir}#${hostname}";
+        rebuild-dry-activate = "sudo nixos-rebuild dry-activate --flake ${configDir}#${hostname}";
+        build-iso = "nix build ${configDir}#nixosConfigurations.installer.config.system.build.isoImage";
+      };
+
+      interactiveShellInit =
+        let
+          hostFunction = cmd: /*bash*/ ''
+
+          host-rebuild-${cmd}() {
+            if [ -z "$1" ]; then
+              echo "Usage: host-rebuild-${cmd} <hostname>"
+              return 1
+            fi
+
+            hostname=$1
+            if [[ "$hostname" == "${hostname}" ]]; then
+              echo "Error: Cannot build remotely on local host"
+              return 1
+            fi
+
+            hosts=(${lib.concatStringsSep " " (builtins.attrNames (utils.hosts outputs))})
+            if ! (($hosts[(I)$hostname])); then
+              echo "Error: Host '$hostname' does not exist" >&2
+              return 1
+            fi
+
+            ssh-add-quiet
+            nixos-rebuild ${cmd} --flake "${configDir}#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
+          }
+
+        '';
+        in
+        concatStrings (map (cmd: hostFunction cmd) [ "switch" "test" "boot" "dry-activate" ]);
     };
-  };
 }

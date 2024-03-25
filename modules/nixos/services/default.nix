@@ -11,7 +11,6 @@ in
     wireguard.enable = mkEnableOption "WireGuard";
     lact.enable = mkEnableOption "Lact";
     unifi.enable = mkEnableOption "Unifi Controller";
-    calibre.enable = mkEnableOption "Calibre E-book Manager";
     mosquitto.enable = mkEnableOption "Mosquitto MQTT Broker";
 
     greetd = {

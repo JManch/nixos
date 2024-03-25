@@ -2,19 +2,21 @@
 , pkgs
 , config
 , inputs
+, hostname
 , ...
 }:
 let
   inherit (lib) mkIf mkBefore mkVMOverride getExe' utils;
   inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.modules.services) caddy;
   cfg = config.modules.services.calibre;
 in
-mkIf cfg.enable
+mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
 {
   services.calibre-web = {
     enable = true;
     listen.ip = "127.0.0.1";
-    listen.port = 8083;
+    listen.port = cfg.port;
     options = {
       enableBookUploading = true;
       calibreLibrary = "/var/lib/calibre-library";
@@ -28,11 +30,7 @@ mkIf cfg.enable
 
   services.caddy.virtualHosts."calibre.${fqDomain}".extraConfig = ''
     import lan_only
-    reverse_proxy http://127.0.0.1:8083
-    # Might need this
-    # {
-    #   header_up X-Script-Name /calibre-web
-    # }
+    reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 
   # Expose wireless server for kobo ereader transfers
@@ -73,6 +71,6 @@ mkIf cfg.enable
         ExecStartPre = mkBefore [ createDummyLibrary.outPath ];
       };
 
-      networking.firewall.allowedTCPPorts = [ 8083 ];
+      networking.firewall.allowedTCPPorts = [ cfg.port ];
     };
 }

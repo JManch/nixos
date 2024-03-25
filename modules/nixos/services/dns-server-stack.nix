@@ -1,13 +1,15 @@
 # DNS stack using a dnsmasq server and Ctrld DNS server. DNS requests first hit
 # the dnsmasq server, which then sends the requests upstream to the Ctrld
 # server. Using dnsmasq here has the advantage of more configurability than
-# Ctrld and makes it possible to setup DNS resolution using the hosts file. We
-# use Ctrld because it provides extra statistics to the web UI for monitoring.
+# Ctrld and makes it possible to setup custom DNS resolution for devices on the
+# local network. We use the Ctrld dns forwarding proxy because it provides
+# extra statistics to the web UI for monitoring and enables DoH/3.
 { lib
 , pkgs
 , config
 , inputs
 , outputs
+, hostname
 , ...
 }:
 let
@@ -38,7 +40,7 @@ let
       (host: v: nameValuePair v.config.device.ipAddress host)
       (filterAttrs (host: v: v.config.device.ipAddress != null) (utils.hosts outputs));
 in
-mkIf cfg.enable
+mkIf (hostname == "homelab" && cfg.enable)
 {
   # Disable systemd-resolved to simplify DNS stack
   modules.system.networking.resolved.enable = mkForce false;

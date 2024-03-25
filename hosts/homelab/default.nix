@@ -22,6 +22,7 @@
 
   modules = {
     hardware.fileSystem.trim = true;
+    hardware.graphics.hardwareAcceleration = true;
 
     services = {
       hass.enable = true;

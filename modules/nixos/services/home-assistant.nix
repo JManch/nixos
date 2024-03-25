@@ -66,6 +66,28 @@ mkIf cfg.enable
 
   # Home assistant module has good systemd hardening
 
+  # Install frigate-hass-card
+  systemd.services.home-assistant.preStart =
+    let
+      inherit (config.services.home-assistant) configDir;
+    in
+      /*bash*/ ''
+
+      mkdir -p "${configDir}/www"
+
+      # Removing existing symbolic links so that frigate-hass-card will
+      # uninstall if it's removed from config
+      readarray -d "" links < <(find "${configDir}/www" -maxdepth 1 -type l -print0)
+        for link in "''${links[@]}"; do
+          if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
+            rm "$link"
+          fi
+        done
+
+      ln -fsn "${outputs.packages.${pkgs.system}.frigate-hass-card}/frigate-hass-card" "${configDir}/www"
+
+    '';
+
   services.postgresql = {
     enable = true;
     ensureDatabases = [ "hass" ];

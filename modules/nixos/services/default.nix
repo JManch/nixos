@@ -96,6 +96,20 @@ in
       };
     };
 
+    unifi = {
+      enable = mkEnableOption "Unifi Controller";
+
+      port = mkOption {
+        type = types.port;
+        internal = true;
+        readOnly = true;
+        default = 8443;
+        description = ''
+          Unifi Controller listen port. Cannot be changed declaratively.
+        '';
+      };
+    };
+
     frigate = {
       enable = mkEnableOption "Frigate";
 

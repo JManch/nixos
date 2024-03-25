@@ -2,14 +2,16 @@
 , pkgs
 , config
 , inputs
+, hostname
 , ...
 }:
 let
   inherit (lib) mkIf;
   inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.modules.services) caddy;
   cfg = config.modules.services.unifi;
 in
-mkIf cfg.enable
+mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
 {
   services.unifi = {
     enable = true;
@@ -30,11 +32,11 @@ mkIf cfg.enable
     ];
   };
 
-  # Unifi module has good default hardening
+  # Unifi module has good default systemd hardening
 
   services.caddy.virtualHosts."unifi.${fqDomain}".extraConfig = ''
     import lan_only
-    reverse_proxy https://127.0.0.1:8443 {
+    reverse_proxy https://127.0.0.1:${toString cfg.port} {
       # We have to allow insecure HTTPS because unifi forcefully enables TLS
       # with an invalid cert.
       transport http {
@@ -54,6 +56,6 @@ mkIf cfg.enable
   ];
 
   virtualisation.vmVariant = {
-    networking.firewall.allowedTCPPorts = [ 8443 ];
+    networking.firewall.allowedTCPPorts = [ cfg.port ];
   };
 }

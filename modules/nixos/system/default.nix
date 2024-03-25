@@ -131,7 +131,6 @@ in
           assertion = (cfg.networking.primaryInterface != "");
           message = "Primary networking interface must be set";
         }
-
         {
           assertion = (cfg.networking.staticIPAddress != null) -> (cfg.networking.defaultGateway != null);
           message = "Default gateway must be set when using a static IPV4 address";

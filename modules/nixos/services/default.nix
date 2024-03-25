@@ -185,6 +185,13 @@ in
         assertion = cfg.frigate.enable -> (cfg.frigate.nvrAddress != "");
         message = "The Frigate service requires nvrAddress to be set";
       }
+      {
+        assertion = cfg.frigate.enable -> config.hardware.opengl.enable;
+        message = ''
+          The Frigate service requires hardware acceleration. Set
+          `hardware.opengl.enable`.
+        '';
+      }
     ];
   };
 }

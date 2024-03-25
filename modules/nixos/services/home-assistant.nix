@@ -26,25 +26,43 @@ mkIf cfg.enable
       ];
     });
 
-    configWritable = true;
     extraComponents = [
-      "google_translate"
-      "hue"
-      "forecast_solar"
-      "homekit_controller"
-      "powerwall"
-      "mqtt"
-      "webostv"
       "sun"
+      "radio_browser"
+      "google_translate"
+      "met" # weather
       "mobile_app"
       "profiler"
-      "met" # weather
+      "hue"
+      "webostv"
+      "powerwall"
       "co2signal"
-    ];
+      "forecast_solar"
+    ] ++ optional mosquitto.enable "mqtt";
+
     customComponents = with pkgs.home-assistant-custom-components; [
-      # TODO: Update these
-      miele
-      adaptive_lighting
+      (miele.overrideAttrs (oldAttrs: rec {
+        version = "2024.3.0";
+        src = pkgs.fetchFromGitHub {
+          owner = oldAttrs.owner;
+          repo = oldAttrs.domain;
+          rev = "refs/tags/v${version}";
+          hash = "sha256-J9n4PFcd87L301B2YktrLcxp5Vu1HwDeCYnrMEJ0+TA=";
+        };
+      }))
+
+      (adaptive_lighting.overrideAttrs (oldAttrs: rec {
+        version = "1.20.0";
+        src = pkgs.fetchFromGitHub {
+          owner = "basnijholt";
+          repo = "adaptive-lighting";
+          rev = "refs/tags/${version}";
+          hash = "sha256-4Emm7/UJvgU7gaPNiD/JJrMCDpmLuW3Me0sKwB9+KYI=";
+        };
+      }))
+
+      (utils.flakePkgs args "graham33").heatmiser-for-home-assistant
+      # TODO: Swap this out for upstream package once in unstable
     ] ++ optional frigate.enable personal-hass-components.frigate-hass-integration;
 
     config = {

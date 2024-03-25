@@ -59,6 +59,10 @@
 
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Provides home assistant heatmiser component
+    graham33.url = "github:graham33/nur-packages?rev=71fcef3f3f0f198577fee51f64a0f3711daefc99";
+    graham33.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, home-manager, ... } @ inputs:

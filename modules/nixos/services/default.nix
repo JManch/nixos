@@ -10,8 +10,6 @@ in
     udisks.enable = mkEnableOption "udisks";
     wireguard.enable = mkEnableOption "WireGuard";
     lact.enable = mkEnableOption "Lact";
-    unifi.enable = mkEnableOption "Unifi Controller";
-    mosquitto.enable = mkEnableOption "Mosquitto MQTT Broker";
 
     greetd = {
       enable = mkEnableOption "Greetd with TUIgreet";
@@ -113,6 +111,11 @@ in
     frigate = {
       enable = mkEnableOption "Frigate";
 
+      port = mkOption {
+        type = types.port;
+        default = 5000;
+      };
+
       rtspAddress = mkOption {
         type = types.functionTo types.str;
         default = _: "";
@@ -127,6 +130,15 @@ in
         description = ''
           IP address of the NVR on the local network.
         '';
+      };
+    };
+
+    mosquitto = {
+      enable = mkEnableOption "Mosquitto MQTT Broker";
+
+      port = mkOption {
+        type = types.port;
+        default = 1883;
       };
     };
 
@@ -157,22 +169,18 @@ in
         assertion = cfg.greetd.enable -> (cfg.greetd.sessionDirs != [ ]);
         message = "Greetd session dirs must be set";
       }
-
       {
         assertion = cfg.caddy.enable -> (cfg.caddy.lanAddressRanges != [ ]);
         message = "LAN address ranges must be set for Caddy";
       }
-
       {
         assertion = cfg.dns-server-stack.enable -> (config.device.ipAddress != null);
         message = "The DNS server stack requires the device to have a static IP address set";
       }
-
       {
         assertion = cfg.dns-server-stack.enable -> (cfg.dns-server-stack.routerAddress != "");
         message = "The DNS server stack requires the device to have a router IP address set";
       }
-
       {
         assertion = cfg.frigate.enable -> (cfg.frigate.nvrAddress != "");
         message = "The Frigate service requires nvrAddress to be set";

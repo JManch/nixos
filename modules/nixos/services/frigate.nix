@@ -1,21 +1,24 @@
-{ lib, config, inputs, ... }:
+{ lib
+, config
+, inputs
+, hostname
+, ...
+}:
 let
   inherit (lib) mkIf mkVMOverride optionalString utils;
-  inherit (config.device) gpu ipAddress;
+  inherit (config.device) ipAddress;
   inherit (config.modules.system.networking) publicPorts;
+  inherit (config.modules.services) hass mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.frigate;
 in
-mkIf cfg.enable
+mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
 {
   modules.services.frigate.rtspAddress = { channel, subtype, go2rtc ? false }:
     "rtsp://${optionalString go2rtc "$"}{FRIGATE_RTSP_USER}:${optionalString go2rtc "$"}{FRIGATE_RTSP_PASSWORD}@${cfg.nvrAddress}:554/cam/realmonitor?channel=${toString channel}&subtype=${toString subtype}";
 
   users.groups.cctv.members = [ "frigate" "go2rtc" ];
 
-  # TODO: (waiting on home assistance module)
-  # - Setup mqtt host... should probably do this on the hass side?
-  # - Test secrets work
   networking.hosts.${cfg.nvrAddress} = [ "cctv" ];
 
   services.frigate = {
@@ -23,12 +26,12 @@ mkIf cfg.enable
     hostname = "frigate.internal.com";
 
     settings = {
-      ffmpeg.hwaccel_args = mkIf (gpu.type == "amd") "preset-vaapi";
+      ffmpeg.hwaccel_args = "preset-vaapi";
 
-      # TODO: Move this to home assistant config
-      mqtt = {
+      mqtt = mkIf (hass.enable && mosquitto.enable) {
         enabled = true;
-        # TODO: Set mqtt host
+        host = "127.0.0.1";
+        port = mosquitto.port;
         user = "{FRIGATE_MQTT_USER}";
         password = "{FRIGATE_MQTT_PASSWORD}";
       };
@@ -91,7 +94,6 @@ mkIf cfg.enable
 
       objects.track = [
         "person"
-        "car"
       ];
 
       record = {
@@ -113,10 +115,14 @@ mkIf cfg.enable
     ProtectProc = "default";
     ProcSubset = "all";
     SystemCallFilter = [ "@system-service" "~@privileged" ];
+    # Device access for hw accel
+    PrivateDevices = false;
+    DeviceAllow = [ ];
     UMask = "0027";
     EnvironmentFile = config.age.secrets.cctvVars.path;
   };
 
+  # Nginx upstream module has good systemd hardening
   systemd.services.nginx.serviceConfig = {
     SocketBindDeny = publicPorts;
   };
@@ -164,22 +170,27 @@ mkIf cfg.enable
     };
   };
 
-  systemd.services.go2rtc.serviceConfig = {
+  systemd.services.go2rtc.serviceConfig = utils.hardeningBaseline config {
     EnvironmentFile = config.age.secrets.cctvVars.path;
-    SocketBindDeny = publicPorts;
+    RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
+    SystemCallFilter = [ "@system-service" "~@privileged" ];
+    SocketBindDeny = "any";
+    SocketBindAllow = [ 8555 8554 1984 ];
   };
 
   # Because WebRTC port has to be forwarded
   modules.system.networking.publicPorts = [ 8555 ];
+  networking.firewall.allowedTCPPorts = [ 8555 ];
+  networking.firewall.allowedUDPPorts = [ 8555 ];
 
   services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = [{
     addr = "127.0.0.1";
-    port = 5000;
+    port = cfg.port;
   }];
 
   services.caddy.virtualHosts."cctv.${fqDomain}".extraConfig = ''
     import lan_only
-    reverse_proxy http://127.0.0.1:5000
+    reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 
   persistence.directories = [{
@@ -204,11 +215,11 @@ mkIf cfg.enable
 
     services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = mkVMOverride [{
       addr = "0.0.0.0";
-      port = 5000;
+      port = cfg.port;
     }];
 
     # NOTE: I can't get the WebRTC stream to work from the VM
-    networking.firewall.allowedTCPPorts = [ 5000 1984 8554 ];
+    networking.firewall.allowedTCPPorts = [ cfg.port 1984 8554 ];
     networking.firewall.allowedUDPPorts = [ 8554 ];
   };
 }

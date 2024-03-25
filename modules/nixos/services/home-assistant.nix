@@ -3,25 +3,25 @@
 , config
 , inputs
 , outputs
+, hostname
 , ...
-}:
+} @ args:
 let
-  inherit (lib) mkIf optional utils mkVMOverride;
-  inherit (config.modules.services) frigate;
+  inherit (lib) mkIf optional utils mkVMOverride escapeShellArg;
+  inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  cfg = config.modules.services.home-assistant;
+  cfg = config.modules.services.hass;
   personal-hass-components = outputs.packages.${pkgs.system}.home-assistant-custom-components;
 in
-# NOTE: This is very WIP
-mkIf cfg.enable
+mkIf (cfg.enable && hostname == "homelab" && caddy.enable)
 {
   services.home-assistant = {
     enable = true;
     openFirewall = false;
 
     package = (pkgs.home-assistant.override {
-      # Needed for postgres support
       extraPackages = ps: [
+        # For postgres support
         ps.psycopg2
       ];
     });
@@ -65,18 +65,32 @@ mkIf cfg.enable
       # TODO: Swap this out for upstream package once in unstable
     ] ++ optional frigate.enable personal-hass-components.frigate-hass-integration;
 
+    configWritable = false;
     config = {
       default_config = { };
       frontend = { };
+
       # We use postgresql instead of the default sqlite because it has better performance
       recorder.db_url = "postgresql://@/hass";
 
       http = {
+        server_port = cfg.port;
         ip_ban_enabled = true;
         login_attempts_threshold = 3;
         use_x_forwarded_for = true;
         trusted_proxies = [ "127.0.0.1" "::1" ];
       };
+
+      camera = [{
+        platform = "local_file";
+        file_path = "/var/lib/hass/media/lounge_floorplan.png";
+        name = "Lounge Floorplan";
+      }];
+
+      lovelace.resources = mkIf frigate.enable [{
+        url = "/local/frigate-hass-card/frigate-hass-card.js";
+        type = "module";
+      }];
 
       automation = { };
     };
@@ -242,7 +256,7 @@ mkIf cfg.enable
     let
       inherit (config.services.home-assistant) configDir;
     in
-      /*bash*/ ''
+    mkIf frigate.enable /*bash*/ ''
 
       mkdir -p "${configDir}/www"
 
@@ -274,7 +288,8 @@ mkIf cfg.enable
   };
 
   services.caddy.virtualHosts."home.${fqDomain}".extraConfig = ''
-    reverse_proxy http://127.0.0.1:8123
+    import lan_only
+    reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 
   persistence.directories = [
@@ -293,7 +308,7 @@ mkIf cfg.enable
   ];
 
   virtualisation.vmVariant = {
-    networking.firewall.allowedTCPPorts = [ 8123 ];
+    networking.firewall.allowedTCPPorts = [ cfg.port ];
 
     services.home-assistant.config.http = {
       trusted_proxies = mkVMOverride [ "0.0.0.0/0" ];

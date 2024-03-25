@@ -24,7 +24,7 @@
     hardware.fileSystem.trim = true;
 
     services = {
-      home-assistant.enable = true;
+      hass.enable = true;
       unifi.enable = true;
       calibre.enable = true;
       mosquitto.enable = true;

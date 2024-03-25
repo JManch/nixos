@@ -10,7 +10,6 @@ in
     udisks.enable = mkEnableOption "udisks";
     wireguard.enable = mkEnableOption "WireGuard";
     lact.enable = mkEnableOption "Lact";
-    home-assistant.enable = mkEnableOption "Home Assistant";
     unifi.enable = mkEnableOption "Unifi Controller";
     calibre.enable = mkEnableOption "Calibre E-book Manager";
     mosquitto.enable = mkEnableOption "Mosquitto MQTT Broker";
@@ -115,6 +114,24 @@ in
         description = ''
           IP address of the NVR on the local network.
         '';
+      };
+    };
+
+    hass = {
+      enable = mkEnableOption "Home Assistant";
+
+      port = mkOption {
+        type = types.port;
+        default = 8123;
+      };
+    };
+
+    calibre = {
+      enable = mkEnableOption "Calibre E-book Manager";
+
+      port = mkOption {
+        type = types.port;
+        default = 8083;
       };
     };
   };

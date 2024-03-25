@@ -1,6 +1,6 @@
 { lib, config, ... }:
 let
-  inherit (lib) mkAliasOptionModule mkEnableOption mkOption types getExe';
+  inherit (lib) mkAliasOptionModule mkEnableOption mkOption types getExe' escapeShellArg;
   cfg = config.modules.desktop.hyprland;
   hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 in
@@ -65,14 +65,14 @@ in
     enableShaders = mkOption {
       type = types.str;
       readOnly = true;
-      default = "'${hyprctl}' keyword decoration:screen_shader \"${cfg.shaderDir}/monitorGamma.frag\"";
+      default = "${escapeShellArg hyprctl} keyword decoration:screen_shader \"${cfg.shaderDir}/monitorGamma.frag\"";
       description = "Command to enable Hyprland screen shaders";
     };
 
     disableShaders = mkOption {
       type = types.str;
       readOnly = true;
-      default = "'${hyprctl}' keyword decoration:screen_shader \"${cfg.shaderDir}/blank.frag\"";
+      default = "${escapeShellArg hyprctl} keyword decoration:screen_shader \"${cfg.shaderDir}/blank.frag\"";
       description = "Command to disable Hyprland screen shaders";
     };
   };

@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf optional mkForce getExe getExe';
+  inherit (lib) mkIf optional mkForce getExe getExe' escapeShellArg;
   cfg = desktopCfg.services.hypridle;
   desktopCfg = config.modules.desktop;
   swaylock = desktopCfg.programs.swaylock;
@@ -47,10 +47,10 @@ in
         while true; do
           # If the display is on, wait screenOffTime seconds then turn off
           # display. Then wait the full lock time before checking again.
-          if '${hyprctl}' monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" >/dev/null 2>&1; then
+          if ${escapeShellArg hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" >/dev/null 2>&1; then
             ${sleep} ${toString cfg.screenOffTime}
             if [ ! -e "$lockfile" ]; then exit 1; fi
-            '${hyprctl}' dispatch dpms off
+            ${escapeShellArg hyprctl} dispatch dpms off
           fi
           # give screens time to turn off and prolong next countdown
           ${sleep} ${toString cfg.lockTime}

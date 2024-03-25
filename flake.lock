@@ -386,6 +386,27 @@
         "type": "github"
       }
     },
+    "graham33": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1706961565,
+        "narHash": "sha256-FGwJvvoWhMnUFQ/kMejBjALwvToxRIZLfgazuUUXrS4=",
+        "owner": "graham33",
+        "repo": "nur-packages",
+        "rev": "71fcef3f3f0f198577fee51f64a0f3711daefc99",
+        "type": "github"
+      },
+      "original": {
+        "owner": "graham33",
+        "repo": "nur-packages",
+        "rev": "71fcef3f3f0f198577fee51f64a0f3711daefc99",
+        "type": "github"
+      }
+    },
     "hercules-ci-effects": {
       "inputs": {
         "flake-parts": "flake-parts_5",
@@ -802,11 +823,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1711241449,
-        "narHash": "sha256-npn6ECtIWA5Y8EMbZ7SxctW8DJJ91HpNd+mNgVpbRn0=",
+        "lastModified": 1711317231,
+        "narHash": "sha256-Qd9LB1MFmdih/QZ7b2Q42t47/7Inm0p7tNuWYti1kPk=",
         "ref": "refs/heads/main",
-        "rev": "ab6d316f1139025ef389d001dd9d350b2e49a3eb",
-        "revCount": 33,
+        "rev": "530dd3131a732a6ace2b5c996c4a5c095816a25f",
+        "revCount": 37,
         "type": "git",
         "url": "ssh://git@github.com/JManch/nix-resources"
       },
@@ -861,6 +882,7 @@
         "disko": "disko",
         "firstBoot": "firstBoot",
         "flake-parts": "flake-parts_2",
+        "graham33": "graham33",
         "home-manager": "home-manager",
         "hypridle": "hypridle",
         "hyprland": "hyprland",

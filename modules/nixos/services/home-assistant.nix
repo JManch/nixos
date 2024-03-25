@@ -80,6 +80,159 @@ mkIf cfg.enable
 
       automation = { };
     };
+
+    lovelaceConfig = {
+      title = "Dashboard";
+
+      views = [
+        {
+          title = "Home";
+
+          cards = [
+            {
+              type = "vertical-stack";
+
+              cards = [
+                {
+                  type = "weather-forecast";
+                  entity = "weather.forecast_home";
+                  forecast_type = "daily";
+                }
+                {
+                  type = "energy-distribution";
+                }
+              ];
+            }
+          ] ++ optional frigate.enable {
+            type = "custom:frigate-card";
+            performance.profile = "low";
+
+            cameras = [
+              {
+                camera_entity = "camera.driveway";
+                frigate.url = "http://127.0.0.1:${toString frigate.port}";
+                live_provider = "go2rtc";
+                go2rtc.modes = [ "webrtc" ];
+              }
+              {
+                camera_entity = "camera.poolhouse";
+                frigate.url = "http://127.0.0.1:${toString frigate.port}";
+                live_provider = "go2rtc";
+                go2rtc.modes = [ "webrtc" ];
+              }
+            ];
+
+            live = {
+              transition_effect = "none";
+              show_image_during_load = true;
+            };
+
+            menu = {
+              style = "hover-card";
+
+              buttons = {
+                cameras.enabled = true;
+                fullscreen.enabled = true;
+                timeline.enabled = true;
+                expand.enabled = false;
+              };
+            };
+
+            view.scan = {
+              enabled = true;
+              untrigger_reset = false;
+            };
+          };
+        }
+        {
+          title = "Lounge";
+          path = "lounge";
+
+          cards = [
+            {
+              type = "vertical-stack";
+
+              cards = [
+                {
+                  type = "light";
+                  entity = "light.lounge";
+                  name = "Lounge";
+                }
+                {
+                  type = "picture-elements";
+                  camera_image = "camera.lounge_floorplan";
+
+                  elements =
+                    let
+                      lightIcon = lightID: posTop: posLeft: {
+                        type = "state-icon";
+                        entity = "light.lounge_spot_ceiling_${lightID}";
+                        tap_action.action = "toggle";
+
+                        style = {
+                          top = posTop;
+                          left = posLeft;
+                          background = "rgba(0, 0, 0, 0.8)";
+                          border-radius = "50%";
+                        };
+                      };
+                    in
+                    [
+                      (lightIcon "01" "65%" "85%")
+                      (lightIcon "02" "25%" "85%")
+                      (lightIcon "03" "45%" "72%")
+                      (lightIcon "04" "65%" "59%")
+                      (lightIcon "05" "25%" "59%")
+                      (lightIcon "06" "65%" "39%")
+                      (lightIcon "07" "25%" "39%")
+                      (lightIcon "08" "45%" "26%")
+                      (lightIcon "09" "65%" "13%")
+                      (lightIcon "10" "25%" "13%")
+                    ];
+                }
+              ];
+            }
+          ];
+        }
+        {
+          title = "Joshua's Room";
+          path = "joshua-room";
+          cards = [
+            {
+              type = "vertical-stack";
+              cards = [
+                {
+                  type = "light";
+                  entity = "light.joshua_room";
+                }
+                {
+                  type = "entities";
+                  state_color = true;
+                  entities = [
+                    {
+                      entity = "switch.adaptive_lighting_joshua_room";
+                      name = "Adaptive Lighting";
+                    }
+                    {
+                      entity = "switch.adaptive_lighting_adapt_brightness_joshua_room";
+                      name = "Adapt Brightness";
+                    }
+                    {
+                      entity = "switch.adaptive_lighting_adapt_color_joshua_room";
+                      name = "Adapt Color";
+                    }
+                    {
+                      entity = "switch.adaptive_lighting_sleep_mode_joshua_room";
+                      name = "Sleep Mode";
+                    }
+                  ];
+                }
+              ];
+            }
+          ];
+        }
+      ];
+    };
   };
 
   # Home assistant module has good systemd hardening

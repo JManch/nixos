@@ -7,7 +7,6 @@
 let
   inherit (lib) mkIf utils mapAttrs getExe concatStringsSep mkVMOverride;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.system.virtualisation) vmVariant;
   cfg = config.modules.services.caddy;
 in
@@ -56,6 +55,7 @@ mkIf cfg.enable
   systemd.services.caddy.serviceConfig = utils.hardeningBaseline config {
     DynamicUser = false;
     PrivateUsers = false;
+    SystemCallFilter = [ "@system-service" "~@resources" ];
     CapabilityBoundingSet = [ "CAP_NET_BIND_SERVICE" ];
     AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
     SocketBindDeny = "any";

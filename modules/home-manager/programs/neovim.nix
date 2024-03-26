@@ -50,6 +50,13 @@ mkIf (cfg.enable && config.modules.shell.enable) {
     ];
   };
 
+  xdg.configFile."nvim".source = pkgs.fetchFromGitHub {
+    repo = "nvim";
+    owner = "JManch";
+    rev = "08960b779a2e451e267e76e95161ff116df854f8";
+    hash = "sha256-B1NwrStp3BVj+mt7A1dW8o5wY6Q3bHD+vYHgKWFH/ZM=";
+  };
+
   # For conditional nix-specific config in nvim config
   home.sessionVariables.NIX_NEOVIM = 1;
 
@@ -80,7 +87,6 @@ mkIf (cfg.enable && config.modules.shell.enable) {
 
   persistence.directories = [
     ".cache/nvim"
-    ".config/nvim"
     ".local/share/nvim"
     ".local/state/nvim"
   ];

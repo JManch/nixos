@@ -37,8 +37,10 @@ in
     supportedFilesystems = [ "zfs" ];
     zfs.forceImportRoot = cfg.forceImportRoot;
 
+    loader.timeout = mkIf cfg.extendedLoaderTimeout 30;
     loader.systemd-boot = {
       enable = true;
+      editor = false;
       consoleMode = "auto";
       configurationLimit = 20;
     };

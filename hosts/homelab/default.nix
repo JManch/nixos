@@ -21,8 +21,11 @@
   };
 
   modules = {
-    hardware.fileSystem.trim = true;
-    hardware.graphics.hardwareAcceleration = true;
+    hardware = {
+      fileSystem.trim = true;
+      fileSystem.extendedLoaderTimeout = true;
+      graphics.hardwareAcceleration = true;
+    };
 
     services = {
       hass.enable = true;

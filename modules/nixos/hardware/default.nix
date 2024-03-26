@@ -12,6 +12,10 @@ in
     fileSystem = {
       trim = mkEnableOption "ZFS automatic trimming";
       unstableZfs = mkEnableOption "unstable ZFS";
+      extendedLoaderTimeout = mkEnableOption ''
+        an extended loader timeout of 30 seconds. Useful for switching to old
+        generations on headless machines.
+      '';
 
       zpoolName = mkOption {
         type = types.str;

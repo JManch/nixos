@@ -48,11 +48,23 @@
         enable = true;
         nvrAddress = "192.168.88.229";
       };
+
+      broadcast-box = {
+        enable = true;
+        port = 8081;
+        autoStart = true;
+        proxy = true;
+      };
+
+      wireguard.friends = {
+        enable = true;
+        autoStart = true;
+        address = "10.0.0.7";
+      };
     };
 
     system = {
       networking = {
-        # TODO: Double check this in installer
         primaryInterface = "enp1s0";
         staticIPAddress = "192.168.89.2";
         defaultGateway = "192.168.89.1";

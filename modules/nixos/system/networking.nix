@@ -19,6 +19,7 @@ in
 
   systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";
   services.resolved.enable = cfg.resolved.enable;
+  services.resolved.fallbackDns = [ ];
 
   networking = {
     hostName = hostname;

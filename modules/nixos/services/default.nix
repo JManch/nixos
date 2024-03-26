@@ -1,6 +1,11 @@
-{ lib, config, hostname, ... }:
+{ lib
+, config
+, username
+, hostname
+, ...
+}:
 let
-  inherit (lib) mkEnableOption mkOption types;
+  inherit (lib) mkIf mkEnableOption mkOption types concatStringsSep;
   cfg = config.modules.services;
 in
 {
@@ -33,7 +38,7 @@ in
 
       sessionDirs = mkOption {
         type = types.listOf types.str;
-        apply = builtins.concatStringsSep ":";
+        apply = concatStringsSep ":";
         default = [ ];
         description = "Directories that contain .desktop files to be used as session definitions";
       };
@@ -195,6 +200,11 @@ in
 
   config = {
     services.udisks2.enable = config.modules.services.udisks.enable;
+
+    # Allows user services like home-manager syncthing to start on boot and
+    # keep running rather than stopping and starting with each ssh session on
+    # servers
+    users.users.${username}.linger = config.device.type == "server";
 
     assertions = [
       {

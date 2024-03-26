@@ -14,8 +14,8 @@ lib.mkIf config.modules.shell.enable
 
   programs.zsh.shellAliases = {
     ls = "eza";
-    ll = "eza -la";
-    la = "eza -a";
+    ll = "eza -la -snew";
+    la = "eza -a -snew";
   };
 
   home.sessionVariables = {

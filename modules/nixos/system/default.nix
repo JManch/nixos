@@ -135,6 +135,10 @@ in
           assertion = (cfg.networking.staticIPAddress != null) -> (cfg.networking.defaultGateway != null);
           message = "Default gateway must be set when using a static IPV4 address";
         }
+        {
+          assertion = lib.allUnique cfg.networking.publicPorts;
+          message = "`networking.publicPorts` contains duplicate ports";
+        }
       ];
     };
 }

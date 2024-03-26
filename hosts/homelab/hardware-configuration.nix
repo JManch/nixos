@@ -10,7 +10,7 @@
   boot = {
     initrd.availableKernelModules = [ "xhci_pci" "ahci" "ehci_pci" "nvme" ];
     kernelModules = [ "kvm-amd" ];
-    # TODO: This is needed to mount in VM, check if it's needed for bare metal
-    zfs.devNodes = "/dev/disk/by-partuuid";
+    # Attempt to fix intermittent ethernet failure
+    kernelParams = [ "pcie_aspm=off" ];
   };
 }

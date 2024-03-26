@@ -285,9 +285,25 @@ mkIf (cfg.enable && hostname == "homelab" && caddy.enable)
     PrivateUsers = false;
   };
 
-  services.caddy.virtualHosts."home.${fqDomain}".extraConfig = ''
-    reverse_proxy http://127.0.0.1:${toString cfg.port}
-  '';
+  services.caddy.virtualHosts = {
+    # Because iPhones are terrible and don't accept my certs
+    # (I don't this iPhone HA app supports certs anyway)
+    "homelan.${fqDomain}".extraConfig = ''
+      import lan_only
+      reverse_proxy http://127.0.0.1:${toString cfg.port}
+    '';
+
+    "home.${fqDomain}".extraConfig = ''
+      tls {
+        client_auth {
+          mode require_and_verify
+          trusted_ca_cert_file ${config.age.secrets.rootCA.path}
+          trusted_leaf_cert_file ${config.age.secrets.homeCert.path}
+        }
+      }
+      reverse_proxy http://127.0.0.1:${toString cfg.port}
+    '';
+  };
 
   persistence.directories = [
     {

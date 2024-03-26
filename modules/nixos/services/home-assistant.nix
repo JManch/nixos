@@ -11,7 +11,6 @@ let
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.hass;
-  personal-hass-components = outputs.packages.${pkgs.system}.home-assistant-custom-components;
 in
 mkIf (cfg.enable && hostname == "homelab" && caddy.enable)
 {
@@ -62,8 +61,7 @@ mkIf (cfg.enable && hostname == "homelab" && caddy.enable)
       }))
 
       (utils.flakePkgs args "graham33").heatmiser-for-home-assistant
-      # TODO: Swap this out for upstream package once in unstable
-    ] ++ optional frigate.enable personal-hass-components.frigate-hass-integration;
+    ] ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;
 
     configWritable = false;
     config = {

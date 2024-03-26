@@ -82,11 +82,15 @@
     services = {
       wgnord.enable = true;
       udisks.enable = true;
-      wireguard.enable = true;
       ollama.enable = false; # FIX: waiting for nixpkgs update
       broadcast-box.enable = true;
       greetd.enable = true;
       lact.enable = true;
+
+      wireguard.friends = {
+        enable = true;
+        address = "10.0.0.2";
+      };
 
       jellyfin = {
         enable = true;
@@ -103,13 +107,12 @@
         primaryInterface = "eno1";
         tcpOptimisations = true;
         resolved.enable = true;
+        firewall.enable = true;
 
         wireless = {
           enable = true;
           disableOnBoot = true;
         };
-
-        firewall.enable = true;
       };
 
       audio = {

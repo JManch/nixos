@@ -27,6 +27,14 @@ let
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 
   hyprlandPkgs = utils.flakePkgs args "hyprland";
+
+  # By default Hyprland adds stdenv.cc, binutils and pciutils to path. I
+  # think it's to fix plugin API function hooking.
+  # https://github.com/hyprwm/Hyprland/pull/2292
+  # Since I don't use plugins I can use the unwrapped package and keep my
+  # path clean.
+  # WARNING: If you ever want to use plugins switch to the wrapped package
+  hyprland = hyprlandPkgs.hyprland-unwrapped;
 in
 mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
   modules.desktop = {
@@ -70,18 +78,12 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
   xdg.portal = {
     extraPortals = [ hyprlandPkgs.xdg-desktop-portal-hyprland ];
-    configPackages = [ hyprlandPkgs.hyprland ];
+    configPackages = [ hyprland ];
   };
 
   wayland.windowManager.hyprland = {
     enable = true;
-    # By default Hyprland adds stdenv.cc, binutils and pciutils to path. I
-    # think it's to fix plugin API function hooking.
-    # https://github.com/hyprwm/Hyprland/pull/2292
-    # Since I don't use plugins I can use the unwrapped package and keep my
-    # path clean.
-    # WARNING: If you ever want to use plugins switch to the wrapped package
-    package = hyprlandPkgs.hyprland-unwrapped;
+    package = hyprland;
 
     systemd = {
       enable = true;

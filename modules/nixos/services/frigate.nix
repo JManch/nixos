@@ -152,13 +152,12 @@ mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
         listen = ":8555";
         candidates = [
           "${ipAddress}:8555"
+          # "stun" here translates to Google's STUN server in the go2rtc code
+          # https://github.com/AlexxIT/go2rtc/blob/5fa31fe4d6cf0e77562b755d52e8ed0165f89d25/internal/webrtc/candidates.go#L21
+          # https://github.com/AlexxIT/go2rtc/blob/5fa31fe4d6cf0e77562b755d52e8ed0165f89d25/pkg/webrtc/helpers.go#L170
           "stun:8555"
         ];
       };
-
-      # TODO: When implementing home assistant need to configure this
-      # Frigate sets it to "/config" but I am not sure if this is correct?
-      # hass.config = "/config";
 
       streams = {
         driveway = (cfg.rtspAddress { channel = 2; subtype = 0; go2rtc = true; });

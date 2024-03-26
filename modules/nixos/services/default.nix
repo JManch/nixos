@@ -50,6 +50,21 @@ in
     broadcast-box = {
       enable = mkEnableOption "Broadcast Box";
       autoStart = mkEnableOption "Broadcast Box service auto start";
+      proxy = mkEnableOption ''
+        publically exposing Broadcast Box with a reverse proxy.
+      '';
+
+      port = mkOption {
+        type = types.port;
+        default = 8080;
+        description = "Webserver listening port";
+      };
+
+      udpMuxPort = mkOption {
+        type = types.port;
+        default = 3000;
+        description = "UDP port used for streaming";
+      };
     };
 
     caddy = {

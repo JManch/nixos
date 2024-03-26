@@ -1,6 +1,13 @@
-{ lib, pkgs, config, ... }:
+{ lib
+, pkgs
+, config
+, inputs
+, ...
+}:
 let
   inherit (lib) mkIf mkForce optional;
+  inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.modules.services) wireguard;
   cfg = config.modules.services.broadcast-box;
 
   # Overriding buildGoModule packages is not elegant...
@@ -41,20 +48,27 @@ mkIf cfg.enable
   services.broadcast-box = {
     enable = true;
     package = broadcast-box;
-    http.port = 8080;
-    udpMux.port = 3000;
-    openFirewall = true;
+    http.port = cfg.port;
+    udpMux.port = cfg.udpMuxPort;
     # This breaks local streaming without hairpin NAT
     nat.autoConfigure = true;
-    statusAPI = false;
+    statusAPI = !cfg.proxy;
   };
 
   systemd.services.broadcast-box.wantedBy = mkForce (
-    optional cfg.autoStart [ "multi-user.target" ]
+    optional cfg.autoStart "multi-user.target"
   );
 
-  networking.firewall.interfaces.wg-discord = {
-    allowedTCPPorts = [ 8080 ];
-    allowedUDPPorts = [ 3000 ];
+  # When not proxying only expose over wg interface
+  networking.firewall.interfaces.wg-friends = mkIf (wireguard.friends.enable && !cfg.proxy) {
+    allowedTCPPorts = [ cfg.port ];
+    allowedUDPPorts = [ cfg.udpMuxPort ];
   };
+
+  modules.system.networking.publicPorts = [ cfg.udpMuxPort ];
+  networking.firewall.allowedUDPPorts = mkIf cfg.proxy [ cfg.udpMuxPort ];
+
+  services.caddy.virtualHosts."stream.${fqDomain}".extraConfig = ''
+    reverse_proxy http://127.0.0.1:${toString cfg.port}
+  '';
 }

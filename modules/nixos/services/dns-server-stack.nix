@@ -24,6 +24,7 @@ let
     filterAttrs
     utils;
   inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.modules.services) wireguard;
   cfg = config.modules.services.dns-server-stack;
 
   # Patch Ctrld to enable loading endpoints from environment variables
@@ -154,6 +155,12 @@ mkIf (hostname == "homelab" && cfg.enable)
   networking.firewall.allowedTCPPorts = [ cfg.listenPort ];
   networking.firewall.allowedUDPPorts = [ cfg.listenPort ];
   networking.nameservers = mkForce [ "127.0.0.1" ];
+
+  # Expose DNS on VPN
+  networking.firewall.interfaces.wg-friends.allowedTCPPorts =
+    mkIf wireguard.friends.enable [ cfg.listenPort ];
+  networking.firewall.interfaces.wg-friends.allowedUDPPorts =
+    mkIf wireguard.friends.enable [ cfg.listenPort ];
 
   # Harden the dnsmasq systemd service
   systemd.services.dnsmasq = {

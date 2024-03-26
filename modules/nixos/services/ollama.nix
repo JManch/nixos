@@ -1,6 +1,7 @@
 { lib, pkgs, config, ... }:
 let
   inherit (lib) mkIf mkForce optional;
+  inherit (config.modules.services) wireguard;
   cfg = config.modules.services.ollama;
 in
 mkIf cfg.enable
@@ -20,7 +21,7 @@ mkIf cfg.enable
     };
   };
 
-  networking.firewall.interfaces.wg-discord = {
+  networking.firewall.interfaces.wg-friends = mkIf wireguard.friends.enable {
     allowedTCPPorts = [ 11434 8000 ];
   };
 

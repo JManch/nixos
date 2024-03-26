@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, hostname, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
   cfg = config.modules.services;
@@ -8,8 +8,25 @@ in
 
   options.modules.services = {
     udisks.enable = mkEnableOption "udisks";
-    wireguard.enable = mkEnableOption "WireGuard";
     lact.enable = mkEnableOption "Lact";
+
+    wireguard = {
+      friends = {
+        enable = mkEnableOption ''
+          private Wireguard server for use with friends. Requires a private key
+          for the host to be stored in agenix.
+        '';
+        autoStart = mkEnableOption "auto start";
+
+        address = mkOption {
+          type = types.str;
+          default = null;
+          description = ''
+            Assigned IP address for this device on the VPN.
+          '';
+        };
+      };
+    };
 
     greetd = {
       enable = mkEnableOption "Greetd with TUIgreet";
@@ -206,6 +223,10 @@ in
           The Frigate service requires hardware acceleration. Set
           `hardware.opengl.enable`.
         '';
+      }
+      {
+        assertion = cfg.wireguard.friends.enable -> config.age.secrets."${hostname}FriendsWGKey" != null;
+        message = "A secret key for the host must be configured to use the friends Wireguard VPN";
       }
     ];
   };

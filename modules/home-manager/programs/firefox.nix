@@ -39,11 +39,12 @@ mkIf (cfg.enable && osDesktop.enable) {
           RemainAfterExit = true;
         };
 
-        # default.target is reached at roughly the same time as the system
-        # multi-user target. This is BEFORE logging in. This service cannot
-        # start with graphical-session.target because the large initial copy
-        # (about 1GB) significantly slows down the start-up of desktop services
-        # like waybar.
+        # default.target is an alias to either multi-user.target or
+        # graphical.target. can view the symlink with ls -l
+        # /etc/systemd/system/default.target This service cannot start with
+        # graphical-session.target because the large initial copy (about 1GB)
+        # significantly slows down the start-up of desktop services like
+        # waybar.
         Install.WantedBy = [ "default.target" ];
       };
 

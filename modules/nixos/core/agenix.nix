@@ -9,6 +9,7 @@ let
   ];
 
   decryptKit = /*bash*/ ''
+
     temp=$(mktemp -d)
     cleanup() {
       rm -rf "$temp"
@@ -19,6 +20,7 @@ let
     age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
     tar -xf "$temp/ssh-bootstrap-kit.tar" -C "$temp"
     rm -f "$temp/ssh-bootstrap-kit.tar";
+
   '';
 
   editSecretScript = pkgs.writeShellApplication {

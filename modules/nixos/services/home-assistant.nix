@@ -288,7 +288,6 @@ mkIf (cfg.enable && hostname == "homelab" && caddy.enable)
   };
 
   services.caddy.virtualHosts."home.${fqDomain}".extraConfig = ''
-    import lan_only
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 

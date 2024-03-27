@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkEnableOption mkOption types concatStringsSep;
+  inherit (lib) mkEnableOption mkOption types concatStringsSep;
   cfg = config.modules.services;
 in
 {

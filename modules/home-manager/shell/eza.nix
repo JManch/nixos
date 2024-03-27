@@ -13,9 +13,12 @@ lib.mkIf config.modules.shell.enable
   };
 
   programs.zsh.shellAliases = {
+    l = "ll"; # because nixpkgs creates an l alias by default
     ls = "eza";
-    ll = "eza -la -snew";
-    la = "eza -a -snew";
+    ll = "eza -l";
+    lln = "ll -snew --group-directories-first";
+    la = "eza -la";
+    lan = "la -snew --group-directories-first";
   };
 
   home.sessionVariables = {

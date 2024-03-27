@@ -105,5 +105,5 @@ mkIf cfg.enable {
       ];
     };
 
-  persistence.directories = [ ".local/share/chatterino" ];
+  persistence.directories = [ ".local/share/chatterino/Settings" ];
 }

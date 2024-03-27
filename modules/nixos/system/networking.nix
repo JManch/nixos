@@ -91,8 +91,9 @@ in
   systemd.services."disable-wifi-on-boot" = mkIf
     (cfg.wireless.enable && cfg.wireless.disableOnBoot)
     {
+      restartIfChanged = false;
+
       unitConfig = {
-        RestartIfChanged = false;
         Description = "Disable wireless interface on boot";
         After = [ "NetworkManager.service" ];
       };

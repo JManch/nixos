@@ -407,6 +407,26 @@
         "type": "github"
       }
     },
+    "grimblast": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1711594267,
+        "narHash": "sha256-fpBj2EA1TU9wdo9v48U/CMrl20yYKSw88eX8qgjbcSY=",
+        "owner": "JManch",
+        "repo": "grimblast",
+        "rev": "93f81de950370511e1654350565f4da94449ff00",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JManch",
+        "repo": "grimblast",
+        "type": "github"
+      }
+    },
     "hercules-ci-effects": {
       "inputs": {
         "flake-parts": "flake-parts_5",
@@ -883,6 +903,7 @@
         "firstBoot": "firstBoot",
         "flake-parts": "flake-parts_2",
         "graham33": "graham33",
+        "grimblast": "grimblast",
         "home-manager": "home-manager",
         "hypridle": "hypridle",
         "hyprland": "hyprland",

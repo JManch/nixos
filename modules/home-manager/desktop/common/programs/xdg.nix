@@ -4,6 +4,9 @@
 , osConfig
 , ...
 }:
+let
+  home = config.home.homeDirectory;
+in
 lib.mkIf osConfig.usrEnv.desktop.enable
 {
   # Many applications need this for xdg-open url opening however packages
@@ -20,7 +23,7 @@ lib.mkIf osConfig.usrEnv.desktop.enable
     xdgOpenUsePortal = true;
   };
 
-  xdg.userDirs = let home = config.home.homeDirectory; in {
+  xdg.userDirs = {
     enable = true;
     desktop = "${home}/desktop";
     documents = "${home}/documents";
@@ -28,6 +31,10 @@ lib.mkIf osConfig.usrEnv.desktop.enable
     music = "${home}/music";
     pictures = "${home}/pictures";
     videos = "${home}/videos";
+
+    extraConfig = {
+      XDG_SCREENSHOTS_DIR = "${home}/pictures/screenshots";
+    };
   };
 
   xdg.mime.enable = true;

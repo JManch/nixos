@@ -4,9 +4,10 @@
 , osConfig
 , vmVariant
 , ...
-}:
+} @ args:
 let
   inherit (lib)
+    utils
     mkIf
     optionals
     optional
@@ -29,7 +30,7 @@ let
   getMonitorByNumber = number: fetchers.getMonitorByNumber osConfig number;
 
   disableShadersCommand =
-    command: "${cfg.disableShaders} && ${command} && ${cfg.enableShaders}";
+    command: "${cfg.disableShaders}; ${command}; ${cfg.enableShaders}";
 
   toggleDwindleGaps = pkgs.writeShellScript "hypr-toggle-dwindle-gaps" /*bash*/ ''
 
@@ -106,7 +107,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
       modShift = "${cfg.modKey}SHIFT";
       modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
 
-      hyprshot = getExe pkgs.hyprshot;
+      grimblast = getExe (utils.flakePkgs args "grimblast").grimblast;
       wpctl = getExe' pkgs.wireplumber "wpctl";
     in
     {
@@ -154,10 +155,12 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
           "${modShift}, X, layoutmsg, swapsplit"
 
           # Screenshots
-          ", Print, exec, ${disableShadersCommand "${hyprshot} -m region --clipboard-only"}"
-          "${mod}, I, exec, ${disableShadersCommand "${hyprshot} -m output -m active --clipboard-only"}"
-          "${modShift}, Print, exec, ${disableShadersCommand "${hyprshot} -m region"}"
-          "${modShift}, I, exec, ${disableShadersCommand "${hyprshot} -m output -m active"}"
+          ", Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy area"}"
+          "${mod}, I, exec, ${disableShadersCommand "${grimblast} --notify copy output"}"
+          "${modShift}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save area"}"
+          "${modShift}, I, exec, ${disableShadersCommand "${grimblast} --notify save output"}"
+          "${modShiftCtrl}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save window"}"
+          "${modShiftCtrl}, I, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy window"}"
 
           # Workspaces other
           "${mod}, N, workspace, previous"

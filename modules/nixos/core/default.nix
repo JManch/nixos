@@ -53,18 +53,7 @@ in
   # situation, overlays might be more convenient or required for their extra
   # functionality.
   nixpkgs = {
-    overlays = [
-      (final: prev: {
-        hyprshot = prev.hyprshot.overrideAttrs (oldAttrs: {
-          src = final.fetchFromGitHub {
-            owner = "Gustash";
-            repo = "Hyprshot";
-            rev = "36dbe2e6e97fb96bf524193bf91f3d172e9011a5";
-            hash = "sha256-n1hDJ4Bi0zBI/Gp8iP9w9rt1nbGSayZ4V75CxOzSfFg=";
-          };
-        });
-      })
-    ];
+    overlays = [ ];
     config.allowUnfree = true;
   };
 

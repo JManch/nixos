@@ -47,6 +47,8 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     });
   };
 
+  home.packages = [ (utils.flakePkgs args "grimblast").grimblast ];
+
   # Generate hyprland debug config
   xdg.configFile."hypr/hyprland.conf".onChange =
     let
@@ -117,7 +119,6 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
         "XDG_SESSION_DESKTOP,Hyprland"
-        "HYPRSHOT_DIR,${config.xdg.userDirs.pictures}/screenshots"
       ] ++ optionals (osConfig.device.gpu.type == "nvidia") [
         "WLR_NO_HARDWARE_CURSORS,1"
         "LIBVA_DRIVER_NAME,nvidia"

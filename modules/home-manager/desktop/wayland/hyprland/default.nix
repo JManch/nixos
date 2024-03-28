@@ -65,14 +65,14 @@ in
     enableShaders = mkOption {
       type = types.str;
       readOnly = true;
-      default = "${escapeShellArg hyprctl} keyword decoration:screen_shader \"${cfg.shaderDir}/monitorGamma.frag\"";
+      default = "${escapeShellArg hyprctl} keyword decoration:screen_shader '${cfg.shaderDir}/monitorGamma.frag'";
       description = "Command to enable Hyprland screen shaders";
     };
 
     disableShaders = mkOption {
       type = types.str;
       readOnly = true;
-      default = "${escapeShellArg hyprctl} keyword decoration:screen_shader \"${cfg.shaderDir}/blank.frag\"";
+      default = "${escapeShellArg hyprctl} keyword decoration:screen_shader '${cfg.shaderDir}/blank.frag'";
       description = "Command to disable Hyprland screen shaders";
     };
   };

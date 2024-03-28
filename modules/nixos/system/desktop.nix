@@ -23,6 +23,9 @@ in
       security.pam.services.swaylock = mkIf (isWayland && homeDesktopCfg.programs.swaylock.enable) { };
       security.pam.services.hyprlock = mkIf (isWayland && homeDesktopCfg.programs.hyprlock.enable) { };
 
+      # Enables wayland for all apps that support it
+      environment.sessionVariables.NIXOS_OZONE_WL = mkIf isWayland "1";
+
       # We configure xdg portal in home-manager
       xdg.portal.enable = mkForce false;
 

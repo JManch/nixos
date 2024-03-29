@@ -23,32 +23,21 @@ in
 
   programs.zsh.interactiveShellInit =
     let
-      inherit (lib) getExe getExe';
+      inherit (lib) getExe;
       fd = getExe pkgs.fd;
-      sed = getExe pkgs.gnused;
-      tr = getExe' pkgs.coreutils "tr";
-      findmnt = getExe' pkgs.util-linux "findmnt";
       extraExcludeDirs = [
-        "proc"
-        "sys"
-        "run"
-        "dev"
-        "tmp"
-        "boot"
         "root/.cache/nix"
         "home/${username}/.mozilla"
         "home/${username}/.cache/mozilla"
+        "home/${username}/.local/share/chatterino/Cache"
       ];
     in
       /*bash*/ ''
 
       # Prints a list of all ephemeral system files
       impermanence() {
-        # Get comma seperated list of zfs mounted directories and remove leading /
-        exclude_dirs=$(${findmnt} -n -o TARGET --list -t zfs | ${sed} 's/^.//' | ${tr} '\n' ',' | ${sed} 's/.$//')
-        exclude_dirs="$exclude_dirs,${concatStringsSep "," extraExcludeDirs}"
-        # Get list of all files, excluding those with zfs mounted paths
-        sudo ${fd} --base-directory / -a -tf -H -E "{$exclude_dirs}"
+        sudo ${fd} --one-file-system --strip-cwd-prefix --base-directory / --type f \
+          --hidden --exclude "{${concatStringsSep "," extraExcludeDirs}}" "''${@:1}"
       }
 
     '';

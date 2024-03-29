@@ -26,7 +26,7 @@ let
       # We define these here rather than in the modules where they are used so that
       # certificates can be generated on devices other than the server
       certDomains = [
-        "home"
+        "home-wan"
       ];
 
       genDomain = domain: /*bash*/ ''

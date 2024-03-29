@@ -288,12 +288,12 @@ mkIf (cfg.enable && hostname == "homelab" && caddy.enable)
   services.caddy.virtualHosts = {
     # Because iPhones are terrible and don't accept my certs
     # (I don't this iPhone HA app supports certs anyway)
-    "homelan.${fqDomain}".extraConfig = ''
+    "home.${fqDomain}".extraConfig = ''
       import lan_only
       reverse_proxy http://127.0.0.1:${toString cfg.port}
     '';
 
-    "home.${fqDomain}".extraConfig = ''
+    "home-wan.${fqDomain}".extraConfig = ''
       tls {
         client_auth {
           mode require_and_verify

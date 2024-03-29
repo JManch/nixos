@@ -52,8 +52,9 @@ mkIf cfg.enable
     package = broadcast-box;
     http.port = cfg.port;
     udpMux.port = cfg.udpMuxPort;
-    # This breaks local streaming without hairpin NAT
-    nat.autoConfigure = true;
+    # This breaks local streaming without hairpin NAT so hairpin NAT is needed
+    # for streaming from local network when proxying
+    nat.autoConfigure = cfg.proxy;
     statusAPI = !cfg.proxy;
   };
 

@@ -37,6 +37,7 @@ mkIf (cfg.enable && hostname == "homelab" && caddy.enable)
       "powerwall"
       "co2signal"
       "forecast_solar"
+      "husqvarna_automower"
     ] ++ optional mosquitto.enable "mqtt";
 
     customComponents = with pkgs.home-assistant-custom-components; [

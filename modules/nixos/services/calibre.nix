@@ -15,6 +15,14 @@ mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
 {
   services.calibre-web = {
     enable = true;
+    package = pkgs.calibre-web.overrideAttrs (oldAttrs: {
+      # Patch increases file size upload limit from 200MB to 2GB
+      # https://github.com/janeczku/calibre-web/issues/452
+
+      # Also fixes unwanted gamma adjusted of cover images
+      # https://github.com/janeczku/calibre-web/issues/2564
+      patches = (oldAttrs.patches or [ ]) ++ [ ../../../patches/calibre-web.patch ];
+    });
     listen.ip = "127.0.0.1";
     listen.port = cfg.port;
     options = {
@@ -25,6 +33,7 @@ mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
 
   systemd.services.calibre-web.serviceConfig = utils.hardeningBaseline config {
     DynamicUser = false;
+    RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
     ReadWritePaths = [ "/var/lib/calibre-library" ];
   };
 

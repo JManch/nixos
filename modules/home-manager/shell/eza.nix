@@ -16,9 +16,9 @@ lib.mkIf config.modules.shell.enable
     l = "ll"; # because nixpkgs creates an l alias by default
     ls = "eza";
     ll = "eza -l";
-    lln = "ll -snew --group-directories-first";
+    lll = "ll -snew --group-directories-first";
     la = "eza -la";
-    lan = "la -snew --group-directories-first";
+    laa = "la -snew --group-directories-first";
   };
 
   home.sessionVariables = {

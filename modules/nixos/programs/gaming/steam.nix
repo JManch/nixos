@@ -3,7 +3,6 @@ let
   inherit (lib) mkIf optionals optional;
   cfg = config.modules.programs.gaming.steam;
   gamingCfg = config.modules.programs.gaming;
-  proton-ge = pkgs.proton-ge-bin;
 in
 mkIf cfg.enable
 {
@@ -37,11 +36,12 @@ mkIf cfg.enable
         optional gamingCfg.gamemode.enable pkgs.gamemode.lib
       );
     };
-    extraCompatPackages = [ proton-ge ];
+    extraCompatPackages = [ pkgs.proton-ge-bin ];
   };
 
   # So that protontricks can find proton-ge
-  environment.sessionVariables.STEAM_EXTRA_COMPAT_TOOLS_PATHS = proton-ge;
+  environment.sessionVariables.STEAM_EXTRA_COMPAT_TOOLS_PATHS =
+    lib.makeSearchPathOutput "steamcompattool" "" [ pkgs.proton-ge-bin ];
 
   persistenceHome.directories = [
     ".steam"

@@ -1,6 +1,11 @@
-{ lib, osConfig, ... }:
+{ lib
+, pkgs
+, config
+, osConfig
+, ...
+}:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf getExe';
   cfg = osConfig.modules.programs.gaming.steam;
 in
 mkIf cfg.enable
@@ -34,4 +39,8 @@ mkIf cfg.enable
     "size 360 700,class:^(steam)$,title:^(Friends List)$"
     "center,class:^(steam)$,title:^(Friends List)$"
   ];
+
+  programs.zsh.shellAliases = {
+    beam-mp = "${getExe' pkgs.protontricks "protontricks-launch"} --appid 284160 ${config.home.homeDirectory}/.local/share/Steam/steamapps/compatdata/284160/pfx/dosdevices/c:/users/steamuser/AppData/Roaming/BeamMP-Launcher/BeamMP-Launcher.exe";
+  };
 }

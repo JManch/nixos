@@ -530,11 +530,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1711847666,
-        "narHash": "sha256-qIe1aJMtXAunGl5OrI2MTWo2SDNyDeucaoa+v/IiAwc=",
+        "lastModified": 1711936967,
+        "narHash": "sha256-kfP4CujEVYyVLICXk39Ca2PVn/CAdF30jHq8F9DPZ1g=",
         "owner": "hyprwm",
         "repo": "Hyprland",
-        "rev": "16a9c16d9f99bd8be9f1bb15442b001fdf2ea759",
+        "rev": "ef7ac53e99c9c443241fd50a38e6edf528df3d7b",
         "type": "github"
       },
       "original": {
@@ -842,11 +842,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1711737282,
-        "narHash": "sha256-LfuNyzDzkQtOtZt3Eid4WfU2nZXM2cJxz18w8E0X0H4=",
+        "lastModified": 1711933733,
+        "narHash": "sha256-c5nv3oQNnZ+UeSVRIAMGg90ri7/I93H+pjPvOHGbeW4=",
         "ref": "refs/heads/main",
-        "rev": "7dc69293416e154aa3a0e4365447f0e649dabb8d",
-        "revCount": 54,
+        "rev": "be626985e1442776f09e6dbd2cdbbd1278810ac4",
+        "revCount": 55,
         "type": "git",
         "url": "ssh://git@github.com/JManch/nix-resources"
       },

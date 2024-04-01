@@ -125,11 +125,17 @@ in
             fi
 
             ssh-add-quiet
+            remote_builds="/home/${username}/files/remote-builds/$hostname"
+            mkdir -p "$remote_builds"
+            # Build and store result persistently to prevent GC deleting builds
+            # for remote hosts
+            $(cd "$remote_builds"; nixos-rebuild build --flake "${configDir}#$hostname")
+            if [[ "$cmd" == "build" ]]; then return 0; fi
             nixos-rebuild ${cmd} --flake "${configDir}#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
           }
 
         '';
         in
-        concatStrings (map (cmd: hostFunction cmd) [ "switch" "test" "boot" "dry-activate" ]);
+        concatStrings (map (cmd: hostFunction cmd) [ "switch" "test" "boot" "dry-activate" "build" ]);
     };
 }

@@ -39,8 +39,8 @@ mkIf (hostname == "ncase-m1" && cfg.enable && (gpu.type == "amd"))
             interval_ms: 500
             curve:
               50: 0.0
-              70: 0.5
-              85: 0.5
+              70: 0.66
+              85: 0.66
               90: 0.66
               100: 0.66
           pmfw_options:

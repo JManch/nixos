@@ -15,6 +15,9 @@ mkIf cfg.enable
     @nClientDownloadEnableHTTP2PlatformLinux 0
   '';
 
+  # RDR2 modded launch arguments
+  # WINEDLLOVERRIDES=EasyHook,EasyHook64,EasyLoad64,NativeInterop,version,dinput8,ScriptHookRDR2,ModManager.Core,ModManager.NativeInterop,NLog=n,b
+
   modules.programs.gaming = {
     gameClasses = [
       "steam_app.*"

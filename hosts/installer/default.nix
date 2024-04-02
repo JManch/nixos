@@ -98,6 +98,7 @@ let
 
       nixos-install --no-root-passwd --no-channel-copy --system "$nixos_system"
       rm -rf "$ssh_dir"
+
     '';
   };
 in

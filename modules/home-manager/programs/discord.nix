@@ -9,7 +9,7 @@ lib.mkIf cfg.enable {
   ];
 
   desktop.hyprland.settings.windowrulev2 = [
-    "workspace special silent, class:^(vesktop|discord)$"
+    "workspace special:social silent, class:^(vesktop|discord)$"
   ];
 
   persistence.directories = [

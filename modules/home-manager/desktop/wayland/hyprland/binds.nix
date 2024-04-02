@@ -164,8 +164,8 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
 
           # Workspaces other
           "${mod}, N, workspace, previous"
-          "${mod}, S, togglespecialworkspace,"
-          "${modShift}, S, movetoworkspacesilent, special"
+          "${mod}, S, togglespecialworkspace, social"
+          "${modShift}, S, movetoworkspacesilent, special:social"
           "${mod}, G, workspace, name:GAME"
           "${modShift}, G, movetoworkspace, name:GAME"
           "${mod}, V, workspace, name:VM"

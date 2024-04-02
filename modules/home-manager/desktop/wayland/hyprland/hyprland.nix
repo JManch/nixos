@@ -285,7 +285,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         ) ++ [
           "name:GAME, monitor:${primaryMonitor.name}"
           "name:VM, monitor:${primaryMonitor.name}"
-          "special, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
+          "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
         ];
     };
   };

@@ -147,7 +147,7 @@ mkIf (cfg.enable && osConfig.modules.system.audio.enable)
     {
       windowrulev2 = [
         "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
-        "workspace special silent, title:^(Spotify( Premium)?)$"
+        "workspace special:social silent, title:^(Spotify( Premium)?)$"
       ];
 
       bindr = [

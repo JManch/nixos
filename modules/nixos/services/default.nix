@@ -202,6 +202,15 @@ in
         default = 8083;
       };
     };
+
+    vaultwarden = {
+      enable = mkEnableOption "Vaultwarden";
+
+      port = mkOption {
+        type = types.port;
+        default = 8222;
+      };
+    };
   };
 
   config = {

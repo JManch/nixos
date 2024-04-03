@@ -1,6 +1,8 @@
-{ lib, config, ... }:
+{ lib, config, inputs, ... }:
 let
+  inherit (secretCfg.templates) gridSellPrice gridBuyPrice;
   cfg = config.modules.services.hass;
+  secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
 in
 lib.mkIf (cfg.enableInternal)
 {
@@ -36,6 +38,8 @@ lib.mkIf (cfg.enableInternal)
       ];
 
       sensor = [
+        gridSellPrice
+        gridBuyPrice
         {
           name = "Powerwall Battery Remaining Time";
           icon = "mdi:battery-clock-outline";

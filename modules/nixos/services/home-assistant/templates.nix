@@ -25,12 +25,12 @@ lib.mkIf (cfg.enableInternal)
         }
         {
           name = "Washing Machine Running";
-          state = "{{ (states('sensor.washing_machine_status') | default('NA')) == 'Running' }}";
+          state = "{{ (states('sensor.washing_machine_status') | default('NA')) == 'running' }}";
           device_class = "running";
         }
         {
           name = "Dishwasher Running";
-          state = "{{ (states('sensor.dishwasher_status') | default('NA')) == 'Running' }}";
+          state = "{{ (states('sensor.dishwasher_status') | default('NA')) == 'running' }}";
           device_class = "running";
         }
       ];

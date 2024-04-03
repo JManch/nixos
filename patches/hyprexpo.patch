@@ -1,0 +1,58 @@
+diff --git a/overview.cpp b/overview.cpp
+index 1d7d9a3..800f46c 100644
+--- a/overview.cpp
++++ b/overview.cpp
+@@ -37,13 +37,14 @@ COverview::COverview(PHLWORKSPACE startedOn_, bool swipe_) : startedOn(startedOn
+     BG_COLOR    = **PCOL;
+ 
+     // process the method
+-    bool     methodCenter  = true;
+-    int      methodStartID = pMonitor->activeWorkspaceID();
+     CVarList method{*PMETHOD, 0, 's', true};
+-    if (method.size() < 2)
+-        Debug::log(ERR, "[he] invalid workspace_method");
+-    else {
+-        methodCenter = method[0] == "center";
++    int      methodStartID = pMonitor->activeWorkspaceID();
++    bool     methodCenter  = method[0] == "center";
++    bool     methodFirst   = method[0] == "first";
++
++    if (methodCenter) {
++        if (method.size() < 2)
++            Debug::log(ERR, "[he] invalid workspace_method");
+         std::string s;
+         methodStartID = getWorkspaceIDFromString(method[1], s);
+         if (methodStartID == WORKSPACE_INVALID)
+@@ -75,7 +76,31 @@ COverview::COverview(PHLWORKSPACE startedOn_, bool swipe_) : startedOn(startedOn
+                 getWorkspaceIDFromString("r" + ((int64_t)i - backtracked < 0 ? std::to_string((int64_t)i - backtracked) : "+" + std::to_string((int64_t)i - backtracked)), s);
+             image.workspaceID = currentID;
+         }
+-    } else {
++    } else if (methodFirst) {
++        int currentID = methodStartID;
++        int lastID    = currentID;
++        int backtracked = 0;
++
++        // Get the first workspace on the monitor
++        for (size_t i = 1; i < 100; ++i) {
++            lastID = currentID;
++            std::string s;
++            currentID = getWorkspaceIDFromString("r-" + std::to_string(i), s);
++            if (currentID == lastID)
++                break;
++
++            backtracked++;
++        }
++
++        for (size_t i = 0; i < SIDE_LENGTH * SIDE_LENGTH; ++i) {
++            auto&       image = images[i];
++            std::string s;
++            currentID =
++                getWorkspaceIDFromString("r" + ((int64_t)i - backtracked < 0 ? std::to_string((int64_t)i - backtracked) : "+" + std::to_string((int64_t)i - backtracked)), s);
++            image.workspaceID = currentID;
++        }
++    }
++    else {
+         int currentID         = methodStartID;
+         images[0].workspaceID = currentID;
+         for (size_t i = 1; i < SIDE_LENGTH * SIDE_LENGTH; ++i) {

@@ -162,6 +162,9 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
           "${modShiftCtrl}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save window"}"
           "${modShiftCtrl}, I, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy window"}"
 
+          # Plugins
+          "${mod}, Escape, hyprexpo:expo"
+
           # Workspaces other
           "${mod}, N, workspace, previous"
           "${mod}, S, togglespecialworkspace, social"

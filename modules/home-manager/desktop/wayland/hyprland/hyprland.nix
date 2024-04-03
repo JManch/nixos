@@ -27,14 +27,7 @@ let
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 
   hyprlandPkgs = utils.flakePkgs args "hyprland";
-
-  # By default Hyprland adds stdenv.cc, binutils and pciutils to path. I
-  # think it's to fix plugin API function hooking.
-  # https://github.com/hyprwm/Hyprland/pull/2292
-  # Since I don't use plugins I can use the unwrapped package and keep my
-  # path clean.
-  # WARNING: If you ever want to use plugins switch to the wrapped package
-  hyprland = hyprlandPkgs.hyprland-unwrapped;
+  hyprland = hyprlandPkgs.hyprland;
 in
 mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
   modules.desktop = {
@@ -86,6 +79,15 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprland;
+
+    plugins = with utils.flakePkgs args "hyprland-plugins"; [
+      (hyprexpo.overrideAttrs (oldAttrs: {
+        # Patch adds a "first" workspace method for displaying workspaces
+        # starting from the first on the monitor. Behaves the same regardless
+        # of which workspace hyprexpo is launched from.
+        patches = (oldAttrs.patches or [ ]) ++ [ ../../../../../patches/hyprexpo.patch ];
+      }))
+    ];
 
     systemd = {
       enable = true;
@@ -287,6 +289,15 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
           "name:VM, monitor:${primaryMonitor.name}"
           "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
         ];
+
+      plugin = {
+        hyprexpo = {
+          columns = 3;
+          gap_size = 0;
+          workspace_method = "first";
+          enable_gesture = false;
+        };
+      };
     };
   };
 }

@@ -93,16 +93,16 @@ mkMerge [
 
       extraConfig = ''
 
-      (lan_only) {
-        @block {
-          not remote_ip ${concatStringsSep " " cfg.lanAddressRanges}
+        (lan_only) {
+          @block {
+            not remote_ip ${concatStringsSep " " cfg.lanAddressRanges}
+          }
+          respond @block "Access denied" 403 {
+            close
+          }
         }
-        respond @block "Access denied" 403 {
-          close
-        }
-      }
 
-    '';
+      '';
 
       virtualHosts."logs.${fqDomain}".extraConfig = ''
         import lan_only

@@ -130,6 +130,9 @@ in
             # Build and store result persistently to prevent GC deleting builds
             # for remote hosts
             $(cd "$remote_builds"; nixos-rebuild build --flake "${configDir}#$hostname")
+            if [[ $? -ne 0 ]]; then
+              return 1
+            fi
             if [[ "$cmd" == "build" ]]; then return 0; fi
             nixos-rebuild ${cmd} --flake "${configDir}#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
           }

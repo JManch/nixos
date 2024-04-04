@@ -7,10 +7,12 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf optional utils mkVMOverride escapeShellArg;
+  inherit (lib) mkIf optional utils mkVMOverride escapeShellArg concatStringsSep;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (secretCfg) devices;
   cfg = config.modules.services.hass;
+  secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
 in
 {
   imports = utils.scanPaths ./.;
@@ -95,7 +97,14 @@ in
           type = "module";
         }];
 
-        automation = { };
+        notify = [{
+          platform = "group";
+          name = "All Notify Devices";
+          services =
+            map
+              (device: { service = device.name; })
+              devices;
+        }];
       };
     };
 
@@ -105,23 +114,30 @@ in
     systemd.services.home-assistant.preStart =
       let
         inherit (config.services.home-assistant) configDir;
+        inherit (outputs.packages.${pkgs.system}) frigate-hass-card frigate-blueprint;
+
+        # Removing existing symbolic links so that packages will uninstall if
+        # they're removed from config
+        removeExistingLinks = subdir: /*bash*/ ''
+          readarray -d "" links < <(find "${configDir}/${subdir}" -maxdepth 1 -type l -print0)
+            for link in "''${links[@]}"; do
+              if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
+                rm "$link"
+              fi
+            done
+        '';
       in
       mkIf frigate.enable /*bash*/ ''
 
-      mkdir -p "${configDir}/www"
+        mkdir -p "${configDir}/www"
+        ${removeExistingLinks "www"}
+        ln -fsn "${frigate-hass-card}/frigate-hass-card" "${configDir}/www"
 
-      # Removing existing symbolic links so that frigate-hass-card will
-      # uninstall if it's removed from config
-      readarray -d "" links < <(find "${configDir}/www" -maxdepth 1 -type l -print0)
-        for link in "''${links[@]}"; do
-          if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
-            rm "$link"
-          fi
-        done
+        mkdir -p "${configDir}/blueprints/automation"
+        ${removeExistingLinks "blueprints/automation"}
+        ln -fsn "${frigate-blueprint}/SgtBatten" "${configDir}/blueprints/automation"
 
-      ln -fsn "${outputs.packages.${pkgs.system}.frigate-hass-card}/frigate-hass-card" "${configDir}/www"
-
-    '';
+      '';
 
     services.postgresql = {
       enable = true;
@@ -140,11 +156,6 @@ in
     services.caddy.virtualHosts = {
       # Because iPhones are terrible and don't accept my certs
       # (I don't this iPhone HA app supports certs anyway)
-      "home.${fqDomain}".extraConfig = ''
-        import lan_only
-        reverse_proxy http://127.0.0.1:${toString cfg.port}
-      '';
-
       "home-wan.${fqDomain}".extraConfig = ''
         tls {
           client_auth {
@@ -154,6 +165,22 @@ in
           }
         }
         reverse_proxy http://127.0.0.1:${toString cfg.port}
+      '';
+
+      "home.${fqDomain}".extraConfig = ''
+        import lan_only
+        reverse_proxy http://127.0.0.1:${toString cfg.port}
+      '';
+
+      # This endpoint is used for notifications that need a base url (such as
+      # the frigate automation notifs)
+      "home-notif.${fqDomain}".extraConfig = ''
+        @is_lan {
+          remote_ip ${concatStringsSep " " caddy.lanAddressRanges}
+        }
+
+        redir @is_lan https://home.${fqDomain}{uri}
+        redir https://home-wan.${fqDomain}{uri}
       '';
     };
 

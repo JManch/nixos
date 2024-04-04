@@ -1,4 +1,8 @@
-{ lib, fetchzip, stdenvNoCC, ... }:
+{ lib
+, fetchzip
+, stdenvNoCC
+, ...
+}:
 stdenvNoCC.mkDerivation rec {
   pname = "frigate-hass-card";
   version = "5.2.0";

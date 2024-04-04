@@ -140,8 +140,13 @@ mkIf (hostname == "homelab" && cfg.enable)
         # Point DDNS domain to router
         "/ddns.${fqDomain}/${cfg.routerAddress}"
 
-        # Point reverse proxy traffic to the device to avoid need for hairpin NAT
+        # Point reverse proxy traffic to the device to avoid need for hairpin
+        # NAT
         "/${fqDomain}/${config.device.ipAddress}"
+
+        # For some reason iPhones sometimes send the CNAME result? Reroute the
+        # DDNS address to cover this
+        "/${mikrotikDDNS}/${config.device.ipAddress}"
       ];
 
       # Host records create PTR entries as well. Using addn-hosts created

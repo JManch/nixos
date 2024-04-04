@@ -23,7 +23,7 @@ let
     nameValuePair
     filterAttrs
     utils;
-  inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (inputs.nix-resources.secrets) fqDomain mikrotikDDNS;
   inherit (config.modules.services) wireguard;
   cfg = config.modules.services.dns-server-stack;
 
@@ -52,7 +52,7 @@ mkIf (hostname == "homelab" && cfg.enable)
 
     settings = {
       service = {
-        log_level = "notice";
+        log_level = if cfg.debug then "trace" else "notice";
         cache_enable = true;
         # Disable all LAN discovery techniques apart from hosts because our
         # hosts file is extensive and we'd rather have manual control over this
@@ -103,6 +103,7 @@ mkIf (hostname == "homelab" && cfg.enable)
 
     settings = {
       port = cfg.listenPort;
+      log-queries = cfg.debug;
 
       # Do not read from hosts because it contains an entry that points
       # ${hostname}.lan to ::1 and 127.0.0.2. Don't want this in responses so
@@ -184,14 +185,11 @@ mkIf (hostname == "homelab" && cfg.enable)
   # Enable extra debugging in our vmVariant and replace secrets
   virtualisation.vmVariant = {
     services.ctrld.settings = {
-      service = {
-        log_level = mkVMOverride "trace";
-        log_path = "/tmp/ctrld.log";
-      };
+      service.log_level = mkVMOverride "trace";
     };
 
     services.dnsmasq.settings = {
-      log-queries = true;
+      log-queries = mkVMOverride true;
     };
   };
 }

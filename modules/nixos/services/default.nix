@@ -108,6 +108,7 @@ in
         devices to provide DNS services on a network.
       '';
       enableIPv6 = mkEnableOption "IPv6 DNS responses";
+      debug = mkEnableOption "verbose logs for debugging";
 
       listenPort = mkOption {
         type = types.port;

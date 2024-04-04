@@ -439,11 +439,11 @@ mkIf (cfg.enableInternal)
       views = [
         home
         power
-        heating
       ]
       ++ optional frigate.enable surveillance
       ++
       [
+        heating
         lounge
         joshuaRoom
         garden

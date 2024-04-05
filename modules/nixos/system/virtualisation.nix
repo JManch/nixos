@@ -30,20 +30,19 @@ let
 
       # Build the VM
       runscript="/home/${username}/result/bin/run-$hostname-vm"
-      cd
-      sudo nixos-rebuild build-vm --flake "/home/${username}/.config/nixos#$hostname"
+      $(cd; nixos-rebuild build-vm --flake "/home/${username}/.config/nixos#$hostname")
 
       # Print ports mapped to the VM
       printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
 
       if [[ ! -e "/home/${username}/$hostname.qcow2" ]]; then
-        # Decrypt the relevant secrets from kit
         temp=$(mktemp -d)
         cleanup() {
           rm -rf "$temp"
         }
         trap cleanup EXIT
 
+        # Decrypt the relevant secrets from kit
         kit_path="${../../../hosts/ssh-bootstrap-kit}"
         age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
         tar -xf "$temp/ssh-bootstrap-kit.tar" --strip-components=1 -C "$temp" "$hostname"

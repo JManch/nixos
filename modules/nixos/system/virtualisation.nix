@@ -46,9 +46,7 @@ let
 
         # Decrypt the relevant secrets from kit
         kit_path="${../../../hosts/ssh-bootstrap-kit}"
-        age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
-        tar -xf "$temp/ssh-bootstrap-kit.tar" --strip-components=1 -C "$temp" "$hostname"
-        rm -f "$temp/ssh-bootstrap-kit.tar"
+        age -d "$kit_path" | tar -xf - --strip-components=1 -C "$temp" "$hostname"
 
         # Copy keys to VM
         printf "Copying SSH keys to VM...\nNOTE: Secret decryption will not work on the first VM launch"

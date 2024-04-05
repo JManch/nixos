@@ -26,6 +26,7 @@ let
       gnutar
     ];
     text = /*bash*/ ''
+
       if [ -z "$1" ] || [ -z "$2" ]; then
         echo "Usage: deploy-host <hostname> <ip_address>"
         exit 1
@@ -61,9 +62,7 @@ let
       install -d -m755 "$temp/persist/home/${username}/.config"
 
       kit_path="${../../../hosts/ssh-bootstrap-kit}"
-      age -d -o "$secret_temp/ssh-bootstrap-kit.tar" "$kit_path"
-      tar -xf "$secret_temp/ssh-bootstrap-kit.tar" -C "$secret_temp"
-      rm "$secret_temp/ssh-bootstrap-kit.tar"
+      age -d "$kit_path" | tar -xf - -C "$secret_temp"
       mv "$secret_temp/$hostname"/* "$temp/persist/etc/ssh"
       mv "$secret_temp/id_ed25519" "$temp/persist/home/${username}/.ssh"
       mv "$secret_temp/id_ed25519.pub" "$temp/persist/home/${username}/.ssh"
@@ -77,6 +76,7 @@ let
 
       nixos-anywhere --extra-files "$temp" --flake "/home/${username}/.config/nixos#$hostname" "root@$ip_address"
       sudo rm -rf "$temp"
+
     '';
   };
 in

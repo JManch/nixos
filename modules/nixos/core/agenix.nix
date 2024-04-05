@@ -17,9 +17,7 @@ let
     trap cleanup EXIT
 
     kit_path="${../../../hosts/ssh-bootstrap-kit}"
-    age -d -o "$temp/ssh-bootstrap-kit.tar" "$kit_path"
-    tar -xf "$temp/ssh-bootstrap-kit.tar" -C "$temp"
-    rm -f "$temp/ssh-bootstrap-kit.tar";
+    age -d "$kit_path" | tar -xf - -C "$temp"
 
   '';
 

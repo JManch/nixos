@@ -58,9 +58,7 @@ let
       }
       trap cleanup EXIT
 
-      age -d -o "$temp/ssh-bootstrap-kit.tar" "$config/hosts/ssh-bootstrap-kit"
-      tar -xf "$temp/ssh-bootstrap-kit.tar" -C "$temp"
-      rm -f "$temp/ssh-bootstrap-kit.tar";
+      age -d "$config/hosts/ssh-bootstrap-kit" | tar -xf - -C "$temp"
 
       ssh_dir="/root/.ssh"
       rm -rf "$ssh_dir"

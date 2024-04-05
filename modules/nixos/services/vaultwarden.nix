@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe mkForce mkVMOverride optional;
+  inherit (lib) mkIf getExe mkForce mkVMOverride optional utils;
   inherit (config.modules.system.virtualisation) vmVariant;
   inherit (inputs.nix-resources.secrets) fqDomain vaultwardenSubdir;
   inherit (config.modules.services) caddy;
@@ -100,7 +100,13 @@ mkIf (cfg.enable && caddy.enable)
     };
   };
 
-  systemd.services.vaultwarden.serviceConfig = {
+  systemd.services.vaultwarden.serviceConfig = utils.hardeningBaseline config {
+    DynamicUser = false;
+    # Because upstream module annoyingly uses strings instead of bools...
+    PrivateDevices = mkForce true;
+    PrivateTmp = mkForce true;
+    ProtectHome = mkForce true;
+    AmbientCapabilities = mkForce "";
     EnvironmentFile = (optional (!vmVariant) vaultwardenSMTPVars.path)
       ++ (optional (!cfg.adminInterface) (pkgs.writeText "vaultwarden-disable-admin" ''
       ADMIN_TOKEN=""

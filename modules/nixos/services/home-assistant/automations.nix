@@ -11,7 +11,7 @@ let
     alias = "Entrance Person Notify";
     description = "";
     use_blueprint = {
-      path = "SgtBatten/Beta.yaml";
+      path = "SgtBatten/frigate_notifications.yaml";
       input = {
         camera = "camera.driveway";
         notify_device = (head devices).id;

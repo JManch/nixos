@@ -19,8 +19,8 @@ stdenvNoCC.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p "$out/SgtBatten"
-    cp "Frigate Camera Notifications/Beta" "$out/SgtBatten/Beta.yaml"
+    mkdir -p "$out"
+    cp "Frigate Camera Notifications/Beta" "$out/frigate_notifications.yaml"
 
     runHook postInstall
   '';

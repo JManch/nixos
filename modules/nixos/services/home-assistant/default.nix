@@ -7,7 +7,7 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf optional utils mkVMOverride escapeShellArg concatStringsSep;
+  inherit (lib) mkIf optional optionalString utils mkVMOverride escapeShellArg concatStringsSep;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (secretCfg) devices;
@@ -127,15 +127,21 @@ in
             done
         '';
       in
-      mkIf frigate.enable /*bash*/ ''
+        /*bash*/ ''
 
         mkdir -p "${configDir}/www"
         ${removeExistingLinks "www"}
-        ln -fsn "${frigate-hass-card}/frigate-hass-card" "${configDir}/www"
+        [[ -d ${configDir}/blueprints/automation/SgtBatten ]] && rm -rf "${configDir}/blueprints/automation/SgtBatten"
 
-        mkdir -p "${configDir}/blueprints/automation"
-        ${removeExistingLinks "blueprints/automation"}
-        ln -fsn "${frigate-blueprint}/SgtBatten" "${configDir}/blueprints/automation"
+        ${optionalString frigate.enable /*bash*/ ''
+          ln -fsn "${frigate-hass-card}/frigate-hass-card" "${configDir}/www"
+
+          # For reasons I don't understand, blueprints will not work if they
+          # are in a symlinked directory. The blueprint file has to be
+          # symlinked directly.
+          mkdir -p "${configDir}/blueprints/automation/SgtBatten"
+          ln -fsn "${frigate-blueprint}/frigate_notifications.yaml" "${configDir}/blueprints/automation/SgtBatten/frigate_notifications.yaml"
+        ''}
 
       '';
 
@@ -155,7 +161,7 @@ in
 
     services.caddy.virtualHosts = {
       # Because iPhones are terrible and don't accept my certs
-      # (I don't this iPhone HA app supports certs anyway)
+      # (I don't think iPhone HA app supports certs anyway)
       "home-wan.${fqDomain}".extraConfig = ''
         tls {
           client_auth {

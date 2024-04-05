@@ -129,7 +129,9 @@ in
             mkdir -p "$remote_builds"
             # Build and store result persistently to prevent GC deleting builds
             # for remote hosts
-            $(cd "$remote_builds"; nixos-rebuild build --flake "${configDir}#$hostname")
+            pushd "$remote_builds" > /dev/null
+            nixos-rebuild build --flake "${configDir}#$hostname"
+            popd > /dev/null
             if [[ $? -ne 0 ]]; then
               return 1
             fi

@@ -30,7 +30,9 @@ let
 
       # Build the VM
       runscript="/home/${username}/result/bin/run-$hostname-vm"
-      $(cd; nixos-rebuild build-vm --flake "/home/${username}/.config/nixos#$hostname")
+      pushd "/home/${username}" > /dev/null
+      nixos-rebuild build-vm --flake "/home/${username}/.config/nixos#$hostname"
+      popd > /dev/null
 
       # Print ports mapped to the VM
       printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"

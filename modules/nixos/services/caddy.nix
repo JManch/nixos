@@ -72,6 +72,7 @@ let
         mv "$temp/rootCA.crt" "$dir"
         echo "Update the encrypted certificates in agenix with the new *.crt files in $dir"
         echo "Import the *.p12 files into browsers and devices you want to grant access to"
+        echo "Unfortunately custom certs do not work in firefox mobile https://bugzilla.mozilla.org/show_bug.cgi?id=1813930, have to use chrome for that now"
         echo "Remember to backup the *.p12 files somewhere safe"
 
     '';

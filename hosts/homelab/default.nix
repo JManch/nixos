@@ -33,6 +33,7 @@
       calibre.enable = true;
       mosquitto.enable = true;
       vaultwarden.enable = true;
+      vaultwarden.adminInterface = false;
 
       caddy = {
         enable = true;

@@ -206,6 +206,7 @@ in
 
     vaultwarden = {
       enable = mkEnableOption "Vaultwarden";
+      adminInterface = mkEnableOption "admin interface. Keep disabled and enable when needed.";
 
       port = mkOption {
         type = types.port;

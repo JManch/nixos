@@ -5,7 +5,8 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe mkForce;
+  inherit (lib) mkIf getExe mkForce mkVMOverride optional;
+  inherit (config.modules.system.virtualisation) vmVariant;
   inherit (inputs.nix-resources.secrets) fqDomain vaultwardenSubdir;
   inherit (config.modules.services) caddy;
   inherit (config.age.secrets)
@@ -14,12 +15,76 @@ let
     vaultwardenSMTPVars
     vaultwardenPublicBackupKey;
   cfg = config.modules.services.vaultwarden;
+
+  restoreScript = pkgs.writeShellApplication {
+    name = "vaultwarden-restore-backup";
+    runtimeInputs = with pkgs; [
+      coreutils
+      age
+      bzip2
+      gnutar
+      systemd
+    ];
+    text = /*bash*/ ''
+
+      if [ "$#" -ne 2 ]; then
+        echo "Usage: vaultwarden-restore-backup <backup> <encrypted_private_key>"
+        exit 1
+      fi
+
+      if [ "$(id -u)" != "0" ]; then
+         echo "This script must be run as root" 1>&2
+         exit 1
+      fi
+
+      backup=$1
+      key=$2
+      vault="/var/lib/bitwarden_rs"
+
+      if ! [ -d "$vault" ]; then
+        echo "Error: The vaultwarden state directory $vault does not exist"
+        exit 1
+      fi
+
+      if ! [ -e "$backup" ]; then
+        echo "Error: $backup file does not exist"
+        exit 1
+      fi
+
+      if ! [ -e "$key" ]; then
+        echo "Error: $key file does not exist"
+        exit 1
+      fi
+
+      echo "WARNING: All data in the current vault ($vault) will be destroyed and replaced with the backup"
+      read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
+      echo
+      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+          echo "Aborting"
+          exit 1
+      fi;
+
+      echo "Hash: $(sha256sum "$backup")"
+      read -p "Does the hash match the expected value? (compare with both email and the hash file) (y/N): " -n 1 -r
+      echo
+      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+          echo "Aborting"
+          exit 1
+      fi;
+
+      systemctl stop vaultwarden
+      rm -rf "''${vault:?}/"*
+
+      age -d "$key" | age -d -i - "$backup" | tar -xjf - -C "$vault"
+
+      chown -R vaultwarden:vaultwarden "$vault"
+      echo "Vault successfully restored. The vaultwarden service must be manually started again."
+
+    '';
+  };
 in
 mkIf (cfg.enable && caddy.enable)
 {
-  # TODO: Test I can actually decrypt and restore backups
-  # TODO: Configure protonmail to sort backup alerts
-
   services.vaultwarden = {
     enable = true;
     backupDir = "/var/backup/vaultwarden";
@@ -27,7 +92,7 @@ mkIf (cfg.enable && caddy.enable)
 
     config = {
       # Reference: https://github.com/dani-garcia/vaultwarden/blob/1.30.5/.env.template
-      DOMAIN = "https://bitwarden.${fqDomain}/${vaultwardenSubdir}";
+      DOMAIN = "https://vaultwarden.${fqDomain}/${vaultwardenSubdir}";
       SIGNUPS_ALLOWED = false;
       INVITATIONS_ALLOWED = false;
       SHOW_PASSWORD_HINT = false;
@@ -36,12 +101,17 @@ mkIf (cfg.enable && caddy.enable)
   };
 
   systemd.services.vaultwarden.serviceConfig = {
-    EnvironmentFile = [ vaultwardenSMTPVars.path ];
+    EnvironmentFile = (optional (!vmVariant) vaultwardenSMTPVars.path)
+      ++ (optional (!cfg.adminInterface) (pkgs.writeText "vaultwarden-disable-admin" ''
+      ADMIN_TOKEN=""
+    ''));
   };
 
   # Run backup twice a day
   systemd.timers.backup-vaultwarden.timerConfig.OnCalendar = "08,20:00";
   systemd.services.backup-vaultwarden.wantedBy = mkForce [ ];
+
+  environment.systemPackages = [ restoreScript ];
 
   systemd.services.vaultwarden-cloud-backup =
     let
@@ -54,6 +124,7 @@ mkIf (cfg.enable && caddy.enable)
           diffutils
           msmtp
           gnutar
+          bzip2
           age
           rclone
         ];
@@ -100,9 +171,7 @@ mkIf (cfg.enable && caddy.enable)
           cd "$tmp"
 
           time=$(date +%s)
-          tar -cf "$time.tar" -C "${backupDir}" .
-          age -R ${publicKey} -o "$time" "$time.tar"
-          rm -f "$time.tar"
+          tar -cjf - -C "${backupDir}" . | age -R ${publicKey} -o "$time"
 
           hash=$(sha256sum "$time")
           echo "$hash" > "$time-sha256"
@@ -161,10 +230,13 @@ mkIf (cfg.enable && caddy.enable)
     # Unfortunately the bitwarden app does not support TLS client authentication
     # https://github.com/bitwarden/mobile/issues/582
     # https://github.com/bitwarden/mobile/pull/2629
-    "bitwarden.${fqDomain}".extraConfig = ''
-      import lan_only
+    "vaultwarden.${fqDomain}".extraConfig = ''
       route {
-        reverse_proxy /${vaultwardenSubdir}/* http://127.0.0.1:${toString cfg.port}
+        reverse_proxy /${vaultwardenSubdir}/* http://127.0.0.1:${toString cfg.port} {
+          # Send the true remote IP to Rocket, so that Vaultwarden can put this
+          # in the log
+          header_up X-Real-IP {remote_host}
+        }
         handle /* {
           abort
         }
@@ -201,4 +273,15 @@ mkIf (cfg.enable && caddy.enable)
       mode = "770";
     }
   ];
+
+  virtualisation.vmVariant = {
+    systemd.services.vaultwarden-cloud-backup.enable = mkVMOverride false;
+    networking.firewall.allowedTCPPorts = [ cfg.port ];
+
+    services.vaultwarden = {
+      environmentFile = mkVMOverride null;
+      config.DOMAIN = mkVMOverride "http://127.0.0.1";
+      config.ROCKET_ADDRESS = "0.0.0.0";
+    };
+  };
 }

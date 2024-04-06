@@ -133,6 +133,25 @@ let
           }
         ];
       }
+      {
+        type = "vertical-stack";
+        cards = [
+          {
+            name = "Temperature";
+            graph = "line";
+            type = "sensor";
+            entity = "sensor.joshua_sensor_temperature";
+            detail = 2;
+          }
+          {
+            name = "Humidity";
+            graph = "line";
+            type = "sensor";
+            entity = "sensor.joshua_sensor_humidity";
+            detail = 2;
+          }
+        ];
+      }
     ];
   };
 
@@ -353,6 +372,24 @@ let
                 name = "Peak Time Today";
               }
             ];
+          }
+        ];
+      }
+      {
+        title = "Power Finances";
+        type = "statistics-graph";
+        chart_type = "line";
+        period = "hour";
+        stat_types = [ "sum" ];
+
+        entities = [
+          {
+            entity = "sensor.powerwall_site_import_cost";
+            name = "Import Cost";
+          }
+          {
+            entity = "sensor.powerwall_site_export_compensation";
+            name = "Export Compensation";
           }
         ];
       }

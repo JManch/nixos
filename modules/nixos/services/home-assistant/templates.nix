@@ -70,6 +70,13 @@ lib.mkIf (cfg.enableInternal)
           icon = "mdi:lightbulb";
           state = "{{ states.light | rejectattr('attributes.entity_id', 'defined') | selectattr('state', 'eq', 'on') | list | count }}";
         }
+        {
+          name = "Powerwall Aggregate Cost";
+          icon = "mdi:currency-gbp";
+          state = "{{ ((states('sensor.powerwall_site_import_cost') | default(0)) | float) - ((states('sensor.powerwall_site_export_compensation') | default(0)) | float) }}";
+          unit_of_measurement = "GBP";
+          state_class = "total_increasing";
+        }
       ];
     }];
   };

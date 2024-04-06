@@ -61,6 +61,11 @@
         proxy = true;
       };
 
+      zigbee2mqtt = {
+        enable = true;
+        deviceNode = "/dev/ttyACM0";
+      };
+
       wireguard.friends = {
         enable = true;
         autoStart = true;

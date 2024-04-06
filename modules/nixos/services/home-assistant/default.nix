@@ -32,10 +32,6 @@ in
         ];
       });
 
-      # NOTE: You can safely ignore the zha component error during start up.
-      # For some reason home-assistant attempts to automatically start zha when
-      # it detects a zigbee device. Obviously we haven't install the zha
-      # component so it's expected.
       extraComponents = [
         "sun"
         "radio_browser"
@@ -115,6 +111,13 @@ in
     };
 
     # Home assistant module has good systemd hardening
+
+    # For some reason home-assistant attempts to automatically start zha when
+    # it detects a zigbee device. It throws an error because we don't have the
+    # zha component installed. Even though the systemd service has
+    # DevicePolicy=closed, home assistant somehow still detects my zigbee
+    # device. This fixes that.
+    systemd.services.home-assistant.serviceConfig.PrivateDevices = true;
 
     # Install frigate-hass-card
     systemd.services.home-assistant.preStart =

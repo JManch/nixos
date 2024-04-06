@@ -137,6 +137,7 @@ mkIf (cfg.enable && caddy.enable)
         text = /*bash*/ ''
 
           set -o errtrace
+          time=$(date +%s)
 
           send_email() {
             recipient="JManch@protonmail.com"
@@ -149,7 +150,7 @@ mkIf (cfg.enable && caddy.enable)
                   --tls-starttls=on \
                   --from="$SMTP_FROM" \
                   "$recipient" <<EOF
-          Subject: Vaultwarden Backup $1
+          Subject: Vaultwarden Backup $1 $time
           From: $SMTP_FROM
           To: $recipient
 
@@ -176,7 +177,6 @@ mkIf (cfg.enable && caddy.enable)
           trap cleanup EXIT
           cd "$tmp"
 
-          time=$(date +%s)
           tar -cjf - -C "${backupDir}" . | age -R ${publicKey} -o "$time"
 
           hash=$(sha256sum "$time")

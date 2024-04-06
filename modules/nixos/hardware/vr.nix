@@ -13,7 +13,7 @@ in
     inputs.nixpkgs-xr.nixosModules.nixpkgs-xr
   ];
 
-  # TODO: Need to get this working
+  # TODO: Get this working
   config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
       libsurvive

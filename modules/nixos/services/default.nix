@@ -251,39 +251,5 @@ in
     # keep running rather than stopping and starting with each ssh session on
     # servers
     users.users.${username}.linger = config.device.type == "server";
-
-    assertions = [
-      {
-        assertion = cfg.greetd.enable -> (cfg.greetd.sessionDirs != [ ]);
-        message = "Greetd session dirs must be set";
-      }
-      {
-        assertion = cfg.caddy.enable -> (cfg.caddy.lanAddressRanges != [ ]);
-        message = "LAN address ranges must be set for Caddy";
-      }
-      {
-        assertion = cfg.dns-server-stack.enable -> (config.device.ipAddress != null);
-        message = "The DNS server stack requires the device to have a static IP address set";
-      }
-      {
-        assertion = cfg.dns-server-stack.enable -> (cfg.dns-server-stack.routerAddress != "");
-        message = "The DNS server stack requires the device to have a router IP address set";
-      }
-      {
-        assertion = cfg.frigate.enable -> (cfg.frigate.nvrAddress != "");
-        message = "The Frigate service requires nvrAddress to be set";
-      }
-      {
-        assertion = cfg.frigate.enable -> config.hardware.opengl.enable;
-        message = ''
-          The Frigate service requires hardware acceleration. Set
-          `hardware.opengl.enable`.
-        '';
-      }
-      {
-        assertion = cfg.wireguard.friends.enable -> config.age.secrets."${hostname}FriendsWGKey" != null;
-        message = "A secret key for the host must be configured to use the friends Wireguard VPN";
-      }
-    ];
   };
 }

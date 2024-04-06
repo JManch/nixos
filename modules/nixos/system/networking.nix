@@ -6,11 +6,29 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkMerge mkIf utils optional mkForce optionals getExe' mkDefault;
+  inherit (lib)
+    mkMerge
+    mkIf
+    utils
+    optional
+    mkForce
+    optionals
+    getExe'
+    mkDefault
+    allUnique;
   cfg = config.modules.system.networking;
   homeManagerFirewall = (utils.homeConfig args).firewall;
 in
 {
+  assertions = utils.asserts [
+    (cfg.primaryInterface != "")
+    "Primary networking interface must be set"
+    ((cfg.staticIPAddress != null) -> (cfg.defaultGateway != null))
+    "Default gateway must be set when using a static IPV4 address"
+    (allUnique cfg.publicPorts)
+    "`networking.publicPorts` contains duplicate ports"
+  ];
+
   environment.systemPackages = with pkgs; [
     ifmetric # for changing metric in emergencies
   ] ++ optional cfg.wireless.enable wpa_supplicant_gui;

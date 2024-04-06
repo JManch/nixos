@@ -5,7 +5,6 @@
 }:
 let
   inherit (lib) mkIf mkBefore;
-  inherit (config.device) gpu;
 
   amdgpu_top = pkgs.amdgpu_top.overrideAttrs (oldAttrs: {
     postInstall = oldAttrs.postInstall + /*bash*/ ''
@@ -14,7 +13,7 @@ let
     '';
   });
 in
-mkIf (gpu.type == "amd")
+mkIf (config.device.gpu.type == "amd")
 {
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
   environment.systemPackages = [ amdgpu_top ];

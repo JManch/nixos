@@ -5,14 +5,21 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe';
+  inherit (lib) mkIf utils getExe';
   inherit (config.device) gpu;
   cfg = config.modules.services.lact;
   gpuId = "1002:744C-1EAE:7905-0000:09:00.0";
 in
 # This module is specifically for 7900XT on NCASE-M1 host
-mkIf (hostname == "ncase-m1" && cfg.enable && (gpu.type == "amd"))
+mkIf cfg.enable
 {
+  assertions = utils.asserts [
+    (hostname == "ncase-m1")
+    "Lact is only intended to work on host 'ncase-m1'"
+    (gpu.type == "amd")
+    "Lact requires an AMD gpu"
+  ];
+
   # WARN: Disable this if you experience flickering or general instability
   # https://wiki.archlinux.org/title/AMDGPU#Boot_parameter
   boot.kernelParams = [ "amdgpu.ppfeaturemask=0xffffffff" ];

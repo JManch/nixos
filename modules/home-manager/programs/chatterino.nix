@@ -73,7 +73,8 @@ let
       '';
     };
 in
-mkIf cfg.enable {
+mkIf cfg.enable
+{
   home.packages = with pkgs; [
     chatterino2
   ] ++ optional mpv.enable streamlink;

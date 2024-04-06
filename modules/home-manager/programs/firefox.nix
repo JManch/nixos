@@ -9,10 +9,9 @@ let
   inherit (lib) mkIf getExe getExe';
   inherit (config.modules) desktop;
   cfg = config.modules.programs.firefox;
-  desktopCfg = config.modules.desktop;
-  osDesktop = osConfig.usrEnv.desktop;
 in
-mkIf (cfg.enable && osDesktop.enable) {
+mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
+{
   # Use systemd to synchronise Firefox data with persistent storage. Allows for
   # running Firefox on tmpfs with improved performance.
   systemd.user =
@@ -339,9 +338,10 @@ mkIf (cfg.enable && osDesktop.enable) {
 
   desktop.hyprland.binds =
     let
+      inherit (config.modules) desktop;
       firefox = getExe config.programs.firefox.package;
     in
     [
-      "${desktopCfg.hyprland.modKey}, Backspace, exec, ${firefox}"
+      "${desktop.hyprland.modKey}, Backspace, exec, ${firefox}"
     ];
 }

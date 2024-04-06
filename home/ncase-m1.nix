@@ -17,11 +17,12 @@
       };
 
       programs = {
+        # TODO: Switch from swaylock to hyprlock
         swaylock.enable = true;
-        # Waiting for the nix hm module to mature
         hyprlock.enable = false;
         anyrun.enable = false;
         fuzzel.enable = true;
+        swww.enable = true;
       };
 
       services = {

@@ -83,8 +83,13 @@ let
     '';
   };
 in
-mkIf (cfg.enable && caddy.enable)
+mkIf cfg.enable
 {
+  assertions = utils.asserts [
+    caddy.enable
+    "Vaultwarden requires Caddy to be enabled"
+  ];
+
   services.vaultwarden = {
     enable = true;
     backupDir = "/var/backup/vaultwarden";

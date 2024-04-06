@@ -2,7 +2,8 @@
 let
   cfg = config.modules.programs.fastfetch;
 in
-lib.mkIf cfg.enable {
+lib.mkIf cfg.enable
+{
   home.packages = [ pkgs.fastfetch ];
 
   programs.zsh.shellAliases = {

@@ -58,7 +58,7 @@
         enable = true;
         port = 8081;
         autoStart = true;
-        proxy = true;
+        proxy = false;
       };
 
       zigbee2mqtt = {

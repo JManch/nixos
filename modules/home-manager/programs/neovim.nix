@@ -8,7 +8,8 @@ let
   inherit (lib) mkIf utils optionalString;
   cfg = config.modules.programs.neovim;
 in
-mkIf (cfg.enable && config.modules.shell.enable) {
+mkIf cfg.enable
+{
   home.packages = [ pkgs.neovide ];
 
   upstream.programs.neovim = {

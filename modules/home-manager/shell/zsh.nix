@@ -9,7 +9,8 @@ let
   inherit (lib) mkIf getExe';
   cfg = config.modules.shell;
 in
-mkIf cfg.enable {
+mkIf cfg.enable
+{
   programs.zsh = {
     enable = true;
     autosuggestion.enable = true;

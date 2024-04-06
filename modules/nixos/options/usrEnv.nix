@@ -1,6 +1,6 @@
-{ lib, ... }:
+{ lib, config, ... }:
 let
-  inherit (lib) mkEnableOption mkOption types;
+  inherit (lib) mkEnableOption length utils mkOption types;
 in
 {
   options.usrEnv = {
@@ -17,5 +17,12 @@ in
         default = null;
       };
     };
+  };
+
+  config = {
+    assertions = utils.asserts [
+      (config.usrEnv.desktop.enable -> (length config.device.monitors != 0))
+      "Device monitors must be configured to enable desktop environment"
+    ];
   };
 }

@@ -1,18 +1,17 @@
 { lib, config, osConfig, ... }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf fetchers;
   cfg = config.modules.desktop.services.dunst;
-  desktopCfg = config.modules.desktop;
   colors = config.colorscheme.palette;
-  primaryMonitor = lib.fetchers.primaryMonitor osConfig;
-  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
+  primaryMonitor = fetchers.primaryMonitor osConfig;
 in
-mkIf (osDesktopEnabled && cfg.enable) {
+mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
+{
   services.dunst = {
     enable = true;
 
     settings = {
-      global = with desktopCfg.style; {
+      global = with config.modules.desktop.style; {
         monitor = toString cfg.monitorNumber;
         follow = "none";
         enable_posix_regex = true;

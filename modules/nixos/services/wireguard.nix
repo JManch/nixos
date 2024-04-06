@@ -6,6 +6,11 @@
 , ...
 }:
 {
+  assertions = lib.utils.asserts [
+    (config.modules.services.wireguard.friends.enable -> config.age.secrets."${hostname}FriendsWGKey" != null)
+    "A secret key for the host must be configured to use the friends Wireguard VPN"
+  ];
+
   environment.systemPackages = [ pkgs.wireguard-tools ];
 
   networking.wg-quick.interfaces = {

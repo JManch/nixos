@@ -13,8 +13,19 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.frigate;
 in
-mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
+mkIf cfg.enable
 {
+  assertions = utils.asserts [
+    (hostname == "homelab")
+    "Frigate is only intended to work on host 'homelab'"
+    caddy.enable
+    "Frigate requires Caddy to be enabled"
+    (cfg.nvrAddress != "")
+    "The Frigate service requires nvrAddress to be set"
+    config.hardware.opengl.enable
+    "The Frigate service requires hardware acceleration. Set `hardware.opengl.enable`."
+  ];
+
   modules.services.frigate.rtspAddress = { channel, subtype, go2rtc ? false }:
     "rtsp://${optionalString go2rtc "$"}{FRIGATE_RTSP_USER}:${optionalString go2rtc "$"}{FRIGATE_RTSP_PASSWORD}@${cfg.nvrAddress}:554/cam/realmonitor?channel=${toString channel}&subtype=${toString subtype}";
 

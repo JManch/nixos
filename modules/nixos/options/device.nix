@@ -136,20 +136,19 @@ in
 
   config =
     let
-      inherit (lib) sort zipListsWith init tail head all;
+      inherit (lib) utils sort zipListsWith init tail head all;
       inherit (config.device) monitors;
     in
     {
-      assertions = [
-        {
-          assertion =
-            let
-              sorted = sort (a: b: a < b) (map (m: m.number) monitors);
-              diff = zipListsWith (a: b: b - a) (init sorted) (tail sorted);
-            in
-            (monitors == [ ]) || ((all (a: a == 1) diff) && ((head sorted) == 1));
-          message = "Monitor numbers must be sequential and start from 1";
-        }
+      assertions = utils.asserts [
+        (
+          let
+            sorted = sort (a: b: a < b) (map (m: m.number) monitors);
+            diff = zipListsWith (a: b: b - a) (init sorted) (tail sorted);
+          in
+          (monitors == [ ]) || ((all (a: a == 1) diff) && ((head sorted) == 1))
+        )
+        "Monitor numbers must be sequential and start from 1"
       ];
     };
 }

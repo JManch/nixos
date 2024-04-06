@@ -120,25 +120,4 @@ in
       bootEntry = mkEnableOption "Windows systemd-boot boot entry";
     };
   };
-
-  config =
-    let
-      cfg = config.modules.system;
-    in
-    {
-      assertions = [
-        {
-          assertion = (cfg.networking.primaryInterface != "");
-          message = "Primary networking interface must be set";
-        }
-        {
-          assertion = (cfg.networking.staticIPAddress != null) -> (cfg.networking.defaultGateway != null);
-          message = "Default gateway must be set when using a static IPV4 address";
-        }
-        {
-          assertion = lib.allUnique cfg.networking.publicPorts;
-          message = "`networking.publicPorts` contains duplicate ports";
-        }
-      ];
-    };
 }

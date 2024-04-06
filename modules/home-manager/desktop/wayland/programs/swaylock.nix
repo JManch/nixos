@@ -66,7 +66,7 @@ let
       '';
     };
 in
-mkIf (osDesktopEnabled && isWayland && cfg.enable) {
+mkIf (cfg.enable && osDesktopEnabled && isWayland) {
   modules.desktop.programs.swaylock.lockScript = getExe lockScript;
 
   programs.swaylock = {

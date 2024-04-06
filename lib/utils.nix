@@ -1,6 +1,6 @@
 lib:
 let
-  inherit (lib) attrNames filterAttrs;
+  inherit (lib) attrNames filterAttrs imap0 mod elemAt concatMap;
 in
 {
   homeConfig = args:
@@ -14,6 +14,16 @@ in
     });
 
   hosts = outputs: filterAttrs (host: v: (host != "installer")) outputs.nixosConfigurations;
+
+  asserts = asserts:
+    concatMap (a: a) (
+      imap0
+        (
+          i: elem:
+            if (mod i 2) == 0 then
+              [{ assertion = elem; message = (elemAt asserts (i + 1)); }] else [ ]
+        )
+        asserts);
 
   hardeningBaseline = config: overrides: {
     DynamicUser = true;

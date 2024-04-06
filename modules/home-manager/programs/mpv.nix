@@ -7,7 +7,8 @@
 let
   cfg = config.modules.programs.mpv;
 in
-lib.mkIf cfg.enable {
+lib.mkIf cfg.enable
+{
   home.packages = [ pkgs.yt-dlp ];
 
   programs.mpv = {

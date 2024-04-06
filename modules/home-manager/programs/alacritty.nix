@@ -6,7 +6,8 @@ let
   normalFontSize = 12;
   largeFontSize = 17;
 in
-lib.mkIf cfg.enable {
+lib.mkIf cfg.enable
+{
   programs.alacritty = {
     enable = true;
 

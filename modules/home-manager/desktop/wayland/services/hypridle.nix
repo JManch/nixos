@@ -5,17 +5,21 @@
 , ...
 }:
 let
-  inherit (lib) mkIf optional mkForce getExe getExe' escapeShellArg;
-  cfg = desktopCfg.services.hypridle;
-  desktopCfg = config.modules.desktop;
-  swaylock = desktopCfg.programs.swaylock;
+  inherit (lib) mkIf utils optional mkForce getExe getExe' escapeShellArg;
+  inherit (config.modules.desktop.programs) swaylock;
+  cfg = config.modules.desktop.services.hypridle;
 in
 {
   imports = [
     inputs.hypridle.homeManagerModules.default
   ];
 
-  config = mkIf (cfg.enable && swaylock.enable) {
+  config = mkIf cfg.enable {
+    assertions = utils.asserts [
+      swaylock.enable
+      "Hypridle requires Swaylock to be enabled"
+    ];
+
     services.hypridle = {
       enable = true;
       lockCmd = swaylock.lockScript;

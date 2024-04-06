@@ -18,7 +18,14 @@ in
 {
   imports = utils.scanPaths ./.;
 
-  config = mkIf (cfg.enable && hostname == "homelab" && caddy.enable) {
+  config = mkIf cfg.enable {
+    assertions = utils.asserts [
+      (hostname == "homelab")
+      "Home Assistant is only intended to work on host 'homelab'"
+      caddy.enable
+      "Home Assistant requires Caddy to be enabled"
+    ];
+
     modules.services.hass.enableInternal = true;
 
     services.home-assistant = {

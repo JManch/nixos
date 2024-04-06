@@ -4,7 +4,8 @@ let
   inherit (config.modules) desktop;
   cfg = config.modules.programs.vscode;
 in
-mkIf cfg.enable {
+mkIf cfg.enable
+{
   # NOTE: To fix credential saving (signing in with gihub) need to add
   # "password-store": "gnome" to ~/.vscode/argv.json
   # https://code.visualstudio.com/docs/editor/settings-sync#_troubleshooting-keychain-issues

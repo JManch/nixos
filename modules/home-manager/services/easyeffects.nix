@@ -5,18 +5,23 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe mkForce getExe';
+  inherit (lib) mkIf utils getExe mkForce getExe';
   inherit (osConfig.programs) dconf;
   inherit (osConfig.modules.system) audio;
   cfg = config.modules.services.easyeffects;
 in
-mkIf (cfg.enable && audio.enable && dconf.enable) {
+mkIf (cfg.enable && audio.enable)
+{
+  assertions = utils.asserts [
+    dconf.enable
+    "Waybar requires dconf to be enabled"
+  ];
+
   services.easyeffects.enable = true;
   systemd.user.services.easyeffects.Install.WantedBy = mkForce [ ];
 
   programs.waybar.settings.bar =
     let
-      colors = config.colorscheme.palette;
       systemctl = getExe' pkgs.systemd "systemctl";
       notifySend = getExe pkgs.libnotify;
     in

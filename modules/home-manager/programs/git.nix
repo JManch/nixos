@@ -3,7 +3,8 @@ let
   inherit (lib) mkIf getExe;
   cfg = config.modules.programs.git;
 in
-mkIf cfg.enable {
+mkIf cfg.enable
+{
   programs.git = {
     enable = true;
     userEmail = "JManch@protonmail.com";

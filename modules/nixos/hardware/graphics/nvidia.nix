@@ -5,11 +5,9 @@
 } @ args:
 let
   inherit (lib) utils mkIf fetchers;
-  nvidia = config.device.gpu.type == "nvidia";
-  desktop = config.usrEnv.desktop.enable;
   homeConfig = utils.homeConfig args;
 in
-mkIf nvidia
+mkIf (config.device.gpu.type == "nvidia")
 {
   hardware.opengl = {
     enable = true;
@@ -21,7 +19,7 @@ mkIf nvidia
     ];
   };
 
-  services.xserver.videoDrivers = mkIf desktop [ "nvidia" ];
+  services.xserver.videoDrivers = mkIf config.usrEnv.desktop.enable [ "nvidia" ];
 
   hardware.nvidia = {
     # Major issues if this is disabled

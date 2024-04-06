@@ -4,7 +4,8 @@ let
   cfg = config.modules.programs.btop;
   colors = config.colorscheme.palette;
 in
-mkIf cfg.enable {
+mkIf cfg.enable
+{
   programs.btop = {
     enable = true;
     settings.color_theme = "custom";

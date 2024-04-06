@@ -2,7 +2,6 @@
 , pkgs
 , config
 , inputs
-, hostname
 , ...
 }:
 let
@@ -11,8 +10,13 @@ let
   inherit (config.modules.services) caddy;
   cfg = config.modules.services.calibre;
 in
-mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
+mkIf cfg.enable
 {
+  assertions = utils.asserts [
+    caddy.enable
+    "Calibre requires Caddy to be enabled"
+  ];
+
   services.calibre-web = {
     enable = true;
     package = pkgs.calibre-web.overrideAttrs (oldAttrs: {

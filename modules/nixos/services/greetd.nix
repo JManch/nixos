@@ -5,11 +5,18 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe';
+  inherit (lib) mkIf getExe' utils;
   cfg = config.modules.services.greetd;
 in
-mkIf (cfg.enable && config.usrEnv.desktop.enable)
+mkIf cfg.enable
 {
+  assertions = utils.asserts [
+    config.usrEnv.desktop.enable
+    "Greetd requires desktop to be enabled"
+    (cfg.sessionDirs != [ ])
+    "Greetd session dirs must be set"
+  ];
+
   services.greetd = {
     enable = true;
     settings = {

@@ -6,9 +6,7 @@
 } @ args:
 let
   inherit (lib) mkIf mkMerge lists getExe getExe' utils;
-  cfg = desktopCfg.services.wallpaper;
-  desktopCfg = config.modules.desktop;
-  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
+  cfg = config.modules.desktop.services.wallpaper;
   allWallpapers = (utils.flakePkgs args "nix-resources").wallpapers.all-wallpapers;
 
   randomiseWallpaper = pkgs.writeShellApplication {
@@ -30,7 +28,7 @@ let
     '';
   };
 in
-mkIf (osDesktopEnabled && cfg.setWallpaperCmd != null) (mkMerge [
+mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
   {
     systemd.user.services.set-wallpaper = {
       Unit = {

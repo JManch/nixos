@@ -8,11 +8,9 @@ let
   inherit (lib) mkIf fetchers getExe getExe';
   cfg = desktopCfg.programs.fuzzel;
   desktopCfg = config.modules.desktop;
-  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
-  isWayland = fetchers.isWayland config;
   colors = config.colorscheme.palette;
 in
-mkIf (cfg.enable && isWayland && osDesktopEnabled)
+mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && (fetchers.isWayland config))
 {
   programs.fuzzel = {
     enable = true;

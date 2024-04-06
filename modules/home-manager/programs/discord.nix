@@ -2,7 +2,8 @@
 let
   cfg = config.modules.programs.discord;
 in
-lib.mkIf cfg.enable {
+lib.mkIf cfg.enable
+{
   home.packages = with pkgs; [
     discord
     vesktop

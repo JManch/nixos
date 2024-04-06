@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkOption getExe length types literalExpression;
+  inherit (lib) mkIf utils mkOption getExe length types literalExpression;
 
   terminalSubmodule = {
     options = {
@@ -92,20 +92,14 @@ in
       cfg = config.modules.desktop;
       osDesktop = osConfig.usrEnv.desktop;
     in
-    mkIf osDesktop.enable {
-      assertions = [
-        {
-          assertion = (cfg.windowManager != null) -> osDesktop.enable;
-          message = "You cannot select a window manager if usrEnv desktop is not enabled";
-        }
-        {
-          assertion = (cfg.windowManager != null) -> (length osConfig.device.monitors != 0);
-          message = "Device monitors must be configured to use the ${cfg.windowManager} window manager";
-        }
-        {
-          assertion = (cfg.windowManager != null) -> (osDesktop.desktopEnvironment == null);
-          message = "Cannot use a desktop environment with window manager ${cfg.windowManager}";
-        }
-      ];
+    {
+      assertions = mkIf (cfg.windowManager != null) (utils.asserts [
+        osDesktop.enable
+        "You cannot select a window manager if usrEnv desktop is not enabled"
+        (osDesktop.desktopEnvironment == null)
+        "You cannot use a desktop environment with a window manager"
+        (length osConfig.device.monitors != 0)
+        "Device monitors must be configured to use a window manager"
+      ]);
     };
 }

@@ -20,7 +20,6 @@ let
   inherit (config.modules.system.virtualisation) vmVariant;
   cfg = config.modules.services.caddy;
 
-
   generateCerts =
     let
       # We define these here rather than in the modules where they are used so that
@@ -83,6 +82,11 @@ mkMerge [
     environment.systemPackages = [ generateCerts ];
   }
   (mkIf cfg.enable {
+    assertions = utils.asserts [
+      (cfg.lanAddressRanges != [ ])
+      "Caddy requires LAN address ranges to be set"
+    ];
+
     services.caddy = {
       enable = true;
       # Does not work when the admin API is off

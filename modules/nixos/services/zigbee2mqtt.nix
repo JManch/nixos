@@ -1,21 +1,18 @@
 { lib, config, inputs, ... }:
 let
+  inherit (lib) mkIf utils;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy mosquitto;
   inherit (config.age.secrets) zigbee2mqttYamlSecrets mqttZigbee2mqttPassword;
   cfg = config.modules.services.zigbee2mqtt;
 in
-lib.mkIf cfg.enable
+mkIf cfg.enable
 {
-  assertions = [
-    {
-      assertion = cfg.enable -> mosquitto.enable;
-      message = "Zigbee2mqtt requires mosquitto to be enabled";
-    }
-    {
-      assertion = cfg.enable -> caddy.enable;
-      message = "Zigbee2mqtt requires caddy to be enabled";
-    }
+  assertions = utils.asserts [
+    (cfg.enable -> mosquitto.enable)
+    "Zigbee2mqtt requires mosquitto to be enabled"
+    (cfg.enable -> caddy.enable)
+    "Zigbee2mqtt requires caddy to be enabled"
   ];
 
   # TODO: Eventually might be worth defining device.yaml and groups.yaml config

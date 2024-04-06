@@ -6,13 +6,20 @@
 , ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf utils;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
   cfg = config.modules.services.unifi;
 in
-mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
+mkIf cfg.enable
 {
+  assertions = utils.asserts [
+    (hostname == "homelab")
+    "Unifi is only intended to work on host 'homelab'"
+    caddy.enable
+    "Frigate requires Caddy to be enabled"
+  ];
+
   services.unifi = {
     enable = true;
     openFirewall = false;

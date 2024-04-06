@@ -9,7 +9,6 @@
 , config
 , inputs
 , outputs
-, hostname
 , ...
 }:
 let
@@ -41,8 +40,17 @@ let
       (host: v: nameValuePair v.config.device.ipAddress host)
       (filterAttrs (host: v: v.config.device.ipAddress != null) (utils.hosts outputs));
 in
-mkIf (hostname == "homelab" && cfg.enable)
+mkIf cfg.enable
 {
+  assertions = utils.asserts [
+    (config.device.type == "server")
+    "DNS server stack can only be used on server devices"
+    (config.device.ipAddress != null)
+    "The DNS server stack requires the device to have a static IP address set"
+    (cfg.routerAddress != "")
+    "The DNS server stack requires the device to have a router IP address set"
+  ];
+
   # Disable systemd-resolved to simplify DNS stack
   modules.system.networking.resolved.enable = mkForce false;
 

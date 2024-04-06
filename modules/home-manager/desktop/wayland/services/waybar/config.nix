@@ -10,7 +10,6 @@ let
   inherit (osConfig.device) gpu;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
-  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
   isWayland = fetchers.isWayland config;
   isHyprland = desktopCfg.windowManager == "Hyprland";
   colors = config.colorscheme.palette;
@@ -20,7 +19,7 @@ let
   gamemode = osConfig.modules.programs.gaming.gamemode;
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
 in
-mkIf (osDesktopEnabled && isWayland && cfg.enable)
+mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
 {
   programs.waybar = {
     enable = true;

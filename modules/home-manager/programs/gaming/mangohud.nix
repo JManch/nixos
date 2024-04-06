@@ -11,7 +11,8 @@ let
   cfg = config.modules.programs.gaming.mangohud;
   colors = config.colorscheme.palette;
 in
-mkIf cfg.enable {
+mkIf cfg.enable
+{
   programs.mangohud = {
     enable = true;
     package = utils.addPatches pkgs.mangohud [ ../../../../patches/mangoHud.diff ];

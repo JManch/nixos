@@ -60,7 +60,8 @@ let
     '';
     };
 in
-mkIf cfg.enable {
+mkIf cfg.enable
+{
   programs.gamemode = {
     enable = true;
 

@@ -32,6 +32,10 @@ in
         ];
       });
 
+      # NOTE: You can safely ignore the zha component error during start up.
+      # For some reason home-assistant attempts to automatically start zha when
+      # it detects a zigbee device. Obviously we haven't install the zha
+      # component so it's expected.
       extraComponents = [
         "sun"
         "radio_browser"
@@ -45,6 +49,7 @@ in
         "co2signal"
         "forecast_solar"
         "husqvarna_automower"
+        "roborock"
       ] ++ optional mosquitto.enable "mqtt";
 
       customComponents = with pkgs.home-assistant-custom-components; [

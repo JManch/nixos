@@ -174,6 +174,19 @@ in
     mosquitto = {
       enable = mkEnableOption "Mosquitto MQTT Broker";
 
+      users = mkOption {
+        type = types.attrs;
+        default = { };
+        example = lib.literalExpression ''
+          {
+            frigate = {
+              acl = [ "readwrite #" ];
+              hashedPasswordFile = mqttFrigatePassword.path;
+            };
+          }
+        '';
+      };
+
       port = mkOption {
         type = types.port;
         default = 1883;
@@ -211,6 +224,22 @@ in
       port = mkOption {
         type = types.port;
         default = 8222;
+      };
+    };
+
+    zigbee2mqtt = {
+      enable = mkEnableOption "Zigbee2MQTT";
+
+      port = mkOption {
+        type = types.port;
+        default = 8084;
+        description = "Port of the frontend web interface";
+      };
+
+      deviceNode = mkOption {
+        type = types.str;
+        example = "/dev/ttyUSB0";
+        description = "The device node of the zigbee adapter.";
       };
     };
   };

@@ -9,6 +9,7 @@ let
   inherit (config.device) ipAddress;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.services) hass mosquitto caddy;
+  inherit (config.age.secrets) cctvVars mqttFrigatePassword;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.frigate;
 in
@@ -124,12 +125,19 @@ mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
     PrivateDevices = false;
     DeviceAllow = [ ];
     UMask = "0027";
-    EnvironmentFile = config.age.secrets.cctvVars.path;
+    EnvironmentFile = cctvVars.path;
   };
 
   # Nginx upstream module has good systemd hardening
   systemd.services.nginx.serviceConfig = {
     SocketBindDeny = publicPorts;
+  };
+
+  modules.services.mosquitto.users = {
+    frigate = {
+      acl = [ "readwrite #" ];
+      hashedPasswordFile = mqttFrigatePassword.path;
+    };
   };
 
   # We just use go2rtc to provide a low latency WebRTC stream. It is lazy so
@@ -175,7 +183,7 @@ mkIf (hostname == "homelab" && cfg.enable && caddy.enable)
   };
 
   systemd.services.go2rtc.serviceConfig = utils.hardeningBaseline config {
-    EnvironmentFile = config.age.secrets.cctvVars.path;
+    EnvironmentFile = cctvVars.path;
     RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
     SystemCallFilter = [ "@system-service" "~@privileged" ];
     SocketBindDeny = "any";

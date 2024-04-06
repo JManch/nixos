@@ -10,6 +10,7 @@ let
   inherit (lib) mkIf optional optionalString utils mkVMOverride escapeShellArg concatStringsSep;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.age.secrets) mqttHassPassword rootCA homeCert;
   inherit (secretCfg) devices;
   cfg = config.modules.services.hass;
   secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
@@ -145,6 +146,13 @@ in
 
       '';
 
+    modules.services.mosquitto.users = {
+      hass = {
+        acl = [ "readwrite #" ];
+        hashedPasswordFile = mqttHassPassword.path;
+      };
+    };
+
     services.postgresql = {
       enable = true;
       ensureDatabases = [ "hass" ];
@@ -166,8 +174,8 @@ in
         tls {
           client_auth {
             mode require_and_verify
-            trusted_ca_cert_file ${config.age.secrets.rootCA.path}
-            trusted_leaf_cert_file ${config.age.secrets.homeCert.path}
+            trusted_ca_cert_file ${rootCA.path}
+            trusted_leaf_cert_file ${homeCert.path}
           }
         }
         reverse_proxy http://127.0.0.1:${toString cfg.port}

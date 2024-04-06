@@ -28,6 +28,7 @@ mkIf (cfg.enable && config.modules.shell.enable) {
       ripgrep
       gnumake
       gcc
+      luajit
 
       # Language servers
       lua-language-server
@@ -53,8 +54,8 @@ mkIf (cfg.enable && config.modules.shell.enable) {
   xdg.configFile."nvim".source = pkgs.fetchFromGitHub {
     repo = "nvim";
     owner = "JManch";
-    rev = "08960b779a2e451e267e76e95161ff116df854f8";
-    hash = "sha256-B1NwrStp3BVj+mt7A1dW8o5wY6Q3bHD+vYHgKWFH/ZM=";
+    rev = "dfb5bad5ed6ea34133d595a3a0ccf105b711d136";
+    hash = "sha256-LfTwZMT6sSI4ze+qdUM/XCB1I+oZRP81rxs9ubs/9ew=";
   };
 
   # For conditional nix-specific config in nvim config

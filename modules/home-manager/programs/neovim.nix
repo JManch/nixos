@@ -55,8 +55,8 @@ mkIf cfg.enable
   xdg.configFile."nvim".source = pkgs.fetchFromGitHub {
     repo = "nvim";
     owner = "JManch";
-    rev = "dfb5bad5ed6ea34133d595a3a0ccf105b711d136";
-    hash = "sha256-LfTwZMT6sSI4ze+qdUM/XCB1I+oZRP81rxs9ubs/9ew=";
+    rev = "25f7be271c260439ad45261665a4c883111b4b08";
+    hash = "sha256-RBNzTbi+8C/0qoxk80BNCNluJbsF1KxAEti5BGtm4uI=";
   };
 
   # For conditional nix-specific config in nvim config

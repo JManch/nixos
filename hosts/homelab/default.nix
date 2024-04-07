@@ -32,8 +32,11 @@
       unifi.enable = true;
       calibre.enable = true;
       mosquitto.enable = true;
-      vaultwarden.enable = true;
-      vaultwarden.adminInterface = false;
+
+      vaultwarden = {
+        enable = true;
+        adminInterface = false;
+      };
 
       caddy = {
         enable = true;

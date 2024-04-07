@@ -22,7 +22,7 @@ let
     nameValuePair
     filterAttrs
     utils;
-  inherit (inputs.nix-resources.secrets) fqDomain mikrotikDDNS;
+  inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) wireguard;
   cfg = config.modules.services.dns-server-stack;
 
@@ -145,12 +145,12 @@ mkIf cfg.enable
       server = [ "127.0.0.1#${toString cfg.ctrldListenPort}" ];
 
       address = [
-        # Point DDNS domain to router
-        "/${mikrotikDDNS}/${cfg.routerAddress}"
-
         # Point reverse proxy traffic to the device to avoid need for hairpin
         # NAT
         "/${fqDomain}/${config.device.ipAddress}"
+        # Return NXDOMAIN for AAAA requests. Otherwise AAAA requests resolve to
+        # the public DDNS CNAME response which resolves to public IP.
+        "/${fqDomain}/"
       ];
 
       # Host records create PTR entries as well. Using addn-hosts created

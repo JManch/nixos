@@ -1,3 +1,18 @@
+diff --git a/main.cpp b/main.cpp
+index 949d72e..cccb10a 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -111,6 +111,10 @@ static void swipeEnd(void* self, SCallbackInfo& info, std::any param) {
+ }
+ 
+ static void onExpoDispatcher(std::string arg) {
++    // The relative workspace dispatchers are unreliable from special
++    // workspaces so refuse to open expo from them
++    if (g_pCompositor->m_pLastMonitor->activeWorkspaceID() < 0)
++        return;
+ 
+     if (arg == "toggle") {
+         if (g_pOverview)
 diff --git a/overview.cpp b/overview.cpp
 index 1d7d9a3..caa3c10 100644
 --- a/overview.cpp

@@ -70,6 +70,7 @@
       wine.enable = true;
       winbox.enable = true;
       matlab.enable = true;
+      wireshark.enable = true;
 
       gaming = {
         enable = true;

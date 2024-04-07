@@ -10,6 +10,7 @@ in
   options.modules.programs = {
     winbox.enable = mkEnableOption "Winbox";
     matlab.enable = mkEnableOption "Matlab";
+    wireshark.enable = mkEnableOption "Wireshark";
 
     wine = {
       enable = mkEnableOption "Wine";

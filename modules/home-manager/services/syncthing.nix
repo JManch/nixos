@@ -1,13 +1,15 @@
 { lib, config, vmVariant, ... }:
 let
+  inherit (lib) mkIf optional;
   cfg = config.modules.services.syncthing;
 in
-lib.mkIf (cfg.enable && !vmVariant) {
+mkIf (cfg.enable && !vmVariant) {
   services.syncthing = {
     enable = true;
     extraOptions = [
       "--home=${config.xdg.configHome}/syncthing"
       "--no-default-folder"
+      "--gui-address=${if cfg.exposeWebGUI then "0.0.0.0" else "127.0.0.1"}:${toString cfg.port}"
     ];
   };
 
@@ -19,18 +21,7 @@ lib.mkIf (cfg.enable && !vmVariant) {
     };
   };
 
-  # age.secrets = {
-  #   syncthingCert.file = ../../../secrets/syncthing/${hostname}/cert.age;
-  #   syncthingKey.file = ../../../secrets/syncthing/${hostname}/key.age;
-  # };
-  #
-  # This doesn't work cause home-manager doesn't want to touch files outside of home
-  # Could probably resolve with some kind of oneshot systemd service that
-  # copies the files to correct locations
-  # Although there's no point implementing this until syncthing config is fully
-  # declarative so I'll just wait on this
-  # xdg.configFile."syncthing/cert.pem".source = /. + config.age.secrets.syncthingCert.path;
-  # xdg.configFile."syncthing/key.pem".source = /. + config.age.secrets.syncthingKey.path;
+  firewall.allowedTCPPorts = optional cfg.exposeWebGUI cfg.port;
 
   persistence.directories = [ ".config/syncthing" ];
 }

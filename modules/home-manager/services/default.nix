@@ -1,12 +1,22 @@
 { lib, ... }:
 let
-  inherit (lib) mkEnableOption;
+  inherit (lib) mkOption types mkEnableOption;
 in
 {
   imports = lib.utils.scanPaths ./.;
 
   options.modules.services = {
-    syncthing.enable = mkEnableOption "Syncthing";
     easyeffects.enable = mkEnableOption "Easyeffects";
+
+    syncthing = {
+      enable = mkEnableOption "Syncthing";
+      exposeWebGUI = mkEnableOption "exposing the web GUI";
+
+      port = mkOption {
+        type = types.port;
+        default = 8384;
+        description = "Web GUI listening port";
+      };
+    };
   };
 }

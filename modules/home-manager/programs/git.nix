@@ -21,9 +21,11 @@ mkIf cfg.enable
     };
   };
 
+  # To disable the circles in the commit view hit <C-l> and set "show git
+  # graph" to "when maximised". For some reason lazygit is forcing stateful
+  # config.
   programs.lazygit = {
     enable = true;
-
     settings.git.overrideGpg = true;
   };
 

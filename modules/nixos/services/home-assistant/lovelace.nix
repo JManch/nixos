@@ -393,6 +393,39 @@ let
           }
         ];
       }
+      {
+        type = "vertical-stack";
+        cards = [
+          {
+            chart_type = "line";
+            period = "hour";
+            type = "statistics-graph";
+            entities = [
+              {
+                entity = "sensor.powerwall_site_import_cost";
+                name = "Month Import Cost";
+              }
+              {
+                entity = "sensor.powerwall_site_export_compensation";
+                name = "Month Export Compensation";
+              }
+            ];
+            stat_types = [ "sum" ];
+          }
+          {
+            chart_type = "line";
+            period = "hour";
+            type = "statistics-graph";
+            entities = [
+              {
+                entity = "sensor.powerwall_aggregate_cost";
+                name = "Month Aggregate Cost";
+              }
+            ];
+            stat_types = [ "sum" ];
+          }
+        ];
+      }
     ];
   };
 

@@ -220,18 +220,27 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
           # "easeInQuart,0.5,0,0.75,0"
           # "easeOutQuart,0.25,1,0.5,1"
           "easeInOutQuart,0.76,0,0.24,1"
+          "fluent_decel, 0, 0.2, 0.4, 1"
+          "easeOutCirc, 0, 0.55, 0.45, 1"
+          "easeOutCubic, 0.33, 1, 0.68, 1"
+          "easeinoutsine, 0.37, 0, 0.63, 1"
         ];
         animation = [
-          # TODO: Add better animations
           # Windows
-          # "windowsIn,1,3,easeOutQuart"
-          # "windowsOut,1,3,easeInQuart"
-          # "windowsMove,1,3,easeInOutQuart"
+          "windowsIn,1,3,easeOutCubic, popin 30%"
+          "windowsOut,1,3,fluent_decel, popin 70%"
+          "windowsMove,1,2,easeinoutsine, slide"
           # Fade
-          # "fade,1,1,easeInQuart"
-          # "fadeOut,1,5,easeOutExpo"
+          "fadeIn, 1, 3, easeOutCubic" # fade in (open) -> layers and windows
+          "fadeOut, 1, 1.7, easeOutCubic" # fade out (close) -> layers and windows
+          "fadeSwitch, 0, 1, easeOutCirc" # fade on changing activewindow and its opacity
+          "fadeShadow, 1, 10, easeOutCirc" # fade on changing activewindow for shadows
+          "fadeDim, 1, 4, fluent_decel" # the easing of the dimming of inactive windows
+          "border, 1, 2.7, easeOutCirc" # for animating the border's color switch speed
+          "borderangle, 1, 30, fluent_decel, once" # for animating the border's gradient angle - styles: once (default), loop
           # Workspaces
-          "workspaces,1,2,easeInOutQuart,slidevert"
+          "workspaces, 1, 3, easeOutCubic, slidevert" # styles: slide, slidevert, fade, slidefade, slidefadevert
+          # "workspaces,1,2,easeInOutQuart,slidevert"
         ];
       };
 

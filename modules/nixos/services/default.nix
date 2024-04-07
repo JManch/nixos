@@ -1,12 +1,6 @@
-{ lib
-, config
-, username
-, hostname
-, ...
-}:
+{ lib, config, username, ... }:
 let
   inherit (lib) mkEnableOption mkOption types concatStringsSep;
-  cfg = config.modules.services;
 in
 {
   imports = lib.utils.scanPaths ./.;

@@ -1,5 +1,5 @@
 diff --git a/overview.cpp b/overview.cpp
-index 1d7d9a3..800f46c 100644
+index 1d7d9a3..caa3c10 100644
 --- a/overview.cpp
 +++ b/overview.cpp
 @@ -37,13 +37,14 @@ COverview::COverview(PHLWORKSPACE startedOn_, bool swipe_) : startedOn(startedOn
@@ -23,7 +23,7 @@ index 1d7d9a3..800f46c 100644
          std::string s;
          methodStartID = getWorkspaceIDFromString(method[1], s);
          if (methodStartID == WORKSPACE_INVALID)
-@@ -75,7 +76,31 @@ COverview::COverview(PHLWORKSPACE startedOn_, bool swipe_) : startedOn(startedOn
+@@ -75,7 +76,33 @@ COverview::COverview(PHLWORKSPACE startedOn_, bool swipe_) : startedOn(startedOn
                  getWorkspaceIDFromString("r" + ((int64_t)i - backtracked < 0 ? std::to_string((int64_t)i - backtracked) : "+" + std::to_string((int64_t)i - backtracked)), s);
              image.workspaceID = currentID;
          }
@@ -38,12 +38,14 @@ index 1d7d9a3..800f46c 100644
 +            lastID = currentID;
 +            std::string s;
 +            currentID = getWorkspaceIDFromString("r-" + std::to_string(i), s);
-+            if (currentID == lastID)
++            if (currentID >= lastID)
 +                break;
 +
 +            backtracked++;
 +        }
 +
++        // Due to a hyprland bug this doesn't work when launching expo from a name workspace
++        // Performing r+1 on the twitch workspace should take me to 2 but it takes me to 4
 +        for (size_t i = 0; i < SIDE_LENGTH * SIDE_LENGTH; ++i) {
 +            auto&       image = images[i];
 +            std::string s;

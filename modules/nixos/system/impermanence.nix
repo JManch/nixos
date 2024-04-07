@@ -26,6 +26,7 @@ in
       inherit (lib) getExe;
       fd = getExe pkgs.fd;
       extraExcludeDirs = [
+        "tmp"
         "root/.cache/nix"
         "home/${username}/.mozilla"
         "home/${username}/.cache/mozilla"

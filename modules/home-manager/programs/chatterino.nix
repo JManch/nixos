@@ -83,7 +83,7 @@ mkIf cfg.enable
   xdg.configFile = mkIf mpv.enable {
     "streamlink/config".text = ''
       player=${getExe pkgs.mpv-unwrapped}
-      player-args=--save-position-on-quit=no --load-scripts=no --osc --loop-playlist=inf --loop-file=inf --cache=yes --demuxer-max-back-bytes=1073741824
+      player-args=--save-position-on-quit=no --load-scripts=no --osc --loop-playlist=inf --loop-file=inf --cache=yes --demuxer-max-back-bytes=268435456
       twitch-low-latency
       twitch-disable-ads
     '';

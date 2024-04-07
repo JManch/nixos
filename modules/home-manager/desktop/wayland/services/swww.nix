@@ -5,10 +5,8 @@
 , ...
 }:
 let
-  inherit (lib) mkIf fetchers getExe;
+  inherit (lib) mkIf fetchers getExe getExe';
   cfg = config.modules.desktop.programs.swww;
-  swww = getExe pkgs.swww;
-
   transition =
     let
       primaryMonitor = fetchers.primaryMonitor osConfig;
@@ -18,6 +16,20 @@ let
 in
 mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && (fetchers.isWayland config))
 {
-  modules.desktop.services.wallpaper.setWallpaperCmd = "${swww} img ${transition}";
-  wayland.windowManager.hyprland.settings.exec-once = [ "${swww} init --no-cache" ];
+  modules.desktop.services.wallpaper.setWallpaperCmd = "${getExe pkgs.swww} img ${transition}";
+
+  systemd.user.services.swww = {
+    Unit = {
+      Description = "Animated wallpaper daemon";
+      Before = [ "set-wallpaper.service" ];
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session-pre.target" ];
+    };
+
+    Service = {
+      ExecStart = "${getExe' pkgs.swww "swww-daemon"}";
+    };
+
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 }

@@ -37,7 +37,7 @@
           {
             publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
             allowedIPs = [ "10.0.0.0/24" ];
-            endpoint = "ddns.${inputs.nix-resources.secrets.fqDomain}:13232";
+            endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:13232";
             persistentKeepalive = 25;
           }
         ];

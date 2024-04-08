@@ -8,6 +8,7 @@
 
     nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-personal";
     # nixpkgs.url = "git+file:///home/joshua/repos/nixpkgs?ref=nixos-unstable-personal";
+    nixpkgs-unstable-small.url = "github:NixOS/nixpkgs/nixos-unstable-small";
     impermanence.url = "github:nix-community/impermanence";
     firstBoot.url = "github:JManch/false";
 

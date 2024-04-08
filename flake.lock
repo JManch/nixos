@@ -876,6 +876,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-unstable-small": {
+      "locked": {
+        "lastModified": 1712558535,
+        "narHash": "sha256-bTldTUEUL2A9BKh3n/HNeNEAfpMwerj818C6GKgBxNo=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "58486b93e7f67bb9b1b1f1eff7288fd8a1119142",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable-small",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-xr": {
       "inputs": {
         "fenix": "fenix",
@@ -921,6 +937,7 @@
         "nix-matlab": "nix-matlab",
         "nix-resources": "nix-resources",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-unstable-small": "nixpkgs-unstable-small",
         "nixpkgs-xr": "nixpkgs-xr"
       }
     },

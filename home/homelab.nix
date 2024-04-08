@@ -1,6 +1,9 @@
 {
   modules = {
-    shell.enable = true;
+    shell = {
+      enable = true;
+      promptColor = "blue";
+    };
 
     programs = {
       btop.enable = true;

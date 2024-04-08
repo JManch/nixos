@@ -1,6 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  inherit (lib) mkEnableOption mkIf optionals;
+  inherit (lib) mkEnableOption mkOption types mkIf optionals;
   cfg = config.modules.shell;
 in
 {
@@ -9,6 +9,12 @@ in
   options.modules.shell = {
     enable = mkEnableOption "custom shell environment";
     sillyTools = mkEnableOption "installation of silly shell tools";
+
+    promptColor = mkOption {
+      type = types.str;
+      default = "green";
+      description = "Starship prompt color";
+    };
   };
 
   config = mkIf cfg.enable {

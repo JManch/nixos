@@ -23,7 +23,7 @@ lib.mkIf cfg.enable
       };
 
       hostname = {
-        format = "[$hostname]($style)";
+        format = "[$hostname]($style) ";
         style = "white";
       };
 

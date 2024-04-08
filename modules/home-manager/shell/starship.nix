@@ -12,6 +12,8 @@ lib.mkIf cfg.enable
       format = "$directory$character";
       right_format = "$all";
       memory_usage.disabled = true;
+      hostname.format = "$hostname ";
+      username.format = "$user@";
 
       character = {
         success_symbol = "[❯](${cfg.promptColor})";
@@ -20,16 +22,6 @@ lib.mkIf cfg.enable
         vimcmd_replace_one_symbol = "[❮](purple)";
         vimcmd_replace_symbol = "[❮](purple)";
         vimcmd_visual_symbol = "[❮](yellow)";
-      };
-
-      hostname = {
-        format = "[$hostname]($style) ";
-        style = "white";
-      };
-
-      username = {
-        format = "[$user@]($style)";
-        style_user = "white";
       };
 
       directory = {

@@ -24,7 +24,8 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
         corner_radius = cornerRadius;
         width = builtins.floor (primaryMonitor.width * 0.14);
         height = builtins.floor (primaryMonitor.height * 0.25);
-        offset = "${toString (gapSize * 2)}x${toString (gapSize * 2)}";
+        offset = let offset = (gapSize * 2) + borderWidth; in
+          "${toString offset}x${toString offset}";
         gap_size = gapSize;
         frame_width = borderWidth;
         transparency = 100;

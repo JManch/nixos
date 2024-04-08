@@ -43,6 +43,7 @@ mkIf cfg.enable
       };
 
       advanced = {
+        log_level = "warn";
         legacy_api = false;
         network_key = "!${zigbee2mqttYamlSecrets.path} network_key";
       };

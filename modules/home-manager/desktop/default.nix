@@ -1,12 +1,11 @@
 { lib
 , pkgs
-, inputs
 , config
 , osConfig
 , ...
-}:
+} @ args:
 let
-  inherit (lib) mkIf utils mkOption getExe length types literalExpression;
+  inherit (lib) mkIf utils mkOption mkPackageOption getExe length types literalExpression;
 
   terminalSubmodule = {
     options = {
@@ -55,9 +54,25 @@ in
 
         package = mkOption {
           type = types.package;
-          default = inputs.nix-resources.packages.${pkgs.system}.berkeley-mono-nerdfont;
+          default = (utils.flakePkgs args "nix-resources").berkeley-mono-nerdfont;
           description = "Font package";
           example = literalExpression "pkgs.fira-code";
+        };
+      };
+
+      cursor = {
+        package = mkPackageOption pkgs "bibata-cursors" { };
+
+        name = mkOption {
+          type = types.str;
+          description = "Cursor name";
+          default = "Bibata-Modern-Classic";
+        };
+
+        size = mkOption {
+          type = types.int;
+          default = 24;
+          description = "Cursor size in pixels";
         };
       };
 
@@ -77,12 +92,6 @@ in
         type = types.int;
         default = 10;
         description = "Gap size in pixels for all desktop applications";
-      };
-
-      cursorSize = mkOption {
-        type = types.int;
-        default = 24;
-        description = "Cursor size in pixels";
       };
     };
   };

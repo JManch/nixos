@@ -1,6 +1,13 @@
-{ lib, config, ... }:
+{ lib, pkgs, config, ... } @ args:
 let
-  inherit (lib) mkAliasOptionModule mkEnableOption mkOption types getExe' escapeShellArg;
+  inherit (lib)
+    utils
+    mkAliasOptionModule
+    mkEnableOption
+    mkOption
+    types
+    getExe'
+    escapeShellArg;
   cfg = config.modules.desktop.hyprland;
   hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 in
@@ -22,6 +29,22 @@ in
       enable direct scanout. Direct scanout reduces input lag for fullscreen
       applications however might cause graphical glitches.
     '';
+
+    hyprcursor = {
+      name = mkOption {
+        type = types.str;
+        description = "Hyprcursor name";
+        default = "Hypr-Bibata-Modern-Classic";
+      };
+
+      package = mkOption {
+        type = types.nullOr types.package;
+        default = (utils.flakePkgs args "nix-resources").bibata-hyprcursors;
+        description = ''
+          A Hyprcursor compatible cursor package. Set to null to disable Hyprcursor.
+        '';
+      };
+    };
 
     blur = mkOption {
       type = types.bool;

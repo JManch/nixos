@@ -42,6 +42,10 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
   home.packages = [ (utils.flakePkgs args "grimblast").grimblast ];
 
+  # Install Hyprcursor package
+  home.file.".icons/${cfg.hyprcursor.name}".source = mkIf (cfg.hyprcursor.package != null)
+    "${cfg.hyprcursor.package}/share/icons/${cfg.hyprcursor.name}";
+
   # Generate hyprland debug config
   xdg.configFile."hypr/hyprland.conf".onChange =
     let
@@ -121,6 +125,9 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
         "XDG_SESSION_DESKTOP,Hyprland"
+      ] ++ optionals (cfg.hyprcursor.package != null) [
+        "HYPRCURSOR_THEME,${cfg.hyprcursor.name}"
+        "HYPRCURSOR_SIZE,${toString config.modules.desktop.style.cursor.size}"
       ] ++ optionals (osConfig.device.gpu.type == "nvidia") [
         "WLR_NO_HARDWARE_CURSORS,1"
         "LIBVA_DRIVER_NAME,nvidia"

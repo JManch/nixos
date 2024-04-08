@@ -5,9 +5,8 @@
 , ...
 }:
 let
-  desktopCfg = config.modules.desktop;
+  inherit (config.modules.desktop.style) cursor;
   colors = config.colorscheme.palette;
-  cursorName = "Bibata-Modern-Classic";
 in
 lib.mkIf osConfig.usrEnv.desktop.enable
 {
@@ -36,23 +35,15 @@ lib.mkIf osConfig.usrEnv.desktop.enable
   # Also sets gtk.cursorTheme
   home.pointerCursor = {
     gtk.enable = true;
-    name = cursorName;
-    package = pkgs.bibata-cursors;
-    size = desktopCfg.style.cursorSize;
+    name = cursor.name;
+    package = cursor.package;
+    size = cursor.size;
   };
 
-  desktop.hyprland.settings =
-    let
-      hyprctl = lib.getExe' config.wayland.windowManager.hyprland.package "hyprctl";
-    in
-    {
-      env = [
-        "XCURSOR_THEME,${cursorName}"
-        "XCURSOR_SIZE,${toString desktopCfg.style.cursorSize}"
-      ];
-
-      exec-once = [
-        "${hyprctl} setcursor ${cursorName} ${toString desktopCfg.style.cursorSize}"
-      ];
-    };
+  desktop.hyprland.settings = {
+    env = [
+      "XCURSOR_THEME,${cursor.name}"
+      "XCURSOR_SIZE,${toString cursor.size}"
+    ];
+  };
 }

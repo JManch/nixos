@@ -113,7 +113,10 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         # potentially insecure to make all env vars accessible...
         # https://github.com/NixOS/nixpkgs/issues/160923
         # https://github.com/hyprwm/Hyprland/issues/2800
-        "${getExe' pkgs.dbus "dbus-update-activation-environment"} --systemd PATH XDG_DATA_DIRS"
+
+        # WARN: This may no longer be needed after https://github.com/NixOS/nixpkgs/pull/298896
+        # Uncomment if there are any issues
+        # "${getExe' pkgs.dbus "dbus-update-activation-environment"} --systemd PATH XDG_DATA_DIRS"
 
         "systemctl --user stop graphical-session.target"
         "systemctl --user start hyprland-session.target"

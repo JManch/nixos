@@ -21,9 +21,10 @@ let
     attrValues
     nameValuePair
     filterAttrs
-    utils;
+    utils
+    getExe
+    getExe';
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) wireguard;
   cfg = config.modules.services.dns-server-stack;
 
   # Patch Ctrld to enable loading endpoints from environment variables
@@ -103,62 +104,62 @@ mkIf cfg.enable
   # Populate hosts file for ctrld host discovery
   networking.hosts = mapAttrs (_: v: [ v ]) homeHosts;
 
-  services.dnsmasq = {
-    enable = true;
-    alwaysKeepRunning = true;
-    # Ignore this, just have to set it to false to workaround upstream issues
-    resolveLocalQueries = false;
+  # We don't use the upstream dnsmasq module because it isn't very good
+  users.users.dnsmasq = {
+    isSystemUser = true;
+    group = "dnsmasq";
+  };
+  users.groups.dnsmasq = { };
 
-    settings = {
-      port = cfg.listenPort;
-      log-queries = cfg.debug;
+  modules.services.dns-server-stack.dnsmasqConfig = {
+    port = cfg.listenPort;
+    log-queries = cfg.debug;
 
-      # Do not read from hosts because it contains an entry that points
-      # ${hostname}.lan to ::1 and 127.0.0.2. Don't want this in responses so
-      # instead we define hosts using the dnsmasq host-record option and keep
-      # /etc/hosts for ctrld.
-      no-hosts = true;
+    # Do not read from hosts because it contains an entry that points
+    # ${hostname}.lan to ::1 and 127.0.0.2. Don't want this in responses so
+    # instead we define hosts using the dnsmasq host-record option and keep
+    # /etc/hosts for ctrld.
+    no-hosts = true;
 
-      # Never forward dns queries without a domain to upstream nameservers
-      domain-needed = true;
+    # Never forward dns queries without a domain to upstream nameservers
+    domain-needed = true;
 
-      # Do not send reverse lookups for private ip ranges upstream
-      bogus-priv = true;
+    # Do not send reverse lookups for private ip ranges upstream
+    bogus-priv = true;
 
-      # Reject addresses from upstream nameservers that are in private ranges
-      stop-dns-rebind = true;
+    # Reject addresses from upstream nameservers that are in private ranges
+    stop-dns-rebind = true;
 
-      # Allow localhost reply from blackhole nameservers
-      rebind-localhost-ok = true;
+    # Allow localhost reply from blackhole nameservers
+    rebind-localhost-ok = true;
 
-      # Do not read or poll resolv.conf, we manually configure servers
-      no-resolv = true;
-      no-poll = true;
+    # Do not read or poll resolv.conf, we manually configure servers
+    no-resolv = true;
+    no-poll = true;
 
-      # Send the entire source ip to the Ctrld DNS server. Otherwise Ctrld DNS
-      # server sees all source requests coming from localhost. Note that this
-      # disables dnsmasq caching so we instead cache with Ctrld.
-      add-subnet = "32,128";
-      filter-AAAA = !cfg.enableIPv6;
+    # Send the entire source ip to the Ctrld DNS server. Otherwise Ctrld DNS
+    # server sees all source requests coming from localhost. Note that this
+    # disables dnsmasq caching so we instead cache with Ctrld.
+    add-subnet = "32,128";
+    filter-AAAA = !cfg.enableIPv6;
 
-      # Send all queries to the Ctrld DNS server
-      server = [ "127.0.0.1#${toString cfg.ctrldListenPort}" ];
+    # Send all queries to the Ctrld DNS server
+    server = [ "127.0.0.1#${toString cfg.ctrldListenPort}" ];
 
-      address = [
-        # Point reverse proxy traffic to the device to avoid need for hairpin
-        # NAT
-        "/${fqDomain}/${config.device.ipAddress}"
-        # Return NXDOMAIN for AAAA requests. Otherwise AAAA requests resolve to
-        # the public DDNS CNAME response which resolves to public IP.
-        "/${fqDomain}/"
-      ];
+    address = [
+      # Point reverse proxy traffic to the device to avoid need for hairpin
+      # NAT
+      "/${fqDomain}/${config.device.ipAddress}"
+      # Return NXDOMAIN for AAAA requests. Otherwise AAAA requests resolve to
+      # the public DDNS CNAME response which resolves to public IP.
+      "/${fqDomain}/"
+    ];
 
-      # Host records create PTR entries as well. Using addn-hosts created
-      # duplicate entries for some reason so using this instead.
-      host-record =
-        attrValues
-          (mapAttrs (address: hostname: "${hostname}.lan,${address}") homeHosts);
-    };
+    # Host records create PTR entries as well. Using addn-hosts created
+    # duplicate entries for some reason so using this instead.
+    host-record =
+      attrValues
+        (mapAttrs (address: hostname: "${hostname}.lan,${address}") homeHosts);
   };
 
   # Open DNS ports in firewall and set nameserver to localhost
@@ -166,30 +167,56 @@ mkIf cfg.enable
   networking.firewall.allowedUDPPorts = [ cfg.listenPort ];
   networking.nameservers = mkForce [ "127.0.0.1" ];
 
-  # Expose DNS on VPN
-  networking.firewall.interfaces.wg-friends.allowedTCPPorts =
-    mkIf wireguard.friends.enable [ cfg.listenPort ];
-  networking.firewall.interfaces.wg-friends.allowedUDPPorts =
-    mkIf wireguard.friends.enable [ cfg.listenPort ];
+  # Settings generation copied from nixpkgs under MIT license
+  # https://github.com/NixOS/nixpkgs/blob/4cba8b53da471aea2ab2b0c1f30a81e7c451f4b6/COPYING
+  modules.services.dns-server-stack.generateDnsmasqConfig =
+    let
+      formatKeyValue =
+        name: value:
+        if value == true
+        then name
+        else if value == false
+        then "# setting `${name}` explicitly set to false"
+        else lib.generators.mkKeyValueDefault { } "=" name value;
 
-  # Harden the dnsmasq systemd service
-  systemd.services.dnsmasq = {
-    # The upstream service is very poorly configured
-    preStart = mkForce "";
-    restartTriggers = mkForce [ ];
+      settingsFormat = pkgs.formats.keyValue {
+        mkKeyValue = formatKeyValue;
+        listsAsDuplicateKeys = true;
+      };
+    in
+    name: settings:
+      settingsFormat.generate name settings;
 
-    serviceConfig = utils.hardeningBaseline config {
-      DynamicUser = false;
-      PrivateUsers = false;
-      ProtectSystem = mkForce "strict";
-      RestrictAddressFamilies = [ "AF_UNIX" "AF_NETLINK" "AF_INET" "AF_INET6" ];
-      SystemCallFilter = [ "@system-service" "~@resources" ];
-      CapabilityBoundingSet = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
-      AmbientCapabilities = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
-      SocketBindDeny = "any";
-      SocketBindAllow = cfg.listenPort;
+  systemd.services.dnsmasq =
+    let
+      configFile = cfg.generateDnsmasqConfig "dnsmasq.conf" cfg.dnsmasqConfig;
+      dnsmasq = getExe pkgs.dnsmasq;
+      kill = getExe' pkgs.coreutils "kill";
+    in
+    {
+      unitConfig = {
+        Description = "Dnsmasq daemon";
+        After = [ "network.target" ];
+      };
+
+      serviceConfig = utils.hardeningBaseline config {
+        ExecStartPre = "${dnsmasq} -C ${configFile} --test";
+        ExecStart = "${dnsmasq} -k --user=dnsmasq -C ${configFile}";
+        ExecReload = "${kill} -HUP $MAINPID";
+        Restart = "always";
+
+        DynamicUser = false;
+        PrivateUsers = false;
+        RestrictAddressFamilies = [ "AF_UNIX" "AF_NETLINK" "AF_INET" "AF_INET6" ];
+        SystemCallFilter = [ "@system-service" "~@resources" ];
+        CapabilityBoundingSet = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
+        AmbientCapabilities = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
+        SocketBindDeny = "any";
+        SocketBindAllow = cfg.listenPort;
+      };
+
+      wantedBy = [ "multi-user.target" ];
     };
-  };
 
   # Enable extra debugging in our vmVariant and replace secrets
   virtualisation.vmVariant = {

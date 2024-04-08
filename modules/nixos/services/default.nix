@@ -155,6 +155,20 @@ in
           pointed to.
         '';
       };
+
+      dnsmasqConfig = mkOption {
+        type = types.attrs;
+        internal = true;
+        readOnly = true;
+        description = "Dnsmasq settings";
+      };
+
+      generateDnsmasqConfig = mkOption {
+        type = types.functionTo (types.functionTo types.pathInStore);
+        internal = true;
+        readOnly = true;
+        description = "Internal function for generate dnsmasq config from attrset";
+      };
     };
 
     unifi = {

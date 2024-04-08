@@ -31,20 +31,9 @@ let
 
   dnsmasqConfig = name: cfg:
     let
-      settings = {
+      # Use dns-server-stack dnsmsaq config as baseline
+      settings = dns-server-stack.dnsmasqConfig // {
         port = cfg.dns.port;
-        log-queries = true;
-        no-hosts = true;
-        domain-needed = true;
-        bogus-priv = true;
-        stop-dns-rebind = true;
-        rebind-localhost-ok = true;
-        no-resolv = true;
-        no-poll = true;
-        add-subnet = "32,128";
-        filter-AAAA = true;
-
-        server = [ "127.0.0.1#${toString dns-server-stack.ctrldListenPort}" ];
 
         address = [
           "/${fqDomain}/${cfg.address}"
@@ -56,41 +45,21 @@ let
             (mapAttrs (address: hostname: "${hostname}.lan,${address}") inputs.nix-resources.secrets."${name}WGHosts");
       };
 
-      configFile = settingsFormat.generate "dnsmasq-wg-${name}.conf" settings;
-
-      formatKeyValue =
-        name: value:
-        if value == true
-        then name
-        else if value == false
-        then "# setting `${name}` explicitly set to false"
-        else lib.generators.mkKeyValueDefault { } "=" name value;
-
-      settingsFormat = pkgs.formats.keyValue {
-        mkKeyValue = formatKeyValue;
-        listsAsDuplicateKeys = true;
-      };
+      configFile = dns-server-stack.generateDnsmasqConfig "dnsmasq-wg-${name}.conf" settings;
+      dnsmasq = getExe pkgs.dnsmasq;
+      baseline = config.systemd.services.dnsmasq;
     in
     {
-      unitConfig = {
+      unitConfig = baseline.unitConfig // {
         Description = "Dnsmasq daemon for ${name} wireguard VPN";
         PartOf = [ "wg-quick-${name}.service" ];
-        After = [ "network.target" ];
       };
 
-      serviceConfig = utils.hardeningBaseline config {
-        ExecStartPre = "${getExe pkgs.dnsmasq} -C ${configFile} --test";
-        ExecStart = "${getExe pkgs.dnsmasq} -k --user=dnsmasq -C ${configFile}";
-        ExecReload = "${getExe' pkgs.coreutils "kill"} -HUP $MAINPID";
-        Restart = "always";
-
-        DynamicUser = false;
-        PrivateUsers = false;
-        RestrictAddressFamilies = [ "AF_UNIX" "AF_NETLINK" "AF_INET" "AF_INET6" ];
-        SystemCallFilter = [ "@system-service" "~@resources" ];
+      serviceConfig = baseline.serviceConfig // {
+        ExecStartPre = "${dnsmasq} -C ${configFile} --test";
+        ExecStart = "${dnsmasq} -k --user=dnsmasq -C ${configFile}";
         CapabilityBoundingSet = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" ];
         AmbientCapabilities = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" ];
-        SocketBindDeny = "any";
         SocketBindAllow = cfg.dns.port;
       };
 
@@ -167,8 +136,8 @@ in
   programs.zsh = {
     shellAliases = listToAttrs (concatMap
       (interface: [
-        (nameValuePair "wg-${interface}-up" "sudo systemctl start wg-quick-${interface}")
-        (nameValuePair "wg-${interface}-down" "sudo systemctl stop wg-quick-${interface}")
+        (nameValuePair "wg-${interface}-up" "sudo systemctl start wg-quick-wg-${interface}")
+        (nameValuePair "wg-${interface}-down" "sudo systemctl stop wg-quick-wg-${interface}")
       ])
       (attrNames (filterAttrs (_: cfg: cfg.enable && !cfg.autoStart) interfaces)));
   };

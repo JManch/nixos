@@ -30,7 +30,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
 
       * {
           font-family: '${font.family}';
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 600;
           min-height: 0px;
       }
@@ -54,8 +54,8 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
       }
 
       #workspaces {
-          margin: 5px 0px 5px ${toString (gapSize + 2)}px;
-          padding: 0px 0px;
+          margin: 5px 0px 5px ${toString gapSize}px;
+          padding: 0px;
           border-radius: ${halfCornerRadius}px;
           background: @blue;
       }
@@ -66,7 +66,8 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
       }
 
       #workspaces button {
-          padding: 5px;
+          margin: 0px;
+          padding: 0px;
       }
 
       #workspaces button:hover {
@@ -77,7 +78,8 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
       #workspaces button label {
           border-radius: ${halfCornerRadius}px;
           border: ${borderWidthStr}px solid @transparent;
-          padding: 0px 0.4em;
+          padding: 0px 6px;
+          margin: 4px 5px;
           color: @text-dark;
           font-weight: 500;
       }
@@ -102,7 +104,7 @@ mkIf (osDesktopEnabled && isWayland && cfg.enable)
       }
 
       #network.hostname {
-          margin: 5px ${toString (gapSize + 2)}px 5px 0px;
+          margin: 5px ${toString gapSize}px 5px 0px;
           padding: 0px 7px;
           border-radius: ${halfCornerRadius}px;
           background: @blue;

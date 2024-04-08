@@ -65,7 +65,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
     settings = {
       bar = {
         layer = "top";
-        height = 45;
+        height = 41;
         margin = "0";
         spacing = 17;
 
@@ -121,18 +121,18 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
 
         pulseaudio = mkIf audio.enable {
           format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%{format_source}";
-          format-muted = "<span color='#${colors.base08}' size='large'>󰖁</span> {volume:2}%";
+          format-muted = "<span color='#${colors.base08}'>󰖁</span> {volume:2}%";
           format-source = "";
-          format-source-muted = "<span color='#${colors.base08}' size='large'> 󰍭</span> Muted";
+          format-source-muted = "<span color='#${colors.base08}'> 󰍭</span> Muted";
 
           format-icons = {
             headphone = "";
             hdmi = "󰍹";
 
             default = [
-              "<span size='large'></span>"
-              "<span size='large'>󰕾</span>"
-              "<span size='large'></span>"
+              "<span></span>"
+              "<span>󰕾</span>"
+              "<span></span>"
             ];
           };
 
@@ -153,7 +153,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
         };
 
         "custom/gpu" = mkIf gpuModuleEnabled {
-          format = "<span color='#${colors.base04}' size='large'>󰾲</span> {}%";
+          format = "<span color='#${colors.base04}'>󰾲</span> {}%";
           exec = "${getExe' pkgs.coreutils "cat"} /sys/class/hwmon/hwmon${toString gpu.hwmonId}/device/gpu_busy_percent";
           interval = 5;
           tooltip = false;
@@ -172,7 +172,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
         };
 
         tray = {
-          icon-size = 19;
+          icon-size = 17;
           show-passive-items = true;
           spacing = 17;
         };

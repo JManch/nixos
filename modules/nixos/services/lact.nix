@@ -46,10 +46,10 @@ mkIf cfg.enable
             interval_ms: 500
             curve:
               50: 0.0
-              70: 0.66
-              85: 0.66
-              90: 0.66
-              100: 0.66
+              60: 0.0
+              70: 0.5
+              75: 0.6
+              80: 0.65
           pmfw_options:
             acoustic_limit: 3300
             acoustic_target: 2000

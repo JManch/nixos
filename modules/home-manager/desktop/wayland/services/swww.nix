@@ -27,7 +27,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && (fetchers.isWayland config
     };
 
     Service = {
-      ExecStart = "${getExe' pkgs.swww "swww-daemon"}";
+      ExecStart = getExe' pkgs.swww "swww-daemon";
     };
 
     Install.WantedBy = [ "graphical-session.target" ];

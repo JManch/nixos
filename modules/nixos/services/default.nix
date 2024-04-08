@@ -9,23 +9,54 @@ in
     udisks.enable = mkEnableOption "udisks";
     lact.enable = mkEnableOption "Lact";
 
-    wireguard = {
-      friends = {
-        enable = mkEnableOption ''
-          private Wireguard server for use with friends. Requires a private key
-          for the host to be stored in agenix.
-        '';
-        autoStart = mkEnableOption "auto start";
+    wireguard =
+      let
+        wgInterfaceOptions = {
+          enable = mkEnableOption "the wireguard interface";
+          autoStart = mkEnableOption "auto start";
+          routerPeer = mkEnableOption "my router as a peer";
 
-        address = mkOption {
-          type = types.str;
-          default = null;
-          description = ''
-            Assigned IP address for this device on the VPN.
-          '';
+          address = mkOption {
+            type = types.str;
+            default = null;
+            description = "Assigned IP address for this device on the VPN";
+          };
+
+          routerAllowedIPs = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "List of allowed IPs for router peer";
+          };
+
+          peers = mkOption {
+            type = types.listOf types.attrs;
+            default = [ ];
+            description = "Wireguard peers";
+          };
+
+          dns = {
+            enable = mkEnableOption "a custom DNS server for the VPN";
+            host = mkEnableOption "hosting the custom DNS server on this host";
+
+            address = mkOption {
+              type = types.str;
+              default = null;
+              description = "Address of the device hosting the DNS server inside the VPN";
+            };
+
+            port = mkOption {
+              type = types.nullOr types.port;
+              default = null;
+              description = "Port for the DNS server to listen on";
+            };
+          };
         };
+      in
+      mkOption {
+        default = { };
+        type = with types; attrsOf (submodule { options = wgInterfaceOptions; });
+        description = "Wireguard VPN interfaces";
       };
-    };
 
     greetd = {
       enable = mkEnableOption "Greetd with TUIgreet";

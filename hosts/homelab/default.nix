@@ -72,7 +72,13 @@
       wireguard.friends = {
         enable = true;
         autoStart = true;
+        routerPeer = true;
+        routerAllowedIPs = [ "10.0.0.0/24" ];
         address = "10.0.0.7";
+        dns = {
+          host = true;
+          port = 13233;
+        };
       };
     };
 

@@ -175,7 +175,7 @@ mkIf cfg.enable
   # Harden the dnsmasq systemd service
   systemd.services.dnsmasq = {
     # The upstream service is very poorly configured
-    preStart = mkForce "dnsmasq --test";
+    preStart = mkForce "";
     restartTriggers = mkForce [ ];
 
     serviceConfig = utils.hardeningBaseline config {

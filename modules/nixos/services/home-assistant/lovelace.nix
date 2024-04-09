@@ -376,24 +376,6 @@ let
         ];
       }
       {
-        title = "Power Finances";
-        type = "statistics-graph";
-        chart_type = "line";
-        period = "hour";
-        stat_types = [ "sum" ];
-
-        entities = [
-          {
-            entity = "sensor.powerwall_site_import_cost";
-            name = "Import Cost";
-          }
-          {
-            entity = "sensor.powerwall_site_export_compensation";
-            name = "Export Compensation";
-          }
-        ];
-      }
-      {
         type = "vertical-stack";
         cards = [
           {

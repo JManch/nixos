@@ -81,7 +81,7 @@ let
       address = [ "${cfg.address}/24" ];
       autostart = cfg.autoStart;
       privateKeyFile = config.age.secrets."${hostname}-wg-${name}-key".path;
-      dns = mkIf (cfg.dns.enable && !cfg.dns.host) [ cfg.dns.address ];
+      dns = mkIf cfg.dns.enable [ cfg.dns.address ];
 
       peers = cfg.peers ++ optional (cfg.routerPeer) {
         publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";

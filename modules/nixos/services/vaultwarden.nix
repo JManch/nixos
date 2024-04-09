@@ -280,7 +280,10 @@ mkIf cfg.enable
       # Stores an archive of all backups
       directory = "/var/backup/vaultwarden-archive";
       user = "vaultwarden";
-      group = "vaultwarden";
+      # WARN: Allows syncthing user service to share folder. Can probably
+      # change this once I setup system syncthing service and sync with that
+      # instead
+      group = "users";
       mode = "770";
     }
   ];

@@ -103,6 +103,11 @@ mkIf cfg.enable
         };
       };
 
+      motion = {
+        threshold = 40;
+        contour_area = 30;
+      };
+
       detect = {
         enabled = true;
         width = 1024; # The source cam is 704 but we stretch it

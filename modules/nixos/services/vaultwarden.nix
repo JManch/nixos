@@ -7,7 +7,7 @@
 let
   inherit (lib) mkIf getExe mkForce mkVMOverride optional utils;
   inherit (config.modules.system.virtualisation) vmVariant;
-  inherit (inputs.nix-resources.secrets) fqDomain vaultwardenSubdir;
+  inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
   inherit (config.age.secrets)
     rcloneConfig
@@ -97,7 +97,7 @@ mkIf cfg.enable
 
     config = {
       # Reference: https://github.com/dani-garcia/vaultwarden/blob/1.30.5/.env.template
-      DOMAIN = "https://vaultwarden.${fqDomain}/${vaultwardenSubdir}";
+      DOMAIN = "https://vaultwarden.${fqDomain}";
       SIGNUPS_ALLOWED = false;
       INVITATIONS_ALLOWED = false;
       SHOW_PASSWORD_HINT = false;
@@ -242,15 +242,11 @@ mkIf cfg.enable
     # https://github.com/bitwarden/mobile/issues/582
     # https://github.com/bitwarden/mobile/pull/2629
     "vaultwarden.${fqDomain}".extraConfig = ''
-      route {
-        reverse_proxy /${vaultwardenSubdir}/* http://127.0.0.1:${toString cfg.port} {
-          # Send the true remote IP to Rocket, so that Vaultwarden can put this
-          # in the log
-          header_up X-Real-IP {remote_host}
-        }
-        handle /* {
-          abort
-        }
+      import lan_only
+      reverse_proxy http://127.0.0.1:${toString cfg.port} {
+        # Send the true remote IP to Rocket, so that Vaultwarden can put this
+        # in the log
+        header_up X-Real-IP {remote_host}
       }
     '';
   };

@@ -51,7 +51,7 @@ in
     knownHosts = (mapAttrs
       (host: _: {
         publicKeyFile = ../../../hosts/${host}/ssh_host_ed25519_key.pub;
-        extraHostNames = (optional (host == hostname) "localhost");
+        extraHostNames = ([ "${host}.lan" ] ++ optional (host == hostname) "localhost");
       })
       (utils.hosts outputs))
     // {

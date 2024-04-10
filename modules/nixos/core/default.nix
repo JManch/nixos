@@ -53,14 +53,7 @@ in
   # situation, overlays might be more convenient or required for their extra
   # functionality.
   nixpkgs = {
-    overlays = [
-      (final: prev: {
-        unstable-small = import inputs.nixpkgs-unstable-small {
-          system = final.system;
-          config.allowUnfree = true;
-        };
-      })
-    ];
+    overlays = [ ];
     config.allowUnfree = true;
   };
 

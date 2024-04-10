@@ -1,9 +1,4 @@
-{ lib
-, pkgs
-, config
-, inputs
-, ...
-} @ args:
+{ lib, config, inputs, ... } @ args:
 let
   inherit (lib) mkIf mkMerge mkForce fetchers utils;
   inherit (desktopCfg) desktopEnvironment;
@@ -17,11 +12,7 @@ in
 {
   imports = [
     inputs.hyprland.nixosModules.default
-    "${inputs.nixpkgs-unstable-small}/nixos/modules/programs/wayland/hyprland.nix"
   ];
-
-  # FIX: Remove once https://nixpk.gs/pr-tracker.html?pr=298896 is on unstable
-  disabledModules = [ "programs/wayland/hyprland.nix" ];
 
   # TODO: Improve the isWayland function to take desktopEnvironment into account
   config = mkIf config.usrEnv.desktop.enable (mkMerge [

@@ -250,7 +250,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
       local monitor_name=''${monitor_num_to_name[$1]}
 
       # Check if the monitor is already disabled
-      ${hyprctl} monitors -j | ${jaq} -e 'first(.[] | select(.name == "'"$monitor_name"'"))' > /dev/null 2>&1
+      ${hyprctl} monitors all -j | ${jaq} -e 'first(.[] | select((.name == "'"$monitor_name"'") and (.disabled == false)))' > /dev/null 2>&1
 
       if [ $? -ne 0 ]; then
         ${hyprctl} keyword monitor ''${monitor_name_to_cfg[$monitor_name]} > /dev/null

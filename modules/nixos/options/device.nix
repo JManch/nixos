@@ -7,6 +7,10 @@ let
       enabled = mkOption {
         type = types.bool;
         default = true;
+        description = ''
+          If the monitor should be disabled by default and enabled on-demand
+          set this to false
+        '';
       };
 
       name = mkOption {
@@ -53,6 +57,18 @@ let
         type = types.str;
         default = "0x0";
         description = "Relative position of the monitor from the top left corner";
+      };
+
+      transform = mkOption {
+        type = types.int;
+        default = 0;
+        description = "Rotation transform according to Hyprlands transform list";
+      };
+
+      mirror = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Name of other display to mirror";
       };
 
       workspaces = mkOption {

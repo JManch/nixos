@@ -41,6 +41,18 @@
         position = "0x0";
         workspaces = [ 2 4 6 8 ];
       }
+      {
+        # Enabled on-demand for sim racing
+        enabled = false;
+        name = "DP-2";
+        mirror = "DP-1";
+        number = 3;
+        refreshRate = 59.951;
+        width = 2560;
+        height = 1440;
+        position = "-2560x0";
+        transform = 2;
+      }
     ];
   };
 

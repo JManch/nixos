@@ -1,6 +1,6 @@
 lib:
 let
-  inherit (lib) findFirst elem any head;
+  inherit (lib) findFirst elem any head optionalString;
 in
 {
   primaryMonitor = osConfig:
@@ -26,5 +26,5 @@ in
     homeConfig: elem homeConfig.modules.desktop.windowManager waylandWindowManagers;
 
   getMonitorHyprlandCfgStr = m:
-    "${m.name},${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},1";
+    "${m.name},${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},1,transform,${toString m.transform}${optionalString (m.mirror != null) ",mirror,${m.mirror}"}";
 }

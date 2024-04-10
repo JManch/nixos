@@ -2,6 +2,7 @@
 , pkgs
 , config
 , inputs
+, username
 , ...
 }:
 let
@@ -68,6 +69,8 @@ in
     settings = {
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;
+      # Fixes builds using --build-host
+      trusted-users = [ username ];
     };
 
     gc = {

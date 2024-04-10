@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) utils concatStrings;
+  inherit (lib) utils concatStrings getExe;
 
   deployScript = pkgs.writeShellApplication {
     name = "deploy-host";
@@ -81,11 +81,14 @@ let
   };
 in
 {
-  environment.systemPackages = [ deployScript ];
+  # Nvd has to be installed system wide to enable the remote host diff script
+  # calling nvd over ssh
+  environment.systemPackages = [ pkgs.nvd deployScript ];
 
   programs.zsh =
     let
       configDir = "/home/${username}/.config/nixos";
+      nvd = getExe pkgs.nvd;
     in
     {
       enable = true;
@@ -94,11 +97,12 @@ in
         rebuild-switch = "sudo nixos-rebuild switch --flake ${configDir}#${hostname}";
         rebuild-test = "sudo nixos-rebuild test --flake ${configDir}#${hostname}";
         rebuild-boot = "sudo nixos-rebuild boot --flake ${configDir}#${hostname}";
-        # cd here because I once had a bad experience where I accidentally built
-        # in /nix/store and it irrepairably corrupted the store
-        rebuild-build = "cd && nixos-rebuild build --flake ${configDir}#${hostname}";
+        # Go to home dir here because I once had a bad experience where I
+        # accidentally built in /nix/store and caused irrepairable corruption
+        rebuild-build = "pushd ~ >/dev/null && nixos-rebuild build --flake ${configDir}#${hostname}; popd >/dev/null";
         rebuild-dry-build = "nixos-rebuild dry-build --flake ${configDir}#${hostname}";
         rebuild-dry-activate = "sudo nixos-rebuild dry-activate --flake ${configDir}#${hostname}";
+        rebuild-diff = "pushd ~ >/dev/null && rebuild-build && ${nvd} diff /run/current-system result; popd >/dev/null";
         build-iso = "nix build ${configDir}#nixosConfigurations.installer.config.system.build.isoImage";
       };
 
@@ -129,9 +133,9 @@ in
             mkdir -p "$remote_builds"
             # Build and store result persistently to prevent GC deleting builds
             # for remote hosts
-            pushd "$remote_builds" > /dev/null
+            pushd "$remote_builds" >/dev/null
             nixos-rebuild build --flake "${configDir}#$hostname"
-            popd > /dev/null
+            popd >/dev/null
             if [[ $? -ne 0 ]]; then
               return 1
             fi
@@ -141,6 +145,50 @@ in
 
         '';
         in
-        concatStrings (map (cmd: hostFunction cmd) [ "switch" "test" "boot" "dry-activate" "build" ]);
+          /*bash*/ ''
+
+          # Hacky script for viewing configuartion diff on remote hosts whilst
+          # building locally
+          host-rebuild-diff() {
+            if [ -z "$1" ]; then
+              echo "Usage: host-rebuild-diff <hostname>"
+              return 1
+            fi
+
+            hostname=$1
+            if [[ "$hostname" == "${hostname}" ]]; then
+              echo "Error: Cannot diff remotely on local host"
+              return 1
+            fi
+
+            hosts=(${lib.concatStringsSep " " (builtins.attrNames (utils.hosts outputs))})
+            if ! (($hosts[(I)$hostname])); then
+              echo "Error: Host '$hostname' does not exist" >&2
+              return 1
+            fi
+
+            # Because nixos-rebuild doesn't create a 'result' symlink when
+            # executed with --build-host we first run host-rebuild-dry-active
+            # to ensure that a cached build is on the host so it won't end up
+            # trying to build everything itself
+            host-rebuild-dry-activate $hostname
+
+            # Package current config and send to remote host
+            tar -cf /tmp/nixos-diff-config.tar -C ${configDir} .
+            ssh "${username}@$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
+            scp /tmp/nixos-diff-config.tar "${username}@$hostname.lan:/tmp/nixos-diff-config"
+
+            # Build new configuration on remote host using nixos-rebuild build.
+            # Compare result with the current system and print the diff.
+            ssh -A "${username}@$hostname.lan" "sh -c \
+              'cd /tmp/nixos-diff-config && tar -xf nixos-diff-config.tar \
+              && nixos-rebuild build --flake /tmp/nixos-diff-config#$hostname \
+              && nvd --color always diff /run/current-system /tmp/nixos-diff-config/result; \
+              rm -rf /tmp/nixos-diff-config'"
+          }
+
+          ${concatStrings (map (cmd: hostFunction cmd) [ "switch" "test" "boot" "dry-activate" "build" ])}
+
+        '';
     };
 }

@@ -862,32 +862,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1712342312,
-        "narHash": "sha256-7JO+hReZQBZEcC8FyZSFeiUVRSyHJz3uy9XdB1Lhi3Q=",
+        "lastModified": 1712714093,
+        "narHash": "sha256-fbVGKS2tQHxc3H9JE41oRh43ALDaEnL/QAoGpFS3+Y4=",
         "owner": "JManch",
         "repo": "nixpkgs",
-        "rev": "e37b0059c1317ad22944e86677ca5dc4986fdc6d",
+        "rev": "aa10563e3398af42b4cd44de30eefb6e4459987a",
         "type": "github"
       },
       "original": {
         "owner": "JManch",
         "ref": "nixos-unstable-personal",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs-unstable-small": {
-      "locked": {
-        "lastModified": 1712558535,
-        "narHash": "sha256-bTldTUEUL2A9BKh3n/HNeNEAfpMwerj818C6GKgBxNo=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "58486b93e7f67bb9b1b1f1eff7288fd8a1119142",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable-small",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -937,7 +921,6 @@
         "nix-matlab": "nix-matlab",
         "nix-resources": "nix-resources",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-unstable-small": "nixpkgs-unstable-small",
         "nixpkgs-xr": "nixpkgs-xr"
       }
     },

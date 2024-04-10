@@ -8,6 +8,7 @@ in
   options.modules.hardware = {
     vr.enable = mkEnableOption "virtual reality";
     secureBoot.enable = mkEnableOption "secure boot";
+    fanatec.enable = mkEnableOption "support for Fanatec hardware";
 
     fileSystem = {
       trim = mkEnableOption "ZFS automatic trimming";

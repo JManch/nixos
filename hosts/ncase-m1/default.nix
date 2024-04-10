@@ -57,6 +57,7 @@
     hardware = {
       secureBoot.enable = true;
       vr.enable = false;
+      fanatec.enable = true;
 
       fileSystem = {
         trim = true;

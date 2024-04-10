@@ -737,11 +737,11 @@
       },
       "locked": {
         "dir": "contrib",
-        "lastModified": 1712355530,
-        "narHash": "sha256-sQmkgl5Z4G3LEtdyFbmRPttVQaLnLdKZtesDTgvHd+E=",
+        "lastModified": 1712704129,
+        "narHash": "sha256-So1Zs1T8/QCb0ix6trDwSGn9B/swKqD0UpJ0kvWJf9k=",
         "owner": "neovim",
         "repo": "neovim",
-        "rev": "a4e4e493df5f6897345278a460cccd175f7f4cf0",
+        "rev": "f49408454ddb48016d51b48bcd9d5dab538f5cc7",
         "type": "github"
       },
       "original": {
@@ -762,11 +762,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1712361808,
-        "narHash": "sha256-akgqGRhjQbRIZJmU/J3Nb5qI1Uhu2+aOsGmqLOMeWpc=",
+        "lastModified": 1712707600,
+        "narHash": "sha256-s9+n5geXWoMza4gdoV5If+L8YVYl7nuJ1j85xB+xpNw=",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "cc3b95fd0c45924babac9195d2a3b345c138866b",
+        "rev": "285436e2a714e47fb507f963046b092f626c859c",
         "type": "github"
       },
       "original": {
@@ -847,11 +847,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1712603238,
-        "narHash": "sha256-C7lh35kRKBArBMhRI2gDFehM1fNqXTB+qQs9gWZ7F9A=",
+        "lastModified": 1712709821,
+        "narHash": "sha256-a0icCKc+zD6zltLlB1MS2j4hGHVfiOZjeAJani826u0=",
         "ref": "refs/heads/main",
-        "rev": "99dc7228c25d81a7eb82941d1a21df5310cabf9b",
-        "revCount": 77,
+        "rev": "3215fcb3be90d877830b9532bd354c76439b9c3a",
+        "revCount": 79,
         "type": "git",
         "url": "ssh://git@github.com/JManch/nix-resources"
       },

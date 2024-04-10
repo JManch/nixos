@@ -95,29 +95,15 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
 
     systemd = {
       enable = true;
-      # https://github.com/nix-community/home-manager/issues/4484
-      # NOTE: This works because hyprland-session.target BindsTo
-      # graphical-session.target so starting hyprland-session.target also
-      # starts graphical-session.target. We stop graphical-session.target
-      # instead of hyprland-session.target because, by default, home-manager
-      # services bind to graphical-session.target. Also, we basically ignore
-      # hyprland-session.target in our config because we manage modularity in
-      # Nix rather than with systemd.
       extraCommands = [
-        # The PATH and XDG_DATA_DIRS variables are required in the dbus and
-        # systemd environment for xdg-open to work using portals (the preferred
-        # method). Some more variables might still be needed but it's unclear
-        # which exactly and a consensus doesn't seem to have been reached.
-        # Using `dbus-update-activation-environment --systemd --all` would
-        # definitely fix all potential problems but it seems messy and
-        # potentially insecure to make all env vars accessible...
-        # https://github.com/NixOS/nixpkgs/issues/160923
-        # https://github.com/hyprwm/Hyprland/issues/2800
-
-        # WARN: This may no longer be needed after https://github.com/NixOS/nixpkgs/pull/298896
-        # Uncomment if there are any issues
-        # "${getExe' pkgs.dbus "dbus-update-activation-environment"} --systemd PATH XDG_DATA_DIRS"
-
+        # This works because hyprland-session.target BindsTo
+        # graphical-session.target so starting hyprland-session.target also
+        # starts graphical-session.target. We stop graphical-session.target
+        # instead of hyprland-session.target because, by default, home-manager
+        # services bind to graphical-session.target. Also, we basically ignore
+        # hyprland-session.target in our config because we manage modularity in
+        # Nix rather than with systemd.
+        # https://github.com/nix-community/home-manager/issues/4484
         "systemctl --user stop graphical-session.target"
         "systemctl --user start hyprland-session.target"
       ];

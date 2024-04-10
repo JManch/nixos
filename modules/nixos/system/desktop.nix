@@ -87,6 +87,12 @@ in
       programs.hyprland = {
         enable = true;
         package = hyprlandPackage;
+        # Extra variables are required in the dbus and systemd environment for
+        # xdg-open to work using portals (the preferred method). This option
+        # adds them to the systemd user environment.
+        # https://github.com/NixOS/nixpkgs/issues/160923
+        # https://github.com/hyprwm/Hyprland/issues/2800
+        systemd.setPath.enable = true;
       };
 
       modules.services.greetd.sessionDirs = [

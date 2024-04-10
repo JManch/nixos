@@ -7,7 +7,15 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf optional optionalString utils mkVMOverride escapeShellArg concatStringsSep;
+  inherit (lib)
+    mkIf
+    mkForce
+    optional
+    optionalString
+    utils
+    mkVMOverride
+    escapeShellArg
+    concatStringsSep;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets) mqttHassPassword rootCA homeCert;
@@ -120,12 +128,18 @@ in
 
     # Home assistant module has good systemd hardening
 
-    # For some reason home-assistant attempts to automatically start zha when
-    # it detects a zigbee device. It throws an error because we don't have the
-    # zha component installed. Even though the systemd service has
-    # DevicePolicy=closed, home assistant somehow still detects my zigbee
-    # device. This fixes that.
-    systemd.services.home-assistant.serviceConfig.PrivateDevices = true;
+    systemd.services.home-assistant = {
+      # For some reason home-assistant attempts to automatically start zha when
+      # it detects a zigbee device. It throws an error because we don't have the
+      # zha component installed. Even though the systemd service has
+      # DevicePolicy=closed, home assistant somehow still detects my zigbee
+      # device. This fixes that.
+      serviceConfig.PrivateDevices = true;
+
+      # Many configuration changes can be reloaded in the UI rather than having
+      # to fully restart home assistant
+      reloadTriggers = mkForce [ ];
+    };
 
     # Install frigate-hass-card
     systemd.services.home-assistant.preStart =

@@ -91,7 +91,7 @@ lib.mkIf (cfg.enableInternal)
             service = "climate.set_temperature";
             target.entity_id = "climate.hallway";
             data = {
-              temperature = "{{ state_attr('climate.toon', 'temperature') |float + 3.5 }}";
+              temperature = "{{ state_attr('climate.joshua_room_thermostat', 'temperature') |float + 2 }}";
               hvac_mode = "heat";
             };
           }];
@@ -100,7 +100,7 @@ lib.mkIf (cfg.enableInternal)
             service = "climate.set_temperature";
             target.entity_id = "climate.hallway";
             data = {
-              temperature = 15;
+              temperature = 5;
               hvac_mode = "heat";
             };
           }];
@@ -118,11 +118,10 @@ lib.mkIf (cfg.enableInternal)
       target_temp = 19;
       eco_temp = 17;
       comfort_temp = 21;
-      # Differnence to target temp required to switch on
-      cold_tolerance = 0.5;
+      # Difference to target temp required to switch on
+      cold_tolerance = 1;
       # Minimum amount of time before reacting to new switch state
-      min_cycle_duration.minutes = 15;
-      initial_hvac_mode = "off";
+      min_cycle_duration.minutes = 10;
       away_temp = 16;
       precision = 0.5;
     }];

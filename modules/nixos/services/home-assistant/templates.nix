@@ -79,5 +79,52 @@ lib.mkIf (cfg.enableInternal)
         }
       ];
     }];
+
+    switch = [{
+      platform = "template";
+      switches = {
+        hallway_thermostat = {
+          friendly_name = "Hallway Thermostat Switch";
+          value_template = "{{ is_state_attr('climate.hallway', 'hvac_action', 'heating') }}";
+
+          turn_on = [{
+            service = "climate.set_temperature";
+            target.entity_id = "climate.hallway";
+            data = {
+              temperature = "{{ state_attr('climate.toon', 'temperature') |float + 3.5 }}";
+              hvac_mode = "heat";
+            };
+          }];
+
+          turn_off = [{
+            service = "climate.set_temperature";
+            target.entity_id = "climate.hallway";
+            data = {
+              temperature = 15;
+              hvac_mode = "heat";
+            };
+          }];
+        };
+      };
+    }];
+
+    climate = [{
+      platform = "generic_thermostat";
+      name = "Joshua Room Thermostat";
+      heater = "switch.hallway_thermostat";
+      target_sensor = "sensor.joshua_sensor_temperature";
+      min_temp = 17;
+      max_temp = 24;
+      target_temp = 19;
+      eco_temp = 17;
+      comfort_temp = 21;
+      # Differnence to target temp required to switch on
+      cold_tolerance = 0.5;
+      # Minimum amount of time before reacting to new switch state
+      min_cycle_duration.minutes = 15;
+      initial_hvac_mode = "off";
+      away_temp = 16;
+      precision = 0.5;
+    }];
   };
 }

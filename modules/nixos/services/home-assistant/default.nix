@@ -46,6 +46,7 @@ in
         "met" # weather
         "mobile_app"
         "profiler"
+        "generic_thermostat"
         "hue"
         "webostv"
         "powerwall"

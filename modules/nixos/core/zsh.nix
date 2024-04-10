@@ -173,18 +173,32 @@ in
             # trying to build everything itself
             host-rebuild-dry-activate $hostname
 
+            # WARN: The commented out code is an old method that I made under
+            # the assumption that store symlinks would be invalid between hosts.
+            # If you run into any problems switch to old method
+
             # Package current config and send to remote host
-            tar -cf /tmp/nixos-diff-config.tar -C ${configDir} .
-            ssh "${username}@$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
-            scp /tmp/nixos-diff-config.tar "${username}@$hostname.lan:/tmp/nixos-diff-config"
+            # tar -cf /tmp/nixos-diff-config.tar -C ${configDir} .
+            # ssh "${username}@$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
+            # scp /tmp/nixos-diff-config.tar "${username}@$hostname.lan:/tmp/nixos-diff-config"
+
+            # Package build symlink and send to remote host
+            tar -cf /tmp/nixos-diff-result.tar -C "/home/${username}/files/remote-builds/$hostname" result
+            scp /tmp/nixos-diff-result.tar "${username}@$hostname.lan:/tmp"
 
             # Build new configuration on remote host using nixos-rebuild build.
             # Compare result with the current system and print the diff.
-            ssh -A "${username}@$hostname.lan" "sh -c \
-              'cd /tmp/nixos-diff-config && tar -xf nixos-diff-config.tar \
-              && nixos-rebuild build --flake /tmp/nixos-diff-config#$hostname \
-              && nvd --color always diff /run/current-system /tmp/nixos-diff-config/result; \
-              rm -rf /tmp/nixos-diff-config'"
+            # ssh -A "${username}@$hostname.lan" "sh -c \
+            #   'cd /tmp/nixos-diff-config && tar -xf nixos-diff-config.tar \
+            #   && nixos-rebuild build --flake /tmp/nixos-diff-config#$hostname \
+            #   && nvd --color always diff /run/current-system /tmp/nixos-diff-config/result; \
+            #   rm -rf /tmp/nixos-diff-config'"
+
+            # Diff the received result with the current system closure
+            ssh -A "${username}@$hostname.lan" "tar -xf /tmp/nixos-diff-result.tar -C /tmp && \
+              nvd --color always diff \
+              /run/current-system /tmp/result; \
+              rm -f /tmp/nixos-diff-result.tar; rm -f /tmp/result"
           }
 
           ${concatStrings (map (cmd: hostFunction cmd) [ "switch" "test" "boot" "dry-activate" "build" ])}

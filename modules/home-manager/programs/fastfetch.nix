@@ -16,6 +16,7 @@ lib.mkIf cfg.enable
       "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
       "modules": [
         "title",
+        "separator",
         {
           "type": "os",
           "format": "{3} {12}"

@@ -93,6 +93,10 @@ in
         default_config = { };
         frontend = { };
 
+        # Setting time zone in configuration.yaml makes it impossible to change
+        # zone settings in the UI
+        homeassistant.time_zone = null;
+
         # We use postgresql instead of the default sqlite because it has better performance
         recorder.db_url = "postgresql://@/hass";
 

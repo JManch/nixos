@@ -41,6 +41,7 @@
 
     programs = {
       alacritty.enable = true;
+      foot.enable = true;
       btop.enable = true;
       cava.enable = true;
       firefox.enable = true;

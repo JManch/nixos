@@ -84,6 +84,7 @@ mkIf cfg.enable
           # The actual endpoint is loaded from an environment variable
           endpoint = "https://dns.controld.com/secret";
           bootstrap_ip = "76.76.2.22";
+          timeout = 5000;
           type = "doh3";
         };
 

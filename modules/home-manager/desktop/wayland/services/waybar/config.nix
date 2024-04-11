@@ -246,5 +246,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
     [
       # Toggle waybar
       "${modKey}, B, exec, ${systemctl} kill --user --signal=SIGUSR1 waybar"
+      # Restart waybar
+      "${modKey}SHIFTCONTROL, B, exec, ${systemctl} restart --user waybar"
     ];
 }

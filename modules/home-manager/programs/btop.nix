@@ -1,6 +1,12 @@
-{ lib, config, osConfig, ... }:
+{ lib
+, pkgs
+, config
+, osConfig
+, ...
+}:
 let
   inherit (lib) mkIf getExe;
+  inherit (osConfig.device) gpu;
   cfg = config.modules.programs.btop;
   colors = config.colorscheme.palette;
 in
@@ -8,6 +14,10 @@ mkIf cfg.enable
 {
   programs.btop = {
     enable = true;
+    package = pkgs.btop.override ({
+      cudaSupport = gpu.type == "nvidia";
+      rocmSupport = gpu.type == "amd";
+    });
     settings.color_theme = "custom";
   };
 

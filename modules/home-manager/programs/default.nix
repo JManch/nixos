@@ -9,7 +9,6 @@ in
     alacritty.enable = mkEnableOption "Alacritty";
     btop.enable = mkEnableOption "btop";
     cava.enable = mkEnableOption "cava";
-    firefox.enable = mkEnableOption "Firefox";
     torBrowser.enable = mkEnableOption "Tor Browser";
     git.enable = mkEnableOption "Git and Lazygit";
     neovim.enable = mkEnableOption "Neovim";
@@ -33,5 +32,10 @@ in
     prism-launcher.enable = mkEnableOption "Prism Launcher";
     unity.enable = mkEnableOption "Unity Game Engine";
     foot.enable = mkEnableOption "Foot";
+
+    firefox = {
+      enable = mkEnableOption "Firefox";
+      runInRam = mkEnableOption "running Firefox in RAM";
+    };
   };
 }

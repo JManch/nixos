@@ -44,7 +44,6 @@
       foot.enable = true;
       btop.enable = true;
       cava.enable = true;
-      firefox.enable = true;
       torBrowser.enable = true;
       git.enable = true;
       neovim.enable = true;
@@ -62,6 +61,11 @@
       qbittorrent.enable = true;
       filenDesktop.enable = true;
       multiviewerF1.enable = true;
+
+      firefox = {
+        enable = true;
+        runInRam = true;
+      };
 
       gaming = {
         mangohud.enable = true;

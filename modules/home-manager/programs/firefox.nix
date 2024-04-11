@@ -20,7 +20,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
       syncToTmpfs = "${rsync} -auh --no-links --info=stats1 '/persist/home/${username}/.mozilla/' '/home/${username}/.mozilla/'";
       syncToPersist = "${rsync} -ah --no-links --delete --info=stats1 '/home/${username}/.mozilla/' '/persist/home/${username}/.mozilla/'";
     in
-    {
+    mkIf cfg.runInRam {
       services.firefox-persist-init = {
         Unit = {
           Description = "Firefox persist initialiser";
@@ -335,6 +335,11 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
       };
     };
   };
+
+  persistence.directories = mkIf (!cfg.runInRam) [
+    ".mozilla"
+    ".cache/mozilla"
+  ];
 
   desktop.hyprland.binds =
     let

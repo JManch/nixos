@@ -73,9 +73,21 @@ mkIf cfg.enable
         discover_ptr = false;
       };
 
+      network."0" = {
+        name = "Any Network";
+        cidrs = [ "0.0.0.0/0" ];
+      };
+
       listener."0" = {
         ip = "127.0.0.1";
         port = cfg.ctrldListenPort;
+      };
+
+      listener."0".policy = {
+        name = "Failover DNS";
+        networks = [
+          { "network.0" = [ "upstream.0" "upstream.1" ]; }
+        ];
       };
 
       upstream = {
@@ -84,7 +96,7 @@ mkIf cfg.enable
           # The actual endpoint is loaded from an environment variable
           endpoint = "https://dns.controld.com/secret";
           bootstrap_ip = "76.76.2.22";
-          timeout = 5000;
+          timeout = 3000;
           type = "doh3";
         };
 

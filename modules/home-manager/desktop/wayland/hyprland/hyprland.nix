@@ -305,4 +305,8 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
       };
     };
   };
+
+  programs.zsh.shellAliases = {
+    hyprland-setup-dev = "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -B build";
+  };
 }

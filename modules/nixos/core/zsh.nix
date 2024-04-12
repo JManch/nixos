@@ -194,6 +194,9 @@ in
             #   && nvd --color always diff /run/current-system /tmp/nixos-diff-config/result; \
             #   rm -rf /tmp/nixos-diff-config'"
 
+            # TODO: Work out why this sometimes fails with '/tmp/result does
+            # not exist' on the first run after a new build
+
             # Diff the received result with the current system closure
             ssh -A "${username}@$hostname.lan" "tar -xf /tmp/nixos-diff-result.tar -C /tmp && \
               nvd --color always diff \

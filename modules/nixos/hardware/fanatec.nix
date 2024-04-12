@@ -22,7 +22,8 @@ lib.mkIf cfg.enable
       sens=1080
       if [ "$1" = "beamng" ]; then sens=2520; fi
 
-      dir="/sys/module/hid_fanatec/drivers/hid:fanatec/0003:0EB7:0020.0015/ftec_tuning/0003:0EB7:0020.0015"
+      device=$(\ls -1 /sys/module/hid_fanatec/drivers/hid:fanatec | head -1)
+      dir="/sys/module/hid_fanatec/drivers/hid:fanatec/$device/ftec_tuning/$device"
       echo "$sens" | sudo tee "$dir/SEN"
       echo 70 | sudo tee "$dir/FEI"
       echo 1 | sudo tee "$dir/NDP"

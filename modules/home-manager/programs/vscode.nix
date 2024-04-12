@@ -17,9 +17,9 @@ mkIf cfg.enable
     # environments. Solution is to run nix shell inside the vscode terminal.
     # Also, some tooling such as LSP servers may need to be added here. I don't
     # use VSCode as my main editor though so not a big deal.
-    package = pkgs.vscode.fhsWithPackages (ps: with ps; ([
+    package = pkgs.vscode.fhsWithPackages (ps: with ps; [
       gdb
-    ]));
+    ]);
 
     userSettings = mkIf (fetchers.isWayland config) {
       # Prevents crash on launch

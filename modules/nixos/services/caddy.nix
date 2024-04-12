@@ -179,17 +179,13 @@ mkMerge [
     persistence.directories =
       let
         inherit (config.services) caddy;
-        definition = dir: {
-          directory = dir;
-          user = caddy.user;
-          group = caddy.group;
-          mode = "700";
-        };
       in
-      [
-        (definition "/var/lib/caddy")
-        (definition "/var/log/caddy")
-      ];
+      [{
+        directory = "/var/lib/caddy";
+        user = caddy.user;
+        group = caddy.group;
+        mode = "700";
+      }];
 
     virtualisation.vmVariant = {
       modules.services.caddy.lanAddressRanges = [ "10.0.2.2/32" ];

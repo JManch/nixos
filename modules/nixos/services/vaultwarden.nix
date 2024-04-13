@@ -2,6 +2,7 @@
 , pkgs
 , config
 , inputs
+, outputs
 , ...
 }:
 let
@@ -133,42 +134,37 @@ mkIf cfg.enable
         runtimeInputs = with pkgs; [
           coreutils
           diffutils
-          msmtp
           gnutar
           bzip2
           age
           rclone
+          outputs.packages.${pkgs.system}.shoutrrr
         ];
-        # TODO: Replace email script with shoutrrr
         text = /*bash*/ ''
 
           set -o errtrace
           time=$(date +%s)
 
-          send_email() {
-            recipient="JManch@protonmail.com"
-            msmtp --host="$SMTP_HOST" \
-                  --port="$SMTP_PORT" \
-                  --auth=on \
-                  --user="$SMTP_USERNAME" \
-                  --passwordeval="echo $SMTP_PASSWORD" \
-                  --tls=on \
-                  --tls-starttls=on \
-                  --from="$SMTP_FROM" \
-                  "$recipient" <<EOF
-          Subject: Vaultwarden Backup $1 $time
-          From: $SMTP_FROM
-          To: $recipient
+          send_notification() {
+            if [ "$1" = "Failure" ]; then
+              discord_auth=$DISCORD_AUTH_FAILURE
+            else
+              discord_auth=$DISCORD_AUTH_SUCCESS
+            fi
 
-          $2
-          EOF
+            shoutrrr send \
+              --url "discord://$discord_auth" \
+              --title "Vaultwarden Backup $1 $time" \
+              --message "$2"
+
+            shoutrrr send \
+              --url "smtp://$SMTP_URL_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=Vaultwarden%20Backup%20$1%20$time" \
+              --message "$2"
           }
 
           on_failure() {
             echo "Sending failure email"
-            send_email "Failure" "$(cat <<EOF
-          Vaultwarden backup failed
-
+            send_notification "Failure" "$(cat <<EOF
           Time: $(date +"%Y-%m-%d %H:%M:%S")
           Error: line $LINENO: $BASH_COMMAND failed
           EOF
@@ -207,9 +203,7 @@ mkIf cfg.enable
 
           rclone --config "$state_dir/rcloneConfig" copy . remote:backups/vaultwarden
 
-          send_email "Success" "$(cat <<EOF
-          Vaultwarden backed up successfully
-
+          send_notification "Success" "$(cat <<EOF
           Timestamp: $time ($(date -d @"$time" +"%Y-%m-%d %H:%M:%S"))
           Hash: $(echo "$hash" | cut -d ' ' -f 1)
           Size: $(stat -c%s "$time" | numfmt --to=iec-i --suffix=B --format="%.1f")

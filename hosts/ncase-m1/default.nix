@@ -100,6 +100,7 @@
       broadcast-box.enable = true;
       greetd.enable = true;
       lact.enable = true;
+      scrutiny.collector.enable = true;
 
       wireguard.friends = {
         enable = true;

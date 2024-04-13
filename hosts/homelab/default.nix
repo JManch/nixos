@@ -80,6 +80,11 @@
           port = 13233;
         };
       };
+
+      scrutiny = {
+        server.enable = true;
+        collector.enable = true;
+      };
     };
 
     system = {

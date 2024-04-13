@@ -139,6 +139,7 @@ mkIf cfg.enable
           age
           rclone
         ];
+        # TODO: Replace email script with shoutrrr
         text = /*bash*/ ''
 
           set -o errtrace

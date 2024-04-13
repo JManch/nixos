@@ -23,6 +23,11 @@ mkMerge [
         api.endpoint = "https://disks.${fqDomain}";
       };
     };
+
+    systemd.services.scrutiny-collectors = {
+      after = [ "network-online.target" ];
+      requires = [ "network-online.target" ];
+    };
   })
 
   (mkIf cfg.server.enable {

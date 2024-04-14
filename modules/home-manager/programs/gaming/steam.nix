@@ -26,6 +26,7 @@ mkIf cfg.enable
 
     tearingExcludedClasses = [
       "steam_app_1174180" # RDR2 - half-vsync without tearing is preferrable
+      "steam_app_881100" # Noita - tearing lags cursor
     ];
   };
 

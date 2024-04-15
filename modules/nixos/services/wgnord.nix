@@ -1,22 +1,29 @@
-{ lib, config, ... }:
+{ lib, pkgs, config, ... }:
 let
+  inherit (lib) mkIf utils getExe' concatStringsSep;
+  inherit (config.modules.system.networking) primaryInterface defaultGateway;
   cfg = config.modules.services.wgnord;
+  ip = getExe' pkgs.iproute "ip";
 in
-lib.mkIf cfg.enable
+mkIf cfg.enable
 {
+  assertions = utils.asserts [
+    (defaultGateway != null)
+    "Default gateway must be set to use wgnord"
+  ];
+
   services.wgnord = {
     enable = true;
     tokenFile = config.age.secrets.nordToken.path;
     country = cfg.country;
-    # TODO: Allow all IPs apart from 192.168.0.0/16 and 10.0.0.0/8. Using the
-    # output from wireguard allowed IPs calculator does not work for some
-    # reason. Probably need an iptables rule instead.
     template = ''
       [Interface]
       PrivateKey = PRIVKEY
       Address = 10.5.0.2/32
       MTU = 1350
       DNS = 103.86.96.100 103.86.99.100
+      PreUp = ${concatStringsSep ";" (map (route: "${ip} route add ${route} via ${defaultGateway} dev ${primaryInterface}") cfg.excludeSubnets)}
+      PostDown = ${concatStringsSep ";" (map (route: "${ip} route del ${route} via ${defaultGateway} dev ${primaryInterface}") cfg.excludeSubnets)}
 
       [Peer]
       PublicKey = SERVER_PUBKEY

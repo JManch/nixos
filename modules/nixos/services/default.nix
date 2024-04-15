@@ -72,6 +72,12 @@ in
     wgnord = {
       enable = mkEnableOption "Wireguard NordVPN";
 
+      excludeSubnets = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "List of subnets to exclude from being routed through the VPN";
+      };
+
       country = mkOption {
         type = types.str;
         default = "Switzerland";

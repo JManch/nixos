@@ -94,13 +94,17 @@
     };
 
     services = {
-      wgnord.enable = true;
       udisks.enable = true;
       ollama.enable = false; # FIX: waiting for nixpkgs update
       broadcast-box.enable = true;
       greetd.enable = true;
       lact.enable = true;
       scrutiny.collector.enable = true;
+
+      wgnord = {
+        enable = true;
+        excludeSubnets = [ "192.168.89.2/32" ];
+      };
 
       wireguard.friends = {
         enable = true;
@@ -126,6 +130,7 @@
 
       networking = {
         primaryInterface = "eno1";
+        defaultGateway = "192.168.88.1";
         tcpOptimisations = true;
         resolved.enable = true;
         firewall.enable = true;

@@ -69,7 +69,7 @@ in
         type = types.str;
         default = null;
         description = ''
-          Default gateway of the device. Only applied if a static IP address is set.
+          Default gateway of the device's primary local network.
         '';
       };
 

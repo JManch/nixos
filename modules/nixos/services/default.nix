@@ -96,6 +96,16 @@ in
     jellyfin = {
       enable = mkEnableOption "Jellyfin";
 
+      reverseProxy = {
+        enable = mkEnableOption "Jellyfin Caddy virtual host";
+
+        address = mkOption {
+          type = types.str;
+          default = null;
+          description = "IP address that reverse proxy should point to";
+        };
+      };
+
       autoStart = mkOption {
         type = types.bool;
         default = true;

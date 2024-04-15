@@ -33,6 +33,11 @@
       calibre.enable = true;
       mosquitto.enable = true;
 
+      jellyfin.reverseProxy = {
+        enable = true;
+        address = "192.168.88.254";
+      };
+
       vaultwarden = {
         enable = true;
         adminInterface = false;

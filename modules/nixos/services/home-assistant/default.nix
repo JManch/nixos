@@ -224,7 +224,7 @@ in
       # the frigate automation notifs)
       "home-notif.${fqDomain}".extraConfig = ''
         @is_lan {
-          remote_ip ${concatStringsSep " " caddy.lanAddressRanges}
+          remote_ip ${caddy.lanAddressRanges}
         }
 
         redir @is_lan https://home.${fqDomain}{uri}

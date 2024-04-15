@@ -134,6 +134,7 @@ in
       lanAddressRanges = mkOption {
         type = types.listOf types.str;
         default = [ ];
+        apply = v: concatStringsSep " " v;
         description = ''
           List of address ranges defining the local network. Endpoints marked
           as 'lan_only' will only accept connections from these ranges.

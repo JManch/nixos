@@ -12,12 +12,12 @@ let
     utils
     mapAttrs
     getExe
-    concatStringsSep
     mkVMOverride
     toUpper
     concatStrings;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
+  inherit (config.modules.services) wireguard;
   cfg = config.modules.services.caddy;
 
   generateCerts =
@@ -83,7 +83,7 @@ mkMerge [
   }
   (mkIf cfg.enable {
     assertions = utils.asserts [
-      (cfg.lanAddressRanges != [ ])
+      (cfg.lanAddressRanges != "")
       "Caddy requires LAN address ranges to be set"
     ];
 
@@ -100,7 +100,7 @@ mkMerge [
 
         (lan_only) {
           @block {
-            not remote_ip ${concatStringsSep " " cfg.lanAddressRanges}
+            not remote_ip ${cfg.lanAddressRanges}
           }
           abort @block
         }
@@ -123,6 +123,11 @@ mkMerge [
     networking.firewall.allowedTCPPorts = [ 443 80 ];
     networking.firewall.allowedUDPPorts = [ 443 ];
     modules.system.networking.publicPorts = [ 443 80 ];
+
+    networking.firewall.interfaces.wg-friends = mkIf wireguard.friends.enable {
+      allowedTCPPorts = [ 443 80 ];
+      allowedUDPPorts = [ 443 ];
+    };
 
     # Extra hardening
     systemd.services.caddy.serviceConfig = utils.hardeningBaseline config {
@@ -162,7 +167,6 @@ mkMerge [
         };
 
         serviceConfig = {
-          # TODO: Might want to exclude private ip ranges
           ExecStart = "${runGoAccess.outPath}";
           Restart = "on-failure";
           RestartSec = "10s";

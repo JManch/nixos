@@ -54,6 +54,7 @@
       vscode.enable = true;
       stremio.enable = true;
       mpv.enable = true;
+      mpv.jellyfinShim.enable = true;
       chatterino.enable = true;
       images.enable = true;
       anki.enable = true;

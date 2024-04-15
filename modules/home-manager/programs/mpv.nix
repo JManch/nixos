@@ -5,11 +5,14 @@
 , ...
 }:
 let
+  inherit (lib) mkIf optional;
   cfg = config.modules.programs.mpv;
 in
-lib.mkIf cfg.enable
+mkIf cfg.enable
 {
-  home.packages = [ pkgs.yt-dlp ];
+  home.packages = [
+    pkgs.yt-dlp
+  ] ++ optional cfg.jellyfinShim.enable pkgs.jellyfin-mpv-shim;
 
   programs.mpv = {
     enable = true;

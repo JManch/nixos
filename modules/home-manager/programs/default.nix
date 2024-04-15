@@ -19,6 +19,7 @@ in
     vscode.enable = mkEnableOption "VSCode";
     stremio.enable = mkEnableOption "Stremio";
     mpv.enable = mkEnableOption "mpv";
+    mpv.jellyfinShim.enable = mkEnableOption "mpv jellyfin shim";
     chatterino.enable = mkEnableOption "Chatterino";
     images.enable = mkEnableOption "image tools";
     anki.enable = mkEnableOption "Anki";

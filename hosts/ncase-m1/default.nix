@@ -111,6 +111,7 @@
         routerPeer = true;
         routerAllowedIPs = [ "10.0.0.0/24" ];
         address = "10.0.0.2";
+        subnet = "24";
         dns = {
           enable = true;
           address = "10.0.0.7";

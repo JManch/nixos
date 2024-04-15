@@ -66,6 +66,44 @@ let
       wantedBy = [ "wg-quick-wg-${name}.service" ];
     };
 
+  # Explanation of wg-quick routing based off https://archive.is/tAvr4
+
+  # On Linux, there are are multiple routing tables. Routing tables are chosen
+  # using 'rules'. Wireguard quick creates its own routing table, and uses
+  # custom rules to route traffic through it. Rules can be viewed with the `ip
+  # rule` command.
+
+  # Wireguard quick creates two ip rules:
+
+  # 32764:	from all lookup main suppress_prefixlength 0
+  # 32765:	not from all fwmark 0xca6c lookup 51820
+
+  # The first rules tells the kernel to use the 'main' routing table for all
+  # traffic EXCEPT traffic that matched the 'default' route in main. This works
+  # because suppress_prefixlength 0 suppresses all traffic where the prefix
+  # /0 is <= 0. If the traffic does not match this rule because it used the
+  # default route and was suppressed, we then move on to the next rule. This
+  # rule tells the kernel to use the routing table 51820 (custom routing table
+  # created by wireguard) for all traffic except traffic that has the fwmark.
+  # The fwmark basically prevents VPN traffic loops.
+
+  # Overall, this system means that wireguard will route all traffic matching
+  # the default route in our "main" routing table through the VPN. We can
+  # bypass the VPN for specific subnets by configuring temporary custom routes
+  # in the PreUp and PostDown wireguard hooks. Here is a standard routing
+  # table:
+
+  # default via 192.168.88.1 dev eno1 proto dhcp src 192.168.88.254 metric 1002
+  # 192.168.88.0/24 dev eno1 proto dhcp scope link src 192.168.88.254 metric 1002
+
+  # The "default" route will be matched for ALL traffic that does not match any
+  # other routes. With this routing table, traffic matching the 192.168.88.0/24
+  # route will NOT be routed throught he VPN. This means that by default,
+  # wireguard will not route local traffic through the VPN.
+
+  # Be careful when adding custom routes as their subnets must not encapsulate
+  # the subnets of any existing routes.
+
   interfaceConfig = name: cfg:
     let
       iptables = getExe' pkgs.iptables "iptables";
@@ -78,7 +116,7 @@ let
       # addresses in that range. It is used for routing to determine if a
       # destination IP address is on the same network and if it can be directly
       # communicated with rather than going through the default gateway.
-      address = [ "${cfg.address}/24" ];
+      address = [ "${cfg.address}/${toString cfg.subnet}" ];
       autostart = cfg.autoStart;
       privateKeyFile = config.age.secrets."${hostname}-wg-${name}-key".path;
       dns = mkIf cfg.dns.enable [ cfg.dns.address ];
@@ -90,7 +128,10 @@ let
         persistentKeepalive = 25;
       };
 
-      postUp = mkIf cfg.dns.host ''
+      # Route incoming DNS traffic on the wireguard interface to the DNS server
+      # port. We do not use standard port 53 for the wireguard DNS server
+      # because that port is most likely taken.
+      preUp = mkIf cfg.dns.host ''
         ${iptables} -t nat -A PREROUTING -i wg-${name} -p udp --dport 53 -j REDIRECT --to-port ${toString cfg.dns.port}
         ${iptables} -t nat -A PREROUTING -i wg-${name} -p tcp --dport 53 -j REDIRECT --to-port ${toString cfg.dns.port}
       '';

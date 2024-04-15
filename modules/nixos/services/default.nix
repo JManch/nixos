@@ -19,7 +19,15 @@ in
           address = mkOption {
             type = types.str;
             default = null;
-            description = "Assigned IP address for this device on the VPN";
+            example = "10.0.0.2/24";
+            description = "Assigned IP address for this device on the VPN along with the subnet mask";
+          };
+
+          subnet = mkOption {
+            type = types.int;
+            default = null;
+            example = "24";
+            description = "Subnet of the wireguard network";
           };
 
           routerAllowedIPs = mkOption {

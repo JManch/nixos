@@ -111,7 +111,7 @@
         routerPeer = true;
         routerAllowedIPs = [ "10.0.0.0/24" ];
         address = "10.0.0.2";
-        subnet = "24";
+        subnet = 24;
         dns = {
           enable = true;
           address = "10.0.0.7";
@@ -121,6 +121,11 @@
       jellyfin = {
         enable = true;
         autoStart = false;
+      };
+
+      nfs.client = {
+        enable = true;
+        supportedMachines = [ "homelab.lan" ];
       };
     };
 

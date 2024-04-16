@@ -256,7 +256,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
       dwindle = {
         preserve_split = true;
         force_split = 2;
-        no_gaps_when_only = 1;
+        no_gaps_when_only = 0; # currently broken https://github.com/hyprwm/Hyprland/issues/5552
       };
 
       binds = {

@@ -20,7 +20,10 @@ mkMerge [
 
       settings = {
         host.id = toUpper hostname;
-        api.endpoint = "https://disks.${fqDomain}";
+        api.endpoint =
+          if cfg.server.enable then
+            "http://127.0.0.1:${toString cfg.port}"
+          else "https://disks.${fqDomain}";
       };
     };
 

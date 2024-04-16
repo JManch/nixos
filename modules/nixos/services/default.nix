@@ -79,6 +79,18 @@ in
 
     wgnord = {
       enable = mkEnableOption "Wireguard NordVPN";
+      setDNS = mkEnableOption "setting DNS to Nord DNS" // {
+        default = true;
+      };
+
+      splitTunnel = mkEnableOption ''
+        only routing traffic from the wgnord interface. Useful for applications
+        that support binding to interfaces (such as qBittorrent) where we only
+        want that traffic routed through the VPN.
+
+        Warning: with this setting enabled, traffic is only guarenteed to be
+        routed through the VPN if the application binds to the interface.
+      '';
 
       excludeSubnets = mkOption {
         type = types.listOf types.str;

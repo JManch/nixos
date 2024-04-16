@@ -50,7 +50,10 @@ in
     systemd.services.wgnord = {
       unitConfig = {
         Description = "Nord Wireguard VPN";
-        After = [ "network.target" ];
+        After = [ "network-online.target" ];
+        Wants = [ "network-online.target" ];
+        StartLimitBurst = 2;
+        StartLimitIntervalSec = 10;
       };
 
       serviceConfig = {

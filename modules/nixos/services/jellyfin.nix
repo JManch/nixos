@@ -20,6 +20,9 @@ mkMerge [
         openFirewall = true;
       };
 
+      users.users.jellyfin.uid = 997;
+      users.groups.jellyfin.gid = 996;
+
       systemd.services.jellyfin = {
         wantedBy = mkForce (optional cfg.autoStart [ "multi-user.target" ]);
 
@@ -46,8 +49,16 @@ mkMerge [
         group = jellyfin.group;
         mode = "700";
       }];
+
+      modules.services.nfs.client.fileSystems = [{
+        path = "jellyfin";
+        machine = "homelab.lan";
+        user = jellyfin.user;
+        group = jellyfin.group;
+      }];
     }
   )
+
   (mkIf cfg.reverseProxy.enable {
     assertions = utils.asserts [
       caddy.enable

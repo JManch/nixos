@@ -333,6 +333,16 @@ in
       };
     };
 
+    qbittorrent-nox = {
+      enable = mkEnableOption "headless qBittorrent client";
+
+      port = mkOption {
+        type = types.port;
+        default = 8087;
+        description = "Listen port of the qBittorrent web GUI";
+      };
+    };
+
     nfs = {
       server = {
         enable = mkEnableOption "NFS server";

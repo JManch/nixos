@@ -2,6 +2,7 @@
 , pkgs
 , config
 , inputs
+, outputs
 , username
 , ...
 }:
@@ -64,7 +65,10 @@ in
 
     # Populates the nix registry with all our flake inputs `nix registry list`
     registry = (mapAttrs (_: flake: { inherit flake; })) ((filterAttrs (_: isType "flake")) inputs)
-      // { n.flake = inputs.nixpkgs; };
+      // {
+      self.flake = inputs.self;
+      n.flake = inputs.nixpkgs;
+    };
 
     settings = {
       experimental-features = "nix-command flakes";

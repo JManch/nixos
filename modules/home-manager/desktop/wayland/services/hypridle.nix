@@ -67,5 +67,24 @@ in
       Unit.After = mkForce [ "graphical-session-pre.target" ];
       Install.WantedBy = mkForce [ "graphical-session.target" ];
     };
+
+    wayland.windowManager.hyprland.settings.bind =
+      let
+        inherit (config.modules.desktop.hyprland) modKey;
+        systemctl = getExe' pkgs.systemd "systemctl";
+        notifySend = getExe pkgs.libnotify;
+        toggleHypridle = pkgs.writeShellScript "hypridle-toggle" ''
+          ${systemctl} status --user hypridle && {
+            ${systemctl} stop --user hypridle
+            ${notifySend} --urgency=low -t 2000 'Hypridle' 'Service disabled'
+          }  || {
+            ${systemctl} start --user hypridle
+            ${notifySend} --urgency=low -t 2000 'Hypridle' 'Service enabled'
+          }
+        '';
+      in
+      [
+        "${modKey}, U, exec, ${toggleHypridle}"
+      ];
   };
 }

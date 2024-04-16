@@ -7,6 +7,7 @@
 }:
 let
   inherit (lib) mkIf fetchers optional remove getExe' toUpper;
+  inherit (config.modules.desktop.services) hypridle;
   inherit (osConfig.device) gpu;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
@@ -18,6 +19,7 @@ let
   wgnord = osConfig.modules.services.wgnord;
   gamemode = osConfig.modules.programs.gaming.gamemode;
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
+  systemctl = getExe' pkgs.systemd "systemctl";
 in
 mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
 {
@@ -179,7 +181,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
 
         "custom/poweroff" = {
           format = "⏻";
-          on-click-middle = "${getExe' pkgs.systemd "systemctl"} poweroff";
+          on-click-middle = "${systemctl} poweroff";
           tooltip = false;
         };
 
@@ -187,6 +189,15 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
           format = "<span color='#${colors.base04}'></span> {}";
           exec = "echo '{\"text\": \"${wgnord.country}\"}'";
           exec-if = "${getExe' pkgs.iproute2 "ip"} link show wgnord > /dev/null 2>&1";
+          return-type = "json";
+          tooltip = false;
+          interval = 5;
+        };
+
+        "custom/hypridle" = mkIf hypridle.enable {
+          format = "<span color='#${colors.base04}'>󰷛 </span> {}";
+          exec = "echo '{\"text\": \"Lock Inhibited\"}'";
+          exec-if = "${systemctl} status --user hypridle > /dev/null 2>&1 && exit 1 || exit 0";
           return-type = "json";
           tooltip = false;
           interval = 5;
@@ -214,21 +225,23 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
           "clock"
         ];
 
-        modules-right = [
-          "network"
-        ] ++
-        optional wgnord.enable "custom/vpn" ++ [
-          "cpu"
-        ] ++
-        optional gpuModuleEnabled "custom/gpu" ++
-        optional gamemode.enable "gamemode" ++ [
-          "memory"
-        ] ++
-        optional audio.enable "pulseaudio" ++ [
-          "tray"
-          "custom/poweroff"
-          "network#hostname"
-        ];
+        modules-right =
+          optional hypridle.enable "custom/hypridle"
+          ++ [
+            "network"
+          ] ++
+          optional wgnord.enable "custom/vpn" ++ [
+            "cpu"
+          ] ++
+          optional gpuModuleEnabled "custom/gpu" ++
+          optional gamemode.enable "gamemode" ++ [
+            "memory"
+          ] ++
+          optional audio.enable "pulseaudio" ++ [
+            "tray"
+            "custom/poweroff"
+            "network#hostname"
+          ];
       };
     };
   };
@@ -241,7 +254,6 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
   desktop.hyprland.settings.bind =
     let
       inherit (config.modules.desktop.hyprland) modKey;
-      systemctl = getExe' pkgs.systemd "systemctl";
     in
     [
       # Toggle waybar

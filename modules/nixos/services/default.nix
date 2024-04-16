@@ -332,6 +332,99 @@ in
         description = "Listen port of the web server";
       };
     };
+
+    nfs = {
+      server = {
+        enable = mkEnableOption "NFS server";
+
+        supportedMachines = mkOption {
+          type = types.listOf types.str;
+          description = ''
+            List of machines that this host can share NFS exports with.
+          '';
+        };
+
+        fileSystems = mkOption {
+          type = with types; listOf (submodule {
+            options = {
+              path = mkOption {
+                type = types.str;
+                example = "jellyfin";
+                description = "Export path relative to /export";
+              };
+
+              clients = mkOption {
+                type = types.attrsOf types.str;
+                example = { "homelab.lan" = "ro,no_subtree_check"; };
+                description = ''
+                  Attribute set of client machine names associated with a comma
+                  separated list of NFS export options
+                '';
+              };
+            };
+          });
+
+          example = [{
+            path = "/export";
+            clients = {
+              "homelab.lan" = "ro,no_subtree_check";
+              "192.168.88.254" = "ro,no_subtree_check";
+            };
+          }];
+
+          description = "List of local file systems that are exported by the NFS server";
+        };
+      };
+
+      client = {
+        enable = mkEnableOption "NFS client";
+
+        supportedMachines = mkOption {
+          type = types.listOf types.str;
+          description = "List of machines this host can accept NFS file systems from";
+        };
+
+        fileSystems = mkOption {
+          type = with types; listOf (submodule {
+            options = {
+              path = mkOption {
+                type = types.str;
+                example = "jellyfin";
+                description = "Mount path relative to /mnt/nfs";
+              };
+
+              machine = mkOption {
+                type = types.str;
+                description = "NFS machine identifier according to exports(5)";
+              };
+
+              user = mkOption {
+                type = types.str;
+                description = "User owning the mounted directory";
+              };
+
+              group = mkOption {
+                type = types.str;
+                description = "Group owning the mounted directory";
+              };
+
+              options = mkOption {
+                type = types.listOf types.str;
+                default = [ "x-systemd.automount" "noauto" "x-systemd.idle-timeout=600" ];
+                description = "List of options for the NFS file system";
+              };
+            };
+          });
+
+          example = [{
+            name = "jellyfin";
+            machine = "homelab.lan";
+          }];
+
+          description = "List of remote NFS file systems to mount";
+        };
+      };
+    };
   };
 
   config = {

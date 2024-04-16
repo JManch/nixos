@@ -168,10 +168,10 @@ in
             fi
 
             # Because nixos-rebuild doesn't create a 'result' symlink when
-            # executed with --build-host we first run host-rebuild-dry-active
-            # to ensure that a cached build is on the host so it won't end up
+            # executed with --build-host we first run host-rebuild-build to
+            # ensure that a cached build is on the host and it won't end up
             # trying to build everything itself
-            host-rebuild-dry-activate $hostname
+            host-rebuild-build $hostname
 
             # WARN: The commented out code is an old method that I made under
             # the assumption that store symlinks would be invalid between hosts.

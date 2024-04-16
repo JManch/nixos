@@ -102,7 +102,9 @@ mkMerge [
           @block {
             not remote_ip ${cfg.lanAddressRanges}
           }
-          abort @block
+          respond @block "Access denied" 403 {
+            close
+          }
         }
 
       '';

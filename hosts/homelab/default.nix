@@ -32,6 +32,7 @@
       unifi.enable = true;
       calibre.enable = true;
       mosquitto.enable = true;
+      qbittorrent-nox.enable = true;
 
       jellyfin.reverseProxy = {
         enable = true;
@@ -92,6 +93,17 @@
       scrutiny = {
         server.enable = true;
         collector.enable = true;
+      };
+
+      wgnord = {
+        enable = true;
+        setDNS = false;
+        splitTunnel = true;
+      };
+
+      nfs.server = {
+        enable = true;
+        supportedMachines = [ "ncase-m1.lan" ];
       };
     };
 

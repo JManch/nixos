@@ -108,5 +108,5 @@ mkIf cfg.enable
 
   persistence.directories = [
     ".local/state/mpv" # contains state for save-position-on-quit
-  ];
+  ] ++ optional cfg.jellyfinShim.enable ".config/jellyfin-mpv-shim";
 }

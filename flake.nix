@@ -90,6 +90,7 @@
     {
       formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
       packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
+      templates = import ./templates;
 
       nixosConfigurations = {
 

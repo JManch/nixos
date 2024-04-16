@@ -164,6 +164,8 @@ mkMerge [
           Description = "GoAccess log analyzer";
           PartOf = [ "caddy.service" ];
           After = [ "caddy.service" "network.target" ];
+          StartLimitBurst = 3;
+          StartLimitIntervalSec = 30;
         };
 
         serviceConfig = {

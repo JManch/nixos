@@ -52,16 +52,16 @@ in
 
       primaryInterface = mkOption {
         type = types.str;
-        default = "";
         example = "eno1";
-        description = "Primary network interface of the device";
+        description = "Primary wired network interface of the device";
       };
 
       staticIPAddress = mkOption {
         type = types.nullOr types.str;
         default = null;
         description = ''
-          Disable DHCP and assign the device a static IPV4 address.
+          Disable DHCP and assign the device a static IPV4 address. Remember to
+          include the network's subnet mask.
         '';
       };
 
@@ -75,8 +75,14 @@ in
 
       wireless = {
         enable = mkEnableOption "wireless";
+
+        interface = mkOption {
+          type = types.str;
+          example = "wlp6s0";
+        };
+
         disableOnBoot = mkEnableOption ''
-          disabling of wireless on boot. Use `rfkill unblock wifi` to manually enable.";
+          disabling of wireless on boot. Use `rfkill unblock wifi` to manually enable.
         '';
       };
 

@@ -1,7 +1,6 @@
 { lib
 , pkgs
 , config
-, username
 , hostname
 , ...
 } @ args:
@@ -11,17 +10,15 @@ let
     mkIf
     utils
     optional
-    mkForce
-    optionals
     getExe'
-    mkDefault
     allUnique;
   cfg = config.modules.system.networking;
   homeManagerFirewall = (utils.homeConfig args).firewall;
+  rfkill = getExe' pkgs.util-linux "rfkill";
 in
 {
   assertions = utils.asserts [
-    (cfg.primaryInterface != "")
+    (cfg.primaryInterface != null)
     "Primary networking interface must be set"
     ((cfg.staticIPAddress != null) -> (cfg.defaultGateway != null))
     "Default gateway must be set when using a static IPV4 address"
@@ -29,39 +26,37 @@ in
     "`networking.publicPorts` contains duplicate ports"
   ];
 
-  environment.systemPackages = with pkgs; [
-    ifmetric # for changing metric in emergencies
-  ] ++ optional cfg.wireless.enable wpa_supplicant_gui;
+  systemd.network = {
+    enable = true;
+    wait-online.anyInterface = true;
 
-  users.users.${username}.extraGroups = [ "networkmanager" ];
+    # Nix generates default systemd-networkd network configs which match all
+    # interfaces so manually defining networks is not really necessary unless
+    # custom configuration is required
+    networks = {
+      "10-wired" = {
+        matchConfig.Name = cfg.primaryInterface;
 
-  systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";
-  services.resolved.enable = cfg.resolved.enable;
-  services.resolved.fallbackDns = [ ];
+        networkConfig = {
+          DHCP = cfg.staticIPAddress == null;
+          Address = mkIf (cfg.staticIPAddress != null) "${cfg.staticIPAddress}";
+          Gateway = mkIf (cfg.staticIPAddress != null) cfg.defaultGateway;
+        };
+
+        dhcpV4Config.ClientIdentifier = "mac";
+      };
+
+      "10-wireless" = mkIf cfg.wireless.enable {
+        matchConfig.Name = cfg.wireless.interface;
+        networkConfig.DHCP = true;
+        dhcpV4Config.RouteMetric = 1025;
+      };
+    };
+  };
 
   networking = {
     hostName = hostname;
-    useDHCP = if (cfg.staticIPAddress != null) then mkForce false else mkDefault true;
-    defaultGateway = mkIf (cfg.staticIPAddress != null) cfg.defaultGateway;
-
-    interfaces = mkIf (cfg.staticIPAddress != null) {
-      ${cfg.primaryInterface}.ipv4.addresses = [{
-        address = cfg.staticIPAddress;
-        prefixLength = 24;
-      }];
-    };
-
-    networkmanager = {
-      enable = true;
-      wifi.powersave = true;
-
-      # Tell network manager not to manage wireless interfaces
-      unmanaged = optionals cfg.wireless.enable [
-        "*"
-        "except:type:wwan"
-        "except:type:gsm"
-      ];
-    };
+    useNetworkd = true;
 
     firewall = {
       enable = cfg.firewall.enable;
@@ -76,9 +71,9 @@ in
 
     wireless = mkIf cfg.wireless.enable {
       enable = true;
+      userControlled.enable = true;
       environmentFile = config.age.secrets.wirelessNetworks.path;
       scanOnLowSignal = config.device.type == "laptop";
-      # Allow imperative network config
       allowAuxiliaryImperativeNetworks = true;
 
       networks = {
@@ -86,25 +81,14 @@ in
           pskRaw = "@PIXEL_5@";
         };
       };
-
-      userControlled = {
-        enable = true;
-        group = "networkmanager";
-      };
-    };
-
-    dhcpcd = {
-      enable = true;
-      # Make Pixel 5 hotspot take priority over any other active network.
-      # Useful in situations where the ethernet network goes down and hotspot
-      # is used as a backup, but the device still prioritises the broken
-      # ethernet network because of its lower metric.
-      extraConfig = ''
-        ssid Pixel 5
-        metric 100
-      '';
     };
   };
+
+  services.resolved.enable = cfg.resolved.enable;
+  services.resolved.fallbackDns = mkIf (config.device.type != "laptop") [ ];
+
+  environment.systemPackages = optional cfg.wireless.enable pkgs.wpa_supplicant_gui;
+  systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";
 
   systemd.services."disable-wifi-on-boot" = mkIf
     (cfg.wireless.enable && cfg.wireless.disableOnBoot)
@@ -113,16 +97,27 @@ in
 
       unitConfig = {
         Description = "Disable wireless interface on boot";
-        After = [ "NetworkManager.service" ];
+        After = [ "systemd-networkd.service" ];
       };
 
       serviceConfig = {
-        ExecStart = "${getExe' pkgs.util-linux "rfkill"} block wifi";
+        ExecStart = "${rfkill} block wifi";
         Type = "oneshot";
         RemainAfterExit = "true";
       };
 
       wantedBy = [ "multi-user.target" ];
+    };
+
+  programs.zsh.shellAliases =
+    let
+      ip = getExe' pkgs.iproute2 "ip";
+    in
+    {
+      "wifi-up" = "sudo ${rfkill} unblock wifi";
+      "wifi-down" = "sudo ${rfkill} block wifi";
+      "ethernet-up" = "sudo ${ip} link set ${cfg.primaryInterface} up";
+      "ethernet-down" = "sudo ${ip} link set ${cfg.primaryInterface} down";
     };
 
   boot = {

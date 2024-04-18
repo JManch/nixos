@@ -103,6 +103,33 @@ in
   config = mkIf (cfg.enable && osConfig.usrEnv.desktop.enable) ({
     services.darkman = {
       enable = true;
+      package = pkgs.darkman.override {
+        buildGoModule = args: pkgs.buildGoModule (args // rec {
+          version = "2024-04-18";
+          patches = [ ../../../../../patches/darkman.diff ];
+
+          src = pkgs.fetchFromGitLab {
+            owner = "WhyNotHugo";
+            repo = "darkman";
+            rev = "57d1bfd417b0810da919fe5cbfee384addc74f2c";
+            sha256 = "sha256-MOhqlxC0aQz1692iiJUlaug9RfDyIJPnzw+4/O+2LZI=";
+          };
+
+          ldflags = [
+            "-X main.Version=${version}"
+            "./cmd/darkman"
+          ];
+
+          installPhase = ''
+            runHook preInstall
+            mkdir -p $out/bin
+            cp darkman $out/bin
+            runHook postInstall
+          '';
+
+          vendorHash = "sha256-3lILSVm7mtquCdR7+cDMuDpHihG+gDJTcQa1cM2o7ZU=";
+        });
+      };
       darkModeScripts = mapAttrs (_: v: v "dark") cfg.switchScripts;
       lightModeScripts = mapAttrs (_: v: v "light") cfg.switchScripts;
 

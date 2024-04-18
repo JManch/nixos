@@ -1,3 +1,17 @@
+diff --git a/src/main.cpp b/src/main.cpp
+index ff446ffc..cc8654a7 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -80,9 +80,6 @@ int main(int argc, char* argv[]) {
+     });
+ 
+     std::signal(SIGUSR2, [](int /*signal*/) {
+-      spdlog::info("Reloading...");
+-      reload = true;
+-      waybar::Client::inst()->reset();
+     });
+ 
+     std::signal(SIGINT, [](int /*signal*/) {
 diff --git a/src/modules/hyprland/workspaces.cpp b/src/modules/hyprland/workspaces.cpp
 index 3c03c708..003cef8f 100644
 --- a/src/modules/hyprland/workspaces.cpp

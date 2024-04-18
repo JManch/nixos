@@ -141,7 +141,7 @@ mkIf (cfg.enable && osConfig.modules.system.audio.enable)
   desktop.hyprland.settings =
     let
       inherit (config.modules.desktop.hyprland) modKey;
-      colors = config.colorscheme.palette;
+      colors = config.colorScheme.palette;
       playerctl = lib.getExe pkgs.playerctl;
     in
     {

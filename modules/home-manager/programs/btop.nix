@@ -8,7 +8,8 @@ let
   inherit (lib) mkIf getExe;
   inherit (osConfig.device) gpu;
   cfg = config.modules.programs.btop;
-  colors = config.colorscheme.palette;
+  colors = config.colorScheme.palette;
+  themePath = "btop/themes/custom.theme";
 in
 mkIf cfg.enable
 {
@@ -21,8 +22,7 @@ mkIf cfg.enable
     settings.color_theme = "custom";
   };
 
-  xdg.configFile."btop/themes/custom.theme".text = ''
-
+  xdg.configFile.${themePath}.text = ''
     theme[main_bg]="#${colors.base00}"
     theme[main_fg]="#${colors.base05}"
     theme[title]="#${colors.base06}"
@@ -65,8 +65,11 @@ mkIf cfg.enable
     theme[process_start]="#${colors.base0A}"
     theme[process_mid]="#${colors.base0A}"
     theme[process_end]="#${colors.base09}"
-
   '';
+
+  darkman.switchApps.btop = {
+    paths = [ themePath ];
+  };
 
   xdg.desktopEntries."btop" =
     let

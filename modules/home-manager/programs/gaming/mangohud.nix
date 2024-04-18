@@ -9,7 +9,7 @@ let
   inherit (osConfig) device;
   inherit (config.modules.desktop.style) cornerRadius;
   cfg = config.modules.programs.gaming.mangohud;
-  colors = config.colorscheme.palette;
+  colors = config.colorScheme.palette;
 in
 mkIf cfg.enable
 {

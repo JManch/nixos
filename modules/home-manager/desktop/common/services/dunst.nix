@@ -1,9 +1,16 @@
-{ lib, config, osConfig, ... }:
+{ lib
+, pkgs
+, config
+, osConfig
+, ...
+}:
 let
-  inherit (lib) mkIf fetchers;
+  inherit (lib) mkIf fetchers getExe';
+  inherit (config.modules.colorScheme) light colorMap;
   cfg = config.modules.desktop.services.dunst;
-  colors = config.colorscheme.palette;
+  colors = config.colorScheme.palette;
   primaryMonitor = fetchers.primaryMonitor osConfig;
+  systemctl = getExe' pkgs.systemd "systemctl";
 in
 mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
 {
@@ -58,6 +65,18 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
         background = "#${colors.base00}b3";
         foreground = "#${colors.base07}";
         frame_color = "#${colors.base0D}";
+      };
+    };
+  };
+
+  darkman.switchApps.dunst = {
+    paths = [ "dunst/dunstrc" ];
+    reloadScript = "${systemctl} restart --user dunst";
+
+    colors = colorMap // {
+      base00 = {
+        dark = "${colors.base00}b3";
+        light = "${light.palette.base00}";
       };
     };
   };

@@ -5,16 +5,24 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf mkMerge lists getExe getExe' utils;
+  inherit (lib) mkIf mkMerge lists getExe getExe' utils optionalString;
+  inherit (config.modules.desktop.services) darkman;
   cfg = config.modules.desktop.services.wallpaper;
-  allWallpapers = (utils.flakePkgs args "nix-resources").wallpapers.all-wallpapers;
+  wallpapers = (utils.flakePkgs args "nix-resources").wallpapers;
 
   randomiseWallpaper = pkgs.writeShellApplication {
     name = "randomise-wallpaper";
     runtimeInputs = with pkgs; [ coreutils findutils ];
     text = /*bash*/ ''
 
-      dir="${allWallpapers}/wallpapers"
+      dir="${wallpapers.all-wallpapers}/wallpapers"
+      ${optionalString darkman.enable /*bash*/ ''
+        if [ "$(${getExe config.services.darkman.package} get)" = "light" ]; then
+          dir="${wallpapers.light-wallpapers}"
+        else
+          dir="${wallpapers.dark-wallpapers}"
+        fi
+      ''}
       cache_file="${config.xdg.cacheHome}/wallpaper"
       previous_wallpaper=""
       [[ -f "$cache_file" ]] && previous_wallpaper=$(<"$cache_file")
@@ -71,6 +79,10 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
     persistence.files = [ ".cache/wallpaper" ];
 
     programs.zsh.shellAliases.randomise-wallpaper = "systemctl start --user randomise-wallpaper";
+
+    darkman.switchScripts.wallpaper = theme: /*bash*/ ''
+      systemctl start --user randomise-wallpaper
+    '';
 
     systemd.user = {
       services.randomise-wallpaper = {

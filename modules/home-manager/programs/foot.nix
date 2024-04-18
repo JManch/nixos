@@ -28,7 +28,7 @@ lib.mkIf cfg.enable
 
       colors =
         let
-          colors = config.colorscheme.palette;
+          colors = config.colorScheme.palette;
         in
         {
           alpha = 0.7;

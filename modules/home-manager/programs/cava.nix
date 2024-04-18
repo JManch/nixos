@@ -26,7 +26,7 @@ mkIf (cfg.enable && osConfig.modules.system.audio.enable) {
         alacritty_sync = 1;
       };
 
-      color = let colors = config.colorscheme.palette; in {
+      color = let colors = config.colorScheme.palette; in {
         gradient = 1;
         gradient_count = 5;
         gradient_color_1 = "'#${colors.base0C}'";

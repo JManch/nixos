@@ -22,7 +22,7 @@ mkIf config.modules.shell.enable
 
     colors =
       let
-        colors = config.colorscheme.palette;
+        colors = config.colorScheme.palette;
       in
       {
         bg = "-1";

@@ -3,7 +3,7 @@ let
   inherit (lib) mkIf;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
-  colors = config.colorscheme.palette;
+  colors = config.colorScheme.palette;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
   isWayland = lib.fetchers.isWayland config;
 in

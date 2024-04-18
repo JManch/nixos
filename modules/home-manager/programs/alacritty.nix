@@ -1,8 +1,8 @@
 { lib, config, ... }:
 let
+  inherit (config.modules) desktop;
   cfg = config.modules.programs.alacritty;
-  desktopCfg = config.modules.desktop;
-  colors = config.colorscheme.palette;
+  colors = config.colorScheme.palette;
   normalFontSize = 12;
   largeFontSize = 17;
 in
@@ -27,7 +27,7 @@ lib.mkIf cfg.enable
       font = {
         size = normalFontSize;
         normal = {
-          family = desktopCfg.style.font.family;
+          family = desktop.style.font.family;
           style = "Regular";
         };
       };
@@ -70,5 +70,5 @@ lib.mkIf cfg.enable
     alacritty-normal-font = "alacritty msg config font.size=${toString normalFontSize}";
   };
 
-  desktop.hyprland.binds = [ "${desktopCfg.hyprland.modKey}, Return, exec, alacritty" ];
+  desktop.hyprland.binds = [ "${desktop.hyprland.modKey}, Return, exec, alacritty" ];
 }

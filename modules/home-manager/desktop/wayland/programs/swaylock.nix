@@ -9,7 +9,7 @@ let
   cfg = desktopCfg.programs.swaylock;
   desktopCfg = config.modules.desktop;
   isWayland = fetchers.isWayland config;
-  colors = config.colorscheme.palette;
+  colors = config.colorScheme.palette;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 
   lockScript =
@@ -118,6 +118,10 @@ mkIf (cfg.enable && osDesktopEnabled && isWayland) {
       inside-caps-lock-color = "#${colors.base00}";
       ring-caps-lock-color = "#${colors.base0E}";
     };
+  };
+
+  darkman.switchApps.swaylock = {
+    paths = [ "swaylock/config" ];
   };
 
   desktop.hyprland.binds =

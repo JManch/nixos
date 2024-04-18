@@ -21,6 +21,7 @@ in
       useUserPackages = true;
       users.${username} = import ../../../home/${hostname}.nix;
       sharedModules = [ ../../home-manager ];
+      backupFileExtension = "homemanagerbak";
 
       extraSpecialArgs = {
         inherit inputs outputs username hostname;

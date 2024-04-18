@@ -7,7 +7,7 @@
 let
   inherit (lib) mkIf fetchers;
   cfg = config.modules.desktop.programs.hyprlock;
-  colors = config.colorscheme.palette;
+  colors = config.colorScheme.palette;
 
   isWayland = fetchers.isWayland config;
   primaryMonitor = fetchers.primaryMonitor osConfig;

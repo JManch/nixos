@@ -8,7 +8,7 @@ let
   inherit (lib) mkIf fetchers getExe getExe';
   cfg = desktopCfg.programs.fuzzel;
   desktopCfg = config.modules.desktop;
-  colors = config.colorscheme.palette;
+  colors = config.colorScheme.palette;
 in
 mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && (fetchers.isWayland config))
 {
@@ -58,6 +58,10 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && (fetchers.isWayland config
         radius = desktopCfg.style.cornerRadius;
       };
     };
+  };
+
+  darkman.switchApps.fuzzel = {
+    paths = [ "fuzzel/fuzzel.ini" ];
   };
 
   desktop.hyprland.settings.bindr =

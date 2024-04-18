@@ -6,14 +6,14 @@
 , ...
 }:
 let
-  inherit (lib) mkIf fetchers optional remove getExe' toUpper;
+  inherit (lib) mkIf fetchers optional remove getExe' toUpper mkForce;
   inherit (config.modules.desktop.services) hypridle;
   inherit (osConfig.device) gpu;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
   isWayland = fetchers.isWayland config;
   isHyprland = desktopCfg.windowManager == "Hyprland";
-  colors = config.colorscheme.palette;
+  colors = config.colorScheme.palette;
 
   audio = osConfig.modules.system.audio;
   wgnord = osConfig.modules.services.wgnord;
@@ -28,23 +28,14 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
     systemd.enable = true;
 
     package = (pkgs.waybar.overrideAttrs (o: {
-      version = "2024-02-23";
-      buildInputs = o.buildInputs ++ [ pkgs.pipewire ];
-
-      src = pkgs.fetchFromGitHub {
-        owner = "Alexays";
-        repo = "Waybar";
-        rev = "793394c862b7ed1b2892d8815101a4567373092c";
-        hash = "sha256-VryxmTIxBnLRmpVfYYMl0WyJFLz0OJFaVMFp6W0rSdc=";
-      };
-
-      mesonFlags = (remove "-Dgtk-layer-shell=enabled" o.mesonFlags)
-        ++ lib.mapAttrsToList lib.mesonEnable {
-        "libevdev" = false;
-      };
+      # Patch disables waybar reloading both when the SIGUSR2 event is sent and
+      # when Hyprland reload. Waybar reloading causes the bar to open twice
+      # because we run waybar in systemd. Also breaks theme switching because
+      # it reloads regardless of the hyprland disable autoreload setting.
+      patches = (o.patches or [ ]) ++ [ ../../../../../../patches/waybar.patch ];
     })).override {
       cavaSupport = false;
-      evdevSupport = false;
+      evdevSupport = true;
       experimentalPatches = false;
       hyprlandSupport = true;
       inputSupport = false;
@@ -248,7 +239,12 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
 
   systemd.user.services.waybar = {
     # Waybar spams restarts during shutdown otherwise
-    Service.Restart = lib.mkForce "no";
+    Service.Restart = mkForce "no";
+  };
+
+  darkman.switchApps.waybar = {
+    paths = [ "waybar/config" "waybar/style.css" ];
+    reloadScript = "${systemctl} restart --user waybar";
   };
 
   desktop.hyprland.settings.bind =

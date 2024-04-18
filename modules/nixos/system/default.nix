@@ -66,7 +66,7 @@ in
       };
 
       defaultGateway = mkOption {
-        type = types.str;
+        type = types.nullOr types.str;
         default = null;
         description = ''
           Default gateway of the device's primary local network.

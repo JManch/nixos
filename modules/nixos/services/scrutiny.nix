@@ -28,8 +28,8 @@ mkMerge [
     };
 
     systemd.services.scrutiny-collectors = {
-      after = [ "network-online.target" "systemd-resolved.service" ];
-      requires = [ "network-online.target" "systemd-resolved.service" ];
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
     };
   })
 

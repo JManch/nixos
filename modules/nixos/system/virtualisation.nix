@@ -105,6 +105,14 @@ mkMerge [
             firewall.enable = mkVMOverride false;
           };
         };
+
+        services = {
+          lact.enable = mkVMOverride false;
+          nfs.client.enable = mkVMOverride false;
+          nfs.server.enable = mkVMOverride false;
+          scrutiny.collector.enable = mkVMOverride false;
+          wgnord.enable = mkVMOverride false;
+        };
       };
 
       virtualisation =

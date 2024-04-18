@@ -204,6 +204,9 @@ mkIf cfg.enable
     SystemCallFilter = [ "@system-service" "~@privileged" ];
     SocketBindDeny = "any";
     SocketBindAllow = [ 8555 8554 1984 ];
+    # go2rtc sometimes randomly crashes
+    Restart = "on-failure";
+    RestartSec = 10;
   };
 
   # Because WebRTC port has to be forwarded

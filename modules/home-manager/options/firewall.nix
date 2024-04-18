@@ -32,7 +32,7 @@ let
       default = [ ];
       apply = canonicalizePortList;
       example = [ 22 80 ];
-      description = lib.mdDoc ''
+      description = ''
         List of TCP ports on which incoming connections are
         accepted.
       '';
@@ -42,7 +42,7 @@ let
       type = types.listOf (types.attrsOf types.port);
       default = [ ];
       example = [{ from = 8999; to = 9003; }];
-      description = lib.mdDoc ''
+      description = ''
         A range of TCP ports on which incoming connections are
         accepted.
       '';
@@ -53,7 +53,7 @@ let
       default = [ ];
       apply = canonicalizePortList;
       example = [ 53 ];
-      description = lib.mdDoc ''
+      description = ''
         List of open UDP ports.
       '';
     };
@@ -62,7 +62,7 @@ let
       type = types.listOf (types.attrsOf types.port);
       default = [ ];
       example = [{ from = 60000; to = 61000; }];
-      description = lib.mdDoc ''
+      description = ''
         Range of open UDP ports.
       '';
     };
@@ -73,7 +73,7 @@ in
     interfaces = mkOption {
       default = { };
       type = with types; attrsOf (submodule [{ options = commonOptions; }]);
-      description = lib.mdDoc ''
+      description = ''
         Interface-specific open ports.
       '';
     };

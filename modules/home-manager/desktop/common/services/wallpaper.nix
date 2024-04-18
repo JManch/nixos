@@ -5,7 +5,7 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf mkMerge lists getExe getExe' utils optionalString;
+  inherit (lib) mkIf mkMerge optional getExe getExe' utils optionalString;
   inherit (config.modules.desktop.services) darkman;
   cfg = config.modules.desktop.services.wallpaper;
   wallpapers = (utils.flakePkgs args "nix-resources").wallpapers;
@@ -46,7 +46,8 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
         Requisite = [ "graphical-session.target" ];
         After = [
           "graphical-session.target"
-        ] ++ lists.optional cfg.randomise "randomise-wallpaper.service";
+        ] ++ optional cfg.randomise "randomise-wallpaper.service"
+        ++ optional darkman.enable "darkman.service";
       };
 
       Service =

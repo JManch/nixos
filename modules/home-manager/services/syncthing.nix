@@ -1,4 +1,9 @@
-{ lib, config, vmVariant, ... }:
+{ lib
+, config
+, username
+, vmVariant
+, ...
+}:
 let
   inherit (lib) mkIf optional;
   cfg = config.modules.services.syncthing;
@@ -15,8 +20,8 @@ mkIf (cfg.enable && !vmVariant) {
 
   systemd.user.services.syncthing = {
     Unit = {
-      Requires = [ "home-joshua-.config-syncthing.mount" ];
-      After = [ "home-joshua-.config-syncthing.mount" ];
+      Requires = [ "home-${username}-.config-syncthing.mount" ];
+      After = [ "home-${username}-.config-syncthing.mount" ];
       X-SwitchMethod = "keep-old";
     };
   };

@@ -34,12 +34,13 @@ in
     # interfaces so manually defining networks is not really necessary unless
     # custom configuration is required
     networks = {
+      # TODO: Might want to bond wired and wireless networks
       "10-wired" = {
         matchConfig.Name = cfg.primaryInterface;
 
         networkConfig = {
           DHCP = cfg.staticIPAddress == null;
-          Address = mkIf (cfg.staticIPAddress != null) "${cfg.staticIPAddress}";
+          Address = mkIf (cfg.staticIPAddress != null) cfg.staticIPAddress;
           Gateway = mkIf (cfg.staticIPAddress != null) cfg.defaultGateway;
         };
 
@@ -85,7 +86,6 @@ in
   };
 
   services.resolved.enable = cfg.resolved.enable;
-  services.resolved.fallbackDns = mkIf (config.device.type != "laptop") [ ];
 
   environment.systemPackages = optional cfg.wireless.enable pkgs.wpa_supplicant_gui;
   systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";

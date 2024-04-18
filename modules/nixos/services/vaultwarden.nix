@@ -217,7 +217,8 @@ mkIf cfg.enable
       unitConfig = {
         Description = "Vaultwarden cloud backup";
         After = [ "backup-vaultwarden.service" "network-online.target" ];
-        Requires = [ "backup-vaultwarden.service" "network-online.target" ];
+        Requires = [ "backup-vaultwarden.service" ];
+        Wants = [ "network-online.target" ];
       };
 
       serviceConfig = {

@@ -26,7 +26,8 @@ mkIf (cfg.enable && !vmVariant) {
     };
   };
 
-  firewall.allowedTCPPorts = optional cfg.exposeWebGUI cfg.port;
+  firewall.allowedTCPPorts = [ 22000 ] ++ optional cfg.exposeWebGUI cfg.port;
+  firewall.allowedUDPPorts = [ 22000 21027 ];
 
   persistence.directories = [ ".config/syncthing" ];
 }

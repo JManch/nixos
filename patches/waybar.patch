@@ -1,0 +1,12 @@
+diff --git a/src/modules/hyprland/workspaces.cpp b/src/modules/hyprland/workspaces.cpp
+index 3c03c708..003cef8f 100644
+--- a/src/modules/hyprland/workspaces.cpp
++++ b/src/modules/hyprland/workspaces.cpp
+@@ -165,7 +165,6 @@ auto Workspaces::registerIpc() -> void {
+   gIPC->registerForIPC("closewindow", this);
+   gIPC->registerForIPC("movewindow", this);
+   gIPC->registerForIPC("urgent", this);
+-  gIPC->registerForIPC("configreloaded", this);
+ 
+   if (windowRewriteConfigUsesTitle()) {
+     spdlog::info(

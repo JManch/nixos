@@ -111,7 +111,7 @@
     system = {
       networking = {
         primaryInterface = "enp1s0";
-        staticIPAddress = "192.168.89.2/32";
+        staticIPAddress = "192.168.89.2/24";
         defaultGateway = "192.168.89.1";
         firewall.enable = true;
         tcpOptimisations = true;

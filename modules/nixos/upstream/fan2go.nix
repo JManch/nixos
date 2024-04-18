@@ -53,7 +53,7 @@ in
           LimitNOFILE = 8192;
           Environment = [ "DISPLAY=:0" ];
           Restart = "always";
-          RestartSec = "1s";
+          RestartSec = 10;
         };
 
         wantedBy = [ "multi-user.target" ];

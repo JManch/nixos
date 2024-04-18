@@ -17,7 +17,7 @@ mkIf false
     Service = {
       ExecStart = getExe' pkgs.wayvnc "wayvnc";
       Restart = "on-failure";
-      RestartSec = "30";
+      RestartSec = 30;
     };
 
     Install.WantedBy = [ "graphical-session.target" ];

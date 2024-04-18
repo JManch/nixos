@@ -173,7 +173,7 @@ mkMerge [
         serviceConfig = {
           ExecStart = "${runGoAccess.outPath}";
           Restart = "on-failure";
-          RestartSec = "10s";
+          RestartSec = 10;
           User = "caddy";
           Group = "caddy";
           StateDirectory = [ "goaccess" ];

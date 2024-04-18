@@ -139,5 +139,12 @@ in
         usegeoclue = false;
       };
     };
+
+    # Causes portal to crash, not sure if this is a darkman problem or xdg
+    # portal?
+    # xdg.portal.config.common = {
+    #   "org.freedesktop.impl.portal.Settings" = [ "darkman" ];
+    # };
+
   } // colorSchemeSwitchingConfiguration);
 }

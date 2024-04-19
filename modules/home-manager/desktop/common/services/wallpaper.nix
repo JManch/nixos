@@ -57,7 +57,7 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
         in
         {
           Type = "oneshot";
-          ExecStartPre = [ "${getExe' pkgs.coreutils "sleep"} 1" ]
+          ExecStartPre =
             # If this is a fresh install and the wallpaper cache does not exist,
             # randomise straight away. This is because daily / weekly timers
             # won't necessarily trigger on the very first boot
@@ -67,12 +67,12 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
             # inside the cache file will be invalidated and the wallpaper will
             # not be applied. Can maybe add a check that runs randomiseWallpaper
             # if the wallpaper file pointed to in the cache does not exist.
-            ++ lib.lists.optional cfg.randomise
-            "${sh} -c '[[ -f \"${config.xdg.cacheHome}/wallpaper\" ]] || ${getExe randomiseWallpaper}'";
+            lib.lists.optional cfg.randomise
+              "${sh} -c '[[ -f \"${config.xdg.cacheHome}/wallpaper\" ]] || ${getExe randomiseWallpaper}'";
           ExecStart = "${sh} -c '${cfg.setWallpaperCmd} ${wallpaperToSet}'";
         };
 
-      Install.WantedBy = [ "graphical-session.target" ];
+      Install.WantedBy = optional (!(darkman.enable && cfg.randomise.enable)) "graphical-session.target";
     };
   }
 

@@ -14,8 +14,7 @@ let
     optionalString
     utils
     mkVMOverride
-    escapeShellArg
-    concatStringsSep;
+    escapeShellArg;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets) mqttHassPassword rootCA homeCert;
@@ -76,12 +75,12 @@ in
         }))
 
         (adaptive_lighting.overrideAttrs (oldAttrs: rec {
-          version = "1.20.0";
+          version = "1.21.1";
           src = pkgs.fetchFromGitHub {
             owner = "basnijholt";
             repo = "adaptive-lighting";
-            rev = "refs/tags/${version}";
-            hash = "sha256-4Emm7/UJvgU7gaPNiD/JJrMCDpmLuW3Me0sKwB9+KYI=";
+            rev = version;
+            hash = "sha256-G1y5eWc9lGFhtZn0m0nLyg3EGetz1r7/QZze1fX9aFk=";
           };
         }))
 

@@ -72,7 +72,7 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
           ExecStart = "${sh} -c '${cfg.setWallpaperCmd} ${wallpaperToSet}'";
         };
 
-      Install.WantedBy = optional (!(darkman.enable && cfg.randomise.enable)) "graphical-session.target";
+      Install.WantedBy = optional (darkman.enable || cfg.randomise.enable) "graphical-session.target";
     };
   }
 

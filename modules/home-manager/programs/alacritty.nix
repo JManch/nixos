@@ -1,6 +1,7 @@
 { lib, config, ... }:
 let
   inherit (config.modules) desktop;
+  inherit (config.modules.colorScheme) colorMap;
   cfg = config.modules.programs.alacritty;
   colors = config.colorScheme.palette;
   normalFontSize = 12;
@@ -61,6 +62,17 @@ lib.mkIf cfg.enable
           shape = "Beam";
           blinking = "On";
         };
+      };
+    };
+  };
+
+  darkman.switchApps.alacritty = {
+    paths = [ "alacritty/alacritty.toml" ];
+
+    colors = colorMap // {
+      baseOpacity = {
+        dark = "opacity = 0.7";
+        light = "opacity = 1";
       };
     };
   };

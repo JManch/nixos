@@ -100,7 +100,7 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
         };
       };
 
-      timers.randomise-wallpaper = {
+      timers.randomise-wallpaper = mkIf (!darkman.enable) {
         Unit = {
           Description = "Timer for randomising the desktop wallpaper";
           X-SwitchMethod = "keep-old";

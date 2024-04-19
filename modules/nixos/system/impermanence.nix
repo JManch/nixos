@@ -31,6 +31,7 @@ in
         "home/${username}/.mozilla"
         "home/${username}/.cache/mozilla"
         "home/${username}/.local/share/chatterino/Cache"
+        "home/${username}/.config/darkman/variants"
       ];
     in
       /*bash*/ ''

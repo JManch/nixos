@@ -46,7 +46,6 @@ in
   options.modules.colorScheme = {
     dark = mkOption {
       type = types.attrs;
-      readOnly = true;
       default = inputs.nix-colors.colorSchemes.ayu-mirage;
       description = "Dark color scheme";
     };

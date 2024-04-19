@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf fetchers optional remove getExe' toUpper mkForce;
+  inherit (lib) mkIf fetchers optional getExe' toUpper mkForce;
   inherit (config.modules.desktop.services) hypridle;
   inherit (osConfig.device) gpu;
   cfg = desktopCfg.services.waybar;

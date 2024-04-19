@@ -71,7 +71,6 @@ mkIf cfg.enable
   programs.zsh.initExtra =
     let
       inherit (config.modules.programs) alacritty;
-      inherit (config.programs.alacritty.settings.window) opacity;
     in
     optionalString alacritty.enable /*bash*/ ''
 
@@ -80,8 +79,9 @@ mkIf cfg.enable
         if [[ -z "$DISPLAY" ]]; then
           command nvim "$@"
         else
-          alacritty msg config window.opacity=1 && \
-            command nvim "$@" && alacritty msg config window.opacity=${toString opacity}
+          opacity=$(grep "^opacity" ${config.xdg.configHome}/alacritty/alacritty.toml | sed 's/opacity = //')
+          alacritty msg config window.opacity=1 \
+            && command nvim "$@" && alacritty msg config window.opacity="$opacity"
         fi
       }
 

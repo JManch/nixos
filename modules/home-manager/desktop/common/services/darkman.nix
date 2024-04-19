@@ -43,7 +43,9 @@ let
     nameValuePair
     attrValues
     listToAttrs;
+  inherit (config.modules) desktop;
   cfg = config.modules.desktop.services.darkman;
+  darkman = getExe config.services.darkman.package;
 
   colorSchemeSwitchingConfiguration =
     let
@@ -51,11 +53,11 @@ let
       inherit (config.xdg) configHome;
       inherit (lib.hm.dag) entryAfter;
       sed = getExe pkgs.gnused;
-      baseColors = attrNames colorMap;
 
       genVariants = { paths, format ? c: c, colors ? colorMap, ... }: concatStringsSep "\n" (map
         (path:
           let
+            baseColors = attrNames colors;
             sedCommand = /*bash*/ ''
               # Replacement have to be done over three commands to avoid cycles
               ${sed} ${concatStringsSep " " (
@@ -79,10 +81,6 @@ let
           in
             /*bash*/ ''
 
-            # Use dark config as a placeholder incase darkman fails or is too
-            # late to start
-            run --quiet install -m644 "${configHome}/darkman/variants/${path}.dark" "${configHome}/darkman/variants/${path}"
-
             if [[ -v DRY_RUN ]]; then
               cat <<EOF
                 ${sedCommand}
@@ -94,9 +92,13 @@ let
             # If the current theme is light then activate the light variant.
             # Prevents the theme resetting to dark when doing home manager
             # rebuilds.
-            theme=$(PATH=${pkgs.dbus.lib}:$PATH ${getExe config.services.darkman.package} get)
+            theme=$(${darkman} get 2>/dev/null || echo "")
             if [ "$theme" = "light" ]; then
               run --quiet cp "${configHome}/darkman/variants/${path}.light" "${configHome}/darkman/variants/${path}"
+            else
+              # Use dark config as a placeholder incase darkman fails or is too
+              # late to start
+              run --quiet install -m644 "${configHome}/darkman/variants/${path}.dark" "${configHome}/darkman/variants/${path}"
             fi
 
           '')
@@ -194,6 +196,8 @@ in
     # xdg.portal.config.common = {
     #   "org.freedesktop.impl.portal.Settings" = [ "darkman" ];
     # };
+
+    desktop.hyprland.binds = [ "${desktop.hyprland.modKey}, F1, exec, ${darkman} toggle" ];
 
   } // colorSchemeSwitchingConfiguration);
 }

@@ -63,8 +63,6 @@ in
     };
 
     wallpaper = {
-      randomise = mkEnableOption "random wallpaper selection";
-
       default = mkOption {
         type = types.package;
         default = inputs.nix-resources.packages.${pkgs.system}.wallpapers.rx7;
@@ -73,13 +71,17 @@ in
         '';
       };
 
-      randomiseFrequency = mkOption {
-        type = types.str;
-        default = "weekly";
-        description = ''
-          How often to randomly select a new wallpaper. Format is for the systemd timer OnCalendar option.
-        '';
-        example = "monthly";
+      randomise = {
+        enable = mkEnableOption "random wallpaper selection";
+
+        frequency = mkOption {
+          type = types.str;
+          default = "weekly";
+          description = ''
+            How often to randomly select a new wallpaper. Format is for the systemd timer OnCalendar option.
+          '';
+          example = "monthly";
+        };
       };
 
       setWallpaperCmd = mkOption {

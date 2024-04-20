@@ -17,7 +17,8 @@ let
 
       dir="${wallpapers.all-wallpapers}/wallpapers"
       ${optionalString darkman.enable /*bash*/ ''
-        if [ "$(${getExe config.services.darkman.package} get)" = "light" ]; then
+        theme=$(${getExe config.services.darkman.package} get)
+        if [ "$theme" = "light" ]; then
           dir="${wallpapers.light-wallpapers}"
         else
           dir="${wallpapers.dark-wallpapers}"
@@ -46,13 +47,13 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
         Requisite = [ "graphical-session.target" ];
         After = [
           "graphical-session.target"
-        ] ++ optional cfg.randomise "randomise-wallpaper.service"
+        ] ++ optional cfg.randomise.enable "randomise-wallpaper.service"
         ++ optional darkman.enable "darkman.service";
       };
 
       Service =
         let
-          wallpaperToSet = if cfg.randomise then "\"$(<${config.xdg.cacheHome}/wallpaper)\"" else cfg.default;
+          wallpaperToSet = if cfg.randomise.enable then "\"$(<${config.xdg.cacheHome}/wallpaper)\"" else cfg.default;
           sh = getExe' pkgs.bash "sh";
         in
         {
@@ -67,21 +68,22 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
             # inside the cache file will be invalidated and the wallpaper will
             # not be applied. Can maybe add a check that runs randomiseWallpaper
             # if the wallpaper file pointed to in the cache does not exist.
-            lib.lists.optional cfg.randomise
+            optional cfg.randomise.enable
               "${sh} -c '[[ -f \"${config.xdg.cacheHome}/wallpaper\" ]] || ${getExe randomiseWallpaper}'";
           ExecStart = "${sh} -c '${cfg.setWallpaperCmd} ${wallpaperToSet}'";
         };
 
-      Install.WantedBy = optional (darkman.enable || cfg.randomise.enable) "graphical-session.target";
+      Install.WantedBy = optional (!(darkman.enable && cfg.randomise.enable)) "graphical-session.target";
     };
   }
 
-  (mkIf cfg.randomise {
+  (mkIf cfg.randomise.enable {
     persistence.files = [ ".cache/wallpaper" ];
 
     programs.zsh.shellAliases.randomise-wallpaper = "systemctl start --user randomise-wallpaper";
 
     darkman.switchScripts.wallpaper = theme: /*bash*/ ''
+      echo "triggering wallpaper switch" >> /home/joshua/wallpaper
       systemctl start --user randomise-wallpaper
     '';
 
@@ -108,7 +110,7 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
 
         Timer = {
           Unit = "randomise-wallpaper.service";
-          OnCalendar = cfg.randomiseFrequency;
+          OnCalendar = cfg.randomise.frequency;
           Persistent = true;
         };
 

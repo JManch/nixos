@@ -34,8 +34,8 @@
         hypridle.enable = true;
 
         wallpaper = {
-          randomise = true;
-          randomiseFrequency = "*-*-* 05:00:00"; # 5am everyday
+          randomise.enable = true;
+          randomise.frequency = "*-*-* 05:00:00"; # 5am everyday
         };
       };
     };

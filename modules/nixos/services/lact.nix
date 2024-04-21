@@ -8,7 +8,7 @@ let
   inherit (lib) mkIf utils getExe';
   inherit (config.device) gpu;
   cfg = config.modules.services.lact;
-  gpuId = "1002:744C-1EAE:7905-0000:08:00.0";
+  gpuId = "1002:744C-1EAE:7905-0000:09:00.0";
 in
 # This module is specifically for 7900XT on NCASE-M1 host
 mkIf cfg.enable

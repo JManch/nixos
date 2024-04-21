@@ -122,6 +122,7 @@
 
       jellyfin = {
         enable = true;
+        openFirewall = true;
         autoStart = false;
         mediaDirs = {
           shows = "/home/${username}/videos/shows";

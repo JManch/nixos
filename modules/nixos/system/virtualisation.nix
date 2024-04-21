@@ -173,7 +173,7 @@ mkMerge [
   (mkIf cfg.enable {
     environment.systemPackages = [ runVMScript ];
     programs.virt-manager.enable = true;
-    users.users.${username}.extraGroups = [ "libvirtd" "docker" ];
+    users.users.${username}.extraGroups = [ "libvirtd" ];
 
     environment.sessionVariables =
       let
@@ -191,11 +191,7 @@ mkMerge [
       };
     };
 
-    virtualisation = {
-      libvirtd.enable = true;
-      # TODO: Properly configure docker
-      docker.enable = false;
-    };
+    virtualisation.libvirtd.enable = true;
 
     programs.zsh.interactiveShellInit = /*bash*/ ''
 

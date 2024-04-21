@@ -8,7 +8,7 @@ let
   inherit (lib) mkIf utils getExe';
   inherit (config.device) gpu;
   cfg = config.modules.services.lact;
-  gpuId = "1002:744C-1EAE:7905-0000:09:00.0";
+  gpuId = "1002:744C-1EAE:7905-0000:08:00.0";
 in
 # This module is specifically for 7900XT on NCASE-M1 host
 mkIf cfg.enable
@@ -29,6 +29,7 @@ mkIf cfg.enable
 
     # Can't use nix yaml because the keys for fan curve have to be integers
     settings = /*yaml*/ ''
+
       daemon:
         log_level: info
         admin_groups:
@@ -57,20 +58,11 @@ mkIf cfg.enable
             target_temperature: 80
           # Run at 257 for slightly better performance but louder fans
           power_cap: 231.0
-          performance_level: manual
+          performance_level: auto
           max_core_clock: 2394
           voltage_offset: -50
-          power_profile_mode_index: 0
-          power_states:
-            core_clock:
-            - 0
-            - 1
-            - 2
-            memory_clock:
-            - 0
-            - 1
-            - 2
-            - 3
+          power_states: {}
+
     '';
   };
 

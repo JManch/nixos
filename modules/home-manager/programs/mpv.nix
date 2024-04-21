@@ -45,9 +45,9 @@ mkIf cfg.enable
     config = {
       # Quality
       profile = "gpu-hq";
-      hwdec = "auto";
+      hwdec = "auto-safe";
       vo = "gpu-next";
-      scale = "ewa_lanczos";
+      scale = "ewa_lanczossharp";
       scale-blur = "0.981251";
       video-sync = "display-resample";
       interpolation = true;
@@ -55,7 +55,7 @@ mkIf cfg.enable
       ytdl-format = "bestvideo+bestaudio";
 
       # General
-      save-position-on-quit = true;
+      save-position-on-quit = false;
       osc = "no"; # we use modernx osc
 
       # Subs
@@ -82,8 +82,14 @@ mkIf cfg.enable
       "MBTN_MID" = "cycle mute";
       F1 = "af toggle acompressor=ratio=4; af toggle loudnorm";
       "Shift+RIGHT" = "seek 0.1 exact"; # for catching-up livestreams
+      E = "add panscan -0.1"; # because jellyfin shim overrides w
     };
   };
+
+  xdg.configFile = mkIf cfg.jellyfinShim.enable ({
+    "jellyfin-mpv-shim/mpv.conf".source = config.xdg.configFile."mpv/mpv.conf".source;
+    "jellyfin-mpv-shim/input.conf".source = config.xdg.configFile."mpv/input.conf".source;
+  });
 
   programs.zsh.initExtra =
     let
@@ -106,7 +112,5 @@ mkIf cfg.enable
 
     '';
 
-  persistence.directories = [
-    ".local/state/mpv" # contains state for save-position-on-quit
-  ] ++ optional cfg.jellyfinShim.enable ".config/jellyfin-mpv-shim";
+  persistence.directories = optional cfg.jellyfinShim.enable ".config/jellyfin-mpv-shim";
 }

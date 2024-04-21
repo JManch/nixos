@@ -39,12 +39,15 @@ in
       enable = true;
       openFirewall = false;
 
-      package = (pkgs.home-assistant.override {
+      package = (pkgs.home-assistant.overrideAttrs (oldAttrs: {
+        # Patch fixes error thrown by husqvarna component
+        patches = (oldAttrs.patches or [ ]) ++ [ ../../../../patches/hass.patch ];
+      })).override {
         extraPackages = ps: [
           # For postgres support
           ps.psycopg2
         ];
-      });
+      };
 
       extraComponents = [
         "sun"

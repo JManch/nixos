@@ -1,3 +1,4 @@
+{ username, ... }:
 {
   imports = [ ./hardware-configuration.nix ];
 
@@ -122,6 +123,10 @@
       jellyfin = {
         enable = true;
         autoStart = false;
+        mediaDirs = {
+          shows = "/home/${username}/videos/shows";
+          movies = "/home/${username}/videos/movies";
+        };
       };
 
       nfs.client = {

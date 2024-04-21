@@ -1,11 +1,6 @@
-{ lib
-, config
-, inputs
-, username
-, ...
-}:
+{ lib, config, inputs, ... }:
 let
-  inherit (lib) mkIf utils mkMerge optional mkForce optionalString;
+  inherit (lib) mkIf utils mkMerge optional mkForce optionalString mapAttrs attrValues;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.services) caddy wireguard;
   inherit (config.services) jellyfin;
@@ -17,21 +12,21 @@ mkMerge [
     {
       services.jellyfin = {
         enable = true;
-        openFirewall = true;
+        openFirewall = cfg.openFirewall;
       };
 
       users.users.jellyfin.uid = 997;
       users.groups.jellyfin.gid = 996;
 
       systemd.services.jellyfin = {
-        wantedBy = mkForce (optional cfg.autoStart [ "multi-user.target" ]);
+        wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
 
         serviceConfig = {
           # Bind mount home media directories so jellyfin can access them
-          BindReadOnlyPaths = [
-            "/home/${username}/videos/shows:/var/lib/jellyfin/media/shows"
-            "/home/${username}/videos/movies:/var/lib/jellyfin/media/movies"
-          ];
+          BindReadOnlyPaths = attrValues
+            (mapAttrs
+              (name: dir: "${dir}:/var/lib/jellyfin/media${optionalString (name != "") "/${name}"}")
+              cfg.mediaDirs);
           SocketBindDeny = publicPorts;
         };
       };
@@ -43,12 +38,20 @@ mkMerge [
         "d /var/lib/jellyfin/media/movies 700 ${jellyfin.user} ${jellyfin.group}"
       ];
 
-      persistence.directories = [{
-        directory = "/var/lib/jellyfin";
-        user = jellyfin.user;
-        group = jellyfin.group;
-        mode = "700";
-      }];
+      persistence.directories = [
+        {
+          directory = "/var/lib/jellyfin";
+          user = jellyfin.user;
+          group = jellyfin.group;
+          mode = "700";
+        }
+        {
+          directory = "/var/cache/jellyfin";
+          user = jellyfin.user;
+          group = jellyfin.group;
+          mode = "700";
+        }
+      ];
 
       modules.services.nfs.client.fileSystems = [{
         path = "jellyfin";

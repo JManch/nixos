@@ -302,6 +302,27 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     };
   };
 
+  darkman.switchApps.hyprland =
+    let
+      inherit (config.modules.colorScheme) colorMap dark;
+      hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
+      mapDarkColor = base: colorMap.${base} // { light = dark.palette.${base}; };
+    in
+    {
+      paths = [ "hypr/hyprland.conf" ];
+      reloadScript = "${hyprctl} reload";
+      colors = colorMap // {
+        base00 = mapDarkColor "base00";
+        base01 = mapDarkColor "base01";
+        base02 = mapDarkColor "base02";
+        base03 = mapDarkColor "base03";
+        base04 = mapDarkColor "base04";
+        base05 = mapDarkColor "base05";
+        base06 = mapDarkColor "base06";
+        base07 = mapDarkColor "base07";
+      };
+    };
+
   programs.zsh.shellAliases = {
     hyprland-setup-dev = "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -B build";
   };

@@ -452,6 +452,8 @@ let
               { entity = "binary_sensor.${camera}_motion"; }
               { entity = "binary_sensor.${camera}_person_occupancy"; }
               { entity = "sensor.${camera}_person_count"; }
+              { entity = "switch.${camera}_motion"; }
+              { entity = "switch.${camera}_detect"; }
             ];
           }
           {

@@ -1,4 +1,3 @@
-{ lib, config, ... }:
 {
   imports = [
     ./disko.nix
@@ -34,20 +33,6 @@
       calibre.enable = true;
       mosquitto.enable = true;
       qbittorrent-nox.enable = true;
-
-      jellyfin = {
-        enable = true;
-        autoStart = true;
-        openFirewall = false;
-        mediaDirs = {
-          "" = lib.mkIf (config.modules.services.qbittorrent-nox.enable)
-            "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin";
-        };
-        reverseProxy = {
-          enable = true;
-          address = "127.0.0.1";
-        };
-      };
 
       vaultwarden = {
         enable = true;

@@ -452,6 +452,16 @@ in
         };
       };
     };
+
+    wallabag = {
+      enable = mkEnableOption "Wallabag";
+
+      port = mkOption {
+        type = types.port;
+        default = 8088;
+        description = "Port for the Wallabag server to listen on";
+      };
+    };
   };
 
   config = {

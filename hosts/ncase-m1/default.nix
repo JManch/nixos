@@ -139,7 +139,7 @@
     system = {
       windows.enable = true;
       bluetooth.enable = true;
-      virtualisation.enable = true;
+      virtualisation.libvirt.enable = true;
 
       networking = {
         primaryInterface = "eno1";

@@ -170,7 +170,7 @@ mkMerge [
     };
   }
 
-  (mkIf cfg.enable {
+  (mkIf cfg.libvirt.enable {
     environment.systemPackages = [ runVMScript ];
     programs.virt-manager.enable = true;
     users.users.${username}.extraGroups = [ "libvirtd" ];
@@ -210,5 +210,11 @@ mkMerge [
     '';
 
     persistence.directories = [ "/var/lib/libvirt" ];
+  })
+
+  (mkIf cfg.containerisation.enable {
+    virtualisation.oci-containers.backend = "podman";
+
+    persistence.directories = [ "/var/lib/containers" ];
   })
 ]

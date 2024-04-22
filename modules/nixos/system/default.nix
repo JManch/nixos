@@ -9,7 +9,8 @@ in
     bluetooth.enable = mkEnableOption "bluetooth";
 
     virtualisation = {
-      enable = mkEnableOption "virtualisation";
+      libvirt.enable = mkEnableOption "libvirt virtualisation";
+      containerisation.enable = mkEnableOption "containerisation virtualisation";
 
       vmVariant = mkOption {
         type = types.bool;

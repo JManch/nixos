@@ -124,8 +124,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
         "__GL_GSYNC_ALLOWED,0"
         "__GL_VRR_ALLOWED,0"
-        # TODO: Remove this when I can use kernel 6.8
-      ] ++ optional cfg.tearing "WLR_DRM_NO_ATOMIC,1";
+      ];
 
       monitor = (map
         (

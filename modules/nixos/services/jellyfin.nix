@@ -31,6 +31,11 @@ mkMerge [
         };
       };
 
+      networking.firewall.interfaces.wg-friends = mkIf (cfg.openFirewall && wireguard.friends.enable) {
+        allowedTCPPorts = [ 8096 8920 ];
+        allowedUDPPorts = [ 1900 7359 ];
+      };
+
       # Jellyfin module has good default hardening
 
       systemd.tmpfiles.rules = [

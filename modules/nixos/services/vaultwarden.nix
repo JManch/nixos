@@ -125,6 +125,9 @@ mkIf cfg.enable
 
   environment.systemPackages = [ restoreScript ];
 
+  # TODO: Implement proper backup failure notify system with something like
+  # this https://healthchecks.io/
+
   systemd.services.vaultwarden-cloud-backup =
     let
       inherit (config.services.vaultwarden) backupDir;

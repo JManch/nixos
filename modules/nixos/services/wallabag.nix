@@ -35,8 +35,6 @@ mkIf cfg.enable
   # https://github.com/nix-community/home-manager/pull/4331
   # https://github.com/nix-community/home-manager/pull/4801
   # (For this to work wallabag needs to be a normal user not system)
-  # User = "wallabag";
-  # Group = "wallabag";
 
   virtualisation.oci-containers.containers.wallabag = {
     image = "wallabag/wallabag:2.6.9";

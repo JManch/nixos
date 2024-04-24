@@ -9,7 +9,9 @@
       windowManager = "Hyprland";
 
       hyprland = {
-        tearing = true;
+        # Disable for now until I can get it working on kernel 6.8 without the
+        # env var
+        tearing = false;
         # FIX: Direct scanout doesn't seem to work due to this error:
         # error: connector D-1: Failed to page-flip output: a page-flip is already pending
         directScanout = false;

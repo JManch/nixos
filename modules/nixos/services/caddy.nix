@@ -184,6 +184,22 @@ mkMerge [
         wantedBy = [ "multi-user.target" ];
       };
 
+    services.fail2ban.jails.caddy-status = {
+      enabled = true;
+
+      settings = {
+        logpath = "/var/log/caddy/access-*.log";
+        port = "http,https";
+        backend = "auto";
+      };
+
+      filter.Definition = {
+        failregex = ''^.*"remote_ip":"<HOST>",.*?"status":(?:401|403|500),.*$'';
+        ignoreregex = "";
+        datepattern = ''"ts":{Epoch}\.'';
+      };
+    };
+
     persistence.directories =
       let
         inherit (config.services) caddy;

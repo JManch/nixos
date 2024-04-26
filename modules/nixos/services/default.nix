@@ -462,6 +462,17 @@ in
         description = "Port for the Wallabag server to listen on";
       };
     };
+
+    fail2ban = {
+      enable = mkEnableOption "Fail2ban";
+
+      ignoredIPs = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "List of address ranges to ignore";
+      };
+    };
+
   };
 
   config = {

@@ -63,14 +63,14 @@ mkIf cfg.enable
     }
   '';
 
-  persistence.directories = [
-    {
-      directory = "/var/lib/unifi";
-      user = "unifi";
-      group = "unifi";
-      mode = "700";
-    }
-  ];
+  # TODO: Fix the actual directory so that the permissions match this. Do the
+  # same for all other persistence directories with custom permissions. 
+  persistence.directories = [{
+    directory = "/var/lib/unifi";
+    user = "unifi";
+    group = "unifi";
+    mode = "700";
+  }];
 
   virtualisation.vmVariant = {
     networking.firewall.allowedTCPPorts = [ cfg.port ];

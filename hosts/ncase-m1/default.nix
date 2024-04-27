@@ -115,7 +115,7 @@
         address = "10.0.0.2";
         subnet = 24;
         dns = {
-          enable = true;
+          enable = false;
           address = "10.0.0.7";
         };
       };

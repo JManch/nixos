@@ -112,6 +112,11 @@
           "10.0.0.0/24"
         ];
       };
+
+      restic = {
+        enable = true;
+        server.enable = true;
+      };
     };
 
     system = {

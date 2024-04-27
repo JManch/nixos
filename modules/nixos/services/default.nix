@@ -475,6 +475,34 @@ in
       };
     };
 
+    restic = {
+      enable = mkEnableOption "Restic backups";
+
+      backups = mkOption {
+        type = types.attrs;
+        default = { };
+        description = ''
+          Attribute set of Restic backups matching the upstream module backups
+          options.
+        '';
+      };
+
+      server = {
+        enable = mkEnableOption "Restic REST server";
+
+        dataDir = mkOption {
+          type = types.str;
+          description = "Directory where the restic repository is stored";
+          default = "/var/lib/restic";
+        };
+
+        port = mkOption {
+          type = types.port;
+          default = 8090;
+          description = "Port for the Restic server to listen on";
+        };
+      };
+    };
   };
 
   config = {

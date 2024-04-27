@@ -1,3 +1,9 @@
+# WARN: It's important to close the webpage when casting from Jellyfin to
+# external clients such as jellyfin-mpv-shim or a TV. This is because the
+# Jellyfin client that started the cast will request a large chunk of metadata
+# every couple of seconds (presumably to update the cast progress bar?). With
+# multiple clients watching this can easily throttle the web server and make
+# Jellyfin unusable.
 { lib
 , pkgs
 , config

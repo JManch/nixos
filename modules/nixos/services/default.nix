@@ -1,6 +1,7 @@
 { lib, config, username, ... }:
 let
   inherit (lib) mkEnableOption mkOption types concatStringsSep;
+  cfg = config.modules.services;
 in
 {
   imports = lib.utils.scanPaths ./.;
@@ -115,7 +116,6 @@ in
 
         address = mkOption {
           type = types.str;
-          default = null;
           default = "127.0.0.1";
           description = "IP address that reverse proxy should point to";
         };
@@ -506,7 +506,7 @@ in
   };
 
   config = {
-    services.udisks2.enable = config.modules.services.udisks.enable;
+    services.udisks2.enable = cfg.udisks.enable;
 
     # Allows user services like home-manager syncthing to start on boot and
     # keep running rather than stopping and starting with each ssh session on

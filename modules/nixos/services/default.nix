@@ -107,6 +107,7 @@ in
 
     jellyfin = {
       enable = mkEnableOption "Jellyfin";
+      mediaPlayer = mkEnableOption "Jellyfin Media Player";
       openFirewall = mkEnableOption "opening the firewall";
 
       reverseProxy = {
@@ -115,6 +116,7 @@ in
         address = mkOption {
           type = types.str;
           default = null;
+          default = "127.0.0.1";
           description = "IP address that reverse proxy should point to";
         };
       };

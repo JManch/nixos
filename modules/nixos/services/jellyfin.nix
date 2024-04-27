@@ -1,6 +1,20 @@
-{ lib, config, inputs, ... }:
+{ lib
+, pkgs
+, config
+, inputs
+, ...
+}:
 let
-  inherit (lib) mkIf utils mkMerge optional mkForce optionalString mapAttrs attrValues;
+  inherit (lib)
+    mkIf
+    utils
+    mkMerge
+    optional
+    mkForce
+    optionalString
+    mapAttrs
+    attrValues
+    attrNames;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.services) caddy wireguard;
   inherit (config.services) jellyfin;
@@ -10,6 +24,8 @@ in
 mkMerge [
   (mkIf cfg.enable
     {
+      environment.systemPackages = optional cfg.mediaPlayer pkgs.jellyfin-media-player;
+
       services.jellyfin = {
         enable = true;
         openFirewall = cfg.openFirewall;
@@ -38,10 +54,9 @@ mkMerge [
 
       # Jellyfin module has good default hardening
 
-      systemd.tmpfiles.rules = [
-        "d /var/lib/jellyfin/media/shows 700 ${jellyfin.user} ${jellyfin.group}"
-        "d /var/lib/jellyfin/media/movies 700 ${jellyfin.user} ${jellyfin.group}"
-      ];
+      systemd.tmpfiles.rules = map
+        (name: "d /var/lib/jellyfin/media${optionalString (name != "") "/${name}"} 700 ${jellyfin.user} ${jellyfin.group}")
+        (attrNames cfg.mediaDirs);
 
       persistence.directories = [
         {
@@ -56,6 +71,11 @@ mkMerge [
           group = jellyfin.group;
           mode = "700";
         }
+      ];
+
+      persistenceHome.directories = mkIf cfg.mediaPlayer [
+        ".local/share/Jellyfin Media Player"
+        ".local/share/jellyfinmediaplayer"
       ];
 
       modules.services.nfs.client.fileSystems = [{

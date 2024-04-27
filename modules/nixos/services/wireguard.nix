@@ -118,7 +118,7 @@ let
       # communicated with rather than going through the default gateway.
       address = [ "${cfg.address}/${toString cfg.subnet}" ];
       autostart = cfg.autoStart;
-      privateKeyFile = config.age.secrets."${hostname}-wg-${name}-key".path;
+      privateKeyFile = config.age.secrets."wg-${name}-key".path;
       dns = mkIf cfg.dns.enable [ cfg.dns.address ];
 
       peers = cfg.peers ++ optional (cfg.routerPeer) {
@@ -131,6 +131,7 @@ let
       # Route incoming DNS traffic on the wireguard interface to the DNS server
       # port. We do not use standard port 53 for the wireguard DNS server
       # because that port is most likely taken.
+      # TODO: Use nftables instead here. Useful guide: https://www.procustodibus.com/blog/2021/11/wireguard-nftables/
       preUp = mkIf cfg.dns.host ''
         ${iptables} -t nat -A PREROUTING -i wg-${name} -p udp --dport 53 -j REDIRECT --to-port ${toString cfg.dns.port}
         ${iptables} -t nat -A PREROUTING -i wg-${name} -p tcp --dport 53 -j REDIRECT --to-port ${toString cfg.dns.port}
@@ -150,7 +151,7 @@ in
         cfg = interface.value;
       in
       [
-        (config.age.secrets."${hostname}-wg-${name}-key" != null)
+        (config.age.secrets."wg-${name}-key" != null)
         "A private key secret for the Wireguard VPN interface ${name} is missing"
         (cfg.dns.host -> dns-server-stack.enable)
         "The dns server stack must be enabled on this host to allow VPN dns hosting"

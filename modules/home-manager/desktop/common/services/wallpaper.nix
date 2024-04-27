@@ -83,7 +83,6 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
     programs.zsh.shellAliases.randomise-wallpaper = "systemctl start --user randomise-wallpaper";
 
     darkman.switchScripts.wallpaper = theme: /*bash*/ ''
-      echo "triggering wallpaper switch" >> /home/joshua/wallpaper
       systemctl start --user randomise-wallpaper
     '';
 

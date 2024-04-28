@@ -1,11 +1,12 @@
 { lib
+, pkgs
 , config
 , inputs
 , hostname
 , ...
 }:
 let
-  inherit (lib) mkIf mkMerge utils toUpper mkForce;
+  inherit (lib) mkIf mkMerge utils toUpper mkForce getExe';
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
   inherit (config.age.secrets) scrutinyVars;
@@ -47,6 +48,13 @@ mkMerge [
           host = "127.0.0.1";
           port = cfg.port;
         };
+
+        # The default database API token is "scrutiny-default-admin-token"
+        # https://github.com/AnalogJ/scrutiny/blob/master/docs/TROUBLESHOOTING_INFLUXDB.md#customize-influxdb-admin-username--password
+        web.influxdb = {
+          org = "scrutiny";
+          bucket = "scrutiny-bucket";
+        };
       };
     };
 
@@ -65,6 +73,32 @@ mkMerge [
       EnvironmentFile = scrutinyVars.path;
     };
 
+    systemd.services.scrutiny-influxdb2-backup = {
+      serviceConfig = {
+        Type = "oneshot";
+        User = "influxdb2";
+        Group = "influxdb2";
+        ExecStart = pkgs.writeShellScript "scrutiny-influxdb2-backup" ''
+          rm -rf /var/backup/influxdb2/scrutiny/*
+          ${getExe' pkgs.influxdb2 "influx"} backup /var/backup/influxdb2/scrutiny \
+            --org scrutiny --bucket scrutiny-bucket -t scrutiny-default-admin-token
+        '';
+      };
+    };
+
+    backups.scrutiny = {
+      paths = [
+        # Contains the sqlite DB
+        "/var/lib/scrutiny"
+        "/var/backup/influxdb2/scrutiny"
+      ];
+    };
+
+    systemd.services.restic-backups-scrutiny = {
+      requires = [ "scrutiny-influxdb2-backup.service" ];
+      after = [ "scrutiny-influxdb2-backup.service" ];
+    };
+
     services.caddy.virtualHosts."disks.${fqDomain}".extraConfig = ''
       import lan_only
       reverse_proxy http://127.0.0.1:${toString cfg.port}
@@ -79,6 +113,12 @@ mkMerge [
       }
       {
         directory = "/var/lib/influxdb2";
+        user = "influxdb2";
+        group = "influxdb2";
+        mode = "750";
+      }
+      {
+        directory = "/var/backup/influxdb2/scrutiny";
         user = "influxdb2";
         group = "influxdb2";
         mode = "750";

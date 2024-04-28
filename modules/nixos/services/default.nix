@@ -493,7 +493,7 @@ in
         dataDir = mkOption {
           type = types.str;
           description = "Directory where the restic repository is stored";
-          default = "/var/lib/restic";
+          default = "/var/backup/restic";
         };
 
         port = mkOption {

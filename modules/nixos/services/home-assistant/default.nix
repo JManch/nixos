@@ -210,7 +210,7 @@ in
       startAt = [ ];
     };
 
-    modules.services.restic.backups.hass = {
+    backups.hass = {
       paths = [
         "/var/lib/hass"
         "/var/backup/postgresql/hass.sql.gz"

@@ -108,7 +108,6 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
         };
 
         Timer = {
-          Unit = "randomise-wallpaper.service";
           OnCalendar = cfg.randomise.frequency;
           Persistent = true;
         };

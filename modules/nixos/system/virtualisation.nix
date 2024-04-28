@@ -112,6 +112,8 @@ mkMerge [
           nfs.server.enable = mkVMOverride false;
           scrutiny.collector.enable = mkVMOverride false;
           wgnord.enable = mkVMOverride false;
+          restic.enable = mkVMOverride false;
+          restic.server.enable = mkVMOverride false;
         };
       };
 

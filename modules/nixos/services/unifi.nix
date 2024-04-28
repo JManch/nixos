@@ -63,13 +63,16 @@ mkIf cfg.enable
     }
   '';
 
-  # TODO: Fix the actual directory so that the permissions match this. Do the
-  # same for all other persistence directories with custom permissions. 
+  # WARN: Auto-backups have to be configured in the UI
+  backups.unifi = {
+    paths = [ "/var/lib/unifi/data/backup/autobackup" ];
+  };
+
   persistence.directories = [{
     directory = "/var/lib/unifi";
     user = "unifi";
     group = "unifi";
-    mode = "700";
+    mode = "750";
   }];
 
   virtualisation.vmVariant = {

@@ -102,6 +102,7 @@
       greetd.enable = true;
       lact.enable = true;
       scrutiny.collector.enable = true;
+      restic.enable = true;
 
       wgnord = {
         enable = true;

@@ -81,10 +81,7 @@
 
     services = {
       syncthing.enable = true;
-
-      easyeffects = {
-        enable = true;
-      };
+      easyeffects.enable = true;
     };
   };
 }

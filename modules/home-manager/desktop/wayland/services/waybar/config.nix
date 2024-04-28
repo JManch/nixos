@@ -28,10 +28,10 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
     systemd.enable = true;
 
     package = (pkgs.waybar.overrideAttrs (o: {
-      # Patch disables waybar reloading both when the SIGUSR2 event is sent and
-      # when Hyprland reload. Waybar reloading causes the bar to open twice
-      # because we run waybar in systemd. Also breaks theme switching because
-      # it reloads regardless of the hyprland disable autoreload setting.
+      # Patch disables Waybar reloading both when the SIGUSR2 event is sent and
+      # when Hyprland reloads. Waybar reloading causes the bar to open twice
+      # because we run Waybar with systemd. Also breaks theme switching because
+      # it reloads regardless of the Hyprland disable autoreload setting.
       patches = (o.patches or [ ]) ++ [ ../../../../../../patches/waybar.patch ];
     })).override {
       cavaSupport = false;

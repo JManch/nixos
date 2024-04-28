@@ -49,6 +49,13 @@ mkIf cfg.enable
   # Expose wireless server for kobo ereader transfers
   networking.firewall.allowedTCPPorts = [ 9090 ];
 
+  backups.calibre = {
+    paths = [
+      "/var/lib/calibre-web"
+      "/var/lib/calibre-library"
+    ];
+  };
+
   persistence.directories = [
     {
       directory = "/var/lib/calibre-web";

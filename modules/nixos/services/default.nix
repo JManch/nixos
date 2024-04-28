@@ -1,10 +1,15 @@
 { lib, config, username, ... }:
 let
-  inherit (lib) mkEnableOption mkOption types concatStringsSep;
+  inherit (lib) mkEnableOption mkOption types concatStringsSep mkAliasOptionModule;
   cfg = config.modules.services;
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = lib.utils.scanPaths ./. ++ [
+    (mkAliasOptionModule
+      [ "backups" ]
+      [ "modules" "services" "restic" "backups" ]
+    )
+  ];
 
   options.modules.services = {
     udisks.enable = mkEnableOption "udisks";

@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe mkForce mkVMOverride optional utils;
+  inherit (lib) mkIf getExe getExe' mkForce mkVMOverride optional utils;
   inherit (config.modules.system.virtualisation) vmVariant;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
@@ -14,7 +14,8 @@ let
     rcloneConfig
     vaultwardenVars
     vaultwardenSMTPVars
-    vaultwardenPublicBackupKey;
+    vaultwardenPublicBackupKey
+    healthCheckVaultwarden;
   cfg = config.modules.services.vaultwarden;
 
   restoreScript = pkgs.writeShellApplication {
@@ -228,6 +229,7 @@ mkIf cfg.enable
         EnvironmentFile = [ vaultwardenSMTPVars.path ];
         Type = "oneshot";
         ExecStart = getExe cloudBackupScript;
+        ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckVaultwarden.path})\"'";
         User = "vaultwarden";
         Group = "vaultwarden";
         StateDirectory = "vaultwarden-cloud-backup";

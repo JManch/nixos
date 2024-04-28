@@ -203,6 +203,25 @@ in
       PrivateUsers = false;
     };
 
+    services.postgresqlBackup = {
+      enable = true;
+      location = "/var/backup/postgresql";
+      databases = [ "hass" ];
+      startAt = [ ];
+    };
+
+    modules.services.restic.backups.hass = {
+      paths = [
+        "/var/lib/hass"
+        "/var/backup/postgresql/hass.sql.gz"
+      ];
+    };
+
+    systemd.services.restic-backups-hass = {
+      requires = [ "postgresqlBackup-hass.service" ];
+      after = [ "postgresqlBackup-hass.service" ];
+    };
+
     services.caddy.virtualHosts = {
       # Because iPhones are terrible and don't accept my certs
       # (I don't think iPhone HA app supports certs anyway)
@@ -243,6 +262,12 @@ in
       }
       {
         directory = "/var/lib/postgresql";
+        user = "postgres";
+        group = "postgres";
+        mode = "750";
+      }
+      {
+        directory = "/var/backup/postgresql";
         user = "postgres";
         group = "postgres";
         mode = "750";

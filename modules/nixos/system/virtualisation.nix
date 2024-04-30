@@ -93,7 +93,8 @@ mkMerge [
         system = {
           bluetooth.enable = mkVMOverride false;
           audio.enable = mkVMOverride false;
-          virtualisation.enable = mkVMOverride false;
+          virtualisation.libvirt.enable = mkVMOverride false;
+          virtualisation.containerisation.enable = mkVMOverride false;
           virtualisation.vmVariant = true;
 
           networking = {
@@ -112,6 +113,9 @@ mkMerge [
           nfs.server.enable = mkVMOverride false;
           scrutiny.collector.enable = mkVMOverride false;
           wgnord.enable = mkVMOverride false;
+          fail2ban.enable = mkVMOverride false;
+          qbittorrent-nox.enable = mkVMOverride false;
+          zigbee2mqtt.enable = mkVMOverride false;
           restic.enable = mkVMOverride false;
           restic.server.enable = mkVMOverride false;
         };
@@ -123,6 +127,7 @@ mkMerge [
         in
         {
           graphics = desktopEnabled;
+          diskSize = 8192;
           qemu = {
             options = optionals desktopEnabled [
               # Allows nixos-rebuild build-vm graphical session

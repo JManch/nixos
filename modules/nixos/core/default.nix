@@ -1,12 +1,11 @@
 { lib
 , pkgs
-, config
 , inputs
 , username
 , ...
 }:
 let
-  inherit (lib) utils mapAttrs mapAttrs' filterAttrs isType;
+  inherit (lib) utils mapAttrs mapAttrsToList filterAttrs isType;
 in
 {
   imports = utils.scanPaths ./.;
@@ -58,38 +57,41 @@ in
     config.allowUnfree = true;
   };
 
-  nix = {
-    # Add flake inputs to the system's legacy channels
-    nixPath = [ "/etc/nix/path" ];
+  nix =
+    let
+      flakeInputs = filterAttrs (_: isType "flake") inputs;
+    in
+    {
+      channel.enable = false;
 
-    # Populates the nix registry with all our flake inputs `nix registry list`
-    registry = (mapAttrs (_: flake: { inherit flake; })) ((filterAttrs (_: isType "flake")) inputs)
-      // {
-      self.flake = inputs.self;
-      n.flake = inputs.nixpkgs;
+      # Add flake inputs to nix path. Enables loading flakes with <flake_name>
+      # like how <nixpkgs> can be referenced.
+      nixPath = mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
+
+      # Populates the nix registry with all our flake inputs `nix registry list`
+      # Enables referencing flakes with short name in nix commands 
+      # e.g. 'nix shell n#dnsutils' or 'nix shell hyprland#wlroots-hyprland'
+      registry = (mapAttrs (_: flake: { inherit flake; }) flakeInputs) // {
+        self.flake = inputs.self;
+        n.flake = inputs.nixpkgs;
+      };
+
+      settings = {
+        experimental-features = "nix-command flakes";
+        auto-optimise-store = true;
+        # Do not load the default global registry
+        # https://channels.nixos.org/flake-registry.json
+        flake-registry = "";
+        # Fixes builds using --build-host
+        trusted-users = [ username ];
+      };
+
+      gc = {
+        automatic = true;
+        dates = "weekly";
+        options = "--delete-older-than 7d";
+      };
     };
-
-    settings = {
-      experimental-features = "nix-command flakes";
-      auto-optimise-store = true;
-      # Fixes builds using --build-host
-      trusted-users = [ username ];
-    };
-
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
-    };
-  };
-
-  environment.etc =
-    mapAttrs'
-      (name: value: {
-        name = "nix/path/${name}";
-        value.source = value.flake;
-      })
-      config.nix.registry;
 
   environment.sessionVariables = {
     XDG_CACHE_HOME = "$HOME/.cache";

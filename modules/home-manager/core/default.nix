@@ -21,14 +21,25 @@
     ".local/share/systemd" # needed for persistent user timers to work properly
   ];
 
-  backups.files = {
-    paths = [ "files" ];
-    exclude = [
-      "files/games"
-      "files/repos"
-      "files/software"
-      "files/remote-builds"
-    ];
+  backups = {
+    nixos = {
+      paths = [ ".config/nixos" ];
+      restore.removeExisting = true;
+    };
+
+    files = {
+      paths = [ "files" ];
+      exclude =
+        let
+          absPath = "/persist/home/${username}";
+        in
+        [
+          "${absPath}/files/games"
+          "${absPath}/files/repos"
+          "${absPath}/files/software"
+          "${absPath}/files/remote-builds"
+        ];
+    };
   };
 
   # Reload systemd services on home-manager restart

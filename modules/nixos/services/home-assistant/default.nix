@@ -13,6 +13,7 @@ let
     optional
     optionalString
     utils
+    getExe'
     mkVMOverride
     escapeShellArg;
   inherit (config.modules.services) frigate mosquitto caddy;
@@ -207,14 +208,36 @@ in
       enable = true;
       location = "/var/backup/postgresql";
       databases = [ "hass" ];
+      # -Fc enables restoring with pg_restore
+      pgdumpOptions = "-C -Fc";
+      # The c format is compressed by default
+      compression = "none";
       startAt = [ ];
     };
 
     backups.hass = {
       paths = [
         "/var/lib/hass"
-        "/var/backup/postgresql/hass.sql.gz"
+        "/var/backup/postgresql/hass.sql"
       ];
+
+      restore =
+        let
+          systemctl = getExe' pkgs.systemd "systemctl";
+          pg_restore = getExe' config.services.postgresql.package "pg_restore";
+          backup = "/var/backup/postgresql/hass.sql";
+        in
+        {
+          removeExisting = true;
+
+          preRestoreScript = ''
+            sudo ${systemctl} stop home-assistant
+          '';
+
+          postRestoreScript = /*bash*/ ''
+            sudo -u postgres ${pg_restore} -U postgres --dbname postgres --clean --create ${backup}
+          '';
+        };
     };
 
     systemd.services.restic-backups-hass = {

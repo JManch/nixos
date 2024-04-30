@@ -18,8 +18,7 @@ let
     optional
     mkForce
     optionalString
-    mapAttrs
-    attrValues
+    mapAttrsToList
     attrNames;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.services) caddy wireguard;
@@ -45,10 +44,9 @@ mkMerge [
 
         serviceConfig = {
           # Bind mount home media directories so jellyfin can access them
-          BindReadOnlyPaths = attrValues
-            (mapAttrs
-              (name: dir: "${dir}:/var/lib/jellyfin/media${optionalString (name != "") "/${name}"}")
-              cfg.mediaDirs);
+          BindReadOnlyPaths = mapAttrsToList
+            (name: dir: "${dir}:/var/lib/jellyfin/media${optionalString (name != "") "/${name}"}")
+            cfg.mediaDirs;
           SocketBindDeny = publicPorts;
         };
       };

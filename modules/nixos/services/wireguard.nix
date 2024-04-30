@@ -2,7 +2,6 @@
 , pkgs
 , config
 , inputs
-, hostname
 , ...
 }:
 let
@@ -13,8 +12,7 @@ let
     getExe'
     attrsToList
     filterAttrs
-    attrValues
-    mapAttrs
+    mapAttrsToList
     optional
     mapAttrs'
     listToAttrs
@@ -40,9 +38,9 @@ let
           "/${fqDomain}/"
         ];
 
-        host-record =
-          attrValues
-            (mapAttrs (address: hostname: "${hostname}.lan,${address}") inputs.nix-resources.secrets."${name}WGHosts");
+        host-record = mapAttrsToList
+          (address: hostname: "${hostname}.lan,${address}")
+          inputs.nix-resources.secrets."${name}WGHosts";
       };
 
       configFile = dns-server-stack.generateDnsmasqConfig "dnsmasq-wg-${name}.conf" settings;

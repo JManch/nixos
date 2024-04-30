@@ -18,7 +18,7 @@ let
     mkVMOverride
     mapAttrs'
     mapAttrs
-    attrValues
+    mapAttrsToList
     nameValuePair
     filterAttrs
     utils
@@ -170,9 +170,9 @@ mkIf cfg.enable
 
     # Host records create PTR entries as well. Using addn-hosts created
     # duplicate entries for some reason so using this instead.
-    host-record =
-      attrValues
-        (mapAttrs (address: hostname: "${hostname}.lan,${address}") homeHosts);
+    host-record = mapAttrsToList
+      (address: hostname: "${hostname}.lan,${address}")
+      homeHosts;
   };
 
   # Open DNS ports in firewall and set nameserver to localhost

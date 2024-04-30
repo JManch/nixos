@@ -15,6 +15,7 @@ let
     all
     elem
     mapAttrs
+    mapAttrsToList
     getExe
     replaceStrings
     concatStrings
@@ -23,7 +24,6 @@ let
     mapAttrs'
     getExe'
     attrNames
-    attrValues
     mkForce
     mkBefore
     optionalString;
@@ -118,7 +118,7 @@ let
       if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then exit 1; fi
       echo
 
-      ${concatStrings (attrValues (mapAttrs (name: value: /*bash*/ ''
+      ${concatStrings (mapAttrsToList (name: value: /*bash*/ ''
         read -p "Restore backup ${name}? (y/N): " -n 1 -r
         if [[ "$REPLY" =~ ^[Yy]$ ]]; then
             echo
@@ -136,14 +136,14 @@ let
 
             # Update ownership because UID/GID mappings are not guaranteed to match between hosts
             # Modules with statically mapped IDs don't need this https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix
-            ${concatStringsSep ";" (attrValues (mapAttrs (path: ownership:
+            ${concatStringsSep ";" (mapAttrsToList (path: ownership:
               (optionalString (ownership.user != null) "sudo chown -R ${ownership.user} ${path}") +
               (optionalString (ownership.group != null) ";sudo chgrp -R ${ownership.group} ${path}")
-              ) value.restore.pathOwnership))}
+              ) value.restore.pathOwnership)}
 
             ${value.restore.postRestoreScript}
         fi
-      '') backups))}
+      '') backups)}
 
     '';
   };
@@ -153,11 +153,11 @@ mkMerge [
   (mkIf (cfg.enable || cfg.server.enable || vmVariant) {
     assertions =
       utils.asserts [
-        (all (v: v == true) (attrValues (mapAttrs (_: backup: all (v: v == true) (map (path: elem path backup.paths) (attrNames backup.restore.pathOwnership))) backups)))
+        (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: elem path backup.paths) (attrNames backup.restore.pathOwnership))) backups))
         "Restic pathOwnership paths must also be defined as backup paths"
-        (all (v: v == true) (attrValues (mapAttrs (_: backup: all (v: v == true) (map (path: path != "") backup.paths)) cfg.backups)))
+        (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "") backup.paths)) cfg.backups))
         "Restic backup paths cannot be empty"
-        (all (v: v == true) (attrValues (mapAttrs (_: backup: all (v: v == true) (map (path: path != "/home/${username}/") backup.paths)) homeBackups)))
+        (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "/home/${username}/") backup.paths)) homeBackups))
         "Restic home backup paths cannot be empty"
       ];
 

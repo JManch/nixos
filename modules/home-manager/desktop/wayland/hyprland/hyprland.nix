@@ -43,8 +43,10 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
   home.packages = [ (utils.flakePkgs args "grimblast").grimblast ];
 
   # Install Hyprcursor package
-  home.file.".icons/${cfg.hyprcursor.name}".source = mkIf (cfg.hyprcursor.package != null)
-    "${cfg.hyprcursor.package}/share/icons/${cfg.hyprcursor.name}";
+  home.file = mkIf (cfg.hyprcursor.package != null) {
+    ".icons/${cfg.hyprcursor.name}".source =
+      "${cfg.hyprcursor.package}/share/icons/${cfg.hyprcursor.name}";
+  };
 
   # Generate hyprland debug config
   xdg.configFile."hypr/hyprland.conf".onChange =

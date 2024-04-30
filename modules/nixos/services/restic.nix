@@ -170,6 +170,21 @@ mkMerge [
       restic-restore-size = "sudo restic stats --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
       restic-repo-size = "sudo restic stats --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
     };
+
+    # Backblaze bucket setup:
+    # backblaze-b2 create-bucket --defaultServerSideEncryption=SSE-B2 <bucket_name> --lifecycleRule '{"daysFromHidingToDeleting": 7, "daysFromUploadingToHiding": null, "fileNamePrefix": ""}' allPrivate
+    # backblaze-b2 create-key --bucket <bucket_name> restic-copy listBuckets,listFiles,readFiles,writeFiles
+    # backblaze-b2 create-key --bucket <bucket_name> restic-read-only listBuckets,listFiles,readFiles
+
+    # For ransomware protection we do not grant the deleteFiles priviledge to
+    # the restic-copy key because writeFiles is capable of overwrite existing
+    # files. Overrwritten files are 'hidden' for the number of days configured
+    # in the lifecycle rule before being permanently deleted. Ideally we would
+    # use the 'Object Lock' feature provided by Backblaze but it does not work
+    # with Restic. This gives me 7 days after a theoretical attack to use
+    # restore an old 'snapshot' of the bucket.
+
+    # Restore tool: https://github.com/viltgroup/bucket-restore
   })
 
   (mkIf cfg.enable {

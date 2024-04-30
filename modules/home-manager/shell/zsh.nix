@@ -73,6 +73,9 @@ mkIf cfg.enable
       '';
   };
 
+  # Backup zsh history
+  backups.zsh.paths = [ ".local/state/zsh" ];
+
   persistence.directories = [
     ".config/zsh" # for zcompdump
     ".local/state/zsh"

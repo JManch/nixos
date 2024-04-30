@@ -7,14 +7,31 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf mkMerge utils mapAttrs getExe concatStringsSep nameValuePair mapAttrs' getExe' attrNames;
+  inherit (lib)
+    mkIf
+    mkMerge
+    utils
+    all
+    elem
+    mapAttrs
+    getExe
+    concatStrings
+    concatStringsSep
+    nameValuePair
+    mapAttrs'
+    getExe'
+    attrNames
+    attrValues
+    optionalString;
   inherit (config.modules.services) caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.modules.system.virtualisation) vmVariant;
   inherit (config.age.secrets)
     resticPasswordFile
     resticHtPasswordsFile
     resticRepositoryFile
-    resticBackblazeVars
+    resticReadWriteBackblazeVars
+    resticReadOnlyBackblazeVars
     resticNotifVars
     healthCheckResticRemoteCopy;
   cfg = config.modules.services.restic;
@@ -56,26 +73,90 @@ let
       };
     };
   };
+
+  restoreScript = pkgs.writeShellApplication {
+    name = "restic-restore";
+    runtimeInputs = [ pkgs.restic pkgs.coreutils ];
+    text = /*bash*/ ''
+
+      echo "Leave empty to restore from the default repo"
+      echo "Enter 'remote' to restore from the backblaze remote repo"
+      echo "Otherwise, enter a custom repo passed to the -r flag"
+      read -p "Enter the repo to restore from: " -r repo
+
+      env_vars="RESTIC_PASSWORD_FILE=\"${resticPasswordFile.path}\""
+      if [[ -z "$repo" ]]; then
+        env_vars+=" RESTIC_REPOSITORY_FILE=\"${resticRepositoryFile.path}\""
+      elif [[ ! "remote" = "$repo" ]]; then
+        env_vars+=" RESTIC_REPOSITORY=\"$repo\""
+      fi
+
+      load_vars="set -a; if [[ \"$repo\" = \"remote\" ]]; then source ${resticReadOnlyBackblazeVars.path}; fi; set +a; export $env_vars;"
+      sudo ${getExe' pkgs.bash "sh"} -c "$load_vars restic snapshots --no-lock"
+
+      read -p "Do you want to proceed with this repo? (y/N): " -n 1 -r
+      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then exit 1; fi
+      echo
+
+      ${concatStrings (attrValues (mapAttrs (name: value: /*bash*/ ''
+        read -p "Restore backup ${name}? (y/N): " -n 1 -r
+        if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+            echo
+            sudo ${getExe' pkgs.bash "sh"} -c "$load_vars restic snapshots --tag ${name} --host ${hostname} --no-lock"
+            read -p "Enter the snapshot ID to restore (leave empty for latest): " -r snapshot
+            if [[ -z "$snapshot" ]]; then snapshot="latest"; fi
+            echo "Restoring snapshot: $snapshot"
+
+            ${optionalString value.restore.removeExisting (
+              concatStringsSep ";" (map (p: "sudo rm -rf ${p}/*") value.paths)
+            )}
+
+            ${value.restore.preRestoreScript}
+            sudo ${getExe' pkgs.bash "sh"} -c "$load_vars restic restore $snapshot --target / --verify --tag ${name} --host ${hostname} --no-lock"
+
+            # Update ownership because UID/GID mappings are not guaranteed to match between hosts
+            # Modules with statically mapped IDs don't need this https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix
+            ${concatStringsSep ";" (attrValues (mapAttrs (path: ownership:
+              (optionalString (ownership.user != null) "sudo chown -R ${ownership.user} ${path}") +
+              (optionalString (ownership.group != null) ";sudo chgrp -R ${ownership.group} ${path}")
+              ) value.restore.pathOwnership))}
+
+            ${value.restore.postRestoreScript}
+        fi
+      '') backups))}
+
+    '';
+  };
 in
 mkMerge [
-  (mkIf (cfg.enable || cfg.server.enable) {
-    environment.systemPackages = [ pkgs.restic ];
+  # To allow testing backup restores in the VM
+  (mkIf (cfg.enable || cfg.server.enable || vmVariant) {
+    assertions = utils.asserts [
+      (all (v: v == true) (attrValues (mapAttrs (_: backup: all (v: v == true) (map (path: elem path backup.paths) (attrNames backup.restore.pathOwnership))) backups)))
+      "Restic pathOwnership paths must also be defined as backup paths"
+    ];
+
+    environment.systemPackages = [ pkgs.restic restoreScript ];
   })
 
   (mkIf cfg.enable {
     services.restic.backups =
       let
-        backupDefaults = {
+        backupDefaults = name: {
           initialize = true;
           # NOTE: Always perform backups using the REST server, even on the same
           # machine. It simplifies permission handling.
           repositoryFile = resticRepositoryFile.path;
           passwordFile = resticPasswordFile.path;
           timerConfig = backupTimerConfig;
+          extraBackupArgs = [
+            "--no-scan"
+            "--tag ${name}"
+          ];
         };
       in
       mapAttrs
-        (_: value: backupDefaults // value)
+        (name: value: (backupDefaults name) // (removeAttrs value [ "restore" ]))
         backups;
 
     systemd.services =
@@ -187,7 +268,7 @@ mkMerge [
           ];
           ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckResticRemoteCopy.path})\"'";
 
-          EnvironmentFile = resticBackblazeVars.path;
+          EnvironmentFile = resticReadWriteBackblazeVars.path;
           User = "root";
           PrivateTmp = true;
           RuntimeDirectory = "restic-remote-copy";
@@ -218,7 +299,7 @@ mkMerge [
       '';
     };
 
-    programs.zsh.shellAliases.restic-repo = "sudo -u restic restic -r ${cfg.server.dataDir}";
+    programs.zsh.shellAliases.restic-repo = "sudo restic -r ${cfg.server.dataDir} --password-file ${resticPasswordFile.path}";
 
     persistence.directories = [
       {

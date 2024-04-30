@@ -23,6 +23,8 @@ let
     getExe'
     attrNames
     attrValues
+    mkForce
+    mkBefore
     optionalString;
   inherit (config.modules.services) caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -40,8 +42,8 @@ let
   restic = getExe pkgs.restic;
   homeBackups = (utils.homeConfig args).backups;
 
-  # WARN: Paths are prefixed with /persist. We don't modify exclude or include paths to
-  # allow non-absolute patterns. Be careful with those.
+  # WARN: Paths are prefixed with /persist. We don't modify exclude or include
+  # paths to allow non-absolute patterns. Be careful with those.
   backups = mapAttrs
     (name: value:
       value // {
@@ -85,7 +87,7 @@ let
 
             ${shoutrrr} send \
               --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${lib.replaceStrings [ " " ] [ "%20" ] title}" \
-              --message "${name} failed on host ${hostname}"
+              --message "${name} failed on ${hostname}"
           '';
       };
     };
@@ -109,7 +111,7 @@ let
       fi
 
       load_vars="set -a; if [[ \"$repo\" = \"remote\" ]]; then source ${resticReadOnlyBackblazeVars.path}; fi; set +a; export $env_vars;"
-      sudo ${getExe' pkgs.bash "sh"} -c "$load_vars restic snapshots --no-lock --latest 3 --group-by tags"
+      sudo ${getExe' pkgs.bash "sh"} -c "$load_vars restic snapshots --compact --no-lock --group-by tags"
 
       read -p "Do you want to proceed with this repo? (y/N): " -n 1 -r
       if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then exit 1; fi
@@ -159,19 +161,29 @@ mkMerge [
       ];
 
     environment.systemPackages = [ pkgs.restic restoreScript ];
+
+    # NOTE: Always interact with the repository using the REST server, even on
+    # the same machine. It ensures correct repo file ownership.
+    programs.zsh.shellAliases = {
+      restic = "sudo restic --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-snapshots = "sudo restic snapshots --compact --group-by tags --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-restore-size = "sudo restic stats --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-repo-size = "sudo restic stats --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+    };
   })
 
   (mkIf cfg.enable {
     services.restic.backups =
       let
         backupDefaults = name: {
-          initialize = true;
-          # NOTE: Always perform backups using the REST server, even on the same
-          # machine. It simplifies permission handling.
+          # We use our own initialize script because the upstream one is inefficient
+          initialize = false;
           repositoryFile = resticRepositoryFile.path;
           passwordFile = resticPasswordFile.path;
           timerConfig = backupTimerConfig;
           extraBackupArgs = [
+            # Disable cache because we don't persist cache directories
+            "--no-cache"
             "--no-scan"
             "--tag ${name}"
           ];
@@ -185,8 +197,13 @@ mkMerge [
       (mapAttrs'
         (name: value: nameValuePair "restic-backups-${name}" {
           enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
+          environment.RESTIC_CACHE_DIR = mkForce "";
           serviceConfig.EnvironmentFile = resticNotifVars.path;
+          serviceConfig.CacheDirectory = mkForce "";
           onFailure = [ "restic-backups-${name}-failure-notif.service" ];
+          preStart = mkBefore /*bash*/ ''
+            ${restic} --no-cache cat config || ${restic} init
+          '';
         })
         backups)
       //
@@ -219,9 +236,9 @@ mkMerge [
             Type = "oneshot";
             PrivateTmp = true;
             ExecStart = [
-              "${restic} forget --prune ${concatStringsSep " " pruneOpts}"
+              "${restic} forget --no-cache --prune ${concatStringsSep " " pruneOpts}"
               # Retry lock timeout in-case another host is performing a check
-              "${restic} check --retry-lock 5m"
+              "${restic} check --read-data-subset=500M --retry-lock 5m"
             ];
           };
         };
@@ -278,19 +295,18 @@ mkMerge [
 
         preStart = ''
           # Initialise with copied chunker params to ensure good deduplication
-          ${restic} snapshots || ${restic} init --copy-chunker-params
+          ${restic} cat config || ${restic} init --copy-chunker-params
         '';
 
         serviceConfig = {
           Type = "oneshot";
+          EnvironmentFile = resticReadWriteBackblazeVars.path;
           ExecStart = [
             "${restic} copy"
-            "${restic} forget --prune ${concatStringsSep " " pruneOpts}"
             "${restic} check --with-cache"
           ];
           ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckResticRemoteCopy.path})\"'";
 
-          EnvironmentFile = resticReadWriteBackblazeVars.path;
           User = "root";
           PrivateTmp = true;
           RuntimeDirectory = "restic-remote-copy";
@@ -298,19 +314,67 @@ mkMerge [
           CacheDirectoryMode = "0700";
         };
       };
+
+      restic-remote-maintenance = {
+        enable = !inputs.firstBoot.value;
+        wants = [ "network-online.target" ];
+        after = [ "network-online.target" ];
+        onFailure = [ "restic-remote-maintenance-failure-notif.service" ];
+        restartIfChanged = false;
+
+        environment = {
+          RESTIC_FROM_REPOSITORY_FILE = resticRepositoryFile.path;
+          RESTIC_FROM_PASSWORD_FILE = resticPasswordFile.path;
+          RESTIC_PASSWORD_FILE = resticPasswordFile.path;
+        };
+
+        preStart = ''
+          # Ensure the repository exists
+          ${restic} cat config
+        '';
+
+        serviceConfig = {
+          Type = "oneshot";
+          EnvironmentFile = resticReadWriteBackblazeVars.path;
+
+          ExecStart = [
+            "${restic} forget --prune ${concatStringsSep " " pruneOpts}"
+            # WARN: Keep an eye on this with egress fees
+            "${restic} check --read-data-subset=500M"
+          ];
+
+          User = "root";
+          PrivateTmp = true;
+          RuntimeDirectory = "restic-remote-maintenance";
+        };
+      };
     } // (failureNotifService "restic-remote-copy-failure-notif"
       "Restic Remote Copy Failed"
       "Remote copy"
+    ) // (failureNotifService "restic-remote-maintenance-failure-notif"
+      "Restic Remote Maintenance Failed"
+      "Remote maintenance"
     );
 
-    systemd.timers.restic-remote-copy = {
-      # Do not enable on firstBoot of a brand new deployment because we want to
-      # manually copy the remote repo first
-      enable = !inputs.firstBoot.value;
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnCalendar = "*-*-* 01:00:00";
-        Persistent = false;
+    systemd.timers = {
+      restic-remote-copy = {
+        # Do not enable on firstBoot of a brand new deployment because we want to
+        # manually copy the remote repo first
+        enable = !inputs.firstBoot.value;
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "*-*-* 01:00:00";
+          Persistent = false;
+        };
+      };
+
+      restic-remote-maintenance = {
+        enable = !inputs.firstBoot.value;
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "Sun *-*-* 01:30:00";
+          Persistent = true;
+        };
       };
     };
 
@@ -320,8 +384,6 @@ mkMerge [
         reverse_proxy http://127.0.0.1:${toString cfg.server.port}
       '';
     };
-
-    programs.zsh.shellAliases.restic-repo = "sudo restic -r ${cfg.server.dataDir} --password-file ${resticPasswordFile.path}";
 
     persistence.directories = [
       {

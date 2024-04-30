@@ -39,6 +39,9 @@ let
          exit 1
       fi
 
+      echo "Tip: if you've restored from the Restic backup you can use the backup at /var/backup/vaultwarden-archive/latest";
+      echo "Be careful to ensure that it's the latest backup because Restic backups do not run as frequently";
+
       backup=$1
       key=$2
       vault="/var/lib/bitwarden_rs"
@@ -126,9 +129,6 @@ mkIf cfg.enable
 
   environment.systemPackages = [ restoreScript ];
 
-  # TODO: Implement proper backup failure notify system with something like
-  # this https://healthchecks.io/
-
   systemd.services.vaultwarden-cloud-backup =
     let
       inherit (config.services.vaultwarden) backupDir;
@@ -147,6 +147,7 @@ mkIf cfg.enable
         text = /*bash*/ ''
 
           set -o errtrace
+          umask 0077
           time=$(date +%s)
 
           send_notification() {
@@ -192,8 +193,13 @@ mkIf cfg.enable
 
           # Archive locally
           mkdir -p "$archive_dir"
-          cp "$time" "$archive_dir"
-          cp "$time-sha256" "$archive_dir"
+          for file in "$archive_dir"/latest*; do
+            if [ -e "$file" ]; then
+              mv "$file" "''${file/latest/last}"
+            fi
+          done
+          cp "$time" "$archive_dir/latest"
+          cp "$time-sha256" "$archive_dir/latest-sha256"
 
           # Because rclone has writes refresh client keys to it's configuration
           # we have to maintain a writeable copy of the config. When we detect
@@ -252,6 +258,13 @@ mkIf cfg.enable
     '';
   };
 
+  backups.vaultwarden = {
+    paths = [ "/var/backup/vaultwarden-archive" ];
+    restore.pathOwnership = {
+      "/var/backup/vaultwarden-archive" = { user = "vaultwarden"; group = "vaultwarden"; };
+    };
+  };
+
   persistence.directories = [
     {
       directory = "/var/lib/bitwarden_rs";
@@ -274,13 +287,10 @@ mkIf cfg.enable
       mode = "770";
     }
     {
-      # Stores an archive of all backups
+      # Stores last two compressed backups
       directory = "/var/backup/vaultwarden-archive";
       user = "vaultwarden";
-      # WARN: Allows syncthing user service to share folder. Can probably
-      # change this once I setup system syncthing service and sync with that
-      # instead
-      group = "users";
+      group = "vaultwarden";
       mode = "770";
     }
   ];

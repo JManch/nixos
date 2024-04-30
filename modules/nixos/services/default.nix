@@ -344,16 +344,19 @@ in
     };
 
     scrutiny = {
-      server.enable = mkEnableOption "hosting the Scrutiny web server";
       collector.enable = mkEnableOption ''
         the Scrutiny collector service. The collector service sends data to the
         web server and can run on any machine that can access the web server.
       '';
 
-      port = mkOption {
-        type = types.port;
-        default = 8085;
-        description = "Listen port of the web server";
+      server = {
+        enable = mkEnableOption "hosting the Scrutiny web server";
+
+        port = mkOption {
+          type = types.port;
+          default = 8085;
+          description = "Listen port of the web server";
+        };
       };
     };
 

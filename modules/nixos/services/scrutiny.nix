@@ -6,11 +6,12 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkMerge utils toUpper mkForce getExe';
+  inherit (lib) mkIf mkMerge utils toUpper mkForce getExe' mkVMOverride;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
   inherit (config.age.secrets) scrutinyVars;
   cfg = config.modules.services.scrutiny;
+  influx = getExe' pkgs.influxdb2 "influx";
 in
 mkMerge [
   (mkIf cfg.collector.enable {
@@ -23,7 +24,7 @@ mkMerge [
         host.id = toUpper hostname;
         api.endpoint =
           if cfg.server.enable then
-            "http://127.0.0.1:${toString cfg.port}"
+            "http://127.0.0.1:${toString cfg.server.port}"
           else "https://disks.${fqDomain}";
       };
     };
@@ -46,7 +47,7 @@ mkMerge [
       settings = {
         web.listen = {
           host = "127.0.0.1";
-          port = cfg.port;
+          port = cfg.server.port;
         };
 
         # The default database API token is "scrutiny-default-admin-token"
@@ -80,8 +81,10 @@ mkMerge [
         Group = "influxdb2";
         ExecStart = pkgs.writeShellScript "scrutiny-influxdb2-backup" ''
           rm -rf /var/backup/influxdb2/scrutiny/*
-          ${getExe' pkgs.influxdb2 "influx"} backup /var/backup/influxdb2/scrutiny \
-            --org scrutiny --bucket scrutiny-bucket -t scrutiny-default-admin-token
+          # NOTE: This does a full backup of the influxdb so if another
+          # application uses influxdb its data will be included
+          ${influx} backup /var/backup/influxdb2/scrutiny \
+            -t scrutiny-default-admin-token
         '';
       };
     };
@@ -92,6 +95,25 @@ mkMerge [
         "/var/lib/scrutiny"
         "/var/backup/influxdb2/scrutiny"
       ];
+
+      restore = {
+        removeExisting = true;
+
+        preRestoreScript = /*bash*/ ''
+          sudo ${getExe' pkgs.systemd "systemctl"} stop scrutiny
+        '';
+
+        postRestoreScript = /*bash*/ ''
+          echo "Restoring Scrutiny influxdb database"
+          sudo -u influxdb2 ${influx} restore /var/backup/influxdb2/scrutiny --full \
+            -t scrutiny-default-admin-token
+        '';
+
+        pathOwnership = {
+          "/var/lib/scrutiny" = { user = "scrutiny"; group = "scrutiny"; };
+          "/var/backup/influxdb2/scrutiny" = { user = "influxdb2"; group = "influxdb2"; };
+        };
+      };
     };
 
     systemd.services.restic-backups-scrutiny = {
@@ -101,7 +123,7 @@ mkMerge [
 
     services.caddy.virtualHosts."disks.${fqDomain}".extraConfig = ''
       import lan_only
-      reverse_proxy http://127.0.0.1:${toString cfg.port}
+      reverse_proxy http://127.0.0.1:${toString cfg.server.port}
     '';
 
     persistence.directories = [
@@ -124,5 +146,10 @@ mkMerge [
         mode = "750";
       }
     ];
+
+    virtualisation.vmVariant = {
+      networking.firewall.allowedTCPPorts = [ cfg.server.port ];
+      services.scrutiny.settings.web.listen.host = mkVMOverride "0.0.0.0";
+    };
   })
 ]

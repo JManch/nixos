@@ -14,7 +14,7 @@
 
     services = {
       syncthing = {
-        enable = true;
+        enable = false;
         exposeWebGUI = true;
       };
     };

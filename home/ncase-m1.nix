@@ -80,7 +80,7 @@
     };
 
     services = {
-      syncthing.enable = true;
+      syncthing.enable = false;
       easyeffects.enable = true;
     };
   };

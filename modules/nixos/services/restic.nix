@@ -4,6 +4,7 @@
 , inputs
 , outputs
 , hostname
+, username
 , ...
 } @ args:
 let
@@ -35,9 +36,25 @@ let
     resticNotifVars
     healthCheckResticRemoteCopy;
   cfg = config.modules.services.restic;
-  backups = cfg.backups // (utils.homeConfig args).backups;
   isServer = (config.device.type == "server");
   restic = getExe pkgs.restic;
+  homeBackups = (utils.homeConfig args).backups;
+
+  # WARN: Paths are prefixed with /persist. We don't modify exclude or include paths to
+  # allow non-absolute patterns. Be careful with those.
+  backups = mapAttrs
+    (name: value:
+      value // {
+        paths = map (path: "/persist${path}") value.paths;
+        restore = value.restore // {
+          pathOwnership = mapAttrs'
+            (path: value: nameValuePair "/persist${path}" value)
+            value.restore.pathOwnership;
+        };
+      }
+    )
+    (cfg.backups // homeBackups);
+
   backupTimerConfig = {
     OnCalendar = if isServer then "*-*-* 00:00:00" else "*-*-* 15:00:00";
     Persistent = !isServer;
@@ -92,7 +109,7 @@ let
       fi
 
       load_vars="set -a; if [[ \"$repo\" = \"remote\" ]]; then source ${resticReadOnlyBackblazeVars.path}; fi; set +a; export $env_vars;"
-      sudo ${getExe' pkgs.bash "sh"} -c "$load_vars restic snapshots --no-lock"
+      sudo ${getExe' pkgs.bash "sh"} -c "$load_vars restic snapshots --no-lock --latest 3 --group-by tags"
 
       read -p "Do you want to proceed with this repo? (y/N): " -n 1 -r
       if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then exit 1; fi
@@ -108,7 +125,7 @@ let
             echo "Restoring snapshot: $snapshot"
 
             ${optionalString value.restore.removeExisting (
-              concatStringsSep ";" (map (p: "sudo rm -rf ${p}/*") value.paths)
+              concatStringsSep ";" (map (path: "sudo rm -rf ${path}/*") value.paths)
             )}
 
             ${value.restore.preRestoreScript}
@@ -131,10 +148,15 @@ in
 mkMerge [
   # To allow testing backup restores in the VM
   (mkIf (cfg.enable || cfg.server.enable || vmVariant) {
-    assertions = utils.asserts [
-      (all (v: v == true) (attrValues (mapAttrs (_: backup: all (v: v == true) (map (path: elem path backup.paths) (attrNames backup.restore.pathOwnership))) backups)))
-      "Restic pathOwnership paths must also be defined as backup paths"
-    ];
+    assertions =
+      utils.asserts [
+        (all (v: v == true) (attrValues (mapAttrs (_: backup: all (v: v == true) (map (path: elem path backup.paths) (attrNames backup.restore.pathOwnership))) backups)))
+        "Restic pathOwnership paths must also be defined as backup paths"
+        (all (v: v == true) (attrValues (mapAttrs (_: backup: all (v: v == true) (map (path: path != "") backup.paths)) cfg.backups)))
+        "Restic backup paths cannot be empty"
+        (all (v: v == true) (attrValues (mapAttrs (_: backup: all (v: v == true) (map (path: path != "/home/${username}/") backup.paths)) homeBackups)))
+        "Restic home backup paths cannot be empty"
+      ];
 
     environment.systemPackages = [ pkgs.restic restoreScript ];
   })

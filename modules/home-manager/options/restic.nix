@@ -12,11 +12,6 @@ in
           default = [ ];
         };
 
-        exclude = mkOption {
-          type = types.listOf types.str;
-          default = [ ];
-        };
-
         restore = {
           pathOwnership = mkOption {
             type = types.attrsOf (types.submodule {
@@ -75,7 +70,6 @@ in
     apply = v: mapAttrs'
       (name: value: nameValuePair "home-${name}" (value // {
         paths = map (path: "/home/${username}/${path}") value.paths;
-        exclude = map (path: "/home/${username}/${path}") value.exclude;
       }))
       v;
     description = ''

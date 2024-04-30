@@ -16,6 +16,7 @@ let
     elem
     mapAttrs
     getExe
+    replaceStrings
     concatStrings
     concatStringsSep
     nameValuePair
@@ -86,7 +87,7 @@ let
               --message "${message} failed on host ${hostname}"
 
             ${shoutrrr} send \
-              --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${lib.replaceStrings [ " " ] [ "%20" ] title}" \
+              --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${replaceStrings [ " " ] [ "%20" ] title}" \
               --message "${name} failed on ${hostname}"
           '';
       };
@@ -162,7 +163,7 @@ mkMerge [
 
     environment.systemPackages = [ pkgs.restic restoreScript ];
 
-    # NOTE: Always interact with the repository using the REST server, even on
+    # WARN: Always interact with the repository using the REST server, even on
     # the same machine. It ensures correct repo file ownership.
     programs.zsh.shellAliases = {
       restic = "sudo restic --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
@@ -181,8 +182,8 @@ mkMerge [
     # files. Overrwritten files are 'hidden' for the number of days configured
     # in the lifecycle rule before being permanently deleted. Ideally we would
     # use the 'Object Lock' feature provided by Backblaze but it does not work
-    # with Restic. This gives me 7 days after a theoretical attack to use
-    # restore an old 'snapshot' of the bucket.
+    # with Restic. This gives us 7 days after a theoretical attack to restore
+    # an old 'snapshot' of the bucket.
 
     # Restore tool: https://github.com/viltgroup/bucket-restore
   })

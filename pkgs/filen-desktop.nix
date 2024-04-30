@@ -25,8 +25,6 @@ appimageTools.wrapType2 rec {
   inherit pname version src;
 
   extraInstallCommands = ''
-    mv $out/bin/${pname}-${version} $out/bin/${pname}
-
     source "${makeWrapper}/nix-support/setup-hook"
     wrapProgram $out/bin/filen-desktop \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform=wayland --enable-features=WaylandWindowDecorations}}" \

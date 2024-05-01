@@ -5,31 +5,72 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf mkMerge optional getExe getExe' utils optionalString;
+  inherit (lib) mkIf mkMerge boolToString optional getExe utils;
   inherit (config.modules.desktop.services) darkman;
   cfg = config.modules.desktop.services.wallpaper;
   wallpapers = (utils.flakePkgs args "nix-resources").wallpapers;
+  wallpaperCache = "${config.xdg.cacheHome}/wallpaper";
+
+  setWallpaper = pkgs.writeShellApplication {
+    name = "set-wallpaper";
+    runtimeInputs = optional darkman.enable config.services.darkman.package;
+    text = /*bash*/ ''
+
+      randomise=${boolToString cfg.randomise.enable};
+      if [ "$randomise" = true ]; then
+        darkman=${boolToString darkman.enable};
+        if [ "$darkman" = true ]; then
+          theme=$(darkman get)
+          random_wallpaper_cache="${wallpaperCache}/$theme-wallpaper"
+        else
+          random_wallpaper_cache="${wallpaperCache}/wallpaper"
+        fi
+
+        # If the cache file doesn't exist we need to randomise
+        if [ ! -f "$random_wallpaper_cache" ]; then
+          ${getExe randomiseWallpaper};
+        fi
+
+        wallpaper=$(<"$random_wallpaper_cache")
+
+        # Cached wallpaper paths might be invalid after garbage collection
+        if [ ! -f "$wallpaper" ]; then
+          ${getExe randomiseWallpaper};
+          wallpaper=$(<"$random_wallpaper_cache")
+        fi
+      else
+        wallpaper="${cfg.default}"
+      fi
+      ${cfg.setWallpaperCmd} "$wallpaper"
+
+    '';
+  };
 
   randomiseWallpaper = pkgs.writeShellApplication {
     name = "randomise-wallpaper";
-    runtimeInputs = with pkgs; [ coreutils findutils ];
+    runtimeInputs = with pkgs; [ coreutils findutils ]
+      ++ optional darkman.enable config.services.darkman.package;
     text = /*bash*/ ''
 
-      dir="${wallpapers.all-wallpapers}/wallpapers"
-      ${optionalString darkman.enable /*bash*/ ''
-        theme=$(${getExe config.services.darkman.package} get)
+      darkman=${boolToString darkman.enable}
+      if [ "$darkman" = true ]; then
+        theme=$(darkman get)
         if [ "$theme" = "light" ]; then
-          dir="${wallpapers.light-wallpapers}"
+          wallpapers="${wallpapers.light-wallpapers}/wallpapers"
         else
-          dir="${wallpapers.dark-wallpapers}"
+          wallpapers="${wallpapers.dark-wallpapers}/wallpapers"
         fi
-      ''}
-      cache_file="${config.xdg.cacheHome}/wallpaper"
+        cache_file="${wallpaperCache}/$theme-wallpaper"
+      else
+        wallpapers="${wallpapers.all-wallpapers}/wallpapers"
+        cache_file="${wallpaperCache}/wallpaper"
+      fi
+
       previous_wallpaper=""
       [[ -f "$cache_file" ]] && previous_wallpaper=$(<"$cache_file")
       # Randomly select a wallpaper excluding the previous
       new_wallpaper=$(
-        find "$dir" -type f ! -wholename "$previous_wallpaper" -print0 |
+        find "$wallpapers" -type f ! -wholename "$previous_wallpaper" -print0 |
         shuf -z -n 1 | tr -d '\0'
       )
       echo "$new_wallpaper" > "$cache_file"
@@ -51,39 +92,22 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
         ++ optional darkman.enable "darkman.service";
       };
 
-      Service =
-        let
-          wallpaperToSet = if cfg.randomise.enable then "\"$(<${config.xdg.cacheHome}/wallpaper)\"" else cfg.default;
-          sh = getExe' pkgs.bash "sh";
-        in
-        {
-          Type = "oneshot";
-          ExecStartPre =
-            # If this is a fresh install and the wallpaper cache does not exist,
-            # randomise straight away. This is because daily / weekly timers
-            # won't necessarily trigger on the very first boot
-
-            # TODO: Minor issue but if full garbage collection is run and a
-            # randomise is not triggered before the next boot the wallpaper path
-            # inside the cache file will be invalidated and the wallpaper will
-            # not be applied. Can maybe add a check that runs randomiseWallpaper
-            # if the wallpaper file pointed to in the cache does not exist.
-            optional cfg.randomise.enable
-              "${sh} -c '[[ -f \"${config.xdg.cacheHome}/wallpaper\" ]] || ${getExe randomiseWallpaper}'";
-          ExecStart = "${sh} -c '${cfg.setWallpaperCmd} ${wallpaperToSet}'";
-        };
+      Service = {
+        Type = "oneshot";
+        ExecStart = getExe setWallpaper;
+      };
 
       Install.WantedBy = optional (!(darkman.enable && cfg.randomise.enable)) "graphical-session.target";
     };
   }
 
   (mkIf cfg.randomise.enable {
-    persistence.files = [ ".cache/wallpaper" ];
+    persistence.directories = [ ".cache/wallpaper" ];
 
     programs.zsh.shellAliases.randomise-wallpaper = "systemctl start --user randomise-wallpaper";
 
     darkman.switchScripts.wallpaper = theme: /*bash*/ ''
-      systemctl start --user randomise-wallpaper
+      systemctl start --user set-wallpaper
     '';
 
     systemd.user = {

@@ -1,11 +1,12 @@
 { lib
 , pkgs
+, config
 , inputs
 , username
 , ...
 }:
 let
-  inherit (lib) utils mapAttrs mapAttrsToList filterAttrs isType;
+  inherit (lib) utils mapAttrs filterAttrs isType;
 in
 {
   imports = utils.scanPaths ./.;
@@ -64,10 +65,6 @@ in
     {
       channel.enable = false;
 
-      # Add flake inputs to nix path. Enables loading flakes with <flake_name>
-      # like how <nixpkgs> can be referenced.
-      nixPath = mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
-
       # Populates the nix registry with all our flake inputs `nix registry list`
       # Enables referencing flakes with short name in nix commands 
       # e.g. 'nix shell n#dnsutils' or 'nix shell hyprland#wlroots-hyprland'
@@ -84,6 +81,8 @@ in
         flake-registry = "";
         # Fixes builds using --build-host
         trusted-users = [ username ];
+        # Workaround for https://github.com/NixOS/nix/issues/9574
+        nix-path = config.nix.nixPath;
       };
 
       gc = {

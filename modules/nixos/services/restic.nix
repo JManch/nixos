@@ -166,10 +166,10 @@ mkMerge [
     # WARN: Always interact with the repository using the REST server, even on
     # the same machine. It ensures correct repo file ownership.
     programs.zsh.shellAliases = {
-      restic = "sudo restic --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-      restic-snapshots = "sudo restic snapshots --compact --group-by tags --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-      restic-restore-size = "sudo restic stats --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-      restic-repo-size = "sudo restic stats --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic = "sudo restic --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-snapshots = "sudo restic snapshots --no-cache --compact --group-by tags --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-restore-size = "sudo restic stats --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-repo-size = "sudo restic stats --no-cache --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
     };
 
     # Backblaze bucket setup:
@@ -218,7 +218,7 @@ mkMerge [
           serviceConfig.CacheDirectory = mkForce "";
           onFailure = [ "restic-backups-${name}-failure-notif.service" ];
           preStart = mkBefore /*bash*/ ''
-            ${restic} --no-cache cat config || ${restic} init
+            ${restic} cat config --no-cache || ${restic} init
           '';
         })
         backups)

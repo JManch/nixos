@@ -14,7 +14,7 @@
     nix-colors.url = "github:misterio77/nix-colors";
     nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
 
-    # nix-resources.url = "git+file:///home/joshua/repos/nix-resources";
+    # nix-resources.url = "git+file:///home/joshua/files/personal-repos/nix-resources";
     nix-resources.url = "git+ssh://git@github.com/JManch/nix-resources";
     nix-resources.inputs.nixpkgs.follows = "nixpkgs";
 

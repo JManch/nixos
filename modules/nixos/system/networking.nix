@@ -103,7 +103,7 @@ in
       serviceConfig = {
         ExecStart = "${rfkill} block wifi";
         Type = "oneshot";
-        RemainAfterExit = "true";
+        RemainAfterExit = true;
       };
 
       wantedBy = [ "multi-user.target" ];

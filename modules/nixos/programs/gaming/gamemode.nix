@@ -42,8 +42,8 @@ let
 
         ${
           optionalString isHyprland /*bash*/ ''
-            # shellcheck disable=SC2010
-            HYPRLAND_INSTANCE_SIGNATURE=$(\ls -1 -t /tmp/hypr | grep lock | head -1 | cut -d '.' -f 1)
+            # shellcheck disable=SC2012
+            HYPRLAND_INSTANCE_SIGNATURE=$(\ls -1 -t /run/user/1000/hypr | head -1)
             export HYPRLAND_INSTANCE_SIGNATURE
             hyprctl --batch "\
               ${optionalString hyprland.blur "keyword decoration:blur:enabled ${blur mode};\\"}

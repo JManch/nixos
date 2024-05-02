@@ -8,7 +8,6 @@ let
   inherit (lib) mkIf mkMerge boolToString optional getExe utils;
   inherit (config.modules.desktop.services) darkman;
   cfg = config.modules.desktop.services.wallpaper;
-  wallpapers = (utils.flakePkgs args "nix-resources").wallpapers;
   wallpaperCache = "${config.xdg.cacheHome}/wallpaper";
 
   setWallpaper = pkgs.writeShellApplication {
@@ -50,32 +49,34 @@ let
     name = "randomise-wallpaper";
     runtimeInputs = with pkgs; [ coreutils findutils ]
       ++ optional darkman.enable config.services.darkman.package;
-    text = /*bash*/ ''
+    text =
+      let
+        wallpapers = type: "${(utils.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers"}/wallpapers";
+      in
+        /*bash*/ ''
+
+        function randomise_cache() {
+          wallpapers="$1"
+          cache_file="$2"
+          previous_wallpaper=""
+          [[ -f "$cache_file" ]] && previous_wallpaper=$(<"$cache_file")
+          # Randomly select a wallpaper excluding the previous
+          new_wallpaper=$(
+            find "$wallpapers" -type f ! -wholename "$previous_wallpaper" -print0 |
+            shuf -z -n 1 | tr -d '\0'
+          )
+          echo "$new_wallpaper" > "$cache_file"
+        }
 
       darkman=${boolToString darkman.enable}
-      if [ "$darkman" = true ]; then
-        theme=$(darkman get)
-        if [ "$theme" = "light" ]; then
-          wallpapers="${wallpapers.light-wallpapers}/wallpapers"
+        if [ "$darkman" = true ]; then
+          randomise_cache "${wallpapers "dark"}" "${wallpaperCache}/dark-wallpaper"
+          randomise_cache "${wallpapers "light"}" "${wallpaperCache}/light-wallpaper"
         else
-          wallpapers="${wallpapers.dark-wallpapers}/wallpapers"
+          randomise_cache "${wallpapers "all"}" "${wallpaperCache}/wallpaper"
         fi
-        cache_file="${wallpaperCache}/$theme-wallpaper"
-      else
-        wallpapers="${wallpapers.all-wallpapers}/wallpapers"
-        cache_file="${wallpaperCache}/wallpaper"
-      fi
 
-      previous_wallpaper=""
-      [[ -f "$cache_file" ]] && previous_wallpaper=$(<"$cache_file")
-      # Randomly select a wallpaper excluding the previous
-      new_wallpaper=$(
-        find "$wallpapers" -type f ! -wholename "$previous_wallpaper" -print0 |
-        shuf -z -n 1 | tr -d '\0'
-      )
-      echo "$new_wallpaper" > "$cache_file"
-
-    '';
+      '';
   };
 in
 mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [

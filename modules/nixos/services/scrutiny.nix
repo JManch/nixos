@@ -30,8 +30,12 @@ mkMerge [
     };
 
     systemd.services.scrutiny-collectors = {
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
+      after = [ "network-online.target" "nss-lookup.target" ];
+      wants = [ "network-online.target" "nss-lookup.target" ];
+      serviceConfig = {
+        # Workaround to ensure the service starts after DNS resolution is ready
+        ExecStartPre = "${getExe' pkgs.bash "sh"} -c 'while ! host ${fqDomain}; do sleep 1; done'";
+      };
     };
   })
 

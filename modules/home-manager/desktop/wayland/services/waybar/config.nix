@@ -27,12 +27,20 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
     enable = true;
     systemd.enable = true;
 
-    package = (pkgs.waybar.overrideAttrs (o: {
+    package = (pkgs.waybar.overrideAttrs (finalAttrs: prevAttrs: {
       # Patch disables Waybar reloading both when the SIGUSR2 event is sent and
       # when Hyprland reloads. Waybar reloading causes the bar to open twice
       # because we run Waybar with systemd. Also breaks theme switching because
       # it reloads regardless of the Hyprland disable autoreload setting.
-      patches = (o.patches or [ ]) ++ [ ../../../../../../patches/waybar.patch ];
+      patches = (prevAttrs.patches or [ ]) ++ [ ../../../../../../patches/waybar.patch ];
+
+      # For Hyprland compat https://github.com/Alexays/Waybar/pull/3183
+      src = pkgs.fetchFromGitHub {
+        owner = "Alexays";
+        repo = "Waybar";
+        rev = "0b6476da32d181ee6b2cabdc5205a46a90521a75";
+        hash = "sha256-ov7v4OaiMW6gylMFTjKXXtoxrgAjtOTHa09oFmu3B3s=";
+      };
     })).override {
       cavaSupport = false;
       evdevSupport = true;

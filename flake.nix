@@ -68,6 +68,13 @@
     # Provides home assistant heatmiser component
     graham33.url = "github:graham33/nur-packages?rev=71fcef3f3f0f198577fee51f64a0f3711daefc99";
     graham33.inputs.nixpkgs.follows = "nixpkgs";
+
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+
+    mint.url = "github:JManch/mint/nix-fix";
+    mint.inputs.nixpkgs.follows = "nixpkgs";
+    mint.inputs.rust-overlay.follows = "rust-overlay";
   };
 
   outputs = { self, nixpkgs, home-manager, ... } @ inputs:

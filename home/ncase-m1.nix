@@ -76,6 +76,7 @@
         r2modman.enable = true;
         lutris.enable = true;
         prism-launcher.enable = true;
+        mint.enable = true;
       };
     };
 

@@ -1,4 +1,9 @@
-{ lib, config, osConfig, ... }:
+{ lib
+, pkgs
+, config
+, osConfig
+, ...
+} @ args:
 let
   inherit (lib)
     mkIf
@@ -9,6 +14,7 @@ let
     concatStringsSep
     concatStrings
     optional;
+  cfg = config.modules.programs.gaming;
 in
 {
   imports = utils.scanPaths ./.;
@@ -18,6 +24,7 @@ in
     r2modman.enable = mkEnableOption "r2modman";
     lutris.enable = mkEnableOption "Lutris";
     prism-launcher.enable = mkEnableOption "Prism Launcher";
+    mint.enable = mkEnableOption "DRG Mod Loader";
 
     gameClasses = mkOption {
       type = with types; listOf str;
@@ -66,10 +73,10 @@ in
 
   config =
     let
-      inherit (osConfig.modules.programs) gaming;
+      osGaming = osConfig.modules.programs.gaming;
     in
-    mkIf gaming.enable {
+    mkIf osGaming.enable {
       modules.programs.gaming.gameClasses =
-        optional gaming.gamescope.enable "\\.gamescope.*";
+        optional osGaming.gamescope.enable "\\.gamescope.*";
     };
 }

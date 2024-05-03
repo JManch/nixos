@@ -1,0 +1,12 @@
+diff --git a/hook/src/hooks.rs b/hook/src/hooks.rs
+index 919ce71..c738390 100644
+--- a/hook/src/hooks.rs
++++ b/hook/src/hooks.rs
+@@ -317,7 +317,6 @@ fn get_server_name_detour(a: *const c_void, b: *const c_void) -> *const ue::FStr
+         let name = GetServerName.call(a, b).cast_mut().as_mut().unwrap();
+ 
+         let mut new_name = widestring::U16String::new();
+-        new_name.push_str("[MODDED] ");
+         new_name.push_slice(name.as_slice());
+ 
+         name.clear();

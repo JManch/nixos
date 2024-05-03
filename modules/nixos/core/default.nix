@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) utils mapAttrs filterAttrs isType;
+  inherit (lib) utils mapAttrs filterAttrs isType mapAttrsToList;
 in
 {
   imports = utils.scanPaths ./.;
@@ -72,6 +72,10 @@ in
         self.flake = inputs.self;
         n.flake = inputs.nixpkgs;
       };
+
+      # Add flake inputs to nix path. Enables loading flakes with <flake_name>
+      # like how <nixpkgs> can be referenced.
+      nixPath = mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
 
       settings = {
         experimental-features = "nix-command flakes";

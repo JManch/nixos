@@ -39,7 +39,7 @@ let
     })).override {
       buildGoModule = args: pkgs.buildGoModule (args // {
         inherit src version;
-        # Because the package uses proxyVendor it seems that vendorHashe breaks
+        # Because the package uses proxyVendor it seems that vendorHash breaks
         # everytime go updates...
         vendorHash = "sha256-D21D2GGunkXrq3l0Pex5ap+K/0rfhTf/choSR3oaAFY=";
       });

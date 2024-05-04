@@ -37,7 +37,7 @@ mkMerge [
         ExecStartPre =
           let
             sh = getExe' pkgs.bash "sh";
-            host = getExe pkgs.host;
+            host = getExe' pkgs.host "host";
             sleep = getExe' pkgs.coreutils "sleep";
           in
           "${sh} -c 'while ! ${host} ${fqDomain}; do ${sleep} 1; done'";

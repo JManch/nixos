@@ -255,6 +255,8 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
       if [ $? -ne 0 ]; then
         ${hyprctl} keyword monitor ''${monitor_name_to_cfg[$monitor_name]} > /dev/null
         echo "Enabled monitor $monitor_name"
+        # Some wallpapers programs such as swww do not reload the wallpaper for toggled monitors
+        ${getExe' pkgs.systemd "systemctl"} start --user set-wallpaper
       else
         ${hyprctl} keyword monitor $monitor_name,disable > /dev/null
         echo "Disabled monitor $monitor_name"

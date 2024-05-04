@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkMerge utils toUpper mkForce getExe' mkVMOverride;
+  inherit (lib) mkIf mkMerge utils toUpper mkForce getExe' getExe mkVMOverride;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
   inherit (config.age.secrets) scrutinyVars;
@@ -34,7 +34,13 @@ mkMerge [
       wants = [ "network-online.target" "nss-lookup.target" ];
       serviceConfig = {
         # Workaround to ensure the service starts after DNS resolution is ready
-        ExecStartPre = "${getExe' pkgs.bash "sh"} -c 'while ! host ${fqDomain}; do sleep 1; done'";
+        ExecStartPre =
+          let
+            sh = getExe' pkgs.bash "sh";
+            host = getExe pkgs.host;
+            sleep = getExe' pkgs.coreutils "sleep";
+          in
+          "${sh} -c 'while ! ${host} ${fqDomain}; do ${sleep} 1; done'";
       };
     };
   })

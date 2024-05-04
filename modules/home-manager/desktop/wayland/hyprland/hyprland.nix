@@ -28,7 +28,9 @@ let
 
   hyprlandPkgs = utils.flakePkgs args "hyprland";
   hyprland = hyprlandPkgs.hyprland.overrideAttrs (old: {
-    patches = (old.patches or [ ]) ++ [ ../../../../../patches/hyprland.patch ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch ];
+    # Patch makes the togglespecialworkspace dispatcher always toggle instead
+    # of moving the open special workspace to the active monitor
+    patches = (old.patches or [ ]) ++ [ ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch ];
   });
 in
 mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {

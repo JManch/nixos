@@ -9,6 +9,7 @@ let
   inherit (config.modules.desktop.services) darkman;
   cfg = config.modules.desktop.services.wallpaper;
   wallpaperCache = "${config.xdg.cacheHome}/wallpaper";
+  wallpapers = type: "${(utils.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers"}/wallpapers";
 
   setWallpaper = pkgs.writeShellApplication {
     name = "set-wallpaper";
@@ -49,34 +50,30 @@ let
     name = "randomise-wallpaper";
     runtimeInputs = with pkgs; [ coreutils findutils ]
       ++ optional darkman.enable config.services.darkman.package;
-    text =
-      let
-        wallpapers = type: "${(utils.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers"}/wallpapers";
-      in
-        /*bash*/ ''
+    text = /*bash*/ ''
 
-        function randomise_cache() {
-          wallpapers="$1"
-          cache_file="$2"
-          previous_wallpaper=""
-          [[ -f "$cache_file" ]] && previous_wallpaper=$(<"$cache_file")
-          # Randomly select a wallpaper excluding the previous
-          new_wallpaper=$(
-            find "$wallpapers" -type f ! -wholename "$previous_wallpaper" -print0 |
-            shuf -z -n 1 | tr -d '\0'
-          )
-          echo "$new_wallpaper" > "$cache_file"
-        }
+      function randomise_cache() {
+        wallpapers="$1"
+        cache_file="$2"
+        previous_wallpaper=""
+        [[ -f "$cache_file" ]] && previous_wallpaper=$(<"$cache_file")
+        # Randomly select a wallpaper excluding the previous
+        new_wallpaper=$(
+          find "$wallpapers" -type f ! -name "$(basename "$previous_wallpaper")" -print0 |
+          shuf -z -n 1 | tr -d '\0'
+        )
+        echo "$new_wallpaper" > "$cache_file"
+      }
 
       darkman=${boolToString darkman.enable}
-        if [ "$darkman" = true ]; then
-          randomise_cache "${wallpapers "dark"}" "${wallpaperCache}/dark-wallpaper"
-          randomise_cache "${wallpapers "light"}" "${wallpaperCache}/light-wallpaper"
-        else
-          randomise_cache "${wallpapers "all"}" "${wallpaperCache}/wallpaper"
-        fi
+      if [ "$darkman" = true ]; then
+        randomise_cache "${wallpapers "dark"}" "${wallpaperCache}/dark-wallpaper"
+        randomise_cache "${wallpapers "light"}" "${wallpaperCache}/light-wallpaper"
+      else
+        randomise_cache "${wallpapers "all"}" "${wallpaperCache}/wallpaper"
+      fi
 
-      '';
+    '';
   };
 in
 mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
@@ -126,7 +123,7 @@ mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
         };
       };
 
-      timers.randomise-wallpaper = mkIf (!darkman.enable) {
+      timers.randomise-wallpaper = {
         Unit = {
           Description = "Timer for randomising the desktop wallpaper";
           X-SwitchMethod = "keep-old";

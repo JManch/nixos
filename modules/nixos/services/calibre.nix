@@ -56,7 +56,6 @@ mkIf cfg.enable
     ];
 
     restore = {
-      removeExisting = true;
       pathOwnership =
         let
           ownership = { user = "calibre-web"; group = "calibre-web"; };

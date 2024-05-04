@@ -21,10 +21,7 @@ mkIf cfg.enable
     categories = [ "Game" ];
   };
 
-  backups.mint = {
-    paths = [ ".config/mint" ];
-    restore.removeExisting = true;
-  };
+  backups.mint.paths = [ ".config/mint" ];
 
   persistence.directories = [
     ".config/mint"

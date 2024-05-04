@@ -228,8 +228,6 @@ in
           backup = "/var/backup/postgresql/hass.sql";
         in
         {
-          removeExisting = true;
-
           preRestoreScript = ''
             sudo ${systemctl} stop home-assistant
           '';

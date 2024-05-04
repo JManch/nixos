@@ -107,8 +107,6 @@ mkMerge [
       ];
 
       restore = {
-        removeExisting = true;
-
         preRestoreScript = /*bash*/ ''
           sudo ${getExe' pkgs.systemd "systemctl"} stop scrutiny
         '';

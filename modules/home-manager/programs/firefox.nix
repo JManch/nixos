@@ -336,10 +336,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
     };
   };
 
-  backups.firefox = {
-    restore.removeExisting = true;
-    paths = [ ".mozilla" ];
-  };
+  backups.firefox.paths = [ ".mozilla" ];
 
   persistence.directories = mkIf (!cfg.runInRam) [
     ".mozilla"

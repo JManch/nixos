@@ -22,13 +22,11 @@
   ];
 
   backups = {
-    nixos = {
-      paths = [ ".config/nixos" ];
-      restore.removeExisting = true;
-    };
+    nixos.paths = [ ".config/nixos" ];
 
     files = {
       paths = [ "files" ];
+      restore.removeExisting = false;
       exclude =
         let
           absPath = "/persist/home/${username}";

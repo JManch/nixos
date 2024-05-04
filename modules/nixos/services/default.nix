@@ -523,7 +523,7 @@ in
 
               removeExisting = mkOption {
                 type = types.bool;
-                default = false;
+                default = true;
                 description = ''
                   Whether to delete all files and directories in the backup
                   paths before restoring backup.

@@ -87,12 +87,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     package = hyprland;
 
     plugins = with utils.flakePkgs args "hyprland-plugins"; [
-      (hyprexpo.overrideAttrs (oldAttrs: {
-        # Patch adds a "first" workspace method for displaying workspaces
-        # starting from the first on the monitor. Behaves the same regardless
-        # of which workspace hyprexpo is launched from.
-        patches = (oldAttrs.patches or [ ]) ++ [ ../../../../../patches/hyprexpo.patch ];
-      }))
+      hyprexpo
     ];
 
     systemd = {
@@ -296,7 +291,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         hyprexpo = {
           columns = 3;
           gap_size = 0;
-          workspace_method = "first";
+          workspace_method = "first m~1";
           enable_gesture = false;
         };
       };

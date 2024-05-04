@@ -27,7 +27,9 @@ let
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
 
   hyprlandPkgs = utils.flakePkgs args "hyprland";
-  hyprland = hyprlandPkgs.hyprland;
+  hyprland = hyprlandPkgs.hyprland.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [ ../../../../../patches/hyprland.patch ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch ];
+  });
 in
 mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
   modules.desktop = {

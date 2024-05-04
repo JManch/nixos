@@ -1,0 +1,26 @@
+diff --git a/src/managers/KeybindManager.cpp b/src/managers/KeybindManager.cpp
+index 7708a77a..3fe33a2b 100644
+--- a/src/managers/KeybindManager.cpp
++++ b/src/managers/KeybindManager.cpp
+@@ -1678,18 +1678,17 @@ void CKeybindManager::toggleSpecialWorkspace(std::string args) {
+     }
+ 
+     bool       requestedWorkspaceIsAlreadyOpen = false;
+-    const auto PMONITOR                        = g_pCompositor->m_pLastMonitor;
+-    int        specialOpenOnMonitor            = PMONITOR->activeSpecialWorkspaceID();
++    auto       PMONITOR                        = g_pCompositor->m_pLastMonitor;
+ 
+     for (auto& m : g_pCompositor->m_vMonitors) {
+         if (m->activeSpecialWorkspaceID() == workspaceID) {
+             requestedWorkspaceIsAlreadyOpen = true;
++            PMONITOR = m.get();
+             break;
+         }
+     }
+ 
+-    if (requestedWorkspaceIsAlreadyOpen && specialOpenOnMonitor == workspaceID) {
+-        // already open on this monitor
++    if (requestedWorkspaceIsAlreadyOpen) {
+         Debug::log(LOG, "Toggling special workspace {} to closed", workspaceID);
+         PMONITOR->setSpecialWorkspace(nullptr);
+     } else {

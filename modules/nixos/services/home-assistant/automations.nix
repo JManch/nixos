@@ -58,7 +58,7 @@ let
             hvac_mode = if enable then "heat" else "off";
           };
           target.entity_id = [
-            "climate.joshua_room_thermostat"
+            "climate.joshua_thermostat"
             "climate.hallway"
           ];
         }];
@@ -99,7 +99,7 @@ let
           service = "humidifier.turn_${if enable then "on" else "off"}";
           metadata = { };
           data = { };
-          target.entity_id = "humidifier.joshua_room_hygrostat";
+          target.entity_id = "humidifier.joshua_hygrostat";
         }];
       }) [ true false ];
 
@@ -125,12 +125,37 @@ let
       };
     }];
   }];
+
+  joshuaDehumidifierMoldToggle = map
+    (enable: {
+      alias = "Joshua Dehumidifier ${if enable then "Enable" else "Disable"}";
+      mode = "single";
+      trigger = [{
+        platform = "numeric_state";
+        entity_id = [ "sensor.joshua_mold_indicator" ];
+        above = mkIf enable 70;
+        below = mkIf (!enable) 65;
+        for = {
+          hours = 0;
+          minutes = if enable then 5 else 30;
+          seconds = 0;
+        };
+      }];
+      condition = [ ];
+      action = [
+        {
+          service = "switch.turn_${if enable then "on" else "off"}";
+          target.entity_id = "switch.joshua_dehumidifier";
+        }
+      ];
+    }) [ true false ];
 in
 mkIf (cfg.enableInternal)
 {
   services.home-assistant.config = {
     automation = heatingTimeToggle
-      ++ joshuaDehumidifierToggle
+      # ++ joshuaDehumidifierToggle
+      ++ joshuaDehumidifierMoldToggle
       ++ joshuaDehumidifierTankFull
       ++ optional frigate.enable frigateEntranceNotify;
 

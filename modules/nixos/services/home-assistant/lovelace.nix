@@ -12,20 +12,42 @@ let
   home = {
     title = "Home";
 
-    cards = [{
-      type = "vertical-stack";
+    cards = [
+      {
+        type = "vertical-stack";
 
-      cards = [
-        {
-          type = "weather-forecast";
-          entity = "weather.forecast_home";
-          forecast_type = "daily";
-        }
-        {
-          type = "energy-distribution";
-        }
-      ];
-    }];
+        cards = [
+          {
+            type = "weather-forecast";
+            entity = "weather.forecast_home";
+            forecast_type = "daily";
+          }
+          { type = "energy-distribution"; }
+        ];
+      }
+      {
+        type = "entities";
+        entities = [
+          { entity = "sensor.outdoor_temperature"; name = "Temperature"; }
+          { entity = "sensor.outdoor_humidity"; name = "Humidity"; }
+          { entity = "sensor.outdoor_thermal_comfort_absolute_humidity"; name = "Absolute Humidity"; }
+          { entity = "sensor.outdoor_thermal_comfort_dew_point"; name = "Dew Point"; }
+          { entity = "sensor.outdoor_thermal_comfort_dew_point_perception"; name = "Dew Point Perception"; }
+          { entity = "sensor.outdoor_thermal_comfort_frost_point"; name = "Frost Point"; }
+          { entity = "sensor.outdoor_thermal_comfort_frost_risk"; name = "Frost Risk"; }
+          { entity = "sensor.outdoor_thermal_comfort_heat_index"; name = "Heat Index"; }
+          { entity = "sensor.outdoor_thermal_comfort_humidex"; name = "Humidex"; }
+          { entity = "sensor.outdoor_thermal_comfort_humidex_perception"; name = "Humidex Perception"; }
+          { entity = "sensor.outdoor_thermal_comfort_moist_air_enthalpy"; name = "Moist Air Enthalpy"; }
+          { entity = "sensor.outdoor_thermal_comfort_relative_strain_perception"; name = "Relative Strain"; }
+          { entity = "sensor.outdoor_thermal_comfort_summer_scharlau_perception"; name = "Summer Scharlau"; }
+          { entity = "sensor.outdoor_thermal_comfort_summer_simmer_index"; name = "Summer Simmer Index"; }
+          { entity = "sensor.outdoor_thermal_comfort_summer_simmer_perception"; name = "Summer Simmer Perception"; }
+          { entity = "sensor.outdoor_thermal_comfort_thoms_discomfort_perception"; name = "Thoms Discomfort"; }
+          { entity = "sensor.outdoor_thermal_comfort_winter_scharlau_perception"; name = "Winter Scharlau"; }
+        ];
+      }
+    ];
   };
 
   lounge = {
@@ -115,22 +137,10 @@ let
         state_color = true;
 
         entities = [
-          {
-            entity = "switch.adaptive_lighting_joshua_room";
-            name = "Adaptive Lighting";
-          }
-          {
-            entity = "switch.adaptive_lighting_adapt_brightness_joshua_room";
-            name = "Adapt Brightness";
-          }
-          {
-            entity = "switch.adaptive_lighting_adapt_color_joshua_room";
-            name = "Adapt Color";
-          }
-          {
-            entity = "switch.adaptive_lighting_sleep_mode_joshua_room";
-            name = "Sleep Mode";
-          }
+          { entity = "switch.adaptive_lighting_joshua_room"; name = "Adaptive Lighting"; }
+          { entity = "switch.adaptive_lighting_adapt_brightness_joshua_room"; name = "Adapt Brightness"; }
+          { entity = "switch.adaptive_lighting_adapt_color_joshua_room"; name = "Adapt Color"; }
+          { entity = "switch.adaptive_lighting_sleep_mode_joshua_room"; name = "Sleep Mode"; }
         ];
       }
       {
@@ -140,15 +150,62 @@ let
             name = "Temperature";
             graph = "line";
             type = "sensor";
-            entity = "sensor.joshua_sensor_temperature";
+            entity = "sensor.joshua_temperature";
             detail = 2;
           }
           {
             name = "Humidity";
             graph = "line";
             type = "sensor";
-            entity = "sensor.joshua_sensor_humidity";
+            entity = "sensor.joshua_humidity";
             detail = 2;
+          }
+          {
+            type = "entities";
+            entities = [
+              { entity = "sensor.joshua_thermal_comfort_summer_scharlau_perception"; name = "Summer Scharlau"; }
+              { entity = "sensor.joshua_thermal_comfort_thoms_discomfort_perception"; name = "Thoms Discomfort"; }
+            ];
+          }
+        ];
+      }
+      {
+        title = "Dehumidifier";
+        state_color = true;
+        type = "entities";
+        entities = [
+          { entity = "switch.joshua_dehumidifier"; name = "Enabled"; }
+          { entity = "sensor.joshua_dehumidifier_tank_status"; name = "Tank Status"; }
+          { entity = "sensor.joshua_dehumidifier_energy"; name = "Energy"; }
+          { entity = "sensor.joshua_dehumidifier_power"; name = "Power"; }
+          { entity = "sensor.joshua_mold_indicator"; name = "Mold Indicator"; }
+          { entity = "sensor.joshua_critical_temperature"; name = "Critical Temperature"; }
+          { entity = "sensor.joshua_dew_point"; name = "Dew Point"; }
+        ];
+      }
+    ];
+  };
+
+  garden = {
+    path = "garden";
+    title = "Garden";
+    cards = [
+      {
+        type = "vertical-stack";
+        cards = [
+          {
+            graph = "line";
+            type = "sensor";
+            detail = 2;
+            entity = "sensor.outdoor_temperature";
+            name = "Temperature";
+          }
+          {
+            graph = "line";
+            type = "sensor";
+            entity = "sensor.outdoor_humidity";
+            detail = 2;
+            name = "Humidity";
           }
         ];
       }
@@ -156,69 +213,27 @@ let
         type = "vertical-stack";
         cards = [
           {
-            type = "humidifier";
-            entity = "humidifier.joshua_room_hygrostat";
-            features = [{
-              type = "humidifier-toggle";
-            }];
+            entities = [
+              { entity = "lawn_mower.lewis"; }
+              { entity = "switch.lewis_enable_schedule"; }
+              { entity = "sensor.lewis_mode"; }
+              { entity = "sensor.lewis_next_start"; }
+              { entity = "sensor.lewis_number_of_charging_cycles"; }
+              { entity = "sensor.lewis_number_of_collisions"; }
+              { entity = "sensor.lewis_total_charging_time"; }
+              { entity = "sensor.lewis_total_cutting_time"; }
+              { entity = "sensor.lewis_total_drive_distance"; }
+              { entity = "sensor.lewis_total_running_time"; }
+              { entity = "sensor.lewis_total_searching_time"; }
+            ];
+            type = "entities";
           }
           {
-            title = "Dehumidifier";
-            state_color = true;
-            type = "entities";
-            entities = [
-              { entity = "sensor.joshua_dehumidifier_tank_status"; name = "Tank Status"; }
-              { entity = "sensor.joshua_dehumidifier_energy"; name = "Energy"; }
-              { entity = "sensor.joshua_dehumidifier_power"; name = "Power"; }
-            ];
+            detail = 1;
+            entity = "sensor.lewis_battery";
+            graph = "line";
+            type = "sensor";
           }
-        ];
-      }
-    ];
-  };
-
-  garden = {
-    title = "Garden";
-    path = "garden";
-
-    cards = [
-      {
-        type = "vertical-stack";
-        cards =
-          (optional frigate.enable {
-            type = "custom:frigate-card";
-            cameras = [{
-              camera_entity = "camera.poolhouse";
-              frigate.url = "http://127.0.0.1:${toString frigate.port}";
-              live_provider = "go2rtc";
-              go2rtc.modes = [ "webrtc" ];
-            }];
-            performance.profile = "low";
-            menu.style = "none";
-          }) ++ [
-            {
-              graph = "line";
-              type = "sensor";
-              detail = 1;
-              entity = "sensor.lewis_battery";
-            }
-          ];
-      }
-      {
-        type = "entities";
-
-        entities = [
-          { entity = "lawn_mower.lewis"; }
-          { entity = "switch.lewis_enable_schedule"; }
-          { entity = "sensor.lewis_mode"; }
-          { entity = "sensor.lewis_next_start"; }
-          { entity = "sensor.lewis_number_of_charging_cycles"; }
-          { entity = "sensor.lewis_number_of_collisions"; }
-          { entity = "sensor.lewis_total_charging_time"; }
-          { entity = "sensor.lewis_total_cutting_time"; }
-          { entity = "sensor.lewis_total_drive_distance"; }
-          { entity = "sensor.lewis_total_running_time"; }
-          { entity = "sensor.lewis_total_searching_time"; }
         ];
       }
     ];
@@ -248,14 +263,8 @@ let
             logarithmic_scale = false;
 
             entities = [
-              {
-                entity = "binary_sensor.washing_machine_running";
-                name = "Washing M";
-              }
-              {
-                entity = "binary_sensor.dishwasher_running";
-                name = "Dishwasher";
-              }
+              { entity = "binary_sensor.washing_machine_running"; name = "Washing M"; }
+              { entity = "binary_sensor.dishwasher_running"; name = "Dishwasher"; }
             ];
           }
           {
@@ -297,18 +306,9 @@ let
             state_color = true;
 
             entities = [
-              {
-                entity = "sensor.powerwall_backup_reserve";
-                name = "Battery Reserve";
-              }
-              {
-                entity = "binary_sensor.powerwall_grid_status";
-                name = "Grid Status";
-              }
-              {
-                entity = "switch.powerwall_off_grid_operation";
-                name = "Off-grid Operation";
-              }
+              { entity = "sensor.powerwall_backup_reserve"; name = "Battery Reserve"; }
+              { entity = "binary_sensor.powerwall_grid_status"; name = "Grid Status"; }
+              { entity = "switch.powerwall_off_grid_operation"; name = "Off-grid Operation"; }
             ];
           }
         ];
@@ -341,22 +341,10 @@ let
             state_color = true;
 
             entities = [
-              {
-                entity = "sensor.powerwall_gateway_battery_capacity";
-                name = "Battery Capacity";
-              }
-              {
-                entity = "sensor.powerwall_gateway_battery_remaining";
-                name = "Battery Remaining";
-              }
-              {
-                entity = "sensor.powerwall_gateway_battery_voltage";
-                name = "Battery Voltage";
-              }
-              {
-                entity = "sensor.powerwall_battery_remaining_time";
-                name = "Battery Time";
-              }
+              { entity = "sensor.powerwall_gateway_battery_capacity"; name = "Battery Capacity"; }
+              { entity = "sensor.powerwall_gateway_battery_remaining"; name = "Battery Remaining"; }
+              { entity = "sensor.powerwall_gateway_battery_voltage"; name = "Battery Voltage"; }
+              { entity = "sensor.powerwall_battery_remaining_time"; name = "Battery Time"; }
             ];
           }
         ];
@@ -377,22 +365,10 @@ let
             state_color = true;
 
             entities = [
-              {
-                entity = "sensor.power_production_now";
-                name = "Estimated Production Now";
-              }
-              {
-                entity = "sensor.energy_production_today";
-                name = "Estimated Production Today";
-              }
-              {
-                entity = "sensor.energy_production_tomorrow";
-                name = "Estimated Production Tomorrow";
-              }
-              {
-                entity = "sensor.power_highest_peak_time_today";
-                name = "Peak Time Today";
-              }
+              { entity = "sensor.power_production_now"; name = "Estimated Production Now"; }
+              { entity = "sensor.energy_production_today"; name = "Estimated Production Today"; }
+              { entity = "sensor.energy_production_tomorrow"; name = "Estimated Production Tomorrow"; }
+              { entity = "sensor.power_highest_peak_time_today"; name = "Peak Time Today"; }
             ];
           }
         ];
@@ -405,14 +381,8 @@ let
             period = "hour";
             type = "statistics-graph";
             entities = [
-              {
-                entity = "sensor.powerwall_site_import_cost";
-                name = "Month Import Cost";
-              }
-              {
-                entity = "sensor.powerwall_site_export_compensation";
-                name = "Month Export Compensation";
-              }
+              { entity = "sensor.powerwall_site_import_cost"; name = "Month Import Cost"; }
+              { entity = "sensor.powerwall_site_export_compensation"; name = "Month Export Compensation"; }
             ];
             stat_types = [ "sum" ];
           }
@@ -420,12 +390,7 @@ let
             chart_type = "line";
             period = "hour";
             type = "statistics-graph";
-            entities = [
-              {
-                entity = "sensor.powerwall_aggregate_cost";
-                name = "Month Aggregate Cost";
-              }
-            ];
+            entities = [{ entity = "sensor.powerwall_aggregate_cost"; name = "Month Aggregate Cost"; }];
             stat_types = [ "sum" ];
           }
         ];

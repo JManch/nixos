@@ -12,6 +12,7 @@ let
     mkForce
     optional
     optionalString
+    optionalAttrs
     utils
     getExe'
     mkVMOverride
@@ -60,6 +61,7 @@ in
         "profiler"
         "generic_thermostat"
         "generic_hygrostat"
+        "mold_indicator"
         "hue"
         "webostv"
         "powerwall"
@@ -91,6 +93,7 @@ in
         }))
 
         (utils.flakePkgs args "graham33").heatmiser-for-home-assistant
+        outputs.packages.${pkgs.system}.thermal-comfort
       ] ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;
 
       configWritable = false;
@@ -119,10 +122,16 @@ in
           name = "Lounge Floorplan";
         }];
 
-        lovelace.resources = mkIf frigate.enable [{
-          url = "/local/frigate-hass-card/frigate-hass-card.js";
-          type = "module";
-        }];
+        lovelace.resources = [
+          {
+            type = "js";
+            url = "/local/thermal_comfort_icons.js";
+          }
+          (optionalAttrs frigate.enable {
+            url = "/local/frigate-hass-card/frigate-hass-card.js";
+            type = "module";
+          })
+        ];
 
         notify = [{
           platform = "group";
@@ -151,7 +160,7 @@ in
     systemd.services.home-assistant.preStart =
       let
         inherit (config.services.home-assistant) configDir;
-        inherit (outputs.packages.${pkgs.system}) frigate-hass-card frigate-blueprint;
+        inherit (outputs.packages.${pkgs.system}) frigate-hass-card frigate-blueprint thermal-comfort-icons;
 
         # Removing existing symbolic links so that packages will uninstall if
         # they're removed from config
@@ -169,6 +178,7 @@ in
         mkdir -p "${configDir}/www"
         ${removeExistingLinks "www"}
         [[ -d ${configDir}/blueprints/automation/SgtBatten ]] && rm -rf "${configDir}/blueprints/automation/SgtBatten"
+        ln -fsn "${thermal-comfort-icons}" "${configDir}/www/thermal_comfort_icons.js"
 
         ${optionalString frigate.enable /*bash*/ ''
           ln -fsn "${frigate-hass-card}/frigate-hass-card" "${configDir}/www"

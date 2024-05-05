@@ -90,7 +90,28 @@ lib.mkIf (cfg.enableInternal)
             {% endif %}
           '';
         }
+        {
+          name = "Joshua Critical Temperature";
+          icon = "mdi:thermometer-alert";
+          state = "{{ state_attr('sensor.joshua_mold_indicator', 'estimated_critical_temp') }}";
+          unit_of_measurement = "°C";
+        }
+        {
+          name = "Joshua Dew Point";
+          icon = "mdi:thermometer-water";
+          state = "{{ state_attr('sensor.joshua_mold_indicator', 'dewpoint') }}";
+          unit_of_measurement = "°C";
+        }
       ];
+    }];
+
+    sensor = [{
+      name = "Joshua Mold Indicator";
+      platform = "mold_indicator";
+      indoor_temp_sensor = "sensor.joshua_temperature";
+      indoor_humidity_sensor = "sensor.joshua_humidity";
+      outdoor_temp_sensor = "sensor.outdoor_temperature";
+      calibration_factor = 1.586;
     }];
 
     switch = [{
@@ -104,7 +125,7 @@ lib.mkIf (cfg.enableInternal)
             service = "climate.set_temperature";
             target.entity_id = "climate.hallway";
             data = {
-              temperature = "{{ state_attr('climate.joshua_room_thermostat', 'temperature') |float + 2 }}";
+              temperature = "{{ state_attr('climate.joshua_thermostat', 'temperature') |float + 2 }}";
               hvac_mode = "heat";
             };
           }];
@@ -123,9 +144,9 @@ lib.mkIf (cfg.enableInternal)
 
     climate = [{
       platform = "generic_thermostat";
-      name = "Joshua Room Thermostat";
+      name = "Joshua Thermostat";
       heater = "switch.hallway_thermostat";
-      target_sensor = "sensor.joshua_sensor_temperature";
+      target_sensor = "sensor.joshua_temperature";
       min_temp = 17;
       max_temp = 24;
       target_temp = 19;
@@ -139,20 +160,27 @@ lib.mkIf (cfg.enableInternal)
       precision = 0.5;
     }];
 
-    generic_hygrostat = [{
-      name = "Joshua Room Hygrostat";
-      humidifier = "switch.joshua_dehumidifier";
-      target_sensor = "sensor.joshua_sensor_humidity";
-      min_humidity = 50;
-      max_humidity = 70;
-      target_humidity = 60;
-      away_humidity = 70;
-      away_fixed = true;
-      dry_tolerance = 5;
-      wet_tolerance = 5;
-      device_class = "dehumidifier";
-      min_cycle_duration.minutes = 60;
-      sensor_stale_duration.minutes = 10;
+    thermal_comfort = [{
+      custom_icons = true;
+      sensor = [
+        # The unique IDs here are random and have no meaning
+        {
+          name = "Outdoor Thermal Comfort";
+          temperature_sensor = "sensor.outdoor_temperature";
+          humidity_sensor = "sensor.outdoor_humidity";
+          unique_id = "63eaf56b-9edf-42c7-83c7-cbab6f16fec4";
+        }
+        {
+          name = "Joshua Thermal Comfort";
+          temperature_sensor = "sensor.joshua_temperature";
+          humidity_sensor = "sensor.joshua_humidity";
+          sensor_types = [
+            "summer_scharlau_perception"
+            "thoms_discomfort_perception"
+          ];
+          unique_id = "df0a2172-04da-4c25-85ae-a7e40e775abb";
+        }
+      ];
     }];
   };
 }

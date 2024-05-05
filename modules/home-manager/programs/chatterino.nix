@@ -63,8 +63,8 @@ let
 
         handle() {
           case $1 in
-            openwindow*) open_window "$1" ;;
-            createworkspace*) create_workspace "$1" ;;
+            openwindow\>*) open_window "$1" ;;
+            createworkspace\>*) create_workspace "$1" ;;
           esac
         }
 

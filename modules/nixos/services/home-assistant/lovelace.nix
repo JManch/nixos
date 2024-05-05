@@ -120,7 +120,6 @@ let
           {
             type = "entities";
             state_color = true;
-
             entities = [
               { entity = "light.joshua_lamp_floor_01"; }
               { entity = "light.joshua_strip_bed_01"; }
@@ -130,17 +129,16 @@ let
               { entity = "light.joshua_play_desk_02"; }
             ];
           }
-        ];
-      }
-      {
-        type = "entities";
-        state_color = true;
-
-        entities = [
-          { entity = "switch.adaptive_lighting_joshua_room"; name = "Adaptive Lighting"; }
-          { entity = "switch.adaptive_lighting_adapt_brightness_joshua_room"; name = "Adapt Brightness"; }
-          { entity = "switch.adaptive_lighting_adapt_color_joshua_room"; name = "Adapt Color"; }
-          { entity = "switch.adaptive_lighting_sleep_mode_joshua_room"; name = "Sleep Mode"; }
+          {
+            type = "entities";
+            state_color = true;
+            entities = [
+              { entity = "switch.adaptive_lighting_joshua_room"; name = "Adaptive Lighting"; }
+              { entity = "switch.adaptive_lighting_adapt_brightness_joshua_room"; name = "Adapt Brightness"; }
+              { entity = "switch.adaptive_lighting_adapt_color_joshua_room"; name = "Adapt Color"; }
+              { entity = "switch.adaptive_lighting_sleep_mode_joshua_room"; name = "Sleep Mode"; }
+            ];
+          }
         ];
       }
       {

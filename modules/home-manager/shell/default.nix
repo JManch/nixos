@@ -1,6 +1,6 @@
-{ lib, pkgs, config, ... }:
+{ lib, pkgs, config, ... } @ args:
 let
-  inherit (lib) mkEnableOption mkOption types mkIf optionals;
+  inherit (lib) utils mkEnableOption mkOption types mkIf optionals;
   cfg = config.modules.shell;
 in
 {
@@ -29,6 +29,7 @@ in
       tokei
       rename
       nurl # tool for generating nix fetcher calls from urls
+      (utils.flakePkgs args "yaml2nix").default
     ] ++ optionals cfg.sillyTools [
       fortune
       cowsay

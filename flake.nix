@@ -75,6 +75,13 @@
     mint.url = "github:JManch/mint/nix-fix";
     mint.inputs.nixpkgs.follows = "nixpkgs";
     mint.inputs.rust-overlay.follows = "rust-overlay";
+
+    cargo2nix.url = "github:cargo2nix/cargo2nix";
+    cargo2nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    yaml2nix.url = "github:euank/yaml2nix";
+    yaml2nix.inputs.nixpkgs.follows = "nixpkgs";
+    yaml2nix.inputs.cargo2nix.follows = "cargo2nix";
   };
 
   outputs = { self, nixpkgs, home-manager, ... } @ inputs:

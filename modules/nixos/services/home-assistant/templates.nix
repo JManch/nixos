@@ -77,6 +77,19 @@ lib.mkIf (cfg.enableInternal)
           unit_of_measurement = "GBP";
           state_class = "total_increasing";
         }
+        {
+          name = "Joshua Dehumidifier Tank Status";
+          icon = "mdi:water";
+          state = ''
+            {% if is_state('switch.joshua_dehumidifier', 'off') %}
+              Unknown
+            {% elif is_state('switch.joshua_dehumidifier', 'on') and states('sensor.joshua_dehumidifier_power') | float == 0 %}
+              Full
+            {% else %}
+              Ok
+            {% endif %}
+          '';
+        }
       ];
     }];
 
@@ -124,6 +137,22 @@ lib.mkIf (cfg.enableInternal)
       min_cycle_duration.minutes = 10;
       away_temp = 16;
       precision = 0.5;
+    }];
+
+    generic_hygrostat = [{
+      name = "Joshua Room Hygrostat";
+      humidifier = "switch.joshua_dehumidifier";
+      target_sensor = "sensor.joshua_sensor_humidity";
+      min_humidity = 50;
+      max_humidity = 70;
+      target_humidity = 60;
+      away_humidity = 70;
+      away_fixed = true;
+      dry_tolerance = 5;
+      wet_tolerance = 5;
+      device_class = "dehumidifier";
+      min_cycle_duration.minutes = 60;
+      sensor_stale_duration.minutes = 10;
     }];
   };
 }

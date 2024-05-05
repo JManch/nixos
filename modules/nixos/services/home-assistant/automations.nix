@@ -1,6 +1,6 @@
 { lib, config, inputs, ... }:
 let
-  inherit (lib) mkIf head optional;
+  inherit (lib) mkIf head optional attrValues;
   inherit (secretCfg) devices;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) frigate;
@@ -14,7 +14,7 @@ let
       path = "SgtBatten/frigate_notifications.yaml";
       input = {
         camera = "camera.driveway";
-        notify_device = (head devices).id;
+        notify_device = (head (attrValues devices)).id;
         notify_group = "All Notify Devices";
         base_url = "https://home-notif.${fqDomain}";
         title = "Security Alert";
@@ -27,52 +27,112 @@ let
     };
   };
 
-  heatingTimeToggle = mode:
-    let
-      oppositeMode = if mode == "enable" then "disable" else "enable";
-    in
-    {
-      alias = "${if mode == "enable" then "Enable" else "Disable"} Heating";
-      mode = "single";
-      trigger = [
-        {
-          platform = "homeassistant";
-          event = "start";
-        }
-        {
-          platform = "time";
-          at = "input_datetime.heating_${mode}_time";
-        }
-      ];
-      condition = [
-        {
+  heatingTimeToggle = map
+    (enable:
+      let
+        stringMode = if enable then "enable" else "disable";
+        oppositeMode = if enable then "disable" else "enable";
+      in
+      {
+        alias = "Heating ${if enable then "Enable" else "Disable"}";
+        mode = "single";
+        trigger = [
+          {
+            platform = "homeassistant";
+            event = "start";
+          }
+          {
+            platform = "time";
+            at = "input_datetime.heating_${stringMode}_time";
+          }
+        ];
+        condition = [{
           condition = "time";
-          after = "input_datetime.heating_${mode}_time";
+          after = "input_datetime.heating_${stringMode}_time";
           before = "input_datetime.heating_${oppositeMode}_time";
-        }
-      ];
-      action = [
-        {
+        }];
+        action = [{
           service = "climate.set_hvac_mode";
           metadata = { };
           data = {
-            hvac_mode = if mode == "enable" then "heat" else "off";
+            hvac_mode = if enable then "heat" else "off";
           };
           target.entity_id = [
             "climate.joshua_room_thermostat"
             "climate.hallway"
           ];
-        }
-      ];
-    };
+        }];
+      }) [ true false ];
+
+  joshuaDehumidifierToggle = map
+    (enable:
+      {
+        alias = "Joshua Dehumidifier ${if enable then "Enable" else "Disable"}";
+        mode = "single";
+        trigger = [
+          {
+            platform = "homeassistant";
+            event = "start";
+          }
+          {
+            platform = "time";
+            at = if enable then "21:00:00" else "10:00:00";
+          }
+        ];
+        condition = [{
+          condition = "and";
+          conditions = [
+            {
+              condition = "time";
+              after = if enable then "21:00:00" else "10:00:00";
+              before = if enable then "10:00:00" else "21:00:00";
+            }
+          ] ++ optional enable {
+            type = "is_plugged_in";
+            condition = "device";
+            device_id = devices.mobile_app_joshua_pixel_5.id;
+            entity_id = devices.mobile_app_joshua_pixel_5.chargingStatusId;
+            domain = "binary_sensor";
+          };
+        }];
+        action = [{
+          service = "humidifier.turn_${if enable then "on" else "off"}";
+          metadata = { };
+          data = { };
+          target.entity_id = "humidifier.joshua_room_hygrostat";
+        }];
+      }) [ true false ];
+
+  joshuaDehumidifierTankFull = [{
+    alias = "Joshua Dehumidifier Full Notify";
+    mode = "single";
+    trigger = [{
+      platform = "state";
+      entity_id = "sensor.joshua_dehumidifier_tank_status";
+      to = "Full";
+      for = {
+        hours = 0;
+        minutes = 5;
+        seconds = 0;
+      };
+    }];
+    condition = [ ];
+    action = [{
+      service = "notify.mobile_app_joshua_pixel_5";
+      data = {
+        title = "Dehumidifier";
+        message = "Tank full";
+      };
+    }];
+  }];
 in
 mkIf (cfg.enableInternal)
 {
   services.home-assistant.config = {
-    automation = [
-      (heatingTimeToggle "enable")
-      (heatingTimeToggle "disable")
-    ] ++ optional frigate.enable frigateEntranceNotify;
+    automation = heatingTimeToggle
+      ++ joshuaDehumidifierToggle
+      ++ joshuaDehumidifierTankFull
+      ++ optional frigate.enable frigateEntranceNotify;
 
     input_datetime = {
       heating_disable_time = {

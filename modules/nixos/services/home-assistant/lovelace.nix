@@ -152,6 +152,28 @@ let
           }
         ];
       }
+      {
+        type = "vertical-stack";
+        cards = [
+          {
+            type = "humidifier";
+            entity = "humidifier.joshua_room_hygrostat";
+            features = [{
+              type = "humidifier-toggle";
+            }];
+          }
+          {
+            title = "Dehumidifier";
+            state_color = true;
+            type = "entities";
+            entities = [
+              { entity = "sensor.joshua_dehumidifier_tank_status"; name = "Tank Status"; }
+              { entity = "sensor.joshua_dehumidifier_energy"; name = "Energy"; }
+              { entity = "sensor.joshua_dehumidifier_power"; name = "Power"; }
+            ];
+          }
+        ];
+      }
     ];
   };
 

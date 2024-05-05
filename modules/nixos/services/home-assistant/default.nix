@@ -15,6 +15,7 @@ let
     utils
     getExe'
     mkVMOverride
+    mapAttrsToList
     escapeShellArg;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -58,6 +59,7 @@ in
         "mobile_app"
         "profiler"
         "generic_thermostat"
+        "generic_hygrostat"
         "hue"
         "webostv"
         "powerwall"
@@ -125,10 +127,7 @@ in
         notify = [{
           platform = "group";
           name = "All Notify Devices";
-          services =
-            map
-              (device: { service = device.name; })
-              devices;
+          services = mapAttrsToList (name: _: { service = name; }) devices;
         }];
       };
     };
@@ -220,6 +219,7 @@ in
         "/var/lib/hass"
         "/var/backup/postgresql/hass.sql"
       ];
+      exclude = [ "*.log*" ];
 
       restore =
         let

@@ -15,8 +15,6 @@ mkIf cfg.enable
     "Zigbee2mqtt requires caddy to be enabled"
   ];
 
-  # TODO: Eventually might be worth defining device.yaml and groups.yaml config
-  # declaratively
   services.zigbee2mqtt = {
     enable = true;
     dataDir = "/var/lib/zigbee2mqtt";
@@ -67,6 +65,13 @@ mkIf cfg.enable
       }
       reverse_proxy http://127.0.0.1:${toString cfg.port}
     '';
+  };
+
+  backups.zigbee2mqtt = {
+    paths = [ config.services.zigbee2mqtt.dataDir ];
+    exclude = [
+      "log"
+    ];
   };
 
   persistence.directories = [{

@@ -192,9 +192,9 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
             ];
           in
           concatMap workspaceBinds workspaceNumbers
-        ) ++ (optional audio.enable (
+        ) ++ (optional audio.enable
           ", XF86AudioMute, exec, ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle"
-        ));
+        );
 
       settings.bindm = [
         # Mouse window interaction

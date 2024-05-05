@@ -39,8 +39,9 @@ mkMerge [
             sh = getExe' pkgs.bash "sh";
             host = getExe' pkgs.host "host";
             sleep = getExe' pkgs.coreutils "sleep";
+            echo = getExe' pkgs.coreutils "echo";
           in
-          "${sh} -c 'while ! ${host} ${fqDomain}; do ${sleep} 1; done'";
+          "${sh} -c 'while ! ${host} ${fqDomain}; do ${echo} 'host failed, sleeping'; ${sleep} 1; done'";
       };
     };
   })

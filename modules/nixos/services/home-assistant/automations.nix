@@ -110,11 +110,7 @@ let
       platform = "state";
       entity_id = "sensor.joshua_dehumidifier_tank_status";
       to = "Full";
-      for = {
-        hours = 0;
-        minutes = 5;
-        seconds = 0;
-      };
+      for.minutes = 5;
     }];
     condition = [ ];
     action = [{
@@ -133,13 +129,9 @@ let
       trigger = [{
         platform = "numeric_state";
         entity_id = [ "sensor.joshua_mold_indicator" ];
-        above = mkIf enable 70;
+        above = mkIf enable 73;
         below = mkIf (!enable) 65;
-        for = {
-          hours = 0;
-          minutes = if enable then 5 else 30;
-          seconds = 0;
-        };
+        for.minutes = if enable then 0 else 30;
       }];
       condition = [ ];
       action = [

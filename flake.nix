@@ -72,7 +72,7 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
 
-    mint.url = "github:JManch/mint/nix-fix";
+    mint.url = "github:trumank/mint";
     mint.inputs.nixpkgs.follows = "nixpkgs";
     mint.inputs.rust-overlay.follows = "rust-overlay";
 

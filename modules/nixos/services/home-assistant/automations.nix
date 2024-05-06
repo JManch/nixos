@@ -110,7 +110,7 @@ let
       platform = "state";
       entity_id = "sensor.joshua_dehumidifier_tank_status";
       to = "Full";
-      for.minutes = 5;
+      for.minutes = 1;
     }];
     condition = [ ];
     action = [{

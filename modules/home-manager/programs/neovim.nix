@@ -12,17 +12,14 @@ mkIf cfg.enable
 {
   home.packages = [ pkgs.neovide ];
 
-  upstream.programs.neovim = {
+  programs.neovim = {
     enable = true;
     package = (utils.flakePkgs args "neovim-nightly-overlay").default;
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;
     defaultEditor = true;
-    # Some treesitter parsers need this library. I had to copy and modify the
-    # home-manager module for this because the way neovim is wrapped makes it a
-    # nightmare to override.
-    extraLibraries = [ pkgs.stdenv.cc.cc.lib ];
+
     extraPackages = with pkgs; [
       # Runtime dependendies
       fzf
@@ -49,6 +46,16 @@ mkIf cfg.enable
       # matlab-language-server
       # prettierd
       # black
+    ];
+
+    # Some treesitter parsers need this library. I had to copy and modify the
+    # home-manager module for this because the way neovim is wrapped makes it a
+    # nightmare to override.
+    extraWrapperArgs = [
+      "--suffix"
+      "LD_LIBRARY_PATH"
+      ":"
+      "${lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}"
     ];
   };
 

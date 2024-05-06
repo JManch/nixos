@@ -111,7 +111,7 @@ lib.mkIf (cfg.enableInternal)
       indoor_temp_sensor = "sensor.joshua_temperature";
       indoor_humidity_sensor = "sensor.joshua_humidity";
       outdoor_temp_sensor = "sensor.outdoor_temperature";
-      calibration_factor = 1.586;
+      calibration_factor = 1.754;
     }];
 
     switch = [{

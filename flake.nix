@@ -82,6 +82,9 @@
     yaml2nix.url = "github:euank/yaml2nix";
     yaml2nix.inputs.nixpkgs.follows = "nixpkgs";
     yaml2nix.inputs.cargo2nix.follows = "cargo2nix";
+
+    broadcast-box.url = "github:JManch/broadcast-box/nix-flake";
+    broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, home-manager, ... } @ inputs:

@@ -2,7 +2,6 @@
 let
   inherit (lib) mkEnableOption mkOption utils fetchers types;
   homeConfig = utils.homeConfig args;
-  isWayland = fetchers.isWayland homeConfig;
 in
 {
   imports = lib.utils.scanPaths ./.;
@@ -16,7 +15,7 @@ in
       enable = mkEnableOption "Wine";
       package = mkOption {
         type = types.package;
-        default = with pkgs.wine64Packages; if isWayland then wayland else stable;
+        default = pkgs.wineWowPackages.stable;
         description = "The default wine package to use";
       };
     };

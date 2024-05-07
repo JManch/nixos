@@ -76,7 +76,6 @@
         trim = true;
         bootLabel = "boot";
         zpoolName = "zpool";
-        unstableZfs = true;
         forceImportRoot = false;
       };
     };

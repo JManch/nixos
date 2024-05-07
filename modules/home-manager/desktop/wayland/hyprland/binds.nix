@@ -176,7 +176,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
         ] ++ (
           # Go to empty workspace on all monitors
           concatMap
-            (m: [
+            (m: optionals (m.mirror == null) [
               "${mod}, D, focusmonitor, ${m.name}"
               "${mod}, D, workspace, name:DESKTOP ${toString m.number}"
             ])

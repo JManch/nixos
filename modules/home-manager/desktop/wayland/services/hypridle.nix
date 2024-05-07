@@ -14,6 +14,8 @@ in
     inputs.hypridle.homeManagerModules.default
   ];
 
+  disabledModules = [ "${inputs.home-manager}/modules/services/hypridle.nix" ];
+
   config = mkIf cfg.enable {
     assertions = utils.asserts [
       swaylock.enable

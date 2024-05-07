@@ -27,8 +27,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && (fetchers.isWayland config
     };
 
     Service = {
-      # TODO: Add --no-cache flag when 0.9.5 releases
-      ExecStart = getExe' pkgs.swww "swww-daemon";
+      ExecStart = "${getExe' pkgs.swww "swww-daemon"} --no-cache";
     };
 
     Install.WantedBy = [ "graphical-session.target" ];

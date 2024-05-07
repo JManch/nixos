@@ -12,7 +12,7 @@ let
   spotify-player = (
     utils.addPatches
       pkgs.spotify-player
-      [ ../../../patches/spotifyPlayerNotifs.diff ]
+      [ ../../../patches/spotifyPlayerNotifs.patch ]
   ).override {
     withDaemon = false;
   };

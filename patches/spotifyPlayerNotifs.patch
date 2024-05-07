@@ -1,0 +1,15 @@
+diff --git a/spotify_player/src/client/mod.rs b/spotify_player/src/client/mod.rs
+index fa1ba1d..0ec9539 100644
+--- a/spotify_player/src/client/mod.rs
++++ b/spotify_player/src/client/mod.rs
+@@ -1494,7 +1494,9 @@ impl Client {
+             ))
+             .body(&get_text_from_format_str(
+                 &configs.app_config.notify_format.body,
+-            ));
++            ))
++            .urgency(notify_rust::Urgency::Low)
++            .hint(notify_rust::Hint::Custom("x-canonical-private-synchronous".to_string(),"anything".to_string()));
+         if configs.app_config.notify_timeout_in_secs > 0 {
+             n.timeout(std::time::Duration::from_secs(
+                 configs.app_config.notify_timeout_in_secs,

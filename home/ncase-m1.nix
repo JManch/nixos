@@ -58,7 +58,7 @@
       stremio.enable = true;
       mpv.enable = true;
       mpv.jellyfinShim.enable = true;
-      chatterino.enable = true;
+      chatterino.enable = false;
       images.enable = true;
       anki.enable = true;
       zathura.enable = true;

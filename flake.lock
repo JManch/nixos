@@ -70,11 +70,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1715016011,
-        "narHash": "sha256-rVo6rMjHNZy0pMUfLWMglQO3tJuXgmUvaulYYAJo1dQ=",
+        "lastModified": 1715040263,
+        "narHash": "sha256-P4tWNba8AS2hRUNkZfTuveXvO5Dgg6srDH2nZyWnvc4=",
         "owner": "JManch",
         "repo": "broadcast-box",
-        "rev": "00a68298742bbbd56d93ade6d7881e671652fc28",
+        "rev": "b4773d15dc7ce4c970b75c7e96cb289066de1d67",
         "type": "github"
       },
       "original": {
@@ -1088,16 +1088,16 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1714409850,
-        "narHash": "sha256-cjl9uRtjMkDycdikxRIo3l63suZEMpLSaq8YgNXHzLk=",
-        "owner": "JManch",
+        "lastModified": 1714253743,
+        "narHash": "sha256-mdTQw2XlariysyScCv2tTE45QSU9v/ezLcHJ22f0Nxc=",
+        "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "39a340eeecf499c64ea24783a380ee13e49ef5a4",
+        "rev": "58a1abdbae3217ca6b702f03d3b35125d88a2994",
         "type": "github"
       },
       "original": {
-        "owner": "JManch",
-        "ref": "nixos-unstable-personal",
+        "owner": "NixOS",
+        "ref": "58a1abdbae3217ca6b702f03d3b35125d88a2994",
         "repo": "nixpkgs",
         "type": "github"
       }

@@ -6,8 +6,7 @@
     # flake needs nixpkgs.follows defined
     # Update individual inputs using `nix flake lock --update-input <INPUT_NAME>`
 
-    nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-personal";
-    # nixpkgs.url = "git+file:///home/joshua/files/repos/nixpkgs?ref=nixos-unstable-personal";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=58a1abdbae3217ca6b702f03d3b35125d88a2994";
     impermanence.url = "github:nix-community/impermanence";
     firstBoot.url = "github:JManch/false";
 

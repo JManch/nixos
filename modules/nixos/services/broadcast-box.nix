@@ -10,10 +10,6 @@ in
     inputs.broadcast-box.nixosModules.default
   ];
 
-  disabledModules = [
-    "${inputs.nixpkgs}/nixos/modules/services/video/broadcast-box.nix"
-  ];
-
   services.broadcast-box = {
     enable = true;
     http.port = cfg.port;

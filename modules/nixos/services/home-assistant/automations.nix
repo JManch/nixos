@@ -130,7 +130,7 @@ let
         platform = "numeric_state";
         entity_id = [ "sensor.joshua_mold_indicator" ];
         above = mkIf enable 73;
-        below = mkIf (!enable) 65;
+        below = mkIf (!enable) 67;
         for.minutes = if enable then 0 else 30;
       }];
       condition = [ ];

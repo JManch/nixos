@@ -20,11 +20,13 @@ let
     optionals
     fetchers;
   inherit (osConfig.device) monitors;
+  inherit (desktopCfg.style) gapSize borderWidth;
 
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
   osDesktopEnabled = osConfig.usrEnv.desktop.enable;
+  primaryMonitor = fetchers.primaryMonitor osConfig;
 
   hyprlandPkgs = utils.flakePkgs args "hyprland";
   hyprland = hyprlandPkgs.hyprland.overrideAttrs (old: {
@@ -143,13 +145,11 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
       exec-once =
         let
           xclip = getExe pkgs.xclip;
-          hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
           wlPaste = getExe' pkgs.wl-clipboard "wl-paste";
           cat = getExe' pkgs.coreutils "cat";
           cmp = getExe' pkgs.diffutils "cmp";
         in
         [
-          "${hyprctl} dispatch focusmonitor ${(fetchers.primaryMonitor osConfig).name}"
           # Temporary and buggy fix for pasting into wine applications
           # https://github.com/hyprwm/Hyprland/issues/2319
           # https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4359
@@ -157,7 +157,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
           "${wlPaste} -t text -w sh -c 'v=$(${cat}); ${cmp} -s <(${xclip} -selection clipboard -o)  <<< \"$v\" || ${xclip} -selection clipboard <<< \"$v\"'"
         ];
 
-      general = with desktopCfg.style; {
+      general = {
         gaps_in = gapSize / 2;
         gaps_out = gapSize;
         border_size = borderWidth;
@@ -168,6 +168,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         "col.inactive_border" = "0xff${colors.base00}";
         cursor_inactive_timeout = 3;
         allow_tearing = cfg.tearing;
+        default_cursor_monitor = primaryMonitor.name;
       };
 
       windowrulev2 =
@@ -267,29 +268,24 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         enable_stdout_logs = false;
       };
 
-      workspace =
-        let
-          inherit (desktopCfg.style) gapSize;
-          primaryMonitor = fetchers.primaryMonitor osConfig;
-        in
-        (concatMap
-          (
-            m: (
-              imap
-                (
-                  i: w: "${toString w}, monitor:${m.name}" +
+      workspace = (concatMap
+        (
+          m: (
+            imap
+              (
+                i: w: "${toString w}, monitor:${m.name}" +
                   optionalString (i == 1) ", default:true" +
                   optionalString (i < 3) ", persistent:true"
-                )
-                m.workspaces
-            )
+              )
+              m.workspaces
           )
-          monitors
-        ) ++ [
-          "name:GAME, monitor:${primaryMonitor.name}"
-          "name:VM, monitor:${primaryMonitor.name}"
-          "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
-        ];
+        )
+        monitors
+      ) ++ [
+        "name:GAME, monitor:${primaryMonitor.name}"
+        "name:VM, monitor:${primaryMonitor.name}"
+        "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
+      ];
 
       plugin = {
         hyprexpo = {

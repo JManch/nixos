@@ -58,11 +58,20 @@ mkIf cfg.enable
             target_temperature: 80
           # Run at 257 for slightly better performance but louder fans
           power_cap: 231.0
-          performance_level: auto
+          performance_level: manual
           max_core_clock: 2394
           voltage_offset: -50
-          power_states: {}
-
+          power_profile_mode_index: 0
+          power_states:
+            memory_clock:
+            - 0
+            - 1
+            - 2
+            - 3
+            core_clock:
+            - 0
+            - 1
+            - 2
     '';
   };
 

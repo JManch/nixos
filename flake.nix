@@ -30,7 +30,8 @@
     agenix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.inputs.home-manager.follows = "home-manager";
 
-    hyprland.url = "github:hyprwm/Hyprland?rev=0b215c5f246d3fde6c023e78b3e3579f7498c172";
+    hyprland.url = "github:hyprwm/Hyprland?rev=cba1ade848feac44b2eda677503900639581c3f4";
+    hyprland.inputs.nixpkgs.follows = "nixpkgs";
 
     hyprland-plugins.url = "github:hyprwm/hyprland-plugins";
     hyprland-plugins.inputs.hyprland.follows = "hyprland";

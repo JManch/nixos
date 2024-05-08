@@ -85,6 +85,9 @@
 
     broadcast-box.url = "github:JManch/broadcast-box/nix-flake";
     broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
+
+    microvm.url = "github:astro/microvm.nix";
+    microvm.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, home-manager, ... } @ inputs:

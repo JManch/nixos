@@ -11,6 +11,7 @@ in
     virtualisation = {
       libvirt.enable = mkEnableOption "libvirt virtualisation";
       containerisation.enable = mkEnableOption "containerisation virtualisation";
+      microvm.enable = mkEnableOption "microvm virtual machines";
 
       vmVariant = mkOption {
         type = types.bool;

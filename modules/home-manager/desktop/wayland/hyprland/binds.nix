@@ -150,7 +150,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
 
           # Dwindle
           "${mod}, P, pseudo,"
-          "${mod}, M, exec, ${toggleDwindleGaps.outPath}"
+          "${modShiftCtrl}, G, exec, ${toggleDwindleGaps.outPath}"
           "${mod}, X, layoutmsg, togglesplit"
           "${modShift}, X, layoutmsg, swapsplit"
 
@@ -167,6 +167,9 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
 
           # Workspaces other
           "${mod}, N, workspace, previous"
+          "${mod}, M, workspace, emptym"
+          "${modShift}, M, movetoworkspace, emptym"
+          "${modShiftCtrl}, M, movetoworkspacesilent, emptym"
           "${mod}, S, togglespecialworkspace, social"
           "${modShift}, S, movetoworkspacesilent, special:social"
           "${mod}, G, workspace, name:GAME"

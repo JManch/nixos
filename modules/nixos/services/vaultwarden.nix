@@ -107,6 +107,10 @@ mkIf cfg.enable
       INVITATIONS_ALLOWED = false;
       SHOW_PASSWORD_HINT = false;
       ROCKET_PORT = cfg.port;
+      # WARN: Vaultwarden publically exposes icons under /icons so website
+      # domains in your vault could be exposed. Since we limit vaultwarden
+      # exposure to LAN this is ok.
+      ICON_BLACKLIST_NON_GLOBAL_IPS = false;
     };
   };
 

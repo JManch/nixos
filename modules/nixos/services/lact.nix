@@ -27,6 +27,21 @@ mkIf cfg.enable
   services.lact = {
     enable = true;
 
+    # Master branch fixes power profile modifications
+    package = pkgs.lact.overrideAttrs (oldAttrs: rec {
+      version = "git";
+      src = pkgs.fetchFromGitHub {
+        owner = "ilya-zlobintsev";
+        repo = "LACT";
+        rev = "974e6ff442110fcfa478409c35e20002fe94708b";
+        hash = "sha256-rcKZNkgyn0SJGueN/3l/Z7NHc0ncXrYgZDal2g1VgVE=";
+      };
+      cargoDeps = oldAttrs.cargoDeps.overrideAttrs (_: {
+        inherit src;
+        outputHash = "sha256-CMK8o1Hcs5E+GtP9EgKmAa5fXHsY5PCYuFQh1zf0YE4=";
+      });
+    });
+
     # Can't use nix yaml because the keys for fan curve have to be integers
     settings = /*yaml*/ ''
 

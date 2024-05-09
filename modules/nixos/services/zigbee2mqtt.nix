@@ -4,6 +4,7 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy mosquitto;
   inherit (config.age.secrets) zigbee2mqttYamlSecrets mqttZigbee2mqttPassword;
+  inherit (config.services.zigbee2mqtt) dataDir;
   cfg = config.modules.services.zigbee2mqtt;
 in
 mkIf cfg.enable
@@ -68,14 +69,13 @@ mkIf cfg.enable
   };
 
   backups.zigbee2mqtt = {
-    paths = [ config.services.zigbee2mqtt.dataDir ];
-    exclude = [
-      "log"
-    ];
+    paths = [ dataDir ];
+    exclude = [ "log" ];
+    restore.pathOwnership.${dataDir} = { user = "zigbee2mqtt"; group = "zigbee2mqtt"; };
   };
 
   persistence.directories = [{
-    directory = config.services.zigbee2mqtt.dataDir;
+    directory = dataDir;
     user = "zigbee2mqtt";
     group = "zigbee2mqtt";
     mode = "770";

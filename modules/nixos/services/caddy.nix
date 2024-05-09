@@ -97,7 +97,6 @@ mkMerge [
       '';
 
       extraConfig = ''
-
         (lan_only) {
           @block {
             not remote_ip ${cfg.lanAddressRanges}
@@ -106,7 +105,6 @@ mkMerge [
             close
           }
         }
-
       '';
 
       virtualHosts."logs.${fqDomain}".extraConfig = ''

@@ -86,6 +86,20 @@ mkIf cfg.enable
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 
+  backups.qbittorrent-nox =
+    let
+      configPath = "/var/lib/qbittorrent-nox/qBittorrent/config";
+    in
+    {
+      paths = [ configPath ];
+      exclude = [ "ipc-socket" "lockfile" "*.lock" ];
+
+      restore = {
+        removeExisting = false;
+        pathOwnership.${configPath} = { user = "qbittorrent-nox"; group = "qbittorrent-nox"; };
+      };
+    };
+
   persistence.directories = [{
     directory = "/var/lib/qbittorrent-nox";
     user = "qbittorrent-nox";

@@ -9,4 +9,5 @@
   shoutrrr = pkgs.callPackage ./shoutrrr.nix { };
   thermal-comfort = pkgs.callPackage ./thermal-comfort.nix { };
   thermal-comfort-icons = pkgs.callPackage ./thermal-comfort-icons.nix { };
+  minecraft-plugins = import ./minecraft-plugins { inherit pkgs; };
 }

@@ -117,6 +117,20 @@
         enable = true;
         server.enable = true;
       };
+
+      minecraft-server = {
+        enable = true;
+        memory = 3000;
+        interfaces = [ "wg-friends" ];
+        plugins = [
+          "vivecraft"
+          "squaremap"
+          "aura-skills"
+          "levelled-mobs"
+          "tab-tps"
+          "luck-perms"
+        ];
+      };
     };
 
     system = {

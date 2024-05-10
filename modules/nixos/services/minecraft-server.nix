@@ -14,7 +14,6 @@ let
 
   files = mapAttrs (name: value: pkgs.writeText "${baseNameOf name}" value) cfg.files;
   availablePlugins = outputs.packages.${pkgs.system}.minecraft-plugins;
-  mysqlRequired = any (p: elem p [ "aura-skills" ]) cfg.plugins;
   pluginEnabled = p: elem p cfg.plugins;
 in
 mkIf cfg.enable
@@ -91,14 +90,6 @@ mkIf cfg.enable
   modules.services.minecraft-server.files = mkMerge [
     (mkIf (pluginEnabled "aura-skills") {
       "plugins/AuraSkills/config.yml" = /*yaml*/ ''
-        sql:
-          enabled: true
-          type: mysql
-          host: localhost
-          port: ${toString config.services.mysql.settings.mysqld.port}
-          database: auraskills
-          username: auraskills
-          password: auraskills
         on_death:
           reset_xp: true
       '';
@@ -160,48 +151,16 @@ mkIf cfg.enable
     reverse_proxy http://127.0.0.1:25566
   '';
 
-  services.mysql = mkIf mysqlRequired {
-    enable = true;
-    package = pkgs.mariadb;
-    ensureDatabases = optional (elem "aura-skills" cfg.plugins) "auraskills";
-    settings.mysqld.port = 3306;
-    ensureUsers = [{
-      name = "auraskills";
-      ensurePermissions = {
-        "auraskills.*" = "ALL PRIVILEGES";
-      };
-    }];
-  };
-
-  users.users.mysql.extraGroups = [ "minecraft" ];
-
-  systemd.services.mysql.postStart = mkIf (pluginEnabled "aura-skills") (mkAfter ''
-    source ${minecraftSecrets.path}
-    ${getExe' config.services.mysql.package "mysql"} <<EOF
-      ALTER USER 'auraskills'@'localhost'
-        IDENTIFIED VIA unix_socket OR mysql_native_password
-        USING PASSWORD('auraskills');
-    EOF
-  '');
-
   networking.firewall.interfaces = (genAttrs cfg.interfaces
     (_: {
       allowedTCPPorts = [ cfg.port ];
       allowedUDPPorts = [ cfg.port ];
     }));
 
-  persistence.directories = [
-    {
-      directory = "/var/lib/minecraft";
-      user = "minecraft";
-      group = "minecraft";
-      mode = "755";
-    }
-    {
-      directory = "/var/lib/mysql";
-      user = "mysql";
-      group = "mysql";
-      mode = "755";
-    }
-  ];
+  persistence.directories = [{
+    directory = "/var/lib/minecraft";
+    user = "minecraft";
+    group = "minecraft";
+    mode = "755";
+  }];
 }

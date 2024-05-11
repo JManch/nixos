@@ -1,8 +1,17 @@
 { lib
 , fetchurl
+, fetchFromGitHub
 , stdenvNoCC
 , ...
 }:
+let
+  srcRepo = fetchFromGitHub {
+    owner = "ArcanePlugins";
+    repo = "LevelledMobs";
+    rev = "a85cf9da01c23c0cb655bb34e7c5a81c75a19a23";
+    sha256 = "sha256-TQHNKAlgSBoYb5NHiDpww12gD8mYTC7QceFK7CdT8+A=";
+  };
+in
 stdenvNoCC.mkDerivation rec {
   pname = "levelled-mobs";
   version = "3.15.4";
@@ -17,6 +26,7 @@ stdenvNoCC.mkDerivation rec {
 
   installPhase = ''
     install -m555 -D ${src} -t "$out"
+    install -m444 -D ${srcRepo}/src/main/resources/* -t "$out/config"
   '';
 
   meta = with lib; {

@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkVMOverride optionalString utils;
+  inherit (lib) mkIf mkVMOverride optionalString utils optional;
   inherit (config.device) ipAddress;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.services) hass mosquitto caddy;
@@ -177,14 +177,14 @@ mkIf cfg.enable
         default_query = "mp4";
       };
 
-      webrtc = {
-        listen = ":8555";
+      webrtc = mkIf cfg.webrtc.enable {
+        listen = ":${toString cfg.webrtc.port}";
         candidates = [
-          "${ipAddress}:8555"
+          "${ipAddress}:${toString cfg.webrtc.port}"
           # "stun" here translates to Google's STUN server in the go2rtc code
           # https://github.com/AlexxIT/go2rtc/blob/5fa31fe4d6cf0e77562b755d52e8ed0165f89d25/internal/webrtc/candidates.go#L21
           # https://github.com/AlexxIT/go2rtc/blob/5fa31fe4d6cf0e77562b755d52e8ed0165f89d25/pkg/webrtc/helpers.go#L170
-          "stun:8555"
+          "stun:${toString cfg.webrtc.port}"
         ];
       };
 
@@ -203,16 +203,18 @@ mkIf cfg.enable
     RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
     SystemCallFilter = [ "@system-service" "~@privileged" ];
     SocketBindDeny = "any";
-    SocketBindAllow = [ 8555 8554 1984 ];
+    SocketBindAllow = [ 8554 1984 ] ++ optional cfg.webrtc.enable cfg.webrtc.port;
     # go2rtc sometimes randomly crashes
     Restart = "on-failure";
     RestartSec = 10;
   };
 
-  # Because WebRTC port has to be forwarded
-  modules.system.networking.publicPorts = [ 8555 ];
-  networking.firewall.allowedTCPPorts = [ 8555 ];
-  networking.firewall.allowedUDPPorts = [ 8555 ];
+  # Always consider a public port because of router forwarding rule
+  modules.system.networking.publicPorts = cfg.webrtc.port;
+  networking.firewall = mkIf cfg.webrtc.enable {
+    allowedTCPPorts = cfg.webrtc.port;
+    allowedUDPPorts = cfg.webrtc.port;
+  };
 
   services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = [{
     addr = "127.0.0.1";

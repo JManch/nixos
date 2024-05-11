@@ -58,6 +58,8 @@
 
       frigate = {
         enable = true;
+        # Disabling in an attempt to workaround https://github.com/AlexxIT/go2rtc/issues/716
+        webrtc.enable = false;
         nvrAddress = "192.168.88.229";
       };
 

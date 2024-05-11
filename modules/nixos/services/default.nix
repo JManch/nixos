@@ -269,6 +269,15 @@ in
           IP address of the NVR on the local network.
         '';
       };
+
+      webrtc = {
+        enable = (mkEnableOption "WebRTC streams with Go2RTC") // { default = true; };
+
+        port = mkOption {
+          type = types.port;
+          default = 8555;
+        };
+      };
     };
 
     mosquitto = {

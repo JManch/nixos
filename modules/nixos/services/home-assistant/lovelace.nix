@@ -406,7 +406,7 @@ let
           camera_entity = "camera.${camera}";
           frigate.url = "https://cctv.${fqDomain}";
           live_provider = "go2rtc";
-          go2rtc.modes = [ "webrtc" ];
+          go2rtc.modes = [ (if frigate.webrtc.enable then "webrtc" else "mse") ];
         }];
 
         live = {

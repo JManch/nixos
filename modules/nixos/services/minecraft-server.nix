@@ -16,8 +16,6 @@ let
 in
 mkIf cfg.enable
 {
-  environment.systemPackages = [ pkgs.mcrcon ];
-
   services.minecraft-server = {
     enable = true;
     openFirewall = true;
@@ -78,10 +76,9 @@ mkIf cfg.enable
       log-ips = true;
       enforce-whitelist = false;
       spawn-protection = 0;
-      # We just use rcon locally as a convenient way to access the console
-      enable-rcon = true;
-      "rcon.port" = 25575;
-      "rcon.password" = "secret";
+      # Instead of rcon use 'echo "command" > /run/minecraft-server.stdin' to
+      # run commands on the server
+      enable-rcon = false;
     };
   };
 

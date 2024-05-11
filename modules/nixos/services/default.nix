@@ -601,7 +601,27 @@ in
         };
 
         files = mkOption {
-          type = types.attrsOf types.lines;
+          type = types.attrsOf (types.submodule {
+            options = {
+              value = mkOption {
+                type = types.nullOr types.lines;
+                default = null;
+                description = "Lines of text to copy into target config file";
+              };
+
+              diff = mkOption {
+                type = types.nullOr types.lines;
+                default = null;
+                description = "Diff file to be applied to reference config file";
+              };
+
+              reference = mkOption {
+                type = types.nullOr types.pathInStore;
+                default = null;
+                description = "Reference config file that diff is applied to";
+              };
+            };
+          });
           default = { };
           description = ''
             Attribute set where keys are paths to files relative to the dataDir and values are files contents"

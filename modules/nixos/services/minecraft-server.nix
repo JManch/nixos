@@ -6,13 +6,11 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkMerge escapeShellArg concatStringsSep mkAfter genAttrs elem mapAttrsToList mapAttrs;
+  inherit (lib) mkIf mkMerge escapeShellArg concatStringsSep mkAfter genAttrs elem mapAttrsToList getExe;
   inherit (config.services.minecraft-server) dataDir;
-  inherit (config.age.secrets) minecraftSecrets;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.minecraft-server;
 
-  files = mapAttrs (name: value: pkgs.writeText "${baseNameOf name}" value) cfg.files;
   availablePlugins = outputs.packages.${pkgs.system}.minecraft-plugins;
   pluginEnabled = p: elem p cfg.plugins;
 in
@@ -89,30 +87,29 @@ mkIf cfg.enable
 
   modules.services.minecraft-server.files = mkMerge [
     (mkIf (pluginEnabled "aura-skills") {
-      "plugins/AuraSkills/config.yml" = /*yaml*/ ''
+      "plugins/AuraSkills/config.yml".value = /*yaml*/ ''
         on_death:
           reset_xp: true
       '';
     })
 
     (mkIf (pluginEnabled "vivecraft") {
-      "plugins/Vivecraft-Spigot-Extensions/config.yml" = /*yaml*/ ''
-        general:
-          bow:
-            standingmultiplier: 1
-            seatedheadshotmultiplier: 2
-          welcomemsg:
-            enabled: true
-            welcomeVanilla: '&player has joined with non-VR!'
-          crawling:
-            enabled: true
-          teleport:
-            enabled: false
+      "plugins/Vivecraft-Spigot-Extensions/config.yml".value = /*yaml*/ ''
+        bow:
+          standingmultiplier: 1
+          seatedheadshotmultiplier: 2
+        welcomemsg:
+          enabled: true
+          welcomeVanilla: '&player has joined with non-VR!'
+        crawling:
+          enabled: true
+        teleport:
+          enable: false
       '';
     })
 
     (mkIf (pluginEnabled "squaremap") {
-      "plugins/squaremap/config.yml" = /*yaml*/ ''
+      "plugins/squaremap/config.yml".value = /*yaml*/ ''
         settings:
           web-address: https://squaremap.${fqDomain}
           internal-webserver:
@@ -120,37 +117,80 @@ mkIf cfg.enable
             port: 25566
       '';
     })
+
+    # Some plugins need config to be applied in context of the default config.
+    # To avoid copying the entire default config file into our nix config we
+    # generate a diff and apply it to the reference config file sourced
+    # upstream.
+    (mkIf (pluginEnabled "levelled-mobs") {
+      "plugins/LevelledMobs/rules.yml" = {
+        reference = "${availablePlugins.levelled-mobs}/config/rules.yml";
+        diff = ''
+          --- rules.yml   2024-05-11 15:43:44.818184123 +0100
+          +++ rules.yml.custom    2024-05-11 15:46:18.765216285 +0100
+          @@ -340,9 +340,9 @@
+               - average_challenge
+               #- advanced_challenge
+               #- extreme_challenge
+          -    - weighted_random_Levelling
+          +    #- weighted_random_Levelling
+               #- spawn_Levelling
+          -    #- lvl-mod_spawn-blended
+          +    - lvl-mod_spawn-blended
+               #- ycoord_Levelling
+               #- random_Levelling
+               #- lvl-mod_player-variable
+          @@ -426,11 +426,14 @@
+           custom-rules:
+             - enabled: true
+               name: 'No Stat Change for Specific Entities'
+          -    use-preset: vanilla_challenge, nametag_no_level
+          +    use-preset: vanilla_challenge
+               conditions:
+                 entities:
+                   allowed-groups: [ 'all_passive_mobs' ]
+                   allowed-list: [ 'BABY_', 'WANDERING_TRADER', 'VILLAGER', 'ZOMBIE_VILLAGER', 'BAT' ]
+          +    apply-settings:
+          +       nametag: disabled
+          +       nametag-visibility-method: DISABLED
+
+             - enabled: true
+               name: 'Custom Nether Levelling'
+        '';
+      };
+    })
   ];
 
-  systemd.services.minecraft-server = {
-    serviceConfig.EnvironmentFile = minecraftSecrets.path;
+  systemd.services.minecraft-server.preStart = mkAfter /*bash*/ ''
+    mkdir -p plugins
+    # Remove existing plugins
+    readarray -d "" links < <(find "${dataDir}/plugins" -maxdepth 5 -type l -print0)
+      for link in "''${links[@]}"; do
+        if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
+          rm "$link"
+        fi
+      done
 
-    preStart = mkAfter /*bash*/ ''
-      mkdir -p plugins
-      # Remove existing plugins and files
-      readarray -d "" links < <(find "${dataDir}/plugins" -maxdepth 5 -type l -print0)
-        for link in "''${links[@]}"; do
-          if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
-            rm "$link"
-          fi
-        done
+    # Install new plugins
+    ${concatStringsSep "\n" (map (plugin: /*bash*/ ''
+      ln -fs "${availablePlugins.${plugin}}"/*.jar "${dataDir}/plugins"
+    '') cfg.plugins)}
 
-      # Install new plugins
-      ${concatStringsSep "\n" (map (plugin: /*bash*/ ''
-        ln -fs "${availablePlugins.${plugin}}"/*.jar "${dataDir}/plugins"
-      '') cfg.plugins)}
-
-      # TODO: Need a way to modify existing files because plugins do not like
-      # having their config files replaced
-
-      # Install files
-      ${concatStringsSep "\n" (mapAttrsToList (file: text: /*bash*/ ''
-        rm -f "${dataDir}/${file}"
-        # Plugins have a tendancy to write to config files for some reason
-        install -m 640 -D "${text}" "${dataDir}/${file}"
-      '') files)}
-    '';
-  };
+    # Install config files
+    # We can't symlink from store becuase plugins need config write privs as
+    # they merge our provided config with the default config
+    ${concatStringsSep "\n" (mapAttrsToList (path: file: /*bash*/ 
+      if file.value != null then ''
+        rm -f "${dataDir}/${path}"
+        install -m 640 -D "${pkgs.writeText "${baseNameOf path}" file.value}" "${dataDir}/${path}"
+      ''
+      else ''
+        rm -f "${dataDir}/${path}"
+        mkdir -p $(dirname "${path}")
+        ${getExe pkgs.patch} -u "${file.reference}" "${pkgs.writeText "${baseNameOf path}.diff" file.diff}" -o "${dataDir}/${path}"
+      ''
+    ) cfg.files)}
+  '';
 
   services.caddy.virtualHosts."squaremap.${fqDomain}".extraConfig = mkIf (pluginEnabled "squaremap") ''
     import wg-friends-only

@@ -253,7 +253,7 @@ mkIf cfg.enable
     # https://github.com/bitwarden/mobile/issues/582
     # https://github.com/bitwarden/mobile/pull/2629
     "vaultwarden.${fqDomain}".extraConfig = ''
-      import lan_only
+      import lan-only
       reverse_proxy http://127.0.0.1:${toString cfg.port} {
         # Send the true remote IP to Rocket, so that Vaultwarden can put this
         # in the log

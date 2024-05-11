@@ -52,7 +52,7 @@ mkIf cfg.enable
   # Unifi module has good default systemd hardening
 
   services.caddy.virtualHosts."unifi.${fqDomain}".extraConfig = ''
-    import lan_only
+    import lan-only
     reverse_proxy https://127.0.0.1:${toString cfg.port} {
       # We have to allow insecure HTTPS because unifi forcefully enables TLS
       # with an invalid cert.

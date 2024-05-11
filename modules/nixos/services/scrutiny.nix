@@ -131,7 +131,7 @@ mkMerge [
     };
 
     services.caddy.virtualHosts."disks.${fqDomain}".extraConfig = ''
-      import lan_only
+      import lan-only
       reverse_proxy http://127.0.0.1:${toString cfg.server.port}
     '';
 

@@ -97,7 +97,7 @@ mkMerge [
       '';
 
       extraConfig = ''
-        (lan_only) {
+        (lan-only) {
           @block {
             not remote_ip ${cfg.lanAddressRanges}
           }
@@ -108,7 +108,7 @@ mkMerge [
       '';
 
       virtualHosts."logs.${fqDomain}".extraConfig = ''
-        import lan_only
+        import lan-only
         root * /var/lib/goaccess/
         file_server * browse
 

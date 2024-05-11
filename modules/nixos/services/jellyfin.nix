@@ -98,12 +98,7 @@ mkMerge [
     ];
 
     services.caddy.virtualHosts."jellyfin.${fqDomain}".extraConfig = ''
-      @block {
-        not remote_ip ${caddy.lanAddressRanges}${optionalString wireguard.friends.enable " ${wireguard.friends.address}/${toString wireguard.friends.subnet}"}
-      }
-      respond @block "Access denied" 403 {
-        close
-      }
+      import wg-friends-only
       reverse_proxy http://${cfg.reverseProxy.address}:8096
     '';
   })

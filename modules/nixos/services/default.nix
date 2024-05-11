@@ -1,6 +1,6 @@
-{ lib, config, username, ... }:
+{ lib, pkgs, config, outputs, username, ... }:
 let
-  inherit (lib) mkEnableOption mkOption types concatStringsSep mkAliasOptionModule;
+  inherit (lib) mkEnableOption mkOption types concatStringsSep mkAliasOptionModule attrNames;
   cfg = config.modules.services;
 in
 {
@@ -183,7 +183,7 @@ in
         apply = v: concatStringsSep " " v;
         description = ''
           List of address ranges defining the local network. Endpoints marked
-          as 'lan_only' will only accept connections from these ranges.
+          as 'lan-only' will only accept connections from these ranges.
         '';
       };
     };
@@ -568,6 +568,46 @@ in
         };
       };
     };
+
+    minecraft-server =
+      let
+        availablePlugins = outputs.packages.${pkgs.system}.minecraft-plugins;
+      in
+      {
+        enable = mkEnableOption "Minecraft server";
+
+        memory = mkOption {
+          type = types.int;
+          default = 4000;
+          description = "Memory allocation in megabytes for the Minecraft server";
+        };
+
+        interfaces = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "List of additional interfaces for the Minecraft server to be exposed on";
+        };
+
+        port = mkOption {
+          type = types.port;
+          default = 25565;
+          description = "Port for the Minecraft server to listen on";
+        };
+
+        plugins = mkOption {
+          type = types.listOf (types.enum (attrNames availablePlugins));
+          default = [ ];
+          description = "List of plugin packages to install on the server";
+        };
+
+        files = mkOption {
+          type = types.attrsOf types.lines;
+          default = { };
+          description = ''
+            Attribute set where keys are paths to files relative to the dataDir and values are files contents"
+          '';
+        };
+      };
   };
 
   config = {

@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkMerge escapeShellArg concatStringsSep mkAfter genAttrs elem mapAttrsToList mapAttrs optional any getExe';
+  inherit (lib) mkIf mkMerge escapeShellArg concatStringsSep mkAfter genAttrs elem mapAttrsToList mapAttrs;
   inherit (config.services.minecraft-server) dataDir;
   inherit (config.age.secrets) minecraftSecrets;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -98,6 +98,9 @@ mkIf cfg.enable
     (mkIf (pluginEnabled "vivecraft") {
       "plugins/Vivecraft-Spigot-Extensions/config.yml" = /*yaml*/ ''
         general:
+          bow:
+            standingmultiplier: 1
+            seatedheadshotmultiplier: 2
           welcomemsg:
             enabled: true
             welcomeVanilla: '&player has joined with non-VR!'
@@ -137,16 +140,19 @@ mkIf cfg.enable
         ln -fs "${availablePlugins.${plugin}}"/*.jar "${dataDir}/plugins"
       '') cfg.plugins)}
 
+      # TODO: Need a way to modify existing files because plugins do not like
+      # having their config files replaced
+
       # Install files
       ${concatStringsSep "\n" (mapAttrsToList (file: text: /*bash*/ ''
         rm -f "${dataDir}/${file}"
         # Plugins have a tendancy to write to config files for some reason
-        install "${text}" "${dataDir}/${file}"
+        install -m 640 -D "${text}" "${dataDir}/${file}"
       '') files)}
     '';
   };
 
-  services.caddy.virtualHosts."squaremap.${fqDomain}".extraConfig = mkIf (elem "squaremap" cfg.plugins) ''
+  services.caddy.virtualHosts."squaremap.${fqDomain}".extraConfig = mkIf (pluginEnabled "squaremap") ''
     import wg-friends-only
     reverse_proxy http://127.0.0.1:25566
   '';
@@ -156,6 +162,12 @@ mkIf cfg.enable
       allowedTCPPorts = [ cfg.port ];
       allowedUDPPorts = [ cfg.port ];
     }));
+
+  # backups.minecraft-server = {
+  #   paths = "/var/lib/minecraft";
+  #   exclude = [ "cache" ".cache" ];
+  #   restore.pathOwnership = { user = "minecraft"; group = "minecraft"; };
+  # };
 
   persistence.directories = [{
     directory = "/var/lib/minecraft";

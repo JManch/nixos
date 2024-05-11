@@ -60,7 +60,7 @@ mkIf cfg.enable
 
   services.caddy.virtualHosts = {
     "zigbee.${fqDomain}".extraConfig = ''
-      import lan_only
+      import lan-only
       basicauth {
         admin $2a$14$6SspBEu6Yi82Bx3VdT4S1eshOACOuf4DdFlQrg2kYcDomTOrsF/ru
       }

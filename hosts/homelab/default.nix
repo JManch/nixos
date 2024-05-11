@@ -120,7 +120,7 @@
 
       minecraft-server = {
         enable = true;
-        memory = 3000;
+        memory = 2000;
         interfaces = [ "wg-friends" ];
         plugins = [
           "vivecraft"

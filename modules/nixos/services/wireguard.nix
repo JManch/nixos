@@ -18,7 +18,8 @@ let
     listToAttrs
     concatMap
     nameValuePair
-    attrNames;
+    attrNames
+    concatStringsSep;
   inherit (config.modules.services) dns-server-stack;
   inherit (inputs.nix-resources.secrets) fqDomain;
   interfaces = config.modules.services.wireguard;
@@ -181,4 +182,21 @@ in
       ])
       (attrNames (filterAttrs (_: cfg: cfg.enable && !cfg.autoStart) interfaces)));
   };
+
+  services.caddy.extraConfig =
+    let
+      inherit (config.modules.services.caddy) lanAddressRanges;
+    in
+    concatStringsSep "\n" (mapAttrsToList
+      (name: cfg: ''
+        (wg-${name}-only) {
+          @block {
+            not remote_ip ${lanAddressRanges} ${cfg.address}/${toString cfg.subnet}
+          }
+          respond @block "Access denied" 403 {
+            close
+          }
+        }
+      '')
+      interfaces);
 }

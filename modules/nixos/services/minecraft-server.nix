@@ -6,12 +6,24 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkMerge escapeShellArg concatStringsSep mkAfter genAttrs elem mapAttrsToList getExe mkForce;
+  inherit (lib)
+    mkIf
+    mkMerge
+    escapeShellArg
+    concatStringsSep
+    mkAfter
+    genAttrs
+    elem
+    mapAttrsToList
+    getExe
+    mkForce
+    getExe';
   inherit (config.services.minecraft-server) dataDir;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.minecraft-server;
 
-  availablePlugins = outputs.packages.${pkgs.system}.minecraft-plugins;
+  availablePlugins = outputs.packages.${pkgs.system}.minecraft-plugins
+    // inputs.nix-resources.packages.${pkgs.system}.minecraft-plugins;
   pluginEnabled = p: elem p cfg.plugins;
 
   serverPackage = pkgs.papermc.overrideAttrs (oldAttrs: {
@@ -53,7 +65,7 @@ mkIf cfg.enable
       allow-nether = true;
       entity-broadcast-range-percentage = 100;
       simulation-distance = 10;
-      player-idle-timeout = 0;
+      player-idle-timeout = 5;
       white-list = false;
       log-ips = true;
       enforce-whitelist = false;
@@ -112,7 +124,7 @@ mkIf cfg.enable
       SuspendRefresh = -1;
       InfoHibernation = "                   §fserver status:\n                   §b§lHIBERNATING";
       InfoStarting = "                   §fserver status:\n                    §6§lWARMING UP";
-      NotifyUpdate = true;
+      NotifyUpdate = false;
       NotifyMessage = true;
     };
   };
@@ -253,11 +265,49 @@ mkIf cfg.enable
     allowedUDPPorts = [ cfg.port ];
   }));
 
-  backups.minecraft-server = {
-    paths = [ "/var/lib/minecraft" ];
-    exclude = [ "cache" ".cache" ];
-    restore.pathOwnership."/var/lib/minecraft" = { user = "minecraft"; group = "minecraft"; };
-  };
+  backups.minecraft-server =
+    let
+      sleep = getExe' pkgs.coreutils "sleep";
+      systemctl = getExe' pkgs.systemd "systemctl";
+    in
+    {
+      paths = [ "/var/lib/minecraft" ];
+      exclude = [ "cache" ".cache" ];
+
+      preBackupScript = /*bash*/ ''
+        # This is a bit fragile because we don't know how long these commands
+        # will take. On my small server they seem to finish in a few seconds
+        # though so 1 min sleep should be safe. If the pipe doesn't exist the
+        # server is shutdown so it's safe to run backup.
+        if [ -p "/run/minecraft-server.stdin" ]; then
+          echo "mine say Performing scheduled backup" > "/run/minecraft-server.stdin";
+          echo "mine save-off" > "/run/minecraft-server.stdin";
+          echo "mine say Disabling auto-save..." > "/run/minecraft-server.stdin";
+          ${sleep} 60s
+          echo "mine say Auto-save disabled" > "/run/minecraft-server.stdin";
+          echo "mine save-all" > "/run/minecraft-server.stdin";
+          echo "mine say Flushing pending disk writes..." > "/run/minecraft-server.stdin";
+          ${sleep} 60s
+          echo "mine say Pending disk writes flushed" > "/run/minecraft-server.stdin";
+          echo "mine say Performing backup..." > "/run/minecraft-server.stdin";
+        fi
+      '';
+
+      postBackupScript = /*bash*/ ''
+        if [ -p "/run/minecraft-server.stdin" ]; then
+          echo "mine save-on" > "/run/minecraft-server.stdin";
+          echo "mine say Re-enabled auto-save" > "/run/minecraft-server.stdin";
+          echo "mine say Backup completed" > "/run/minecraft-server.stdin";
+        fi
+      '';
+
+      restore = {
+        preRestoreScript = ''
+          sudo ${systemctl} stop minecraft-server
+        '';
+        pathOwnership."/var/lib/minecraft" = { user = "minecraft"; group = "minecraft"; };
+      };
+    };
 
   persistence.directories = [{
     directory = "/var/lib/minecraft";

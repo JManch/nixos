@@ -131,6 +131,7 @@
           "levelled-mobs"
           "tab-tps"
           "luck-perms"
+          "gsit"
         ];
       };
     };

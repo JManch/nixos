@@ -6,4 +6,5 @@
   levelled-mobs = pkgs.callPackage ./levelled-mobs.nix { };
   tab-tps = pkgs.callPackage ./tab-tps.nix { };
   luck-perms = pkgs.callPackage ./luck-perms.nix { };
+  gsit = pkgs.callPackage ./gsit.nix { };
 }

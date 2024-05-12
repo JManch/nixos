@@ -117,7 +117,12 @@
 
       restic = {
         enable = true;
-        server.enable = true;
+        backupSchedule = "*-*-* 05:30:00";
+        server = {
+          enable = true;
+          remoteCopySchedule = "*-*-* 05:30:00";
+          remoteMaintenanceSchedule = "Sun *-*-* 06:00:00";
+        };
       };
 
       minecraft-server = {
@@ -132,6 +137,7 @@
           "tab-tps"
           "luck-perms"
           "gsit"
+          "play-times"
         ];
       };
     };

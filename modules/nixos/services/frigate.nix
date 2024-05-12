@@ -210,7 +210,7 @@ mkIf cfg.enable
   };
 
   # Always consider a public port because of router forwarding rule
-  modules.system.networking.publicPorts = cfg.webrtc.port;
+  modules.system.networking.publicPorts = [ cfg.webrtc.port ];
   networking.firewall = mkIf cfg.webrtc.enable {
     allowedTCPPorts = cfg.webrtc.port;
     allowedUDPPorts = cfg.webrtc.port;

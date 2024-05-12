@@ -26,6 +26,7 @@ let
     attrNames
     mkForce
     mkBefore
+    mkAfter
     optionalString;
   inherit (config.modules.services) caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -59,8 +60,8 @@ let
     (cfg.backups // homeBackups);
 
   backupTimerConfig = {
-    OnCalendar = if isServer then "*-*-* 00:00:00" else "*-*-* 15:00:00";
-    Persistent = !isServer;
+    OnCalendar = cfg.backupSchedule;
+    Persistent = true;
   };
 
   pruneOpts = [
@@ -211,7 +212,7 @@ mkMerge [
         };
       in
       mapAttrs
-        (name: value: (backupDefaults name) // (removeAttrs value [ "restore" ]))
+        (name: value: (backupDefaults name) // (removeAttrs value [ "restore" "preBackupScript" "postBackupScript" ]))
         backups;
 
     systemd.services =
@@ -219,12 +220,18 @@ mkMerge [
         (name: value: nameValuePair "restic-backups-${name}" {
           enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
           environment.RESTIC_CACHE_DIR = mkForce "";
-          serviceConfig.EnvironmentFile = resticNotifVars.path;
-          serviceConfig.CacheDirectory = mkForce "";
           onFailure = [ "restic-backups-${name}-failure-notif.service" ];
+
           preStart = mkBefore /*bash*/ ''
+            ${value.preBackupScript}
             ${restic} cat config --no-cache || ${restic} init
           '';
+          postStop = mkAfter value.postBackupScript;
+
+          serviceConfig = {
+            EnvironmentFile = resticNotifVars.path;
+            CacheDirectory = mkForce "";
+          };
         })
         backups)
       //
@@ -324,7 +331,7 @@ mkMerge [
           EnvironmentFile = resticReadWriteBackblazeVars.path;
           ExecStart = [
             "${restic} copy"
-            "${restic} check --with-cache"
+            "${restic} check --with-cache --retry-lock 5m"
           ];
           ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckResticRemoteCopy.path})\"'";
 
@@ -361,7 +368,7 @@ mkMerge [
           ExecStart = [
             "${restic} forget --prune ${concatStringsSep " " pruneOpts}"
             # WARN: Keep an eye on this with egress fees
-            "${restic} check --read-data-subset=500M"
+            "${restic} check --read-data-subset=500M --retry-lock 5m"
           ];
 
           User = "root";
@@ -384,7 +391,7 @@ mkMerge [
         enable = !inputs.firstBoot.value;
         wantedBy = [ "timers.target" ];
         timerConfig = {
-          OnCalendar = "*-*-* 01:00:00";
+          OnCalendar = cfg.server.remoteCopySchedule;
           Persistent = false;
         };
       };
@@ -393,7 +400,7 @@ mkMerge [
         enable = !inputs.firstBoot.value;
         wantedBy = [ "timers.target" ];
         timerConfig = {
-          OnCalendar = "Sun *-*-* 01:30:00";
+          OnCalendar = cfg.server.remoteMaintenanceSchedule;
           Persistent = true;
         };
       };

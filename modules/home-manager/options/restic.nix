@@ -12,6 +12,18 @@ in
           default = [ ];
         };
 
+        preBackupScript = mkOption {
+          type = types.lines;
+          default = "";
+          description = "Script to run before backing up";
+        };
+
+        postBackupScript = mkOption {
+          type = types.lines;
+          default = "";
+          description = "Script to run after backing up";
+        };
+
         restore = {
           pathOwnership = mkOption {
             type = types.attrsOf (types.submodule {

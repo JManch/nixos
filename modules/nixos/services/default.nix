@@ -1,4 +1,11 @@
-{ lib, pkgs, config, outputs, username, ... }:
+{ lib
+, pkgs
+, config
+, inputs
+, outputs
+, username
+, ...
+}:
 let
   inherit (lib) mkEnableOption mkOption types concatStringsSep mkAliasOptionModule attrNames;
   cfg = config.modules.services;
@@ -499,6 +506,18 @@ in
         type = types.attrsOf (types.submodule {
           freeformType = types.attrsOf types.anything;
           options = {
+            preBackupScript = mkOption {
+              type = types.lines;
+              default = "";
+              description = "Script to run before backing up";
+            };
+
+            postBackupScript = mkOption {
+              type = types.lines;
+              default = "";
+              description = "Script to run after backing up";
+            };
+
             restore = {
               pathOwnership = mkOption {
                 type = types.attrsOf (types.submodule {
@@ -561,6 +580,12 @@ in
         '';
       };
 
+      backupSchedule = mkOption {
+        type = types.str;
+        default = "*-*-* 05:30:00";
+        description = "Backup service default OnCalendar schedule";
+      };
+
       server = {
         enable = mkEnableOption "Restic REST server";
 
@@ -568,6 +593,18 @@ in
           type = types.str;
           description = "Directory where the restic repository is stored";
           default = "/var/backup/restic";
+        };
+
+        remoteCopySchedule = mkOption {
+          type = types.str;
+          default = "*-*-* 05:30:00";
+          description = "OnCalendar schedule when local repo is copied to cloud";
+        };
+
+        remoteMaintenanceSchedule = mkOption {
+          type = types.str;
+          default = "Sun *-*-* 06:00:00";
+          description = "OnCalendar schedule to perform maintenance on remote repo";
         };
 
         port = mkOption {
@@ -580,7 +617,8 @@ in
 
     minecraft-server =
       let
-        availablePlugins = outputs.packages.${pkgs.system}.minecraft-plugins;
+        availablePlugins = outputs.packages.${pkgs.system}.minecraft-plugins
+          // inputs.nix-resources.packages.${pkgs.system}.minecraft-plugins;
         jsonFormat = pkgs.formats.json { };
       in
       {

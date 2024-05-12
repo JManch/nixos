@@ -101,7 +101,11 @@
       greetd.enable = true;
       lact.enable = true;
       scrutiny.collector.enable = true;
-      restic.enable = true;
+
+      restic = {
+        enable = true;
+        backupSchedule = "*-*-* 15:00:00";
+      };
 
       wgnord = {
         enable = true;

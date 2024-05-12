@@ -581,9 +581,17 @@ in
     minecraft-server =
       let
         availablePlugins = outputs.packages.${pkgs.system}.minecraft-plugins;
+        jsonFormat = pkgs.formats.json { };
       in
       {
         enable = mkEnableOption "Minecraft server";
+
+        mshConfig = mkOption {
+          type = jsonFormat.type;
+          apply = jsonFormat.generate "msh-config.json";
+          internal = true;
+          description = "Minecraft server hibernation config";
+        };
 
         memory = mkOption {
           type = types.int;
@@ -594,13 +602,19 @@ in
         interfaces = mkOption {
           type = types.listOf types.str;
           default = [ ];
-          description = "List of additional interfaces for the Minecraft server to be exposed on";
+          description = ''
+            List of additional interfaces for the Minecraft server to be
+            exposed on.
+          '';
         };
 
         port = mkOption {
           type = types.port;
           default = 25565;
-          description = "Port for the Minecraft server to listen on";
+          description = ''
+            The actual server listens on `port - 1` and the server hibernator
+            listens on this port.
+          '';
         };
 
         plugins = mkOption {
@@ -621,7 +635,10 @@ in
               diff = mkOption {
                 type = types.nullOr types.lines;
                 default = null;
-                description = "Diff file to be applied to reference config file";
+                description = ''
+                  Diff file to be applied to reference config file. Use diff -u
+                  to generate diff.
+                '';
               };
 
               reference = mkOption {
@@ -633,7 +650,8 @@ in
           });
           default = { };
           description = ''
-            Attribute set where keys are paths to files relative to the dataDir and values are files contents"
+            Attribute set where keys are paths to files relative to the dataDir
+            and values are files contents"
           '';
         };
       };

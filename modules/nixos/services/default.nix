@@ -75,7 +75,7 @@ in
       in
       mkOption {
         default = { };
-        type = with types; attrsOf (submodule { options = wgInterfaceOptions; });
+        type = types.attrsOf (types.submodule { options = wgInterfaceOptions; });
         description = "Wireguard VPN interfaces";
       };
 
@@ -398,7 +398,7 @@ in
         };
 
         fileSystems = mkOption {
-          type = with types; listOf (submodule {
+          type = types.listOf (types.submodule {
             options = {
               path = mkOption {
                 type = types.str;
@@ -438,7 +438,7 @@ in
         };
 
         fileSystems = mkOption {
-          type = with types; listOf (submodule {
+          type = types.listOf (types.submodule {
             options = {
               path = mkOption {
                 type = types.str;

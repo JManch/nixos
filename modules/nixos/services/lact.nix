@@ -75,7 +75,7 @@ mkIf cfg.enable
           power_cap: 231.0
           performance_level: manual
           max_core_clock: 2394
-          voltage_offset: -50
+          voltage_offset: -40
           power_profile_mode_index: 0
           power_states:
             memory_clock:

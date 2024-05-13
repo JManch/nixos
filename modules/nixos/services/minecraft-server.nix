@@ -72,7 +72,7 @@ mkIf cfg.enable
       spawn-protection = 0;
       # Instead of rcon use 'echo "mine <command>" > /run/minecraft-server.stdin' to
       # run commands on the server. Prefix commands with 'mine' to go through
-      # minecraft-hibernate and pass to the server.
+      # msh and pass to the server.
       enable-rcon = false;
       # Msh uses queries
       enable-query = true;
@@ -218,7 +218,7 @@ mkIf cfg.enable
       ln -fs "${getExe serverPackage}" "${dataDir}/minecraft-server"
       ln -fs "${serverIcon}" "${dataDir}/server-icon-frozen.png"
 
-      # Remove existing plugins and their configs
+      # Remove existing plugins
       readarray -d "" links < <(find "${dataDir}/plugins" -maxdepth 5 -type l -print0)
         for link in "''${links[@]}"; do
           if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
@@ -233,7 +233,7 @@ mkIf cfg.enable
       '') cfg.plugins)}
 
       # Install config files
-      # We can't symlink from store becuase plugins need config write privs as
+      # We can't symlink from store because plugins need config write privs as
       # they merge our provided config with the default config
       ${concatStringsSep "\n" (mapAttrsToList (path: file: /*bash*/ 
         if file.value != null then ''

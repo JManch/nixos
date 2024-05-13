@@ -107,16 +107,21 @@ mkIf cfg.enable
       INVITATIONS_ALLOWED = false;
       SHOW_PASSWORD_HINT = false;
       ROCKET_PORT = cfg.port;
-      # WARN: Vaultwarden publically exposes icons under /icons so website
-      # domains in your vault could be exposed. Since we limit vaultwarden
-      # exposure to LAN this is ok.
+      # WARN: Vaultwarden exposes icons under /icons so login domains in the
+      # vault are exposed to anyone who can access the server. Since we limit
+      # vaultwarden exposure to LAN this is ok.
+
+      # If an icon is not loading it may be due to a previously failed attempt
+      # to fetch the icon. Vaultwarden creates a .miss file in the icon cache
+      # which has to be manually deleted. Remember to also clear browser cache
+      # when refreshing the page (CTRL+F5).
       ICON_BLACKLIST_NON_GLOBAL_IPS = false;
     };
   };
 
   systemd.services.vaultwarden.serviceConfig = utils.hardeningBaseline config {
     DynamicUser = false;
-    # Because upstream module annoyingly uses strings instead of bools...
+    # Because upstream module uses strings instead of bools
     PrivateDevices = mkForce true;
     PrivateTmp = mkForce true;
     ProtectHome = mkForce true;

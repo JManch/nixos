@@ -175,10 +175,13 @@ mkIf cfg.enable
       homeHosts;
   };
 
-  # Open DNS ports in firewall and set nameserver to localhost
+  # Open DNS ports in firewall
   networking.firewall.allowedTCPPorts = [ cfg.listenPort ];
   networking.firewall.allowedUDPPorts = [ cfg.listenPort ];
+
+  # Set nameserver to localhost
   networking.nameservers = mkForce [ "127.0.0.1" ];
+  networking.resolvconf.useLocalResolver = true;
 
   # Settings generation copied from nixpkgs under MIT license
   # https://github.com/NixOS/nixpkgs/blob/4cba8b53da471aea2ab2b0c1f30a81e7c451f4b6/COPYING

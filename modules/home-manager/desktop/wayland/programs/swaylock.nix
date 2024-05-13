@@ -16,29 +16,21 @@ let
     let
       osAudio = osConfig.modules.system.audio;
       preLock = /*bash*/ ''
-
-        # Store audio volumes and mute 
         ${optionalString osAudio.enable ''
-          sink_volume=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | cut -c 9-)
-          source_volume=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | cut -c 9-)
-          wpctl set-volume @DEFAULT_AUDIO_SINK@ 0
-          wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 0
+          wpctl set-mute @DEFAULT_AUDIO_SINK@ 1
+          wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1
         ''}
         ${cfg.preLockScript}
-
       '';
 
       postLock = cfg.postLockScript;
 
       postUnlock = /*bash*/ ''
-
-        # Restore audio volumes
         ${optionalString osAudio.enable ''
-          wpctl set-volume @DEFAULT_AUDIO_SINK@ "$sink_volume"
-          wpctl set-volume @DEFAULT_AUDIO_SOURCE@ "$source_volume"
+          wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
+          wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0
         ''}
         ${cfg.postUnlockScript}
-
       '';
     in
     pkgs.writeShellApplication {

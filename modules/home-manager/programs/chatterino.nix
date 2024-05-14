@@ -75,8 +75,8 @@ let
 in
 mkIf cfg.enable
 {
-  home.packages = with pkgs; [
-    chatterino2
+  home.packages = [
+    pkgs.chatterino2
   ] ++ optional mpv.enable streamlink;
 
   # WARNING: Enabling the MPV audio compression adds 4 seconds of latency

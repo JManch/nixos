@@ -17,6 +17,8 @@ in
     inputs.hyprlock.homeManagerModules.default
   ];
 
+  disabledModules = [ "${inputs.home-manager}/modules/programs/hyprlock.nix" ];
+
   config = mkIf (cfg.enable && isWayland) {
     programs.hyprlock = {
       enable = true;

@@ -16,8 +16,7 @@ let
     elem
     mapAttrsToList
     getExe
-    mkForce
-    getExe';
+    mkForce;
   inherit (config.services.minecraft-server) dataDir;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.minecraft-server;
@@ -119,7 +118,7 @@ mkIf cfg.enable
       MshPort = cfg.port;
       MshPortQuery = cfg.port;
       EnableQuery = true;
-      TimeBeforeStoppingEmptyServer = 300;
+      TimeBeforeStoppingEmptyServer = 3600;
       SuspendAllow = false;
       SuspendRefresh = -1;
       InfoHibernation = "                   §fserver status:\n                   §b§lHIBERNATING";
@@ -252,6 +251,9 @@ mkIf cfg.enable
   services.caddy.virtualHosts."squaremap.${fqDomain}".extraConfig = mkIf (pluginEnabled "squaremap") ''
     import wg-friends-only
     reverse_proxy http://127.0.0.1:25566
+    handle_errors {
+      respond "Minecraft server is hibernating or offline" 503
+    }
   '';
 
   networking.firewall = {
@@ -267,38 +269,80 @@ mkIf cfg.enable
 
   backups.minecraft-server =
     let
-      sleep = getExe' pkgs.coreutils "sleep";
+      functions = /*bash*/ ''
+        run_cmd_wait_for_message() {
+            local found=false
+            (sleep 5; echo "$1" > "/run/minecraft-server.stdin") &
+            while read -r line; do
+                if [[ $line == *"$2"* ]]; then
+                    found=true;
+                    break;
+                fi
+            done < <(timeout 30 journalctl -u minecraft-server -fqn0)
+            echo $found
+        }
+
+        server_say() {
+            echo "mine say $1" > "/run/minecraft-server.stdin"
+            echo "$1"
+        }
+      '';
+
+      preBackupScript = pkgs.writeShellApplication {
+        name = "minecraft-server-pre-backup";
+        runtimeInputs = with pkgs; [ coreutils ];
+        text = /*bash*/ ''
+          if [ ! -p "/run/minecraft-server.stdin" ]; then exit 0; fi
+
+          ${functions}
+
+          rm -f "/tmp/minecraft-server-save-off"
+          server_running=$(run_cmd_wait_for_message "mine say Performing scheduled backup" "[Server] Performing scheduled backup")
+          if $server_running; then
+              server_say "Disabling auto-save..."
+              if [ "$(run_cmd_wait_for_message "mine save-off" ": Automatic saving is now disabled")" == "false" ]; then
+                  server_say "Failed to disable auto-save, aborting backup"
+                  exit 1
+              fi
+              touch "/tmp/minecraft-server-save-off"
+              sleep 10
+              server_say "Auto-save disabled"
+
+              server_say "Flushing pending disk writes..."
+              if [ "$(run_cmd_wait_for_message "mine save-all" ": Saved the game")" == "false" ]; then
+                  server_say "Failed to flush pending disk writes, aborting backup"
+                  exit 1
+              fi
+              sleep 10
+              server_say "Pending disk writes flushed"
+              server_say "Performing backup..."
+          fi
+        '';
+      };
+
+      postBackupScript = pkgs.writeShellApplication {
+        name = "minecraft-server-post-backup";
+        runtimeInputs = with pkgs; [ coreutils ];
+        text = /*bash*/ ''
+          ${functions}
+          if [ -e "/tmp/minecraft-server-save-off" ]; then
+              server_say "Re-enabling auto-save..."
+              if [ "$(run_cmd_wait_for_message "mine save-on" ": Automatic saving is now enabled")" == "false" ]; then
+                  server_say "Failed to re-enable auto-save, reporting failure"
+                  exit 1
+              fi
+              server_say "Auto-save re-enabled"
+              server_say "Backup completed"
+          fi
+        '';
+      };
     in
     {
       paths = [ "/var/lib/minecraft" ];
       exclude = [ "cache" ".cache" ];
 
-      preBackupScript = /*bash*/ ''
-        # This is a bit fragile because we don't know how long these commands
-        # will take. On my small server they seem to finish in a few seconds
-        # though so 1 min sleep should be safe. If the pipe doesn't exist the
-        # server is shutdown so it's safe to run backup.
-        if [ -p "/run/minecraft-server.stdin" ]; then
-          echo "mine say Performing scheduled backup" > "/run/minecraft-server.stdin";
-          echo "mine save-off" > "/run/minecraft-server.stdin";
-          echo "mine say Disabling auto-save..." > "/run/minecraft-server.stdin";
-          ${sleep} 60s
-          echo "mine say Auto-save disabled" > "/run/minecraft-server.stdin";
-          echo "mine save-all" > "/run/minecraft-server.stdin";
-          echo "mine say Flushing pending disk writes..." > "/run/minecraft-server.stdin";
-          ${sleep} 60s
-          echo "mine say Pending disk writes flushed" > "/run/minecraft-server.stdin";
-          echo "mine say Performing backup..." > "/run/minecraft-server.stdin";
-        fi
-      '';
-
-      postBackupScript = /*bash*/ ''
-        if [ -p "/run/minecraft-server.stdin" ]; then
-          echo "mine save-on" > "/run/minecraft-server.stdin";
-          echo "mine say Re-enabled auto-save" > "/run/minecraft-server.stdin";
-          echo "mine say Backup completed" > "/run/minecraft-server.stdin";
-        fi
-      '';
+      preBackupScript = getExe preBackupScript;
+      postBackupScript = getExe postBackupScript;
 
       restore = {
         preRestoreScript = ''

@@ -124,7 +124,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
           format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%{format_source}";
           format-muted = "<span color='#${colors.base08}'>󰖁</span> {volume:2}%";
           format-source = "";
-          format-source-muted = "<span color='#${colors.base08}'> 󰍭</span> Muted";
+          format-source-muted = "<span color='#${colors.base08}'>  󰍭</span> Muted";
 
           format-icons = {
             headphone = "";

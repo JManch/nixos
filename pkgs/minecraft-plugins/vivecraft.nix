@@ -8,7 +8,7 @@ stdenvNoCC.mkDerivation rec {
   version = "120r1";
 
   src = fetchzip {
-    url = "https://github.com/jrbudda/Vivecraft_Spigot_Extensions/releases/download/${version}/Vivecraft_Spigot_Extensions.1.20.4r1.zip ";
+    url = "https://github.com/jrbudda/Vivecraft_Spigot_Extensions/releases/download/${version}/Vivecraft_Spigot_Extensions.1.20.4r1.zip";
     sha256 = "sha256-4TS6oG7/BegYC/9yvsoYk8eYRmXDA3k8b9KJa3b4VJ4=";
   };
 

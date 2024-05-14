@@ -264,7 +264,7 @@ mkMerge [
             Type = "oneshot";
             PrivateTmp = true;
             ExecStart = [
-              "${restic} forget --no-cache --prune ${concatStringsSep " " pruneOpts}"
+              "${restic} forget --no-cache --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
               # Retry lock timeout in-case another host is performing a check
               "${restic} check --read-data-subset=500M --retry-lock 5m"
             ];
@@ -310,7 +310,7 @@ mkMerge [
       restic-remote-copy = {
         enable = !inputs.firstBoot.value;
         wants = [ "network-online.target" ];
-        after = [ "network-online.target" ];
+        after = [ "network-online.target" "restic-repo-maintenance.service" ];
         onFailure = [ "restic-remote-copy-failure-notif.service" ];
         restartIfChanged = false;
 
@@ -346,7 +346,7 @@ mkMerge [
       restic-remote-maintenance = {
         enable = !inputs.firstBoot.value;
         wants = [ "network-online.target" ];
-        after = [ "network-online.target" ];
+        after = [ "network-online.target" "restic-remote-copy.service" ];
         onFailure = [ "restic-remote-maintenance-failure-notif.service" ];
         restartIfChanged = false;
 
@@ -366,7 +366,7 @@ mkMerge [
           EnvironmentFile = resticReadWriteBackblazeVars.path;
 
           ExecStart = [
-            "${restic} forget --prune ${concatStringsSep " " pruneOpts}"
+            "${restic} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
             # WARN: Keep an eye on this with egress fees
             "${restic} check --read-data-subset=500M --retry-lock 5m"
           ];
@@ -392,7 +392,7 @@ mkMerge [
         wantedBy = [ "timers.target" ];
         timerConfig = {
           OnCalendar = cfg.server.remoteCopySchedule;
-          Persistent = false;
+          Persistent = true;
         };
       };
 

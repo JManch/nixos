@@ -117,7 +117,7 @@
 
       restic = {
         enable = true;
-        backupSchedule = "*-*-* 05:30:00";
+        backupSchedule = "*-*-* 05:00:00";
         server = {
           enable = true;
           remoteCopySchedule = "*-*-* 05:30:00";

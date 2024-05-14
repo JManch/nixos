@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) utils concatStrings getExe;
+  inherit (lib) utils concatStrings getExe optionalString;
 
   deployScript = pkgs.writeShellApplication {
     name = "deploy-host";
@@ -128,18 +128,18 @@ in
               return 1
             fi
 
-            ssh-add-quiet
+            ${optionalString (cmd != "build") "ssh-add-quiet"}
             remote_builds="/home/${username}/files/remote-builds/$hostname"
             mkdir -p "$remote_builds"
             # Build and store result persistently to prevent GC deleting builds
             # for remote hosts
             pushd "$remote_builds" >/dev/null
-            nixos-rebuild build --flake "${configDir}#$hostname"
-            popd >/dev/null
+            nixos-rebuild build --flake "${configDir}#$hostname" "''${@:2}"
             if [[ $? -ne 0 ]]; then
               return 1
             fi
-            if [[ "$cmd" == "build" ]]; then return 0; fi
+            popd >/dev/null
+            ${optionalString (cmd == "build") "return 0"}
             nixos-rebuild ${cmd} --flake "${configDir}#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
           }
 

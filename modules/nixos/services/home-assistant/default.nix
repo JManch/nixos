@@ -230,13 +230,12 @@ in
 
       restore =
         let
-          systemctl = getExe' pkgs.systemd "systemctl";
           pg_restore = getExe' config.services.postgresql.package "pg_restore";
           backup = "/var/backup/postgresql/hass.sql";
         in
         {
           preRestoreScript = ''
-            sudo ${systemctl} stop home-assistant
+            sudo systemctl stop home-assistant
           '';
 
           postRestoreScript = /*bash*/ ''

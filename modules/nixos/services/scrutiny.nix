@@ -109,7 +109,7 @@ mkMerge [
 
       restore = {
         preRestoreScript = /*bash*/ ''
-          sudo ${getExe' pkgs.systemd "systemctl"} stop scrutiny
+          sudo systemctl stop scrutiny
         '';
 
         postRestoreScript = /*bash*/ ''

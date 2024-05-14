@@ -268,7 +268,6 @@ mkIf cfg.enable
   backups.minecraft-server =
     let
       sleep = getExe' pkgs.coreutils "sleep";
-      systemctl = getExe' pkgs.systemd "systemctl";
     in
     {
       paths = [ "/var/lib/minecraft" ];
@@ -303,7 +302,7 @@ mkIf cfg.enable
 
       restore = {
         preRestoreScript = ''
-          sudo ${systemctl} stop minecraft-server
+          sudo systemctl stop minecraft-server
         '';
         pathOwnership."/var/lib/minecraft" = { user = "minecraft"; group = "minecraft"; };
       };

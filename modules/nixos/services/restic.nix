@@ -97,7 +97,7 @@ let
 
   restoreScript = pkgs.writeShellApplication {
     name = "restic-restore";
-    runtimeInputs = [ pkgs.restic pkgs.coreutils ];
+    runtimeInputs = with pkgs; [ pkgs.restic coreutils sudo systemd ];
     text = /*bash*/ ''
 
       echo "Leave empty to restore from the default repo"

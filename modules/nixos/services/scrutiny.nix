@@ -34,14 +34,7 @@ mkMerge [
       wants = [ "network-online.target" "nss-lookup.target" ];
       serviceConfig = {
         # Workaround to ensure the service starts after DNS resolution is ready
-        ExecStartPre =
-          let
-            sh = getExe' pkgs.bash "sh";
-            host = getExe' pkgs.host "host";
-            sleep = getExe' pkgs.coreutils "sleep";
-            echo = getExe' pkgs.coreutils "echo";
-          in
-          "${sh} -c 'while ! ${host} ${fqDomain}; do ${echo} 'host failed, sleeping'; ${sleep} 1; done'";
+        ExecStartPre = "${getExe' pkgs.coreutils "sleep"} 5";
       };
     };
   })

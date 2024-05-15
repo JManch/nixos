@@ -121,7 +121,6 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         "HYPRCURSOR_THEME,${cfg.hyprcursor.name}"
         "HYPRCURSOR_SIZE,${toString config.modules.desktop.style.cursor.size}"
       ] ++ optionals (osConfig.device.gpu.type == "nvidia") [
-        "WLR_NO_HARDWARE_CURSORS,1"
         "LIBVA_DRIVER_NAME,nvidia"
         "GBM_BACKEND,nvidia-drm"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
@@ -166,9 +165,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         hover_icon_on_border = false;
         "col.active_border" = "0xff${colors.base0D}";
         "col.inactive_border" = "0xff${colors.base00}";
-        cursor_inactive_timeout = 3;
         allow_tearing = cfg.tearing;
-        default_cursor_monitor = primaryMonitor.name;
       };
 
       windowrulev2 =
@@ -210,6 +207,14 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         repeat_rate = 30;
       };
 
+      cursor = {
+        inactive_timeout = 3;
+        hide_on_key_press = true;
+        default_monitor = primaryMonitor.name;
+        enable_hyprcursor = cfg.hyprcursor.package != null;
+        no_hardware_cursors = osConfig.device.gpu.type == "nvidia";
+      };
+
       animations = {
         enabled = cfg.animations;
 
@@ -241,7 +246,6 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         disable_hyprland_logo = true;
         focus_on_activate = false;
         no_direct_scanout = !cfg.directScanout;
-        hide_cursor_on_key_press = true;
         mouse_move_enables_dpms = true;
         key_press_enables_dpms = true;
         background_color = "0xff${colors.base00}";

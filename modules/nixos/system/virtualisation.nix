@@ -122,6 +122,7 @@ in
             zigbee2mqtt.enable = mkVMOverride false;
             restic.enable = mkVMOverride false;
             restic.server.enable = mkVMOverride false;
+            minecraft-server.enable = mkVMOverride false;
           };
         };
 

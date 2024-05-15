@@ -29,11 +29,10 @@ let
   primaryMonitor = fetchers.primaryMonitor osConfig;
 
   hyprlandPkgs = utils.flakePkgs args "hyprland";
-  hyprland = hyprlandPkgs.hyprland.overrideAttrs (old: {
-    # Patch makes the togglespecialworkspace dispatcher always toggle instead
-    # of moving the open special workspace to the active monitor
-    patches = (old.patches or [ ]) ++ [ ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch ];
-  });
+
+  # Patch makes the togglespecialworkspace dispatcher always toggle instead
+  # of moving the open special workspace to the active monitor
+  hyprland = utils.addPatches hyprlandPkgs.hyprland [ ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch ../../../../../patches/hyprlandEmptyMonitorFix.patch ];
 in
 mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
   modules.desktop = {

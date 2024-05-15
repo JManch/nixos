@@ -29,13 +29,9 @@ mkMerge [
       };
     };
 
-    systemd.services.scrutiny-collectors = {
+    systemd.services.scrutiny-collector = {
       after = [ "network-online.target" "nss-lookup.target" ];
       wants = [ "network-online.target" "nss-lookup.target" ];
-      serviceConfig = {
-        # Workaround to ensure the service starts after DNS resolution is ready
-        ExecStartPre = "${getExe' pkgs.coreutils "sleep"} 5";
-      };
     };
   })
 

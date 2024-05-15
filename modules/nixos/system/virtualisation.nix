@@ -23,6 +23,15 @@ let
     ];
     text = /*bash*/ ''
 
+      no_secrets=false
+      while getopts 'n' flag; do
+        case "$flag" in
+          n) no_secrets=true ;;
+          *) ;;
+        esac
+      done
+      shift $(( OPTIND - 1 ))
+
       if [ -z "$1" ]; then
         echo "Usage: build-vm <hostname>"
         exit 1
@@ -38,7 +47,7 @@ let
       # Print ports mapped to the VM
       printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
 
-      if [[ ! -e "/home/${username}/$hostname.qcow2" ]]; then
+      if [[ "$no_secrets" = false && ! -e "/home/${username}/$hostname.qcow2" ]]; then
         temp=$(mktemp -d)
         cleanup() {
           rm -rf "$temp"

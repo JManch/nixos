@@ -256,18 +256,23 @@ mkMerge [
           onFailure = [ "restic-repo-maintenance-failure-notif.service" ];
 
           environment = {
+            RESTIC_CACHE_DIR = "/var/cache/restic-repo-maintenance";
             RESTIC_REPOSITORY_FILE = resticRepositoryFile.path;
             RESTIC_PASSWORD_FILE = resticPasswordFile.path;
           };
 
           serviceConfig = {
             Type = "oneshot";
-            PrivateTmp = true;
             ExecStart = [
-              "${restic} forget --no-cache --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
+              "${restic} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
               # Retry lock timeout in-case another host is performing a check
               "${restic} check --read-data-subset=500M --retry-lock 5m"
             ];
+
+            PrivateTmp = true;
+            RuntimeDirectory = "restic-repo-maintenance";
+            CacheDirectory = "restic-repo-maintenance";
+            CacheDirectoryMode = "0700";
           };
         };
       }
@@ -335,7 +340,6 @@ mkMerge [
           ];
           ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckResticRemoteCopy.path})\"'";
 
-          User = "root";
           PrivateTmp = true;
           RuntimeDirectory = "restic-remote-copy";
           CacheDirectory = "restic-remote-copy";
@@ -351,6 +355,7 @@ mkMerge [
         restartIfChanged = false;
 
         environment = {
+          RESTIC_CACHE_DIR = "/var/cache/restic-remote-maintenance";
           RESTIC_FROM_REPOSITORY_FILE = resticRepositoryFile.path;
           RESTIC_FROM_PASSWORD_FILE = resticPasswordFile.path;
           RESTIC_PASSWORD_FILE = resticPasswordFile.path;
@@ -364,16 +369,16 @@ mkMerge [
         serviceConfig = {
           Type = "oneshot";
           EnvironmentFile = resticReadWriteBackblazeVars.path;
-
           ExecStart = [
             "${restic} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
             # WARN: Keep an eye on this with egress fees
             "${restic} check --read-data-subset=500M --retry-lock 5m"
           ];
 
-          User = "root";
           PrivateTmp = true;
           RuntimeDirectory = "restic-remote-maintenance";
+          CacheDirectory = "restic-remote-maintenance";
+          CacheDirectoryMode = "0700";
         };
       };
     } // (failureNotifService "restic-remote-copy-failure-notif"
@@ -420,11 +425,19 @@ mkMerge [
         group = "restic";
         mode = "700";
       }
+      # Persist cache because we want to avoid read operations from B2 storage
       {
-        # Persist cache because we want to avoid read operations from B2 storage
         directory = "/var/cache/restic-remote-copy";
-        user = "root";
-        group = "root";
+        mode = "700";
+      }
+      {
+        directory = "/var/cache/restic-remote-maintenance";
+        mode = "700";
+      }
+      # Persist maintenance service cache otherwise forget command can be very
+      # expensive
+      {
+        directory = "/var/cache/restic-repo-maintenance";
         mode = "700";
       }
     ];

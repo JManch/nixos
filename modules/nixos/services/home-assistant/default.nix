@@ -69,26 +69,16 @@ in
       ] ++ optional mosquitto.enable "mqtt";
 
       customComponents = with pkgs.home-assistant-custom-components; [
-        (miele.overrideAttrs (oldAttrs: rec {
-          version = "2024.3.0";
-          src = pkgs.fetchFromGitHub {
-            owner = oldAttrs.owner;
-            repo = oldAttrs.domain;
-            rev = "refs/tags/v${version}";
-            hash = "sha256-J9n4PFcd87L301B2YktrLcxp5Vu1HwDeCYnrMEJ0+TA=";
-          };
-        }))
-
+        miele
         (adaptive_lighting.overrideAttrs (oldAttrs: rec {
-          version = "1.21.1";
+          version = "1.21.2";
           src = pkgs.fetchFromGitHub {
             owner = "basnijholt";
             repo = "adaptive-lighting";
             rev = version;
-            hash = "sha256-G1y5eWc9lGFhtZn0m0nLyg3EGetz1r7/QZze1fX9aFk=";
+            hash = "sha256-VeSMBjvlmvVE93IpDbOhkDizMlE/SYclL6yoQ3d6biw=";
           };
         }))
-
         (utils.flakePkgs args "graham33").heatmiser-for-home-assistant
         outputs.packages.${pkgs.system}.thermal-comfort
       ] ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;

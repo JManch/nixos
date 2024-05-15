@@ -19,14 +19,11 @@ mkIf cfg.enable
 
   services.calibre-web = {
     enable = true;
-    package = pkgs.calibre-web.overrideAttrs (oldAttrs: {
-      # Patch increases file size upload limit from 200MB to 2GB
-      # https://github.com/janeczku/calibre-web/issues/452
-
-      # Also fixes unwanted gamma adjusted of cover images
-      # https://github.com/janeczku/calibre-web/issues/2564
-      patches = (oldAttrs.patches or [ ]) ++ [ ../../../patches/calibre-web.patch ];
-    });
+    # Patch increases file size upload limit from 200MB to 2GB
+    # https://github.com/janeczku/calibre-web/issues/452
+    # Also fixes unwanted gamma adjusted of cover images
+    # https://github.com/janeczku/calibre-web/issues/2564
+    package = utils.addPatches pkgs.calibre-web [ ../../../patches/calibre-web.patch ];
     listen.ip = "127.0.0.1";
     listen.port = cfg.port;
     options = {

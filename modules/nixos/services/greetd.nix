@@ -1,9 +1,4 @@
-{ lib
-, pkgs
-, config
-, username
-, ...
-}:
+{ lib, pkgs, config, ... }:
 let
   inherit (lib) mkIf getExe' utils;
   cfg = config.modules.services.greetd;
@@ -21,8 +16,16 @@ mkIf cfg.enable
     enable = true;
     settings = {
       default_session = {
-        user = username;
-        command = "${getExe' pkgs.greetd.tuigreet "tuigreet"} -t -s ${cfg.sessionDirs}";
+        # greetd should run as the greeter user, this settings is not related
+        # to the user that will log in
+        user = "greeter";
+        command = ''
+          ${getExe' pkgs.greetd.tuigreet "tuigreet"} \
+          --time \
+          --sessions ${cfg.sessionDirs} \
+          --remember \
+          --remember-session
+        '';
       };
     };
   };
@@ -46,6 +49,13 @@ mkIf cfg.enable
     startSession = true;
     enableGnomeKeyring = true;
   };
+
+  persistence.directories = [{
+    directory = "/var/cache/tuigreet";
+    user = "greeter";
+    group = "greeter";
+    mode = "755";
+  }];
 
   persistenceHome.directories = [ ".local/share/keyrings" ];
 }

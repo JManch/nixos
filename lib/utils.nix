@@ -8,10 +8,9 @@ in
 
   flakePkgs = args: flake: args.inputs.${flake}.packages.${args.pkgs.system};
 
-  addPatches = pkg: patches: pkg.overrideAttrs
-    (oldAttrs: {
-      patches = (oldAttrs.patches or [ ]) ++ patches;
-    });
+  addPatches = pkg: patches: pkg.overrideAttrs (oldAttrs: {
+    patches = (oldAttrs.patches or [ ]) ++ patches;
+  });
 
   hosts = outputs: filterAttrs (host: v: (host != "installer")) outputs.nixosConfigurations;
 

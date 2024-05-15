@@ -20,9 +20,7 @@ let
       # This patch also preserves the file ownership in the rsync command used
       # for extra-files transfer. This is needed for deploying secrets to the
       # home directory.
-      (pkgs.nixos-anywhere.overrideAttrs (oldAttrs: {
-        patches = (oldAttrs.patches or [ ]) ++ [ ../../../patches/nixosAnywhere.patch ];
-      }))
+      (utils.addPatches pkgs.nixos-anywhere [ ../../../patches/nixosAnywhere.patch ])
       gnutar
     ];
     text = /*bash*/ ''

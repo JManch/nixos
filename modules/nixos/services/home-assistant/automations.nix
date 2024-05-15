@@ -46,11 +46,28 @@ let
             at = "input_datetime.heating_${stringMode}_time";
           }
         ];
-        condition = [{
-          condition = "time";
-          after = "input_datetime.heating_${stringMode}_time";
-          before = "input_datetime.heating_${oppositeMode}_time";
-        }];
+        condition =
+          let
+            timeCond = {
+              condition = "time";
+              after = "input_datetime.heating_${stringMode}_time";
+              before = "input_datetime.heating_${oppositeMode}_time";
+            };
+          in
+          (optional (!enable) timeCond)
+          ++
+          (optional enable {
+            condition = "and";
+            conditions = [
+              timeCond
+              {
+                condition = "state";
+                entity_id = "input_boolean.heating_enabled";
+                state = "on";
+              }
+            ];
+          })
+        ;
         action = [{
           service = "climate.set_hvac_mode";
           metadata = { };
@@ -160,6 +177,13 @@ mkIf (cfg.enableInternal)
       heating_enable_time = {
         name = "Heating Enable Time";
         has_time = true;
+      };
+    };
+
+    input_boolean = {
+      heating_enabled = {
+        name = "Heating Enabled";
+        icon = "mdi:heating-coil";
       };
     };
   };

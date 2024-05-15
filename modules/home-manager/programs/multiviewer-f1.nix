@@ -12,11 +12,14 @@ let
 
   multiviewer-for-f1 =
     pkgs.multiviewer-for-f1.overrideAttrs (_: rec {
-      version = "1.31.7";
+      version = "1.31.10";
+
       src = pkgs.fetchurl {
-        url = "https://releases.multiviewer.app/download/155752210/multiviewer-for-f1_${version}_amd64.deb";
-        sha256 = "sha256-Tnr5Lvzoswhbvhs9SOprP2TcPbr6SP1uR3OqtnqiPrA=";
+        url = "https://releases.multiviewer.app/download/167189307/multiviewer-for-f1_${version}_amd64.deb";
+        sha256 = "sha256-bWxzAX+HoPTfhaQKCbJZ5Btz17ZzpnFA1/PxIx1F9BU=";
       };
+
+      # Add libglvnd to library path for hardware acceleration
       installPhase = ''
         runHook preInstall
 
@@ -195,18 +198,13 @@ lib.mkIf cfg.enable
         (
           m: "name:F1-${toString m.number}, monitor:${m.name}, gapsin:0, gapsout:0, decorate:false, rounding:false, border:false"
         )
-        (take 2 monitors))
-      ++ [
-        # The 'main' multiviewer windows goes into a special workspace
-        "special:multiviewer, on-created-empty:${getExe multiviewer-for-f1}, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
-      ];
+        (take 2 monitors));
 
       bind = (
         map (m: "${modKey}, F, workspace, name:F1-${toString m.number}")
           (take 2 monitors)
       )
       ++ [
-        "${modKey}SHIFTCONTROL, M, togglespecialworkspace, multiviewer"
         "${modKey}SHIFTCONTROL, F, exec, ${getExe multiviewerWorkspaceScript}"
         "${modKey}SHIFT, F, movetoworkspace, name:F1-2"
       ];

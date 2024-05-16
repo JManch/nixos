@@ -17,7 +17,8 @@
 
   virtualisation.vmVariant = {
     users.users.${username} = {
-      password = lib.mkVMOverride "test";
+      # Password is "test"
+      hashedPassword = "$y$jFT$zqu09q6g6PFap8WgDT4wv.$Yc.72WQcVGkA/gog4ogtdkrEhu3S0vRk3.teeAc09GB";
       hashedPasswordFile = lib.mkVMOverride null;
     };
   };

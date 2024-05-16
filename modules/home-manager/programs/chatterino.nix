@@ -68,6 +68,13 @@ let
           esac
         }
 
+        # If initial workspace tracking is enabled, Hyprland sets this token in
+        # all exec-once and exec scripts. It makes sense for scripts that
+        # immediately launch clients but because this is a long-running script
+        # that reacts to socket events it doesn't make sense here. It causes
+        # chatterino to unexpectedly open on workspace 1 when the bind is first
+        # used.
+        unset HL_INITIAL_WORKSPACE_TOKEN
         socat -U - UNIX-CONNECT:"/$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" | while read -r line; do handle "$line"; done
 
       '';

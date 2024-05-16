@@ -22,7 +22,7 @@ let
     concatStringsSep;
   inherit (config.modules.services) dns-server-stack;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  interfaces = config.modules.services.wireguard;
+  interfaces = filterAttrs (_: cfg: cfg.enable) config.modules.services.wireguard;
 
   # Friends VPN public keys
   # NCASE-M1 PFt9p3zx8nAYjU9pbNVRGS4QIvU/Tb18DdVowbcLuFc=
@@ -157,7 +157,7 @@ in
         (cfg.routerPeer -> (cfg.routerAllowedIPs != [ ]))
         "The routerAllowedIPs list for VPN ${name} must not be empty if routerPeer is enabled"
       ])
-    (attrsToList (filterAttrs (_: cfg: cfg.enable) interfaces)));
+    (attrsToList interfaces));
 
   networking.wg-quick.interfaces = mapAttrs'
     (name: cfg: nameValuePair ("wg-" + name) (interfaceConfig name cfg))
@@ -180,7 +180,7 @@ in
         (nameValuePair "wg-${interface}-up" "sudo systemctl start wg-quick-wg-${interface}")
         (nameValuePair "wg-${interface}-down" "sudo systemctl stop wg-quick-wg-${interface}")
       ])
-      (attrNames (filterAttrs (_: cfg: cfg.enable && !cfg.autoStart) interfaces)));
+      (attrNames (filterAttrs (_: cfg: !cfg.autoStart) interfaces)));
   };
 
   services.caddy.extraConfig =

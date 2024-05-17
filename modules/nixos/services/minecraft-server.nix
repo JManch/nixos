@@ -137,6 +137,9 @@ mkIf cfg.enable
               players: 128
               animals: 64
               monsters: 64
+            merge-radius:
+              exp: 0
+              item: 0
       '';
     }
 

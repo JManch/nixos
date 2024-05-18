@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe getExe';
+  inherit (lib) mkIf getExe;
   inherit (config.modules) desktop;
   cfg = config.modules.programs.firefox;
 in
@@ -17,8 +17,21 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
   systemd.user =
     let
       rsync = getExe pkgs.rsync;
-      syncToTmpfs = "${rsync} -auh --no-links --info=stats1 '/persist/home/${username}/.mozilla/' '/home/${username}/.mozilla/'";
-      syncToPersist = "${rsync} -ah --no-links --delete --info=stats1 '/home/${username}/.mozilla/' '/persist/home/${username}/.mozilla/'";
+      fd = getExe pkgs.fd;
+      persistDir = "/persist/home/${username}/.mozilla/";
+      tmpfsDir = "/home/${username}/.mozilla/";
+
+      syncToTmpfs = /*bash*/ ''
+        # Do not delete the existing Nix store links when syncing
+        ${fd} -Ht l --base-directory "${tmpfsDir}" | \
+          ${rsync} -ah --no-links --delete --info=stats1 --mkpath \
+          --exclude-from=- "${persistDir}" "${tmpfsDir}"
+      '';
+
+      syncToPersist = /*bash*/ ''
+        ${rsync} -ah --no-links --delete --info=stats1 --mkpath \
+          "${tmpfsDir}" "${persistDir}"
+      '';
     in
     mkIf cfg.runInRam {
       services.firefox-persist-init = {
@@ -29,10 +42,13 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
 
         Service = {
           Type = "oneshot";
-          ExecStart = [
-            "${getExe' pkgs.coreutils "mkdir"} -p /persist/home/${username}/.mozilla"
-            syncToTmpfs
-          ];
+          ExecStart = (pkgs.writeShellScript "firefox-persist-init" /*bash*/ ''
+            if [ ! -e "${persistDir}" ]; then
+              ${syncToPersist}
+            else
+              ${syncToTmpfs}
+            fi
+          '').outPath;
           # Backup on shutdown
           ExecStop = syncToPersist;
           RemainAfterExit = true;
@@ -59,7 +75,9 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
           Type = "oneshot";
           CPUSchedulingPolicy = "idle";
           IOSchedulingClass = "idle";
-          ExecStart = syncToPersist;
+          ExecStart = (pkgs.writeShellScript "firefox-persist-sync" ''
+            ${syncToPersist}
+          '').outPath;
         };
       };
 
@@ -78,11 +96,6 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
       };
     };
 
-  # TODO: Add extension config files
-  # - res
-  # - ffz
-  # - vimium
-  # - ublock?
   programs.firefox = {
     enable = true;
 
@@ -336,7 +349,13 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
     };
   };
 
-  backups.firefox.paths = [ ".mozilla" ];
+  backups.firefox = {
+    paths = [ ".mozilla" ];
+    restore = mkIf cfg.runInRam {
+      preRestoreScript = "systemctl stop --user firefox-persist-init";
+      postRestoreScript = "systemctl start --user firefox-persist-init";
+    };
+  };
 
   persistence.directories = mkIf (!cfg.runInRam) [
     ".mozilla"

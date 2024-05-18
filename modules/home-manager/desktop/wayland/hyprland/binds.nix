@@ -123,7 +123,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
           "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
           "${modShift}, R, exec, ${make16By9.outPath}"
           "${mod}, A, exec, ${toggleSwallowing.outPath}"
-          "${modShift}, B, exec, ${toggleGaps.outPath}"
+          "${modShiftCtrl}, T, exec, ${toggleGaps.outPath}"
 
           # Movement
           "${mod}, H, movefocus, l"

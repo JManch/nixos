@@ -414,6 +414,10 @@ mkMerge [
     services.caddy.virtualHosts = {
       "restic.${fqDomain}".extraConfig = ''
         import lan-only
+        # Because syncing involves many HTTP requests logs get very large.
+        # Exclude LAN IPs from logs to circumvent this.
+        @lan remote_ip ${caddy.lanAddressRanges}
+        skip_log @lan
         reverse_proxy http://127.0.0.1:${toString cfg.server.port}
       '';
     };

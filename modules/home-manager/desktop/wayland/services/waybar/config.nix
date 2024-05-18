@@ -6,7 +6,20 @@
 , ...
 }:
 let
-  inherit (lib) utils mkIf fetchers optional getExe' toUpper mkForce;
+  inherit (lib)
+    utils
+    mkIf
+    fetchers
+    optional
+    getExe'
+    toUpper
+    mkForce
+    getExe
+    filter
+    escapeShellArg
+    imap1
+    sort
+    concatStringsSep;
   inherit (config.modules.desktop.services) hypridle;
   inherit (osConfig.device) gpu;
   cfg = desktopCfg.services.waybar;
@@ -27,11 +40,18 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
     enable = true;
     systemd.enable = true;
 
-    # Patch disables Waybar reloading both when the SIGUSR2 event is sent and
-    # when Hyprland reloads. Waybar reloading causes the bar to open twice
+    # First patch disables Waybar reloading both when the SIGUSR2 event is sent
+    # and when Hyprland reloads. Waybar reloading causes the bar to open twice
     # because we run Waybar with systemd. Also breaks theme switching because
     # it reloads regardless of the Hyprland disable autoreload setting.
-    package = (utils.addPatches pkgs.waybar [ ../../../../../../patches/waybar.patch ]).override {
+
+    # The output bar patch allows for toggling the bar on specific outputs by
+    # sending the SIGRTMIN+<output_number> signal. It disables the custom
+    # module signal functionality that I don't use.
+    package = (utils.addPatches pkgs.waybar [
+      ../../../../../../patches/waybarDisableReload.patch
+      ../../../../../../patches/waybarOutputBarToggle.patch
+    ]).override {
       cavaSupport = false;
       evdevSupport = true;
       experimentalPatches = false;
@@ -248,10 +268,26 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
   desktop.hyprland.settings.bind =
     let
       inherit (config.modules.desktop.hyprland) modKey;
+      hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
+      jaq = getExe pkgs.jaq;
+      monitors = filter (m: m.mirror == null) osConfig.device.monitors;
+      # Waybar bars are ordered based on x pos so we need to sort
+      sortedMonitors = sort (a: b: a.position.x < b.position.x) monitors;
+
+      toggleActiveMonitorBar = pkgs.writeShellScript "hypr-toggle-active-monitor-waybar" ''
+        focused_monitor=$(${escapeShellArg hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
+        # Get ID of the monitor based on x pos sort
+        declare -A monitor_name_to_id
+        ${concatStringsSep "\n" (imap1 (i: m: "monitor_name_to_id[${m.name}]='${toString i}'") sortedMonitors)}
+        monitor_id=''${monitor_name_to_id[$focused_monitor]}
+        ${systemctl} kill --user --signal="SIGRTMIN+$monitor_id" waybar
+      '';
     in
     [
-      # Toggle waybar
-      "${modKey}, B, exec, ${systemctl} kill --user --signal=SIGUSR1 waybar"
+      # Toggle active monitor bar
+      "${modKey}, B, exec, ${toggleActiveMonitorBar.outPath}"
+      # Toggle all bars
+      "${modKey}SHIFT, B, exec, ${systemctl} kill --user --signal=SIGUSR1 waybar"
       # Restart waybar
       "${modKey}SHIFTCONTROL, B, exec, ${systemctl} restart --user waybar"
     ];

@@ -315,7 +315,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
       paths = [ "hypr/hyprland.conf" ];
       # Only reload if gamemode is not active to avoid overriding
       # gamemode-specific hyprland settings
-      reloadScript = "${getExe pkgs.gamemode} --status | grep 'is active' -q || ${hyprctl} reload";
+      reloadScript = "${getExe' pkgs.gamemode "gamemoded"} --status | grep 'is active' -q || ${hyprctl} reload";
       colors = colorMap // {
         base00 = mapDarkColor "base00";
         base01 = mapDarkColor "base01";

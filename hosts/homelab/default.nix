@@ -48,6 +48,10 @@
           "10.20.20.0/24"
           "10.0.0.2/32" # NCASE-M1 on friends VPN
         ];
+        goAccessExcludeIPRanges = [
+          "192.168.89.2"
+          "192.168.88.0-192.168.88.255"
+        ];
       };
 
       dns-server-stack = {

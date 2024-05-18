@@ -14,6 +14,7 @@ let
     getExe
     mkVMOverride
     toUpper
+    concatStringsSep
     concatStrings;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
@@ -156,6 +157,7 @@ mkMerge [
             --ws-url=logs.${fqDomain}:${if vmVariant then "50080" else "443"} \
             --port=7890 \
             --real-os \
+            ${concatStringsSep " " (map (ip: "--exclude-ip ${ip}") cfg.goAccessExcludeIPRanges)} \
             -o /var/lib/goaccess/index.html
         '';
       in

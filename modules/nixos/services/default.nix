@@ -193,6 +193,15 @@ in
           as 'lan-only' will only accept connections from these ranges.
         '';
       };
+
+      goAccessExcludeIPRanges = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of address ranges excluded from go access using their strange
+          format.
+        '';
+      };
     };
 
     dns-server-stack = {

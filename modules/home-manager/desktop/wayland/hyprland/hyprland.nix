@@ -80,7 +80,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
       # Add monitor config
       ${
         concatStringsSep "\n" (map (m: let res = "${toString m.width}x${toString m.height}"; in
-          "echo \"monitor=WL-${toString m.number},${res},${m.position},1\" >> ${hyprDir}/hyprlandd.conf")
+          "echo \"monitor=WL-${toString m.number},${res},${toString m.position.x}x${toString m.position.y},1\" >> ${hyprDir}/hyprlandd.conf")
           monitors)
       }
 
@@ -313,7 +313,9 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     in
     {
       paths = [ "hypr/hyprland.conf" ];
-      reloadScript = "${hyprctl} reload";
+      # Only reload if gamemode is not active to avoid overriding
+      # gamemode-specific hyprland settings
+      reloadScript = "${getExe pkgs.gamemode} --status | grep 'is active' -q || ${hyprctl} reload";
       colors = colorMap // {
         base00 = mapDarkColor "base00";
         base01 = mapDarkColor "base01";

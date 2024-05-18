@@ -53,10 +53,17 @@ let
         description = "Custom gamma level";
       };
 
-      position = mkOption {
-        type = types.str;
-        default = "0x0";
-        description = "Relative position of the monitor from the top left corner";
+      position = {
+        x = mkOption {
+          type = types.int;
+          default = 0;
+          description = "Relative x position of monitor from top left corner";
+        };
+        y = mkOption {
+          type = types.int;
+          default = 0;
+          description = "Relative y position of monitor from top left corner";
+        };
       };
 
       transform = mkOption {

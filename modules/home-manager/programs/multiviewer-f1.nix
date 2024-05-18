@@ -58,12 +58,12 @@ let
       # Only generate script if two monitors exist
       text = optionalString (monitor1.number != monitor2.number) /*bash*/ ''
 
-        m1_pos_x=${head monitor1Positions}
-        m1_pos_y=${last monitor1Positions}
+        m1_pos_x=${toString monitor1.position.x}
+        m1_pos_y=${toString monitor1.position.y}
         m1_res_x=${toString monitor1.width}
         m1_res_y=${toString monitor1.height}
-        m2_pos_x=${head monitor2Positions}
-        m2_pos_y=${last monitor2Positions}
+        m2_pos_x=${toString monitor2.position.x}
+        m2_pos_y=${toString monitor2.position.y}
         m2_res_x=${toString monitor2.width}
         m2_res_y=${toString monitor2.height}
 

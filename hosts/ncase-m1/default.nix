@@ -31,7 +31,7 @@
         width = 2560;
         height = 1440;
         position = "2560x0";
-        workspaces = (builtins.genList (i: (i * 2) + 1) 25);
+        workspaces = builtins.genList (i: (i * 2) + 1) 25;
       }
       {
         name = "HDMI-A-1";
@@ -40,7 +40,7 @@
         width = 2560;
         height = 1440;
         position = "0x0";
-        workspaces = (builtins.genList (i: (i * 2) + 2) 25);
+        workspaces = builtins.genList (i: (i * 2) + 2) 25;
       }
       {
         # Enabled on-demand for sim racing

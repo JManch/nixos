@@ -59,9 +59,6 @@
     lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
     lanzaboote.inputs.pre-commit-hooks-nix.follows = "";
 
-    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay?rev=cf6844d105415e19d124f66f1e794ac08a3610c3";
-    neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
-
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
 

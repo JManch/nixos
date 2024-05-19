@@ -3,9 +3,9 @@
 , config
 , osConfig
 , ...
-} @ args:
+}:
 let
-  inherit (lib) mkIf utils optionalString;
+  inherit (lib) mkIf optionalString;
   cfg = config.modules.programs.neovim;
 in
 mkIf cfg.enable
@@ -14,7 +14,6 @@ mkIf cfg.enable
 
   programs.neovim = {
     enable = true;
-    package = (utils.flakePkgs args "neovim-nightly-overlay").default;
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;

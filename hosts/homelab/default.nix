@@ -144,6 +144,11 @@
           "play-times"
         ];
       };
+
+      jellyfin.reverseProxy = {
+        enable = true;
+        address = "ncase-m1.lan";
+      };
     };
 
     system = {

@@ -217,11 +217,11 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
           }
 
           @media {
-            #navigator-toolbox:not(:-moz-lwtheme){ background-color: -moz-dialog !important; }
+            :root:not([lwtheme]) #navigator-toolbox{ background-color: -moz-dialog !important; }
           }
 
           :root[sizemode="fullscreen"],
-          #navigator-toolbox[inFullscreen]{ margin-top: 0 !important; }
+          :root[sizemode="fullscreen"] #navigator-toolbox{ margin-top: 0 !important; }
 
           #navigator-toolbox{
             position: fixed !important;

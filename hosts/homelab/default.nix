@@ -41,6 +41,7 @@
 
       caddy = {
         enable = true;
+        interfaces = [ "wg-friends" ];
         lanAddressRanges = [
           "192.168.89.2/32"
           "192.168.88.0/24"
@@ -72,6 +73,7 @@
         port = 8081;
         autoStart = true;
         proxy = true;
+        interfaces = [ "wg-friends" ];
       };
 
       zigbee2mqtt = {

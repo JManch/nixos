@@ -19,6 +19,7 @@ let
     mkForce
     optionalString
     mapAttrsToList
+    genAttrs
     attrNames;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.services) caddy wireguard;
@@ -51,10 +52,10 @@ mkMerge [
         };
       };
 
-      networking.firewall.interfaces.wg-friends = mkIf (cfg.openFirewall && wireguard.friends.enable) {
+      networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
         allowedTCPPorts = [ 8096 8920 ];
         allowedUDPPorts = [ 1900 7359 ];
-      };
+      });
 
       # Jellyfin module has good default hardening
 
@@ -98,7 +99,7 @@ mkMerge [
     ];
 
     services.caddy.virtualHosts."jellyfin.${fqDomain}".extraConfig = ''
-      import wg-friends-only
+      import ${if wireguard.friends.enable then "wg-friends" else "lan"}-only
       reverse_proxy http://${cfg.reverseProxy.address}:8096
     '';
   })

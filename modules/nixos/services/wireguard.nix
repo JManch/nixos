@@ -7,7 +7,9 @@
 let
   inherit (lib)
     mkIf
+    all
     utils
+    elem
     getExe
     getExe'
     attrsToList
@@ -19,6 +21,8 @@ let
     concatMap
     nameValuePair
     attrNames
+    removePrefix
+    substring
     concatStringsSep;
   inherit (config.modules.services) dns-server-stack;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -143,21 +147,27 @@ let
     };
 in
 {
-  assertions = utils.asserts (concatMap
-    (interface:
-      let
-        name = interface.name;
-        cfg = interface.value;
-      in
-      [
-        (config.age.secrets."wg-${name}-key" != null)
-        "A private key secret for the Wireguard VPN interface ${name} is missing"
-        (cfg.dns.host -> dns-server-stack.enable)
-        "The dns server stack must be enabled on this host to allow VPN dns hosting"
-        (cfg.routerPeer -> (cfg.routerAllowedIPs != [ ]))
-        "The routerAllowedIPs list for VPN ${name} must not be empty if routerPeer is enabled"
-      ])
-    (attrsToList interfaces));
+  assertions = utils.asserts (
+    (concatMap
+      (interface:
+        let
+          name = interface.name;
+          cfg = interface.value;
+        in
+        [
+          (config.age.secrets."wg-${name}-key" != null)
+          "A private key secret for the Wireguard VPN interface ${name} is missing"
+          (cfg.dns.host -> dns-server-stack.enable)
+          "The dns server stack must be enabled on this host to allow VPN dns hosting"
+          (cfg.routerPeer -> (cfg.routerAllowedIPs != [ ]))
+          "The routerAllowedIPs list for VPN ${name} must not be empty if routerPeer is enabled"
+        ])
+      (attrsToList interfaces)) ++ [
+      # Check that all interfaces starting with "wg-" in networking.firewall.interfaces are configured wireguard interfaces that are enabled
+      (all (v: v == true) (map (interface: (if (substring 0 3 interface) != "wg-" then true else elem (removePrefix "wg-" interface) (attrNames interfaces))) (attrNames config.networking.firewall.interfaces)))
+      "At least one of the wireguard interfaces (interface starting with 'wg-') added to `networking.firewall.interfaces` is not a valid/enabled wireguard interface"
+    ]
+  );
 
   networking.wg-quick.interfaces = mapAttrs'
     (name: cfg: nameValuePair ("wg-" + name) (interfaceConfig name cfg))

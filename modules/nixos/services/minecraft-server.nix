@@ -19,6 +19,7 @@ let
     mkForce;
   inherit (config.services.minecraft-server) dataDir;
   inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.modules.services) wireguard;
   cfg = config.modules.services.minecraft-server;
 
   availablePlugins = outputs.packages.${pkgs.system}.minecraft-plugins
@@ -252,7 +253,7 @@ mkIf cfg.enable
   };
 
   services.caddy.virtualHosts."squaremap.${fqDomain}".extraConfig = mkIf (pluginEnabled "squaremap") ''
-    import wg-friends-only
+    import ${if wireguard.friends.enable then "wg-friends" else "lan"}-only
     reverse_proxy http://127.0.0.1:25566
     handle_errors {
       respond "Minecraft server is hibernating or offline" 503

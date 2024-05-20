@@ -15,6 +15,7 @@ let
     mkVMOverride
     toUpper
     concatStringsSep
+    genAttrs
     concatStrings;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
@@ -125,10 +126,10 @@ mkMerge [
     networking.firewall.allowedUDPPorts = [ 443 ];
     modules.system.networking.publicPorts = [ 443 80 ];
 
-    networking.firewall.interfaces.wg-friends = mkIf wireguard.friends.enable {
+    networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
       allowedTCPPorts = [ 443 80 ];
       allowedUDPPorts = [ 443 ];
-    };
+    });
 
     # Extra hardening
     systemd.services.caddy.serviceConfig = utils.hardeningBaseline config {

@@ -1,6 +1,6 @@
 { lib, config, inputs, ... }:
 let
-  inherit (lib) mkIf mkForce optional;
+  inherit (lib) mkIf mkForce optional genAttrs;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) wireguard;
   cfg = config.modules.services.broadcast-box;
@@ -24,11 +24,10 @@ in
     optional cfg.autoStart "multi-user.target"
   );
 
-  # When not proxying only expose over wg interface
-  networking.firewall.interfaces.wg-friends = mkIf (wireguard.friends.enable && !cfg.proxy) {
+  networking.firewall.interfaces = mkIf (!cfg.proxy) (genAttrs cfg.interfaces (_: {
     allowedTCPPorts = [ cfg.port ];
     allowedUDPPorts = [ cfg.udpMuxPort ];
-  };
+  }));
 
   modules.system.networking.publicPorts = [ cfg.udpMuxPort ];
   networking.firewall.allowedUDPPorts = mkIf cfg.proxy [ cfg.udpMuxPort ];

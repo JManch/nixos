@@ -99,8 +99,6 @@
 
     services = {
       udisks.enable = true;
-      ollama.enable = false; # FIX: waiting for nixpkgs update
-      broadcast-box.enable = true;
       greetd.enable = true;
       lact.enable = true;
       scrutiny.collector.enable = true;
@@ -131,6 +129,7 @@
         enable = true;
         openFirewall = true;
         autoStart = false;
+        interfaces = [ "wg-friends" ];
         mediaDirs = {
           shows = "/home/${username}/videos/shows";
           movies = "/home/${username}/videos/movies";
@@ -140,6 +139,11 @@
       nfs.client = {
         enable = true;
         supportedMachines = [ "homelab.lan" ];
+      };
+
+      ollama = {
+        enable = false;
+        interfaces = [ "wg-friends" ];
       };
     };
 

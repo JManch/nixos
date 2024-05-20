@@ -1,7 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf mkForce optional;
-  inherit (config.modules.services) wireguard;
+  inherit (lib) mkIf mkForce optional genAttrs;
   cfg = config.modules.services.ollama;
 in
 mkIf cfg.enable
@@ -21,9 +20,9 @@ mkIf cfg.enable
     };
   };
 
-  networking.firewall.interfaces.wg-friends = mkIf wireguard.friends.enable {
+  networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
     allowedTCPPorts = [ 11434 8000 ];
-  };
+  });
 
   persistence.directories = [
     # NOTE: Can't be persisted because Ollama is a DynamicUser service so the

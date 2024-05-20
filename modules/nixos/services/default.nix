@@ -133,6 +133,14 @@ in
         };
       };
 
+      interfaces = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of additional interfaces for Jellyfin to be exposed on.
+        '';
+      };
+
       autoStart = mkOption {
         type = types.bool;
         default = true;
@@ -159,6 +167,14 @@ in
     ollama = {
       enable = mkEnableOption "Ollama";
       autoStart = mkEnableOption "Ollama service auto start";
+
+      interfaces = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of additional interfaces for Ollama to be exposed on.
+        '';
+      };
     };
 
     broadcast-box = {
@@ -167,6 +183,14 @@ in
       proxy = mkEnableOption ''
         publically exposing Broadcast Box with a reverse proxy.
       '';
+
+      interfaces = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of additional interfaces for Broadcast Box to be exposed on.
+        '';
+      };
 
       port = mkOption {
         type = types.port;
@@ -183,6 +207,14 @@ in
 
     caddy = {
       enable = mkEnableOption "Caddy";
+
+      interfaces = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of additional interfaces for Caddy to be exposed on.
+        '';
+      };
 
       lanAddressRanges = mkOption {
         type = types.listOf types.str;

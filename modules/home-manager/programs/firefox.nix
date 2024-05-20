@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) mkIf getExe getExe';
   inherit (config.modules) desktop;
   cfg = config.modules.programs.firefox;
 in
@@ -24,12 +24,12 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
       syncToTmpfs = /*bash*/ ''
         # Do not delete the existing Nix store links when syncing
         ${fd} -Ht l --base-directory "${tmpfsDir}" | \
-          ${rsync} -ah --no-links --delete --info=stats1 --mkpath \
+          ${rsync} -ah --no-links --delete --info=stats1 \
           --exclude-from=- "${persistDir}" "${tmpfsDir}"
       '';
 
       syncToPersist = /*bash*/ ''
-        ${rsync} -ah --no-links --delete --info=stats1 --mkpath \
+        ${rsync} -ah --no-links --delete --info=stats1 \
           "${tmpfsDir}" "${persistDir}"
       '';
     in
@@ -54,12 +54,14 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
           RemainAfterExit = true;
         };
 
-        # default.target is an alias to either multi-user.target or
-        # graphical.target. can view the symlink with ls -l
-        # /etc/systemd/system/default.target This service cannot start with
-        # graphical-session.target because the large initial copy (about 1GB)
-        # significantly slows down the start-up of desktop services like
-        # waybar.
+        # Ideally we would use "graphical-session-pre.target" here to ensure
+        # that firefox cannot be launched before the sync has finished (if
+        # firefox launches it creates files and breaks the sync). However, I
+        # don't want to stare at a blank screen for 5 seconds every boot so
+        # instead I prevent firefox launch bind from working unless sync has
+        # finished. It's not too fragile because even if firefox is forcefully
+        # launched within the ~5 second window, the persist-init service will
+        # fail, prevent further syncs from happening, and prevent corruption.
         Install.WantedBy = [ "default.target" ];
       };
 
@@ -365,9 +367,15 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
   desktop.hyprland.binds =
     let
       inherit (config.modules) desktop;
+      systemctl = getExe' pkgs.systemd "systemctl";
       firefox = getExe config.programs.firefox.package;
+      notifySend = getExe pkgs.libnotify;
+      launchFirefox =
+        if cfg.runInRam then
+          "${systemctl} is-active --quiet --user firefox-persist-init && ${firefox} || ${notifySend} -u critical -t 3000 'Firefox' 'Initial sync has not yet finished'"
+        else firefox;
     in
     [
-      "${desktop.hyprland.modKey}, Backspace, exec, ${firefox}"
+      "${desktop.hyprland.modKey}, Backspace, exec, ${launchFirefox}"
     ];
 }

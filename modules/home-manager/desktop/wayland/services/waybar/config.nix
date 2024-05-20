@@ -206,7 +206,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
         "custom/hypridle" = mkIf hypridle.enable {
           format = "<span color='#${colors.base04}'>󰷛 </span> {}";
           exec = "echo '{\"text\": \"Lock Inhibited\"}'";
-          exec-if = "${systemctl} status --user hypridle > /dev/null 2>&1 && exit 1 || exit 0";
+          exec-if = "${systemctl} is-active --quiet --user hypridle && exit 1 || exit 0";
           return-type = "json";
           tooltip = false;
           interval = 5;

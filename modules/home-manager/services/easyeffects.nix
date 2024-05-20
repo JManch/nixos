@@ -28,7 +28,7 @@ mkIf (cfg.enable && audio.enable)
     {
       pulseaudio = {
         "on-click-middle" = /* bash */ ''
-          ${systemctl} status --user easyeffects > /dev/null 2>&1 && {
+          ${systemctl} is-active --quiet --user easyeffects && {
             ${systemctl} stop --user easyeffects
             ${notifySend} --urgency=low -t 3000 'Easyeffects disabled'
           } || {

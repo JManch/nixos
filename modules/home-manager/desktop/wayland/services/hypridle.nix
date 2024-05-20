@@ -76,11 +76,11 @@ in
         systemctl = getExe' pkgs.systemd "systemctl";
         notifySend = getExe pkgs.libnotify;
         toggleHypridle = pkgs.writeShellScript "hypridle-toggle" ''
-          ${systemctl} status --user hypridle && {
-            ${systemctl} stop --user hypridle
+          ${systemctl} is-active --quiet --user hypridle && {
+            ${systemctl} stop --quiet --user hypridle
             ${notifySend} --urgency=low -t 2000 'Hypridle' 'Service disabled'
-          }  || {
-            ${systemctl} start --user hypridle
+          } || {
+            ${systemctl} start --quiet --user hypridle
             ${notifySend} --urgency=low -t 2000 'Hypridle' 'Service enabled'
           }
         '';

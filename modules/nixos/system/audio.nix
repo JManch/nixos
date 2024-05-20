@@ -1,12 +1,6 @@
-{ lib
-, pkgs
-, config
-, inputs
-, ...
-}:
+{ lib, pkgs, config, ... }:
 let
   inherit (lib) mkMerge mkIf getExe getExe' mkForce;
-  inherit (config.modules.programs) gaming;
   cfg = config.modules.system.audio;
 
   toggleMic =

@@ -44,7 +44,6 @@ mkIf cfg.enable
 
     # Can't use nix yaml because the keys for fan curve have to be integers
     settings = /*yaml*/ ''
-
       daemon:
         log_level: info
         admin_groups:
@@ -100,6 +99,7 @@ mkIf cfg.enable
         echo '{"command": "set_power_profile_mode", "args": {"id": "${gpuId}", "index": 1}}' | ${ncat} -U /run/lactd.sock
         ${confirm}
       '';
+
       stopScript = ''
         echo '{"command": "set_power_profile_mode", "args": {"id": "${gpuId}", "index": 0}}' | ${ncat} -U /run/lactd.sock
         ${confirm}

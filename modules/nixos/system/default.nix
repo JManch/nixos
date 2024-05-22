@@ -1,11 +1,28 @@
 { lib, config, ... }:
 let
-  inherit (lib) mkEnableOption mkOption types;
+  inherit (lib) utils mkEnableOption mkOption types mapAttrsToList all allUnique;
+  cfg = config.modules.system;
 in
 {
   imports = lib.utils.scanPaths ./.;
 
   options.modules.system = {
+    reservedIDs = mkOption {
+      type = types.attrsOf (types.submodule {
+        options = {
+          uid = mkOption { type = types.int; };
+          gid = mkOption { type = types.int; };
+        };
+      });
+      default = { };
+      description = ''
+        Manually allocated UIDs and GIDs for users. IDs must be > 1000 to
+        prevent clashing with dynamically allocated system users. This option
+        must be unconditionally set regardless of whether or not the associated
+        module is enabled.
+      '';
+    };
+
     bluetooth.enable = mkEnableOption "bluetooth";
 
     virtualisation = {
@@ -127,5 +144,23 @@ in
       enable = mkEnableOption "features for systems dual-booting Window";
       bootEntry = mkEnableOption "Windows systemd-boot boot entry";
     };
+  };
+
+  config = {
+    assertions =
+      let
+        gids = mapAttrsToList (name: value: value.gid) cfg.reservedIDs;
+        uids = mapAttrsToList (name: value: value.uid) cfg.reservedIDs;
+      in
+      utils.asserts [
+        (allUnique uids)
+        "Reserved UIDs must be unique"
+        (allUnique gids)
+        "Reserved GIDs must be unique"
+        (all (uid: uid > 1000 && uid < 2000) uids)
+        "Reserved UIDs must be greater than 1000 and less than 2000"
+        (all (gid: gid > 1000 && gid < 2000) gids)
+        "Reserved GIDs must be greater than 1000 and less than 2000"
+      ];
   };
 }

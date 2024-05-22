@@ -1,4 +1,3 @@
-{ username, ... }:
 {
   imports = [ ./hardware-configuration.nix ];
 
@@ -125,19 +124,8 @@
         };
       };
 
-      jellyfin = {
-        enable = true;
-        openFirewall = true;
-        autoStart = false;
-        interfaces = [ "wg-friends" ];
-        mediaDirs = {
-          shows = "/home/${username}/videos/shows";
-          movies = "/home/${username}/videos/movies";
-        };
-      };
-
       nfs.client = {
-        enable = true;
+        enable = false;
         supportedMachines = [ "homelab.lan" ];
       };
 

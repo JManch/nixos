@@ -60,8 +60,19 @@ mkMerge [
       # Jellyfin module has good default hardening
 
       systemd.tmpfiles.rules = map
-        (name: "d /var/lib/jellyfin/media${optionalString (name != "") "/${name}"} 700 ${jellyfin.user} ${jellyfin.group}")
+        (name: "d /var/lib/jellyfin/media${optionalString (name != "") "/${name}"} 0700 ${jellyfin.user} ${jellyfin.group}")
         (attrNames cfg.mediaDirs);
+
+      backups.jellyfin = {
+        paths = [ "/var/lib/jellyfin" ];
+        exclude = [ "transcodes" "media" "log" "metadata" ];
+        restore = {
+          preRestoreScript = "sudo systemctl stop jellyfin";
+          pathOwnership = {
+            "/var/lib/jellyfin" = { user = "jellyfin"; group = "jellyfin"; };
+          };
+        };
+      };
 
       persistence.directories = [
         {

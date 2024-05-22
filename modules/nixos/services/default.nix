@@ -433,6 +433,7 @@ in
 
         supportedMachines = mkOption {
           type = types.listOf types.str;
+          default = [ ];
           description = ''
             List of machines that this host can share NFS exports with.
           '';
@@ -457,15 +458,14 @@ in
               };
             };
           });
-
+          default = [ ];
           example = [{
-            path = "/export";
+            path = "jellyfin";
             clients = {
               "homelab.lan" = "ro,no_subtree_check";
               "192.168.88.254" = "ro,no_subtree_check";
             };
           }];
-
           description = "List of local file systems that are exported by the NFS server";
         };
       };
@@ -475,6 +475,7 @@ in
 
         supportedMachines = mkOption {
           type = types.listOf types.str;
+          default = [ ];
           description = "List of machines this host can accept NFS file systems from";
         };
 
@@ -509,12 +510,13 @@ in
               };
             };
           });
-
+          default = [ ];
           example = [{
             name = "jellyfin";
             machine = "homelab.lan";
+            user = "jellyfin";
+            group = "jellyfin";
           }];
-
           description = "List of remote NFS file systems to mount";
         };
       };

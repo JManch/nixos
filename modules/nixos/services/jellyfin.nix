@@ -26,8 +26,16 @@ let
   inherit (config.services) jellyfin;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.jellyfin;
+  uid = 1500;
+  gid = 1500;
 in
 mkMerge [
+  {
+    modules.system.reservedIDs.jellyfin = {
+      inherit uid gid;
+    };
+  }
+
   (mkIf cfg.enable
     {
       environment.systemPackages = optional cfg.mediaPlayer pkgs.jellyfin-media-player;
@@ -37,8 +45,8 @@ mkMerge [
         openFirewall = cfg.openFirewall;
       };
 
-      users.users.jellyfin.uid = 1500;
-      users.groups.jellyfin.gid = 1500;
+      users.users.jellyfin.uid = uid;
+      users.groups.jellyfin.gid = gid;
 
       systemd.services.jellyfin = {
         wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
@@ -93,13 +101,6 @@ mkMerge [
         ".local/share/Jellyfin Media Player"
         ".local/share/jellyfinmediaplayer"
       ];
-
-      modules.services.nfs.client.fileSystems = [{
-        path = "jellyfin";
-        machine = "homelab.lan";
-        user = jellyfin.user;
-        group = jellyfin.group;
-      }];
     }
   )
 

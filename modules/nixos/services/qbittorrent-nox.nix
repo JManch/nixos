@@ -2,7 +2,6 @@
 , pkgs
 , config
 , inputs
-, outputs
 , username
 , ...
 }:
@@ -58,7 +57,7 @@ mkIf cfg.enable
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin 775 qbittorrent-nox qbittorrent-nox"
+    "d /var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin 0775 qbittorrent-nox qbittorrent-nox"
   ];
 
   fileSystems."/export/jellyfin" = mkIf nfs.server.enable {
@@ -68,16 +67,14 @@ mkIf cfg.enable
 
   modules.services.nfs.server.fileSystems =
     let
-      inherit (outputs.nixosConfigurations.ncase-m1.config) users;
-      jellyfinUid = toString users.users.jellyfin.uid;
-      jellyfinGid = toString users.groups.jellyfin.gid;
+      inherit (config.modules.system.reservedIDs.jellyfin) uid gid;
     in
     [{
       path = "jellyfin";
       clients = {
         # all_squash doesn't change the ownership of existing files
         # It just affects the access priviledges somehow through NFS I think?
-        "ncase-m1.lan" = "ro,no_subtree_check,all_squash,anonuid=${jellyfinUid},anongid=${jellyfinGid}";
+        "ncase-m1.lan" = "ro,no_subtree_check,all_squash,anonuid=${toString uid},anongid=${toString gid}";
       };
     }];
 

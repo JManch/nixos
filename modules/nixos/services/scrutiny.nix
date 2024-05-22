@@ -97,9 +97,7 @@ mkMerge [
       ];
 
       restore = {
-        preRestoreScript = /*bash*/ ''
-          sudo systemctl stop scrutiny
-        '';
+        preRestoreScript = "sudo systemctl stop scrutiny";
 
         postRestoreScript = /*bash*/ ''
           echo "Restoring Scrutiny influxdb database"

@@ -91,7 +91,7 @@ mkMerge [
 
       # Need to do this as well
       systemd.tmpfiles.rules = map
-        (f: "d /mnt/nfs/${f.path} 775 ${f.user} ${f.group}")
+        (f: "d /mnt/nfs/${f.path} 0775 ${f.user} ${f.group}")
         fileSystems;
 
       fileSystems = listToAttrs (map

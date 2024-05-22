@@ -73,8 +73,8 @@ mkIf cfg.enable
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/wallabag/data 755 root root"
-    "d /var/lib/wallabag/images 755 root root"
+    "d /var/lib/wallabag/data 0755 root root"
+    "d /var/lib/wallabag/images 0755 root root"
   ];
 
   persistence.directories = [{

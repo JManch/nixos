@@ -147,9 +147,15 @@
         ];
       };
 
-      jellyfin.reverseProxy = {
+      jellyfin = {
         enable = true;
-        address = "ncase-m1.lan";
+        openFirewall = false;
+        autoStart = true;
+        reverseProxy.enable = true;
+        mediaDirs = {
+          shows = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/shows";
+          movies = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/movies";
+        };
       };
     };
 

@@ -37,8 +37,8 @@ mkMerge [
         openFirewall = cfg.openFirewall;
       };
 
-      users.users.jellyfin.uid = 997;
-      users.groups.jellyfin.gid = 996;
+      users.users.jellyfin.uid = 1500;
+      users.groups.jellyfin.gid = 1500;
 
       systemd.services.jellyfin = {
         wantedBy = mkForce (optional cfg.autoStart "multi-user.target");

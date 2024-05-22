@@ -106,7 +106,7 @@
       };
 
       nfs.server = {
-        enable = true;
+        enable = false;
         supportedMachines = [ "ncase-m1.lan" ];
       };
 

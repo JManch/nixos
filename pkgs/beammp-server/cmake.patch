@@ -1,0 +1,43 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c51779d..6f0bdd8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -4,8 +4,6 @@ if (WIN32)
+     set(VCPKG_TARGET_TRIPLET x64-windows-static)
+ endif()
+ 
+-include(cmake/Vcpkg.cmake) # needs to happen before project()
+-
+ project(
+     "BeamMP-Server" # replace this
+     VERSION 3.3.0
+@@ -13,7 +11,6 @@ project(
+ 
+ include(cmake/StandardSettings.cmake)
+ include(cmake/StaticAnalyzers.cmake)
+-include(cmake/Git.cmake)
+ 
+ # below are options which should be changed
+ 
+@@ -95,12 +92,12 @@ set(PRJ_LIBRARIES
+     Threads::Threads
+     commandline_static
+     toml11::toml11
+-    rapidjson
+     sol2
+     httplib::httplib
+     libzip::zip
+     OpenSSL::SSL OpenSSL::Crypto
+     ${LUA_LIBRARIES}
++    ZLIB::ZLIB
+ )
+ 
+ # add dependency find_package calls and similar here
+@@ -113,6 +110,7 @@ find_package(libzip CONFIG REQUIRED)
+ find_package(RapidJSON CONFIG REQUIRED)
+ find_package(sol2 CONFIG REQUIRED)
+ find_package(toml11 CONFIG REQUIRED)
++find_package(ZLIB)
+ 
+ include_directories(include)
+ 

@@ -157,6 +157,12 @@
           movies = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/movies";
         };
       };
+
+      beammp-server = {
+        enable = true;
+        openFirewall = true;
+        interfaces = [ "wg-friends" ];
+      };
     };
 
     system = {

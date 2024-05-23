@@ -736,6 +736,46 @@ in
           '';
         };
       };
+
+    beammp-server = {
+      enable = mkEnableOption "BeamMP Server";
+      openFirewall = mkEnableOption "opening the firewall";
+
+      map = mkOption {
+        type = types.enum [
+          "gridmap_v2"
+          "johnson_valley"
+          "automation_test_track"
+          "east_coast_usa"
+          "hirochi_raceway"
+          "italy"
+          "jungle_rock_island"
+          "industrial"
+          "small_island"
+          "smallgrid"
+          "utah"
+          "west_coast_usa"
+          "driver_training"
+          "derby"
+        ];
+        default = "east_coast_usa";
+        description = "Map the server runs";
+      };
+
+      port = mkOption {
+        type = types.port;
+        default = 30814;
+        description = "Port for the BeamMP Server to listen on";
+      };
+
+      interfaces = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of additional interfaces for BeamMP Server to be exposed on.
+        '';
+      };
+    };
   };
 
   config = {

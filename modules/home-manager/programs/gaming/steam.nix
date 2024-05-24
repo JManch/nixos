@@ -32,16 +32,16 @@ mkIf cfg.enable
 
   desktop.hyprland.settings.windowrulev2 = [
     # Main steam window
-    "workspace 5,class:^(steam)$,title:^(Steam)$"
+    "workspace emptym silent, class:^(steam)$, title:^(Steam)$"
 
     # Steam sign-in window
-    "noinitialfocus,class:^(steam)$,title:^(Sign in to Steam)$"
-    "workspace 5 silent,class:^(steam)$,title:^(Sign in to Steam)$"
+    "noinitialfocus, class:^(steam)$, title:^(Sign in to Steam)$"
+    "workspace special:loading silent, class:^(steam)$, title:^(Sign in to Steam)$"
 
     # Friends list
-    "float,class:^(steam)$,title:^(Friends List)$"
-    "size 360 700,class:^(steam)$,title:^(Friends List)$"
-    "center,class:^(steam)$,title:^(Friends List)$"
+    "float, class:^(steam)$, title:^(Friends List)$"
+    "size 360 700, class:^(steam)$, title:^(Friends List)$"
+    "center, class:^(steam)$, title:^(Friends List)$"
   ];
 
   programs.zsh.shellAliases = {

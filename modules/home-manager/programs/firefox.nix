@@ -377,5 +377,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
     in
     [
       "${desktop.hyprland.modKey}, Backspace, exec, ${launchFirefox}"
+      "${desktop.hyprland.modKey}SHIFT, Backspace, workspace, emptym"
+      "${desktop.hyprland.modKey}SHIFT, Backspace, exec, ${launchFirefox}"
     ];
 }

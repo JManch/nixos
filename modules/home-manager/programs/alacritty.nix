@@ -82,5 +82,9 @@ lib.mkIf cfg.enable
     alacritty-normal-font = "alacritty msg config font.size=${toString normalFontSize}";
   };
 
-  desktop.hyprland.binds = [ "${desktop.hyprland.modKey}, Return, exec, alacritty" ];
+  desktop.hyprland.binds = [
+    "${desktop.hyprland.modKey}, Return, exec, alacritty"
+    "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
+    "${desktop.hyprland.modKey}SHIFT, Return, exec, alacritty"
+  ];
 }

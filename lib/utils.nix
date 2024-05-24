@@ -1,6 +1,17 @@
 lib:
 let
-  inherit (lib) attrNames filterAttrs imap0 mod elemAt concatMap;
+  inherit (lib)
+    attrNames
+    filterAttrs
+    imap0
+    head
+    tail
+    concatStrings
+    toUpper
+    mod
+    elemAt
+    concatMap
+    stringToCharacters;
 in
 {
   homeConfig = args:
@@ -13,6 +24,12 @@ in
   });
 
   hosts = outputs: filterAttrs (host: v: (host != "installer")) outputs.nixosConfigurations;
+
+  upperFirstChar = string:
+    let
+      chars = stringToCharacters string;
+    in
+    concatStrings ([ (toUpper (head chars)) ] ++ (tail chars));
 
   asserts = asserts:
     concatMap (a: a) (

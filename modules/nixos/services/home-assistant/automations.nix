@@ -1,6 +1,6 @@
 { lib, config, inputs, ... }:
 let
-  inherit (lib) mkIf head optional attrValues;
+  inherit (lib) mkIf utils head optional optionals attrValues;
   inherit (secretCfg) devices;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) frigate;
@@ -9,7 +9,6 @@ let
 
   frigateEntranceNotify = {
     alias = "Entrance Person Notify";
-    description = "";
     use_blueprint = {
       path = "SgtBatten/frigate_notifications.yaml";
       input = {
@@ -17,15 +16,41 @@ let
         notify_device = (head (attrValues devices)).id;
         notify_group = "All Notify Devices";
         base_url = "https://home-notif.${fqDomain}";
+        group = "{{camera}}-frigate-notification";
         title = "Security Alert";
         message = "A person was detected in the entrance";
         update_thumbnail = true;
+        alert_once = true;
         zone_filter = true;
         zones = [ "entrance" ];
         labels = [ "person" ];
       };
     };
   };
+
+  frigateHighAlertNotify = map
+    (camera: {
+      alias = "High Alert ${utils.upperFirstChar camera} Notify";
+      use_blueprint = {
+        path = "SgtBatten/frigate_notifications.yaml";
+        input = {
+          camera = "camera.${camera}";
+          state_filter = true;
+          state_entity = "input_boolean.high_alert_surveillance";
+          state_filter_states = [ "on" ];
+          notify_device = (head (attrValues devices)).id;
+          sticky = true;
+          notify_group = "All Notify Devices";
+          group = "{{camera}}-frigate-notification";
+          base_url = "https://home-notif.${fqDomain}";
+          title = "Security Alert";
+          ios_live_view = "camera.${camera}";
+          message = "A person was detected on the property";
+          color = "#f44336";
+          update_thumbnail = true;
+        };
+      };
+    }) [ "driveway" "poolhouse" ];
 
   heatingTimeToggle = map
     (enable:
@@ -166,7 +191,8 @@ mkIf (cfg.enableInternal)
       # ++ joshuaDehumidifierToggle
       ++ joshuaDehumidifierMoldToggle
       ++ joshuaDehumidifierTankFull
-      ++ optional frigate.enable frigateEntranceNotify;
+      ++ optional frigate.enable frigateEntranceNotify
+      ++ optionals frigate.enable frigateHighAlertNotify;
 
     input_datetime = {
       heating_disable_time = {
@@ -184,6 +210,11 @@ mkIf (cfg.enableInternal)
       heating_enabled = {
         name = "Heating Enabled";
         icon = "mdi:heating-coil";
+      };
+
+      high_alert_surveillance = {
+        name = "High Alert Surveillance";
+        icon = "mdi:cctv";
       };
     };
   };

@@ -461,6 +461,11 @@ let
           cards = [
             (frigateCameraCard "driveway")
             (frigateCameraCard "poolhouse")
+            {
+              type = "entities";
+              entities = [{ entity = "input_boolean.high_alert_surveillance"; }];
+              state_color = true;
+            }
           ];
         }
         (frigateCameraStats "driveway")

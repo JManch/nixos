@@ -10,6 +10,7 @@
   thermal-comfort = pkgs.callPackage ./thermal-comfort.nix { };
   thermal-comfort-icons = pkgs.callPackage ./thermal-comfort-icons.nix { };
   beammp-server = pkgs.callPackage ./beammp-server { };
+  heatmiser = pkgs.home-assistant.python.pkgs.callPackage ./heatmiser.nix { };
 
   # WARN: Due to https://github.com/NixOS/nix/issues/9346 this breaks my
   # flake's output with commands like `nix flake check`

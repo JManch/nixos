@@ -5,7 +5,7 @@
 , outputs
 , hostname
 , ...
-} @ args:
+}:
 let
   inherit (lib)
     mkIf
@@ -68,9 +68,9 @@ in
         "roborock"
       ] ++ optional mosquitto.enable "mqtt";
 
-      customComponents = with pkgs.home-assistant-custom-components; [
-        miele
-        (adaptive_lighting.overrideAttrs (oldAttrs: rec {
+      customComponents = [
+        pkgs.home-assistant-custom-components.miele
+        (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs (oldAttrs: rec {
           version = "1.21.2";
           src = pkgs.fetchFromGitHub {
             owner = "basnijholt";
@@ -79,7 +79,7 @@ in
             hash = "sha256-VeSMBjvlmvVE93IpDbOhkDizMlE/SYclL6yoQ3d6biw=";
           };
         }))
-        (utils.flakePkgs args "graham33").heatmiser-for-home-assistant
+        outputs.packages.${pkgs.system}.heatmiser
         outputs.packages.${pkgs.system}.thermal-comfort
       ] ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;
 

@@ -465,27 +465,6 @@
         "type": "github"
       }
     },
-    "graham33": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1706961565,
-        "narHash": "sha256-FGwJvvoWhMnUFQ/kMejBjALwvToxRIZLfgazuUUXrS4=",
-        "owner": "graham33",
-        "repo": "nur-packages",
-        "rev": "71fcef3f3f0f198577fee51f64a0f3711daefc99",
-        "type": "github"
-      },
-      "original": {
-        "owner": "graham33",
-        "repo": "nur-packages",
-        "rev": "71fcef3f3f0f198577fee51f64a0f3711daefc99",
-        "type": "github"
-      }
-    },
     "grimblast": {
       "inputs": {
         "nixpkgs": [
@@ -991,7 +970,6 @@
         "disko": "disko",
         "firstBoot": "firstBoot",
         "flake-parts": "flake-parts_2",
-        "graham33": "graham33",
         "grimblast": "grimblast",
         "home-manager": "home-manager",
         "hypridle": "hypridle",

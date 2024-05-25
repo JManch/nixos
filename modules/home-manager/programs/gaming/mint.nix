@@ -1,4 +1,4 @@
-{ lib, pkgs, config, ... } @ args:
+{ lib, config, ... } @ args:
 let
   inherit (lib) mkIf getExe utils optional;
   cfg = config.modules.programs.gaming.mint;

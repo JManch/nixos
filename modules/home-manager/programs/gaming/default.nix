@@ -1,9 +1,8 @@
 { lib
-, pkgs
 , config
 , osConfig
 , ...
-} @ args:
+}:
 let
   inherit (lib)
     mkIf
@@ -14,7 +13,6 @@ let
     concatStringsSep
     concatStrings
     optional;
-  cfg = config.modules.programs.gaming;
 in
 {
   imports = utils.scanPaths ./.;
@@ -40,7 +38,7 @@ in
       type = types.str;
       internal = true;
       readOnly = true;
-      apply = with config.modules.programs.gaming; _: "^(${concatStringsSep "|" gameClasses})$";
+      apply = _: "^(${concatStringsSep "|" config.modules.programs.gaming.gameClasses})$";
     };
 
     tearingExcludedClasses = mkOption {

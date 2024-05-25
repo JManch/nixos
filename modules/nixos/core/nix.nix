@@ -322,7 +322,7 @@ in
           echo "Usage: inspect-host <hostname>"
           return 1
         fi
-        nixos-rebuild repl --flake "${configDir}#$hostname" "$@"
+        nixos-rebuild repl --flake "${configDir}#$1"
       }
     '';
 

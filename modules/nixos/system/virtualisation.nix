@@ -142,6 +142,7 @@ in
           {
             graphics = desktopEnabled;
             diskSize = 8192;
+
             qemu = {
               options = optionals desktopEnabled [
                 # Allows nixos-rebuild build-vm graphical session
@@ -150,13 +151,10 @@ in
                 "-display gtk,show-menubar=off,gl=on"
               ];
             };
+
             # Forward all TCP and UDP ports that are opened in the firewall on
             # the default interfaces. Should make the majority of the VMs
             # services accessible from host
-            # TODO: Add a "vmVariant.firewallInterfaces" option that lists
-            # interfaces to expose from the VM variant. Might need to remove
-            # duplicate ports, not sure if it's an issue to open same port
-            # multiple times?
             forwardPorts =
               let
                 # It's important to use firewall rules from the vmVariant here

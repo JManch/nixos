@@ -70,15 +70,13 @@ in
         sshAdd = getExe' pkgs.openssh "ssh-add";
       in
         /*bash*/ ''
-
-      ssh-add-quiet() {
-        keys=$(${sshAdd} -l)
-        if [[ "$keys" == "The agent has no identities." ]]; then
-          ${sshAdd}
-        fi
-      }
-
-    '';
+        ssh-add-quiet() {
+          keys=$(${sshAdd} -l)
+          if [[ "$keys" == "The agent has no identities." ]]; then
+            ${sshAdd}
+          fi
+        }
+      '';
   };
 
   security.pam.sshAgentAuth = {

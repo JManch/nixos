@@ -6,12 +6,22 @@
 , ...
 }:
 let
-  inherit (lib) utils concatStrings getExe optionalString;
+  inherit (lib)
+    utils
+    concatStrings
+    getExe
+    optionalString
+    concatStringsSep
+    attrNames
+    filterAttrs
+    all
+    mapAttrsToList
+    hasAttr;
 
   deployScript = pkgs.writeShellApplication {
     name = "deploy-host";
-    runtimeInputs = with pkgs; [
-      age
+    runtimeInputs = [
+      pkgs.age
       # nixos-anywhere does not allow passing extra flags to the nix build commands
       # so we have to patch it. The patch overrides our 'firstBoot' flake input to
       # 'true' so that we can change certain config options for the very first
@@ -21,7 +31,7 @@ let
       # for extra-files transfer. This is needed for deploying secrets to the
       # home directory.
       (utils.addPatches pkgs.nixos-anywhere [ ../../../patches/nixosAnywhere.patch ])
-      gnutar
+      pkgs.gnutar
     ];
     text = /*bash*/ ''
 
@@ -30,7 +40,21 @@ let
         exit 1
       fi
 
-      hosts=(${lib.concatStringsSep " " (builtins.attrNames (utils.hosts outputs))})
+      # Exclude hosts that use zfs disk encryption because nixos-anywhere will
+      # get stuck when setting disk passphrase
+      hosts=(${
+        concatStringsSep " " (
+          attrNames (
+            filterAttrs (
+              _: value:
+              all (v: v == false) (
+                mapAttrsToList (_: pool: hasAttr "encryption" pool.rootFsOptions) value.config.disko.devices.zpool
+              )
+            ) (utils.hosts outputs)
+          )
+        )
+      })
+
       hostname=$1
       ip_address=$2
 
@@ -42,7 +66,7 @@ let
         fi
       done
       if [[ $match = 0 ]]; then
-        echo "Error: Host '$hostname' does not exist" >&2
+        echo "Error: Host '$hostname' either does not exist or uses disk encryption" >&2
         exit 1
       fi
 

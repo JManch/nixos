@@ -31,7 +31,7 @@ let
       done
       shift $(( OPTIND - 1 ))
 
-      if [ -z "$1" ]; then
+      if [ "$#" -ne 1 ]; then
         echo "Usage: build-vm <hostname>"
         exit 1
       fi

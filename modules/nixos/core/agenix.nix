@@ -26,7 +26,7 @@ let
     runtimeInputs = scriptInputs;
     text = /*bash*/ ''
 
-      if [ -z "$1" ]; then
+      if [ "$#" -ne 1 ]; then
         echo "Usage: agenix-edit <file_path>"
         exit 1
       fi

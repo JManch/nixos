@@ -21,7 +21,7 @@ let
          exit 1
       fi
 
-      if [ -z "$1" ]; then
+      if [ "$#" -ne 1 ]; then
         echo "Usage: install-host <hostname>"
         exit 1
       fi

@@ -44,6 +44,8 @@ in
 
     '';
 
+  fileSystems."/persist".neededForBoot = true;
+
   persistence = {
     hideMounts = true;
 

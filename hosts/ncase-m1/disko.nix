@@ -5,15 +5,17 @@
   ];
 
   disko.devices = {
-    # The attribute name of the disk gets used for the disk partlabel
-    disk."256GB-NVME" = {
+    disk."1TB-NVME" = {
       type = "disk";
-      device = "/dev/disk/by-id/nvme-SAMSUNG_MZVPV256HDGL-000H1_S27GNY0HB13473";
+      device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S4EWNM0W333051B";
       content = {
         type = "gpt";
         partitions = {
           esp = {
             name = "boot";
+            # TODO: Delete this next install. Disko will use partlabel from
+            # disk attribute name instead.
+            device = "/dev/disk/by-label/boot";
             size = "512M";
             type = "EF00";
             content = {
@@ -27,7 +29,8 @@
             size = "100%";
             content = {
               type = "zfs";
-              pool = "zroot";
+              # TODO: Change this to zroot next install
+              pool = "zpool";
             };
           };
         };
@@ -39,15 +42,18 @@
       mountOptions = [ "defaults" "mode=755" ];
     };
 
-    zpool.zroot = {
+    # TODO: Next install change zpool name to zroot to match homelab disko
+    zpool.zpool = {
       type = "zpool";
 
-      # rootFsOptions are -O options and options are -o
       rootFsOptions = {
         atime = "off";
         mountpoint = "none";
         xattr = "sa";
         acltype = "posixacl";
+        encryption = "aes-256-gcm";
+        keyformat = "passphrase";
+        keylocation = "prompt";
         compression = "lz4";
       };
 
@@ -65,12 +71,6 @@
         persist = {
           type = "zfs_fs";
           mountpoint = "/persist";
-          options.mountpoint = "legacy";
-        };
-
-        tmp = {
-          type = "zfs_fs";
-          mountpoint = "/tmp";
           options.mountpoint = "legacy";
         };
       };

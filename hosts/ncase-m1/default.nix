@@ -1,5 +1,8 @@
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [
+    ./hardware-configuration.nix
+    ./disko.nix
+  ];
 
   networking.hostId = "625ec505";
 
@@ -76,8 +79,6 @@
 
       fileSystem = {
         trim = true;
-        bootLabel = "boot";
-        zpoolName = "zpool";
         forceImportRoot = false;
       };
     };

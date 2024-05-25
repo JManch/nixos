@@ -105,13 +105,12 @@ in
     "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix"
   ];
 
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = (with pkgs; [
     # nixos-anywhere needs rsync for transfering secrets
     rsync
     gitMinimal
     neovim
-    installScript
-  ];
+  ]) ++ [ installScript ];
 
   nix.settings = {
     experimental-features = "nix-command flakes";

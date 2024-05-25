@@ -31,10 +31,10 @@ let
     mode: pkgs.writeShellApplication {
       name = "gamemode-${mode}";
 
-      runtimeInputs = with pkgs; [
-        coreutils
-        libnotify
-        gnugrep
+      runtimeInputs = [
+        pkgs.coreutils
+        pkgs.libnotify
+        pkgs.gnugrep
         homeConfig.wayland.windowManager.hyprland.package
       ] ++ optional isHyprland homeConfig.wayland.windowManager.hyprland.package;
 
@@ -63,6 +63,12 @@ let
 in
 mkIf cfg.enable
 {
+  # Do not start gamemoded for system users. This prevents gamemoded starting
+  # during login when greetd temporarily runs as the greeter user.
+  systemd.user.services.gamemoded = {
+    unitConfig.ConditionUser = "!@system";
+  };
+
   programs.gamemode = {
     enable = true;
 

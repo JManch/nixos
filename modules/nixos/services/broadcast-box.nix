@@ -2,7 +2,6 @@
 let
   inherit (lib) mkIf mkForce optional genAttrs;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) wireguard;
   cfg = config.modules.services.broadcast-box;
 in
 {

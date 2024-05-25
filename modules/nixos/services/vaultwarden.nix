@@ -144,15 +144,14 @@ mkIf cfg.enable
       publicKey = vaultwardenPublicBackupKey.path;
       cloudBackupScript = pkgs.writeShellApplication {
         name = "vaultwarden-cloud-backup";
-        runtimeInputs = with pkgs; [
+        runtimeInputs = (with pkgs; [
           coreutils
           diffutils
           gnutar
           bzip2
           age
           rclone
-          outputs.packages.${pkgs.system}.shoutrrr
-        ];
+        ]) ++ [ outputs.packages.${pkgs.system}.shoutrrr ];
         text = /*bash*/ ''
 
           set -o errtrace

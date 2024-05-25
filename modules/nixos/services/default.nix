@@ -741,6 +741,12 @@ in
       enable = mkEnableOption "BeamMP Server";
       openFirewall = mkEnableOption "opening the firewall";
 
+      autoStart = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Whether to enable BeamMP Server autostart";
+      };
+
       map = mkOption {
         type = types.enum [
           "gridmap_v2"

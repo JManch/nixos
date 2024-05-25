@@ -13,6 +13,7 @@ mkIf cfg.enable
 {
   services.beammp-server = {
     enable = true;
+    autoStart = cfg.autoStart;
     package = outputs.packages.${pkgs.system}.beammp-server;
     authenticationKeyFile = config.age.secrets.beammpAuthKey.path;
     settings = {

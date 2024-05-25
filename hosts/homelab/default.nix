@@ -160,6 +160,7 @@
 
       beammp-server = {
         enable = true;
+        autoStart = false;
         openFirewall = true;
         interfaces = [ "wg-friends" ];
       };

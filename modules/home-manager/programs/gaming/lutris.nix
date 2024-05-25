@@ -13,7 +13,10 @@ lib.mkIf cfg.enable
 {
   home.packages = [ lutris ];
 
-  modules.programs.gaming.gameClasses = [ "bfv.exe" ];
+  modules.programs.gaming.gameClasses = [
+    "bfv.exe"
+    "xdefiant.exe"
+  ];
 
   # Install lutris games to ~/files/games
   persistence.directories = [

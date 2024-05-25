@@ -37,7 +37,6 @@ mkIf cfg.enable
     shellAliases = {
       cat = "bat -pp --theme=base16";
       reload = "exec zsh";
-      inspect-nix-config = "nix --extra-experimental-features repl-flake repl /home/${username}/.config/nixos#nixosConfigurations.${hostname}";
     };
 
     initExtra =

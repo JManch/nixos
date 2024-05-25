@@ -18,7 +18,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [
+    home.packages = (with pkgs; [
       unzip
       zip
       tree
@@ -29,12 +29,13 @@ in
       tokei
       rename
       nurl # tool for generating nix fetcher calls from urls
-      (utils.flakePkgs args "yaml2nix").default
-    ] ++ optionals cfg.sillyTools [
+    ])
+    ++ [ (utils.flakePkgs args "yaml2nix").default ]
+    ++ optionals cfg.sillyTools (with pkgs; [
       fortune
       cowsay
       lolcat
-    ];
+    ]);
 
     home.sessionVariables.COLORTERM = "truecolor";
   };

@@ -1,9 +1,4 @@
-{ lib
-, pkgs
-, inputs
-, config
-, ...
-}:
+{ lib, config, ... } @ args:
 let
   inherit (lib) mkIf utils;
   cfg = config.modules.programs.matlab;
@@ -12,7 +7,7 @@ mkIf cfg.enable
 {
   # Install instructions: https://gitlab.com/doronbehar/nix-matlab
   environment.systemPackages = [
-    (utils.flakePkgs { inherit pkgs inputs; } "nix-matlab").matlab
+    (utils.flakePkgs args "nix-matlab").matlab
   ];
 
   persistenceHome.directories = [ ".config/matlab" ];

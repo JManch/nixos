@@ -1,4 +1,4 @@
-{ lib, pkgs, config, ... } @ args:
+{ lib, config, ... } @ args:
 let
   inherit (lib)
     utils

@@ -4,7 +4,7 @@
 , config
 , osConfig
 , ...
-}:
+} @ args:
 let
   inherit (lib) mkIf fetchers utils getExe';
   cfg = desktopCfg.programs.anyrun;
@@ -34,7 +34,7 @@ in
           # Blur background over waybar
           ignoreExclusiveZones = true;
 
-          plugins = with utils.flakePkgs { inherit pkgs inputs; } "anyrun"; [
+          plugins = with utils.flakePkgs args "anyrun"; [
             applications
             websearch
           ];

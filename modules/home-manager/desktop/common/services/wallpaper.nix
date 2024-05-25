@@ -48,7 +48,7 @@ let
 
   randomiseWallpaper = pkgs.writeShellApplication {
     name = "randomise-wallpaper";
-    runtimeInputs = with pkgs; [ coreutils findutils ]
+    runtimeInputs = (with pkgs; [ coreutils findutils ])
       ++ optional darkman.enable config.services.darkman.package;
     text = /*bash*/ ''
 

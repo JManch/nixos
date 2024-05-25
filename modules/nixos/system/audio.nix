@@ -41,6 +41,14 @@ in
         wireplumber.enable = true;
         # lowLatency.enable = gaming.enable;
       };
+
+      # Do not start pipewire user sockets for non-system users. This prevents
+      # pipewire sockets unnecessarily starting for the greeter user during
+      # login.
+      systemd.user.sockets = {
+        pipewire.unitConfig.ConditionUser = "!@system";
+        pipewire-pulse.unitConfig.ConditionUser = "!@system";
+      };
     })
 
     (mkIf (cfg.enable && cfg.extraAudioTools) {

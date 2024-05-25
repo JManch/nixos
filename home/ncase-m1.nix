@@ -19,7 +19,6 @@
       };
 
       programs = {
-        # TODO: Switch from swaylock to hyprlock
         swaylock.enable = true;
         hyprlock.enable = false;
         anyrun.enable = false;
@@ -36,7 +35,7 @@
 
         wallpaper = {
           randomise.enable = true;
-          randomise.frequency = "*-*-* 05:00:00"; # 5am everyday
+          randomise.frequency = "*-*-* 05:00:00";
         };
       };
     };

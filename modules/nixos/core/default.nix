@@ -96,6 +96,27 @@ in
       };
     };
 
+  # Sometimes nixos-rebuild compiles large pieces software that require more
+  # space in /tmp than my tmpfs can provide. The obvious solution is to mount
+  # /tmp to some actual storage. However, the majority of my rebuilds do not
+  # need the extra space and I'd like to avoid the extra disk wear. By using a
+  # custom tmp directory for nix builds, I can bind mount the build dir to
+  # persistent storage when I know the build will be large. This wouldn't be
+  # possible with the standard /tmp dir because bind mounting /tmp on a running
+  # system would break things.
+
+  # List of programs that require the bind mount to compile:
+  # - mongodb
+  systemd = {
+    services.nix-daemon.environment.TMPDIR = "/var/nix-tmp";
+    tmpfiles.rules = [
+      "d /var/nix-tmp 0755 root root"
+      "d /persist/var/nix-tmp 0755 root root"
+    ];
+  };
+
+  programs.zsh.shellAliases.mount-nix-tmp = "sudo mount --bind /persist/var/nix-tmp /var/nix-tmp";
+
   environment.sessionVariables = {
     XDG_CACHE_HOME = "$HOME/.cache";
     XDG_CONFIG_HOME = "$HOME/.config";

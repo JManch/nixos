@@ -24,14 +24,6 @@ mkIf cfg.enable
     enable = true;
     openFirewall = false;
     unifiPackage = pkgs.unifi8;
-    # WARN: Mongodb is not in cachix due to its license so has to be built from
-    # source. It takes a considerable amount of time (~1 hour) and requires
-    # more memory than my tmpfs has space for. A solution to
-    # https://github.com/NixOS/nixpkgs/issues/293114 would make this a
-    # non-issue but, for now, best solution I've found is to temporarily add
-    # /tmp to impermanence, reboot, build, and then remove /tmp again. Pretty
-    # annoying.
-
     # WARN: Be careful when changing mongodb versions as mongodb requires
     # manual intervention to migrate. Safest method is to export a unifi
     # backup, clear /var/lib/unifi and then restore from backup.

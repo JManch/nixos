@@ -41,7 +41,7 @@ let
     healthCheckResticRemoteCopy;
   cfg = config.modules.services.restic;
   isServer = (config.device.type == "server");
-  restic = getExe pkgs.restic;
+  resticExe = getExe pkgs.restic;
   homeBackups = config.home-manager.users.${username}.backups;
 
   # WARN: Paths are prefixed with /persist. We don't modify exclude or include
@@ -97,7 +97,7 @@ let
 
   restoreScript = pkgs.writeShellApplication {
     name = "restic-restore";
-    runtimeInputs = [ pkgs.restic pkgs.coreutils pkgs.systemd ];
+    runtimeInputs = with pkgs; [ restic coreutils systemd ];
     text = /*bash*/ ''
 
       echo "Leave empty to restore from the default repo"
@@ -224,7 +224,7 @@ mkMerge [
 
           preStart = mkBefore /*bash*/ ''
             ${value.preBackupScript}
-            ${restic} cat config --no-cache || ${restic} init
+            ${resticExe} cat config --no-cache || ${resticExe} init
           '';
           postStop = mkAfter value.postBackupScript;
 
@@ -264,9 +264,9 @@ mkMerge [
           serviceConfig = {
             Type = "oneshot";
             ExecStart = [
-              "${restic} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
+              "${resticExe} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
               # Retry lock timeout in-case another host is performing a check
-              "${restic} check --read-data-subset=500M --retry-lock 5m"
+              "${resticExe} check --read-data-subset=500M --retry-lock 5m"
             ];
 
             PrivateTmp = true;
@@ -328,15 +328,15 @@ mkMerge [
 
         preStart = ''
           # Initialise with copied chunker params to ensure good deduplication
-          ${restic} cat config || ${restic} init --copy-chunker-params
+          ${resticExe} cat config || ${resticExe} init --copy-chunker-params
         '';
 
         serviceConfig = {
           Type = "oneshot";
           EnvironmentFile = resticReadWriteBackblazeVars.path;
           ExecStart = [
-            "${restic} copy"
-            "${restic} check --with-cache --retry-lock 5m"
+            "${resticExe} copy"
+            "${resticExe} check --with-cache --retry-lock 5m"
           ];
           ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckResticRemoteCopy.path})\"'";
 
@@ -363,16 +363,16 @@ mkMerge [
 
         preStart = ''
           # Ensure the repository exists
-          ${restic} cat config
+          ${resticExe} cat config
         '';
 
         serviceConfig = {
           Type = "oneshot";
           EnvironmentFile = resticReadWriteBackblazeVars.path;
           ExecStart = [
-            "${restic} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
+            "${resticExe} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
             # WARN: Keep an eye on this with egress fees
-            "${restic} check --read-data-subset=500M --retry-lock 5m"
+            "${resticExe} check --read-data-subset=500M --retry-lock 5m"
           ];
 
           PrivateTmp = true;

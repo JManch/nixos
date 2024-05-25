@@ -14,9 +14,6 @@ let
     stringToCharacters;
 in
 {
-  homeConfig = args:
-    args.outputs.nixosConfigurations.${args.hostname}.config.home-manager.users.${args.username};
-
   flakePkgs = args: flake: args.inputs.${flake}.packages.${args.pkgs.system};
 
   addPatches = pkg: patches: pkg.overrideAttrs (oldAttrs: {

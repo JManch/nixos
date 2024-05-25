@@ -1,10 +1,15 @@
-{ lib, config, inputs, ... } @ args:
+{ lib
+, config
+, inputs
+, username
+, ...
+}:
 let
-  inherit (lib) mkIf mkMerge mkForce fetchers utils;
+  inherit (lib) mkIf mkForce mkMerge fetchers;
   inherit (desktopCfg) desktopEnvironment;
   inherit (homeDesktopCfg) windowManager;
   desktopCfg = config.usrEnv.desktop;
-  homeConfig = utils.homeConfig args;
+  homeConfig = config.home-manager.users.${username};
   homeDesktopCfg = homeConfig.modules.desktop;
   isWayland = fetchers.isWayland homeConfig;
   hyprlandPackage = homeConfig.wayland.windowManager.hyprland.package;

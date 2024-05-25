@@ -6,7 +6,7 @@
 , hostname
 , username
 , ...
-} @ args:
+}:
 let
   inherit (lib)
     mkIf
@@ -42,7 +42,7 @@ let
   cfg = config.modules.services.restic;
   isServer = (config.device.type == "server");
   restic = getExe pkgs.restic;
-  homeBackups = (utils.homeConfig args).backups;
+  homeBackups = config.home-manager.users.${username}.backups;
 
   # WARN: Paths are prefixed with /persist. We don't modify exclude or include
   # paths to allow non-absolute patterns. Be careful with those.
@@ -97,7 +97,7 @@ let
 
   restoreScript = pkgs.writeShellApplication {
     name = "restic-restore";
-    runtimeInputs = with pkgs; [ pkgs.restic coreutils systemd ];
+    runtimeInputs = [ pkgs.restic pkgs.coreutils pkgs.systemd ];
     text = /*bash*/ ''
 
       echo "Leave empty to restore from the default repo"

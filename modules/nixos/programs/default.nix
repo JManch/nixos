@@ -1,7 +1,6 @@
-{ lib, pkgs, ... } @ args:
+{ lib, pkgs, ... }:
 let
-  inherit (lib) mkEnableOption mkOption utils fetchers types;
-  homeConfig = utils.homeConfig args;
+  inherit (lib) mkEnableOption mkOption types;
 in
 {
   imports = lib.utils.scanPaths ./.;

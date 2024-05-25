@@ -1,13 +1,18 @@
-{ lib, pkgs, config, ... } @ args:
+{ lib
+, pkgs
+, config
+, username
+, ...
+}:
 let
-  inherit (lib) mkIf utils getExe;
+  inherit (lib) mkIf getExe;
   cfg = config.modules.programs.gaming.gamemode;
 
   startStopScript =
     let
       inherit (lib) optionalString fetchers boolToString substring stringLength toUpper optional;
       inherit (homeConfig.modules.desktop) hyprland;
-      homeConfig = utils.homeConfig args;
+      homeConfig = config.home-manager.users.${username};
       isHyprland = homeConfig.modules.desktop.windowManager == "Hyprland";
       monitor = fetchers.primaryMonitor config;
 

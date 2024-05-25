@@ -1,11 +1,12 @@
 { lib
 , pkgs
 , config
+, username
 , ...
-} @ args:
+}:
 let
-  inherit (lib) utils mkIf fetchers;
-  homeConfig = utils.homeConfig args;
+  inherit (lib) mkIf fetchers;
+  homeConfig = config.home-manager.users.${username};
 in
 mkIf (config.device.gpu.type == "nvidia")
 {

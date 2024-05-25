@@ -4,12 +4,11 @@
 , inputs
 , username
 , ...
-} @ args:
+}:
 let
-  inherit (lib) utils mkIf mkMerge mkVMOverride mod optionals;
-  inherit (homeConfig.modules.desktop) terminal;
+  inherit (lib) mkIf mkMerge mkVMOverride mod optionals;
+  inherit (config.home-manager.users.${username}.modules.desktop) terminal;
   inherit (config.device) monitors cpu memory;
-  homeConfig = utils.homeConfig args;
   cfg = config.modules.system.virtualisation;
 
   runVMScript = pkgs.writeShellApplication {

@@ -1,12 +1,13 @@
 { lib
 , pkgs
+, config
 , inputs
 , username
 , ...
-} @ args:
+}:
 let
-  inherit (lib) utils mkAliasOptionModule concatStringsSep;
-  homeManagerPersistence = (utils.homeConfig args).persistence;
+  inherit (lib) mkAliasOptionModule concatStringsSep;
+  homePersistence = config.home-manager.users.${username}.persistence;
 in
 {
   imports = [
@@ -70,6 +71,6 @@ in
       "/etc/adjtime"
     ];
 
-    users.${username} = homeManagerPersistence;
+    users.${username} = homePersistence;
   };
 }

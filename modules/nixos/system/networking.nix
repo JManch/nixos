@@ -1,9 +1,10 @@
 { lib
 , pkgs
 , config
+, username
 , hostname
 , ...
-} @ args:
+}:
 let
   inherit (lib)
     mkMerge
@@ -13,7 +14,7 @@ let
     getExe'
     allUnique;
   cfg = config.modules.system.networking;
-  homeManagerFirewall = (utils.homeConfig args).firewall;
+  homeFirewall = config.home-manager.users.${username}.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
 in
 {
@@ -62,7 +63,7 @@ in
     firewall = {
       enable = cfg.firewall.enable;
       defaultInterfaces = cfg.firewall.defaultInterfaces;
-      inherit (homeManagerFirewall)
+      inherit (homeFirewall)
         allowedTCPPorts
         allowedTCPPortRanges
         allowedUDPPorts

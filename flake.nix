@@ -76,7 +76,7 @@
     yaml2nix.inputs.nixpkgs.follows = "nixpkgs";
     yaml2nix.inputs.cargo2nix.follows = "cargo2nix";
 
-    broadcast-box.url = "github:JManch/broadcast-box/nix-flake";
+    broadcast-box.url = "github:JManch/broadcast-box";
     broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
 
     microvm.url = "github:astro/microvm.nix";

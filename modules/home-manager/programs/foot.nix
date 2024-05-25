@@ -16,8 +16,7 @@ lib.mkIf cfg.enable
 
       cursor = {
         style = "beam";
-        # TODO: Uncomment these when foot updates
-        # unfocused-style = "hollow";
+        unfocused-style = "hollow";
         blink = "yes";
         beam-thickness = 1.5;
       };

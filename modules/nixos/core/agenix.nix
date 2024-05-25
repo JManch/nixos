@@ -1,12 +1,11 @@
 { pkgs, inputs, ... }:
 let
   inherit (inputs) agenix nix-resources;
-  scriptInputs = with pkgs; [
+  scriptInputs = (with pkgs; [
     age
     findutils
-    agenix.packages.${pkgs.system}.agenix
     gnutar
-  ];
+  ]) ++ [ agenix.packages.${pkgs.system}.agenix ];
 
   decryptKit = /*bash*/ ''
 

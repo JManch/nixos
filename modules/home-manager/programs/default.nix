@@ -33,6 +33,7 @@ in
     prism-launcher.enable = mkEnableOption "Prism Launcher";
     unity.enable = mkEnableOption "Unity Game Engine";
     foot.enable = mkEnableOption "Foot";
+    zed.enable = mkEnableOption "Zed Editor";
 
     firefox = {
       enable = mkEnableOption "Firefox";

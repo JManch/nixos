@@ -31,7 +31,9 @@ in
   modules.system.networking.publicPorts = [ cfg.udpMuxPort ];
   networking.firewall.allowedUDPPorts = mkIf cfg.proxy [ cfg.udpMuxPort ];
 
-  services.caddy.virtualHosts."stream.${fqDomain}".extraConfig = mkIf cfg.proxy ''
-    reverse_proxy http://127.0.0.1:${toString cfg.port}
-  '';
+  services.caddy.virtualHosts = mkIf cfg.proxy {
+    "stream.${fqDomain}".extraConfig = ''
+      reverse_proxy http://127.0.0.1:${toString cfg.port}
+    '';
+  };
 }

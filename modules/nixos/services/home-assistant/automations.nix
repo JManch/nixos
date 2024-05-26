@@ -15,7 +15,7 @@ let
         camera = "camera.driveway";
         notify_device = (head (attrValues devices)).id;
         notify_group = "All Notify Devices";
-        base_url = "https://home-notif.${fqDomain}";
+        base_url = "https://home.${fqDomain}";
         group = "{{camera}}-frigate-notification";
         title = "Security Alert";
         message = "A person was detected in the entrance";
@@ -42,7 +42,7 @@ let
           sticky = true;
           notify_group = "All Notify Devices";
           group = "{{camera}}-frigate-notification";
-          base_url = "https://home-notif.${fqDomain}";
+          base_url = "https://home.${fqDomain}";
           title = "Security Alert";
           ios_live_view = "camera.${camera}";
           message = "A person was detected on the property";

@@ -20,7 +20,7 @@ let
     escapeShellArg;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.age.secrets) mqttHassPassword rootCA homeCert;
+  inherit (config.age.secrets) mqttHassPassword;
   inherit (secretCfg) devices;
   cfg = config.modules.services.hass;
   secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
@@ -239,36 +239,10 @@ in
       after = [ "postgresqlBackup-hass.service" ];
     };
 
-    services.caddy.virtualHosts = {
-      # Because iPhones are terrible and don't accept my certs
-      # (I don't think iPhone HA app supports certs anyway)
-      "home-wan.${fqDomain}".extraConfig = ''
-        tls {
-          client_auth {
-            mode require_and_verify
-            trusted_ca_cert_file ${rootCA.path}
-            trusted_leaf_cert_file ${homeCert.path}
-          }
-        }
-        reverse_proxy http://127.0.0.1:${toString cfg.port}
-      '';
-
-      "home.${fqDomain}".extraConfig = ''
-        import lan-only
-        reverse_proxy http://127.0.0.1:${toString cfg.port}
-      '';
-
-      # This endpoint is used for notifications that need a base url (such as
-      # the frigate automation notifs)
-      "home-notif.${fqDomain}".extraConfig = ''
-        @is_lan {
-          remote_ip ${caddy.lanAddressRanges}
-        }
-
-        redir @is_lan https://home.${fqDomain}{uri}
-        redir https://home-wan.${fqDomain}{uri}
-      '';
-    };
+    services.caddy.virtualHosts."home.${fqDomain}".extraConfig = ''
+      import lan-only
+      reverse_proxy http://127.0.0.1:${toString cfg.port}
+    '';
 
     persistence.directories = [
       {

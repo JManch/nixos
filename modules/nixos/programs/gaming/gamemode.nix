@@ -47,10 +47,7 @@ let
 
         ${
           optionalString isHyprland /*bash*/ ''
-            # shellcheck disable=SC2012
-            HYPRLAND_INSTANCE_SIGNATURE=$(\ls -1 -t /run/user/1000/hypr | head -1)
-            export HYPRLAND_INSTANCE_SIGNATURE
-            hyprctl --batch "\
+            hyprctl --instance 0 --batch "\
               ${optionalString hyprland.blur "keyword decoration:blur:enabled ${blur mode};\\"}
               keyword animations:enabled ${animate mode}; \
               keyword monitor ${fetchers.getMonitorHyprlandCfgStr (monitor // {refreshRate = refreshRate mode;})}; \

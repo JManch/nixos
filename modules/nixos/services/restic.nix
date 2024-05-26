@@ -287,6 +287,13 @@ mkMerge [
       wantedBy = [ "timers.target" ];
       timerConfig = backupTimerConfig;
     };
+
+    # Persist maintenance service cache otherwise forget command can be very
+    # expensive
+    persistence.directories = [{
+      directory = "/var/cache/restic-repo-maintenance";
+      mode = "700";
+    }];
   })
 
   (mkIf cfg.server.enable {
@@ -436,12 +443,6 @@ mkMerge [
       }
       {
         directory = "/var/cache/restic-remote-maintenance";
-        mode = "700";
-      }
-      # Persist maintenance service cache otherwise forget command can be very
-      # expensive
-      {
-        directory = "/var/cache/restic-repo-maintenance";
         mode = "700";
       }
     ];

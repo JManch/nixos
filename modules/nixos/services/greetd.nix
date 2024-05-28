@@ -12,6 +12,9 @@ mkIf cfg.enable
     "Greetd session dirs must be set"
   ];
 
+  # WARN: Ever since https://github.com/linux-pam/linux-pam/pull/784 there
+  # is a delay after entering the username during login. Because I use a
+  # strong hashing algorithm it's quite noticeable.
   services.greetd = {
     enable = true;
     settings = {

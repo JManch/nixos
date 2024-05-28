@@ -9,6 +9,9 @@ let
     concatStringsSep
     concatStrings
     optional;
+  inherit (config.modules.desktop) hyprland;
+  cfg = config.modules.programs.gaming;
+  osGaming = osConfig.modules.programs.gaming;
 in
 {
   imports = utils.scanPaths ./.;
@@ -65,12 +68,12 @@ in
     };
   };
 
-  config =
-    let
-      osGaming = osConfig.modules.programs.gaming;
-    in
-    mkIf osGaming.enable {
-      modules.programs.gaming.gameClasses =
-        optional osGaming.gamescope.enable "\\.gamescope.*";
-    };
+  config = mkIf osGaming.enable {
+    modules.programs.gaming.gameClasses =
+      optional osGaming.gamescope.enable "\\.gamescope.*";
+
+    desktop.hyprland.settings.windowrulev2 = [
+      "workspace name:GAME, class:${cfg.gameRegex}"
+    ] ++ optional hyprland.tearing "immediate, class:${cfg.tearingRegex}";
+  };
 }

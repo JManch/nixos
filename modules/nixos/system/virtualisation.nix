@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkMerge mkVMOverride mod optionals;
+  inherit (lib) mkIf mkMerge mkVMOverride mod;
   inherit (config.home-manager.users.${username}.modules.desktop) terminal;
   inherit (config.device) monitors cpu memory;
   cfg = config.modules.system.virtualisation;
@@ -143,14 +143,12 @@ in
             graphics = desktopEnabled;
             diskSize = 8192;
 
-            qemu = {
-              options = optionals desktopEnabled [
-                # Allows nixos-rebuild build-vm graphical session
-                # https://github.com/NixOS/nixpkgs/issues/59219
-                "-device virtio-vga-gl"
-                "-display gtk,show-menubar=off,gl=on"
-              ];
-            };
+            qemu.options = mkIf desktopEnabled [
+              # Useful resource explaining qemu display device options:
+              # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/#virtio-gpu-pci
+              "-device virtio-vga-gl"
+              "-display gtk,show-menubar=off,zoom-to-fit=off,gl=on"
+            ];
 
             # Forward all TCP and UDP ports that are opened in the firewall on
             # the default interfaces. Should make the majority of the VMs
@@ -189,6 +187,14 @@ in
       };
 
       microvm.host.enable = cfg.microvm.enable;
+
+      hm.desktop.hyprland.settings.windowrulev2 = [
+        "workspace name:VM silent, class:^(\.?qemu.*|wlroots)$"
+        "float, class:^(\.?qemu.*)$"
+        "size 80% 80%, class:^(\.?qemu.*)$"
+        "center, class:^(\.?qemu.*)$"
+        "keepaspectratio, class:^(\.?qemu.*)$"
+      ];
     }
 
     (mkIf cfg.libvirt.enable {

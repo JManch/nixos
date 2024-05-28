@@ -15,7 +15,6 @@ let
     concatStringsSep
     concatMap
     imap
-    optional
     optionalString
     optionals
     fetchers;
@@ -170,21 +169,6 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         "col.inactive_border" = "0xff${colors.base00}";
         allow_tearing = cfg.tearing;
       };
-
-      windowrulev2 =
-        let
-          inherit (config.modules.programs.gaming) gameRegex tearingRegex;
-        in
-        [
-          "workspace name:GAME, class:${gameRegex}"
-
-          "workspace name:VM silent, class:^(qemu|wlroots)$"
-          "float, class:^(qemu)$"
-          "size 80% 80%, class:^(qemu)$"
-          "center, class:^(qemu)$"
-          "keepaspectratio, class:^(qemu)$"
-        ] ++ optional cfg.tearing
-          "immediate, class:${tearingRegex}";
 
       decoration = {
         rounding = desktopCfg.style.cornerRadius - 2;

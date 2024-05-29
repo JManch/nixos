@@ -88,6 +88,7 @@
       winbox.enable = true;
       matlab.enable = true;
       wireshark.enable = true;
+      adb.enable = true;
 
       gaming = {
         enable = true;

@@ -1,4 +1,4 @@
-{ lib, pkgs, ... } @ args:
+{ lib, pkgs, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
 in
@@ -9,6 +9,7 @@ in
     winbox.enable = mkEnableOption "Winbox";
     matlab.enable = mkEnableOption "Matlab";
     wireshark.enable = mkEnableOption "Wireshark";
+    adb.enable = mkEnableOption "Android Debug Bridge";
 
     wine = {
       enable = mkEnableOption "Wine";

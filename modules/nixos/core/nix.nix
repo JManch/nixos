@@ -38,12 +38,13 @@ let
     # Always rebuild in ~ because I once had a bad experience where I
     # accidentally built in /nix/store and caused irrepairable corruption
     text = /*bash*/ ''
-      pushd ~ >/dev/null 2>&1 
+      pushd ~ >/dev/null 2>&1
       exit() {
         popd >/dev/null 2>&1
       }
       trap exit EXIT
-      nixos-rebuild ${cmd} --use-remote-sudo --flake "${configDir}#${hostname}" "$@"
+      nixos-rebuild ${if (cmd == "diff") then "build" else cmd} \
+        --use-remote-sudo --flake "${configDir}#${hostname}" "$@"
       ${optionalString (cmd == "diff") /*bash*/ ''
         nvd diff /run/current-system result
       ''}

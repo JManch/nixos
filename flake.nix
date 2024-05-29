@@ -1,11 +1,44 @@
 {
   description = "Joshua's NixOS Flake";
 
-  inputs = {
-    # NOTE: Use the `nix flake metadata <flake_url>` command to check if a
-    # flake needs nixpkgs.follows defined
-    # Update individual inputs using `nix flake lock --update-input <INPUT_NAME>`
+  outputs = { self, nixpkgs, home-manager, ... } @ inputs:
+    let
+      inherit (self) outputs;
+      inherit (lib) nixosSystem genAttrs optional;
 
+      lib = nixpkgs.lib.extend
+        (final: prev: (import ./lib final) // home-manager.lib);
+
+      systems = [ "x86_64-linux" ];
+      forEachSystem = f:
+        genAttrs systems (system:
+          f (nixpkgs.legacyPackages.${system}));
+
+      mkHost = hostname: system: {
+        ${hostname} = nixosSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs outputs hostname lib;
+            username = "joshua";
+          };
+          modules = [
+            ./hosts/${hostname}
+          ] ++ optional (hostname != "installer") ./modules/nixos;
+        };
+      };
+    in
+    {
+      formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
+      packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs lib; });
+      templates = import ./templates;
+
+      nixosConfigurations =
+        mkHost "ncase-m1" "x86_64-linux" //
+        mkHost "homelab" "x86_64-linux" //
+        mkHost "installer" "x86_64-linux";
+    };
+
+  inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     impermanence.url = "github:nix-community/impermanence";
     firstBoot.url = "github:JManch/false";
@@ -82,62 +115,4 @@
     microvm.url = "github:astro/microvm.nix";
     microvm.inputs.nixpkgs.follows = "nixpkgs";
   };
-
-  outputs = { self, nixpkgs, home-manager, ... } @ inputs:
-    let
-      inherit (self) outputs;
-      systems = [ "x86_64-linux" ];
-      username = "joshua";
-
-      mkLib = nixpkgs:
-        nixpkgs.lib.extend
-          (final: prev: (import ./lib final) // home-manager.lib);
-
-      lib = mkLib nixpkgs;
-
-      forEachSystem = f:
-        nixpkgs.lib.genAttrs systems (system:
-          f (nixpkgs.legacyPackages.${system}));
-    in
-    {
-      formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
-      packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs lib; });
-      templates = import ./templates;
-
-      nixosConfigurations = {
-        installer = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {
-            inherit inputs outputs username lib;
-          };
-          modules = [
-            ./hosts/installer
-          ];
-        };
-
-        ncase-m1 = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {
-            hostname = "ncase-m1";
-            inherit inputs outputs username lib;
-          };
-          modules = [
-            ./modules/nixos
-            ./hosts/ncase-m1
-          ];
-        };
-
-        homelab = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {
-            hostname = "homelab";
-            inherit inputs outputs username lib;
-          };
-          modules = [
-            ./modules/nixos
-            ./hosts/homelab
-          ];
-        };
-      };
-    };
 }

@@ -33,6 +33,7 @@
 let
   inherit (lib)
     mkIf
+    utils
     mapAttrs
     getExe
     concatStringsSep
@@ -42,8 +43,11 @@ let
     concatMap
     nameValuePair
     attrValues
+    optionalAttrs
     listToAttrs;
   inherit (config.modules) desktop;
+  inherit (osConfig.device) hassIntegration;
+  inherit (config.age.secrets) hassToken;
   cfg = config.modules.desktop.services.darkman;
   darkman = getExe config.services.darkman.package;
 
@@ -133,12 +137,12 @@ let
           )
           (attrValues cfg.switchApps));
 
-      home.activation."generate-darkman-variants" = entryAfter [ "linkGeneration" ] ''
-        ${concatStringsSep "\n" (
-          map (app: genVariants cfg.switchApps.${app})
-          (attrNames cfg.switchApps)
-        )}
-      '';
+      home.activation."generate-darkman-variants" = entryAfter [ "linkGeneration" ]
+        (concatStringsSep "\n"
+          (
+            map (app: genVariants cfg.switchApps.${app})
+              (attrNames cfg.switchApps)
+          ));
 
       modules.desktop.services.darkman.switchScripts = mapAttrs
         (_: value:
@@ -152,6 +156,11 @@ let
 in
 {
   config = mkIf (cfg.enable && osConfig.usrEnv.desktop.enable) ({
+    assertions = utils.asserts [
+      ((cfg.switchMethod == "solar") -> hassIntegration.enable)
+      "Darkman 'solar' switch mode requires the device to have hass integration enabled"
+    ];
+
     services.darkman = {
       enable = true;
       package = pkgs.darkman.override {
@@ -185,9 +194,10 @@ in
       lightModeScripts = mapAttrs (_: v: v "light") cfg.switchScripts;
 
       settings = {
+        usegeoclue = false;
+      } // optionalAttrs (cfg.switchMethod == "coordinates") {
         lat = 50.8;
         lng = -0.1;
-        usegeoclue = false;
       };
     };
 
@@ -198,6 +208,81 @@ in
     # };
 
     desktop.hyprland.binds = [ "${desktop.hyprland.modKey}, F1, exec, ${darkman} toggle" ];
+
+    systemd.user.services.darkman-solar-switcher = mkIf (cfg.switchMethod == "solar") {
+      Unit = {
+        Description = "Switch darkman theme based on home assistant solar power";
+        Requires = [ "darkman.service" ];
+        After = [ "darkman.service" ];
+      };
+
+      Service = {
+        ExecStart = pkgs.writers.writePython3 "darkman-solar-switcher" { libraries = [ pkgs.python3Packages.requests ]; } ''
+          import os
+          import time
+          import requests
+          import subprocess
+
+          THRESHOLD = ${toString config.modules.services.hass.solarLightThreshold}
+          REFRESH_RATE = 60
+          COOLDOWN_PERIOD = 5 * 60
+
+
+          def get_entity_status(entity_id):
+              url = f"${hassIntegration.endpoint}/api/states/{entity_id}"
+              headers = {
+                  "Authorization": f"Bearer {token}",
+                  "Content-Type": "application/json",
+              }
+              response = requests.get(url, headers=headers)
+
+              if response.status_code == 200:
+                  entity_data = response.json()
+                  return entity_data
+              else:
+                  print(f"Failed to retrieve entity status: {response.status_code}")
+                  return None
+
+
+          def check_power():
+              status = get_entity_status("sensor.powerwall_solar_power")
+              if status:
+                  power = float(status['state'])
+                  if power < THRESHOLD and current_mode != "dark":
+                      switch_mode("dark")
+                  elif power >= THRESHOLD and current_mode != "light":
+                      switch_mode("light")
+
+
+          def switch_mode(mode):
+              global current_mode, last_switch_time
+
+              if (time.time() - last_switch_time < COOLDOWN_PERIOD):
+                  print("Skipping theme switching due to cooldown")
+                  return
+
+              print(f"Switching to mode {mode}")
+              current_mode = mode
+              last_switch_time = time.time()
+              os.system(f"darkman set {mode}")
+
+
+          if __name__ == "__main__":
+              global token, current_mode
+
+              token_path = os.path.expandvars('${hassToken.path}')
+              with open(token_path, 'r') as file:
+                  token = file.read().rstrip()
+              current_mode = subprocess.getoutput("darkman get")
+
+              while True:
+                  check_power()
+                  time.sleep(REFRESH_RATE)
+        '';
+      };
+
+      Install.WantedBy = [ "darkman.service" ];
+    };
 
   } // colorSchemeSwitchingConfiguration);
 }

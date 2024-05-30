@@ -30,12 +30,16 @@
         waybar.enable = true;
         dunst.enable = true;
         wlsunset.enable = true;
-        darkman.enable = true;
         hypridle.enable = true;
 
         wallpaper = {
           randomise.enable = true;
           randomise.frequency = "*-*-* 05:00:00";
+        };
+
+        darkman = {
+          enable = true;
+          switchMethod = "solar";
         };
       };
     };

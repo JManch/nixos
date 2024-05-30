@@ -17,6 +17,16 @@ in
     darkman = {
       enable = mkEnableOption "Darkman";
 
+      switchMethod = mkOption {
+        type = types.enum [ "manual" "coordinates" "solar" ];
+        default = "coordinates";
+        description = ''
+          Manual means the theme will not switch automatically. Coordinates
+          uses the configured longitude and latitude to switch at sunrise and
+          sunset. Solar uses the solar power generation from home-assistant.
+        '';
+      };
+
       switchScripts = mkOption {
         type = types.attrsOf (types.functionTo types.lines);
         default = { };

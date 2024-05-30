@@ -19,7 +19,6 @@ let
     concatStrings;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
-  inherit (config.modules.services) wireguard;
   cfg = config.modules.services.caddy;
 
   generateCerts =
@@ -172,7 +171,7 @@ mkMerge [
         };
 
         serviceConfig = {
-          ExecStart = "${runGoAccess.outPath}";
+          ExecStart = runGoAccess.outPath;
           Restart = "on-failure";
           RestartSec = 10;
           User = "caddy";

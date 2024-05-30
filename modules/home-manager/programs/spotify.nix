@@ -35,9 +35,9 @@ let
 in
 mkIf (cfg.enable && osConfig.modules.system.audio.enable)
 {
-  home.packages = with pkgs; [
+  home.packages = [
     # Need this for the spotify-player desktop icon
-    (spotify.overrideAttrs (oldAttrs: {
+    (pkgs.spotify.overrideAttrs (oldAttrs: {
       postInstall = /*bash*/ ''
         rm "$out/share/applications/spotify.desktop"
       '';
@@ -145,8 +145,8 @@ mkIf (cfg.enable && osConfig.modules.system.audio.enable)
         ", XF86AudioPrev, exec, ${playerctl} previous"
         ", XF86AudioPlay, exec, ${playerctl} play"
         ", XF86AudioPause, exec, ${playerctl} pause"
-        "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume.outPath} 5"
-        "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume.outPath} -5"
+        "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume} 5"
+        "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume} -5"
       ];
     };
 

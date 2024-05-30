@@ -285,7 +285,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable && isWayland)
     in
     [
       # Toggle active monitor bar
-      "${modKey}, B, exec, ${toggleActiveMonitorBar.outPath}"
+      "${modKey}, B, exec, ${toggleActiveMonitorBar}"
       # Toggle all bars
       "${modKey}SHIFT, B, exec, ${systemctl} kill --user --signal=SIGUSR1 waybar"
       # Restart waybar

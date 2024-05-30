@@ -116,14 +116,14 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
           # General
           "${modShiftCtrl}, Q, exit,"
           "${mod}, ${cfg.killActiveKey}, killactive,"
-          "${mod}, C, exec, ${toggleFloating.outPath}"
+          "${mod}, C, exec, ${toggleFloating}"
           "${mod}, E, fullscreen, 1"
           "${modShift}, E, fullscreen, 0"
           "${mod}, Z, pin, active"
           "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
-          "${modShift}, R, exec, ${make16By9.outPath}"
-          "${mod}, A, exec, ${toggleSwallowing.outPath}"
-          "${modShiftCtrl}, T, exec, ${toggleGaps.outPath}"
+          "${modShift}, R, exec, ${make16By9}"
+          "${mod}, A, exec, ${toggleSwallowing}"
+          "${modShiftCtrl}, T, exec, ${toggleGaps}"
 
           # Movement
           "${mod}, H, movefocus, l"
@@ -150,7 +150,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
 
           # Dwindle
           "${mod}, P, pseudo,"
-          "${modShiftCtrl}, G, exec, ${toggleDwindleGaps.outPath}"
+          "${modShiftCtrl}, G, exec, ${toggleDwindleGaps}"
           "${mod}, X, layoutmsg, togglesplit"
           "${modShift}, X, layoutmsg, swapsplit"
 

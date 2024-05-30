@@ -81,7 +81,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     in
     mkIf isGammaCustom {
       decoration.screen_shader = "${config.xdg.configHome}/hypr/shaders/monitorGamma.frag";
-      bind = [ "${cfg.modKey}, O, exec, ${toggleShader.outPath}" ];
+      bind = [ "${cfg.modKey}, O, exec, ${toggleShader}" ];
     };
 
   modules.desktop.programs.swaylock = {

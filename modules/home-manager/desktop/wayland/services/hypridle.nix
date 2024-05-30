@@ -36,8 +36,6 @@ mkIf cfg.enable {
 
   modules.desktop.programs.swaylock.postLockScript =
     let
-      sleep = getExe' pkgs.coreutils "sleep";
-      date = getExe' pkgs.coreutils "date";
       hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
       jaq = getExe pkgs.jaq;
     in
@@ -45,19 +43,16 @@ mkIf cfg.enable {
 
       # Turn off the display after locking. I've found that doing this in the
       # lock script is more reliable than adding another listener.
-      lockfile="/tmp/dpms-lock-$$-$(${date} +%s)"
-      touch "$lockfile"
-      trap 'rm -f "$lockfile"' EXIT
       while true; do
         # If the display is on, wait screenOffTime seconds then turn off
         # display. Then wait the full lock time before checking again.
         if ${escapeShellArg hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" >/dev/null 2>&1; then
-          ${sleep} ${toString cfg.screenOffTime}
+          sleep ${toString cfg.screenOffTime}
           if [ ! -e "$lockfile" ]; then exit 1; fi
           ${escapeShellArg hyprctl} dispatch dpms off
         fi
         # give screens time to turn off and prolong next countdown
-        ${sleep} ${toString cfg.lockTime}
+        sleep ${toString cfg.lockTime}
       done &
 
     '';

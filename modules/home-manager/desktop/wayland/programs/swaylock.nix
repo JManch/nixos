@@ -48,6 +48,12 @@ let
         # Exit if swaylock is running
         pgrep -x swaylock && exit 1
 
+        # Create a unique lock file so forked processes can track if precisely
+        # this instance of swaylock is still running
+        lockfile="/tmp/swaylock-lock-$$-$(date +%s)"
+        touch "$lockfile"
+        trap 'rm -f "$lockfile"' EXIT
+
         ${preLock}
         ${getExe config.programs.swaylock.package} &
         SWAYLOCK_PID=$!

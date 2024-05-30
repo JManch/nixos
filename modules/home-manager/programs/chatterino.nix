@@ -8,6 +8,7 @@
 let
   inherit (lib) mkIf optional getExe fetchers;
   inherit (config.modules.programs) mpv;
+  inherit (config.age.secrets) streamlinkTwitchAuth;
   cfg = config.modules.programs.chatterino;
   desktopCfg = config.modules.desktop;
 
@@ -17,7 +18,7 @@ let
     postInstall = ''
       wrapProgram $out/bin/streamlink \
         --add-flags "--config /home/${username}/.config/streamlink/config" \
-        --add-flags '--config "${config.age.secrets.streamlinkTwitchAuth.path}"'
+        --add-flags '--config "${streamlinkTwitchAuth.path}"'
     '';
   });
 
@@ -27,10 +28,11 @@ let
     in
     pkgs.writeShellApplication {
       name = "hypr-twitch-workspace";
-      runtimeInputs = with pkgs; [
+      runtimeInputs = (with pkgs; [
         coreutils
         chatterino2
         socat
+      ]) ++ [
         config.programs.firefox.package
         config.wayland.windowManager.hyprland.package
       ];

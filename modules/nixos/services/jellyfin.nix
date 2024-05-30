@@ -28,18 +28,6 @@ let
   cfg = config.modules.services.jellyfin;
   uid = 1500;
   gid = 1500;
-
-  # Patched jellyfin-web to fix a bug in jellyfin-apiclient-javascript that
-  # caused Android logins to fail when using a reverse proxy
-  # I think it's somewhat to this issue https://github.com/jellyfin/jellyfin-android/issues/742
-  jellyfin-web = pkgs.jellyfin-web.overrideAttrs (oldAttrs: rec {
-    patches = (oldAttrs.patches or [ ]) ++ [ ../../../patches/jellyfin-web.patch ];
-    npmDeps = pkgs.fetchNpmDeps {
-      inherit (oldAttrs) src;
-      inherit patches;
-      hash = "sha256-49cHlscStoef0kvB0X/Fpphwe51uIV2ZlLswHo/3K+Y=";
-    };
-  });
 in
 mkMerge [
   {
@@ -54,14 +42,6 @@ mkMerge [
 
       services.jellyfin = {
         enable = true;
-        package = pkgs.jellyfin.overrideAttrs (oldAttrs: {
-          preInstall = ''
-            makeWrapperArgs+=(
-              --add-flags "--ffmpeg ${pkgs.ffmpeg}/bin/ffmpeg"
-              --add-flags "--webdir ${jellyfin-web}/share/jellyfin-web"
-            )
-          '';
-        });
         openFirewall = cfg.openFirewall;
       };
 

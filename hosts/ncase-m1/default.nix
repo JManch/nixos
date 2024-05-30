@@ -10,6 +10,7 @@
     type = "desktop";
     ipAddress = "192.168.88.254";
     memory = 32000;
+    hassIntegration.enable = true;
 
     cpu = {
       name = "R7 3700x";

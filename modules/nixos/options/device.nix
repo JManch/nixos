@@ -1,6 +1,7 @@
-{ lib, config, ... }:
+{ lib, config, inputs, ... }:
 let
-  inherit (lib) mkOption types;
+  inherit (lib) mkEnableOption mkOption types;
+  inherit (inputs.nix-resources.secrets) fqDomain;
 
   monitorSubmodule = {
     options = {
@@ -154,6 +155,18 @@ in
         The local IP address of the device on my home network. Must be a static
         address.
       '';
+    };
+
+    hassIntegration = {
+      enable = mkEnableOption "Home Assistant Integration";
+      endpoint = mkOption {
+        type = types.str;
+        default = "https://home.${fqDomain}";
+        description = ''
+          Endpoint of the home assistance instance. Should always be accessible
+          on this device.
+        '';
+      };
     };
   };
 

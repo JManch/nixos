@@ -18,6 +18,7 @@ let
     concatStringsSep
     concatMap
     all
+    getExe
     attrNames
     hasAttr;
   configDir = "/home/${username}/.config/nixos";
@@ -108,7 +109,7 @@ let
           'cd /tmp/nixos-diff-config && \
           tar -xf nixos-diff-config.tar && \
           nixos-rebuild build --flake .#$hostname && \
-          nvd --color always diff /run/current-system ./result; \
+          ${getExe pkgs.nvd} --color always diff /run/current-system ./result; \
           rm -rf /tmp/nixos-diff-config'"
 
       '' else /*bash*/ ''

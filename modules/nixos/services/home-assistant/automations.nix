@@ -106,45 +106,6 @@ let
         }];
       }) [ true false ];
 
-  joshuaDehumidifierToggle = map
-    (enable:
-      {
-        alias = "Joshua Dehumidifier ${if enable then "Enable" else "Disable"}";
-        mode = "single";
-        trigger = [
-          {
-            platform = "homeassistant";
-            event = "start";
-          }
-          {
-            platform = "time";
-            at = if enable then "21:00:00" else "10:00:00";
-          }
-        ];
-        condition = [{
-          condition = "and";
-          conditions = [
-            {
-              condition = "time";
-              after = if enable then "21:00:00" else "10:00:00";
-              before = if enable then "10:00:00" else "21:00:00";
-            }
-          ] ++ optional enable {
-            type = "is_plugged_in";
-            condition = "device";
-            device_id = devices.mobile_app_joshua_pixel_5.id;
-            entity_id = devices.mobile_app_joshua_pixel_5.chargingStatusId;
-            domain = "binary_sensor";
-          };
-        }];
-        action = [{
-          service = "humidifier.turn_${if enable then "on" else "off"}";
-          metadata = { };
-          data = { };
-          target.entity_id = "humidifier.joshua_hygrostat";
-        }];
-      }) [ true false ];
-
   joshuaDehumidifierTankFull = [{
     alias = "Joshua Dehumidifier Full Notify";
     mode = "single";
@@ -188,7 +149,6 @@ mkIf (cfg.enableInternal)
 {
   services.home-assistant.config = {
     automation = heatingTimeToggle
-      # ++ joshuaDehumidifierToggle
       ++ joshuaDehumidifierMoldToggle
       ++ joshuaDehumidifierTankFull
       ++ optional frigate.enable frigateEntranceNotify

@@ -168,6 +168,10 @@ let
         ];
       }
       {
+        type = "history-graph";
+        entities = [{ entity = "binary_sensor.ncase_m1_active"; name = "NCASE-M1"; }];
+      }
+      {
         title = "Dehumidifier";
         state_color = true;
         type = "entities";

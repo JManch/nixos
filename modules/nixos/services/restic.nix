@@ -378,8 +378,8 @@ mkMerge [
           EnvironmentFile = resticReadWriteBackblazeVars.path;
           ExecStart = [
             "${resticExe} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
-            # WARN: Keep an eye on this with egress fees
-            "${resticExe} check --read-data-subset=500M --retry-lock 5m"
+            # In practice bandwidth usage seems to be data-subset * 2
+            "${resticExe} check --read-data-subset=400M --retry-lock 5m"
           ];
 
           PrivateTmp = true;

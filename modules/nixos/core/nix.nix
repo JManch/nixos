@@ -16,7 +16,6 @@ let
     mapAttrsToList
     optionalString
     concatStringsSep
-    concatMap
     all
     getExe
     attrNames
@@ -33,57 +32,60 @@ let
     "diff"
   ];
 
-  rebuildScript = cmd: pkgs.writeShellApplication {
-    name = "rebuild-${cmd}";
-    runtimeInputs = with pkgs; [ nixos-rebuild nvd ];
-    # Always rebuild in ~ because I once had a bad experience where I
-    # accidentally built in /nix/store and caused irrepairable corruption
-    text = /*bash*/ ''
-      pushd ~ >/dev/null 2>&1
-      exit() {
-        popd >/dev/null 2>&1
-      }
-      trap exit EXIT
-      nixos-rebuild ${if (cmd == "diff") then "build" else cmd} \
-        --use-remote-sudo --flake "${configDir}#${hostname}" "$@"
-      ${optionalString (cmd == "diff") /*bash*/ ''
-        nvd diff /run/current-system result
-      ''}
-    '';
-  };
-
-  remoteRebuildScript = cmd:
-    let
-      validation = /*bash*/ ''
-        if [ "$#" -ne 1 ]; then
-          echo "Usage: host-rebuild-${cmd} <hostname>"
-          exit 1
-        fi
-
-        hostname=$1
-        if [[ "$hostname" == "${hostname}" ]]; then
-          echo "Error: Cannot ${cmd} remotely on local host"
-          exit 1
-        fi
-
-        hosts=(${concatStringsSep " " (builtins.attrNames (utils.hosts outputs))})
-        match=0
-        for host in "''${hosts[@]}"; do
-          if [[ $host = "$hostname" ]]; then
-            match=1
-            break
-          fi
-        done
-        if [[ $match = 0 ]]; then
-          echo "Error: Host '$hostname' does not exist" >&2
-          exit 1
-        fi
+  rebuildScripts = map
+    (cmd: pkgs.writeShellApplication {
+      name = "rebuild-${cmd}";
+      runtimeInputs = with pkgs; [ nixos-rebuild nvd ];
+      # Always rebuild in ~ because I once had a bad experience where I
+      # accidentally built in /nix/store and caused irrepairable corruption
+      text = /*bash*/ ''
+        pushd ~ >/dev/null 2>&1
+        exit() {
+          popd >/dev/null 2>&1
+        }
+        trap exit EXIT
+        nixos-rebuild ${if (cmd == "diff") then "build" else cmd} \
+          --use-remote-sudo --flake "${configDir}#${hostname}" "$@"
+        ${optionalString (cmd == "diff") /*bash*/ ''
+          nvd diff /run/current-system result
+        ''}
       '';
-    in
-    pkgs.writeShellApplication {
-      name = "host-rebuild-${cmd}";
-      runtimeInputs = with pkgs; [ nixos-rebuild openssh ];
-      text = validation + (if (cmd == "diff") then /*bash*/ ''
+    })
+    rebuildCmds;
+
+  remoteRebuildScripts = map
+    (cmd:
+      let
+        validation = /*bash*/ ''
+          if [ "$#" -ne 1 ]; then
+            echo "Usage: host-rebuild-${cmd} <hostname>"
+            exit 1
+          fi
+
+          hostname=$1
+          if [[ "$hostname" == "${hostname}" ]]; then
+            echo "Error: Cannot ${cmd} remotely on local host"
+            exit 1
+          fi
+
+          hosts=(${concatStringsSep " " (builtins.attrNames (utils.hosts outputs))})
+          match=0
+          for host in "''${hosts[@]}"; do
+            if [[ $host = "$hostname" ]]; then
+              match=1
+              break
+            fi
+          done
+          if [[ $match = 0 ]]; then
+            echo "Error: Host '$hostname' does not exist" >&2
+            exit 1
+          fi
+        '';
+      in
+      pkgs.writeShellApplication {
+        name = "host-rebuild-${cmd}";
+        runtimeInputs = with pkgs; [ nixos-rebuild openssh ];
+        text = validation + (if (cmd == "diff") then /*bash*/ ''
 
         # Because nixos-rebuild doesn't create a 'result' symlink when
         # executed with --build-host we first run build locally with
@@ -128,7 +130,8 @@ let
         ''}
 
       '');
-    };
+      })
+    rebuildCmds;
 
   deployScript = pkgs.writeShellApplication {
     name = "deploy-host";
@@ -213,9 +216,9 @@ let
   };
 in
 {
-  environment.systemPackages = [
+  environment.systemPackages = rebuildScripts ++ remoteRebuildScripts ++ [
     deployScript
-  ] ++ (concatMap (cmd: [ (rebuildScript cmd) (remoteRebuildScript cmd) ]) rebuildCmds);
+  ];
 
   # Nice explanation of overlays: https://archive.is/f8goR
   #

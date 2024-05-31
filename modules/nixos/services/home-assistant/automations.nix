@@ -1,16 +1,9 @@
-{ lib
-, config
-, inputs
-, username
-, ...
-}:
+{ lib, config, inputs, ... }:
 let
   inherit (lib) mkIf utils head optional optionals attrValues;
   inherit (secretCfg) devices;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) frigate;
-  inherit (homeConfig.modules.services.hass) solarLightThreshold;
-  homeConfig = config.home-manager.users.${username};
   cfg = config.modules.services.hass;
   secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
 
@@ -156,25 +149,39 @@ let
       mode = "single";
       trigger = [
         {
-          platform = "numeric_state";
-          entity_id = [ "sensor.powerwall_solar_power" ];
-          for.minutes = 2;
-          below = mkIf enable solarLightThreshold;
-          above = mkIf (!enable) solarLightThreshold;
+          platform = "state";
+          entity_id = [ "binary_sensor.brightness_threshold" ];
+          from = if enable then "on" else "off";
+          to = if enable then "off" else "on";
+          for.minutes = 5;
         }
         {
           platform = "state";
-          entity_id = [ "input_boolean.ncase_m1_active" ];
+          entity_id = [ "binary_sensor.ncase_m1_active" ];
           from = if enable then "off" else "on";
           to = if enable then "on" else "off";
           for.seconds = if enable then 0 else 30;
         }
+        {
+          platform = "homeassistant";
+          event = "start";
+        }
       ];
-      condition = optional enable {
-        condition = "state";
-        entity_id = "input_boolean.ncase_m1_active";
-        state = "on";
-      };
+      condition = [{
+        condition = if enable then "and" else "or";
+        conditions = [
+          {
+            condition = "state";
+            entity_id = "binary_sensor.brightness_threshold";
+            state = if enable then "off" else "on";
+          }
+          {
+            condition = "state";
+            entity_id = "binary_sensor.ncase_m1_active";
+            state = if enable then "on" else "off";
+          }
+        ];
+      }];
       action = [{
         service = "light.turn_${if enable then "on" else "off"}";
         target.entity_id = "light.joshua_room";
@@ -212,13 +219,6 @@ mkIf (cfg.enableInternal)
       high_alert_surveillance = {
         name = "High Alert Surveillance";
         icon = "mdi:cctv";
-      };
-
-      # Input booleans are normally meant for UI interaction but we only update
-      # this entity through the API
-      ncase_m1_active = {
-        name = "NCASE-M1 Active";
-        icon = "mdi:desktop-classic";
       };
     };
   };

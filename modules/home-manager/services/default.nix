@@ -19,12 +19,10 @@ in
       };
     };
 
-    hass.solarLightThreshold = mkOption {
-      type = types.float;
-      default = 1.0;
+    hass.curlCommand = mkOption {
+      type = types.functionTo types.lines;
       description = ''
-        Solar power threshold that is considered bright enough to warrant
-        turning off the lights and enabling light mode.
+        Function for generating a curl command to query the hass API
       '';
     };
   };

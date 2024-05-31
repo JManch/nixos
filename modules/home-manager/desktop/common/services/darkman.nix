@@ -258,7 +258,7 @@ in
               global current_mode, last_switch_time
 
               if (time.time() - last_switch_time < COOLDOWN_PERIOD):
-                  print("Skipping theme switching due to cooldown")
+                  print("Skipping theme switch due to cooldown")
                   return
 
               print(f"Switching to mode {mode}")

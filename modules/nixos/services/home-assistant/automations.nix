@@ -1,9 +1,16 @@
-{ lib, config, inputs, ... }:
+{ lib
+, config
+, inputs
+, username
+, ...
+}:
 let
   inherit (lib) mkIf utils head optional optionals attrValues;
   inherit (secretCfg) devices;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) frigate;
+  inherit (homeConfig.modules.services.hass) solarLightThreshold;
+  homeConfig = config.home-manager.users.${username};
   cfg = config.modules.services.hass;
   secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
 
@@ -137,12 +144,41 @@ let
         for.minutes = if enable then 0 else 30;
       }];
       condition = [ ];
-      action = [
+      action = [{
+        service = "switch.turn_${if enable then "on" else "off"}";
+        target.entity_id = "switch.joshua_dehumidifier";
+      }];
+    }) [ true false ];
+
+  joshuaLightsToggle = map
+    (enable: {
+      alias = "Joshua Lights ${if enable then "On" else "Off"}";
+      mode = "single";
+      trigger = [
         {
-          service = "switch.turn_${if enable then "on" else "off"}";
-          target.entity_id = "switch.joshua_dehumidifier";
+          platform = "numeric_state";
+          entity_id = [ "sensor.powerwall_solar_power" ];
+          for.minutes = 2;
+          below = mkIf enable solarLightThreshold;
+          above = mkIf (!enable) solarLightThreshold;
+        }
+        {
+          platform = "state";
+          entity_id = [ "input_boolean.ncase_m1_active" ];
+          from = if enable then "off" else "on";
+          to = if enable then "on" else "off";
+          for.seconds = if enable then 0 else 30;
         }
       ];
+      condition = optional enable {
+        condition = "state";
+        entity_id = "input_boolean.ncase_m1_active";
+        state = "on";
+      };
+      action = [{
+        service = "light.turn_${if enable then "on" else "off"}";
+        target.entity_id = "light.joshua_room";
+      }];
     }) [ true false ];
 in
 mkIf (cfg.enableInternal)
@@ -151,6 +187,7 @@ mkIf (cfg.enableInternal)
     automation = heatingTimeToggle
       ++ joshuaDehumidifierMoldToggle
       ++ joshuaDehumidifierTankFull
+      ++ joshuaLightsToggle
       ++ optional frigate.enable frigateEntranceNotify
       ++ optionals frigate.enable frigateHighAlertNotify;
 
@@ -175,6 +212,13 @@ mkIf (cfg.enableInternal)
       high_alert_surveillance = {
         name = "High Alert Surveillance";
         icon = "mdi:cctv";
+      };
+
+      # Input booleans are normally meant for UI interaction but we only update
+      # this entity through the API
+      ncase_m1_active = {
+        name = "NCASE-M1 Active";
+        icon = "mdi:desktop-classic";
       };
     };
   };

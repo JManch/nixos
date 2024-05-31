@@ -1,56 +1,49 @@
 { lib
 , pkgs
 , config
+, hostname
 , osConfig
 , ...
 }:
 let
-  inherit (lib) mkIf getExe getExe';
+  inherit (lib) mkIf getExe optionalString toLower replaceStrings;
   inherit (osConfig.device) hassIntegration;
   inherit (config.age.secrets) hassToken;
-  cfg = config.modules.services.hass;
-  curl = getExe pkgs.curl;
-  bc = getExe' pkgs.bc "bc";
-  jaq = getExe pkgs.jaq;
 
-  setLights = state:
-    let
-      curlLights = ''
-        ${curl} -s \
-          -H "Authorization: Bearer $(<${hassToken.path})" \
-          -H "Content-Type: application/json" \
-          -d '{"entity_id": "light.joshua_room"}' \
-          ${hassIntegration.endpoint}/api/services/light/turn_${state}
-      '';
-    in
-    pkgs.writeShellScript "joshua_lights_${state}" ''
-      ${if (state == "on") then /*bash*/ ''
-        power=$(${curl} -s \
-          -H "Authorization: Bearer $(<${hassToken.path})" \
-          -H "Content-Type: application/json" \
-          ${hassIntegration.endpoint}/api/states/sensor.powerwall_solar_power \
-          | ${jaq} -r .state)
+  curlCommand = { endpoint, data ? null }:
+    ''${getExe pkgs.curl} -s \
+      -H "Authorization: Bearer $(<${hassToken.path})" \
+      -H "Content-Type: application/json" \
+      ${optionalString (data != null) "-d '{${data}}'"} \
+      ${hassIntegration.endpoint}/api/${endpoint}'';
 
-        if [ "$(echo "$power < ${toString cfg.solarLightThreshold}" | ${bc})" -eq 1 ]; then
-          ${curlLights}
-        fi
-      '' else ''
-        ${curlLights}
-      ''}
-    '';
+  entityHostname = replaceStrings [ "-" ] [ "_" ] (toLower hostname);
+  updateActiveState = state: pkgs.writeShellScript "hass-host-active-${state}" (curlCommand {
+    data = ''"entity_id": "input_boolean.${entityHostname}_active"'';
+    endpoint = "services/input_boolean/turn_${state}";
+  });
 in
 mkIf osConfig.device.hassIntegration.enable
 {
-  modules.desktop.programs.swaylock = {
-    postLockScript = /*bash*/ ''
-      (
-        sleep 5
-        if [ -e "$lockfile" ]; then
-          ${setLights "off"}
-        fi
-      ) &
-    '';
+  # Set the active state entity on login and logout
+  systemd.user.services.hass-active-state-init = {
+    Unit = {
+      Description = "Home assistant active host entity initialiser";
+    };
 
-    postUnlockScript = (setLights "on").outPath;
+    Service = {
+      Type = "oneshot";
+      ExecStart = (updateActiveState "on").outPath;
+      ExecStop = (updateActiveState "off").outPath;
+      RemainAfterExit = true;
+    };
+
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  # Update the active state when locking
+  modules.desktop.programs.swaylock = {
+    postLockScript = (updateActiveState "off").outPath;
+    postUnlockScript = (updateActiveState "on").outPath;
   };
 }

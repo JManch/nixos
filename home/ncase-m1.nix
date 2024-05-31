@@ -39,7 +39,7 @@
 
         darkman = {
           enable = true;
-          switchMethod = "solar";
+          switchMethod = "hass";
         };
       };
     };

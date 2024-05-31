@@ -47,9 +47,9 @@ let
     listToAttrs;
   inherit (config.modules) desktop;
   inherit (osConfig.device) hassIntegration;
-  inherit (config.age.secrets) hassToken;
+  inherit (config.modules.services.hass) curlCommand;
   cfg = config.modules.desktop.services.darkman;
-  darkman = getExe config.services.darkman.package;
+  darkmanPackage = config.services.darkman.package;
 
   colorSchemeSwitchingConfiguration =
     let
@@ -96,7 +96,7 @@ let
             # If the current theme is light then activate the light variant.
             # Prevents the theme resetting to dark when doing home manager
             # rebuilds.
-            theme=$(${darkman} get 2>/dev/null || echo "")
+            theme=$(${getExe darkmanPackage} get 2>/dev/null || echo "")
             if [ "$theme" = "light" ]; then
               run --quiet cp "${configHome}/darkman/variants/${path}.light" "${configHome}/darkman/variants/${path}"
             else
@@ -157,8 +157,8 @@ in
 {
   config = mkIf (cfg.enable && osConfig.usrEnv.desktop.enable) ({
     assertions = utils.asserts [
-      ((cfg.switchMethod == "solar") -> hassIntegration.enable)
-      "Darkman 'solar' switch mode requires the device to have hass integration enabled"
+      ((cfg.switchMethod == "hass") -> hassIntegration.enable)
+      "Darkman 'hass' switch mode requires the device to have hass integration enabled"
     ];
 
     services.darkman = {
@@ -207,78 +207,42 @@ in
     #   "org.freedesktop.impl.portal.Settings" = [ "darkman" ];
     # };
 
-    desktop.hyprland.binds = [ "${desktop.hyprland.modKey}, F1, exec, ${darkman} toggle" ];
+    desktop.hyprland.binds = [ "${desktop.hyprland.modKey}, F1, exec, ${getExe darkmanPackage} toggle" ];
 
-    systemd.user.services.darkman-solar-switcher = mkIf (cfg.switchMethod == "solar") {
+    systemd.user.services.darkman-hass-switcher = mkIf (cfg.switchMethod == "hass") {
       Unit = {
-        Description = "Switch darkman theme based on home assistant solar power";
+        Description = "Switch darkman theme based on home assistant brightness entity";
         Requires = [ "darkman.service" ];
         After = [ "darkman.service" ];
       };
 
       Service = {
-        ExecStart = pkgs.writers.writePython3 "darkman-solar-switcher" { libraries = [ pkgs.python3Packages.requests ]; } ''
-          import os
-          import time
-          import requests
-          import subprocess
+        ExecStart = getExe (pkgs.writeShellApplication {
+          name = "darkman-solar-switcher";
+          runtimeInputs = [ pkgs.coreutils pkgs.jaq darkmanPackage ];
+          text = /*bash*/ ''
+            current_theme=$(darkman get)
+            switch_theme() {
+              if [ "$1" != "$(darkman get)" ]; then
+                darkman set "$1"
+                current_theme="$1"
+              fi
+            }
 
-          THRESHOLD = ${toString config.modules.services.hass.solarLightThreshold}
-          REFRESH_RATE = 60
-          COOLDOWN_PERIOD = 5 * 60
-
-
-          def get_entity_status(entity_id):
-              url = f"${hassIntegration.endpoint}/api/states/{entity_id}"
-              headers = {
-                  "Authorization": f"Bearer {token}",
-                  "Content-Type": "application/json",
-              }
-              response = requests.get(url, headers=headers)
-
-              if response.status_code == 200:
-                  entity_data = response.json()
-                  return entity_data
-              else:
-                  print(f"Failed to retrieve entity status: {response.status_code}")
-                  return None
-
-
-          def check_power():
-              status = get_entity_status("sensor.powerwall_solar_power")
-              if status:
-                  power = float(status['state'])
-                  if power < THRESHOLD and current_mode != "dark":
-                      switch_mode("dark")
-                  elif power >= THRESHOLD and current_mode != "light":
-                      switch_mode("light")
-
-
-          def switch_mode(mode):
-              global current_mode, last_switch_time
-
-              if (time.time() - last_switch_time < COOLDOWN_PERIOD):
-                  print("Skipping theme switch due to cooldown")
-                  return
-
-              print(f"Switching to mode {mode}")
-              current_mode = mode
-              last_switch_time = time.time()
-              os.system(f"darkman set {mode}")
-
-
-          if __name__ == "__main__":
-              global token, current_mode
-
-              token_path = os.path.expandvars('${hassToken.path}')
-              with open(token_path, 'r') as file:
-                  token = file.read().rstrip()
-              current_mode = subprocess.getoutput("darkman get")
-
-              while True:
-                  check_power()
-                  time.sleep(REFRESH_RATE)
-        '';
+            while true
+            do
+              state=$(${curlCommand { endpoint = "states/binary_sensor.brightness_threshold"; }} | jaq -r .state)
+              if [[ "$state" = "on" && ("$current_theme" = "dark" || "$current_theme" = "null") ]]; then
+                switch_theme "light"
+              elif [[ "$state" = "off" && ("$current_theme" = "light" || "$current_theme" = "null") ]]; then
+                switch_theme "dark"
+              elif [ "$current_theme" = "null" ]; then
+                darkman set dark
+              fi
+              sleep 180
+            done
+          '';
+        });
       };
 
       Install.WantedBy = [ "darkman.service" ];

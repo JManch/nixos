@@ -18,12 +18,13 @@ in
       enable = mkEnableOption "Darkman";
 
       switchMethod = mkOption {
-        type = types.enum [ "manual" "coordinates" "solar" ];
+        type = types.enum [ "manual" "coordinates" "hass" ];
         default = "coordinates";
         description = ''
           Manual means the theme will not switch automatically. Coordinates
           uses the configured longitude and latitude to switch at sunrise and
-          sunset. Solar uses the solar power generation from home-assistant.
+          sunset. Hass uses a home assistant brightness entity to select the
+          theme.
         '';
       };
 

@@ -137,6 +137,7 @@ let
               { entity = "switch.adaptive_lighting_adapt_brightness_joshua_room"; name = "Adapt Brightness"; }
               { entity = "switch.adaptive_lighting_adapt_color_joshua_room"; name = "Adapt Color"; }
               { entity = "switch.adaptive_lighting_sleep_mode_joshua_room"; name = "Sleep Mode"; }
+              { entity = "input_boolean.joshua_room_wake_up_lights"; name = "Wake Up Lights"; }
             ];
           }
         ];

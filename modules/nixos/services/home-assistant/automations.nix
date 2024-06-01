@@ -79,9 +79,9 @@ let
               before = "input_datetime.heating_${oppositeMode}_time";
             };
           in
-          (optional (!enable) timeCond)
+          optional (!enable) timeCond
           ++
-          (optional enable {
+          optional enable {
             condition = "and";
             conditions = [
               timeCond
@@ -91,7 +91,7 @@ let
                 state = "on";
               }
             ];
-          })
+          }
         ;
         action = [{
           service = "climate.set_hvac_mode";
@@ -161,26 +161,51 @@ let
           to = if enable then "on" else "off";
           for.seconds = if enable then 0 else 30;
         }
-        {
-          platform = "homeassistant";
-          event = "start";
-        }
-      ];
-      condition = [{
-        condition = if enable then "and" else "or";
-        conditions = [
-          {
-            condition = "state";
-            entity_id = "binary_sensor.brightness_threshold";
-            state = if enable then "off" else "on";
-          }
-          {
-            condition = "state";
-            entity_id = "binary_sensor.ncase_m1_active";
-            state = if enable then "on" else "off";
-          }
-        ];
-      }];
+      ]
+      ++ optional enable {
+        platform = "template";
+        value_template = "{{ now().timestamp() == (${joshuaWakeUpTimestamp} - 60*60) }}";
+      };
+      condition =
+        let
+          mainCondition = {
+            condition = if enable then "and" else "or";
+            conditions = [
+              {
+                condition = "state";
+                entity_id = "binary_sensor.brightness_threshold";
+                state = if enable then "off" else "on";
+              }
+              {
+                condition = "state";
+                entity_id = "binary_sensor.ncase_m1_active";
+                state = if enable then "on" else "off";
+              }
+            ];
+          };
+          wakeUpCondition = {
+            condition = "or";
+            conditions = [
+              mainCondition
+              {
+                condition = "and";
+                conditions = [
+                  {
+                    condition = "template";
+                    value_template = "{{ now().timestamp() == (${joshuaWakeUpTimestamp} - 60*60) }}";
+                  }
+                  {
+                    condition = "state";
+                    entity_id = "input_boolean.joshua_room_wake_up_lights";
+                    state = "on";
+                  }
+                ];
+              }
+            ];
+          };
+        in
+        optional (!enable) mainCondition
+        ++ optional enable wakeUpCondition;
       action = [{
         service = "light.turn_${if enable then "on" else "off"}";
         target.entity_id = "light.joshua_room";
@@ -193,10 +218,16 @@ let
   joshuaAdaptiveLightingSunTimes = [{
     alias = "Joshua Room Lighting Sun Times";
     mode = "single";
-    trigger = [{
-      platform = "state";
-      entity_id = [ "sensor.joshua_pixel_5_next_alarm" ];
-    }];
+    trigger = [
+      {
+        platform = "state";
+        entity_id = [ "sensor.joshua_pixel_5_next_alarm" ];
+      }
+      {
+        platform = "homeassistant";
+        event = "start";
+      }
+    ];
     action = [{
       "if" = [{
         condition = "or";
@@ -236,7 +267,7 @@ let
         {
           platform = "template";
           value_template = if enable then "{{ now().timestamp() == ${joshuaSleepTimestamp} }}" else
-          "{{ now().timestamp() == (${joshuaWakeUpTimestamp} - 2*60*60) }}";
+          "{{ now().timestamp() == (${joshuaWakeUpTimestamp} - 60*60) }}";
         }
         {
           platform = "state";
@@ -250,13 +281,11 @@ let
           event = "start";
         }
       ];
-      condition = [
-        {
-          condition = "template";
-          value_template = if enable then "{{ now().timestamp() >= ${joshuaSleepTimestamp} and now().timestamp() < (${joshuaWakeUpTimestamp} - 2*60*60) }}" else
-          "{{ now().timestamp() >= (${joshuaWakeUpTimestamp} - 2*60*60) and now().timestamp() < ${joshuaSleepTimestamp} }}";
-        }
-      ] ++ optional enable {
+      condition = [{
+        condition = "template";
+        value_template = if enable then "{{ now().timestamp() >= ${joshuaSleepTimestamp} and now().timestamp() < (${joshuaWakeUpTimestamp} - 60*60) }}" else
+        "{{ now().timestamp() >= (${joshuaWakeUpTimestamp} - 60*60) and now().timestamp() < ${joshuaSleepTimestamp} }}";
+      }] ++ optional enable {
         condition = "state";
         entity_id = "binary_sensor.ncase_m1_active";
         state = "off";
@@ -301,6 +330,11 @@ mkIf cfg.enableInternal
       high_alert_surveillance = {
         name = "High Alert Surveillance";
         icon = "mdi:cctv";
+      };
+
+      joshua_room_wake_up_lights = {
+        name = "Joshua Room Wake Up Lights";
+        icon = "mdi:weather-sunset-up";
       };
     };
   };

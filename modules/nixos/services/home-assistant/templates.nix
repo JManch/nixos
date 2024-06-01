@@ -79,7 +79,7 @@ mkIf (cfg.enableInternal)
             icon = "mdi:currency-gbp";
             state = "{{ ((states('sensor.powerwall_site_import_cost') | default(0)) | float) - ((states('sensor.powerwall_site_export_compensation') | default(0)) | float) }}";
             unit_of_measurement = "GBP";
-            state_class = "total_increasing";
+            state_class = "total";
           }
           {
             name = "Joshua Dehumidifier Tank Status";
@@ -139,10 +139,10 @@ mkIf (cfg.enableInternal)
           triggers = map
             (variant: {
               platform = "numeric_state";
-              entity_id = [ "sensors.powerwall_solar_power" ];
+              entity_id = [ "sensor.smoothed_solar_power" ];
               above = mkIf variant solarThreshold;
               below = mkIf (!variant) solarThreshold;
-              for.minutes = 5;
+              for.minutes = 3;
             }) [ true false ];
         in
         {
@@ -154,26 +154,33 @@ mkIf (cfg.enableInternal)
             name = "Brightness Threshold";
             icon = "mdi:white-balance-sunny";
             device_class = "light";
-            state = ''
-              {% if ((states('sensor.powerwall_solar_power') | default(0)) | float) > ${toString solarThreshold} %}
-                'on'
-              {% else %}
-                'off'
-              {% endif %}
-            '';
+            state = "{{ (states('sensor.smoothed_solar_power') | float) > ${toString solarThreshold} }}";
           };
         }
       )
     ];
 
-    sensor = [{
-      name = "Joshua Mold Indicator";
-      platform = "mold_indicator";
-      indoor_temp_sensor = "sensor.joshua_temperature";
-      indoor_humidity_sensor = "sensor.joshua_humidity";
-      outdoor_temp_sensor = "sensor.outdoor_temperature";
-      calibration_factor = 1.754;
-    }];
+    sensor = [
+      {
+        name = "Joshua Mold Indicator";
+        platform = "mold_indicator";
+        indoor_temp_sensor = "sensor.joshua_temperature";
+        indoor_humidity_sensor = "sensor.joshua_humidity";
+        outdoor_temp_sensor = "sensor.outdoor_temperature";
+        calibration_factor = 1.754;
+      }
+      {
+        name = "Smoothed Solar Power";
+        platform = "filter";
+        entity_id = "sensor.powerwall_solar_power";
+        filters = [{
+          # The solar power sensor updates every 30 secs
+          filter = "time_simple_moving_average";
+          window_size = "00:05";
+          precision = 2;
+        }];
+      }
+    ];
 
     switch = [{
       platform = "template";

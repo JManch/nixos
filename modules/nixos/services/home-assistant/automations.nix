@@ -153,7 +153,6 @@ let
           entity_id = [ "binary_sensor.brightness_threshold" ];
           from = if enable then "on" else "off";
           to = if enable then "off" else "on";
-          for.minutes = 5;
         }
         {
           platform = "state";

@@ -5,13 +5,13 @@
 }:
 stdenvNoCC.mkDerivation (finalAttrs: rec {
   pname = "mpv-modernx";
-  version = "0.3.0";
+  version = "0.3.5.5";
 
   src = fetchFromGitHub {
     owner = "zydezu";
     repo = "ModernX";
     rev = version;
-    hash = "sha256-/DmoQSPe0J41Y2IVHg0doHs67+iOJjYI8b8n2RK0Oc0=";
+    hash = "sha256-sPpVwI8w5JsP/jML0viOSqhyYBVKfxWuKbxHkX3GVug=";
   };
 
   dontBuild = true;
@@ -37,6 +37,6 @@ stdenvNoCC.mkDerivation (finalAttrs: rec {
     description = "A fork of modernX (a replacement for MPV that retains the functionality of the default OSC), adding additional features";
     homepage = "https://github.com/zydezu/ModernX";
     license = licenses.free;
-    maintainers = with maintainers; [ jmanch ];
+    maintainers = with maintainers; [ JManch ];
   };
 })

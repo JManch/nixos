@@ -57,7 +57,7 @@ let
     (cmd:
       let
         validation = /*bash*/ ''
-          if [ "$#" -ne 1 ]; then
+          if [ "$#" = 0 ]; then
             echo "Usage: host-rebuild-${cmd} <hostname>"
             exit 1
           fi

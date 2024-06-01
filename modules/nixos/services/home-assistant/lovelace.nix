@@ -478,7 +478,7 @@ let
     };
 
 in
-mkIf (cfg.enableInternal)
+mkIf cfg.enableInternal
 {
   services.home-assistant = {
     lovelaceConfig = {

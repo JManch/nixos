@@ -71,12 +71,12 @@ in
       customComponents = [
         pkgs.home-assistant-custom-components.miele
         (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs (oldAttrs: rec {
-          version = "1.21.2";
+          version = "1.22.0";
           src = pkgs.fetchFromGitHub {
             owner = "basnijholt";
             repo = "adaptive-lighting";
             rev = version;
-            hash = "sha256-VeSMBjvlmvVE93IpDbOhkDizMlE/SYclL6yoQ3d6biw=";
+            hash = "sha256-k5pCgPM5xjVfWjOcr0UDFzYl/8z7yUwgYdBmC3+2F5k=";
           };
         }))
         outputs.packages.${pkgs.system}.heatmiser

@@ -5,7 +5,7 @@ let
   cfg = config.modules.services.hass;
   secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
 in
-mkIf (cfg.enableInternal)
+mkIf cfg.enableInternal
 {
   services.home-assistant.config = {
     recorder.exclude.entities = [ "sensor.powerwall_battery_remaining_time" ];

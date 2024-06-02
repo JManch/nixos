@@ -239,9 +239,10 @@ mkMerge [
         (name: value:
           let
             failureServiceName = "restic-backups-${name}-failure-notif";
+            capitalisedNamed = utils.upperFirstChar name;
             service = failureNotifService failureServiceName
-              "Restic Backup ${name} Failed"
-              "${name} backup";
+              "Restic Backup ${capitalisedNamed} Failed"
+              "${capitalisedNamed} backup";
           in
           nameValuePair failureServiceName service.${failureServiceName}
         )

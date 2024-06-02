@@ -52,16 +52,14 @@ mkIf cfg.enable
       "/var/lib/calibre-library"
     ];
 
-    restore = {
-      pathOwnership =
-        let
-          ownership = { user = "calibre-web"; group = "calibre-web"; };
-        in
-        {
-          "/var/lib/calibre-web" = ownership;
-          "/var/lib/calibre-library" = ownership;
-        };
-    };
+    restore.pathOwnership =
+      let
+        ownership = { user = "calibre-web"; group = "calibre-web"; };
+      in
+      {
+        "/var/lib/calibre-web" = ownership;
+        "/var/lib/calibre-library" = ownership;
+      };
   };
 
   persistence.directories = [

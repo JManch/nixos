@@ -133,6 +133,7 @@ in
             restic.enable = mkVMOverride false;
             restic.server.enable = mkVMOverride false;
             minecraft-server.enable = mkVMOverride false;
+            mikrotik-backup.enable = mkVMOverride false;
           };
         };
 

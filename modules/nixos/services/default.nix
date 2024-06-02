@@ -782,6 +782,16 @@ in
         '';
       };
     };
+
+    mikrotik-backup = {
+      enable = mkEnableOption "Mikrotik Backup";
+
+      routerAddress = mkOption {
+        type = types.str;
+        default = "router.lan";
+        description = "Address of the router to fetch backup files from";
+      };
+    };
   };
 
   config = {

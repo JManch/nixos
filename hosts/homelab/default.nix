@@ -33,6 +33,7 @@
       calibre.enable = true;
       mosquitto.enable = true;
       qbittorrent-nox.enable = true;
+      mikrotik-backup.enable = true;
 
       vaultwarden = {
         enable = true;

@@ -153,6 +153,7 @@ let
           entity_id = [ "binary_sensor.brightness_threshold" ];
           from = if enable then "on" else "off";
           to = if enable then "off" else "on";
+          id = "Brightness";
         }
         {
           platform = "state";
@@ -206,14 +207,39 @@ let
         in
         optional (!enable) mainCondition
         ++ optional enable wakeUpCondition;
-      action = [{
-        service = "light.turn_${if enable then "on" else "off"}";
-        target.entity_id = "light.joshua_room";
-      }];
+      action =
+        let
+          lightService =
+            {
+              service = "light.turn_${if enable then "on" else "off"}";
+              target.entity_id = "light.joshua_room";
+            };
+        in
+        optional enable lightService
+        ++ optional (!enable) {
+          "if" = [{
+            condition = "not";
+            conditions = [{
+              condition = "and";
+              conditions = [
+                {
+                  condition = "trigger";
+                  id = [ "Brightness" ];
+                }
+                {
+                  condition = "numeric_state";
+                  entity_id = "sensor.joshua_pixel_5_sleep_confidence";
+                  above = 90;
+                }
+              ];
+            }];
+          }];
+          "then" = [ lightService ];
+        };
     }) [ true false ];
 
-  joshuaSleepTimestamp = "((as_timestamp(states('sensor.joshua_pixel_5_next_alarm')) | default(0)) + 16*60*60)";
-  joshuaWakeUpTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm')) | default(0))";
+  joshuaSleepTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) - 8*60*60)";
+  joshuaWakeUpTimestamp = "as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0)";
 
   joshuaAdaptiveLightingSunTimes = [{
     alias = "Joshua Room Lighting Sun Times";
@@ -230,26 +256,23 @@ let
     ];
     action = [{
       "if" = [{
-        condition = "or";
-        conditions = [
-          { condition = "state"; entity_id = "sensor.joshua_pixel_5_next_alarm"; state = "unavailable"; }
-          { condition = "state"; entity_id = "sensor.joshua_pixel_5_next_alarm"; state = "unknown"; }
-        ];
+        condition = "template";
+        value_template = "{{ has_value('sensor.joshua_pixel_5_next_alarm') }}";
       }];
       "then" = [{
-        service = "adaptive_lighting.change_switch_settings";
-        data = {
-          entity_id = "switch.adaptive_lighting_joshua_room";
-          use_default = "configuration";
-        };
-      }];
-      "else" = [{
         service = "adaptive_lighting.change_switch_settings";
         data = {
           use_defaults = "configuration";
           entity_id = "switch.adaptive_lighting_joshua_room";
           sunrise_time = "{{ ${joshuaWakeUpTimestamp} | timestamp_custom('%H:%M:%S') }}";
           sunset_time = "{{ ${joshuaSleepTimestamp} | timestamp_custom('%H:%M:%S') }}";
+        };
+      }];
+      "else" = [{
+        service = "adaptive_lighting.change_switch_settings";
+        data = {
+          entity_id = "switch.adaptive_lighting_joshua_room";
+          use_default = "configuration";
         };
       }];
     }];
@@ -280,11 +303,16 @@ let
           platform = "homeassistant";
           event = "start";
         }
-      ];
+      ] ++ optional enable {
+        platform = "state";
+        entity_id = [ "light.joshua_room" ];
+        to = "on";
+        id = "Lights On";
+      };
       condition = [{
         condition = "template";
-        value_template = if enable then "{{ now().timestamp() >= ${joshuaSleepTimestamp} and now().timestamp() < (${joshuaWakeUpTimestamp} - 60*60) }}" else
-        "{{ now().timestamp() >= (${joshuaWakeUpTimestamp} - 60*60) and now().timestamp() < ${joshuaSleepTimestamp} }}";
+        value_template = if enable then "{{ (now().timestamp() >= ${joshuaSleepTimestamp}) and (now().timestamp() < (${joshuaWakeUpTimestamp} - 60*60)) }}" else
+        "{{ (now().timestamp() >= (${joshuaWakeUpTimestamp} - 60*60)) and (now().timestamp() < ${joshuaSleepTimestamp}) }}";
       }] ++ optional enable {
         condition = "state";
         entity_id = "binary_sensor.ncase_m1_active";
@@ -294,7 +322,13 @@ let
       action = [{
         service = "switch.turn_${if enable then "on" else "off"}";
         target.entity_id = "switch.adaptive_lighting_sleep_mode_joshua_room";
-      }];
+      }] ++ optional enable {
+        "if" = [{ condition = "trigger"; id = [ "Lights On" ]; }];
+        "then" = [{ service = "light.turn_off"; target.entity_id = "light.joshua_bulb_ceiling_01"; }];
+      } ++ optional (!enable) {
+        "if" = [{ condition = "state"; entity_id = "light.joshua_room"; state = "on"; }];
+        "then" = [{ service = "light.turn_on"; target.entity_id = "light.joshua_bulb_ceiling_01"; }];
+      };
     }) [ true false ];
 in
 mkIf cfg.enableInternal

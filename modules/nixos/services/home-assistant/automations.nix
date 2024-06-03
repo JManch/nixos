@@ -307,7 +307,6 @@ let
         platform = "state";
         entity_id = [ "light.joshua_room" ];
         to = "on";
-        id = "Lights On";
       };
       condition = [{
         condition = "template";
@@ -323,8 +322,8 @@ let
         service = "switch.turn_${if enable then "on" else "off"}";
         target.entity_id = "switch.adaptive_lighting_sleep_mode_joshua_room";
       }] ++ optional enable {
-        "if" = [{ condition = "trigger"; id = [ "Lights On" ]; }];
-        "then" = [{ service = "light.turn_off"; target.entity_id = "light.joshua_bulb_ceiling_01"; }];
+        service = "light.turn_off";
+        target.entity_id = "light.joshua_bulb_ceiling_01";
       } ++ optional (!enable) {
         "if" = [{ condition = "state"; entity_id = "light.joshua_room"; state = "on"; }];
         "then" = [{ service = "light.turn_on"; target.entity_id = "light.joshua_bulb_ceiling_01"; }];

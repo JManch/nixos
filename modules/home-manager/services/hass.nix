@@ -39,6 +39,7 @@ mkIf osConfig.device.hassIntegration.enable
           ${getExe' pkgs.coreutils "sleep"} 60
         done
       '';
+      ExecStopPost = (updateActiveState "off").outPath;
     };
 
     Install.WantedBy = [ "default.target" ];
@@ -46,11 +47,7 @@ mkIf osConfig.device.hassIntegration.enable
 
   # Update the active state when locking
   modules.desktop.programs.swaylock = {
-    postLockScript = ''
-      systemctl stop --user hass-active-heartbeat
-      ${updateActiveState "off"}
-    '';
-
+    postLockScript = "systemctl stop --user hass-active-heartbeat";
     postUnlockScript = "systemctl start --user hass-active-heartbeat";
   };
 }

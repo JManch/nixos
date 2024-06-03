@@ -165,7 +165,8 @@ let
       ]
       ++ optional enable {
         platform = "template";
-        value_template = "{{ now().timestamp() == (${joshuaWakeUpTimestamp} - 60*60) }}";
+        value_template = "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 60*60) }}";
+        id = "Wake Up Time";
       };
       condition =
         let
@@ -192,8 +193,8 @@ let
                 condition = "and";
                 conditions = [
                   {
-                    condition = "template";
-                    value_template = "{{ now().timestamp() == (${joshuaWakeUpTimestamp} - 60*60) }}";
+                    condition = "trigger";
+                    id = "Wake Up Time";
                   }
                   {
                     condition = "state";
@@ -238,8 +239,8 @@ let
         };
     }) [ true false ];
 
-  joshuaSleepTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) - 8*60*60)";
-  joshuaWakeUpTimestamp = "as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0)";
+  joshuaSleepTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) | round(0) - 8*60*60)";
+  joshuaWakeUpTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) | round(0))";
 
   joshuaAdaptiveLightingSunTimes = [{
     alias = "Joshua Room Lighting Sun Times";
@@ -289,8 +290,8 @@ let
         }
         {
           platform = "template";
-          value_template = if enable then "{{ now().timestamp() == ${joshuaSleepTimestamp} }}" else
-          "{{ now().timestamp() == (${joshuaWakeUpTimestamp} - 60*60) }}";
+          value_template = if enable then "{{ now().timestamp() | round(0) == ${joshuaSleepTimestamp} }}" else
+          "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 60*60) }}";
         }
         {
           platform = "state";
@@ -310,8 +311,8 @@ let
       };
       condition = [{
         condition = "template";
-        value_template = if enable then "{{ (now().timestamp() >= ${joshuaSleepTimestamp}) and (now().timestamp() < (${joshuaWakeUpTimestamp} - 60*60)) }}" else
-        "{{ (now().timestamp() >= (${joshuaWakeUpTimestamp} - 60*60)) and (now().timestamp() < ${joshuaSleepTimestamp}) }}";
+        value_template = if enable then "{{ (now().timestamp() | round(0) >= ${joshuaSleepTimestamp}) and (now().timestamp() | round(0) < (${joshuaWakeUpTimestamp} - 60*60)) }}" else
+        "{{ (now().timestamp() | round(0) >= (${joshuaWakeUpTimestamp} - 60*60)) and (now().timestamp() | round(0) < ${joshuaSleepTimestamp}) }}";
       }] ++ optional enable {
         condition = "state";
         entity_id = "binary_sensor.ncase_m1_active";

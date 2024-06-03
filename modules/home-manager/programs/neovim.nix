@@ -1,6 +1,7 @@
 { lib
 , pkgs
 , config
+, inputs
 , osConfig
 , ...
 }:
@@ -59,12 +60,7 @@ mkIf cfg.enable
     ];
   };
 
-  xdg.configFile."nvim".source = pkgs.fetchFromGitHub {
-    repo = "nvim";
-    owner = "JManch";
-    rev = "0c7104ba277c89d49fa247417ce366f84a04a59f";
-    hash = "sha256-gpplG8ARyQ3pi2+nNRU6RGnNYkFPvBZIlJFBz/yzlUE=";
-  };
+  xdg.configFile."nvim".source = inputs.neovim-config.outPath;
 
   # For conditional nix-specific config in nvim config
   home.sessionVariables = {

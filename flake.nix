@@ -50,6 +50,9 @@
     nix-resources.url = "git+ssh://git@github.com/JManch/nix-resources";
     nix-resources.inputs.nixpkgs.follows = "nixpkgs";
 
+    neovim-config.url = "github:JManch/nvim";
+    neovim-config.flake = false;
+
     anyrun.url = "github:Kirottu/anyrun";
     anyrun.inputs.nixpkgs.follows = "nixpkgs";
 

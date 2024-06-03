@@ -836,6 +836,22 @@
         "type": "github"
       }
     },
+    "neovim-config": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1717175376,
+        "narHash": "sha256-gpplG8ARyQ3pi2+nNRU6RGnNYkFPvBZIlJFBz/yzlUE=",
+        "owner": "JManch",
+        "repo": "nvim",
+        "rev": "0c7104ba277c89d49fa247417ce366f84a04a59f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JManch",
+        "repo": "nvim",
+        "type": "github"
+      }
+    },
     "nix-colors": {
       "inputs": {
         "base16-schemes": "base16-schemes",
@@ -979,6 +995,7 @@
         "lanzaboote": "lanzaboote",
         "microvm": "microvm",
         "mint": "mint",
+        "neovim-config": "neovim-config",
         "nix-colors": "nix-colors",
         "nix-gaming": "nix-gaming",
         "nix-matlab": "nix-matlab",

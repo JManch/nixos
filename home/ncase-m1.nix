@@ -68,6 +68,7 @@
       filenDesktop.enable = true;
       multiviewerF1.enable = true;
       zed.enable = true;
+      foliate.enable = true;
 
       firefox = {
         enable = true;

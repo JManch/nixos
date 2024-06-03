@@ -34,6 +34,7 @@ in
     unity.enable = mkEnableOption "Unity Game Engine";
     foot.enable = mkEnableOption "Foot";
     zed.enable = mkEnableOption "Zed Editor";
+    foliate.enable = mkEnableOption "Foliate Ebook Reader";
 
     firefox = {
       enable = mkEnableOption "Firefox";

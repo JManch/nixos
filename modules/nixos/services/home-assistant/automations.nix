@@ -266,7 +266,10 @@ let
           use_defaults = "configuration";
           entity_id = "switch.adaptive_lighting_joshua_room";
           sunrise_time = "{{ ${joshuaWakeUpTimestamp} | timestamp_custom('%H:%M:%S') }}";
-          sunset_time = "{{ ${joshuaSleepTimestamp} | timestamp_custom('%H:%M:%S') }}";
+          # Set sunset 1 hour before sleep time so that lights will reach
+          # minimum brightness 30 mins before sleep time. Sleep mode enables 30
+          # mins before sleep time.
+          sunset_time = "{{ (${joshuaSleepTimestamp} - 60*60) | timestamp_custom('%H:%M:%S') }}";
         };
       }];
       "else" = [{
@@ -290,7 +293,7 @@ let
         }
         {
           platform = "template";
-          value_template = if enable then "{{ now().timestamp() | round(0) == ${joshuaSleepTimestamp} }}" else
+          value_template = if enable then "{{ now().timestamp() | round(0) == (${joshuaSleepTimestamp} - 30*60) }}" else
           "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 60*60) }}";
         }
         {
@@ -311,8 +314,8 @@ let
       };
       condition = [{
         condition = "template";
-        value_template = if enable then "{{ (now().timestamp() | round(0) >= ${joshuaSleepTimestamp}) and (now().timestamp() | round(0) < (${joshuaWakeUpTimestamp} - 60*60)) }}" else
-        "{{ (now().timestamp() | round(0) >= (${joshuaWakeUpTimestamp} - 60*60)) and (now().timestamp() | round(0) < ${joshuaSleepTimestamp}) }}";
+        value_template = if enable then "{{ (now().timestamp() | round(0) >= (${joshuaSleepTimestamp} - 30*60)) and (now().timestamp() | round(0) < (${joshuaWakeUpTimestamp} - 60*60)) }}" else
+        "{{ (now().timestamp() | round(0) >= (${joshuaWakeUpTimestamp} - 60*60)) and (now().timestamp() | round(0) < (${joshuaSleepTimestamp} - 30*60)) }}";
       }] ++ optional enable {
         condition = "state";
         entity_id = "binary_sensor.ncase_m1_active";

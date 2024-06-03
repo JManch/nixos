@@ -27,8 +27,6 @@ lib.mkIf cfg.enableInternal
       transition_until_sleep = false;
       sunrise_time = "07:00:00";
       sunset_time = "22:30:00";
-      # Offset sunset so that lights will be dark by the set sunset_time
-      sunset_offset = -1800;
       brightness_mode = "tanh";
       brightness_mode_time_dark = 2600;
       brightness_mode_time_light = 900;

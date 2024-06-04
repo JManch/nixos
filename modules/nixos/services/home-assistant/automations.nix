@@ -239,7 +239,6 @@ let
         };
     }) [ true false ];
 
-  joshuaSleepTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) | round(0) - 8*60*60)";
   joshuaWakeUpTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) | round(0))";
 
   joshuaAdaptiveLightingSunTimes = [{
@@ -269,7 +268,7 @@ let
           # Set sunset 1 hour before sleep time so that lights will reach
           # minimum brightness 30 mins before sleep time. Sleep mode enables 30
           # mins before sleep time.
-          sunset_time = "{{ (${joshuaSleepTimestamp} - 60*60) | timestamp_custom('%H:%M:%S') }}";
+          sunset_time = "{{ (${joshuaWakeUpTimestamp} - 9*60*60) | timestamp_custom('%H:%M:%S') }}";
         };
       }];
       "else" = [{
@@ -293,7 +292,7 @@ let
         }
         {
           platform = "template";
-          value_template = if enable then "{{ now().timestamp() | round(0) == (${joshuaSleepTimestamp} - 30*60) }}" else
+          value_template = if enable then "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 8.5*60*60) }}" else
           "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 60*60) }}";
         }
         {
@@ -301,7 +300,6 @@ let
           entity_id = [ "binary_sensor.ncase_m1_active" ];
           from = if enable then "on" else "off";
           to = if enable then "off" else "on";
-          for.minutes = if enable then 5 else 0;
         }
         {
           platform = "homeassistant";
@@ -314,21 +312,26 @@ let
       };
       condition = [{
         condition = "template";
-        value_template = if enable then "{{ (now().timestamp() | round(0) >= (${joshuaSleepTimestamp} - 30*60)) and (now().timestamp() | round(0) < (${joshuaWakeUpTimestamp} - 60*60)) }}" else
-        "{{ (now().timestamp() | round(0) >= (${joshuaWakeUpTimestamp} - 60*60)) and (now().timestamp() | round(0) < (${joshuaSleepTimestamp} - 30*60)) }}";
+        value_template =
+          if enable then "{{ (${joshuaWakeUpTimestamp} != 0) and ((${joshuaWakeUpTimestamp} - now().timestamp() | round(0)) <= 8.5*60*60) }}" else
+          "{{ (${joshuaWakeUpTimestamp} - now().timestamp() | round(0)) > 8.5*60*60 }}";
       }] ++ optional enable {
         condition = "state";
         entity_id = "binary_sensor.ncase_m1_active";
         state = "off";
-        for.minutes = 5;
       };
       action = [{
         service = "switch.turn_${if enable then "on" else "off"}";
         target.entity_id = "switch.adaptive_lighting_sleep_mode_joshua_room";
-      }] ++ optional enable {
-        service = "light.turn_off";
-        target.entity_id = "light.joshua_bulb_ceiling_01";
-      } ++ optional (!enable) {
+      }] ++ optionals enable [
+        # Delay to wait for 1 second adaptive lighting transition as turning
+        # off lights during transition doesn't work
+        { delay.seconds = 2; }
+        {
+          service = "light.turn_off";
+          target.entity_id = "light.joshua_bulb_ceiling_01";
+        }
+      ] ++ optional (!enable) {
         "if" = [{ condition = "state"; entity_id = "light.joshua_room"; state = "on"; }];
         "then" = [{ service = "light.turn_on"; target.entity_id = "light.joshua_bulb_ceiling_01"; }];
       };

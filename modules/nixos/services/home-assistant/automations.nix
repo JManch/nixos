@@ -149,10 +149,10 @@ let
       mode = "single";
       trigger = [
         {
-          platform = "state";
-          entity_id = [ "binary_sensor.brightness_threshold" ];
-          from = if enable then "on" else "off";
-          to = if enable then "off" else "on";
+          platform = "numeric_state";
+          entity_id = [ "sensor.smoothed_solar_power" ];
+          above = mkIf (!enable) 2;
+          below = mkIf enable 2;
           id = "Brightness";
         }
         {
@@ -174,9 +174,10 @@ let
             condition = if enable then "and" else "or";
             conditions = [
               {
-                condition = "state";
-                entity_id = "binary_sensor.brightness_threshold";
-                state = if enable then "off" else "on";
+                condition = "numeric_state";
+                entity_id = "sensor.smoothed_solar_power";
+                above = mkIf (!enable) 2;
+                below = mkIf enable 2;
               }
               {
                 condition = "state";

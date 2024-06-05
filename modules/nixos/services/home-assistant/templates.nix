@@ -135,26 +135,25 @@ mkIf cfg.enableInternal
       }
       (
         let
-          solarThreshold = 2;
-          triggers = map
-            (variant: {
+          triggers = (map
+            (enable: {
               platform = "numeric_state";
               entity_id = [ "sensor.smoothed_solar_power" ];
-              above = mkIf variant solarThreshold;
-              below = mkIf (!variant) solarThreshold;
-              for.minutes = 3;
-            }) [ true false ];
-        in
-        {
-          trigger = triggers ++ [{
+              above = mkIf enable 1;
+              below = mkIf (!enable) 1;
+              for.minutes = 5;
+            }) [ true false ]) ++ [{
             platform = "homeassistant";
             event = "start";
           }];
+        in
+        {
+          trigger = triggers;
           binary_sensor = {
-            name = "Brightness Threshold";
+            name = "Dark Mode Brightness Threshold";
             icon = "mdi:white-balance-sunny";
             device_class = "light";
-            state = "{{ (states('sensor.smoothed_solar_power') | float) > ${toString solarThreshold} }}";
+            state = "{{ (states('sensor.smoothed_solar_power') | float) > 1 }}";
           };
         }
       )

@@ -18,7 +18,7 @@ lib.mkIf cfg.enableInternal
         "light.joshua_play_desk_01"
         "light.joshua_play_desk_02"
       ];
-      min_brightness = 15;
+      min_brightness = 20;
       max_brightness = 100;
       min_color_temp = 2000;
       max_color_temp = 5000;

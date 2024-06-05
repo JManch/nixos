@@ -293,8 +293,11 @@ let
         }
         {
           platform = "template";
-          value_template = if enable then "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 8.5*60*60) }}" else
-          "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 60*60) }}";
+          value_template =
+            if enable then
+              "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 8.5*60*60) }}"
+            else
+              "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 60*60) }}";
         }
         {
           platform = "state";
@@ -313,9 +316,15 @@ let
       };
       condition = [{
         condition = "template";
-        value_template =
-          if enable then "{{ (${joshuaWakeUpTimestamp} != 0) and ((${joshuaWakeUpTimestamp} - now().timestamp() | round(0)) <= 8.5*60*60) }}" else
-          "{{ (${joshuaWakeUpTimestamp} - now().timestamp() | round(0)) > 8.5*60*60 }}";
+        value_template = ''
+          {% set time_to_wake = ${joshuaWakeUpTimestamp} - (now().timestamp() | round(0)) %}
+          {{ (${joshuaWakeUpTimestamp} != 0) and ${
+            if enable then
+              "(time_to_wake <= 8.5*60*60) and (time_to_wake > 60*60)"
+            else
+              "((time_to_wake <= 60*60) or (time_to_wake > 8.5*60*60))"
+            } }}
+        '';
       }] ++ optional enable {
         condition = "state";
         entity_id = "binary_sensor.ncase_m1_active";
@@ -334,7 +343,10 @@ let
         }
       ] ++ optional (!enable) {
         "if" = [{ condition = "state"; entity_id = "light.joshua_room"; state = "on"; }];
-        "then" = [{ service = "light.turn_on"; target.entity_id = "light.joshua_bulb_ceiling_01"; }];
+        "then" = [
+          { delay.seconds = 2; }
+          { service = "light.turn_on"; target.entity_id = "light.joshua_bulb_ceiling_01"; }
+        ];
       };
     }) [ true false ];
 in

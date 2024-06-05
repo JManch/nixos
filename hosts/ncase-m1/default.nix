@@ -75,7 +75,7 @@
   modules = {
     hardware = {
       secureBoot.enable = true;
-      vr.enable = false;
+      vr.enable = true;
       fanatec.enable = true;
 
       fileSystem = {

@@ -231,7 +231,7 @@ in
 
             while true
             do
-              state=$(${curlCommand { endpoint = "states/binary_sensor.brightness_threshold"; }} | jaq -r .state)
+              state=$(${curlCommand { endpoint = "states/binary_sensor.dark_mode_brightness_threshold"; }} | jaq -r .state)
               if [[ "$state" = "on" && ("$current_theme" = "dark" || "$current_theme" = "null") ]]; then
                 switch_theme "light"
               elif [[ "$state" = "off" && ("$current_theme" = "light" || "$current_theme" = "null") ]]; then

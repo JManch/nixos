@@ -71,6 +71,10 @@ mkIf cfg.enable
     unitConfig.ConditionUser = "!@system";
   };
 
+  # Since version 1.8 gamemode requires the user to be in the gamemode group
+  # https://github.com/FeralInteractive/gamemode/issues/452
+  users.users.${username}.extraGroups = [ "gamemode" ];
+
   programs.gamemode = {
     enable = true;
 

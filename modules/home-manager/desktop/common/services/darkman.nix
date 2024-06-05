@@ -28,6 +28,7 @@
 , pkgs
 , config
 , osConfig
+, vmVariant
 , ...
 }:
 let
@@ -43,6 +44,7 @@ let
     concatMap
     nameValuePair
     attrValues
+    mkVMOverride
     optionalAttrs
     listToAttrs;
   inherit (config.modules) desktop;
@@ -160,6 +162,9 @@ in
       ((cfg.switchMethod == "hass") -> hassIntegration.enable)
       "Darkman 'hass' switch mode requires the device to have hass integration enabled"
     ];
+
+    modules.desktop.services.darkman.switchMethod = mkIf vmVariant
+      (mkVMOverride "coordinates");
 
     services.darkman = {
       enable = true;

@@ -77,6 +77,7 @@
       secureBoot.enable = true;
       vr.enable = true;
       fanatec.enable = true;
+      printing.enable = true;
 
       fileSystem = {
         trim = true;

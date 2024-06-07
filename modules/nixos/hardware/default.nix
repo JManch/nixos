@@ -9,6 +9,7 @@ in
     vr.enable = mkEnableOption "virtual reality";
     secureBoot.enable = mkEnableOption "secure boot";
     fanatec.enable = mkEnableOption "support for Fanatec hardware";
+    printing.enable = mkEnableOption "printing";
 
     fileSystem = {
       trim = mkEnableOption "ZFS automatic trimming";

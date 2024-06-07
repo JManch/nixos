@@ -139,9 +139,9 @@ mkIf cfg.enableInternal
             (enable: {
               platform = "numeric_state";
               entity_id = [ "sensor.smoothed_solar_power" ];
-              above = mkIf enable 1;
-              below = mkIf (!enable) 1;
-              for.minutes = 5;
+              above = mkIf enable 0.8;
+              below = mkIf (!enable) 0.8;
+              for.minutes = 10;
             }) [ true false ]) ++ [{
             platform = "homeassistant";
             event = "start";

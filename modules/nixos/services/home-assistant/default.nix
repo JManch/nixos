@@ -85,6 +85,8 @@ in
 
       configWritable = false;
       config = {
+        # WARN: default_config enables zeroconf which runs an mDNS server. It
+        # can't be disabled because several integrations depend on zeroconf.
         default_config = { };
         frontend = { };
 
@@ -131,12 +133,14 @@ in
     # Home assistant module has good systemd hardening
 
     systemd.services.home-assistant = {
-      # For some reason home-assistant attempts to automatically start zha when
-      # it detects a zigbee device. It throws an error because we don't have the
-      # zha component installed. Even though the systemd service has
-      # DevicePolicy=closed, home assistant somehow still detects my zigbee
-      # device. This fixes that.
-      serviceConfig.PrivateDevices = true;
+      serviceConfig = {
+        # For some reason home-assistant attempts to automatically start zha when
+        # it detects a zigbee device. It throws an error because we don't have the
+        # zha component installed. Even though the systemd service has
+        # DevicePolicy=closed, home assistant somehow still detects my zigbee
+        # device. This fixes that.
+        PrivateDevices = true;
+      };
 
       # Many configuration changes can be reloaded in the UI rather than having
       # to fully restart home assistant

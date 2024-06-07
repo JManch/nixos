@@ -23,7 +23,8 @@ let
     filterAttrs
     utils
     getExe
-    getExe';
+    getExe'
+    genAttrs;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.dns-server-stack;
 
@@ -176,6 +177,10 @@ mkIf cfg.enable
   # Open DNS ports in firewall
   networking.firewall.allowedTCPPorts = [ cfg.listenPort ];
   networking.firewall.allowedUDPPorts = [ cfg.listenPort ];
+  networking.firewall.interfaces = (genAttrs cfg.interfaces (_: {
+    allowedTCPPorts = [ cfg.listenPort ];
+    allowedUDPPorts = [ cfg.listenPort ];
+  }));
 
   # Set nameserver to localhost
   networking.nameservers = mkForce [ "127.0.0.1" ];

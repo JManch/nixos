@@ -257,6 +257,14 @@ in
         description = "Listen port for the internal Ctrld DNS server";
       };
 
+      interfaces = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of additional interfaces for dnsmasq to be exposed on.
+        '';
+      };
+
       routerAddress = mkOption {
         type = types.str;
         default = null;

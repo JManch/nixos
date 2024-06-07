@@ -42,7 +42,7 @@ mkIf osConfig.device.hassIntegration.enable
       ExecStopPost = (updateActiveState "off").outPath;
     };
 
-    Install.WantedBy = [ "default.target" ];
+    Install.WantedBy = [ "graphical-session.target" ];
   };
 
   # Update the active state when locking

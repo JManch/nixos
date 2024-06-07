@@ -126,6 +126,16 @@ in
           all systemd services that shouldn't bind to them.
         '';
       };
+
+      vlans = mkOption {
+        type = types.attrsOf types.attrs;
+        default = { };
+        description = ''
+          Attribute set where the keys are VLAN IDs and the values are the
+          VLAN's network config. The VLANs will the added to the primary
+          interface.
+        '';
+      };
     };
 
     audio = {

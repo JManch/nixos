@@ -10,12 +10,18 @@ let
     mkMerge
     mkIf
     utils
+    listToAttrs
+    toInt
     optional
+    imap0
+    attrNames
+    length
     getExe'
     allUnique;
   cfg = config.modules.system.networking;
   homeFirewall = config.home-manager.users.${username}.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
+  vlanIds = attrNames cfg.vlans;
 in
 {
   assertions = utils.asserts [
@@ -25,6 +31,8 @@ in
     "Default gateway must be set when using a static IPV4 address"
     (allUnique cfg.publicPorts)
     "`networking.publicPorts` contains duplicate ports"
+    (length vlanIds <= 10)
+    "A single interface cannot have more than 10 VLANs assigned (arbitrary limit because of VLAN name mapping)"
   ];
 
   systemd.network = {
@@ -43,6 +51,7 @@ in
           DHCP = cfg.staticIPAddress == null;
           Address = mkIf (cfg.staticIPAddress != null) cfg.staticIPAddress;
           Gateway = mkIf (cfg.staticIPAddress != null) cfg.defaultGateway;
+          VLAN = map (vlanId: "vlan${vlanId}") vlanIds;
         };
 
         dhcpV4Config.ClientIdentifier = "mac";
@@ -53,7 +62,33 @@ in
         networkConfig.DHCP = true;
         dhcpV4Config.RouteMetric = 1025;
       };
-    };
+    } // listToAttrs (imap0
+      (i: vlanId: {
+        name = "3${toString i}-vlan${vlanId}";
+        value = {
+          matchConfig.Name = "vlan${vlanId}";
+          networkConfig = cfg.vlans.${vlanId};
+          dhcpV4Config.ClientIdentifier = "mac";
+        };
+      })
+      vlanIds);
+
+    # Useful VLAN guide:
+    # https://volatilesystems.org/implementing-vlans-with-systemd-networkd-on-an-active-physical-interface.html
+    # https://archive.ph/t6bJg
+
+    netdevs = listToAttrs (imap0
+      (i: vlanId: {
+        name = "2${toString i}-vlan${vlanId}";
+        value = {
+          netdevConfig = {
+            Name = "vlan${vlanId}";
+            Kind = "vlan";
+          };
+          vlanConfig.Id = toInt vlanId;
+        };
+      })
+      vlanIds);
   };
 
   networking = {

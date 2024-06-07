@@ -793,6 +793,16 @@ in
         description = "Address of the router to fetch backup files from";
       };
     };
+
+    avahi = {
+      enable = mkEnableOption "Avahi";
+
+      interfaces = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "List of interfaces to be used by avahi";
+      };
+    };
   };
 
   config = {

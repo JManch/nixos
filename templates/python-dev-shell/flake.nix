@@ -8,7 +8,12 @@
     in
     {
       devShells.${system}.default = pkgs.mkShell {
-        packages = with pkgs; [ ];
+        packages = with pkgs; [
+          (python3.withPackages
+            (ps: with ps; [
+
+            ]))
+        ];
       };
     };
 }

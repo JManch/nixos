@@ -34,6 +34,7 @@
       mosquitto.enable = true;
       qbittorrent-nox.enable = true;
       mikrotik-backup.enable = true;
+      index-checker.enable = true;
 
       vaultwarden = {
         enable = true;

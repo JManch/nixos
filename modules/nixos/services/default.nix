@@ -21,6 +21,7 @@ in
   options.modules.services = {
     udisks.enable = mkEnableOption "udisks";
     lact.enable = mkEnableOption "Lact";
+    index-checker.enable = mkEnableOption "Google Site Index Checker";
 
     wireguard =
       let

@@ -69,7 +69,7 @@
         # TODO: Update: this is likely fixed by go2rtc 1.9.2 but there are new
         # webrtc options and I need to go through them
         webrtc.enable = false;
-        nvrAddress = "192.168.88.229";
+        nvrAddress = "192.168.40.6";
       };
 
       broadcast-box = {

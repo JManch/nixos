@@ -214,7 +214,7 @@ in
 
     desktop.hyprland.binds = [ "${desktop.hyprland.modKey}, F1, exec, ${getExe darkmanPackage} toggle" ];
 
-    systemd.user.services.darkman-hass-switcher = mkIf (cfg.switchMethod == "hass") {
+    systemd.user.services.darkman-solar-switcher = mkIf (cfg.switchMethod == "hass") {
       Unit = {
         Description = "Switch darkman theme based on home assistant brightness entity";
         Requires = [ "darkman.service" ];
@@ -226,6 +226,7 @@ in
           name = "darkman-solar-switcher";
           runtimeInputs = [ pkgs.coreutils pkgs.jaq darkmanPackage ];
           text = /*bash*/ ''
+            set +e
             current_theme=$(darkman get)
             switch_theme() {
               if [ "$1" != "$(darkman get)" ]; then

@@ -64,9 +64,12 @@ in
       };
     } // listToAttrs (imap0
       (i: vlanId: {
-        name = "3${toString i}-vlan${vlanId}";
+        name = "2${toString i}-vlan${vlanId}";
         value = {
-          matchConfig.Name = "vlan${vlanId}";
+          matchConfig = {
+            Name = "vlan${vlanId}";
+            Type = "vlan";
+          };
           networkConfig = cfg.vlans.${vlanId};
           dhcpV4Config.ClientIdentifier = "mac";
         };
@@ -77,9 +80,10 @@ in
     # https://volatilesystems.org/implementing-vlans-with-systemd-networkd-on-an-active-physical-interface.html
     # https://archive.ph/t6bJg
 
+    # Netdevs have to be defined before physical interfaces
     netdevs = listToAttrs (imap0
       (i: vlanId: {
-        name = "2${toString i}-vlan${vlanId}";
+        name = "${toString i}-vlan${vlanId}";
         value = {
           netdevConfig = {
             Name = "vlan${vlanId}";

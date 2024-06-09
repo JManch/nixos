@@ -77,7 +77,11 @@
       secureBoot.enable = true;
       vr.enable = true;
       fanatec.enable = true;
-      printing.enable = true;
+
+      printing.client = {
+        enable = true;
+        serverAddress = "homelab.lan";
+      };
 
       fileSystem = {
         trim = true;

@@ -1,6 +1,14 @@
-{ lib, pkgs, config, ... }:
+{ lib
+, pkgs
+, config
+, inputs
+, ...
+}:
 let
-  inherit (lib) mkIf mkForce;
+  inherit (lib) mkIf mkMerge utils mkForce;
+  inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.modules.services) caddy;
+  inherit (config.device) ipAddress;
   cfg = config.modules.hardware.printing;
 
   dcp9015cdwlpr = pkgs.dcp9020cdwlpr.overrideAttrs (oldAttrs: rec {
@@ -23,28 +31,98 @@ let
     installPhase = lib.replaceStrings [ "dcp9020cdw" ] [ "dcp9015cdw" ] oldAttrs.installPhase;
   });
 in
-mkIf cfg.enable
-{
-  services.printing = {
-    enable = true;
-    drivers = [
-      dcp9015cdwlpr
-      dcp9015cdw-cupswrapper
+mkMerge [
+  (mkIf cfg.client.enable {
+    services.printing.enable = true;
+
+    hardware.printers = {
+      ensurePrinters = [{
+        name = "Brother_DCP-9015CDW";
+        deviceUri = "ipp://${cfg.client.serverAddress}/printers/Brother_DCP-9015CDW";
+        model = "everywhere";
+        ppdOptions.PageSize = "A4";
+      }];
+      ensureDefaultPrinter = "Brother_DCP-9015CDW";
+    };
+  })
+
+  (mkIf cfg.server.enable {
+    assertions = utils.asserts [
+      caddy.enable
+      "Printing server requires Caddy to be enabled"
+      (config.device.type == "server")
+      "Printing server can only be run on servers on secure local networks"
     ];
-  };
 
-  hardware.printers = {
-    ensurePrinters = [{
-      name = "Brother_DCP-9015CDW";
-      deviceUri = "ipp://printer.lan/ipp/print";
-      model = "everywhere";
-      ppdOptions.PageSize = "A4";
-    }];
-    ensureDefaultPrinter = "Brother_DCP-9015CDW";
-  };
+    services.printing = {
+      enable = true;
+      openFirewall = true;
+      stateless = true;
+      # Doesn't work well with stateless because previously configured printers
+      # gets removed everytime the service starts with this enabled
+      startWhenNeeded = false;
+      defaultShared = true;
 
-  # Add printer on demand because I don't use it very often. Also works around
-  # https://github.com/NixOS/nixpkgs/issues/78535
-  systemd.services.ensure-printers.wantedBy = mkForce [ ];
-  programs.zsh.shellAliases.enable-printing = "sudo systemctl start ensure-printers.service";
-}
+      listenAddresses = [
+        "localhost:631"
+        "${ipAddress}:631"
+      ];
+
+      drivers = [
+        dcp9015cdwlpr
+        dcp9015cdw-cupswrapper
+      ];
+
+      # WARN: This is an insecure config that gives anyone on the local network
+      # full access to printer operations. Only use on secure networks.
+      # Admin auth should be done through the https reverse proxy.
+      extraConf = mkForce ''
+        ServerAlias *
+        DefaultEncryption Never
+        DefaultAuthType None
+
+        <Location />
+          Order allow,deny
+          Allow from all
+        </Location>
+
+        <Location /admin>
+          Order allow,deny
+          Allow localhost
+        </Location>
+
+        <Location /admin/conf>
+          AuthType Basic
+          Require user @SYSTEM
+          Order allow,deny
+          Allow localhost
+        </Location>
+
+        <Policy default>
+          <Limit All>
+            Order deny,allow
+            Allow from all
+          </Limit>
+        </Policy>
+      '';
+    };
+
+    # Keep an eye on this for https://github.com/NixOS/nixpkgs/issues/78535
+    hardware.printers = {
+      ensurePrinters = [{
+        name = "Brother_DCP-9015CDW";
+        deviceUri = "ipp://printer.lan/ipp/print";
+        model = "everywhere";
+        ppdOptions.PageSize = "A4";
+      }];
+      ensureDefaultPrinter = "Brother_DCP-9015CDW";
+    };
+
+    services.caddy.virtualHosts."printing.${fqDomain}".extraConfig = ''
+      import lan-only
+      reverse_proxy http://localhost:631 {
+        header_up host localhost
+      }
+    '';
+  })
+]

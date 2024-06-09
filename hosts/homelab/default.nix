@@ -25,6 +25,7 @@
       fileSystem.trim = true;
       fileSystem.extendedLoaderTimeout = true;
       graphics.hardwareAcceleration = true;
+      printing.server.enable = true;
     };
 
     services = {

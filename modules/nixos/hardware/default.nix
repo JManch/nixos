@@ -9,7 +9,6 @@ in
     vr.enable = mkEnableOption "virtual reality";
     secureBoot.enable = mkEnableOption "secure boot";
     fanatec.enable = mkEnableOption "support for Fanatec hardware";
-    printing.enable = mkEnableOption "printing";
 
     fileSystem = {
       trim = mkEnableOption "ZFS automatic trimming";
@@ -26,6 +25,18 @@ in
           Should set to false after initial setup. May cause ZFS import to
           break so be prepared to set `zfs_force=1` kernel param in boot menu.
         '';
+      };
+    };
+
+    printing = {
+      server.enable = mkEnableOption "printing server";
+
+      client = {
+        enable = mkEnableOption "printing client";
+        serverAddress = mkOption {
+          type = types.str;
+          description = "Address of the cups server to print from";
+        };
       };
     };
   };

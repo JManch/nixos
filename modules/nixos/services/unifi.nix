@@ -20,10 +20,18 @@ mkIf cfg.enable
     "Frigate requires Caddy to be enabled"
   ];
 
+  # WARN: Firmware version 6.6.65 seems to have a bug that causes my APs to
+  # intermittently go offline/lose adopting in the controller. Using 6.6.55
+  # until new firmware fixes this.
   services.unifi = {
     enable = true;
     openFirewall = false;
-    unifiPackage = pkgs.unifi8;
+    unifiPackage = pkgs.unifi8.overrideAttrs (_: {
+      src = pkgs.fetchurl {
+        url = "https://dl.ubnt.com/unifi/8.2.93-1c329ecd26/unifi_sysvinit_all.deb";
+        sha256 = "sha256-7zcRxflEvPRxH7MtudOqumeUpSzAaEIbjaaJVpr2Gbc=";
+      };
+    });
     # WARN: Be careful when changing mongodb versions as mongodb requires
     # manual intervention to migrate. Safest method is to export a unifi
     # backup, clear /var/lib/unifi and then restore from backup.
@@ -45,7 +53,7 @@ mkIf cfg.enable
 
   services.caddy.virtualHosts."unifi.${fqDomain}".extraConfig = ''
     import lan-only
-    reverse_proxy https://127.0.0.1:${toString cfg.port} {
+    reverse_proxy https://127.0.0.1:8443 {
       # We have to allow insecure HTTPS because unifi forcefully enables TLS
       # with an invalid cert.
       transport http {
@@ -71,6 +79,6 @@ mkIf cfg.enable
   }];
 
   virtualisation.vmVariant = {
-    networking.firewall.allowedTCPPorts = [ cfg.port ];
+    networking.firewall.allowedTCPPorts = [ 8443 ];
   };
 }

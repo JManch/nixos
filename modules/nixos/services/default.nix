@@ -22,6 +22,7 @@ in
     udisks.enable = mkEnableOption "udisks";
     lact.enable = mkEnableOption "Lact";
     index-checker.enable = mkEnableOption "Google Site Index Checker";
+    unifi.enable = mkEnableOption "Unifi Controller";
 
     wireguard =
       let
@@ -286,20 +287,6 @@ in
         internal = true;
         readOnly = true;
         description = "Internal function for generate dnsmasq config from attrset";
-      };
-    };
-
-    unifi = {
-      enable = mkEnableOption "Unifi Controller";
-
-      port = mkOption {
-        type = types.port;
-        internal = true;
-        readOnly = true;
-        default = 8443;
-        description = ''
-          Unifi Controller listen port. Cannot be changed declaratively.
-        '';
       };
     };
 

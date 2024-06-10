@@ -8,7 +8,6 @@ let
   inherit (lib) mkIf mkMerge utils mkForce;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
-  inherit (config.device) ipAddress;
   cfg = config.modules.hardware.printing;
 
   dcp9015cdwlpr = pkgs.dcp9020cdwlpr.overrideAttrs (oldAttrs: rec {
@@ -62,11 +61,7 @@ mkMerge [
       # gets removed everytime the service starts with this enabled
       startWhenNeeded = false;
       defaultShared = true;
-
-      listenAddresses = [
-        "localhost:631"
-        "${ipAddress}:631"
-      ];
+      listenAddresses = [ "*:631" ];
 
       drivers = [
         dcp9015cdwlpr

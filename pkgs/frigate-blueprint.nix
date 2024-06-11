@@ -1,28 +1,20 @@
-{ lib
-, stdenvNoCC
-, fetchFromGitHub
-, ...
-}:
-stdenvNoCC.mkDerivation {
+{ lib, stdenvNoCC, fetchFromGitHub, ... }:
+stdenvNoCC.mkDerivation rec {
   pname = "frigate-blueprint";
-  version = "04-04-2024";
+  version = "0.12.0.4";
 
   src = fetchFromGitHub {
     owner = "SgtBatten";
     repo = "HA_blueprints";
-    rev = "d815163056def410023c72379897fefbdabf9cb3";
-    hash = "sha256-/cFptFy22RgwkGtGL88zlSCQvZ8fpHu3OFFtZCkmfWo=";
+    rev = "v${version}";
+    hash = "sha256-HBetLcRli6I+E/+s35SDFilUi90yhR+ccbPVG/a0muA=";
   };
 
   dontBuild = true;
 
   installPhase = ''
-    runHook preInstall
-
     mkdir -p "$out"
     cp "Frigate Camera Notifications/Beta" "$out/frigate_notifications.yaml"
-
-    runHook postInstall
   '';
 
   meta = with lib; {

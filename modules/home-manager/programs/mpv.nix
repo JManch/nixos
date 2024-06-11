@@ -17,13 +17,11 @@ mkIf cfg.enable
   programs.mpv = {
     enable = true;
 
-    # Temporarily disabling scripts until
-    # https://github.com/nix-community/home-manager/pull/5524 gets merged
-    # scripts = [
-    #   pkgs.mpvScripts.thumbfast
-    #   pkgs.mpvScripts.sponsorblock-minimal
-    #   outputs.packages.${pkgs.system}.modernx
-    # ];
+    scripts = [
+      pkgs.mpvScripts.thumbfast
+      pkgs.mpvScripts.sponsorblock-minimal
+      outputs.packages.${pkgs.system}.modernx
+    ];
 
     scriptOpts = {
       modernx = {

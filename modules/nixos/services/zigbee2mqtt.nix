@@ -61,7 +61,7 @@ mkIf cfg.enable
   services.caddy.virtualHosts = {
     "zigbee.${fqDomain}".extraConfig = ''
       import lan-only
-      basicauth {
+      basic_auth {
         admin $2a$14$6SspBEu6Yi82Bx3VdT4S1eshOACOuf4DdFlQrg2kYcDomTOrsF/ru
       }
       reverse_proxy http://127.0.0.1:${toString cfg.port}

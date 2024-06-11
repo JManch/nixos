@@ -1,17 +1,8 @@
-From e65cebe831c4c07f8ab26cac2fd6dd58eadee7e5 Mon Sep 17 00:00:00 2001
-From: Joshua Manchester <JManch@protonmail.com>
-Date: Mon, 18 Mar 2024 14:18:20 +0000
-Subject: [PATCH] override firstBoot flake input and preserve permissions
-
----
- src/nixos-anywhere.sh | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
 diff --git a/src/nixos-anywhere.sh b/src/nixos-anywhere.sh
-index d5adca2..346b181 100755
+index 9010ae6..82daf69 100755
 --- a/src/nixos-anywhere.sh
 +++ b/src/nixos-anywhere.sh
-@@ -203,6 +203,7 @@ nix_build() {
+@@ -218,6 +218,7 @@ nix_build() {
    NIX_SSHOPTS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $ssh_key_dir/nixos-anywhere ${ssh_args[*]}" nix build \
      --print-out-paths \
      --no-link \
@@ -19,15 +10,12 @@ index d5adca2..346b181 100755
      "${nix_options[@]}" \
      "$@"
  }
-@@ -466,7 +467,7 @@ if [[ -n ${extra_files-} ]]; then
-     extra_files="$extra_files/"
-   fi
+@@ -484,7 +485,7 @@ fi
+ 
+ if [[ -n ${extra_files-} ]]; then
    step Copying extra files
--  rsync -rlpv -FF \
-+  sudo rsync -rlpov -FF \
-     -e "ssh -i \"$ssh_key_dir\"/nixos-anywhere -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${ssh_args[*]}" \
-     "$extra_files" \
-     "${ssh_connection}:/mnt/"
--- 
-2.43.2
-
+-  tar -C "$extra_files" -cpf- . | ssh_ "${maybe_sudo} tar -C /mnt -xf- --no-same-owner"
++  tar -C "$extra_files" -cpf- . | ssh_ "${maybe_sudo} tar -C /mnt -xf- --same-owner"
+   ssh_ "chmod 755 /mnt" # tar also changes permissions of /mnt
+ fi
+ 

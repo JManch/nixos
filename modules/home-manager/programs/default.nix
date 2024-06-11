@@ -12,6 +12,7 @@ in
     torBrowser.enable = mkEnableOption "Tor Browser";
     git.enable = mkEnableOption "Git and Lazygit";
     neovim.enable = mkEnableOption "Neovim";
+    neovim.neovide.enable = mkEnableOption "Neovide";
     spotify.enable = mkEnableOption "Spotify";
     fastfetch.enable = mkEnableOption "Fastfetch";
     discord.enable = mkEnableOption "Discord";

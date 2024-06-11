@@ -6,13 +6,13 @@
 , ...
 }:
 let
-  inherit (lib) mkIf optionalString;
+  inherit (lib) mkIf optionalString optional;
   inherit (config.modules.desktop.services) darkman;
   cfg = config.modules.programs.neovim;
 in
 mkIf cfg.enable
 {
-  home.packages = [ pkgs.neovide ];
+  home.packages = optional cfg.neovide.enable pkgs.neovide;
 
   programs.neovim = {
     enable = true;

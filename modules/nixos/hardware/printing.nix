@@ -113,6 +113,11 @@ mkMerge [
       ensureDefaultPrinter = "Brother_DCP-9015CDW";
     };
 
+    systemd.services.ensure-printers = {
+      after = [ "network-online.target" "nss-lookup.target" ];
+      wants = [ "network-online.target" "nss-lookup.target" ];
+    };
+
     services.caddy.virtualHosts."printing.${fqDomain}".extraConfig = ''
       import lan-only
       reverse_proxy http://localhost:631 {

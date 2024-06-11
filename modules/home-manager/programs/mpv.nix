@@ -17,11 +17,13 @@ mkIf cfg.enable
   programs.mpv = {
     enable = true;
 
-    scripts = with pkgs.mpvScripts; [
-      thumbfast
-      sponsorblock-minimal
-      outputs.packages.${pkgs.system}.modernx
-    ];
+    # Temporarily disabling scripts until
+    # https://github.com/nix-community/home-manager/pull/5524 gets merged
+    # scripts = [
+    #   pkgs.mpvScripts.thumbfast
+    #   pkgs.mpvScripts.sponsorblock-minimal
+    #   outputs.packages.${pkgs.system}.modernx
+    # ];
 
     scriptOpts = {
       modernx = {
@@ -86,10 +88,10 @@ mkIf cfg.enable
     };
   };
 
-  xdg.configFile = mkIf cfg.jellyfinShim.enable ({
+  xdg.configFile = mkIf cfg.jellyfinShim.enable {
     "jellyfin-mpv-shim/mpv.conf".source = config.xdg.configFile."mpv/mpv.conf".source;
     "jellyfin-mpv-shim/input.conf".source = config.xdg.configFile."mpv/input.conf".source;
-  });
+  };
 
   programs.zsh.initExtra =
     let
@@ -97,7 +99,6 @@ mkIf cfg.enable
       ytDlp = lib.getExe pkgs.yt-dlp;
     in
       /*bash*/ ''
-
       screenshare () {
         if [[ -z "$1" ]]; then
             echo "Usage: screenshare <ip:port>"
@@ -109,7 +110,6 @@ mkIf cfg.enable
       yt-dlp-audio () {
         eval "${ytDlp} --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s' '$1'"
       }
-
     '';
 
   persistence.directories = optional cfg.jellyfinShim.enable ".config/jellyfin-mpv-shim";

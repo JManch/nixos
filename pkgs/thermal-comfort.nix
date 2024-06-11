@@ -17,10 +17,10 @@ buildHomeAssistantComponent rec {
 
   dontBuild = true;
 
-  meta = with lib; {
+  meta = {
     changelog = "https://github.com/dolezsa/thermal_comfort/releases/tag/v${version}";
     description = "Thermal Comfort sensor for HA";
     homepage = "https://github.com/dolezsa/thermal_comfort";
-    license = licenses.mit;
+    license = lib.licenses.mit;
   };
 }

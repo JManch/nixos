@@ -48,9 +48,9 @@ mkIf cfg.enableInternal
             name = "Powerwall Battery Remaining Time";
             icon = "mdi:battery-clock-outline";
             state = ''
-              {% set power = (states('sensor.powerwall_battery_power') | float) %}
-              {% set remaining = (states('sensor.powerwall_gateway_battery_remaining') | float) %}
-              {% set capacity = (states('sensor.powerwall_gateway_battery_capacity') | float) %}
+              {% set power = ((states('sensor.powerwall_battery_power') | default(0)) | float) %}
+              {% set remaining = ((states('sensor.powerwall_gateway_battery_remaining') | default(0)) | float) %}
+              {% set capacity = ((states('sensor.powerwall_gateway_battery_capacity') | default(0)) | float) %}
 
               {% if power > 0.1 %}
                 {% set remaining_mins = ((remaining / power) * 60) | round(0) %}
@@ -135,12 +135,13 @@ mkIf cfg.enableInternal
       }
       (
         let
+          threshold = 0.8;
           triggers = (map
             (enable: {
               platform = "numeric_state";
               entity_id = [ "sensor.smoothed_solar_power" ];
-              above = mkIf enable 0.8;
-              below = mkIf (!enable) 0.8;
+              above = mkIf enable threshold;
+              below = mkIf (!enable) threshold;
               for.minutes = 10;
             }) [ true false ]) ++ [{
             platform = "homeassistant";
@@ -153,7 +154,7 @@ mkIf cfg.enableInternal
             name = "Dark Mode Brightness Threshold";
             icon = "mdi:white-balance-sunny";
             device_class = "light";
-            state = "{{ (states('sensor.smoothed_solar_power') | float) > 1 }}";
+            state = "{{ (states('sensor.smoothed_solar_power') | float) > ${toString threshold} }}";
           };
         }
       )

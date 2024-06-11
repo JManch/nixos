@@ -21,17 +21,12 @@ mkIf cfg.enable
   ];
 
   # WARN: Firmware version 6.6.65 seems to have a bug that causes my APs to
-  # intermittently go offline/lose adopting in the controller. Using 6.6.55
+  # intermittently go offline/lose adoption in the controller. Using 6.6.55
   # until new firmware fixes this.
   services.unifi = {
     enable = true;
     openFirewall = false;
-    unifiPackage = pkgs.unifi8.overrideAttrs (_: {
-      src = pkgs.fetchurl {
-        url = "https://dl.ubnt.com/unifi/8.2.93-1c329ecd26/unifi_sysvinit_all.deb";
-        sha256 = "sha256-7zcRxflEvPRxH7MtudOqumeUpSzAaEIbjaaJVpr2Gbc=";
-      };
-    });
+    unifiPackage = pkgs.unifi8;
     # WARN: Be careful when changing mongodb versions as mongodb requires
     # manual intervention to migrate. Safest method is to export a unifi
     # backup, clear /var/lib/unifi and then restore from backup.

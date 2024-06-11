@@ -70,18 +70,24 @@ in
 
       customComponents = [
         pkgs.home-assistant-custom-components.miele
-        (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs (oldAttrs: rec {
-          version = "1.22.0";
+        (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs (_: {
           src = pkgs.fetchFromGitHub {
             owner = "basnijholt";
             repo = "adaptive-lighting";
-            rev = version;
+            rev = "1.22.0";
             hash = "sha256-k5pCgPM5xjVfWjOcr0UDFzYl/8z7yUwgYdBmC3+2F5k=";
           };
         }))
         outputs.packages.${pkgs.system}.heatmiser
         outputs.packages.${pkgs.system}.thermal-comfort
-      ] ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;
+      ] ++ optional frigate.enable (pkgs.home-assistant-custom-components.frigate.overrideAttrs (_: {
+        src = pkgs.fetchFromGitHub {
+          owner = "blakeblackshear";
+          repo = "frigate-hass-integration";
+          rev = "v5.2.0";
+          hash = "sha256-OWpOYNVzowdn0iZfJwhdMrAYeqDpNJvSwHpsJX9fDk4=";
+        };
+      }));
 
       configWritable = false;
       config = {

@@ -164,6 +164,8 @@
         openFirewall = false;
         autoStart = true;
         reverseProxy.enable = true;
+        # Google TV on guest VLAN
+        extraAllowedAddresses = [ "10.30.30.6/32" ];
         mediaDirs = {
           shows = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/shows";
           movies = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/movies";

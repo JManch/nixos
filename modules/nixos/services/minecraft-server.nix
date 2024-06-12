@@ -1,6 +1,5 @@
 { lib
 , pkgs
-, self
 , config
 , inputs
 , ...
@@ -24,7 +23,7 @@ let
   inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.modules.services.minecraft-server;
 
-  availablePlugins = self.packages.${pkgs.system}.minecraft-plugins
+  availablePlugins = (import ../../../pkgs/minecraft-plugins { inherit lib pkgs; }).minecraft-plugins
     // inputs.nix-resources.packages.${pkgs.system}.minecraft-plugins;
   pluginEnabled = p: elem p cfg.plugins;
 

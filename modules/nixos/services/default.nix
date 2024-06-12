@@ -692,7 +692,7 @@ in
 
     minecraft-server =
       let
-        availablePlugins = self.packages.${pkgs.system}.minecraft-plugins
+        availablePlugins = (import ../../../pkgs/minecraft-plugins { inherit lib pkgs; }).minecraft-plugins
           // inputs.nix-resources.packages.${pkgs.system}.minecraft-plugins;
         jsonFormat = pkgs.formats.json { };
       in

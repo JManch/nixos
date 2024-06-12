@@ -109,7 +109,7 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
 
         search = {
           force = true;
-          default = "Google";
+          default = "Kagi";
         };
 
         settings = {

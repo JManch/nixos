@@ -31,11 +31,18 @@
     services = {
       hass.enable = true;
       unifi.enable = true;
-      calibre.enable = true;
       mosquitto.enable = true;
       qbittorrent-nox.enable = true;
       mikrotik-backup.enable = true;
       index-checker.enable = true;
+
+      calibre = {
+        enable = true;
+        extraAllowedAddresses = [
+          # Kobo on guest network
+          "10.30.30.16/32"
+        ];
+      };
 
       vaultwarden = {
         enable = true;

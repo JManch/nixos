@@ -8,6 +8,7 @@ let
   inherit (lib) mkIf mkBefore mkVMOverride getExe' utils;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
+  inherit (caddy) lanAddressRanges;
   cfg = config.modules.services.calibre;
 in
 mkIf cfg.enable
@@ -39,7 +40,12 @@ mkIf cfg.enable
   };
 
   services.caddy.virtualHosts."calibre.${fqDomain}".extraConfig = ''
-    import lan-only
+    @block {
+      not remote_ip ${lanAddressRanges} ${cfg.extraAllowedAddresses}
+    }
+    respond @block "Access denied" 403 {
+      close
+    }
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 

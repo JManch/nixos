@@ -368,6 +368,16 @@ in
         type = types.port;
         default = 8083;
       };
+
+      extraAllowedAddresses = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        apply = v: concatStringsSep " " v;
+        description = ''
+          List of address to give access to Calibre in addition the local
+          network.
+        '';
+      };
     };
 
     vaultwarden = {

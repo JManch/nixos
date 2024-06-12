@@ -12,5 +12,7 @@ mkIf cfg.enable
     };
   };
 
+  backups.anki.paths = [ ".local/share/Anki2" ];
+
   persistence.directories = [ ".local/share/Anki2" ];
 }

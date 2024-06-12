@@ -30,7 +30,6 @@ let
       ];
 
       genDomain = domain: /*bash*/ ''
-
         openssl genrsa -out "$temp/${domain}.key" 4096
         openssl req -new -sha256 -key "$temp/${domain}.key" -out "$temp/${domain}.csr" \
           -subj "/C=GB/O=${toUpper hostname}/CN=${domain}.${fqDomain}"
@@ -38,14 +37,12 @@ let
         cat "$temp/${domain}.crt" "$temp/${domain}.key" > "$temp/${domain}.pem"
         openssl pkcs12 -export -out "$dir/${domain}.p12" -inkey "$temp/${domain}.key" -in "$temp/${domain}.pem" 
         mv "$temp/${domain}.crt" "$dir"
-
       '';
     in
     pkgs.writeShellApplication {
       name = "generate-caddy-certs";
       runtimeInputs = [ pkgs.openssl ];
       text = /*bash*/ ''
-
         umask 077
         dir="generated-certs"
         if [ ! -d "$dir" ]; then
@@ -72,10 +69,9 @@ let
         mv "$temp/rootCA.crt" "$dir"
         echo "Update the encrypted certificates in agenix with the new *.crt files in $dir"
         echo "Import the *.p12 files into browsers and devices you want to grant access to"
-        echo "Unfortunately custom certs do not work in firefox mobile https://bugzilla.mozilla.org/show_bug.cgi?id=1813930, have to use chrome for that now"
+        echo "Unfortunately custom certs do not work on firefox mobile https://bugzilla.mozilla.org/show_bug.cgi?id=1813930, have to use chrome for that now"
         echo "Remember to backup the *.p12 files somewhere safe"
-
-    '';
+      '';
     };
 in
 mkMerge [
@@ -84,8 +80,8 @@ mkMerge [
   }
   (mkIf cfg.enable {
     assertions = utils.asserts [
-      (cfg.lanAddressRanges != "")
-      "Caddy requires LAN address ranges to be set"
+      (cfg.trustedAddresses != [ ])
+      "Caddy requires trusted addresses to be set"
     ];
 
     services.caddy = {
@@ -97,19 +93,8 @@ mkMerge [
         admin off
       '';
 
-      extraConfig = ''
-        (lan-only) {
-          @block {
-            not remote_ip ${cfg.lanAddressRanges}
-          }
-          respond @block "Access denied" 403 {
-            close
-          }
-        }
-      '';
-
       virtualHosts."logs.${fqDomain}".extraConfig = ''
-        import lan-only
+        ${cfg.allowAddresses cfg.trustedAddresses}
         root * /var/lib/goaccess/
         file_server * browse
 
@@ -212,7 +197,7 @@ mkMerge [
       }];
 
     virtualisation.vmVariant = {
-      modules.services.caddy.lanAddressRanges = [ "10.0.2.2/32" ];
+      modules.services.caddy.trustedAddressRanges = [ "10.0.2.2/32" ];
 
       services.caddy = {
         # Confusingly auto_https off doesn't actually server all hosts of http

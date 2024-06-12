@@ -3,6 +3,7 @@ let
   inherit (lib) mkIf utils;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy mosquitto;
+  inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.age.secrets) zigbee2mqttYamlSecrets mqttZigbee2mqttPassword;
   inherit (config.services.zigbee2mqtt) dataDir;
   cfg = config.modules.services.zigbee2mqtt;
@@ -60,7 +61,7 @@ mkIf cfg.enable
 
   services.caddy.virtualHosts = {
     "zigbee.${fqDomain}".extraConfig = ''
-      import lan-only
+      ${allowAddresses trustedAddresses}
       basic_auth {
         admin $2a$14$6SspBEu6Yi82Bx3VdT4S1eshOACOuf4DdFlQrg2kYcDomTOrsF/ru
       }

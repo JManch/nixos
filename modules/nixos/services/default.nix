@@ -149,6 +149,15 @@ in
         description = "Jellyfin service auto start";
       };
 
+      extraAllowedAddresses = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of address to give access to Jellyfin in addition to the trusted
+          list.
+        '';
+      };
+
       mediaDirs = mkOption {
         type = types.attrsOf types.str;
         default = { };
@@ -218,13 +227,13 @@ in
         '';
       };
 
-      lanAddressRanges = mkOption {
+      trustedAddresses = mkOption {
         type = types.listOf types.str;
         default = [ ];
-        apply = v: concatStringsSep " " v;
+        example = [ "192.168.89.2/32" "192.168.88.0/24" ];
         description = ''
-          List of address ranges defining the local network. Endpoints marked
-          as 'lan-only' will only accept connections from these ranges.
+          List of address ranges representing the trusted local network. Use in
+          combination with allowAddresses to restrict access to virtual hosts.
         '';
       };
 
@@ -234,6 +243,24 @@ in
         description = ''
           List of address ranges excluded from go access using their strange
           format.
+        '';
+      };
+
+      allowAddresses = mkOption {
+        type = types.functionTo types.lines;
+        internal = true;
+        readOnly = true;
+        default = addresses: ''
+          @block {
+            not remote_ip ${concatStringsSep " " addresses}
+          }
+          respond @block "Access denied" 403 {
+            close
+          }
+        '';
+        description = ''
+          Template for blocking access to a host from all addresses apart from
+          the provided list.
         '';
       };
     };
@@ -372,10 +399,9 @@ in
       extraAllowedAddresses = mkOption {
         type = types.listOf types.str;
         default = [ ];
-        apply = v: concatStringsSep " " v;
         description = ''
-          List of address to give access to Calibre in addition the local
-          network.
+          List of address to give access to Jellyfin in addition to the trusted
+          list.
         '';
       };
     };

@@ -52,7 +52,7 @@
       caddy = {
         enable = true;
         interfaces = [ "wg-friends" ];
-        lanAddressRanges = [
+        trustedAddresses = [
           "192.168.89.2/32"
           "192.168.88.0/24"
           "192.168.100.0/24"

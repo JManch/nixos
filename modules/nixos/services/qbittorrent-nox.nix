@@ -9,6 +9,7 @@ let
   inherit (lib) mkIf utils getExe';
   inherit (config.modules.services) wgnord caddy nfs;
   inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.modules.services.qbittorrent-nox;
   qbittorrent-nox = pkgs.qbittorrent.override {
     guiSupport = false;
@@ -79,7 +80,7 @@ mkIf cfg.enable
     }];
 
   services.caddy.virtualHosts."torrents.${fqDomain}".extraConfig = ''
-    import lan-only
+    ${allowAddresses trustedAddresses}
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 

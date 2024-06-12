@@ -6,9 +6,10 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkMerge utils toUpper mkForce getExe' getExe mkVMOverride;
+  inherit (lib) mkIf mkMerge utils toUpper mkForce getExe' mkVMOverride;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
+  inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.age.secrets) scrutinyVars;
   cfg = config.modules.services.scrutiny;
   influx = getExe' pkgs.influxdb2 "influx";
@@ -118,7 +119,7 @@ mkMerge [
     };
 
     services.caddy.virtualHosts."disks.${fqDomain}".extraConfig = ''
-      import lan-only
+      ${allowAddresses trustedAddresses}
       reverse_proxy http://127.0.0.1:${toString cfg.server.port}
     '';
 

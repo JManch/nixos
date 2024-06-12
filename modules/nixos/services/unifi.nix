@@ -9,6 +9,7 @@ let
   inherit (lib) mkIf utils;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
+  inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.modules.services.unifi;
 in
 mkIf cfg.enable
@@ -47,7 +48,7 @@ mkIf cfg.enable
   # Unifi module has good default systemd hardening
 
   services.caddy.virtualHosts."unifi.${fqDomain}".extraConfig = ''
-    import lan-only
+    ${allowAddresses trustedAddresses}
     reverse_proxy https://127.0.0.1:8443 {
       # We have to allow insecure HTTPS because unifi forcefully enables TLS
       # with an invalid cert.

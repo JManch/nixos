@@ -23,6 +23,7 @@ let
     attrNames;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.services) caddy wireguard;
+  inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.services) jellyfin;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.jellyfin;
@@ -110,9 +111,14 @@ mkMerge [
       "Jellyfin reverse proxy requires caddy to be enabled"
     ];
 
-    services.caddy.virtualHosts."jellyfin.${fqDomain}".extraConfig = ''
-      import ${if wireguard.friends.enable then "wg-friends" else "lan"}-only
-      reverse_proxy http://${cfg.reverseProxy.address}:8096
-    '';
+    services.caddy.virtualHosts."jellyfin.${fqDomain}".extraConfig =
+      let
+        addressRange = toString wireguard.friends.address + "/" + toString wireguard.friends.subnet;
+        wgAddresses = optional wireguard.friends.enable addressRange;
+      in
+      ''
+        ${allowAddresses (trustedAddresses ++ wgAddresses ++ cfg.extraAllowedAddresses)}
+        reverse_proxy http://${cfg.reverseProxy.address}:8096
+      '';
   })
 ]

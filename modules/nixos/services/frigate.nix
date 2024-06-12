@@ -9,6 +9,7 @@ let
   inherit (config.device) ipAddress;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.services) hass mosquitto caddy;
+  inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.age.secrets) cctvVars mqttFrigatePassword;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.frigate;
@@ -222,7 +223,7 @@ mkIf cfg.enable
   }];
 
   services.caddy.virtualHosts."cctv.${fqDomain}".extraConfig = ''
-    import lan-only
+    ${allowAddresses trustedAddresses}
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 

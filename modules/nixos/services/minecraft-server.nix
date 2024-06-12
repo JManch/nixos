@@ -12,6 +12,7 @@ let
     escapeShellArg
     concatStringsSep
     mkAfter
+    optional
     genAttrs
     elem
     mapAttrsToList
@@ -19,7 +20,8 @@ let
     mkForce;
   inherit (config.services.minecraft-server) dataDir;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) wireguard;
+  inherit (config.modules.services) caddy wireguard;
+  inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.modules.services.minecraft-server;
 
   availablePlugins = self.packages.${pkgs.system}.minecraft-plugins
@@ -252,15 +254,21 @@ mkIf cfg.enable
     '';
   };
 
-  services.caddy.virtualHosts = mkIf (pluginEnabled "squaremap") {
-    "squaremap.${fqDomain}".extraConfig = ''
-      import ${if wireguard.friends.enable then "wg-friends" else "lan"}-only
-      reverse_proxy http://127.0.0.1:25566
-      handle_errors {
-        respond "Minecraft server is hibernating or offline" 503
-      }
-    '';
-  };
+  services.caddy.virtualHosts =
+    mkIf (pluginEnabled "squaremap") {
+      "squaremap.${fqDomain}".extraConfig =
+        let
+          addressRange = toString wireguard.friends.address + "/" + toString wireguard.friends.subnet;
+          wgAddresses = optional wireguard.friends.enable addressRange;
+        in
+        ''
+          ${allowAddresses (trustedAddresses ++ wgAddresses)}
+          reverse_proxy http://127.0.0.1:25566
+          handle_errors {
+            respond "Minecraft server is hibernating or offline" 503
+          }
+        '';
+    };
 
   networking.firewall = {
     allowedTCPPorts = [ cfg.port ];

@@ -31,6 +31,7 @@ let
   inherit (config.modules.services) caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
+  inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.age.secrets)
     resticPasswordFile
     resticHtPasswordsFile
@@ -421,10 +422,10 @@ mkMerge [
 
     services.caddy.virtualHosts = {
       "restic.${fqDomain}".extraConfig = ''
-        import lan-only
+        ${allowAddresses trustedAddresses}
         # Because syncing involves many HTTP requests logs get very large.
         # Exclude LAN IPs from logs to circumvent this.
-        @lan remote_ip ${caddy.lanAddressRanges}
+        @lan remote_ip ${concatStringsSep " " trustedAddresses}
         log_skip @lan
         reverse_proxy http://127.0.0.1:${toString cfg.server.port}
       '';

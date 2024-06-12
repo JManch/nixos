@@ -21,6 +21,7 @@ let
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets) mqttHassPassword;
+  inherit (caddy) allowAddresses trustedAddresses;
   inherit (secretCfg) devices;
   cfg = config.modules.services.hass;
   secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
@@ -250,7 +251,7 @@ in
     };
 
     services.caddy.virtualHosts."home.${fqDomain}".extraConfig = ''
-      import lan-only
+      ${allowAddresses trustedAddresses}
       reverse_proxy http://127.0.0.1:${toString cfg.port}
     '';
 

@@ -8,6 +8,7 @@ let
   inherit (lib) mkIf mkMerge utils mkForce;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
+  inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.modules.hardware.printing;
 
   dcp9015cdwlpr = pkgs.dcp9020cdwlpr.overrideAttrs (oldAttrs: rec {
@@ -119,7 +120,7 @@ mkMerge [
     };
 
     services.caddy.virtualHosts."printing.${fqDomain}".extraConfig = ''
-      import lan-only
+      ${allowAddresses trustedAddresses}
       reverse_proxy http://localhost:631 {
         header_up host localhost
       }

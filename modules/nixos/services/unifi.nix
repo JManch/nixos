@@ -59,12 +59,13 @@ mkIf cfg.enable
   '';
 
   # WARN: Auto-backups have to be configured in the UI
-  backups.unifi = {
-    paths = [ "/var/lib/unifi/data/backup/autobackup" ];
-    restore.pathOwnership = {
-      "/var/lib/unifi/data/backup/autobackup" = { user = "unifi"; group = "unifi"; };
-    };
-  };
+  # Unifi auto-backup refuses to run so disabling until that gets fixed
+  # backups.unifi = {
+  #   paths = [ "/var/lib/unifi/data/backup/autobackup" ];
+  #   restore.pathOwnership = {
+  #     "/var/lib/unifi/data/backup/autobackup" = { user = "unifi"; group = "unifi"; };
+  #   };
+  # };
 
   persistence.directories = [{
     directory = "/var/lib/unifi";

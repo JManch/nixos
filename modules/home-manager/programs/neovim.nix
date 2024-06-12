@@ -49,9 +49,7 @@ mkIf cfg.enable
       # black
     ];
 
-    # Some treesitter parsers need this library. I had to copy and modify the
-    # home-manager module for this because the way neovim is wrapped makes it a
-    # nightmare to override.
+    # Some treesitter parsers need this library
     extraWrapperArgs = [
       "--suffix"
       "LD_LIBRARY_PATH"

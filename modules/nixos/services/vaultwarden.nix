@@ -1,8 +1,8 @@
 { lib
 , pkgs
+, self
 , config
 , inputs
-, outputs
 , ...
 }:
 let
@@ -151,7 +151,7 @@ mkIf cfg.enable
           bzip2
           age
           rclone
-        ]) ++ [ outputs.packages.${pkgs.system}.shoutrrr ];
+        ]) ++ [ self.packages.${pkgs.system}.shoutrrr ];
         text = /*bash*/ ''
 
           set -o errtrace

@@ -3,7 +3,6 @@
 
   outputs = { self, nixpkgs, home-manager, ... } @ inputs:
     let
-      inherit (self) outputs;
       inherit (lib) nixosSystem genAttrs optional;
 
       lib = nixpkgs.lib.extend
@@ -18,7 +17,7 @@
         ${hostname} = nixosSystem {
           inherit system;
           specialArgs = {
-            inherit inputs outputs hostname lib;
+            inherit self inputs hostname lib;
             username = "joshua";
           };
           modules = [

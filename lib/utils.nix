@@ -24,7 +24,7 @@ in
     patches = (oldAttrs.patches or [ ]) ++ patches;
   });
 
-  hosts = outputs: filterAttrs (host: v: (host != "installer")) outputs.nixosConfigurations;
+  hosts = self: filterAttrs (host: v: (host != "installer")) self.nixosConfigurations;
 
   upperFirstChar = string:
     let

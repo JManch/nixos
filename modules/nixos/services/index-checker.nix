@@ -1,13 +1,13 @@
 { lib
 , pkgs
+, self
 , config
-, outputs
 , ...
 }:
 let
   inherit (lib) mkIf getExe;
   cfg = config.modules.services.index-checker;
-  shoutrrr = getExe outputs.packages.${pkgs.system}.shoutrrr;
+  shoutrrr = getExe self.packages.${pkgs.system}.shoutrrr;
 
   pythonScript = pkgs.writers.writePython3 "index-checker"
     {
@@ -45,7 +45,7 @@ mkIf cfg.enable
       StateDirectory = "index-checker";
       ExecStart = getExe (pkgs.writeShellApplication {
         name = "index-checker";
-        runtimeInputs = [ pkgs.coreutils outputs.packages.${pkgs.system}.shoutrrr ];
+        runtimeInputs = [ pkgs.coreutils self.packages.${pkgs.system}.shoutrrr ];
         text = /*bash*/ ''
           set +e
           send_notif() {

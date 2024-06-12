@@ -1,8 +1,8 @@
 { lib
 , pkgs
+, self
 , config
 , inputs
-, outputs
 , ...
 }:
 let
@@ -22,7 +22,7 @@ let
   inherit (config.modules.services) wireguard;
   cfg = config.modules.services.minecraft-server;
 
-  availablePlugins = outputs.packages.${pkgs.system}.minecraft-plugins
+  availablePlugins = self.packages.${pkgs.system}.minecraft-plugins
     // inputs.nix-resources.packages.${pkgs.system}.minecraft-plugins;
   pluginEnabled = p: elem p cfg.plugins;
 

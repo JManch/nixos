@@ -1,6 +1,6 @@
 { lib
 , pkgs
-, outputs
+, self
 , username
 , ...
 }:
@@ -39,7 +39,7 @@ let
               all (v: v == false) (
                 mapAttrsToList (_: pool: hasAttr "encryption" pool.rootFsOptions) value.config.disko.devices.zpool
               )
-            ) (utils.hosts outputs)
+            ) (utils.hosts self)
           )
         )
       })

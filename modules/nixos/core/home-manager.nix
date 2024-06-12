@@ -1,7 +1,7 @@
 { lib
+, self
 , inputs
 , config
-, outputs
 , username
 , hostname
 , ...
@@ -23,7 +23,7 @@ in
       sharedModules = [ ../../home-manager ];
 
       extraSpecialArgs = {
-        inherit inputs outputs username hostname;
+        inherit inputs self username hostname;
         vmVariant = false;
       };
     };

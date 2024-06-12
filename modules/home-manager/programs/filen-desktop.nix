@@ -1,7 +1,7 @@
 { lib
 , pkgs
+, self
 , config
-, outputs
 , ...
 }:
 let
@@ -9,7 +9,7 @@ let
 in
 lib.mkIf cfg.enable
 {
-  home.packages = [ outputs.packages.${pkgs.system}.filen-desktop ];
+  home.packages = [ self.packages.${pkgs.system}.filen-desktop ];
 
   desktop.hyprland.settings.windowrulev2 = [
     "nomaxsize, class:filen-desktop"

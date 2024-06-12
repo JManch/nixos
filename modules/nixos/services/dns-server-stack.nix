@@ -6,9 +6,9 @@
 # extra statistics to the web UI for monitoring and enables DoH/3.
 { lib
 , pkgs
+, self
 , config
 , inputs
-, outputs
 , ...
 }:
 let
@@ -29,7 +29,7 @@ let
   cfg = config.modules.services.dns-server-stack;
 
   # Patch Ctrld to enable loading endpoints from environment variables
-  ctrld = utils.addPatches outputs.packages.${pkgs.system}.ctrld [ ../../../patches/ctrldSecretEndpoint.patch ];
+  ctrld = utils.addPatches self.packages.${pkgs.system}.ctrld [ ../../../patches/ctrldSecretEndpoint.patch ];
 
   # Declares hostnames for all devices on my local network
   homeHosts = inputs.nix-resources.secrets.homeHosts // {
@@ -38,7 +38,7 @@ let
     # Add all hosts that have a static local address
     mapAttrs'
       (host: v: nameValuePair v.config.device.ipAddress host)
-      (filterAttrs (host: v: v.config.device.ipAddress != null) (utils.hosts outputs));
+      (filterAttrs (host: v: v.config.device.ipAddress != null) (utils.hosts self));
 in
 mkIf cfg.enable
 {

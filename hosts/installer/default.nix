@@ -1,6 +1,6 @@
 { lib
 , pkgs
-, outputs
+, self
 , username
 , modulesPath
 , ...
@@ -26,7 +26,7 @@ let
         exit 1
       fi
       hostname=$1
-      hosts=(${lib.concatStringsSep " " (builtins.attrNames (utils.hosts outputs))})
+      hosts=(${lib.concatStringsSep " " (builtins.attrNames (utils.hosts self))})
       match=0
       for host in "''${hosts[@]}"; do
         if [[ $host = "$hostname" ]]; then

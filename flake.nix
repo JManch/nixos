@@ -3,7 +3,7 @@
 
   outputs = { self, nixpkgs, home-manager, ... } @ inputs:
     let
-      inherit (lib) nixosSystem genAttrs optional;
+      inherit (lib) nixosSystem genAttrs hasPrefix;
 
       lib = nixpkgs.lib.extend
         (final: prev: (import ./lib final) // home-manager.lib);
@@ -20,9 +20,13 @@
             inherit self inputs hostname lib;
             username = "joshua";
           };
-          modules = [
-            ./hosts/${hostname}
-          ] ++ optional (hostname != "installer") ./modules/nixos;
+          modules =
+            if (hasPrefix "installer" hostname) then
+              [ ./hosts/installer ]
+            else [
+              ./hosts/${hostname}
+              ./modules/nixos
+            ];
         };
       };
     in
@@ -34,7 +38,8 @@
       nixosConfigurations =
         mkHost "ncase-m1" "x86_64-linux" //
         mkHost "homelab" "x86_64-linux" //
-        mkHost "installer" "x86_64-linux";
+        mkHost "installer" "x86_64-linux" //
+        mkHost "installer-arm" "aarch64-linux";
     };
 
   inputs = {

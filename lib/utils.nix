@@ -11,6 +11,7 @@ let
     mod
     elemAt
     concatMap
+    hasPrefix
     stringToCharacters;
 in
 {
@@ -24,7 +25,7 @@ in
     patches = (oldAttrs.patches or [ ]) ++ patches;
   });
 
-  hosts = self: filterAttrs (host: v: (host != "installer")) self.nixosConfigurations;
+  hosts = self: filterAttrs (host: _: !hasPrefix "installer" host) self.nixosConfigurations;
 
   upperFirstChar = string:
     let

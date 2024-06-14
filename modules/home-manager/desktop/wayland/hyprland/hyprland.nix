@@ -94,9 +94,9 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
     enable = true;
     package = hyprland;
 
-    plugins = with utils.flakePkgs args "hyprland-plugins"; [
-      hyprexpo
-    ];
+    # plugins = with utils.flakePkgs args "hyprland-plugins"; [
+    #   hyprexpo
+    # ];
 
     systemd = {
       enable = true;
@@ -168,6 +168,7 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         "col.active_border" = "0xff${colors.base0D}";
         "col.inactive_border" = "0xff${colors.base00}";
         allow_tearing = cfg.tearing;
+        cursor_inactive_timeout = 3;
       };
 
       decoration = {
@@ -192,14 +193,6 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         kb_layout = "us";
         repeat_delay = 500;
         repeat_rate = 30;
-      };
-
-      cursor = {
-        inactive_timeout = 3;
-        hide_on_key_press = true;
-        default_monitor = primaryMonitor.name;
-        enable_hyprcursor = cfg.hyprcursor.package != null;
-        no_hardware_cursors = osConfig.device.gpu.type == "nvidia";
       };
 
       animations = {
@@ -239,6 +232,8 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         new_window_takes_over_fullscreen = 2;
         enable_swallow = false;
         swallow_regex = "^(${desktopCfg.terminal.class})$";
+        enable_hyprcursor = cfg.hyprcursor.package != null;
+        hide_cursor_on_key_press = true;
       };
 
       dwindle = {
@@ -278,14 +273,14 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
       ];
 
-      plugin = {
-        hyprexpo = {
-          columns = 3;
-          gap_size = 0;
-          workspace_method = "first m~1";
-          enable_gesture = false;
-        };
-      };
+      # plugin = {
+      #   hyprexpo = {
+      #     columns = 3;
+      #     gap_size = 0;
+      #     workspace_method = "first m~1";
+      #     enable_gesture = false;
+      #   };
+      # };
     };
   };
 

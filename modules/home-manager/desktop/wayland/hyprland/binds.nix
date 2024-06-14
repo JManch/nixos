@@ -24,6 +24,7 @@ let
   osDesktop = osConfig.usrEnv.desktop;
 
   jaq = getExe pkgs.jaq;
+  bc = getExe' pkgs.bc "bc";
   notifySend = getExe pkgs.libnotify;
   hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 
@@ -33,33 +34,27 @@ let
     command: "${cfg.disableShaders}; ${command}; ${cfg.enableShaders}";
 
   toggleDwindleGaps = pkgs.writeShellScript "hypr-toggle-dwindle-gaps" /*bash*/ ''
-
     new_value=$(($(${hyprctl} getoption -j dwindle:no_gaps_when_only | ${jaq} -r '.int') ^ 1))
     ${hyprctl} keyword dwindle:no_gaps_when_only $new_value
     message=$([[ $new_value == "1" ]] && echo "Dwindle gaps disabled" || echo "Dwindle gaps enabled")
     ${notifySend} --urgency=low -t 2000 -h \
       'string:x-canonical-private-synchronous:hypr-dwindle-gaps' 'Hyprland' "$message"
-
   '';
 
   toggleFloating = pkgs.writeShellScript "hypr-toggle-floating" /*bash*/ ''
-
     if [[ $(${hyprctl} activewindow -j | ${jaq} -r '.floating') == "false" ]]; then
       ${hyprctl} --batch 'dispatch togglefloating; dispatch resizeactive exact 75% 75%; dispatch centerwindow;'
     else
       ${hyprctl} dispatch togglefloating
     fi
-
   '';
 
   toggleSwallowing = pkgs.writeShellScript "hypr-toggle-swallowing" /*bash*/ ''
-
     new_value=$(($(${hyprctl} getoption -j misc:enable_swallow | ${jaq} -r '.int') ^ 1))
     ${hyprctl} keyword misc:enable_swallow $new_value
     message=$([[ $new_value == "1" ]] && echo "Window swallowing enabled" || echo "Window swallowing disabled")
     ${notifySend} --urgency=low -t 2000 -h \
       'string:x-canonical-private-synchronous:hypr-swallow' 'Hyprland' "$message"
-
   '';
 
   toggleGaps =
@@ -67,33 +62,62 @@ let
       inherit (config.wayland.windowManager.hyprland.settings) general decoration;
     in
     pkgs.writeShellScript "hypr-toggle-gaps" /*bash*/ ''
-
-    rounding=$(${hyprctl} getoption -j decoration:rounding | ${jaq} -r '.int')
-    if [[ "$rounding" == "0" ]]; then
-      ${hyprctl} --batch "\
-        keyword general:gaps_in ${toString general.gaps_in}; \
-        keyword general:gaps_out ${toString general.gaps_out}; \
-        keyword general:border_size ${toString general.border_size}; \
-        keyword decoration:rounding ${toString decoration.rounding} \
-      "
-      message="Gaps enabled"
-    else
-      ${hyprctl} --batch "\
-        keyword general:gaps_in 0; \
-        keyword general:gaps_out 0; \
-        keyword general:border_size 0; \
-        keyword decoration:rounding 0 \
-      "
-      message="Gaps disabled"
-    fi
-    ${notifySend} --urgency=low -t 2000 -h \
-      'string:x-canonical-private-synchronous:hypr-toggle-gaps' 'Hyprland' "$message"
-
-  '';
+      rounding=$(${hyprctl} getoption -j decoration:rounding | ${jaq} -r '.int')
+      if [[ "$rounding" == "0" ]]; then
+        ${hyprctl} --batch "\
+          keyword general:gaps_in ${toString general.gaps_in}; \
+          keyword general:gaps_out ${toString general.gaps_out}; \
+          keyword general:border_size ${toString general.border_size}; \
+          keyword decoration:rounding ${toString decoration.rounding} \
+        "
+        message="Gaps enabled"
+      else
+        ${hyprctl} --batch "\
+          keyword general:gaps_in 0; \
+          keyword general:gaps_out 0; \
+          keyword general:border_size 0; \
+          keyword decoration:rounding 0 \
+        "
+        message="Gaps disabled"
+      fi
+      ${notifySend} --urgency=low -t 2000 -h \
+        'string:x-canonical-private-synchronous:hypr-toggle-gaps' 'Hyprland' "$message"
+    '';
 
   make16By9 = pkgs.writeShellScript "hypr-16-by-9" /*bash*/ ''
     width=$(${hyprctl} activewindow -j | ${jaq} -r '.size[0]')
     ${hyprctl} dispatch resizeactive exact "$width" "$(( ($width * 9) / 16 ))"
+  '';
+
+  scaleTabletToWindow = pkgs.writeShellScript "hypr-scale-tablet" /*bash*/ ''
+    tablet_width=152
+    tablet_height=95
+    window=$(${hyprctl} activewindow -j)
+    width=$(echo $window | ${jaq} -r '.size[0]')
+    height=$(echo $window | ${jaq} -r '.size[1]')
+    pos_x=$(echo $window | ${jaq} -r '.at[0]')
+    pos_y=$(echo $window | ${jaq} -r '.at[1]')
+    new_width=$(echo "scale=0; $height*$tablet_width/$tablet_height" | ${bc} -l)
+    new_height=$(echo "scale=0; $width*$tablet_height/$tablet_width" | ${bc} -l)
+
+    if [ $((width - new_width)) -lt 0 ]; then
+        region_height=$new_height
+        region_width=$width
+        region_pos_x=$pos_x
+        region_pos_y=$((pos_y + (height - new_height) / 2))
+    else
+        region_height=$height
+        region_width=$new_width
+        region_pos_x=$((pos_x + (width - new_width) / 2))
+        region_pos_y=$pos_y
+    fi
+
+    ${hyprctl} --batch "\
+      keyword input:tablet:region_size $region_width $region_height; \
+      keyword input:tablet:region_position $region_pos_x $region_pos_y \
+    "
+    ${notifySend} --urgency=low -t 2000 -h \
+      'string:x-canonical-private-synchronous:hypr-scale-tablet' 'Hyprland' 'Scaled tablet to active window'
   '';
 in
 mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
@@ -123,6 +147,7 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
           "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
           "${modShift}, R, exec, ${make16By9}"
           "${mod}, A, exec, ${toggleSwallowing}"
+          "${modShift}, T, exec, ${scaleTabletToWindow}"
           "${modShiftCtrl}, T, exec, ${toggleGaps}"
 
           # Movement

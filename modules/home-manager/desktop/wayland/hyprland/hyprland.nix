@@ -193,6 +193,16 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
         kb_layout = "us";
         repeat_delay = 500;
         repeat_rate = 30;
+
+        # TODO: Configure this properly. Waiting for crashing to be fixed so I
+        # can configure with new implementation.
+        # https://github.com/hyprwm/Hyprland/issues/6312
+        tablet = {
+          transform = 1;
+          output = primaryMonitor.name;
+          region_position = "3929 51";
+          region_size = "1102 689";
+        };
       };
 
       animations = {

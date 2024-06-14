@@ -36,6 +36,7 @@ in
     foot.enable = mkEnableOption "Foot";
     zed.enable = mkEnableOption "Zed Editor";
     foliate.enable = mkEnableOption "Foliate Ebook Reader";
+    rnote.enable = mkEnableOption "Rnote";
 
     firefox = {
       enable = mkEnableOption "Firefox";

@@ -69,6 +69,7 @@
       multiviewerF1.enable = true;
       zed.enable = true;
       foliate.enable = true;
+      rnote.enable = true;
 
       firefox = {
         enable = true;

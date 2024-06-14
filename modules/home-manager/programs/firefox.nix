@@ -107,11 +107,6 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
         name = "default";
         isDefault = true;
 
-        search = {
-          force = true;
-          default = "Kagi";
-        };
-
         settings = {
           # General
           "general.autoScroll" = true;

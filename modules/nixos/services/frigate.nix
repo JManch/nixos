@@ -105,8 +105,8 @@ mkIf cfg.enable
       };
 
       motion = {
-        threshold = 60;
-        contour_area = 30;
+        threshold = 30;
+        contour_area = 10;
       };
 
       detect = {

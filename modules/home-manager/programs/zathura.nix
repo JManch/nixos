@@ -54,6 +54,10 @@ lib.mkIf cfg.enable
     };
   };
 
+  xdg.mimeApps.defaultApplications = {
+    "application/pdf" = [ "org.pwmt.zathura.desktop" ];
+  };
+
   programs.zsh.shellAliases = {
     pdf = "zathura";
   };

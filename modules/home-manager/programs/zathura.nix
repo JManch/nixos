@@ -21,7 +21,7 @@ lib.mkIf cfg.enable
       notification-error-fg = "#${colors.base00}";
       notification-warning-bg = "#${colors.base08}";
       notification-warning-fg = "#${colors.base00}";
-      highlight-color = "#${colors.base0A}";
+      highlight-color = "#${colors.base0A}4d";
       highlight-active-color = "#${colors.base0D}";
       completion-highlight-fg = "#${colors.base02}";
       completion-highlight-bg = "#${colors.base0C}";

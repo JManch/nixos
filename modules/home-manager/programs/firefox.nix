@@ -6,7 +6,8 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe getExe';
+  inherit (lib) mkIf getExe getExe' optional;
+  inherit (config.modules.programs) mpv;
   inherit (config.modules) desktop;
   cfg = config.modules.programs.firefox;
 in
@@ -345,6 +346,12 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
         '';
       };
     };
+  };
+
+  # The extension must also be installed https://github.com/Baldomo/open-in-mpv
+  home.packages = optional mpv.enable pkgs.open-in-mpv;
+  xdg.mimeApps.defaultApplications = mkIf mpv.enable {
+    "x-scheme-handler/mpv" = [ "open-in-mpv.desktop" ];
   };
 
   backups.firefox = {

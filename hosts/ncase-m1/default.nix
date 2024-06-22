@@ -4,8 +4,6 @@
     ./disko.nix
   ];
 
-  networking.hostId = "625ec505";
-
   device = {
     type = "desktop";
     ipAddress = "192.168.88.254";
@@ -63,14 +61,7 @@
     ];
   };
 
-  usrEnv = {
-    homeManager.enable = true;
-
-    desktop = {
-      enable = true;
-      desktopEnvironment = null;
-    };
-  };
+  usrEnv.homeManager.enable = true;
 
   modules = {
     hardware = {
@@ -147,6 +138,11 @@
       windows.enable = true;
       bluetooth.enable = true;
       virtualisation.libvirt.enable = true;
+
+      desktop = {
+        enable = true;
+        desktopEnvironment = null;
+      };
 
       networking = {
         primaryInterface = "eno1";

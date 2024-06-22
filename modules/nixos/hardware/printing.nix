@@ -37,12 +37,12 @@ mkMerge [
 
     hardware.printers = {
       ensurePrinters = [{
-        name = "Brother_DCP-9015CDW";
-        deviceUri = "ipp://${cfg.client.serverAddress}/printers/Brother_DCP-9015CDW";
+        name = "Brother-DCP-9015CDW";
+        deviceUri = "ipp://${cfg.client.serverAddress}/printers/Brother-DCP-9015CDW";
         model = "everywhere";
         ppdOptions.PageSize = "A4";
       }];
-      ensureDefaultPrinter = "Brother_DCP-9015CDW";
+      ensureDefaultPrinter = "Brother-DCP-9015CDW";
     };
   })
 
@@ -106,12 +106,12 @@ mkMerge [
     # Keep an eye on this for https://github.com/NixOS/nixpkgs/issues/78535
     hardware.printers = {
       ensurePrinters = [{
-        name = "Brother_DCP-9015CDW";
+        name = "Brother-DCP-9015CDW";
         deviceUri = "ipp://printer.lan/ipp/print";
         model = "everywhere";
         ppdOptions.PageSize = "A4";
       }];
-      ensureDefaultPrinter = "Brother_DCP-9015CDW";
+      ensureDefaultPrinter = "Brother-DCP-9015CDW";
     };
 
     systemd.services.ensure-printers = {

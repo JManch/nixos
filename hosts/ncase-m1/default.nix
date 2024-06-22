@@ -136,6 +136,7 @@
     };
 
     system = {
+      ssh.enable = true;
       windows.enable = true;
       bluetooth.enable = true;
       virtualisation.libvirt.enable = true;

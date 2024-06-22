@@ -8,6 +8,7 @@ in
 
   options.modules.system = {
     bluetooth.enable = mkEnableOption "bluetooth";
+    ssh.enable = mkEnableOption "Whether to enable ssh server";
 
     impermanence.enable = mkOption {
       type = types.bool;
@@ -80,12 +81,6 @@ in
           50000-65000 range.
         '';
       };
-    };
-
-    ssh.enable = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Whether to enable ssh server";
     };
 
     networking = {

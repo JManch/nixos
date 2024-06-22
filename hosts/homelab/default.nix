@@ -176,6 +176,7 @@
     };
 
     system = {
+      ssh.enable = true;
       desktop.enable = false;
 
       networking = {

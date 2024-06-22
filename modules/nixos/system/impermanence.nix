@@ -7,7 +7,7 @@
 }:
 let
   inherit (lib) mkIf mkForce mkMerge utils mkAliasOptionModule concatStringsSep hasAttr;
-  inherit (config.usrEnv) homeManager;
+  inherit (config.modules.core) homeManager;
   cfg = config.modules.system.impermanence;
   homePersistence = config.home-manager.users.${username}.persistence;
 in

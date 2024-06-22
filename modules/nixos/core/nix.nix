@@ -16,6 +16,7 @@ let
     isType
     mapAttrsToList
     optionalString
+    mkForce
     concatStringsSep
     getExe;
   inherit (config.modules.system) impermanence;
@@ -223,6 +224,22 @@ in
     dates = "daily";
   };
 
+  # Because one of our flake inputs is a private repo temporarily copy host ssh
+  # keys so root uses them to authenticate with github
+  systemd.services.nixos-upgrade.serviceConfig.ExecStart = mkForce (pkgs.writeShellScript "nixos-upgrade-ssh-auth" ''
+    # Copy host ssh keys to /root/.ssh
+    # Abort if /root.ssh exists
+    if [ -d /root/.ssh ]; then
+      echo "Aborting because root has ssh keys for some reason"
+      exit 1
+    fi
+    mkdir -p /root/.ssh
+    cp /etc/ssh/ssh_host_ed25519_key.pub /root/.ssh/id_ed25519.pub
+    cp /etc/ssh/ssh_host_ed25519_key /root/.ssh/id_ed25519
+    ${config.systemd.services.nixos-upgrade.script}
+    rm -rf /root/.ssh
+  '').outPath;
+
   # Sometimes nixos-rebuild compiles large pieces software that require more
   # space in /tmp than my tmpfs can provide. The obvious solution is to mount
   # /tmp to some actual storage. However, the majority of my rebuilds do not
@@ -235,13 +252,11 @@ in
 
   # List of programs that require the bind mount to compile:
   # - mongodb
-  systemd = mkIf impermanence.enable {
-    services.nix-daemon.environment.TMPDIR = "/var/nix-tmp";
-    tmpfiles.rules = [
-      "d /var/nix-tmp 0755 root root"
-      "d /persist/var/nix-tmp 0755 root root"
-    ];
-  };
+  systemd.services.nix-daemon.environment.TMPDIR = mkIf impermanence.enable "/var/nix-tmp";
+  systemd.tmpfiles.rules = mkIf impermanence.enable [
+    "d /var/nix-tmp 0755 root root"
+    "d /persist/var/nix-tmp 0755 root root"
+  ];
 
   programs.zsh = {
     interactiveShellInit = /*bash*/ ''

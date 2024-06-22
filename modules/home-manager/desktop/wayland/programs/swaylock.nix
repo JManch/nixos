@@ -8,7 +8,7 @@ let
   inherit (lib) mkIf optionalString fetchers getExe;
   cfg = desktopCfg.programs.swaylock;
   desktopCfg = config.modules.desktop;
-  isWayland = fetchers.isWayland osConfig;
+  isWayland = fetchers.isWayland osConfig config;
   colors = config.colorScheme.palette;
   osDesktopEnabled = osConfig.modules.system.desktop.enable;
 

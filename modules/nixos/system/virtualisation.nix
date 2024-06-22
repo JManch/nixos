@@ -9,7 +9,7 @@ let
   inherit (lib) mkIf mkMerge mkVMOverride mod;
   inherit (config.home-manager.users.${username}.modules.desktop) terminal;
   inherit (config.device) monitors cpu memory;
-  inherit (config.usrEnv) homeManager;
+  inherit (config.modules.core) homeManager;
   cfg = config.modules.system.virtualisation;
 
   runVMScript = pkgs.writeShellApplication {

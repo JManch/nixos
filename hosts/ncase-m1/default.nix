@@ -61,9 +61,10 @@
     ];
   };
 
-  usrEnv.homeManager.enable = true;
 
   modules = {
+    core.homeManager.enable = true;
+
     hardware = {
       secureBoot.enable = true;
       vr.enable = true;

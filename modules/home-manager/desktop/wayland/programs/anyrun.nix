@@ -10,7 +10,7 @@ let
   cfg = desktopCfg.programs.anyrun;
   desktopCfg = config.modules.desktop;
   osDesktopEnabled = osConfig.modules.system.desktop.enable;
-  isWayland = fetchers.isWayland osConfig;
+  isWayland = fetchers.isWayland osConfig config;
 in
 {
   imports = [

@@ -18,7 +18,7 @@ let
     length
     getExe'
     allUnique;
-  inherit (config.usrEnv) homeManager;
+  inherit (config.modules.core) homeManager;
   cfg = config.modules.system.networking;
   homeFirewall = config.home-manager.users.${username}.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";

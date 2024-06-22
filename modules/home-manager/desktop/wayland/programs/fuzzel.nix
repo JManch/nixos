@@ -10,7 +10,7 @@ let
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
 in
-mkIf (cfg.enable && osConfig.modules.system.desktop.enable && (fetchers.isWayland osConfig))
+mkIf (cfg.enable && osConfig.modules.system.desktop.enable && (fetchers.isWayland osConfig config))
 {
   programs.fuzzel = {
     enable = true;

@@ -13,9 +13,9 @@
     ipAddress = "192.168.89.2";
   };
 
-  usrEnv.homeManager.enable = true;
-
   modules = {
+    core.homeManager.enable = true;
+
     hardware = {
       fileSystem.trim = true;
       fileSystem.extendedLoaderTimeout = true;

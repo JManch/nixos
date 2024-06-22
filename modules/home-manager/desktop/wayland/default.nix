@@ -1,7 +1,12 @@
-{ lib, pkgs, osConfig, ... }:
+{ lib
+, pkgs
+, config
+, osConfig
+, ...
+}:
 let
   inherit (lib) mkIf utils fetchers;
-  isWayland = fetchers.isWayland osConfig;
+  isWayland = fetchers.isWayland osConfig config;
   osDesktopEnabled = osConfig.modules.system.desktop.enable;
 in
 {

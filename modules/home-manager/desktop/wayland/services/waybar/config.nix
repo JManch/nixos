@@ -24,7 +24,7 @@ let
   inherit (osConfig.device) gpu;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
-  isWayland = fetchers.isWayland osConfig;
+  isWayland = fetchers.isWayland osConfig config;
   isHyprland = desktopCfg.windowManager == "Hyprland";
   colors = config.colorScheme.palette;
 

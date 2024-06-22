@@ -6,12 +6,12 @@
 }:
 let
   inherit (lib) mkIf mkForce mkMerge fetchers;
-  inherit (config.usrEnv) homeManager;
+  inherit (config.modules.core) homeManager;
   inherit (homeDesktopCfg.programs) swaylock hyprlock;
   cfg = config.modules.system.desktop;
   homeConfig = config.home-manager.users.${username};
   homeDesktopCfg = homeConfig.modules.desktop;
-  isWayland = fetchers.isWayland config;
+  isWayland = fetchers.isWayland config homeManager.enable;
   hyprlandPackage = homeConfig.wayland.windowManager.hyprland.package;
   windowManager = if homeManager.enable then homeDesktopCfg.windowManager else null;
 in

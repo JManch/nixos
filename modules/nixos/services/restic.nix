@@ -31,7 +31,7 @@ let
     optionalString;
   inherit (config.modules.services) caddy;
   inherit (config.modules.system) impermanence;
-  inherit (config.usrEnv) homeManager;
+  inherit (config.modules.core) homeManager;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
   inherit (caddy) allowAddresses trustedAddresses;

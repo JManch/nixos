@@ -1,6 +1,7 @@
 { lib, pkgs, config, ... }:
 let
   inherit (lib) mkIf fetchers;
+  inherit (config.modules.core) homeManager;
 in
 mkIf (config.device.gpu.type == "nvidia")
 {
@@ -21,7 +22,7 @@ mkIf (config.device.gpu.type == "nvidia")
     # Major issues if this is disabled
     modesetting.enable = true;
     open = true;
-    nvidiaSettings = !(fetchers.isWayland config);
+    nvidiaSettings = !(fetchers.isWayland config homeManager.enable);
   };
 
   persistenceHome.directories = [

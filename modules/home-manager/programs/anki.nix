@@ -12,7 +12,7 @@ mkIf cfg.enable
 {
   home = {
     packages = [ pkgs.anki-bin ];
-    sessionVariables = mkIf (fetchers.isWayland osConfig) {
+    sessionVariables = mkIf (fetchers.isWayland osConfig config) {
       ANKI_WAYLAND = 1;
     };
   };

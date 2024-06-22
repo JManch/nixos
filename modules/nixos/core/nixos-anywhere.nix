@@ -60,7 +60,7 @@ let
       fi
 
       host_config="/home/${username}/.config/nixos#nixosConfigurations.$hostname.config"
-      username=$(nix eval --raw "$host_config.usrEnv.username")
+      username=$(nix eval --raw "$host_config.modules.core.username")
       impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
 
       secret_temp=$(mktemp -d)

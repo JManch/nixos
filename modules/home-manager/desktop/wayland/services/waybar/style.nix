@@ -5,7 +5,7 @@ let
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
   osDesktopEnabled = osConfig.modules.system.desktop.enable;
-  isWayland = lib.fetchers.isWayland osConfig;
+  isWayland = lib.fetchers.isWayland osConfig config;
 in
 mkIf (osDesktopEnabled && isWayland && cfg.enable)
 {

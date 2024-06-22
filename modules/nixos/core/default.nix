@@ -1,12 +1,22 @@
-{ lib, pkgs, ... }:
+{ lib, pkgs, username, ... }:
 let
-  inherit (lib) mkEnableOption;
+  inherit (lib) mkOption mkEnableOption;
 in
 {
   imports = lib.utils.scanPaths ./.;
 
   options.modules.core = {
+    homeManager.enable = mkEnableOption "Home Manager";
     autoUpgrade = mkEnableOption "auto upgrade";
+
+    username = mkOption {
+      internal = true;
+      readOnly = true;
+      default = username;
+      description = ''
+        Used for getting the username of a given nixosConfiguration.
+      '';
+    };
   };
 
   config = {

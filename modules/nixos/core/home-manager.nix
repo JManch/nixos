@@ -7,7 +7,7 @@
 , ...
 }:
 let
-  cfg = config.usrEnv.homeManager;
+  cfg = config.modules.core.homeManager;
 in
 {
   imports = [

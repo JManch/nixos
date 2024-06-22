@@ -50,7 +50,7 @@ mkIf cfg.enable
       gdb
     ]);
 
-    userSettings = mkIf (fetchers.isWayland osConfig) {
+    userSettings = mkIf (fetchers.isWayland osConfig config) {
       # Prevents crash on launch
       "window.titleBarStyle" = "custom";
       "window.menuBarVisibility" = "toggle";

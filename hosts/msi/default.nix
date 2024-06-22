@@ -31,10 +31,9 @@
     }];
   };
 
-  usrEnv.homeManager.enable = false;
-
   modules = {
     core = {
+      homeManager.enable = false;
       autoUpgrade = true;
     };
 

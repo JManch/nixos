@@ -104,7 +104,7 @@ in
     {
       assertions = mkIf (cfg.windowManager != null) (utils.asserts [
         osDesktop.enable
-        "You cannot select a window manager if usrEnv desktop is not enabled"
+        "You cannot select a window manager if os desktop is not enabled"
         (osDesktop.desktopEnvironment == null)
         "You cannot use a desktop environment with a window manager"
         (length osConfig.device.monitors != 0)

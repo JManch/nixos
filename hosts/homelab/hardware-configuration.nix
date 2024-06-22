@@ -4,8 +4,8 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
+  networking.hostId = "8d4ed64c";
   hardware.cpu.amd.updateMicrocode = true;
-  nixpkgs.hostPlatform = "x86_64-linux";
 
   boot = {
     initrd.availableKernelModules = [ "xhci_pci" "ahci" "ehci_pci" "nvme" ];

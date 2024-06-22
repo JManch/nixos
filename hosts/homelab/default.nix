@@ -4,8 +4,6 @@
     ./hardware-configuration.nix
   ];
 
-  networking.hostId = "8d4ed64c";
-
   device = {
     type = "server";
     cpu.type = "amd";
@@ -15,10 +13,7 @@
     ipAddress = "192.168.89.2";
   };
 
-  usrEnv = {
-    homeManager.enable = true;
-    desktop.enable = false;
-  };
+  usrEnv.homeManager.enable = true;
 
   modules = {
     hardware = {
@@ -181,6 +176,8 @@
     };
 
     system = {
+      desktop.enable = false;
+
       networking = {
         primaryInterface = "enp1s0";
         staticIPAddress = "192.168.89.2/24";

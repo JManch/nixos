@@ -12,8 +12,10 @@ let
     let
       inherit (lib) optionalString fetchers boolToString substring stringLength toUpper optional;
       inherit (homeConfig.modules.desktop) hyprland;
+      inherit (config.modules.core) homeManager;
+      inherit (config.modules.system) desktop;
       homeConfig = config.home-manager.users.${username};
-      isHyprland = homeConfig.modules.desktop.windowManager == "Hyprland";
+      isHyprland = homeManager.enable && homeConfig.modules.desktop.windowManager == "Hyprland";
       monitor = fetchers.primaryMonitor config;
 
       # Remap the killactive key to use the shift modifier
@@ -40,11 +42,9 @@ let
         pkgs.coreutils
         pkgs.libnotify
         pkgs.gnugrep
-        homeConfig.wayland.windowManager.hyprland.package
       ] ++ optional isHyprland homeConfig.wayland.windowManager.hyprland.package;
 
       text = ''
-
         ${
           optionalString isHyprland /*bash*/ ''
             hyprctl --instance 0 --batch "\
@@ -57,10 +57,13 @@ let
 
         ${if mode == "start" then cfg.startScript else cfg.stopScript}
 
-        notify-send --urgency=critical -t 2000 \
-          -h 'string:x-canonical-private-synchronous:gamemode-toggle' 'GameMode' '${notifBody mode}ed'
-
-    '';
+        ${
+          optionalString (desktop.desktopEnvironment == null) /*bash*/ ''
+            notify-send --urgency=critical -t 2000 \
+              -h 'string:x-canonical-private-synchronous:gamemode-toggle' 'GameMode' '${notifBody mode}ed'
+          ''
+        }
+      '';
     };
 in
 mkIf cfg.enable

@@ -7,9 +7,8 @@ in
 
   options.modules.hardware.graphics = {
     hardwareAcceleration = mkEnableOption ''
-      Enable hardware acceleration regardless of whether or not the system has
-      a dedicated GPU. Useful for headless systems without dedicated GPUs or
-      graphical environments.
+      Enable hardware acceleration. Useful for headless systems that need to
+      perform hardware accelerated rendering.
     '';
   };
 
@@ -18,6 +17,6 @@ in
       cfg = config.modules.hardware.graphics;
     in
     {
-      hardware.opengl.enable = mkDefault cfg.hardwareAcceleration;
+      hardware.graphics.enable = mkDefault cfg.hardwareAcceleration;
     };
 }

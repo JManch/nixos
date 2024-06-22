@@ -1,3 +1,4 @@
+{ pkgs, username, ... }:
 {
   imports = [
     ./disko.nix
@@ -6,7 +7,7 @@
 
   device = {
     type = "desktop";
-    ipAddress = null; # TODO:
+    ipAddress = null;
     memory = 16000;
 
     cpu = {
@@ -15,17 +16,17 @@
       cores = "8";
     };
 
-    # gpu = {
-    #   name = "RTX 2070";
-    #   type = "nvidia";
-    # };
+    gpu = {
+      name = "RTX 2070";
+      type = "nvidia";
+    };
 
     monitors = [{
-      name = "UNKNOWN"; # TODO:
+      name = "placeholder";
       number = 1;
       refreshRate = 60;
-      width = 1920; # TODO:
-      height = 1080; # TODO:
+      width = 1920;
+      height = 1080;
       position.x = 0;
       position.y = 0;
     }];
@@ -40,19 +41,35 @@
     hardware = {
       fileSystem = {
         trim = true;
-        forceImportRoot = true; # TODO: set this to false
+        # TODO: set this to false after install
+        forceImportRoot = true;
       };
-      # TODO: Delete this when I configure GPU again
-      graphics.hardwareAcceleration = true;
+
+      printing.client = {
+        enable = true;
+        serverAddress = "homelab.lan";
+      };
     };
 
-    # programs = {
-    #   gaming = {
-    #     enable = true;
-    #     steam.enable = true;
-    #     gamemode.enable = true;
-    #   };
-    # };
+    system = {
+      impermanence.enable = false;
+      audio.enable = true;
+      # TODO: Set this
+      networking.primaryInterface = "eno1";
+
+      desktop = {
+        enable = true;
+        desktopEnvironment = "gnome";
+      };
+    };
+
+    programs = {
+      gaming = {
+        enable = true;
+        steam.enable = true;
+        gamemode.enable = true;
+      };
+    };
 
     services = {
       # restic = {
@@ -60,19 +77,10 @@
       #   backupSchedule = "*-*-* 15:00:00";
       # };
     };
-
-    system = {
-      impermanence.enable = false;
-
-      desktop = {
-        enable = true;
-        desktopEnvironment = "gnome";
-      };
-
-      # TODO: Set this
-      networking.primaryInterface = "eno1";
-
-      # audio.enable = true;
-    };
   };
+
+  users.users.${username}.packages = with pkgs; [
+    prismlauncher
+    chromium
+  ];
 }

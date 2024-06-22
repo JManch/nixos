@@ -25,6 +25,7 @@ stdenv.mkDerivation rec {
     repo = "BeamMP-Server";
     rev = "v${version}";
     hash = "sha256-dAo/HxFjXHi8F0dd9CGmyOWtWCwnKf4aKJl8A7ZzLAQ=";
+    fetchSubmodules = true;
   };
 
   patches = [

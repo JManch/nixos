@@ -6,7 +6,7 @@
 }:
 let
   udisks = osConfig.modules.services.udisks;
-  osDesktop = osConfig.usrEnv.desktop;
+  osDesktop = osConfig.modules.system.desktop;
 in
 lib.mkIf (osDesktop.enable && udisks.enable && !vmVariant)
 {

@@ -6,46 +6,51 @@
 }:
 let
   inherit (lib) mkIf fetchers getExe';
+  inherit (config.modules) desktop;
   inherit (config.modules.colorScheme) light colorMap;
-  cfg = config.modules.desktop.services.dunst;
+  cfg = desktop.services.dunst;
   colors = config.colorScheme.palette;
   primaryMonitor = fetchers.primaryMonitor osConfig;
   systemctl = getExe' pkgs.systemd "systemctl";
 in
-mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
+mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
 {
   services.dunst = {
     enable = true;
 
     settings = {
-      global = with config.modules.desktop.style; {
-        monitor = toString cfg.monitorNumber;
-        follow = "none";
-        enable_posix_regex = true;
-        font = "${font.family} 13";
-        icon_theme = config.gtk.iconTheme.name;
-        show_indicators = true;
-        format = "<b>%s</b>\\n<span font='11'>%b</span>";
-        layer = "overlay";
+      global =
+        let
+          inherit (desktop.style) font cornerRadius gapSize borderWidth;
+        in
+        {
+          monitor = toString cfg.monitorNumber;
+          follow = "none";
+          enable_posix_regex = true;
+          font = "${font.family} 13";
+          icon_theme = config.gtk.iconTheme.name;
+          show_indicators = true;
+          format = "<b>%s</b>\\n<span font='11'>%b</span>";
+          layer = "overlay";
 
-        corner_radius = cornerRadius;
-        width = builtins.floor (primaryMonitor.width * 0.14);
-        height = builtins.floor (primaryMonitor.height * 0.25);
-        offset = let offset = (gapSize * 2) + borderWidth; in
-          "${toString offset}x${toString offset}";
-        gap_size = gapSize;
-        frame_width = borderWidth;
-        transparency = 100;
+          corner_radius = cornerRadius;
+          width = builtins.floor (primaryMonitor.width * 0.14);
+          height = builtins.floor (primaryMonitor.height * 0.25);
+          offset = let offset = (gapSize * 2) + borderWidth; in
+            "${toString offset}x${toString offset}";
+          gap_size = gapSize;
+          frame_width = borderWidth;
+          transparency = 100;
 
-        mouse_left_click = "do_action";
-        mouse_middle_click = "close_all";
-        mouse_right_click = "close_current";
-        sort = true;
-        stack_duplicates = true;
-        min_icon_size = 128;
-        max_icon_size = 128;
-        markup = "full";
-      };
+          mouse_left_click = "do_action";
+          mouse_middle_click = "close_all";
+          mouse_right_click = "close_current";
+          sort = true;
+          stack_duplicates = true;
+          min_icon_size = 128;
+          max_icon_size = 128;
+          markup = "full";
+        };
 
       fullscreen_delay_everything = { fullscreen = "show"; };
 

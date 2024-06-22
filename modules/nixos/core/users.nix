@@ -10,7 +10,7 @@
     users.${username} = {
       isNormalUser = true;
       shell = pkgs.zsh;
-      hashedPasswordFile = config.age.secrets.joshuaPasswd.path;
+      hashedPasswordFile = config.age.secrets."${username}Passwd".path;
       extraGroups = [ "wheel" ];
     };
   };

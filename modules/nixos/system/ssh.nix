@@ -7,12 +7,12 @@
 , ...
 }:
 let
-  inherit (lib) mapAttrs mkVMOverride utils optional getExe';
+  inherit (lib) mkIf mapAttrs mkVMOverride utils optional getExe';
   cfg = config.modules.system.ssh;
 in
 {
-  services.openssh = {
-    enable = cfg.enable;
+  services.openssh = mkIf cfg.enable {
+    enable = true;
 
     # Some devices are weird with port 22
     ports = [ 22 2222 ];

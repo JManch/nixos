@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{ lib
+, pkgs
+, config
+, osConfig
+, ...
+}:
 let
   inherit (lib) mkIf fetchers;
   inherit (config.modules) desktop;
@@ -45,7 +50,7 @@ mkIf cfg.enable
       gdb
     ]);
 
-    userSettings = mkIf (fetchers.isWayland config) {
+    userSettings = mkIf (fetchers.isWayland osConfig) {
       # Prevents crash on launch
       "window.titleBarStyle" = "custom";
       "window.menuBarVisibility" = "toggle";

@@ -21,7 +21,7 @@ let
   inherit (osConfig.device) monitors;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
-  osDesktop = osConfig.usrEnv.desktop;
+  osDesktop = osConfig.modules.system.desktop;
 
   jaq = getExe pkgs.jaq;
   bc = getExe' pkgs.bc "bc";

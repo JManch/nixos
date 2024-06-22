@@ -9,6 +9,7 @@ let
   inherit (lib) mkIf mkMerge mkVMOverride mod;
   inherit (config.home-manager.users.${username}.modules.desktop) terminal;
   inherit (config.device) monitors cpu memory;
+  inherit (config.usrEnv) homeManager;
   cfg = config.modules.system.virtualisation;
 
   runVMScript = pkgs.writeShellApplication {
@@ -75,7 +76,7 @@ let
       # For non-graphical VMs, launch VM and start ssh session in new
       # terminal windows
       if grep -q -- "-nographic" "$runscript"; then
-        ${if config.usrEnv.desktop.enable then /*bash*/ ''
+        ${if config.modules.system.desktop.enable then /*bash*/ ''
           ${terminal.exePath} -e "zsh" "-i" "-c" "ssh-vm; zsh -i" &
           ${terminal.exePath} --class qemu -e "$runscript"
         ''
@@ -137,8 +138,6 @@ in
             fail2ban.enable = mkVMOverride false;
             qbittorrent-nox.enable = mkVMOverride false;
             zigbee2mqtt.enable = mkVMOverride false;
-            restic.enable = mkVMOverride false;
-            restic.server.enable = mkVMOverride false;
             minecraft-server.enable = mkVMOverride false;
             mikrotik-backup.enable = mkVMOverride false;
           };
@@ -146,13 +145,13 @@ in
 
         virtualisation =
           let
-            desktopEnabled = config.usrEnv.desktop.enable;
+            inherit (config.modules.system) desktop;
           in
           {
-            graphics = desktopEnabled;
+            graphics = desktop.enable;
             diskSize = 8192;
 
-            qemu.options = mkIf desktopEnabled [
+            qemu.options = mkIf desktop.enable [
               # Useful resource explaining qemu display device options:
               # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/#virtio-gpu-pci
               "-device virtio-vga-gl"
@@ -197,13 +196,15 @@ in
 
       microvm.host.enable = cfg.microvm.enable;
 
-      hm.desktop.hyprland.settings.windowrulev2 = [
-        "workspace name:VM silent, class:^(\.?qemu.*|wlroots)$"
-        "float, class:^(\.?qemu.*)$"
-        "size 80% 80%, class:^(\.?qemu.*)$"
-        "center, class:^(\.?qemu.*)$"
-        "keepaspectratio, class:^(\.?qemu.*)$"
-      ];
+      hm = mkIf homeManager.enable {
+        desktop.hyprland.settings.windowrulev2 = [
+          "workspace name:VM silent, class:^(\.?qemu.*|wlroots)$"
+          "float, class:^(\.?qemu.*)$"
+          "size 80% 80%, class:^(\.?qemu.*)$"
+          "center, class:^(\.?qemu.*)$"
+          "keepaspectratio, class:^(\.?qemu.*)$"
+        ];
+      };
     }
 
     (mkIf cfg.libvirt.enable {
@@ -220,10 +221,12 @@ in
           QEMU_OPTS = "-m ${memoryStr} -smp ${cores}";
         };
 
-      hm.dconf.settings = {
-        "org/virt-manager/virt-manager/connections" = {
-          autoconnect = [ "qemu:///system" ];
-          uris = [ "qemu:///system" ];
+      hm = mkIf homeManager.enable {
+        dconf.settings = {
+          "org/virt-manager/virt-manager/connections" = {
+            autoconnect = [ "qemu:///system" ];
+            uris = [ "qemu:///system" ];
+          };
         };
       };
 

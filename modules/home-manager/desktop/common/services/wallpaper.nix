@@ -76,7 +76,7 @@ let
     '';
   };
 in
-mkIf (osConfig.usrEnv.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
+mkIf (osConfig.modules.system.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
   {
     systemd.user.services.set-wallpaper = {
       Unit = {

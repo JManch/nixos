@@ -99,7 +99,7 @@ in
   config =
     let
       cfg = config.modules.desktop;
-      osDesktop = osConfig.usrEnv.desktop;
+      osDesktop = osConfig.modules.system.desktop;
     in
     {
       assertions = mkIf (cfg.windowManager != null) (utils.asserts [

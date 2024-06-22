@@ -1,5 +1,5 @@
 { lib, config, osConfig, ... }:
-lib.mkIf osConfig.usrEnv.desktop.enable
+lib.mkIf osConfig.modules.system.desktop.enable
 {
   fonts.fontconfig.enable = true;
 

@@ -7,7 +7,7 @@
 let
   home = config.home.homeDirectory;
 in
-lib.mkIf osConfig.usrEnv.desktop.enable
+lib.mkIf osConfig.modules.system.desktop.enable
 {
   # Many applications need this for xdg-open url opening however packages
   # rarely include is as a dependency for some reason

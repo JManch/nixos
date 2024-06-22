@@ -19,6 +19,7 @@ let
     concatStringsSep
     getExe;
   inherit (config.modules.system) impermanence;
+  cfg = config.modules.core;
   configDir = "/home/${username}/.config/nixos";
 
   rebuildCmds = [
@@ -214,6 +215,13 @@ in
         options = "--delete-older-than 7d";
       };
     };
+
+  system.autoUpgrade = mkIf cfg.autoUpgrade {
+    enable = true;
+    flake = "github:JManch/nixos";
+    operation = "boot";
+    dates = "daily";
+  };
 
   # Sometimes nixos-rebuild compiles large pieces software that require more
   # space in /tmp than my tmpfs can provide. The obvious solution is to mount

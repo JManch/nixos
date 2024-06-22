@@ -157,7 +157,7 @@ let
     };
 in
 {
-  config = mkIf (cfg.enable && osConfig.usrEnv.desktop.enable) ({
+  config = mkIf (cfg.enable && osConfig.modules.system.desktop.enable) ({
     assertions = utils.asserts [
       ((cfg.switchMethod == "hass") -> hassIntegration.enable)
       "Darkman 'hass' switch mode requires the device to have hass integration enabled"

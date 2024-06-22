@@ -2,12 +2,13 @@
 , pkgs
 , inputs
 , config
+, osConfig
 , ...
 }:
 let
   inherit (lib) mkIf fetchers;
   cfg = config.modules.desktop.programs.hyprlock;
-  isWayland = fetchers.isWayland config;
+  isWayland = fetchers.isWayland osConfig;
 in
 mkIf (cfg.enable && isWayland) {
   programs.hyprlock = {

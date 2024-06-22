@@ -1,8 +1,9 @@
 { lib, pkgs, config, ... }:
 let
+  inherit (config.modules.system) desktop;
   cfg = config.modules.programs.wine;
 in
-lib.mkIf (cfg.enable && config.usrEnv.desktop.enable)
+lib.mkIf (cfg.enable && desktop.enable)
 {
   environment.systemPackages = [
     cfg.package

@@ -18,6 +18,20 @@ in
       '';
     };
 
+    desktop = {
+      enable = mkEnableOption "desktop functionality";
+
+      desktopEnvironment = mkOption {
+        type = with types; nullOr (enum [ "xfce" "plasma" "gnome" ]);
+        default = null;
+        description = ''
+          The desktop environment to use. The window manager is configured in
+          home manager. Some windows managers don't require a desktop
+          environment and some desktop environments include a window manager.
+        '';
+      };
+    };
+
     reservedIDs = mkOption {
       type = types.attrsOf (types.submodule {
         options = {
@@ -75,6 +89,10 @@ in
     };
 
     networking = {
+      useNetworkd = mkEnableOption ''
+        Whether to enable systemd-networkd network configuration.
+      '' // { default = true; };
+
       tcpOptimisations = mkEnableOption "TCP optimisations";
       resolved.enable = mkEnableOption "Resolved";
 
@@ -115,7 +133,7 @@ in
       };
 
       firewall = {
-        enable = mkEnableOption "Firewall";
+        enable = mkEnableOption "Firewall" // { default = true; };
         defaultInterfaces = mkOption {
           type = types.listOf types.str;
           default = [ config.modules.system.networking.primaryInterface ];
@@ -180,6 +198,8 @@ in
         "Reserved UIDs must be greater than 1000 and less than 2000"
         (all (gid: gid > 1000 && gid < 2000) gids)
         "Reserved GIDs must be greater than 1000 and less than 2000"
+        (cfg.desktop.enable -> (lib.length config.device.monitors != 0))
+        "Device monitors must be configured to enable desktop environment"
       ];
   };
 }

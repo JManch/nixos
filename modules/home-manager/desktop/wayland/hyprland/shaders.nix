@@ -9,7 +9,7 @@ let
   inherit (osConfig.device) monitors;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
-  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.modules.system.desktop.enable;
   isGammaCustom = fetchers.isGammaCustom osConfig;
 
   monitorGammaConditionals = (concatMap

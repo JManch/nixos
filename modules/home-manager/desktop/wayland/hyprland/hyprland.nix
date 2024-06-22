@@ -24,7 +24,7 @@ let
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
-  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.modules.system.desktop.enable;
   primaryMonitor = fetchers.primaryMonitor osConfig;
 
   hyprlandPkgs = utils.flakePkgs args "hyprland";

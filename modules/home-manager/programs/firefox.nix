@@ -12,7 +12,7 @@ let
   inherit (osConfig.modules.system) impermanence;
   cfg = config.modules.programs.firefox;
 in
-mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
+mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
 {
   assertions = utils.asserts [
     (cfg.runInRam -> impermanence.enable)

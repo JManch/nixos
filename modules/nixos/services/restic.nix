@@ -21,6 +21,7 @@ let
     concatStrings
     concatStringsSep
     nameValuePair
+    optionalAttrs
     mapAttrs'
     getExe'
     attrNames
@@ -30,6 +31,7 @@ let
     optionalString;
   inherit (config.modules.services) caddy;
   inherit (config.modules.system) impermanence;
+  inherit (config.usrEnv) homeManager;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -44,7 +46,7 @@ let
   cfg = config.modules.services.restic;
   isServer = (config.device.type == "server");
   resticExe = getExe pkgs.restic;
-  homeBackups = config.home-manager.users.${username}.backups;
+  homeBackups = optionalAttrs homeManager.enable config.home-manager.users.${username}.backups;
 
   # WARN: On impermanence hosts paths are prefixed with /persist. We don't
   # modify exclude or include paths to allow non-absolute patterns. Be careful
@@ -154,17 +156,7 @@ let
 in
 mkMerge [
   # To allow testing backup restores in the VM
-  (mkIf (cfg.enable || cfg.server.enable || vmVariant) {
-    assertions =
-      utils.asserts [
-        (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: elem path backup.paths) (attrNames backup.restore.pathOwnership))) backups))
-        "Restic pathOwnership paths must also be defined as backup paths"
-        (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "") backup.paths)) cfg.backups))
-        "Restic backup paths cannot be empty"
-        (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "/home/${username}/") backup.paths)) homeBackups))
-        "Restic home backup paths cannot be empty"
-      ];
-
+  (mkIf (cfg.enable || cfg.server.enable || (cfg.enable && vmVariant)) {
     environment.systemPackages = [ pkgs.restic restoreScript ];
 
     # WARN: Always interact with the repository using the REST server, even on
@@ -197,7 +189,16 @@ mkMerge [
     # Restore tool: https://github.com/viltgroup/bucket-restore
   })
 
-  (mkIf cfg.enable {
+  (mkIf (cfg.enable && !vmVariant) {
+    assertions = utils.asserts [
+      (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: elem path backup.paths) (attrNames backup.restore.pathOwnership))) backups))
+      "Restic pathOwnership paths must also be defined as backup paths"
+      (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "") backup.paths)) cfg.backups))
+      "Restic backup paths cannot be empty"
+      (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "/home/${username}/") backup.paths)) homeBackups))
+      "Restic home backup paths cannot be empty"
+    ];
+
     services.restic.backups =
       let
         backupDefaults = name: {
@@ -300,7 +301,7 @@ mkMerge [
     }];
   })
 
-  (mkIf cfg.server.enable {
+  (mkIf (cfg.server.enable && !vmVariant) {
     assertions = utils.asserts [
       caddy.enable
       "Restic server requires Caddy to be enabled"

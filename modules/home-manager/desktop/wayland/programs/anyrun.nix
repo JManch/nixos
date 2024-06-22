@@ -9,8 +9,8 @@ let
   inherit (lib) mkIf fetchers utils getExe';
   cfg = desktopCfg.programs.anyrun;
   desktopCfg = config.modules.desktop;
-  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
-  isWayland = fetchers.isWayland config;
+  osDesktopEnabled = osConfig.modules.system.desktop.enable;
+  isWayland = fetchers.isWayland osConfig;
 in
 {
   imports = [

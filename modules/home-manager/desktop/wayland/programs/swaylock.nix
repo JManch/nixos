@@ -8,9 +8,9 @@ let
   inherit (lib) mkIf optionalString fetchers getExe;
   cfg = desktopCfg.programs.swaylock;
   desktopCfg = config.modules.desktop;
-  isWayland = fetchers.isWayland config;
+  isWayland = fetchers.isWayland osConfig;
   colors = config.colorScheme.palette;
-  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
+  osDesktopEnabled = osConfig.modules.system.desktop.enable;
 
   lockScript =
     let

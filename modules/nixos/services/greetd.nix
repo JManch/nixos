@@ -6,7 +6,7 @@ in
 mkIf cfg.enable
 {
   assertions = utils.asserts [
-    config.usrEnv.desktop.enable
+    config.modules.system.desktop.enable
     "Greetd requires desktop to be enabled"
     (cfg.sessionDirs != [ ])
     "Greetd session dirs must be set"

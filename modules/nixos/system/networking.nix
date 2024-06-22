@@ -18,6 +18,7 @@ let
     length
     getExe'
     allUnique;
+  inherit (config.usrEnv) homeManager;
   cfg = config.modules.system.networking;
   homeFirewall = config.home-manager.users.${username}.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
@@ -35,7 +36,7 @@ in
     "A single interface cannot have more than 10 VLANs assigned (arbitrary limit because of VLAN name mapping)"
   ];
 
-  systemd.network = {
+  systemd.network = mkIf cfg.useNetworkd {
     enable = true;
     wait-online.anyInterface = true;
 
@@ -97,18 +98,19 @@ in
 
   networking = {
     hostName = hostname;
-    useNetworkd = true;
+    useNetworkd = cfg.useNetworkd;
 
     firewall = {
       enable = cfg.firewall.enable;
       defaultInterfaces = cfg.firewall.defaultInterfaces;
+    } // (mkIf homeManager.enable {
       inherit (homeFirewall)
         allowedTCPPorts
         allowedTCPPortRanges
         allowedUDPPorts
         allowedUDPPortRanges
         interfaces;
-    };
+    });
 
     wireless = mkIf cfg.wireless.enable {
       enable = true;

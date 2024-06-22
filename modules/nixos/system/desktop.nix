@@ -6,30 +6,29 @@
 }:
 let
   inherit (lib) mkIf mkForce mkMerge fetchers;
-  inherit (desktopCfg) desktopEnvironment;
-  inherit (homeDesktopCfg) windowManager;
-  desktopCfg = config.usrEnv.desktop;
+  inherit (config.usrEnv) homeManager;
+  inherit (homeDesktopCfg.programs) swaylock hyprlock;
+  cfg = config.modules.system.desktop;
   homeConfig = config.home-manager.users.${username};
   homeDesktopCfg = homeConfig.modules.desktop;
-  isWayland = fetchers.isWayland homeConfig;
+  isWayland = fetchers.isWayland config;
   hyprlandPackage = homeConfig.wayland.windowManager.hyprland.package;
+  windowManager = if homeManager.enable then homeDesktopCfg.windowManager else null;
 in
 {
   imports = [
     inputs.hyprland.nixosModules.default
   ];
 
-  # TODO: Improve the isWayland function to take desktopEnvironment into account
-  config = mkIf config.usrEnv.desktop.enable (mkMerge [
+  config = mkIf cfg.enable (mkMerge [
     {
-      services.xserver.xkb.layout = "us";
-
-      # Needed for swaylock authentication
-      security.pam.services.swaylock = mkIf (isWayland && homeDesktopCfg.programs.swaylock.enable) { };
-      security.pam.services.hyprlock = mkIf (isWayland && homeDesktopCfg.programs.hyprlock.enable) { };
-
       # Enables wayland for all apps that support it
       environment.sessionVariables.NIXOS_OZONE_WL = mkIf isWayland "1";
+    }
+
+    (mkIf homeManager.enable {
+      security.pam.services.swaylock = mkIf (isWayland && swaylock.enable) { };
+      security.pam.services.hyprlock = mkIf (isWayland && hyprlock.enable) { };
 
       # We configure xdg portal in home-manager
       xdg.portal.enable = mkForce false;
@@ -39,9 +38,9 @@ in
       # NOTE: When https://github.com/nix-community/home-manager/pull/2548 gets
       # merged this may no longer be needed
       environment.pathsToLink = [ "/share/xdg-desktop-portal" "/share/applications" ];
-    }
+    })
 
-    (mkIf (desktopEnvironment == "xfce") {
+    (mkIf (cfg.desktopEnvironment == "xfce") {
       services.xserver = {
         enable = true;
         displayManager.defaultSession = "xfce";
@@ -56,7 +55,7 @@ in
       };
     })
 
-    (mkIf (desktopEnvironment == "plasma") {
+    (mkIf (cfg.desktopEnvironment == "plasma") {
       services.xserver = {
         displayManager = {
           defaultSession = "plasma";
@@ -69,12 +68,19 @@ in
       };
     })
 
-    (mkIf (desktopEnvironment == "gnome") {
+    (mkIf (cfg.desktopEnvironment == "gnome") {
       services.xserver = {
         enable = true;
         displayManager.gdm.enable = true;
         desktopManager.gnome.enable = true;
       };
+
+      # Gnome uses network manager
+      modules.system.networking.useNetworkd = mkForce false;
+
+      # Only enable the power management feature on laptops
+      services.upower.enable = mkForce (config.device.type == "laptop");
+      services.power-profiles-daemon.enable = mkForce (config.device.type == "laptop");
     })
 
     (mkIf (windowManager == "Hyprland") {

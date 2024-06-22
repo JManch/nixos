@@ -1,13 +1,12 @@
 { lib
 , pkgs
-, self
 , config
 , inputs
 , username
 , ...
 }:
 let
-  inherit (lib) mkEnableOption mkOption types concatStringsSep mkAliasOptionModule attrNames;
+  inherit (lib) mkEnableOption mkOption types concatStringsSep mkAliasOptionModule attrNames mkDefault;
   cfg = config.modules.services;
 in
 {
@@ -837,7 +836,7 @@ in
   };
 
   config = {
-    services.udisks2.enable = cfg.udisks.enable;
+    services.udisks2.enable = mkDefault cfg.udisks.enable;
 
     # Allows user services like home-manager syncthing to start on boot and
     # keep running rather than stopping and starting with each ssh session on

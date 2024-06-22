@@ -14,7 +14,7 @@ let
   darkTheme = gtkThemeFromScheme { scheme = colorScheme.dark; };
   lightTheme = gtkThemeFromScheme { scheme = colorScheme.light; };
 in
-mkIf osConfig.usrEnv.desktop.enable
+mkIf osConfig.modules.system.desktop.enable
 {
   home.packages = [
     darkTheme

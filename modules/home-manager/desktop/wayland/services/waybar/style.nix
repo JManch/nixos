@@ -4,8 +4,8 @@ let
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
-  osDesktopEnabled = osConfig.usrEnv.desktop.enable;
-  isWayland = lib.fetchers.isWayland config;
+  osDesktopEnabled = osConfig.modules.system.desktop.enable;
+  isWayland = lib.fetchers.isWayland osConfig;
 in
 mkIf (osDesktopEnabled && isWayland && cfg.enable)
 {

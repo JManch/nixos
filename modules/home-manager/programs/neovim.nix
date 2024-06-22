@@ -66,7 +66,7 @@ mkIf cfg.enable
     NIX_NEOVIM_DARKMAN = if darkman.enable then 1 else 0;
   };
 
-  xdg.mimeApps = mkIf osConfig.usrEnv.desktop.enable {
+  xdg.mimeApps = mkIf osConfig.modules.system.desktop.enable {
     defaultApplications = {
       "text/plain" = [ "nvim.desktop" ];
     };

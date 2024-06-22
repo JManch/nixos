@@ -13,12 +13,11 @@
         genAttrs systems (system:
           f (nixpkgs.legacyPackages.${system}));
 
-      mkHost = hostname: system: {
+      mkHost = hostname: username: system: {
         ${hostname} = nixosSystem {
           inherit system;
           specialArgs = {
-            inherit self inputs hostname lib;
-            username = "joshua";
+            inherit self inputs hostname username lib;
           };
           modules =
             if (hasPrefix "installer" hostname) then
@@ -36,10 +35,10 @@
       templates = import ./templates;
 
       nixosConfigurations =
-        mkHost "ncase-m1" "x86_64-linux" //
-        mkHost "homelab" "x86_64-linux" //
-        mkHost "installer" "x86_64-linux" //
-        mkHost "installer-arm" "aarch64-linux";
+        mkHost "ncase-m1" "joshua" "x86_64-linux" //
+        mkHost "homelab" "joshua" "x86_64-linux" //
+        mkHost "installer" "joshua" "x86_64-linux" //
+        mkHost "installer-arm" "joshua" "aarch64-linux";
     };
 
   inputs = {

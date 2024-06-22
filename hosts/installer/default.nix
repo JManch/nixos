@@ -1,7 +1,6 @@
 { lib
 , pkgs
 , self
-, username
 , modulesPath
 , ...
 }:
@@ -44,6 +43,10 @@ let
         git clone https://github.com/JManch/nixos "$config"
       fi
 
+      host_config="$config#nixosConfigurations.$hostname.config"
+      username=$(nix eval --raw "$host_config.usrEnv.username")
+      impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
+
       echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"
       read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
       echo
@@ -63,26 +66,50 @@ let
       ssh_dir="/root/.ssh"
       rm -rf "$ssh_dir"
       mkdir -p "$ssh_dir"
+
+      # Temporarily copy host keys to id_ed25519 as they are used for remote
+      # private repo access
       mv "$temp/$hostname/ssh_host_ed25519_key" "$ssh_dir/id_ed25519"
       mv "$temp/$hostname/ssh_host_ed25519_key.pub" "$ssh_dir/id_ed25519.pub"
-      mv "$temp/${username}" "$ssh_dir"
-      mv "$temp/id_ed25519" "$ssh_dir/id_ed25519.ignore"
-      mv "$temp/id_ed25519.pub" "$ssh_dir/id_ed25519.pub.ignore"
+
+      # Get user keys for home-manager secret decryption
+      if [ -d "$temp/$username" ]; then
+        mv "$temp/$username" "$ssh_dir"
+      fi
+
+      # Get personal ssh key. Only needed for my hosts.
+      if [ "$username" = "joshua" ]; then
+        mv "$temp/id_ed25519" "$ssh_dir/id_ed25519.ignore"
+        mv "$temp/id_ed25519.pub" "$ssh_dir/id_ed25519.pub.ignore"
+      fi
       rm -rf "$temp"
 
       echo "Starting disko format and mount..."
       disko --mode disko --flake "$config#$hostname"
       echo "Disko finished"
 
-      mkdir -p /mnt/persist/{etc/ssh,home/${username}/.ssh,home/${username}/.config}
-      cp "$ssh_dir/id_ed25519" /mnt/persist/etc/ssh/ssh_host_ed25519_key
-      cp "$ssh_dir/id_ed25519.pub" /mnt/persist/etc/ssh/ssh_host_ed25519_key.pub
-      mv "$ssh_dir"/${username}/* /mnt/persist/home/${username}/.ssh
-      mv "$ssh_dir/id_ed25519.ignore" /mnt/persist/home/${username}/.ssh/id_ed25519
-      mv "$ssh_dir/id_ed25519.pub.ignore" /mnt/persist/home/${username}/.ssh/id_ed25519.pub
-      rm -rf /mnt/persist/home/${username}/.config/nixos
-      cp -r "$config" /mnt/persist/home/${username}/.config/nixos
-      chown -R nixos:users /mnt/persist/home/${username}
+      rootDir="/mnt"
+      if [ "$impermanence" = "true" ]; then
+        rootDir="/mnt/persist"
+      fi
+
+      mkdir -p "$rootDir"/{etc/ssh,"home/$username/.ssh","home/$username/.config"}
+
+      cp "$ssh_dir/id_ed25519" "$rootDir/etc/ssh/ssh_host_ed25519_key"
+      cp "$ssh_dir/id_ed25519.pub" "$rootDir/etc/ssh/ssh_host_ed25519_key.pub"
+
+      if [ -d "$ssh_dir/$username" ]; then
+        mv "$ssh_dir/$username"/* "$rootDir/home/$username/.ssh"
+      fi
+
+      if [ "$username" = "joshua" ]; then
+        mv "$ssh_dir/id_ed25519.ignore" "$rootDir/home/$username/.ssh/id_ed25519"
+        mv "$ssh_dir/id_ed25519.pub.ignore" "$rootDir/home/$username/.ssh/id_ed25519.pub"
+      fi
+
+      rm -rf "$rootDir/home/$username/.config/nixos"
+      cp -r "$config" "$rootDir/home/$username/.config/nixos"
+      chown -R nixos:users "$rootDir/home/$username"
 
       nixos_system=$(
         nix build \

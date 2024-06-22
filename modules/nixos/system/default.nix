@@ -7,6 +7,17 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.system = {
+    bluetooth.enable = mkEnableOption "bluetooth";
+
+    impermanence.enable = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Whether to enable impermanence. /persist will be used for the
+        persistent filesystem.
+      '';
+    };
+
     reservedIDs = mkOption {
       type = types.attrsOf (types.submodule {
         options = {
@@ -22,8 +33,6 @@ in
         module is enabled.
       '';
     };
-
-    bluetooth.enable = mkEnableOption "bluetooth";
 
     virtualisation = {
       libvirt.enable = mkEnableOption "libvirt virtualisation";

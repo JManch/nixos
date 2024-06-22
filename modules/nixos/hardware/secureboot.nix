@@ -5,7 +5,8 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkForce;
+  inherit (lib) mkIf mkForce optionalString;
+  inherit (config.modules.system) impermanence;
   cfg = config.modules.hardware.secureBoot;
 in
 {
@@ -26,7 +27,7 @@ in
     boot.loader.systemd-boot.enable = mkForce false;
     boot.lanzaboote = {
       enable = true;
-      pkiBundle = "/persist/etc/secureboot";
+      pkiBundle = "${optionalString impermanence.enable "/persist"}/etc/secureboot";
     };
 
     persistence.directories = [ "/etc/secureboot" ];

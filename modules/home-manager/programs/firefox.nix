@@ -6,98 +6,18 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe getExe' optional;
+  inherit (lib) mkIf utils getExe getExe' optional;
   inherit (config.modules.programs) mpv;
   inherit (config.modules) desktop;
+  inherit (osConfig.modules.system) impermanence;
   cfg = config.modules.programs.firefox;
 in
 mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
 {
-  # Use systemd to synchronise Firefox data with persistent storage. Allows for
-  # running Firefox on tmpfs with improved performance.
-  systemd.user =
-    let
-      rsync = getExe pkgs.rsync;
-      fd = getExe pkgs.fd;
-      persistDir = "/persist/home/${username}/.mozilla/";
-      tmpfsDir = "/home/${username}/.mozilla/";
-
-      syncToTmpfs = /*bash*/ ''
-        # Do not delete the existing Nix store links when syncing
-        ${fd} -Ht l --base-directory "${tmpfsDir}" | \
-          ${rsync} -ah --no-links --delete --info=stats1 \
-          --exclude-from=- "${persistDir}" "${tmpfsDir}"
-      '';
-
-      syncToPersist = /*bash*/ ''
-        ${rsync} -ah --no-links --delete --info=stats1 \
-          "${tmpfsDir}" "${persistDir}"
-      '';
-    in
-    mkIf cfg.runInRam {
-      services.firefox-persist-init = {
-        Unit = {
-          Description = "Firefox persist initialiser";
-          X-SwitchMethod = "keep-old";
-        };
-
-        Service = {
-          Type = "oneshot";
-          ExecStart = (pkgs.writeShellScript "firefox-persist-init" /*bash*/ ''
-            if [ ! -e "${persistDir}" ]; then
-              ${syncToPersist}
-            else
-              ${syncToTmpfs}
-            fi
-          '').outPath;
-          # Backup on shutdown
-          ExecStop = syncToPersist;
-          RemainAfterExit = true;
-        };
-
-        # Ideally we would use "graphical-session-pre.target" here to ensure
-        # that firefox cannot be launched before the sync has finished (if
-        # firefox launches it creates files and breaks the sync). However, I
-        # don't want to stare at a blank screen for 5 seconds every boot so
-        # instead I prevent firefox launch bind from working unless sync has
-        # finished. It's not too fragile because even if firefox is forcefully
-        # launched within the ~5 second window, the persist-init service will
-        # fail, prevent further syncs from happening, and prevent corruption.
-        Install.WantedBy = [ "default.target" ];
-      };
-
-      services.firefox-persist-sync = {
-        Unit = {
-          Description = "Firefox persist synchroniser";
-          X-SwitchMethod = "keep-old";
-          After = [ "firefox-persist-init.service" ];
-          Requisite = [ "firefox-persist-init.service" "graphical-session.target" ];
-        };
-
-        Service = {
-          Type = "oneshot";
-          CPUSchedulingPolicy = "idle";
-          IOSchedulingClass = "idle";
-          ExecStart = (pkgs.writeShellScript "firefox-persist-sync" ''
-            ${syncToPersist}
-          '').outPath;
-        };
-      };
-
-      timers.firefox-persist-sync = {
-        Unit = {
-          Description = "Firefox persist synchroniser timer";
-          X-SwitchMethod = "keep-old";
-        };
-
-        Timer = {
-          Unit = "firefox-persist-sync.service";
-          OnCalendar = "*:0/15";
-        };
-
-        Install.WantedBy = [ "timers.target" ];
-      };
-    };
+  assertions = utils.asserts [
+    (cfg.runInRam -> impermanence.enable)
+    "Firefox run in RAM option can only be used on hosts with impermanence enabled"
+  ];
 
   programs.firefox = {
     enable = true;
@@ -347,6 +267,92 @@ mkIf (cfg.enable && osConfig.usrEnv.desktop.enable)
       };
     };
   };
+
+  # Use systemd to synchronise Firefox data with persistent storage. Allows for
+  # running Firefox on tmpfs with improved performance.
+  systemd.user =
+    let
+      rsync = getExe pkgs.rsync;
+      fd = getExe pkgs.fd;
+      persistDir = "/persist/home/${username}/.mozilla/";
+      tmpfsDir = "/home/${username}/.mozilla/";
+
+      syncToTmpfs = /*bash*/ ''
+        # Do not delete the existing Nix store links when syncing
+        ${fd} -Ht l --base-directory "${tmpfsDir}" | \
+          ${rsync} -ah --no-links --delete --info=stats1 \
+          --exclude-from=- "${persistDir}" "${tmpfsDir}"
+      '';
+
+      syncToPersist = /*bash*/ ''
+        ${rsync} -ah --no-links --delete --info=stats1 \
+          "${tmpfsDir}" "${persistDir}"
+      '';
+    in
+    mkIf cfg.runInRam {
+      services.firefox-persist-init = {
+        Unit = {
+          Description = "Firefox persist initialiser";
+          X-SwitchMethod = "keep-old";
+        };
+
+        Service = {
+          Type = "oneshot";
+          ExecStart = (pkgs.writeShellScript "firefox-persist-init" /*bash*/ ''
+            if [ ! -e "${persistDir}" ]; then
+              ${syncToPersist}
+            else
+              ${syncToTmpfs}
+            fi
+          '').outPath;
+          # Backup on shutdown
+          ExecStop = syncToPersist;
+          RemainAfterExit = true;
+        };
+
+        # Ideally we would use "graphical-session-pre.target" here to ensure
+        # that firefox cannot be launched before the sync has finished (if
+        # firefox launches it creates files and breaks the sync). However, I
+        # don't want to stare at a blank screen for 5 seconds every boot so
+        # instead I prevent firefox launch bind from working unless sync has
+        # finished. It's not too fragile because even if firefox is forcefully
+        # launched within the ~5 second window, the persist-init service will
+        # fail, prevent further syncs from happening, and prevent corruption.
+        Install.WantedBy = [ "default.target" ];
+      };
+
+      services.firefox-persist-sync = {
+        Unit = {
+          Description = "Firefox persist synchroniser";
+          X-SwitchMethod = "keep-old";
+          After = [ "firefox-persist-init.service" ];
+          Requisite = [ "firefox-persist-init.service" "graphical-session.target" ];
+        };
+
+        Service = {
+          Type = "oneshot";
+          CPUSchedulingPolicy = "idle";
+          IOSchedulingClass = "idle";
+          ExecStart = (pkgs.writeShellScript "firefox-persist-sync" ''
+            ${syncToPersist}
+          '').outPath;
+        };
+      };
+
+      timers.firefox-persist-sync = {
+        Unit = {
+          Description = "Firefox persist synchroniser timer";
+          X-SwitchMethod = "keep-old";
+        };
+
+        Timer = {
+          Unit = "firefox-persist-sync.service";
+          OnCalendar = "*:0/15";
+        };
+
+        Install.WantedBy = [ "timers.target" ];
+      };
+    };
 
   # The extension must also be installed https://github.com/Baldomo/open-in-mpv
   home.packages = optional mpv.enable pkgs.open-in-mpv;

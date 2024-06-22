@@ -1,10 +1,19 @@
-{ lib, config, ... }:
+{ lib, config, username, ... }:
 let
   inherit (lib) mkEnableOption length utils mkOption types;
 in
 {
   options.usrEnv = {
     homeManager.enable = mkEnableOption "Home Manager";
+
+    username = mkOption {
+      internal = true;
+      readOnly = true;
+      default = username;
+      description = ''
+        Used for getting the username of a given nixosConfiguration.
+      '';
+    };
 
     desktop = {
       enable = mkEnableOption "desktop functionality";

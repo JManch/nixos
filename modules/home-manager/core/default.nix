@@ -1,6 +1,10 @@
-{ lib, username, ... }:
+{ lib, username, osConfig, ... }:
+let
+  inherit (lib) utils optionalString;
+  inherit (osConfig.modules.system) impermanence;
+in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = utils.scanPaths ./.;
 
   programs.home-manager.enable = true;
 
@@ -29,7 +33,7 @@
       restore.removeExisting = false;
       exclude =
         let
-          absPath = "/persist/home/${username}";
+          absPath = "${optionalString impermanence.enable "/persist"}/home/${username}";
         in
         [
           "${absPath}/files/games"

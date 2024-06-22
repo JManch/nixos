@@ -9,6 +9,7 @@
 }:
 let
   inherit (lib)
+    mkIf
     utils
     mapAttrs
     filterAttrs
@@ -17,6 +18,7 @@ let
     optionalString
     concatStringsSep
     getExe;
+  inherit (config.modules.system) impermanence;
   configDir = "/home/${username}/.config/nixos";
 
   rebuildCmds = [
@@ -225,7 +227,7 @@ in
 
   # List of programs that require the bind mount to compile:
   # - mongodb
-  systemd = {
+  systemd = mkIf impermanence.enable {
     services.nix-daemon.environment.TMPDIR = "/var/nix-tmp";
     tmpfiles.rules = [
       "d /var/nix-tmp 0755 root root"
@@ -245,7 +247,7 @@ in
     '';
 
     shellAliases = {
-      mount-nix-tmp = "sudo mount --bind /persist/var/nix-tmp /var/nix-tmp";
+      mount-nix-tmp = mkIf impermanence.enable "sudo mount --bind /persist/var/nix-tmp /var/nix-tmp";
       build-iso = "nix build ${configDir}#nixosConfigurations.installer.config.system.build.isoImage";
     };
   };

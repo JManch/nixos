@@ -29,6 +29,7 @@ let
     mkAfter
     optionalString;
   inherit (config.modules.services) caddy;
+  inherit (config.modules.system) impermanence;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -45,15 +46,16 @@ let
   resticExe = getExe pkgs.restic;
   homeBackups = config.home-manager.users.${username}.backups;
 
-  # WARN: Paths are prefixed with /persist. We don't modify exclude or include
-  # paths to allow non-absolute patterns. Be careful with those.
+  # WARN: On impermanence hosts paths are prefixed with /persist. We don't
+  # modify exclude or include paths to allow non-absolute patterns. Be careful
+  # with those.
   backups = mapAttrs
     (name: value:
       value // {
-        paths = map (path: "/persist${path}") value.paths;
+        paths = map (path: "${optionalString impermanence.enable "/persist"}${path}") value.paths;
         restore = value.restore // {
           pathOwnership = mapAttrs'
-            (path: value: nameValuePair "/persist${path}" value)
+            (path: value: nameValuePair "${optionalString impermanence.enable "/persist"}${path}" value)
             value.restore.pathOwnership;
         };
       }

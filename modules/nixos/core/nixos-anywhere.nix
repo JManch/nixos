@@ -59,6 +59,10 @@ let
         exit 1
       fi
 
+      host_config="/home/${username}/.config/nixos#nixosConfigurations.$hostname.config"
+      username=$(nix eval --raw "$host_config.usrEnv.username")
+      impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
+
       secret_temp=$(mktemp -d)
       temp=$(mktemp -d)
       cleanup() {
@@ -66,24 +70,38 @@ let
         sudo rm -rf "$temp"
       }
       trap cleanup EXIT
-      install -d -m755 "$temp/persist/etc/ssh"
-      install -d -m755 "$temp/persist/home"
-      install -d -m700 "$temp/persist/home/${username}"
-      install -d -m700 "$temp/persist/home/${username}/.ssh"
-      install -d -m755 "$temp/persist/home/${username}/.config"
+
+      rootDir=""
+      if [ "$impermanence" = "true" ]; then
+        rootDir="persist"
+      fi
+
+      install -d -m755 "$temp/$rootDir/etc/ssh"
+      install -d -m755 "$temp/$rootDir/home"
+      install -d -m700 "$temp/$rootDir/home/$username"
+      install -d -m700 "$temp/$rootDir/home/$username/.ssh"
+      install -d -m755 "$temp/$rootDir/home/$username/.config"
 
       kit_path="${../../../hosts/ssh-bootstrap-kit}"
       age -d "$kit_path" | tar -xf - -C "$secret_temp"
-      mv "$secret_temp/$hostname"/* "$temp/persist/etc/ssh"
-      mv "$secret_temp/id_ed25519" "$temp/persist/home/${username}/.ssh"
-      mv "$secret_temp/id_ed25519.pub" "$temp/persist/home/${username}/.ssh"
-      mv "$secret_temp"/${username}/* "$temp/persist/home/${username}/.ssh"
+      mv "$secret_temp/$hostname"/* "$temp/$rootDir/etc/ssh"
+
+      if [ "$username" = "joshua" ]; then
+        mv "$secret_temp/id_ed25519" "$temp/$rootDir/home/$username/.ssh"
+        mv "$secret_temp/id_ed25519.pub" "$temp/$rootDir/home/$username/.ssh"
+      fi
+
+      if [ -d "$secret_temp/$username" ]; then
+        mv "$secret_temp/$username"/* "$temp/$rootDir/home/$username/.ssh"
+      fi
       rm -rf "$secret_temp"
 
-      cp -r /home/${username}/.config/nixos "$temp/persist/home/${username}/.config/nixos"
+      cp -r /home/${username}/.config/nixos "$temp/$rootDir/home/$username/.config/nixos"
 
-      sudo chown -R root:root "$temp/persist"
-      sudo chown -R ${username}:users "$temp/persist/home"
+      sudo chown -R root:root "$temp/$rootDir"
+      # It's fine if the username here does not match the new hosts username as
+      # the UID will match and that's all that matters
+      sudo chown -R ${username}:users "$temp/$rootDir/home"
 
       nixos-anywhere --extra-files "$temp" --flake "/home/${username}/.config/nixos#$hostname" "root@$ip_address"
       sudo rm -rf "$temp"

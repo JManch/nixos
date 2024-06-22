@@ -1,4 +1,5 @@
 { lib
+, pkgs
 , config
 , inputs
 , username
@@ -22,6 +23,8 @@ in
 
   config = mkIf cfg.enable (mkMerge [
     {
+      services.xserver.excludePackages = [ pkgs.xterm ];
+
       # Enables wayland for all apps that support it
       environment.sessionVariables.NIXOS_OZONE_WL = mkIf isWayland "1";
     }

@@ -120,13 +120,8 @@ mkIf cfg.enable
     };
   };
 
-  systemd.services.vaultwarden.serviceConfig = utils.hardeningBaseline config {
-    DynamicUser = false;
-    # Because upstream module uses strings instead of bools
-    PrivateDevices = mkForce true;
-    PrivateTmp = mkForce true;
-    ProtectHome = mkForce true;
-    AmbientCapabilities = mkForce "";
+  # Upstream has good systemd hardening
+  systemd.services.vaultwarden.serviceConfig = {
     EnvironmentFile = (optional (!vmVariant) vaultwardenSMTPVars.path)
       ++ (optional (!cfg.adminInterface) (pkgs.writeText "vaultwarden-disable-admin" ''
       ADMIN_TOKEN=""

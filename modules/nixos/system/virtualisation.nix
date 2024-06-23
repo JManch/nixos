@@ -198,11 +198,11 @@ in
 
       hm = mkIf homeManager.enable {
         desktop.hyprland.settings.windowrulev2 = [
-          "workspace name:VM silent, class:^(\.?qemu.*|wlroots)$"
-          "float, class:^(\.?qemu.*)$"
-          "size 80% 80%, class:^(\.?qemu.*)$"
-          "center, class:^(\.?qemu.*)$"
-          "keepaspectratio, class:^(\.?qemu.*)$"
+          "workspace name:VM silent, class:^(\.?qemu.*|wlroots|virt-manager)$"
+          "float, class:^(\.?qemu.*|virt-manager)$"
+          "size 80% 80%, class:^(\.?qemu.*|virt-manager)$"
+          "center, class:^(\.?qemu.*|virt-manager)$"
+          "keepaspectratio, class:^(\.?qemu.*|virt-manager)$"
         ];
       };
     }

@@ -45,6 +45,7 @@
     # TODO: Next install change zpool name to zroot to match homelab disko
     zpool.zpool = {
       type = "zpool";
+      options.ashift = "12";
 
       rootFsOptions = {
         atime = "off";
@@ -55,10 +56,6 @@
         keyformat = "passphrase";
         keylocation = "prompt";
         compression = "lz4";
-      };
-
-      options = {
-        ashift = "12";
       };
 
       datasets = {

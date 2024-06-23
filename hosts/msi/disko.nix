@@ -37,7 +37,7 @@
     zpool.zroot = {
       type = "zpool";
       mountpoint = "/";
-      options.ashift = 12;
+      options.ashift = "12";
 
       rootFsOptions = {
         atime = "off";

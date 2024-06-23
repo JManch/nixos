@@ -41,6 +41,7 @@
 
     zpool.zroot = {
       type = "zpool";
+      options.ashift = "12";
 
       # rootFsOptions are -O options and options are -o
       rootFsOptions = {
@@ -49,10 +50,6 @@
         xattr = "sa";
         acltype = "posixacl";
         compression = "lz4";
-      };
-
-      options = {
-        ashift = "12";
       };
 
       datasets = {

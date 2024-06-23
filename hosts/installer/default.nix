@@ -44,8 +44,6 @@ let
       fi
 
       host_config="$config#nixosConfigurations.$hostname.config"
-      username=$(nix eval --raw "$host_config.modules.core.username")
-      impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
 
       echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"
       read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
@@ -55,58 +53,49 @@ let
           exit 1
       fi;
 
-      temp=$(mktemp -d)
+      temp_keys=$(mktemp -d)
+      ssh_dir="/root/.ssh"
       cleanup() {
-        rm -rf "$temp"
+        rm -rf "$ssh_dir"
+        rm -rf "$temp_keys"
       }
       trap cleanup EXIT
 
-      age -d "$config/hosts/ssh-bootstrap-kit" | tar -xf - -C "$temp"
+      age -d "$config/hosts/ssh-bootstrap-kit" | tar -xf - -C "$temp_keys"
 
-      ssh_dir="/root/.ssh"
       rm -rf "$ssh_dir"
       mkdir -p "$ssh_dir"
 
-      # Temporarily copy host keys to id_ed25519 as they are used for remote
-      # private repo access
-      mv "$temp/$hostname/ssh_host_ed25519_key" "$ssh_dir/id_ed25519"
-      mv "$temp/$hostname/ssh_host_ed25519_key.pub" "$ssh_dir/id_ed25519.pub"
-
-      # Get user keys for home-manager secret decryption
-      if [ -d "$temp/$username" ]; then
-        mv "$temp/$username" "$ssh_dir"
-      fi
-
-      # Get personal ssh key. Only needed for my hosts.
-      if [ "$username" = "joshua" ]; then
-        mv "$temp/id_ed25519" "$ssh_dir/id_ed25519.ignore"
-        mv "$temp/id_ed25519.pub" "$ssh_dir/id_ed25519.pub.ignore"
-      fi
-      rm -rf "$temp"
+      # Temporarily copy host keys to id_ed25519 as they are used for private
+      # nix-resources repo access
+      cp "$temp_keys/$hostname/ssh_host_ed25519_key" "$ssh_dir/id_ed25519"
+      cp "$temp_keys/$hostname/ssh_host_ed25519_key.pub" "$ssh_dir/id_ed25519.pub"
 
       echo "Starting disko format and mount..."
       disko --mode disko --flake "$config#$hostname"
       echo "Disko finished"
 
+      impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
       rootDir="/mnt"
       if [ "$impermanence" = "true" ]; then
         rootDir="/mnt/persist"
       fi
 
+      username=$(nix eval --raw "$host_config.modules.core.username")
       mkdir -p "$rootDir"/{etc/ssh,"home/$username/.ssh","home/$username/.config"}
 
-      cp "$ssh_dir/id_ed25519" "$rootDir/etc/ssh/ssh_host_ed25519_key"
-      cp "$ssh_dir/id_ed25519.pub" "$rootDir/etc/ssh/ssh_host_ed25519_key.pub"
+      # Install host keys
+      mv "$temp_keys/$hostname"/* "$rootDir/etc/ssh"
 
-      if [ -d "$ssh_dir/$username" ]; then
-        mv "$ssh_dir/$username"/* "$rootDir/home/$username/.ssh"
+      # Install user keys
+      if [ -d "$temp_keys/$username" ]; then
+        mv "$temp_keys/$username"/* "$rootDir/home/$username/.ssh"
       fi
 
-      if [ "$username" = "joshua" ]; then
-        mv "$ssh_dir/id_ed25519.ignore" "$rootDir/home/$username/.ssh/id_ed25519"
-        mv "$ssh_dir/id_ed25519.pub.ignore" "$rootDir/home/$username/.ssh/id_ed25519.pub"
-      fi
+      # Install user nix-resources key
+      mv "$temp_keys"/id_nix-resources* "$rootDir/home/$username/.ssh"
 
+      rm -rf "$temp_keys"
       rm -rf "$rootDir/home/$username/.config/nixos"
       cp -r "$config" "$rootDir/home/$username/.config/nixos"
       chown -R nixos:users "$rootDir/home/$username"

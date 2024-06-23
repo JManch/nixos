@@ -1,9 +1,14 @@
 { lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf utils;
   cfg = config.modules.hardware.fileSystem;
 in
 {
+  assertions = utils.asserts [
+    (cfg.tmpfsTmp -> !config.modules.system.impermanence.enable)
+    "Tmp on tmpfs should not be necessary if impermanence is enabled"
+  ];
+
   zramSwap.enable = true;
 
   # We use legacy ZFS mountpoints and use systemd to mount them rather than
@@ -16,6 +21,7 @@ in
     # Faster but also needed for build-vm to work with impermanence
     initrd.systemd.enable = true;
     loader.efi.canTouchEfiVariables = true;
+    tmp.useTmpfs = cfg.tmpfsTmp;
 
     # ZFS does not always support the latest kernel
     kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;

@@ -18,25 +18,25 @@ mkIf cfg.enableInternal
           {
             name = "Powerwall Grid Charge Status";
             icon = "mdi:home-export-outline";
-            state = "{{ ((states('sensor.powerwall_site_power') | default(0)) | float) < -0.1 }}";
+            state = "{{ states('sensor.powerwall_site_power') | float(0) < -0.1 }}";
             device_class = "battery_charging";
           }
           {
             name = "Powerwall Battery Charge Status";
             icon = "mdi:battery-charging";
-            state = "{{ ((states('sensor.powerwall_battery_power') | default(0)) | float) < -0.1 }}";
+            state = "{{ states('sensor.powerwall_battery_power') | float(0) < -0.1 }}";
             device_class = "battery_charging";
           }
           {
             name = "Washing Machine Running";
             icon = "mdi:washing-machine";
-            state = "{{ (states('sensor.washing_machine_status') | default('NA')) == 'running' }}";
+            state = "{{ states('sensor.washing_machine_status') == 'running' }}";
             device_class = "running";
           }
           {
             name = "Dishwasher Running";
             icon = "mdi:dishwasher";
-            state = "{{ (states('sensor.dishwasher_status') | default('NA')) == 'running' }}";
+            state = "{{ states('sensor.dishwasher_status') == 'running' }}";
             device_class = "running";
           }
         ];
@@ -48,9 +48,9 @@ mkIf cfg.enableInternal
             name = "Powerwall Battery Remaining Time";
             icon = "mdi:battery-clock-outline";
             state = ''
-              {% set power = ((states('sensor.powerwall_battery_power') | default(0)) | float) %}
-              {% set remaining = ((states('sensor.powerwall_gateway_battery_remaining') | default(0)) | float) %}
-              {% set capacity = ((states('sensor.powerwall_gateway_battery_capacity') | default(0)) | float) %}
+              {% set power = states('sensor.powerwall_battery_power') | float(0) %}
+              {% set remaining = states('sensor.powerwall_gateway_battery_remaining') | float(0) %}
+              {% set capacity = states('sensor.powerwall_gateway_battery_capacity') | float(0) %}
 
               {% if power > 0.1 %}
                 {% set remaining_mins = ((remaining / power) * 60) | round(0) %}
@@ -77,7 +77,7 @@ mkIf cfg.enableInternal
           {
             name = "Powerwall Aggregate Cost";
             icon = "mdi:currency-gbp";
-            state = "{{ ((states('sensor.powerwall_site_import_cost') | default(0)) | float) - ((states('sensor.powerwall_site_export_compensation') | default(0)) | float) }}";
+            state = "{{ states('sensor.powerwall_site_import_cost') | float(0) - states('sensor.powerwall_site_export_compensation') | float(0) }}";
             unit_of_measurement = "GBP";
             state_class = "total";
           }

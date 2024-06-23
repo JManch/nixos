@@ -3,19 +3,16 @@ let
   inherit (lib) mkIf optional;
   inherit (config.modules.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (secretCfg.lovelaceConfig) heating;
+  inherit (secretCfg.lovelaceConfig) heating room1;
 
   cfg = config.modules.services.hass;
   secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
 
-
   home = {
     title = "Home";
-
     cards = [
       {
         type = "vertical-stack";
-
         cards = [
           {
             type = "weather-forecast";
@@ -53,11 +50,9 @@ let
   lounge = {
     title = "Lounge";
     path = "lounge";
-
     cards = [
       {
         type = "vertical-stack";
-
         cards = [
           {
             type = "light";
@@ -67,14 +62,12 @@ let
           {
             type = "picture-elements";
             camera_image = "camera.lounge_floorplan";
-
             elements =
               let
                 lightIcon = lightID: posTop: posLeft: {
                   type = "state-icon";
                   entity = "light.lounge_spot_ceiling_${lightID}";
                   tap_action.action = "toggle";
-
                   style = {
                     top = posTop;
                     left = posLeft;
@@ -98,25 +91,18 @@ let
           }
         ];
       }
-      {
-        type = "thermostat";
-        entity = "climate.lounge";
-      }
+      { type = "thermostat"; entity = "climate.lounge"; }
     ];
   };
 
   joshuaRoom = {
     title = "Joshua's Room";
     path = "joshua-room";
-
     cards = [
       {
         type = "vertical-stack";
         cards = [
-          {
-            type = "light";
-            entity = "light.joshua_room";
-          }
+          { type = "light"; entity = "light.joshua_room"; }
           {
             type = "entities";
             state_color = true;
@@ -245,12 +231,10 @@ let
   power = {
     title = "Power";
     path = "power";
-
     cards = [
       { type = "energy-distribution"; }
       {
         type = "vertical-stack";
-
         cards = [
           {
             graph = "line";
@@ -282,7 +266,6 @@ let
       }
       {
         type = "vertical-stack";
-
         cards = [
           {
             graph = "line";
@@ -307,7 +290,6 @@ let
           {
             type = "entities";
             state_color = true;
-
             entities = [
               { entity = "sensor.powerwall_backup_reserve"; name = "Battery Reserve"; }
               { entity = "binary_sensor.powerwall_grid_status"; name = "Grid Status"; }
@@ -318,7 +300,6 @@ let
       }
       {
         type = "vertical-stack";
-
         cards = [
           {
             graph = "line";
@@ -366,7 +347,6 @@ let
           {
             type = "entities";
             state_color = true;
-
             entities = [
               { entity = "sensor.power_production_now"; name = "Estimated Production Now"; }
               { entity = "sensor.energy_production_today"; name = "Estimated Production Today"; }
@@ -406,22 +386,18 @@ let
       frigateCameraCard = camera: {
         type = "custom:frigate-card";
         performance.profile = "low";
-
         cameras = [{
           camera_entity = "camera.${camera}";
           frigate.url = "https://cctv.${fqDomain}";
           live_provider = "go2rtc";
           go2rtc.modes = [ (if frigate.webrtc.enable then "webrtc" else "mse") ];
         }];
-
         live = {
           transition_effect = "none";
           show_image_during_load = true;
         };
-
         menu = {
           style = "hover-card";
-
           buttons = {
             cameras.enabled = false;
             fullscreen.enabled = true;
@@ -437,7 +413,6 @@ let
           {
             type = "entities";
             state_color = true;
-
             entities = [
               { entity = "binary_sensor.${camera}_motion"; }
               { entity = "binary_sensor.${camera}_person_occupancy"; }
@@ -459,7 +434,6 @@ let
     {
       title = "Surveillance";
       path = "surveillance";
-
       cards = [
         {
           type = "vertical-stack";
@@ -495,6 +469,7 @@ mkIf cfg.enableInternal
         heating
         lounge
         joshuaRoom
+        room1
         garden
       ];
     };

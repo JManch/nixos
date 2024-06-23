@@ -38,6 +38,8 @@ let
       fi
       hostname=$1
 
+      # TODO: Handle nix-resources key here
+
       # Build the VM
       runscript="/home/${username}/result/bin/run-$hostname-vm"
       pushd "/home/${username}" > /dev/null

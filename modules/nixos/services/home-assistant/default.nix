@@ -71,14 +71,7 @@ in
 
       customComponents = [
         pkgs.home-assistant-custom-components.miele
-        (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs (_: {
-          src = pkgs.fetchFromGitHub {
-            owner = "basnijholt";
-            repo = "adaptive-lighting";
-            rev = "1.22.0";
-            hash = "sha256-k5pCgPM5xjVfWjOcr0UDFzYl/8z7yUwgYdBmC3+2F5k=";
-          };
-        }))
+        pkgs.home-assistant-custom-components.adaptive_lighting
         self.packages.${pkgs.system}.heatmiser
         self.packages.${pkgs.system}.thermal-comfort
       ] ++ optional frigate.enable (pkgs.home-assistant-custom-components.frigate.overrideAttrs (_: {

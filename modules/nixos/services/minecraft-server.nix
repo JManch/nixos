@@ -22,17 +22,11 @@ let
   inherit (config.modules.services) caddy wireguard;
   inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.modules.services.minecraft-server;
+  serverPackage = pkgs.papermcServers.papermc-1_20_4;
+  pluginEnabled = p: elem p cfg.plugins;
 
   availablePlugins = (import ../../../pkgs/minecraft-plugins { inherit lib pkgs; }).minecraft-plugins
     // inputs.nix-resources.packages.${pkgs.system}.minecraft-plugins;
-  pluginEnabled = p: elem p cfg.plugins;
-
-  serverPackage = pkgs.papermc.overrideAttrs (oldAttrs: {
-    src = pkgs.fetchurl {
-      url = "https://api.papermc.io/v2/projects/paper/versions/1.20.4/builds/496/downloads/paper-1.20.4-496.jar";
-      hash = "sha256-nGQZw1BNuE1DfUu+tbnSfVSKAJo+0vHGF7Yuc0HP7uM=";
-    };
-  });
 
   serverIcon = pkgs.fetchurl {
     url = "https://i.imgur.com/ugQk6xn.png";

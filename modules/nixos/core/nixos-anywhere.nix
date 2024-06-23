@@ -86,11 +86,7 @@ let
       age -d "$kit_path" | tar -xf - -C "$secret_temp"
       mv "$secret_temp/$hostname"/* "$temp/$rootDir/etc/ssh"
 
-      if [ "$username" = "joshua" ]; then
-        mv "$secret_temp/id_ed25519" "$temp/$rootDir/home/$username/.ssh"
-        mv "$secret_temp/id_ed25519.pub" "$temp/$rootDir/home/$username/.ssh"
-      fi
-
+      mv "$secret_temp"/id_nix-resources* "$temp/$rootDir/home/$username/.ssh"
       if [ -d "$secret_temp/$username" ]; then
         mv "$secret_temp/$username"/* "$temp/$rootDir/home/$username/.ssh"
       fi

@@ -36,7 +36,7 @@ let
       fi
 
       if [ "$(id -u)" != "0" ]; then
-         echo "This script must be run as root" 1>&2
+         echo "This script must be run as root" >&2
          exit 1
       fi
 
@@ -47,18 +47,18 @@ let
       key=$2
       vault="/var/lib/bitwarden_rs"
 
-      if ! [ -d "$vault" ]; then
-        echo "Error: The vaultwarden state directory $vault does not exist"
+      if [ ! -d "$vault" ]; then
+        echo "Error: The vaultwarden state directory $vault does not exist" >&2
         exit 1
       fi
 
-      if ! [ -e "$backup" ]; then
-        echo "Error: $backup file does not exist"
+      if [ ! -e "$backup" ]; then
+        echo "Error: $backup file does not exist" >&2
         exit 1
       fi
 
-      if ! [ -e "$key" ]; then
-        echo "Error: $key file does not exist"
+      if [ ! -e "$key" ]; then
+        echo "Error: $key file does not exist" >&2
         exit 1
       fi
 

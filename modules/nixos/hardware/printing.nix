@@ -114,16 +114,18 @@ mkMerge [
       ensureDefaultPrinter = "Brother-DCP-9015CDW";
     };
 
-    systemd.services.ensure-printers = {
-      after = [ "network-online.target" "nss-lookup.target" ];
-      wants = [ "network-online.target" "nss-lookup.target" ];
-    };
-
     services.caddy.virtualHosts."printing.${fqDomain}".extraConfig = ''
       ${allowAddresses trustedAddresses}
       reverse_proxy http://localhost:631 {
         header_up host localhost
       }
     '';
+  })
+
+  (mkIf (cfg.client.enable || cfg.server.enable) {
+    systemd.services.ensure-printers = {
+      after = [ "network-online.target" "nss-lookup.target" ];
+      wants = [ "network-online.target" "nss-lookup.target" ];
+    };
   })
 ]

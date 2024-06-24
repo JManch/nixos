@@ -66,10 +66,10 @@ let
       rm -rf "$ssh_dir"
       mkdir -p "$ssh_dir"
 
-      # Temporarily copy host keys to id_ed25519 as they are used for private
-      # nix-resources repo access
-      cp "$temp_keys/$hostname/ssh_host_ed25519_key" "$ssh_dir/id_ed25519"
-      cp "$temp_keys/$hostname/ssh_host_ed25519_key.pub" "$ssh_dir/id_ed25519.pub"
+      # Temporarily copy nix-resources keys to id_ed25519 as they are used for
+      # accessing the private repo
+      cp "$temp_keys/id_nix-resources" "$ssh_dir/id_ed25519"
+      cp "$temp_keys/id_nix-resources.pub" "$ssh_dir/id_ed25519.pub"
 
       echo "Starting disko format and mount..."
       disko --mode disko --flake "$config#$hostname"

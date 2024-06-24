@@ -22,12 +22,14 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets) mqttHassPassword;
   inherit (caddy) allowAddresses trustedAddresses;
-  inherit (secretCfg) devices;
+  inherit (secrets.general) devices;
   cfg = config.modules.services.hass;
-  secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
+  secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 in
 {
-  imports = utils.scanPaths ./.;
+  imports = (utils.scanPaths ./.) ++ [
+    inputs.nix-resources.nixosModules.home-assistant
+  ];
 
   config = mkIf cfg.enable {
     assertions = utils.asserts [

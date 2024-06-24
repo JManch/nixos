@@ -1,12 +1,11 @@
 { lib, config, inputs, ... }:
 let
   inherit (lib) mkIf utils head optional optionals attrValues;
-  inherit (secretCfg) devices;
-  inherit (secretCfg.automations) person1LightsToggle person1AdaptiveLightingSunTimes;
+  inherit (secrets.general) devices;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) frigate;
   cfg = config.modules.services.hass;
-  secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
+  secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 
   frigateEntranceNotify = {
     alias = "Entrance Person Notify";
@@ -360,48 +359,36 @@ mkIf cfg.enableInternal
       ++ joshuaLightsToggle
       ++ joshuaAdaptiveLightingSunTimes
       ++ joshuaSleepModeToggle
-      ++ person1LightsToggle
-      ++ person1AdaptiveLightingSunTimes
       ++ optional frigate.enable frigateEntranceNotify
       ++ optionals frigate.enable frigateHighAlertNotify;
 
-    input_datetime =
-      let
-        inherit (secretCfg.input_datetime) person1WakeUpTime person1SleepTime;
-      in
-      {
-        heating_disable_time = {
-          name = "Heating Disable Time";
-          has_time = true;
-        };
+    input_datetime = {
+      heating_disable_time = {
+        name = "Heating Disable Time";
+        has_time = true;
+      };
 
-        heating_enable_time = {
-          name = "Heating Enable Time";
-          has_time = true;
-        };
-      } //
-      person1WakeUpTime //
-      person1SleepTime;
+      heating_enable_time = {
+        name = "Heating Enable Time";
+        has_time = true;
+      };
+    };
 
-    input_boolean =
-      let
-        inherit (secretCfg.input_boolean) room1WakeUpLights;
-      in
-      {
-        heating_enabled = {
-          name = "Heating Enabled";
-          icon = "mdi:heating-coil";
-        };
+    input_boolean = {
+      heating_enabled = {
+        name = "Heating Enabled";
+        icon = "mdi:heating-coil";
+      };
 
-        high_alert_surveillance = {
-          name = "High Alert Surveillance";
-          icon = "mdi:cctv";
-        };
+      high_alert_surveillance = {
+        name = "High Alert Surveillance";
+        icon = "mdi:cctv";
+      };
 
-        joshua_room_wake_up_lights = {
-          name = "Joshua Room Wake Up Lights";
-          icon = "mdi:weather-sunset-up";
-        };
-      } // room1WakeUpLights;
+      joshua_room_wake_up_lights = {
+        name = "Joshua Room Wake Up Lights";
+        icon = "mdi:weather-sunset-up";
+      };
+    };
   };
 }

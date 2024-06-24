@@ -3,10 +3,10 @@ let
   inherit (lib) mkIf optional;
   inherit (config.modules.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (secretCfg.lovelaceConfig) heating room1;
+  inherit (secrets.lovelace) heating room1;
 
   cfg = config.modules.services.hass;
-  secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
+  secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 
   home = {
     title = "Home";

@@ -42,8 +42,6 @@ mkIf cfg.enableInternal
         ];
 
         sensor = [
-          gridSellPrice
-          gridBuyPrice
           {
             name = "Powerwall Battery Remaining Time";
             icon = "mdi:battery-clock-outline";

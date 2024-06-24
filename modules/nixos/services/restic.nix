@@ -102,55 +102,83 @@ let
 
   restoreScript = pkgs.writeShellApplication {
     name = "restic-restore";
-    runtimeInputs = with pkgs; [ restic coreutils systemd ];
+    runtimeInputs = with pkgs; [ restic coreutils systemd bash ];
     text = /*bash*/ ''
-
       echo "Leave empty to restore from the default repo"
       echo "Enter 'remote' to restore from the backblaze remote repo"
       echo "Otherwise, enter a custom repo passed to the -r flag"
       read -p "Enter the repo to restore from: " -r repo
 
       env_vars="RESTIC_PASSWORD_FILE=\"${resticPasswordFile.path}\""
-      if [[ -z "$repo" ]]; then
+      if [ -z "$repo" ]; then
         env_vars+=" RESTIC_REPOSITORY_FILE=\"${resticRepositoryFile.path}\""
-      elif [[ ! "remote" = "$repo" ]]; then
+      elif [ ! "remote" = "$repo" ]; then
         env_vars+=" RESTIC_REPOSITORY=\"$repo\""
       fi
 
       load_vars="set -a; if [[ \"$repo\" = \"remote\" ]]; then source ${resticReadOnlyBackblazeVars.path}; fi; set +a; export $env_vars;"
-      sudo ${getExe' pkgs.bash "sh"} -c "$load_vars restic snapshots --compact --no-lock --group-by tags"
+      sudo sh -c "$load_vars restic snapshots --compact --no-lock --group-by tags"
 
       read -p "Do you want to proceed with this repo? (y/N): " -n 1 -r
-      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then exit 1; fi
+      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
       echo
 
       ${concatStrings (mapAttrsToList (name: value: /*bash*/ ''
         read -p "Restore backup ${name}? (y/N): " -n 1 -r
         if [[ "$REPLY" =~ ^[Yy]$ ]]; then
             echo
-            sudo ${getExe' pkgs.bash "sh"} -c "$load_vars restic snapshots --tag ${name} --host ${hostname} --no-lock"
+            sudo sh -c "$load_vars restic snapshots --tag ${name} --host ${hostname} --no-lock"
             read -p "Enter the snapshot ID to restore (leave empty for latest): " -r snapshot
-            if [[ -z "$snapshot" ]]; then snapshot="latest"; fi
-            echo "Restoring snapshot: $snapshot"
+            if [ -z "$snapshot" ]; then snapshot="latest"; fi
 
-            ${optionalString value.restore.removeExisting (
-              concatStringsSep ";" (map (path: "sudo rm -rf ${path}/*") value.paths)
-            )}
+            custom_target=false
+            read -p "Would you like to restore to a custom path instead of the original? Restore scripts will NOT run. (y/N): " -n 1 -r
+            if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+              echo
+              read -p "Enter an absolute path to a restore directory: " -r target
+              if [[ -z "$target" || -e "$target" ]]; then
+                echo "Invalid path, make sure it does not already exist" >&2
+                exit 1
+              fi
+              mkdir -p "$target"
+              custom_target=true
+            fi
 
-            ${value.restore.preRestoreScript}
-            sudo ${getExe' pkgs.bash "sh"} -c "$load_vars restic restore $snapshot --target / --verify --tag ${name} --host ${hostname} --no-lock"
+            echo "Restoring snapshot $snapshot to $target..."
 
-            # Update ownership because UID/GID mappings are not guaranteed to match between hosts
-            # Modules with statically mapped IDs don't need this https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix
-            ${concatStringsSep ";" (mapAttrsToList (path: ownership:
-              (optionalString (ownership.user != null) "sudo chown -R ${ownership.user} ${path}") +
-              (optionalString (ownership.group != null) ";sudo chgrp -R ${ownership.group} ${path}")
-              ) value.restore.pathOwnership)}
+            restore_snapshot() {
+              echo "Restoring snapshot..."
+              sudo sh -c "$load_vars restic restore $snapshot --target $target --verify --tag ${name} --host ${hostname} --no-lock"
+            }
 
-            ${value.restore.postRestoreScript}
+            restore_ownership() {
+              echo "Restoring ownership..."
+              # Update ownership because UID/GID mappings are not guaranteed to match between hosts
+              # Modules with statically mapped IDs don't need this https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix
+              ${concatStringsSep ";" (mapAttrsToList (path: ownership:
+                (optionalString (ownership.user != null) "sudo chown -R ${ownership.user} ${path}") +
+                (optionalString (ownership.group != null) ";sudo chgrp -R ${ownership.group} ${path}")
+                ) value.restore.pathOwnership)}
+            }
+
+            if [ "$custom_target" = true ]; then
+              restore_snapshot
+              restore_ownership
+            else
+              read -p "Existing files are about to be replaced by the backup. Are you sure you want to continue? (y/N): " -n 1 -r
+              if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
+              ${optionalString value.restore.removeExisting (
+                concatStringsSep ";" (map (path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}/*") value.paths)
+              )}
+              echo "Running pre-restore script..."
+              ${value.restore.preRestoreScript}
+              restore_snapshot
+              restore_ownership
+              echo "Running post-restore script..."
+              ${value.restore.postRestoreScript}
+            fi
         fi
       '') backups)}
-
     '';
   };
 in

@@ -945,11 +945,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1719252601,
-        "narHash": "sha256-DJr8O0T0rbEyonRsrFWYsjIQGZ542Vkgfy/2fhqReuQ=",
+        "lastModified": 1719266346,
+        "narHash": "sha256-dike8fapav1b2M/dX5I6gCDXxEq4OemXjWBu5+Yb54I=",
         "ref": "refs/heads/main",
-        "rev": "f9228e0aa577dae6f76fd11f28ec16873a521c7e",
-        "revCount": 121,
+        "rev": "fffd540bc5669d195b8896b3146a303e003e26d2",
+        "revCount": 122,
         "type": "git",
         "url": "ssh://git@github.com/JManch/nix-resources"
       },

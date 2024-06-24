@@ -40,35 +40,14 @@ let
       # Always rebuild in ~ because I once had a bad experience where I
       # accidentally built in /nix/store and caused irrepairable corruption
       text = /*bash*/ ''
-        tmp=$(mktemp -d)
-        ssh_dir="/home/${username}/.ssh"
-        flake="${configDir}"
-        if [ ! -d $flake ]; then
-          flake="github:JManch/nixos"
-        fi
+        ${cfg.loadNixResourcesKey}
 
-        exit() {
-          set +e
-          popd >/dev/null 2>&1
-          mv "$tmp/id_ed25519" "$ssh_dir" 2>/dev/null
-          rm -rf "$tmp"
+        reset_dir() {
+          popd >/dev/null 2>&1 || true
         }
-        trap exit EXIT
-
-        # On users that are not my own, temporarily copy the nix-resources key
-        # to .ssh/ed25519. This is because there's no way (that I'm aware of)
-        # to specify the SSH key that nixos-rebuild uses for authentication. My
-        # own user does not need this workaround because my main ssh key gives
-        # access.
-        # shellcheck disable=SC2050
-        if [ "${username}" != "joshua" ]; then
-          if [ -f "$ssh_dir/id_ed25519" ]; then
-            mv "$ssh_dir/id_ed25519" "$tmp"
-          fi
-          cp "$ssh_dir/id_nix-resources" "$ssh_dir/id_ed25519"
-        fi
-
+        trap reset_dir EXIT
         pushd ~ >/dev/null 2>&1
+
         nixos-rebuild ${if (cmd == "diff") then "build" else cmd} \
           --use-remote-sudo --flake "$flake#${hostname}" "$@"
         ${optionalString (cmd == "diff") /*bash*/ ''
@@ -106,28 +85,7 @@ let
             exit 1
           fi
 
-          flake="${configDir}"
-          if [ ! -d $flake ]; then
-            flake="github:JManch/nixos"
-          fi
-
-          tmp=$(mktemp -d)
-          ssh_dir="/home/${username}/.ssh"
-
-          reset_key() {
-            set +e
-            mv "$tmp/id_ed25519" "$ssh_dir" 2>/dev/null
-            rm -rf "$tmp"
-          }
-          trap reset_key EXIT
-
-          # shellcheck disable=SC2050
-          if [ "${username}" != "joshua" ]; then
-            if [ -f "$ssh_dir/id_ed25519" ]; then
-              mv "$ssh_dir/id_ed25519" "$tmp"
-            fi
-            cp "$ssh_dir/id_nix-resources" "$ssh_dir/id_ed25519"
-          fi
+          ${cfg.loadNixResourcesKey}
         '';
       in
       pkgs.writeShellApplication {

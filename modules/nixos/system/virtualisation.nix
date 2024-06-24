@@ -38,16 +38,25 @@ let
       fi
       hostname=$1
 
-      # TODO: Handle nix-resources key here
+      ${config.modules.core.loadNixResourcesKey}
 
       # Build the VM
       runscript="/home/${username}/result/bin/run-$hostname-vm"
       pushd "/home/${username}" > /dev/null
-      nixos-rebuild build-vm --flake "/home/${username}/.config/nixos#$hostname"
+      reset_dir() {
+        popd >/dev/null 2>&1 || true
+      }
+      trap reset_dir EXIT
+      nixos-rebuild build-vm --flake "$flake#$hostname"
       popd > /dev/null
 
       # Check if the VM uses impermanence
-      impermanence=$(nix eval "/home/${username}/.config/nixos#nixosConfigurations.$hostname.config.virtualisation.vmVariant.modules.system.impermanence.enable")
+      impermanence=$(nix eval "$flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.modules.system.impermanence.enable")
+
+      # Reset ssh key early as we no longer need flake access
+      if [ -f "$tmp_key" ]; then
+        mv "$tmp_key" "$ssh_dir/id_ed25519"
+      fi
 
       # Print ports mapped to the VM
       printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"

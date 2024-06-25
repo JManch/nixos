@@ -10,9 +10,7 @@ let
     name = "install-host";
     runtimeInputs = with pkgs; [
       age
-      (disko.overrideAttrs (oldAttrs: {
-        patches = (oldAttrs.patches or [ ]) ++ [ ../../patches/disko.diff ];
-      }))
+      disko
       gitMinimal
     ];
     text = /*bash*/ ''
@@ -52,6 +50,12 @@ let
         vmInstall=true
         echo "WARNING: The vmInstall flake input will only be overridden for the initial install"
         echo "Any nixos-rebuild commands ran in the VM will need '--override-input vmInstall github:JManch/$vmInstall' manually added"
+        # Disko does not allow overriding inputs so instead we update the flake
+        # lock file of our downloaded config
+        nix flake lock \
+          --update-input vmInstall \
+          --override-input vmInstall "github:JManch/true" \
+          "$config"
       fi
 
       echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"
@@ -82,11 +86,7 @@ let
       cp "$temp_keys/id_nix-resources.pub" "$ssh_dir/id_ed25519.pub"
 
       echo "Starting disko format and mount..."
-      disko \
-        --mode disko \
-        --override-input vmInstall "github:JManch/$vmInstall" \
-        --no-write-lock-file \
-        --flake "$config#$hostname"
+      disko --mode disko --flake "$config#$hostname"
       echo "Disko finished"
 
       host_config="$config#nixosConfigurations.$hostname.config"

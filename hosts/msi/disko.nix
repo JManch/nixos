@@ -1,4 +1,8 @@
-{ inputs, ... }:
+{ lib, inputs, ... }:
+let
+  inherit (lib) optionalAttrs;
+  vmInstall = inputs.vmInstall.value;
+in
 {
   imports = [
     inputs.disko.nixosModules.default
@@ -10,7 +14,7 @@
       # WARN: If installing in a VM use /dev/disk/by-path/ and enable the
       # modules.fileSystem.zfsVM option
       device =
-        if inputs.vmInstall.value then
+        if vmInstall then
           "/dev/disk/by-path/pci-0000:04:00.0"
         else
         # TODO: Set this
@@ -49,10 +53,11 @@
         mountpoint = "none";
         xattr = "sa";
         acltype = "posixacl";
+        compression = "lz4";
+      } // optionalAttrs (!vmInstall) {
         encryption = "aes-256-gcm";
         keyformat = "passphrase";
         keylocation = "prompt";
-        compression = "lz4";
       };
 
       datasets.root = {

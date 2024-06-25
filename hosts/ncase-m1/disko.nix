@@ -1,4 +1,8 @@
-{ inputs, ... }:
+{ lib, inputs, ... }:
+let
+  inherit (lib) optionalAttrs;
+  vmInstall = inputs.vmInstall.value;
+in
 {
   imports = [
     inputs.disko.nixosModules.default
@@ -8,7 +12,7 @@
     disk."1TB-NVME" = {
       type = "disk";
       device =
-        if inputs.vmInstall.value then
+        if vmInstall then
           "/dev/disk/by-path/pci-0000:04:00.0"
         else
           "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S4EWNM0W333051B";
@@ -56,10 +60,11 @@
         mountpoint = "none";
         xattr = "sa";
         acltype = "posixacl";
+        compression = "lz4";
+      } // optionalAttrs (!vmInstall) {
         encryption = "aes-256-gcm";
         keyformat = "passphrase";
         keylocation = "prompt";
-        compression = "lz4";
       };
 
       datasets = {

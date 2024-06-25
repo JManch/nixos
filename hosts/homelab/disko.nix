@@ -1,4 +1,4 @@
-{ lib, inputs, ... }:
+{ inputs, ... }:
 {
   imports = [
     inputs.disko.nixosModules.default
@@ -8,7 +8,11 @@
     # The attribute name of the disk gets used for the disk partlabel
     disk."256GB-NVME" = {
       type = "disk";
-      device = "/dev/disk/by-id/nvme-SAMSUNG_MZVPV256HDGL-000H1_S27GNY0HB13473";
+      device =
+        if inputs.vmInstall.value then
+          "/dev/disk/by-path/pci-0000:04:00.0"
+        else
+          "/dev/disk/by-id/nvme-SAMSUNG_MZVPV256HDGL-000H1_S27GNY0HB13473";
       content = {
         type = "gpt";
         partitions = {
@@ -72,9 +76,5 @@
         };
       };
     };
-  };
-
-  virtualisation.vmVariant = {
-    disko.devices.disk."256GB-NVME".device = lib.mkVMOverride "/dev/disk/by-path/pci-0000:04:00.0";
   };
 }

@@ -46,6 +46,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     impermanence.url = "github:nix-community/impermanence";
     firstBoot.url = "github:JManch/false";
+    vmInstall.url = "github:JManch/false";
 
     nix-colors.url = "github:misterio77/nix-colors";
     nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";

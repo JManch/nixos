@@ -45,14 +45,14 @@ let
         git clone https://github.com/JManch/nixos "$config"
       fi
 
-      host_config="$config#nixosConfigurations.$hostname.config"
-      flake="$config#$hostname"
-      read -p "Would you like to install the VM variant of $hostname? (y/N): " -n 1 -r
+      vmInstall=false
+      read -p "Are you installing this host in a virtual machine? (y/N): " -n 1 -r
       echo
       if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-        host_config="$host_config.virtualisation.vmVariant"
-        flake="$config#$hostname.config.virtualisation.vmVariant"
-      fi;
+        vmInstall=true
+        echo "WARNING: The vmInstall flake input will only be overridden for the initial install"
+        echo "Any nixos-rebuild commands ran in the VM will need '--override-input vmInstall github:JManch/$vmInstall' manually added"
+      fi
 
       echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"
       read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
@@ -60,7 +60,7 @@ let
       if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
           echo "Aborting"
           exit 1
-      fi;
+      fi
 
       temp_keys=$(mktemp -d)
       ssh_dir="/root/.ssh"
@@ -82,9 +82,14 @@ let
       cp "$temp_keys/id_nix-resources.pub" "$ssh_dir/id_ed25519.pub"
 
       echo "Starting disko format and mount..."
-      disko --mode disko --flake "$flake"
+      disko \
+        --mode disko \
+        --override-input vmInstall "github:JManch/$vmInstall" \
+        --no-write-lock-file \
+        --flake "$config#$hostname"
       echo "Disko finished"
 
+      host_config="$config#nixosConfigurations.$hostname.config"
       impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
       rootDir="/mnt"
       if [ "$impermanence" = "true" ]; then
@@ -127,7 +132,8 @@ let
         --no-write-lock-file \
         --no-channel-copy \
         --override-input firstBoot "github:JManch/true" \
-        --flake "$flake"
+        --override-input vmInstall "github:JManch/$vmInstall" \
+        --flake "$config#$hostname"
       rm -rf "$ssh_dir"
 
     '';

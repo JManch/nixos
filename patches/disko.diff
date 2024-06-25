@@ -1,13 +1,19 @@
-diff --git a/cli.nix b/cli.nix
-index 9998219..119c049 100644
---- a/cli.nix
-+++ b/cli.nix
-@@ -40,7 +40,7 @@ let
-     diskoFile != null || lib.hasAttrByPath [ "diskoConfigurations" flakeAttr ] (builtins.getFlake flake);
- 
-   hasDiskoModuleFlake =
--    lib.hasAttrByPath [ "nixosConfigurations" flakeAttr "config" "disko" "devices" ] (builtins.getFlake flake);
-+    true;
- 
-   diskFormat =
-     let
+diff --git a/disko b/disko
+index 807c4e1..285073d 100755
+--- a/disko
++++ b/disko
+@@ -92,6 +92,14 @@ while [[ $# -gt 0 ]]; do
+     --show-trace)
+       nix_args+=("$1")
+       ;;
++    --override-input)
++      nix_args+=("$1" "$2" "$3")
++      shift
++      shift
++      ;;
++    --no-write-lock-file)
++      nix_args+=("$1")
++      ;;
+     *)
+       if [ -z ${disko_config+x} ]; then
+         disko_config=$1

@@ -1024,6 +1024,7 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-xr": "nixpkgs-xr",
         "rust-overlay": "rust-overlay_3",
+        "vmInstall": "vmInstall",
         "yaml2nix": "yaml2nix"
       }
     },
@@ -1277,6 +1278,21 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "vmInstall": {
+      "locked": {
+        "lastModified": 1657739266,
+        "narHash": "sha256-vLy8GQr0noEcoA+jX24FgUVBA/poV36zDWAUChN3hIY=",
+        "owner": "JManch",
+        "repo": "false",
+        "rev": "d06b4794a134686c70a1325df88a6e6768c6b212",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JManch",
+        "repo": "false",
         "type": "github"
       }
     },

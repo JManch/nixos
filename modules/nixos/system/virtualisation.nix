@@ -100,48 +100,34 @@ let
   };
 in
 {
-  imports = [
-    inputs.microvm.nixosModules.host
-
-    # Workaround that exposes vm variant at
-    # flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.config.system.build.toplevel
-    # This enables passing the vmVariant to commands like nixos-rebuild which
-    # hardcode flake attrs with the suffix "config.system.build.toplevel",
-    # making it impossible to reference the vmVariant.
-    (lib.mkAliasOptionModule
-      [ "config" "system" "build" ]
-      [ "system" "build" ])
-
-    (lib.mkAliasOptionModule
-      [ "config" "disko" "devices" ]
-      [ "disko" "devices" ])
-  ];
+  imports = [ inputs.microvm.nixosModules.host ];
 
   config = mkMerge [
     {
+      # The vmInstall input flake indicates whether or not we are installing
+      # the host in a virtual machine. This is NOT the same as a vmVariant.
+      # Matches options in modules/profiles/qemu_guest.nix as conditional
+      # imports are not possible.
+      boot = mkIf (inputs.vmInstall.value) {
+        initrd.availableKernelModules = mkVMOverride [
+          "ahci"
+          "xhci_pci"
+          "virtio_pci"
+          "sr_mod"
+          "virtio_blk"
+          "virtio_net"
+          "virtio_mmio"
+          "virtio_scsi"
+          "9p"
+          "9pnet_virtio"
+        ];
+        kernelModules = mkVMOverride [ "kvm-amd" "virtio_balloon" "virtio_console" "virtio_rng" ];
+        kernelParams = mkVMOverride [ ];
+      };
+
       # We configure the vmVariant regardless of whether or not the host has
       # virtualisation enabled because it should be possible to create a VM of any host
       virtualisation.vmVariant = {
-        # Override the hardware configuration for VMs. Matches options in
-        # modules/profiles/qemu_guest.nix as conditional imports are not
-        # possible.
-        boot = {
-          initrd.availableKernelModules = mkVMOverride [
-            "ahci"
-            "xhci_pci"
-            "virtio_pci"
-            "sr_mod"
-            "virtio_blk"
-            "virtio_net"
-            "virtio_mmio"
-            "virtio_scsi"
-            "9p"
-            "9pnet_virtio"
-          ];
-          kernelModules = mkVMOverride [ "kvm-amd" "virtio_balloon" "virtio_console" "virtio_rng" ];
-          kernelParams = mkVMOverride [ ];
-        };
-
         device = {
           monitors = mkIf (monitors != [ ]) (mkVMOverride [{
             name = "Virtual-1";

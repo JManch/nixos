@@ -1,4 +1,4 @@
-{ lib, inputs, ... }:
+{ inputs, ... }:
 {
   imports = [
     inputs.disko.nixosModules.default
@@ -7,7 +7,11 @@
   disko.devices = {
     disk."1TB-NVME" = {
       type = "disk";
-      device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S4EWNM0W333051B";
+      device =
+        if inputs.vmInstall.value then
+          "/dev/disk/by-path/pci-0000:04:00.0"
+        else
+          "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S4EWNM0W333051B";
       content = {
         type = "gpt";
         partitions = {
@@ -72,9 +76,5 @@
         };
       };
     };
-  };
-
-  virtualisation.vmVariant = {
-    disko.devices.disk."1TB-NVME".device = lib.mkVMOverride "/dev/disk/by-path/pci-0000:04:00.0";
   };
 }

@@ -14,7 +14,6 @@
 , sol2
 , toml11
 , nlohmann_json
-,
 }:
 stdenv.mkDerivation rec {
   pname = "beammp-server";

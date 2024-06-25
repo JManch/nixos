@@ -197,7 +197,7 @@ mkMerge [
       }];
 
     virtualisation.vmVariant = {
-      modules.services.caddy.trustedAddressRanges = [ "10.0.2.2/32" ];
+      modules.services.caddy.trustedAddresses = [ "10.0.2.2/32" ];
 
       services.caddy = {
         # Confusingly auto_https off doesn't actually server all hosts of http

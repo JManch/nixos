@@ -323,7 +323,7 @@ in
   };
 
   disabledModules = [
-    "${inputs.nixpkgs}/nixos/modules/services/networking/firewall.nix"
+    "services/networking/firewall.nix"
   ];
 
   config = mkIf cfg.enable {

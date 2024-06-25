@@ -8,7 +8,7 @@
     disk."512GB-SATA" = {
       type = "disk";
       # TODO: Fill in device here
-      device = "/dev/disk/by-id/IDK";
+      device = "/dev/disk/by-id/ata-QEMU_DVD-ROM_QM00001";
       content = {
         type = "gpt";
         partitions = {
@@ -36,7 +36,6 @@
 
     zpool.zroot = {
       type = "zpool";
-      mountpoint = "/";
       options.ashift = "12";
 
       rootFsOptions = {

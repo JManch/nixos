@@ -100,7 +100,22 @@ let
   };
 in
 {
-  imports = [ inputs.microvm.nixosModules.host ];
+  imports = [
+    inputs.microvm.nixosModules.host
+
+    # Workaround that exposes vm variant at
+    # flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.config.system.build.toplevel
+    # This enables passing the vmVariant to commands like nixos-rebuild which
+    # hardcode flake attrs with the suffix "config.system.build.toplevel",
+    # making it impossible to reference the vmVariant.
+    (lib.mkAliasOptionModule
+      [ "config" "system" "build" ]
+      [ "system" "build" ])
+
+    (lib.mkAliasOptionModule
+      [ "config" "disko" "devices" ]
+      [ "disko" "devices" ])
+  ];
 
   config = mkMerge [
     {

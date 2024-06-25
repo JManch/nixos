@@ -44,12 +44,13 @@ let
       fi
 
       host_config="$config#nixosConfigurations.$hostname.config"
+      flake="$hostname"
       read -p "Would you like to install the VM variant of $hostname? (y/N): " -n 1 -r
       echo
       if [[ "$REPLY" =~ ^[Yy]$ ]]; then
         host_config="$host_config.virtualisation.vmVariant"
+        flake="$hostname.config.virtualisation.vmVariant"
       fi;
-      flake="$host_config.system.build.toplevel"
 
       echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"
       read -p "Are you sure you want to proceed? (y/N): " -n 1 -r

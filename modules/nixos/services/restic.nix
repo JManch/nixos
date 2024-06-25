@@ -168,7 +168,7 @@ let
               read -p "Existing files are about to be replaced by the backup. Are you sure you want to continue? (y/N): " -n 1 -r
               if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
               ${optionalString value.restore.removeExisting (
-                concatStringsSep ";" (map (path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}/*") value.paths)
+                concatStringsSep ";" (map (path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}") value.paths)
               )}
               echo "Running pre-restore script..."
               ${value.restore.preRestoreScript}

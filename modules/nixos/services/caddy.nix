@@ -179,7 +179,7 @@ mkMerge [
       };
 
       filter.Definition = {
-        failregex = ''^.*"remote_ip":"<HOST>",.*?"status":(?:401|403|500),.*$'';
+        failregex = ''^.*"remote_ip":"<HOST>",.*?"status":(?:401|403|404|500),.*$'';
         ignoreregex = "";
         datepattern = ''"ts":{Epoch}\.'';
       };

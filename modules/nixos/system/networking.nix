@@ -1,6 +1,7 @@
 { lib
 , pkgs
 , config
+, inputs
 , username
 , hostname
 , ...
@@ -43,39 +44,41 @@ in
     # Nix generates default systemd-networkd network configs which match all
     # interfaces so manually defining networks is not really necessary unless
     # custom configuration is required
-    networks = {
-      # TODO: Might want to bond wired and wireless networks
-      "10-wired" = {
-        matchConfig.Name = cfg.primaryInterface;
+    networks = mkIf (!inputs.vmInstall.value) (
+      {
+        # TODO: Might want to bond wired and wireless networks
+        "10-wired" = {
+          matchConfig.Name = cfg.primaryInterface;
 
-        networkConfig = {
-          DHCP = cfg.staticIPAddress == null;
-          Address = mkIf (cfg.staticIPAddress != null) cfg.staticIPAddress;
-          Gateway = mkIf (cfg.staticIPAddress != null) cfg.defaultGateway;
-          VLAN = map (vlanId: "vlan${vlanId}") vlanIds;
-        };
-
-        dhcpV4Config.ClientIdentifier = "mac";
-      };
-
-      "10-wireless" = mkIf cfg.wireless.enable {
-        matchConfig.Name = cfg.wireless.interface;
-        networkConfig.DHCP = true;
-        dhcpV4Config.RouteMetric = 1025;
-      };
-    } // listToAttrs (imap0
-      (i: vlanId: {
-        name = "2${toString i}-vlan${vlanId}";
-        value = {
-          matchConfig = {
-            Name = "vlan${vlanId}";
-            Type = "vlan";
+          networkConfig = {
+            DHCP = cfg.staticIPAddress == null;
+            Address = mkIf (cfg.staticIPAddress != null) cfg.staticIPAddress;
+            Gateway = mkIf (cfg.staticIPAddress != null) cfg.defaultGateway;
+            VLAN = map (vlanId: "vlan${vlanId}") vlanIds;
           };
-          networkConfig = cfg.vlans.${vlanId};
+
           dhcpV4Config.ClientIdentifier = "mac";
         };
-      })
-      vlanIds);
+
+        "10-wireless" = mkIf cfg.wireless.enable {
+          matchConfig.Name = cfg.wireless.interface;
+          networkConfig.DHCP = true;
+          dhcpV4Config.RouteMetric = 1025;
+        };
+      } // listToAttrs (imap0
+        (i: vlanId: {
+          name = "2${toString i}-vlan${vlanId}";
+          value = {
+            matchConfig = {
+              Name = "vlan${vlanId}";
+              Type = "vlan";
+            };
+            networkConfig = cfg.vlans.${vlanId};
+            dhcpV4Config.ClientIdentifier = "mac";
+          };
+        })
+        vlanIds)
+    );
 
     # Useful VLAN guide:
     # https://volatilesystems.org/implementing-vlans-with-systemd-networkd-on-an-active-physical-interface.html

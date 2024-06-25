@@ -10,7 +10,9 @@ let
     name = "install-host";
     runtimeInputs = with pkgs; [
       age
-      disko
+      (disko.overrideAttrs (oldAttrs: {
+        patches = (oldAttrs.patches or [ ]) ++ [ ../../patches/disko.diff ];
+      }))
       gitMinimal
     ];
     text = /*bash*/ ''
@@ -44,12 +46,12 @@ let
       fi
 
       host_config="$config#nixosConfigurations.$hostname.config"
-      flake="$hostname"
+      flake="$config#$hostname"
       read -p "Would you like to install the VM variant of $hostname? (y/N): " -n 1 -r
       echo
       if [[ "$REPLY" =~ ^[Yy]$ ]]; then
         host_config="$host_config.virtualisation.vmVariant"
-        flake="$hostname.config.virtualisation.vmVariant"
+        flake="$config#$hostname.config.virtualisation.vmVariant"
       fi;
 
       echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"

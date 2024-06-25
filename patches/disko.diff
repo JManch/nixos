@@ -1,0 +1,13 @@
+diff --git a/cli.nix b/cli.nix
+index 9998219..119c049 100644
+--- a/cli.nix
++++ b/cli.nix
+@@ -40,7 +40,7 @@ let
+     diskoFile != null || lib.hasAttrByPath [ "diskoConfigurations" flakeAttr ] (builtins.getFlake flake);
+ 
+   hasDiskoModuleFlake =
+-    lib.hasAttrByPath [ "nixosConfigurations" flakeAttr "config" "disko" "devices" ] (builtins.getFlake flake);
++    true;
+ 
+   diskFormat =
+     let

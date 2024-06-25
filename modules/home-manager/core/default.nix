@@ -1,50 +1,65 @@
-{ lib, username, osConfig, ... }:
+{ lib
+, username
+, config
+, osConfig
+, ...
+}:
 let
-  inherit (lib) utils optionalString;
+  inherit (lib) mkIf utils optionalString mkEnableOption optional;
   inherit (osConfig.modules.system) impermanence;
+  cfg = config.modules.core;
 in
 {
   imports = utils.scanPaths ./.;
 
-  programs.home-manager.enable = true;
-
-  home = {
-    username = username;
-    homeDirectory = "/home/${username}";
-    stateVersion = "23.05";
+  options.modules.core = {
+    configManager = mkEnableOption ''
+      Whether this host manages the NixOS config.
+    '';
   };
 
-  persistence.directories = [
-    "downloads"
-    "pictures"
-    "music"
-    "videos"
-    "files"
-    ".config/nixos"
-    ".cache/nix"
-    ".local/share/systemd" # needed for persistent user timers to work properly
-  ];
+  config = {
+    programs.home-manager.enable = true;
 
-  backups = {
-    nixos.paths = [ ".config/nixos" ];
-
-    files = {
-      paths = [ "files" ];
-      restore.removeExisting = false;
-      exclude =
-        let
-          absPath = "${optionalString impermanence.enable "/persist"}/home/${username}";
-        in
-        [
-          "${absPath}/files/games"
-          "${absPath}/files/repos"
-          "${absPath}/files/software"
-          "${absPath}/files/remote-builds"
-        ];
+    home = {
+      username = username;
+      homeDirectory = "/home/${username}";
+      stateVersion = "23.05";
     };
-  };
 
-  # Reload systemd services on home-manager restart
-  # Add [Unit] X-SwitchMethod=(reload|restart|stop-start|keep-old) to control service behaviour
-  systemd.user.startServices = "sd-switch";
+    persistence.directories = [
+      "downloads"
+      "pictures"
+      "music"
+      "videos"
+      "files"
+      ".cache/nix"
+      ".local/share/systemd" # needed for persistent user timers to work properly
+    ] ++ optional cfg.configManager ".config/nixos";
+
+    backups = {
+      nixos = mkIf cfg.configManager {
+        paths = [ ".config/nixos" ];
+      };
+
+      files = {
+        paths = [ "files" ];
+        restore.removeExisting = false;
+        exclude =
+          let
+            absPath = "${optionalString impermanence.enable "/persist"}/home/${username}";
+          in
+          [
+            "${absPath}/files/games"
+            "${absPath}/files/repos"
+            "${absPath}/files/software"
+            "${absPath}/files/remote-builds"
+          ];
+      };
+    };
+
+    # Reload systemd services on home-manager restart
+    # Add [Unit] X-SwitchMethod=(reload|restart|stop-start|keep-old) to control service behaviour
+    systemd.user.startServices = "sd-switch";
+  };
 }

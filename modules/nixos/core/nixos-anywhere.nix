@@ -1,6 +1,7 @@
 { lib
 , pkgs
 , self
+, config
 , username
 , ...
 }:
@@ -59,7 +60,9 @@ let
         exit 1
       fi
 
-      host_config="/home/${username}/.config/nixos#nixosConfigurations.$hostname.config"
+      ${config.modules.core.loadNixResourcesKey}
+
+      host_config="$flake#nixosConfigurations.$hostname.config"
       username=$(nix eval --raw "$host_config.modules.core.username")
       impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
 
@@ -92,14 +95,12 @@ let
       fi
       rm -rf "$secret_temp"
 
-      cp -r /home/${username}/.config/nixos "$temp/$rootDir/home/$username/.config/nixos"
-
       sudo chown -R root:root "$temp/$rootDir"
-      # It's fine if the username here does not match the new hosts username as
-      # the UID will match and that's all that matters
+      # It's fine if the username here does not match the new host's username
+      # as the UID will match and that's all that matters
       sudo chown -R ${username}:users "$temp/$rootDir/home"
 
-      nixos-anywhere --extra-files "$temp" --flake "/home/${username}/.config/nixos#$hostname" "root@$ip_address"
+      nixos-anywhere --extra-files "$temp" --flake "$flake#$hostname" "root@$ip_address"
       sudo rm -rf "$temp"
     '';
   };

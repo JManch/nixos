@@ -1,5 +1,7 @@
 {
   modules = {
+    core.configManager = true;
+
     shell = {
       enable = true;
       sillyTools = true;

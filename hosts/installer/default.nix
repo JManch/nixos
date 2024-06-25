@@ -82,7 +82,7 @@ let
       fi
 
       username=$(nix eval --raw "$host_config.modules.core.username")
-      mkdir -p "$rootDir"/{etc/ssh,"home/$username/.ssh","home/$username/.config"}
+      mkdir -p "$rootDir"/{etc/ssh,"home/$username/.ssh"}
 
       # Install host keys
       mv "$temp_keys/$hostname"/* "$rootDir/etc/ssh"
@@ -96,8 +96,6 @@ let
       mv "$temp_keys"/id_nix-resources* "$rootDir/home/$username/.ssh"
 
       rm -rf "$temp_keys"
-      rm -rf "$rootDir/home/$username/.config/nixos"
-      cp -r "$config" "$rootDir/home/$username/.config/nixos"
       chown -R nixos:users "$rootDir/home/$username"
 
       nixos_system=$(

@@ -1,8 +1,5 @@
-{ modulesPath, ... }:
 {
   # TODO: Generate this
-  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
-
   networking.hostId = "13bd7dcf";
 
   boot = {

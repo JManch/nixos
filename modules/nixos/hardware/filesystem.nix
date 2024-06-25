@@ -1,6 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf utils;
+  inherit (lib) mkIf utils mkVMOverride;
   cfg = config.modules.hardware.fileSystem;
 in
 {
@@ -28,7 +28,6 @@ in
     zfs.package = mkIf cfg.unstableZfs pkgs.zfs_unstable;
 
     supportedFilesystems = [ "zfs" ];
-    zfs.forceImportRoot = cfg.forceImportRoot;
 
     loader.timeout = mkIf cfg.extendedLoaderTimeout 30;
     loader.systemd-boot = {
@@ -46,5 +45,12 @@ in
 
   programs.zsh.shellAliases = {
     boot-bios = "systemctl reboot --firmware-setup";
+  };
+
+  virtualisation.vmVariant = {
+    # Set zfs devNodes to "/dev/disk/by-path" for VMs to fix zpool import
+    # failure. Make sure the disks in disko have VM overrides configured.
+    # https://discourse.nixos.org/t/cannot-import-zfs-pool-at-boot/4805
+    boot.zfs.devNodes = mkVMOverride "/dev/disk/by-path";
   };
 }

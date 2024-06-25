@@ -42,8 +42,6 @@
       fileSystem = {
         trim = true;
         tmpfsTmp = true;
-        # TODO: set this to false after install
-        forceImportRoot = true;
       };
 
       printing.client = {

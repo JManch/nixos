@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ lib, inputs, ... }:
 {
   imports = [
     inputs.disko.nixosModules.default
@@ -7,8 +7,9 @@
   disko.devices = {
     disk."512GB-SATA" = {
       type = "disk";
-      # TODO: Fill in device here
-      device = "/dev/disk/by-id/ata-QEMU_DVD-ROM_QM00001";
+      # WARN: If installing in a VM use /dev/disk/by-path/ and enable the
+      # modules.fileSystem.zfsVM option
+      device = "/dev/disk/by-path/pci-0000:04:00.0";
       content = {
         type = "gpt";
         partitions = {
@@ -55,5 +56,9 @@
         options.mountpoint = "legacy";
       };
     };
+  };
+
+  virtualisation.vmVariant = {
+    disko.devices.disk."512GB-SATA".device = lib.mkVMOverride "/dev/disk/by-path/pci-0000:04:00.0";
   };
 }

@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ lib, inputs, ... }:
 {
   imports = [
     inputs.disko.nixosModules.default
@@ -72,5 +72,9 @@
         };
       };
     };
+  };
+
+  virtualisation.vmVariant = {
+    disko.devices.disk."1TB-NVME".device = lib.mkVMOverride "/dev/disk/by-path/pci-0000:04:00.0";
   };
 }

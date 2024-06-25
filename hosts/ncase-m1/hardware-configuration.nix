@@ -1,7 +1,4 @@
-{ modulesPath, ... }:
 {
-  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
-
   networking.hostId = "625ec505";
   hardware.cpu.amd.updateMicrocode = true;
 

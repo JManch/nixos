@@ -44,6 +44,12 @@ let
       fi
 
       host_config="$config#nixosConfigurations.$hostname.config"
+      read -p "Would you like to install the VM variant of $hostname? (y/N): " -n 1 -r
+      echo
+      if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+        host_config="$host_config.virtualisation.vmVariant"
+      fi;
+      flake="$host_config.system.build.toplevel"
 
       echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"
       read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
@@ -61,6 +67,7 @@ let
       }
       trap cleanup EXIT
 
+      echo "Decrypting ssh-bootstrap-kit..."
       age -d "$config/hosts/ssh-bootstrap-kit" | tar -xf - -C "$temp_keys"
 
       rm -rf "$ssh_dir"
@@ -72,7 +79,7 @@ let
       cp "$temp_keys/id_nix-resources.pub" "$ssh_dir/id_ed25519.pub"
 
       echo "Starting disko format and mount..."
-      disko --mode disko --flake "$config#$hostname"
+      disko --mode disko --flake "$flake"
       echo "Disko finished"
 
       impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
@@ -98,17 +105,26 @@ let
       rm -rf "$temp_keys"
       chown -R nixos:users "$rootDir/home/$username"
 
-      nixos_system=$(
-        nix build \
-          --print-out-paths \
-          --no-link \
-          --extra-experimental-features "nix-command flakes" \
-          --no-write-lock-file \
-          --override-input firstBoot "github:JManch/true" \
-          "$config#nixosConfigurations.\"$hostname\".config.system.build.toplevel"
-      )
+      # WARN: nixos-install has a bunch of options that are not documented in
+      # the man page. The source is here: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/installer/tools/nixos-install.sh
 
-      nixos-install --no-root-passwd --no-channel-copy --system "$nixos_system"
+      # We have to clear the nix cache because previously cached paths refer to
+      # /nix/store whilst nixos-install expects store paths at /mnt/nix/store.
+      # Not sure why this isn't handled in the nixos-install script...
+      rm -rf /root/.cache/nix
+
+      # By default, nixos-install creates a tmpdir at `/mnt/$(mktmp -d)`. This
+      # is a problem on impermanence hosts as / is not a mounted filesystem so
+      # the build will likely fail as it runs out of space. We workaround this
+      # by creating the tmpdir ourselves.
+      tmpdir="$(mktemp -d -p "$rootDir")"
+      trap 'rm -rf $tmpdir' EXIT
+      TMPDIR="$tmpdir" nixos-install \
+        --no-root-passwd \
+        --no-write-lock-file \
+        --no-channel-copy \
+        --override-input firstBoot "github:JManch/true" \
+        --flake "$flake"
       rm -rf "$ssh_dir"
 
     '';
@@ -124,12 +140,16 @@ in
     rsync
     gitMinimal
     neovim
+    zellij
+    btop
   ]) ++ [ installScript ];
 
   nix.settings = {
     experimental-features = "nix-command flakes";
     auto-optimise-store = true;
   };
+
+  zramSwap.enable = true;
 
   services.openssh = {
     enable = true;

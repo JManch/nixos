@@ -107,6 +107,26 @@ in
       # We configure the vmVariant regardless of whether or not the host has
       # virtualisation enabled because it should be possible to create a VM of any host
       virtualisation.vmVariant = {
+        # Override the hardware configuration for VMs. Matches options in
+        # modules/profiles/qemu_guest.nix as conditional imports are not
+        # possible.
+        boot = {
+          initrd.availableKernelModules = mkVMOverride [
+            "ahci"
+            "xhci_pci"
+            "virtio_pci"
+            "sr_mod"
+            "virtio_blk"
+            "virtio_net"
+            "virtio_mmio"
+            "virtio_scsi"
+            "9p"
+            "9pnet_virtio"
+          ];
+          kernelModules = mkVMOverride [ "kvm-amd" "virtio_balloon" "virtio_console" "virtio_rng" ];
+          kernelParams = mkVMOverride [ ];
+        };
+
         device = {
           monitors = mkIf (monitors != [ ]) (mkVMOverride [{
             name = "Virtual-1";

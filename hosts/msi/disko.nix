@@ -11,8 +11,6 @@ in
   disko.devices = {
     disk."512GB-SATA" = {
       type = "disk";
-      # WARN: If installing in a VM use /dev/disk/by-path/ and enable the
-      # modules.fileSystem.zfsVM option
       device =
         if vmInstall then
           "/dev/disk/by-path/pci-0000:04:00.0"

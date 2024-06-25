@@ -145,8 +145,6 @@ in
   ];
 
   environment.systemPackages = (with pkgs; [
-    # nixos-anywhere needs rsync for transfering secrets
-    rsync
     gitMinimal
     neovim
     zellij

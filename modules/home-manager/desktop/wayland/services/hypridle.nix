@@ -57,12 +57,6 @@ mkIf cfg.enable {
 
     '';
 
-  systemd.user.services.hypridle = {
-    Unit.PartOf = [ "graphical-session.target" ];
-    Unit.After = mkForce [ "graphical-session-pre.target" ];
-    Install.WantedBy = mkForce [ "graphical-session.target" ];
-  };
-
   wayland.windowManager.hyprland.settings.bind =
     let
       inherit (config.modules.desktop.hyprland) modKey;

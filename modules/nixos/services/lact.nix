@@ -5,10 +5,18 @@
 , ...
 }:
 let
-  inherit (lib) mkIf utils getExe';
+  inherit (lib) mkIf utils getExe' getExe concatMapStrings;
   inherit (config.device) gpu;
   cfg = config.modules.services.lact;
-  gpuId = "1002:744C-1EAE:7905-0000:09:00.0";
+
+  # I haven't worked out why yet but sometimes my GPU's PCIE address changes,
+  # causing the LACT config to not load. It only seems to switch between these
+  # two IDs though so I can workaround it by adding the same config for each
+  # ID.
+  gpuIds = [
+    "1002:744C-1EAE:7905-0000:08:00.0"
+    "1002:744C-1EAE:7905-0000:09:00.0"
+  ];
 in
 # This module is specifically for 7900XT on NCASE-M1 host
 mkIf cfg.enable
@@ -33,26 +41,19 @@ mkIf cfg.enable
       src = pkgs.fetchFromGitHub {
         owner = "ilya-zlobintsev";
         repo = "LACT";
-        rev = "974e6ff442110fcfa478409c35e20002fe94708b";
-        hash = "sha256-rcKZNkgyn0SJGueN/3l/Z7NHc0ncXrYgZDal2g1VgVE=";
+        rev = "4db593c73f7b46a8d1466bf5734e9a764c43afb7";
+        hash = "sha256-ehJYUZ4Bdttqzs3/SSvhJRzPO7CPbeP8ormXQ7NUzXI=";
       };
       cargoDeps = oldAttrs.cargoDeps.overrideAttrs (_: {
         inherit src;
-        outputHash = "sha256-CMK8o1Hcs5E+GtP9EgKmAa5fXHsY5PCYuFQh1zf0YE4=";
+        outputHash = "sha256-SX+2u0VbMPQTPxHwikmpaRgZ+y5Tp7Splogb6hJdpxo=";
       });
     });
 
     # Can't use nix yaml because the keys for fan curve have to be integers
-    settings = /*yaml*/ ''
-      daemon:
-        log_level: info
-        admin_groups:
-        - wheel
-        - sudo
-        disable_clocks_cleanup: false
-      apply_settings_timer: 5
-      gpus:
-        ${gpuId}:
+    settings =
+      let
+        gpuConfig = /*yaml*/ ''
           fan_control_enabled: true
           fan_control_settings:
             mode: curve
@@ -60,11 +61,11 @@ mkIf cfg.enable
             temperature_key: edge
             interval_ms: 500
             curve:
-              50: 0.0
               60: 0.0
               70: 0.5
               75: 0.6
               80: 0.65
+              90: 0.8
           pmfw_options:
             acoustic_limit: 3300
             acoustic_target: 2000
@@ -86,23 +87,42 @@ mkIf cfg.enable
             - 0
             - 1
             - 2
-    '';
+        '';
+      in
+        /*yaml*/ ''
+        daemon:
+          log_level: info
+          admin_groups:
+          - wheel
+          - sudo
+          disable_clocks_cleanup: false
+        apply_settings_timer: 5
+        gpus:
+        ${
+          concatMapStrings (gpuId: ''
+            # anchor for correct indendation
+              ${gpuId}:
+                ${lib.replaceStrings ["\n" ] ["\n    "] gpuConfig}
+          '') gpuIds
+        }
+      '';
   };
 
   modules.programs.gaming.gamemode =
     let
       ncat = getExe' pkgs.nmap "ncat";
+      jaq = getExe pkgs.jaq;
       confirm = ''echo '{"command": "confirm_pending_config", "args": {"command": "confirm"}}' | ${ncat} -U /run/lactd.sock'';
+      getId = ''echo '{"command": "list_devices"}' | ${ncat} -U /run/lactd.sock | ${jaq} -r ".data.[0].id"'';
+
+      setPowerProfile = profileIndex: /*bash*/ ''
+        id=$(${getId})
+        echo "{\"command\": \"set_power_profile_mode\", \"args\": {\"id\": \"$id\", \"index\": ${toString profileIndex}}}" | ${ncat} -U /run/lactd.sock
+        ${confirm}
+      '';
     in
     {
-      startScript = ''
-        echo '{"command": "set_power_profile_mode", "args": {"id": "${gpuId}", "index": 1}}' | ${ncat} -U /run/lactd.sock
-        ${confirm}
-      '';
-
-      stopScript = ''
-        echo '{"command": "set_power_profile_mode", "args": {"id": "${gpuId}", "index": 0}}' | ${ncat} -U /run/lactd.sock
-        ${confirm}
-      '';
+      startScript = setPowerProfile 1;
+      stopScript = setPowerProfile 0;
     };
 }

@@ -33,7 +33,7 @@ let
         chatterino2
         socat
       ]) ++ [
-        config.programs.firefox.package
+        config.programs.firefox.finalPackage
         config.wayland.windowManager.hyprland.package
       ];
       text = /*bash*/ ''

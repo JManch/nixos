@@ -22,6 +22,20 @@ mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
   programs.firefox = {
     enable = true;
 
+    package = mkIf cfg.runInRam (
+      pkgs.firefox.overrideAttrs (old: {
+        buildCommand =
+          let
+            systemctl = getExe' pkgs.systemd "systemctl";
+            notifySend = getExe pkgs.libnotify;
+          in
+          old.buildCommand + /*bash*/ ''
+            wrapProgram $out/bin/firefox --run "${systemctl} is-active --quiet --user firefox-persist-init \
+              || { ${notifySend} -u critical -t 3000 'Firefox' 'Initial sync has not yet finished'; exit 0; }"
+          '';
+      })
+    );
+
     profiles = {
       default = {
         id = 0;
@@ -376,17 +390,11 @@ mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
   desktop.hyprland.binds =
     let
       inherit (config.modules) desktop;
-      systemctl = getExe' pkgs.systemd "systemctl";
-      firefox = getExe config.programs.firefox.package;
-      notifySend = getExe pkgs.libnotify;
-      launchFirefox =
-        if cfg.runInRam then
-          "${systemctl} is-active --quiet --user firefox-persist-init && ${firefox} || ${notifySend} -u critical -t 3000 'Firefox' 'Initial sync has not yet finished'"
-        else firefox;
+      firefox = getExe config.programs.firefox.finalPackage;
     in
     [
-      "${desktop.hyprland.modKey}, Backspace, exec, ${launchFirefox}"
+      "${desktop.hyprland.modKey}, Backspace, exec, ${firefox}"
       "${desktop.hyprland.modKey}SHIFT, Backspace, workspace, emptym"
-      "${desktop.hyprland.modKey}SHIFT, Backspace, exec, ${launchFirefox}"
+      "${desktop.hyprland.modKey}SHIFT, Backspace, exec, ${firefox}"
     ];
 }

@@ -37,7 +37,7 @@ let
     utils
     mapAttrs
     getExe
-    concatStringsSep
+    concatMapStringsSep
     attrNames
     take
     drop
@@ -60,29 +60,29 @@ let
       inherit (lib.hm.dag) entryAfter;
       sed = getExe pkgs.gnused;
 
-      genVariants = { paths, format ? c: c, colors ? colorMap, ... }: concatStringsSep "\n" (map
+      genVariants = { paths, format ? c: c, colors ? colorMap, ... }: concatMapStringsSep "\n"
         (path:
           let
             baseColors = attrNames colors;
             sedCommand = /*bash*/ ''
               # Replacement have to be done over three commands to avoid cycles
-              ${sed} ${concatStringsSep " " (
+              ${sed} ${concatMapStringsSep " "
                 # Replace first four colors with their base name
-                map (base: "-e 's/${format colors.${base}.dark}/${base}/g'")
+                (base: "-e 's/${format colors.${base}.dark}/${base}/g'")
                 (take 4 baseColors)
-              )} "${configHome}/darkman/variants/${path}.dark" | \
+              } "${configHome}/darkman/variants/${path}.dark" | \
               \
-              ${sed} ${concatStringsSep " " (
+              ${sed} ${concatMapStringsSep " "
                 # Replace all but the first 4 colors with their light variant
-                map (base: "-e 's/${format colors.${base}.dark}/${format colors.${base}.light}/g'")
+                (base: "-e 's/${format colors.${base}.dark}/${format colors.${base}.light}/g'")
                 (drop 4 baseColors)
-              )} | \
+              } | \
               \
-              ${sed} ${concatStringsSep " " (
+              ${sed} ${concatMapStringsSep " "
                 # Replace the first 4 base names with their light variant
-                map (base: "-e 's/${base}/${format colors.${base}.light}/g'")
+                (base: "-e 's/${base}/${format colors.${base}.light}/g'")
                 (take 4 baseColors)
-              )} > "${configHome}/darkman/variants/${path}.light"
+              } > "${configHome}/darkman/variants/${path}.light"
             '';
           in
             /*bash*/ ''
@@ -108,13 +108,13 @@ let
             fi
 
           '')
-        paths);
+        paths;
 
-      switchScript = { paths, theme }: concatStringsSep "\n" (map
+      switchScript = { paths, theme }: concatMapStringsSep "\n"
         (path: /*bash*/ ''
           cp "${configHome}/darkman/variants/${path}.${theme}" "${configHome}/darkman/variants/${path}"
         '')
-        paths);
+        paths;
     in
     {
       xdg.configFile = listToAttrs (
@@ -140,11 +140,10 @@ let
           (attrValues cfg.switchApps));
 
       home.activation."generate-darkman-variants" = entryAfter [ "linkGeneration" ]
-        (concatStringsSep "\n"
-          (
-            map (app: genVariants cfg.switchApps.${app})
-              (attrNames cfg.switchApps)
-          ));
+        (concatMapStringsSep "\n"
+          (app: genVariants cfg.switchApps.${app})
+          (attrNames cfg.switchApps)
+        );
 
       modules.desktop.services.darkman.switchScripts = mapAttrs
         (_: value:

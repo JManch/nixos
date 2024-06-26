@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) utils;
+  inherit (lib) utils concatStringsSep;
   installScript = pkgs.writeShellApplication {
     name = "install-host";
     runtimeInputs = with pkgs; [
@@ -25,7 +25,7 @@ let
         exit 1
       fi
       hostname=$1
-      hosts=(${lib.concatStringsSep " " (builtins.attrNames (utils.hosts self))})
+      hosts=(${concatStringsSep " " (builtins.attrNames (utils.hosts self))})
       match=0
       for host in "''${hosts[@]}"; do
         if [[ $host = "$hostname" ]]; then

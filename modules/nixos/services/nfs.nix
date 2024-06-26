@@ -8,6 +8,7 @@ let
     elem
     filter
     concatStringsSep
+    concatMapStringsSep
     mapAttrsToList
     concatMap
     attrNames
@@ -39,16 +40,15 @@ mkMerge [
           ''
             # Unlike NFSv3, NFSv4 requires a root filesystem to be defined with
             # fsid=0 and all exported directories must be under the root
-            /export ${concatStringsSep " " (map (m: "${m}(rw,fsid=0,nohide,no_subtree_check)") uniqueMachines)}
+            /export ${concatMapStringsSep " " (m: "${m}(rw,fsid=0,nohide,no_subtree_check)") uniqueMachines}
 
             # Create export entries for every file system
-            ${concatStringsSep "\n" (
-              map (
+            ${concatMapStringsSep "\n" (
                 f: "/export/${f.path} ${concatStringsSep " " (
                   mapAttrsToList (machine: opts: "${machine}(${opts})") f.clients
                 )}"
               )
-              fileSystems)
+              fileSystems
             }
           '';
       };

@@ -1,6 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf utils getExe' concatStringsSep optionalString;
+  inherit (lib) mkIf utils getExe' concatMapStringsSep optionalString;
   inherit (config.modules.system.networking) primaryInterface defaultGateway resolved;
   cfg = config.modules.services.wgnord;
   ip = getExe' pkgs.iproute "ip";
@@ -26,8 +26,8 @@ mkIf cfg.enable
       Address = 10.5.0.2/32
       MTU = 1350
       ${optionalString cfg.setDNS "DNS = 103.86.96.100 103.86.99.100"}
-      PreUp = ${concatStringsSep ";" (map (route: "${ip} route add ${route} via ${defaultGateway} dev ${primaryInterface}") cfg.excludeSubnets)}
-      PostDown = ${concatStringsSep ";" (map (route: "${ip} route del ${route} via ${defaultGateway} dev ${primaryInterface}") cfg.excludeSubnets)}
+      PreUp = ${concatMapStringsSep ";" (route: "${ip} route add ${route} via ${defaultGateway} dev ${primaryInterface}") cfg.excludeSubnets}
+      PostDown = ${concatMapStringsSep ";" (route: "${ip} route del ${route} via ${defaultGateway} dev ${primaryInterface}") cfg.excludeSubnets}
 
       ${optionalString cfg.splitTunnel ''
         PostUp = ip -4 rule delete table 51820

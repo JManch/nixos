@@ -19,7 +19,7 @@ let
     escapeShellArg
     imap1
     sort
-    concatStringsSep;
+    concatLines;
   inherit (config.modules.desktop.services) hypridle;
   inherit (osConfig.device) gpu;
   cfg = desktopCfg.services.waybar;
@@ -278,7 +278,7 @@ mkIf (cfg.enable && osConfig.modules.system.desktop.enable && isWayland)
         focused_monitor=$(${escapeShellArg hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
         # Get ID of the monitor based on x pos sort
         declare -A monitor_name_to_id
-        ${concatStringsSep "\n" (imap1 (i: m: "monitor_name_to_id[${m.name}]='${toString i}'") sortedMonitors)}
+        ${concatLines (imap1 (i: m: "monitor_name_to_id[${m.name}]='${toString i}'") sortedMonitors)}
         monitor_id=''${monitor_name_to_id[$focused_monitor]}
         ${systemctl} kill --user --signal="SIGRTMIN+$monitor_id" waybar
       '';

@@ -20,6 +20,7 @@ let
     replaceStrings
     concatStrings
     concatStringsSep
+    concatMapStringsSep
     nameValuePair
     optionalAttrs
     mapAttrs'
@@ -170,7 +171,7 @@ let
               if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
               echo
               ${optionalString value.restore.removeExisting (
-                concatStringsSep ";" (map (path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}") value.paths)
+                concatMapStringsSep ";" (path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}") value.paths
               )}
               echo "Running pre-restore script..."
               ${value.restore.preRestoreScript}

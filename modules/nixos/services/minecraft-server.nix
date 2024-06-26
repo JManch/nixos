@@ -10,6 +10,8 @@ let
     mkMerge
     escapeShellArg
     concatStringsSep
+    concatMapStringsSep
+    concatLines
     mkAfter
     optional
     genAttrs
@@ -226,14 +228,14 @@ mkIf cfg.enable
 
       # Install new plugins
       mkdir -p plugins
-      ${concatStringsSep "\n" (map (plugin: /*bash*/ ''
+      ${concatMapStringsSep "\n" (plugin: /*bash*/ ''
         ln -fs "${availablePlugins.${plugin}}"/*.jar "${dataDir}/plugins"
-      '') cfg.plugins)}
+      '') cfg.plugins}
 
       # Install config files
       # We can't symlink from store because plugins need config write privs as
       # they merge our provided config with the default config
-      ${concatStringsSep "\n" (mapAttrsToList (path: file: /*bash*/ 
+      ${concatLines (mapAttrsToList (path: file: /*bash*/ 
         if file.value != null then ''
           rm -f "${dataDir}/${path}"
           install -m 640 -D "${pkgs.writeText "${baseNameOf path}" file.value}" "${dataDir}/${path}"

@@ -5,7 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf concatMap fetchers getExe getExe';
+  inherit (lib) mkIf concatMap concatLines fetchers getExe getExe';
   inherit (osConfig.device) monitors;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
@@ -54,7 +54,7 @@ let
       uniform int wl_output;
 
       void main() {
-        ${builtins.concatStringsSep ("\n") monitorGammaConditionals}
+        ${concatLines monitorGammaConditionals}
       }
 
     '' else blankShader;

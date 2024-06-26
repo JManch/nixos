@@ -14,9 +14,9 @@ let
     getExe
     mkVMOverride
     toUpper
-    concatStringsSep
-    genAttrs
-    concatStrings;
+    concatMapStrings
+    concatMapStringsSep
+    genAttrs;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
   cfg = config.modules.services.caddy;
@@ -64,7 +64,7 @@ let
           -subj "/C=GB/O=${toUpper hostname}/CN=Joshua's Root Certificate"
 
         # Generate leaf certificate for each domain
-        ${concatStrings (map (d: genDomain d) certDomains)}
+        ${concatMapStrings (d: genDomain d) certDomains}
 
         mv "$temp/rootCA.crt" "$dir"
         echo "Update the encrypted certificates in agenix with the new *.crt files in $dir"
@@ -142,7 +142,7 @@ mkMerge [
             --ws-url=logs.${fqDomain}:${if vmVariant then "50080" else "443"} \
             --port=7890 \
             --real-os \
-            ${concatStringsSep " " (map (ip: "--exclude-ip ${ip}") cfg.goAccessExcludeIPRanges)} \
+            ${concatMapStringsSep " " (ip: "--exclude-ip ${ip}") cfg.goAccessExcludeIPRanges} \
             -o /var/lib/goaccess/index.html
         '';
       in

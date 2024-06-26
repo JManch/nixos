@@ -243,7 +243,6 @@ in
       exit 1
     fi
     mkdir -p /root/.ssh
-    cp /etc/ssh/ssh_host_ed25519_key.pub /root/.ssh/id_ed25519.pub
     cp /etc/ssh/ssh_host_ed25519_key /root/.ssh/id_ed25519
     ${config.systemd.services.nixos-upgrade.script}
     rm -rf /root/.ssh

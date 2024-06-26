@@ -56,7 +56,7 @@ mkIf cfg.enable
 
   desktop.hyprland.settings.windowrulev2 = [
     # Main steam window
-    "workspace emptym silent, class:^(steam)$, title:^(Steam)$"
+    "workspace emptym, class:^(steam)$, title:^(Steam)$"
 
     # Steam sign-in window
     "noinitialfocus, class:^(steam)$, title:^(Sign in to Steam)$"

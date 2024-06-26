@@ -16,7 +16,7 @@ let
     range
     concatMap
     fetchers
-    concatStringsSep;
+    concatMapStringsSep;
   inherit (osConfig.modules.system) audio;
   inherit (osConfig.device) monitors;
   cfg = desktopCfg.hyprland;
@@ -261,14 +261,10 @@ mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
       fi
 
       declare -A monitor_num_to_name
-      ${concatStringsSep "\n  "
-        (map (m: "monitor_num_to_name[${toString m.number}]='${m.name}'") monitors)
-      }
+      ${concatMapStringsSep "\n  " (m: "monitor_num_to_name[${toString m.number}]='${m.name}'") monitors}
 
       declare -A monitor_name_to_cfg
-      ${concatStringsSep "\n  "
-        (map (m: "monitor_name_to_cfg[${m.name}]='${fetchers.getMonitorHyprlandCfgStr m}'") monitors)
-      }
+      ${concatMapStringsSep "\n  " (m: "monitor_name_to_cfg[${m.name}]='${fetchers.getMonitorHyprlandCfgStr m}'") monitors}
 
       if [[ ! -v monitor_num_to_name[$1] ]]; then
         echo "Error: monitor with number '$1' does not exist"

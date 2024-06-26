@@ -12,7 +12,7 @@ let
     mkVMOverride
     getExe
     getExe'
-    concatStringsSep
+    concatMapStringsSep
     concatMap
     imap
     optionalString
@@ -62,28 +62,25 @@ mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
       hyprDir = "${config.xdg.configHome}/hypr";
     in
       /*bash*/ ''
-
-        ${getExe pkgs.gnused} \
-          -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
-          -e 's/enable_stdout_logs=false/enable_stdout_logs=true/' \
-          -e 's/disable_hyprland_logo=true/disable_hyprland_logo=false/' \
-          -e 's/no_direct_scanout=false/no_direct_scanout=true/' \
-          -e '/ALTALT/d' \
-          -e '/screen_shader/d' \
-          -e '/^exec-once/d' \
-          -e '/^monitor/d' \
-          -e 's/, monitor:(.*),//g' \
-          ${concatStringsSep " " (map (m: "-e 's/${m.name}/WL-${toString m.number}/g'") monitors)} \
-          ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf
-
-      # Add monitor config
+      ${getExe pkgs.gnused} \
+        -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
+        -e 's/enable_stdout_logs=false/enable_stdout_logs=true/' \
+        -e 's/disable_hyprland_logo=true/disable_hyprland_logo=false/' \
+        -e 's/no_direct_scanout=false/no_direct_scanout=true/' \
+        -e '/ALTALT/d' \
+        -e '/screen_shader/d' \
+        -e '/^exec-once/d' \
+        -e '/^monitor/d' \
+        -e 's/, monitor:(.*),//g' \
+        ${concatMapStringsSep " " (m: "-e 's/${m.name}/WL-${toString m.number}/g'") monitors} \
+        ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf
       ${
-        concatStringsSep "\n" (map (m: let res = "${toString m.width}x${toString m.height}"; in
+        # Add monitor config
+        concatMapStringsSep "\n" (m: let res = "${toString m.width}x${toString m.height}"; in
           "echo \"monitor=WL-${toString m.number},${res},${toString m.position.x}x${toString m.position.y},1\" >> ${hyprDir}/hyprlandd.conf")
-          monitors)
+          monitors
       }
-
-      '';
+    '';
 
   xdg.portal = {
     extraPortals = [ hyprlandPkgs.xdg-desktop-portal-hyprland ];

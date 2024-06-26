@@ -131,6 +131,7 @@ let
             read -p "Enter the snapshot ID to restore (leave empty for latest): " -r snapshot
             if [ -z "$snapshot" ]; then snapshot="latest"; fi
 
+            target="/"
             custom_target=false
             read -p "Would you like to restore to a custom path instead of the original? Restore scripts will NOT run. (y/N): " -n 1 -r
             if [[ "$REPLY" =~ ^[Yy]$ ]]; then
@@ -167,6 +168,7 @@ let
             else
               read -p "Existing files are about to be replaced by the backup. Are you sure you want to continue? (y/N): " -n 1 -r
               if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
+              echo
               ${optionalString value.restore.removeExisting (
                 concatStringsSep ";" (map (path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}") value.paths)
               )}

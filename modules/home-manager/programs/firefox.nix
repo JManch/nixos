@@ -22,6 +22,13 @@ mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
   programs.firefox = {
     enable = true;
 
+    # Ideally we would make the sync service a strict dependency of
+    # graphical-session.target to ensure that firefox cannot be launched before
+    # the sync has finished (if firefox launches it creates files and breaks
+    # the sync). However, I don't want graphical-session.target to be delayed
+    # ~10 secs every boot until the sync finishes. Instead, I wrap the firefox
+    # package to prevent launch unless sync has finished. That way I can use
+    # other applications until firefox is ready.
     package = mkIf cfg.runInRam (
       pkgs.firefox.overrideAttrs (old: {
         buildCommand =
@@ -308,6 +315,10 @@ mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
         Unit = {
           Description = "Firefox persist initialiser";
           X-SwitchMethod = "keep-old";
+          # We don't want graphical-session.target activation to be delayed
+          # until this service is active.
+          After = "graphical-session.target";
+          PartOf = "graphical-session.target";
         };
 
         Service = {
@@ -324,15 +335,7 @@ mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
           RemainAfterExit = true;
         };
 
-        # Ideally we would use "graphical-session-pre.target" here to ensure
-        # that firefox cannot be launched before the sync has finished (if
-        # firefox launches it creates files and breaks the sync). However, I
-        # don't want to stare at a blank screen for 5 seconds every boot so
-        # instead I prevent firefox launch bind from working unless sync has
-        # finished. It's not too fragile because even if firefox is forcefully
-        # launched within the ~5 second window, the persist-init service will
-        # fail, prevent further syncs from happening, and prevent corruption.
-        Install.WantedBy = [ "default.target" ];
+        Install.WantedBy = [ "graphical-session.target" ];
       };
 
       services.firefox-persist-sync = {

@@ -82,6 +82,18 @@ in
         '';
       };
 
+      dependencyUnit = mkOption {
+        type = types.str;
+        internal = true;
+        default = "graphical-session.target";
+        example = "swww.service";
+        description = ''
+          The dependency unit for the set-wallpaper service.
+          graphical-session.target will always work but using the specific
+          wallpaper setter service may provide less delay.
+        '';
+      };
+
       randomise = {
         enable = mkEnableOption "random wallpaper selection";
 

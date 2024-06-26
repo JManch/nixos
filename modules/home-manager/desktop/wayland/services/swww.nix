@@ -32,4 +32,6 @@ mkIf (cfg.enable && osConfig.modules.system.desktop.enable && (fetchers.isWaylan
 
     Install.WantedBy = [ "graphical-session.target" ];
   };
+
+  modules.desktop.services.wallpaper.dependencyUnit = "swww.service";
 }

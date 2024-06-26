@@ -82,10 +82,10 @@ mkIf (osConfig.modules.system.desktop.enable && cfg.setWallpaperCmd != null) (mk
       Unit = {
         Description = "Set the desktop wallpaper";
         X-SwitchMethod = "keep-old";
-        PartOf = [ "graphical-session.target" ];
-        Requisite = [ "graphical-session.target" ];
+        PartOf = [ cfg.dependencyUnit ];
+        Requisite = [ cfg.dependencyUnit ];
         After = [
-          "graphical-session.target"
+          cfg.dependencyUnit
         ] ++ optional cfg.randomise.enable "randomise-wallpaper.service"
         ++ optional darkman.enable "darkman.service";
       };

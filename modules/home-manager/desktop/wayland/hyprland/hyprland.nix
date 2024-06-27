@@ -40,6 +40,9 @@ in
 mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
   modules.desktop = {
     # Optimise for performance in VM variant
+    # TODO: When I update hyprland, add a hook to disable hardware cursors when
+    # launching a QEMU VM otherwise the cursor is upside down.
+    # https://github.com/hyprwm/Hyprland/issues/6428
     hyprland = mkIf vmVariant (mkVMOverride {
       tearing = false;
       directScanout = false;

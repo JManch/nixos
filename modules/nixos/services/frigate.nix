@@ -30,8 +30,8 @@ mkIf cfg.enable {
     "Frigate requires Caddy to be enabled"
     (cfg.nvrAddress != "")
     "The Frigate service requires nvrAddress to be set"
-    config.hardware.graphics.enable
-    "The Frigate service requires hardware acceleration. Set `hardware.graphics.enable`."
+    config.hardware.opengl.enable
+    "The Frigate service requires hardware acceleration. Set `hardware.opengl.enable`."
   ];
 
   modules.services.frigate.rtspAddress =

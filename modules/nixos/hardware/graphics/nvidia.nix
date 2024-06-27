@@ -8,9 +8,12 @@ let
   inherit (lib) mkIf;
   inherit (config.modules.system.desktop) isWayland suspend;
 in
-mkIf (config.device.gpu.type == "nvidia") {
-  hardware.graphics = {
+mkIf (config.device.gpu.type == "nvidia")
+{
+  hardware.opengl = {
     enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
     extraPackages = with pkgs; [
       vaapiVdpau
       nvidia-vaapi-driver

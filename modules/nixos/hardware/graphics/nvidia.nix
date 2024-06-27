@@ -5,8 +5,10 @@ let
 in
 mkIf (config.device.gpu.type == "nvidia")
 {
-  hardware.graphics = {
+  hardware.opengl = {
     enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
     extraPackages = with pkgs; [
       vaapiVdpau
       nvidia-vaapi-driver

@@ -29,8 +29,10 @@ mkIf (config.device.gpu.type == "amd")
   # the Mesa driver package which is installed when hardware.opengl.driSupport is
   # enabled. AMDVLK is installed through the extraPackages option. There is also
   # the kernel module driver component which is amdgpu.
-  hardware.graphics = {
+  hardware.opengl = {
     enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
 
     # NOTE: Completely removing amdvlk for now because it seems that gamescope
     # does not adhere to AMD_VULKAN_ICD and uses amdvlk regardless, causing it

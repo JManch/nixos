@@ -34,6 +34,7 @@
 let
   inherit (lib)
     mkIf
+    mkMerge
     utils
     mapAttrs
     getExe
@@ -116,7 +117,7 @@ let
         '')
         paths;
     in
-    {
+    mkIf (cfg.enable && osConfig.modules.system.desktop.enable) {
       xdg.configFile = listToAttrs (
         concatMap
           (value:
@@ -155,8 +156,9 @@ let
         cfg.switchApps;
     };
 in
-{
-  config = mkIf (cfg.enable && osConfig.modules.system.desktop.enable) ({
+mkIf (cfg.enable && osConfig.modules.system.desktop.enable) (mkMerge [
+  colorSchemeSwitchingConfiguration
+  {
     assertions = utils.asserts [
       ((cfg.switchMethod == "hass") -> hassIntegration.enable)
       "Darkman 'hass' switch mode requires the device to have hass integration enabled"
@@ -223,6 +225,5 @@ in
 
       Install.WantedBy = [ "darkman.service" ];
     };
-
-  } // colorSchemeSwitchingConfiguration);
-}
+  }
+])

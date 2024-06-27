@@ -1,6 +1,6 @@
 { lib
-, username
 , config
+, username
 , osConfig
 , ...
 }:

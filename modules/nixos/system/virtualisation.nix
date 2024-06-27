@@ -43,10 +43,7 @@ let
       # Build the VM
       runscript="/home/${username}/result/bin/run-$hostname-vm"
       pushd "/home/${username}" > /dev/null
-      reset_dir() {
-        popd >/dev/null 2>&1 || true
-      }
-      add_exit_trap reset_dir
+      add_exit_trap "popd >/dev/null 2>&1 || true"
       nixos-rebuild build-vm --flake "$flake#$hostname"
       popd > /dev/null
 
@@ -54,21 +51,19 @@ let
       impermanence=$(nix eval "$flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.modules.system.impermanence.enable")
 
       # Reset ssh key early as we no longer need flake access
-      if [ -f "$tmp_key" ]; then
-        mv "$tmp_key" "$ssh_dir/id_ed25519"
-      fi
+      reset_key
 
       # Print ports mapped to the VM
       printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
 
       if [[ "$no_secrets" = false && ! -e "/home/${username}/$hostname.qcow2" ]]; then
-        temp=$(mktemp -d)
+        tmp=$(mktemp -d)
         # shellcheck disable=SC2016
-        add_exit_trap 'rm -rf $temp'
+        add_exit_trap 'rm -rf $tmp'
 
         # Decrypt the relevant secrets from kit
         kit_path="${../../../hosts/ssh-bootstrap-kit}"
-        age -d "$kit_path" | tar -xf - --strip-components=1 -C "$temp" "$hostname"
+        age -d "$kit_path" | tar -xf - --strip-components=1 -C "$tmp" "$hostname"
 
         # Copy keys to VM
         printf "Copying SSH keys to VM...\nNOTE: Secret decryption will not work on the first VM launch"
@@ -78,8 +73,8 @@ let
         fi
         (scp -P 50022 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
           -o LogLevel=QUIET -o ConnectionAttempts=30 \
-          "$temp/ssh_host_ed25519_key" "$temp/ssh_host_ed25519_key.pub" \
-          root@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$temp") &
+          "$tmp/ssh_host_ed25519_key" "$tmp/ssh_host_ed25519_key.pub" \
+          root@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$tmp") &
       fi
 
       # For non-graphical VMs, launch VM and start ssh session in new

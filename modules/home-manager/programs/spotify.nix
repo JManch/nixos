@@ -36,10 +36,10 @@ in
 mkIf (cfg.enable && osConfig.modules.system.audio.enable)
 {
   home.packages = [
-    # Need this for the spotify-player desktop icon
-    (pkgs.spotify.overrideAttrs (oldAttrs: {
-      postInstall = /*bash*/ ''
-        rm "$out/share/applications/spotify.desktop"
+    (pkgs.spotify.overrideAttrs (old: {
+      postInstall = (old.postInstall or "") + /*bash*/ ''
+        substituteInPlace $out/share/applications/spotify.desktop \
+          --replace-fail Spotify "Spotify Desktop"
       '';
     }))
     spotify-player
@@ -134,13 +134,13 @@ mkIf (cfg.enable && osConfig.modules.system.audio.enable)
       ];
 
       bindr = [
-        "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause --player spotify_player"
-        "${modKey}SHIFT, ${modKey}_R, exec, ${playerctl} play-pause --ignore-player spotify_player"
+        "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause --player spotify_player,spotify"
+        "${modKey}SHIFT, ${modKey}_R, exec, ${playerctl} play-pause --ignore-player spotify_player,spotify"
       ];
 
       bind = [
-        "${modKey}, Period, exec, ${playerctl} next --player spotify_player"
-        "${modKey}, Comma, exec, ${playerctl} previous --player spotify_player"
+        "${modKey}, Period, exec, ${playerctl} next --player spotify_player,spotify"
+        "${modKey}, Comma, exec, ${playerctl} previous --player spotify_player,spotify"
         ", XF86AudioNext, exec, ${playerctl} next"
         ", XF86AudioPrev, exec, ${playerctl} previous"
         ", XF86AudioPlay, exec, ${playerctl} play"

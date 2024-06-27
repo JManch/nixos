@@ -8,6 +8,7 @@
 }:
 let
   cfg = config.modules.core.homeManager;
+  inherit (config.modules.system.virtualisation) vmVariant;
 in
 {
   imports = [
@@ -23,12 +24,8 @@ in
       sharedModules = [ ../../home-manager ];
 
       extraSpecialArgs = {
-        inherit inputs self username hostname;
-        vmVariant = false;
+        inherit inputs self username hostname vmVariant;
       };
-    };
-    virtualisation.vmVariant = {
-      home-manager.extraSpecialArgs = { vmVariant = true; };
     };
   };
 }

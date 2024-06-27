@@ -65,7 +65,7 @@ mkIf cfg.enable
               70: 0.5
               75: 0.6
               80: 0.65
-              90: 0.8
+              90: 1
           pmfw_options:
             acoustic_limit: 3300
             acoustic_target: 2000
@@ -108,6 +108,14 @@ mkIf cfg.enable
       '';
   };
 
+  # Set LACT_HIGH_PERF=1 when using gamemoderun for higher power cap of 257. In
+  # unigine superposition 4k optimised gives an 8% FPS instead (132fps ->
+  # 122fps). Max core clock speeds go 2000MHz -> 2200Mhz. Thermals are a fair
+  # bit worse though, ~200rpm fan increase.
+
+  # TODO: Since gamemoderun does not allow passing custom args or env vars to
+  # the start/stop scripts, I'll need to wrap it to enable conditional GPU
+  # modes.
   modules.programs.gaming.gamemode =
     let
       ncat = getExe' pkgs.nmap "ncat";
@@ -115,14 +123,29 @@ mkIf cfg.enable
       confirm = ''echo '{"command": "confirm_pending_config", "args": {"command": "confirm"}}' | ${ncat} -U /run/lactd.sock'';
       getId = ''echo '{"command": "list_devices"}' | ${ncat} -U /run/lactd.sock | ${jaq} -r ".data.[0].id"'';
 
+      setPowerCap = powerCap: /*bash*/ ''
+        echo "{\"command\": \"set_power_cap\", \"args\": {\"id\": \"$id\", \"cap\": ${toString powerCap}}}" | ${ncat} -U /run/lactd.sock
+        ${confirm}
+      '';
+
       setPowerProfile = profileIndex: /*bash*/ ''
-        id=$(${getId})
         echo "{\"command\": \"set_power_profile_mode\", \"args\": {\"id\": \"$id\", \"index\": ${toString profileIndex}}}" | ${ncat} -U /run/lactd.sock
         ${confirm}
       '';
     in
     {
-      startScript = setPowerProfile 1;
-      stopScript = setPowerProfile 0;
+      startScript = ''
+        id=$(${getId})
+        ${setPowerProfile 1}
+        # if [ -n "''${LACT_HIGH_PERF+x}" ]; then
+        #   ${setPowerCap 257}
+        # fi
+      '';
+
+      stopScript = ''
+        id=$(${getId})
+        ${setPowerProfile 0}
+        # ${setPowerCap 231}
+      '';
     };
 }

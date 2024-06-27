@@ -41,11 +41,7 @@ let
       # accidentally built in /nix/store and caused irrepairable corruption
       text = /*bash*/ ''
         ${cfg.loadNixResourcesKey}
-
-        reset_dir() {
-          popd >/dev/null 2>&1 || true
-        }
-        add_exit_trap reset_dir
+        add_exit_trap "popd >/dev/null 2>&1 || true"
         pushd ~ >/dev/null 2>&1
 
         nixos-rebuild ${if (cmd == "diff") then "build" else cmd} \
@@ -129,10 +125,7 @@ let
           # Always build and store result to prevent GC deleting builds for remote hosts
           remote_builds="/home/${username}/files/remote-builds/$hostname"
           mkdir -p "$remote_builds"
-          reset_dir() {
-            popd >/dev/null 2>&1
-          }
-          add_exit_trap reset_dir
+          add_exit_trap "popd >/dev/null 2>&1 || true"
           pushd "$remote_builds" >/dev/null 2>&1
           nixos-rebuild build --flake "$flake#$hostname" "''${@:2}"
           ${optionalString (cmd != "build") /*bash*/ ''

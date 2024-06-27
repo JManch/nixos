@@ -28,6 +28,7 @@ let
         indexed_results = search.get_dict().get('organic_results', [])
         if len(indexed_results) == 0:
             exit(1)
+        print(indexed_results)
         exit(0)
   '';
 in

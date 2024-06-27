@@ -33,6 +33,25 @@ in
     in
     concatStrings ([ (toUpper (head chars)) ] ++ (tail chars));
 
+  # Adding multiple EXIT traps in a bash script is a pain because they
+  # overwrite each other. This makes that easier.
+  exitTrapBuilder = /*bash*/ ''
+    exit_trap_command=""
+    function call_exit_traps {
+      eval "$exit_trap_command"
+    }
+    trap call_exit_traps EXIT
+
+    function add_exit_trap {
+      local to_add=$1
+      if [ -z "$exit_trap_command" ]; then
+        exit_trap_command="$to_add"
+      else
+        exit_trap_command="$exit_trap_command; $to_add"
+      fi
+    }
+  '';
+
   asserts = asserts:
     concatMap (a: a) (
       imap0

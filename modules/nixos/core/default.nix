@@ -1,9 +1,9 @@
 { lib, pkgs, username, ... }:
 let
-  inherit (lib) mkOption mkEnableOption types;
+  inherit (lib) utils mkOption mkEnableOption types;
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = utils.scanPaths ./.;
 
   options.modules.core = {
     homeManager.enable = mkEnableOption "Home Manager";
@@ -32,13 +32,14 @@ in
           flake="github:JManch/nixos"
         fi
 
+        ${utils.exitTrapBuilder}
         reset_key() {
-          if [ -f "$tmp_key" ]; then
+          if [[ -f "$tmp_key" && -s "$tmp_key" ]]; then
             mv "$tmp_key" "$ssh_dir/id_ed25519"
           fi
-          rm -rf "$tmp_key"
+          rm -f "$tmp_key"
         }
-        trap reset_key EXIT
+        add_exit_trap reset_key
 
         # On users that are not my own, temporarily copy the nix-resources key
         # to .ssh/ed25519. This is because there's no way (that I'm aware of)

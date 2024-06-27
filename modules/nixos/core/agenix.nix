@@ -14,7 +14,6 @@ let
   ]) ++ [ agenix.packages.${pkgs.system}.agenix ];
 
   decryptKit = /*bash*/ ''
-
     temp=$(mktemp -d)
     cleanup() {
       rm -rf "$temp"
@@ -23,7 +22,6 @@ let
 
     kit_path="${../../../hosts/ssh-bootstrap-kit}"
     age -d "$kit_path" | tar -xf - -C "$temp"
-
   '';
 
   editSecretScript = pkgs.writeShellApplication {

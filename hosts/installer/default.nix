@@ -72,7 +72,8 @@ let
         rm -rf "$ssh_dir"
         rm -rf "$temp_keys"
       }
-      trap cleanup EXIT
+      ${utils.exitTrapBuilder}
+      add_exit_trap cleanup
 
       echo "Decrypting ssh-bootstrap-kit..."
       age -d "$config/hosts/ssh-bootstrap-kit" | tar -xf - -C "$temp_keys"
@@ -126,7 +127,7 @@ let
       # the build will likely fail as it runs out of space. We workaround this
       # by creating the tmpdir ourselves.
       tmpdir="$(mktemp -d -p "$rootDir")"
-      trap 'rm -rf $tmpdir' EXIT
+      add_exit_trap 'rm -rf $tmpdir'
       TMPDIR="$tmpdir" nixos-install \
         --no-root-passwd \
         --no-write-lock-file \

@@ -45,7 +45,7 @@ let
         reset_dir() {
           popd >/dev/null 2>&1 || true
         }
-        trap reset_dir EXIT
+        add_exit_trap reset_dir
         pushd ~ >/dev/null 2>&1
 
         nixos-rebuild ${if (cmd == "diff") then "build" else cmd} \
@@ -129,10 +129,10 @@ let
           # Always build and store result to prevent GC deleting builds for remote hosts
           remote_builds="/home/${username}/files/remote-builds/$hostname"
           mkdir -p "$remote_builds"
-          exit() {
+          reset_dir() {
             popd >/dev/null 2>&1
           }
-          trap exit EXIT
+          add_exit_trap reset_dir
           pushd "$remote_builds" >/dev/null 2>&1
           nixos-rebuild build --flake "$flake#$hostname" "''${@:2}"
           ${optionalString (cmd != "build") /*bash*/ ''

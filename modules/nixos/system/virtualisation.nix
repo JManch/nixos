@@ -46,7 +46,7 @@ let
       reset_dir() {
         popd >/dev/null 2>&1 || true
       }
-      trap reset_dir EXIT
+      add_exit_trap reset_dir
       nixos-rebuild build-vm --flake "$flake#$hostname"
       popd > /dev/null
 
@@ -63,10 +63,8 @@ let
 
       if [[ "$no_secrets" = false && ! -e "/home/${username}/$hostname.qcow2" ]]; then
         temp=$(mktemp -d)
-        cleanup() {
-          rm -rf "$temp"
-        }
-        trap cleanup EXIT
+        # shellcheck disable=SC2016
+        add_exit_trap 'rm -rf $temp'
 
         # Decrypt the relevant secrets from kit
         kit_path="${../../../hosts/ssh-bootstrap-kit}"

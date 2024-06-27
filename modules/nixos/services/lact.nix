@@ -108,14 +108,10 @@ mkIf cfg.enable
       '';
   };
 
-  # Set LACT_HIGH_PERF=1 when using gamemoderun for higher power cap of 257. In
+  # Pass --high-perf when using gamemoderun for higher power cap of 257. In
   # unigine superposition 4k optimised gives an 8% FPS instead (132fps ->
   # 122fps). Max core clock speeds go 2000MHz -> 2200Mhz. Thermals are a fair
   # bit worse though, ~200rpm fan increase.
-
-  # TODO: Since gamemoderun does not allow passing custom args or env vars to
-  # the start/stop scripts, I'll need to wrap it to enable conditional GPU
-  # modes.
   modules.programs.gaming.gamemode =
     let
       ncat = getExe' pkgs.nmap "ncat";
@@ -137,15 +133,15 @@ mkIf cfg.enable
       startScript = ''
         id=$(${getId})
         ${setPowerProfile 1}
-        # if [ -n "''${LACT_HIGH_PERF+x}" ]; then
-        #   ${setPowerCap 257}
-        # fi
+        if [[ "$*" == *"--high-perf"* ]]; then
+          ${setPowerCap 257}
+        fi
       '';
 
       stopScript = ''
         id=$(${getId})
         ${setPowerProfile 0}
-        # ${setPowerCap 231}
+        ${setPowerCap 231}
       '';
     };
 }

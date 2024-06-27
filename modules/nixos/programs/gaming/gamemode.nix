@@ -45,6 +45,13 @@ let
       ] ++ optional isHyprland homeConfig.wayland.windowManager.hyprland.package;
 
       text = ''
+        # Load custom arguments into positional parameters
+        args_file="/home/${username}/.gamemode-custom-args"
+        if [ -e "$args_file" ]; then
+          set -- "$(cat "$args_file")"
+          rm "$args_file"
+        fi
+
         ${
           optionalString isHyprland /*bash*/ ''
             hyprctl --instance 0 --batch "\
@@ -78,11 +85,48 @@ mkIf cfg.enable
   # https://github.com/FeralInteractive/gamemode/issues/452
   users.users.${username}.extraGroups = [ "gamemode" ];
 
+  nixpkgs.overlays = [
+    (final: prev: {
+      gamemode = prev.gamemode.overrideAttrs (old: {
+        # This allows us to pass custom arguments to gamemoderun. For example,
+        # passing --high-perf sets a higher GPU power cap in our start script.
+        # The custom arguments must be the first arguments passed to
+        # gamemoderun. We have to write to a file like this because it's better
+        # to run the script in the gamemode environment than in steam's FHS
+        # environment where a bunch of stuff (like lib-notify) doesn't work.
+
+        # We can't write to /tmp because steam runs in a chroot with its own
+        # tmp dir. Any files we write there will not be accessible from our
+        # gamemoderun start script. Our home directory is bind mounted in the
+        # chroot so that is accessible.
+        postFixup = old.postFixup + ''
+          wrapProgram $out/bin/gamemoderun --run '
+          rm -f /home/${username}/.gamemode-custom-args
+          while test $# -gt 0
+          do
+            case "$1" in
+              --high-perf)
+                ;&
+              --low-perf) echo -n "$1 " >> /home/${username}/.gamemode-custom-args;
+                ;;
+              *) break
+                ;;
+            esac
+            shift
+          done
+          '
+        '';
+      });
+    })
+  ];
+
   programs.gamemode = {
     enable = true;
 
     settings = {
       custom = {
+        # WARN: For gamemode script changes to be applied the user service must
+        # be manually restarted with `systemctl restart --user gamemoded`
         start = getExe (startStopScript "start");
         end = getExe (startStopScript "end");
       };

@@ -5,8 +5,17 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe';
+  inherit (lib) mkIf getExe' mapAttrs' nameValuePair;
+  inherit (config.xdg) dataHome;
   cfg = osConfig.modules.programs.gaming.steam;
+
+  steamAppIDs = {
+    "BeamNG.drive" = 284160;
+    "Red Dead Redemption 2" = 1174180;
+    "Deep Rock Galactic" = 548430;
+    Noita = 881100;
+  };
+
 in
 mkIf cfg.enable
 {
@@ -14,6 +23,13 @@ mkIf cfg.enable
   home.file.".steam/steam/steam_dev.cfg".text = ''
     @nClientDownloadEnableHTTP2PlatformLinux 0
   '';
+
+  # Create compatdata symlinks to make finding proton prefixes easier
+  xdg.dataFile = mapAttrs'
+    (gameName: appID: nameValuePair "Steam/steamapps/compatdata/${gameName}" {
+      source = config.lib.file.mkOutOfStoreSymlink "${dataHome}/Steam/steamapps/compatdata/${toString appID}";
+    })
+    steamAppIDs;
 
   # WARN: Having third mirrored monitor enabled before launching seems to break
   # games (black screen in content manager). The issue doesn't occur if I
@@ -48,9 +64,9 @@ mkIf cfg.enable
       "cs2"
     ];
 
-    tearingExcludedClasses = [
-      "steam_app_1174180" # RDR2 - half-vsync without tearing is preferrable
-      "steam_app_881100" # Noita - tearing lags cursor
+    tearingExcludedClasses = map (game: "steam_app_${steamAppIDs.${game}}") [
+      "Red Dead Redemption 2" # half-vsync without tearing is preferrable
+      "Noita" # tearing lags cursor
     ];
   };
 
@@ -69,6 +85,6 @@ mkIf cfg.enable
   ];
 
   programs.zsh.shellAliases = {
-    beam-mp = "${getExe' pkgs.protontricks "protontricks-launch"} --appid 284160 ${config.home.homeDirectory}/.local/share/Steam/steamapps/compatdata/284160/pfx/dosdevices/c:/users/steamuser/AppData/Roaming/BeamMP-Launcher/BeamMP-Launcher.exe";
+    beam-mp = "${getExe' pkgs.protontricks "protontricks-launch"} --appid 284160 ${dataHome}/Steam/steamapps/compatdata/284160/pfx/dosdevices/c:/users/steamuser/AppData/Roaming/BeamMP-Launcher/BeamMP-Launcher.exe";
   };
 }

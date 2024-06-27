@@ -57,7 +57,7 @@ in
         Light color scheme. Uses first eight from dark color scheme.
       '';
       apply = v: v // {
-        palette = with dark.palette; v.palette // {
+        palette = v.palette // (with dark.palette; {
           base00 = base07;
           base01 = base06;
           base02 = base05;
@@ -66,7 +66,7 @@ in
           base05 = base02;
           base06 = base01;
           base07 = base00;
-        };
+        });
       };
     };
 
@@ -80,7 +80,7 @@ in
           lightColors = light.palette;
           baseColors = attrNames darkColors;
         in
-        genAttrs (baseColors) (name: {
+        genAttrs baseColors (name: {
           dark = darkColors.${name};
           light = lightColors.${name};
         });

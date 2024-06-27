@@ -34,7 +34,7 @@ in
 
         ${utils.exitTrapBuilder}
         reset_key() {
-          if [[ -f "$tmp_key" && -s "$tmp_key" ]]; then
+          if [ -s "$tmp_key" ]; then
             mv "$tmp_key" "$ssh_dir/id_ed25519"
           fi
           rm -f "$tmp_key"

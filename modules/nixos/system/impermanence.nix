@@ -8,6 +8,7 @@
 let
   inherit (lib) mkIf mkForce mkMerge utils mkAliasOptionModule concatStringsSep hasAttr;
   inherit (config.modules.core) homeManager;
+  inherit (config.modules.system.virtualisation) vmVariant;
   cfg = config.modules.system.impermanence;
   homePersistence = config.home-manager.users.${username}.persistence;
 in
@@ -27,7 +28,7 @@ in
   config = mkMerge [
     (mkIf cfg.enable {
       assertions = utils.asserts [
-        (hasAttr "/persist" config.fileSystems)
+        (vmVariant || (hasAttr "/persist" config.fileSystems))
         "A /persist file system must be defined for impermanence"
       ];
 

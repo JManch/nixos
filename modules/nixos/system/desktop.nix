@@ -28,6 +28,11 @@ in
 
       # Enables wayland for all apps that support it
       environment.sessionVariables.NIXOS_OZONE_WL = mkIf isWayland "1";
+
+      # To workaround Nvidia explicit sync crashing, temporarily force Firefox
+      # to use xwayland. Remove once this issue gets resolved:
+      # https://bugzilla.mozilla.org/show_bug.cgi?id=1898476
+      environment.sessionVariables.MOZ_ENABLE_WAYLAND = mkIf (gpu.type == "nvidia") 0;
     }
 
     (mkIf homeManager.enable {

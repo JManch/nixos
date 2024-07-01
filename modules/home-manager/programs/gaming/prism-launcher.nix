@@ -1,14 +1,22 @@
-{ lib, pkgs, config, ... }:
+{ lib
+, pkgs
+, config
+, osConfig
+, ...
+}:
 let
+  inherit (lib) mkIf utils;
   cfg = config.modules.programs.gaming.prism-launcher;
 in
-lib.mkIf cfg.enable
+mkIf cfg.enable
 {
   home.packages = [ pkgs.prismlauncher ];
 
   modules.programs.gaming.gameClasses = [ "Minecraft.*" ];
 
-  firewall.interfaces.wg-friends.allowedTCPPorts = [ 25565 ];
+  firewall.interfaces = mkIf (utils.wgInterfaceEnabled "friends" osConfig) {
+    wg-friends.allowedTCPPorts = [ 25565 ];
+  };
 
   persistence.directories = [ ".local/share/PrismLauncher" ];
 }

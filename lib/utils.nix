@@ -4,6 +4,7 @@ let
     attrNames
     filterAttrs
     imap0
+    hasAttr
     head
     tail
     concatStrings
@@ -61,6 +62,9 @@ in
               [{ assertion = elem; message = (elemAt asserts (i + 1)); }] else [ ]
         )
         asserts);
+
+  wgInterfaceEnabled = interface: osConfig:
+    (hasAttr interface osConfig.modules.services.wireguard) && (osConfig.modules.services.wireguard.${interface}.enable);
 
   hardeningBaseline = config: overrides: {
     DynamicUser = true;

@@ -1,13 +1,13 @@
 { lib
 , pkgs
 , config
-, osConfig
+, desktopEnabled
 , ...
 }:
 let
   home = config.home.homeDirectory;
 in
-lib.mkIf osConfig.modules.system.desktop.enable
+lib.mkIf desktopEnabled
 {
   # Many applications need this for xdg-open url opening however packages
   # rarely include is as a dependency for some reason

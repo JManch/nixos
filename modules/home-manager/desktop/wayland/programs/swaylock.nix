@@ -2,15 +2,15 @@
 , pkgs
 , config
 , osConfig
+, isWayland
+, desktopEnabled
 , ...
 }:
 let
-  inherit (lib) mkIf optionalString fetchers getExe;
+  inherit (lib) mkIf optionalString getExe;
   cfg = desktopCfg.programs.swaylock;
   desktopCfg = config.modules.desktop;
-  isWayland = fetchers.isWayland osConfig config;
   colors = config.colorScheme.palette;
-  osDesktopEnabled = osConfig.modules.system.desktop.enable;
 
   lockScript =
     let
@@ -64,7 +64,7 @@ let
       '';
     };
 in
-mkIf (cfg.enable && osDesktopEnabled && isWayland) {
+mkIf (cfg.enable && desktopEnabled && isWayland) {
   modules.desktop.programs.swaylock.lockScript = getExe lockScript;
 
   programs.swaylock = {

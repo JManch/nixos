@@ -5,7 +5,16 @@
 , ...
 } @ args:
 let
-  inherit (lib) mkIf utils mkOption mkPackageOption getExe length types literalExpression;
+  inherit (lib)
+    mkIf
+    utils
+    mkOption
+    mkPackageOption
+    getExe
+    length
+    types
+    literalExpression
+    mkEnableOption;
 
   terminalSubmodule = {
     options = {
@@ -28,6 +37,8 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.desktop = {
+    enable = mkEnableOption "home-manager desktop modules";
+
     windowManager = mkOption {
       type = types.nullOr (types.enum [ "Hyprland" ]);
       default = null;
@@ -102,13 +113,18 @@ in
       osDesktop = osConfig.modules.system.desktop;
     in
     {
-      assertions = mkIf (cfg.windowManager != null) (utils.asserts [
+      assertions = mkIf cfg.enable (utils.asserts [
         osDesktop.enable
-        "You cannot select a window manager if os desktop is not enabled"
-        (osDesktop.desktopEnvironment == null)
+        "You cannot enable home-manager desktop if NixOS desktop is not enabled"
+        (cfg.windowManager != null -> osDesktop.desktopEnvironment == null)
         "You cannot use a desktop environment with a window manager"
-        (length osConfig.device.monitors != 0)
+        (cfg.windowManager != null -> length osConfig.device.monitors != 0)
         "Device monitors must be configured to use a window manager"
       ]);
+
+      _module.args = {
+        desktopEnabled = cfg.enable;
+        isWayland = lib.fetchers.isWayland osConfig config;
+      };
     };
 }

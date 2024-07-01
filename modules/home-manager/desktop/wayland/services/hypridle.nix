@@ -2,14 +2,16 @@
 , pkgs
 , inputs
 , config
+, isWayland
+, desktopEnabled
 , ...
 }:
 let
-  inherit (lib) mkIf utils optional mkForce getExe getExe' escapeShellArg;
+  inherit (lib) mkIf utils optional getExe getExe' escapeShellArg;
   inherit (config.modules.desktop.programs) swaylock;
   cfg = config.modules.desktop.services.hypridle;
 in
-mkIf cfg.enable {
+mkIf (cfg.enable && desktopEnabled && isWayland) {
   assertions = utils.asserts [
     swaylock.enable
     "Hypridle requires Swaylock to be enabled"

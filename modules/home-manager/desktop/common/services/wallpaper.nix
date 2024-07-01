@@ -1,7 +1,7 @@
 { lib
 , pkgs
 , config
-, osConfig
+, desktopEnabled
 , ...
 } @ args:
 let
@@ -76,7 +76,7 @@ let
     '';
   };
 in
-mkIf (osConfig.modules.system.desktop.enable && cfg.setWallpaperCmd != null) (mkMerge [
+mkIf (cfg.setWallpaperCmd != null && desktopEnabled) (mkMerge [
   {
     systemd.user.services.set-wallpaper = {
       Unit = {

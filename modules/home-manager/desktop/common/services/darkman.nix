@@ -29,6 +29,7 @@
 , config
 , osConfig
 , vmVariant
+, desktopEnabled
 , ...
 }:
 let
@@ -117,7 +118,7 @@ let
         '')
         paths;
     in
-    mkIf (cfg.enable && osConfig.modules.system.desktop.enable) {
+    mkIf (cfg.enable && desktopEnabled) {
       xdg.configFile = listToAttrs (
         concatMap
           (value:
@@ -156,7 +157,7 @@ let
         cfg.switchApps;
     };
 in
-mkIf (cfg.enable && osConfig.modules.system.desktop.enable) (mkMerge [
+mkIf (cfg.enable && desktopEnabled) (mkMerge [
   colorSchemeSwitchingConfiguration
   {
     assertions = utils.asserts [

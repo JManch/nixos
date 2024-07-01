@@ -2,15 +2,15 @@
 , pkgs
 , inputs
 , config
-, osConfig
+, isWayland
+, desktopEnabled
 , ...
 }:
 let
-  inherit (lib) mkIf fetchers;
+  inherit (lib) mkIf;
   cfg = config.modules.desktop.programs.hyprlock;
-  isWayland = fetchers.isWayland osConfig config;
 in
-mkIf (cfg.enable && isWayland) {
+mkIf (cfg.enable && desktopEnabled && isWayland) {
   programs.hyprlock = {
     enable = true;
     package = inputs.hyprlock.packages.${pkgs.system}.default;

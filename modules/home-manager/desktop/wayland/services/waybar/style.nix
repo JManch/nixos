@@ -1,13 +1,16 @@
-{ lib, config, osConfig, ... }:
+{ lib
+, config
+, isWayland
+, desktopEnabled
+, ...
+}:
 let
   inherit (lib) mkIf;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
-  osDesktopEnabled = osConfig.modules.system.desktop.enable;
-  isWayland = lib.fetchers.isWayland osConfig config;
 in
-mkIf (osDesktopEnabled && isWayland && cfg.enable)
+mkIf (cfg.enable && desktopEnabled && isWayland)
 {
   programs.waybar.style =
     let

@@ -2,7 +2,7 @@
 , pkgs
 , config
 , inputs
-, osConfig
+, desktopEnabled
 , ...
 }:
 let
@@ -14,7 +14,7 @@ let
   darkTheme = gtkThemeFromScheme { scheme = colorScheme.dark; };
   lightTheme = gtkThemeFromScheme { scheme = colorScheme.light; };
 in
-mkIf osConfig.modules.system.desktop.enable
+mkIf desktopEnabled
 {
   home.packages = [
     darkTheme

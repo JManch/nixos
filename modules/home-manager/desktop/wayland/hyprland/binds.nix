@@ -3,6 +3,7 @@
 , config
 , osConfig
 , vmVariant
+, desktopEnabled
 , ...
 } @ args:
 let
@@ -21,7 +22,6 @@ let
   inherit (osConfig.device) monitors;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
-  osDesktop = osConfig.modules.system.desktop;
 
   jaq = getExe pkgs.jaq;
   bc = getExe' pkgs.bc "bc";
@@ -120,7 +120,7 @@ let
       'string:x-canonical-private-synchronous:hypr-scale-tablet' 'Hyprland' 'Scaled tablet to active window'
   '';
 in
-mkIf (osDesktop.enable && desktopCfg.windowManager == "Hyprland")
+mkIf (desktopEnabled && desktopCfg.windowManager == "Hyprland")
 {
   # Force secondaryModKey VM variant because binds are repeated on host
   modules.desktop.hyprland.modKey = mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);

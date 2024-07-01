@@ -1,8 +1,8 @@
-{ lib, pkgs, osConfig, ... }:
+{ lib, pkgs, desktopEnabled, ... }:
 {
   imports = lib.utils.scanPaths ./.;
 
-  config = lib.mkIf osConfig.modules.system.desktop.enable {
+  config = lib.mkIf desktopEnabled {
     home.packages = [ pkgs.gnome.nautilus ];
   };
 }

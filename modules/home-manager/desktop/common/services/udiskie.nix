@@ -2,13 +2,13 @@
 , pkgs
 , osConfig
 , vmVariant
+, desktopEnabled
 , ...
 }:
 let
   udisks = osConfig.modules.services.udisks;
-  osDesktop = osConfig.modules.system.desktop;
 in
-lib.mkIf (osDesktop.enable && udisks.enable && !vmVariant)
+lib.mkIf (desktopEnabled && udisks.enable && !vmVariant)
 {
   # Use `udiskie-umount -a` to unmount all
   home.packages = [ pkgs.udiskie ];

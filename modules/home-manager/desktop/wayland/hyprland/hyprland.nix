@@ -3,6 +3,7 @@
 , config
 , osConfig
 , vmVariant
+, desktopEnabled
 , ...
 } @ args:
 let
@@ -24,7 +25,6 @@ let
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
-  osDesktopEnabled = osConfig.modules.system.desktop.enable;
   primaryMonitor = fetchers.primaryMonitor osConfig;
 
   hyprlandPkgs = utils.flakePkgs args "hyprland";
@@ -37,7 +37,7 @@ let
     ../../../../../patches/hyprlandDispatcherError.patch
   ];
 in
-mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
+mkIf (desktopEnabled && desktopCfg.windowManager == "Hyprland") {
   modules.desktop = {
     # Optimise for performance in VM variant
     # TODO: When I update hyprland, add a hook to disable hardware cursors when

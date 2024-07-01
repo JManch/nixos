@@ -1,16 +1,17 @@
 { lib
 , pkgs
 , config
-, osConfig
+, isWayland
+, desktopEnabled
 , ...
 }:
 let
-  inherit (lib) mkIf fetchers getExe getExe';
+  inherit (lib) mkIf getExe getExe';
   cfg = desktopCfg.programs.fuzzel;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
 in
-mkIf (cfg.enable && osConfig.modules.system.desktop.enable && (fetchers.isWayland osConfig config))
+mkIf (cfg.enable && desktopEnabled && isWayland)
 {
   programs.fuzzel = {
     enable = true;

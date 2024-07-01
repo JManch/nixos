@@ -2,6 +2,7 @@
 , pkgs
 , config
 , osConfig
+, desktopEnabled
 , ...
 }:
 let
@@ -13,7 +14,7 @@ let
   primaryMonitor = fetchers.primaryMonitor osConfig;
   systemctl = getExe' pkgs.systemd "systemctl";
 in
-mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
+mkIf (cfg.enable && desktopEnabled)
 {
   services.dunst = {
     enable = true;

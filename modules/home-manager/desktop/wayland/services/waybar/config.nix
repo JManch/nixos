@@ -3,13 +3,14 @@
 , config
 , hostname
 , osConfig
+, isWayland
+, desktopEnabled
 , ...
 }:
 let
   inherit (lib)
     utils
     mkIf
-    fetchers
     optional
     getExe'
     toUpper
@@ -24,7 +25,6 @@ let
   inherit (osConfig.device) gpu;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
-  isWayland = fetchers.isWayland osConfig config;
   isHyprland = desktopCfg.windowManager == "Hyprland";
   colors = config.colorScheme.palette;
 
@@ -34,7 +34,7 @@ let
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
   systemctl = getExe' pkgs.systemd "systemctl";
 in
-mkIf (cfg.enable && osConfig.modules.system.desktop.enable && isWayland)
+mkIf (cfg.enable && desktopEnabled && isWayland)
 {
   programs.waybar = {
     enable = true;

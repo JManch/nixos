@@ -2,6 +2,7 @@
 , pkgs
 , config
 , osConfig
+, desktopEnabled
 , ...
 }:
 let
@@ -9,7 +10,6 @@ let
   inherit (osConfig.device) monitors;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
-  osDesktopEnabled = osConfig.modules.system.desktop.enable;
   isGammaCustom = fetchers.isGammaCustom osConfig;
 
   monitorGammaConditionals = (concatMap
@@ -60,7 +60,7 @@ let
     '' else blankShader;
 
 in
-mkIf (osDesktopEnabled && desktopCfg.windowManager == "Hyprland") {
+mkIf (desktopEnabled && desktopCfg.windowManager == "Hyprland") {
   xdg.configFile."hypr/shaders/monitorGamma.frag".text = gammaShader;
   xdg.configFile."hypr/shaders/blank.frag".text = blankShader;
 

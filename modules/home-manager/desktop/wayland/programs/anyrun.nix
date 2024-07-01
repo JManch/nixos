@@ -2,22 +2,21 @@
 , pkgs
 , inputs
 , config
-, osConfig
+, isWayland
+, desktopEnabled
 , ...
 } @ args:
 let
-  inherit (lib) mkIf fetchers utils getExe';
+  inherit (lib) mkIf utils getExe';
   cfg = desktopCfg.programs.anyrun;
   desktopCfg = config.modules.desktop;
-  osDesktopEnabled = osConfig.modules.system.desktop.enable;
-  isWayland = fetchers.isWayland osConfig config;
 in
 {
   imports = [
     inputs.anyrun.homeManagerModules.default
   ];
 
-  config = mkIf (cfg.enable && osDesktopEnabled && isWayland) {
+  config = mkIf (cfg.enable && desktopEnabled && isWayland) {
     programs.anyrun =
       let
         color = base:

@@ -54,8 +54,7 @@
       impermanence.enable = false;
       audio.enable = true;
       ssh.enable = true;
-      # TODO: Set this
-      networking.primaryInterface = "eno1";
+      networking.primaryInterface = "enp3s0";
 
       desktop = {
         enable = true;

@@ -1,6 +1,5 @@
-{ lib, inputs, ... }:
+{ inputs, ... }:
 let
-  inherit (lib) optionalAttrs;
   vmInstall = inputs.vmInstall.value;
 in
 {
@@ -15,8 +14,7 @@ in
         if vmInstall then
           "/dev/disk/by-path/pci-0000:04:00.0"
         else
-        # TODO: Set this
-          "/dev/disk/by-path/pci-0000:04:00.0";
+          "/dev/disk/by-id/ata-CT1000MX500SSD1_1923E209C93E";
       content = {
         type = "gpt";
         partitions = {
@@ -52,10 +50,6 @@ in
         xattr = "sa";
         acltype = "posixacl";
         compression = "lz4";
-      } // optionalAttrs (!vmInstall) {
-        encryption = "aes-256-gcm";
-        keyformat = "passphrase";
-        keylocation = "prompt";
       };
 
       datasets.root = {

@@ -1,6 +1,9 @@
 {
   modules = {
-    core.configManager = true;
+    core = {
+      configManager = true;
+      backupFiles = true;
+    };
 
     shell = {
       enable = true;
@@ -8,6 +11,7 @@
     };
 
     desktop = {
+      enable = true;
       windowManager = "Hyprland";
 
       hyprland = {
@@ -74,6 +78,7 @@
 
       firefox = {
         enable = true;
+        hideToolbar = true;
         runInRam = true;
       };
 

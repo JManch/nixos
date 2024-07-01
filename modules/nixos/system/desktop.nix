@@ -9,6 +9,7 @@ let
   inherit (lib) mkIf mkForce mkMerge fetchers;
   inherit (config.modules.core) homeManager;
   inherit (homeDesktopCfg.programs) swaylock hyprlock;
+  inherit (config.device) gpu;
   cfg = config.modules.system.desktop;
   homeConfig = config.home-manager.users.${username};
   homeDesktopCfg = homeConfig.modules.desktop;
@@ -75,6 +76,8 @@ in
       services.xserver = {
         enable = true;
         displayManager.gdm.enable = true;
+        # Suspend is temperamental on nvidia GPUs
+        displayManager.gdm.autoSuspend = !(gpu.type == "nvidia");
         desktopManager.gnome.enable = true;
       };
 

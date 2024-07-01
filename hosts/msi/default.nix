@@ -53,6 +53,7 @@
     system = {
       impermanence.enable = false;
       audio.enable = true;
+      ssh.enable = true;
       # TODO: Set this
       networking.primaryInterface = "eno1";
 

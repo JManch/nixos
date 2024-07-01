@@ -137,7 +137,7 @@ let
     rebuildCmds;
 in
 {
-  environment.systemPackages = rebuildScripts ++ remoteRebuildScripts;
+  environment.systemPackages = [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts;
 
   # Nice explanation of overlays: https://archive.is/f8goR
   #

@@ -21,9 +21,12 @@ mkIf (config.device.gpu.type == "nvidia")
     modesetting.enable = true;
     open = true;
     nvidiaSettings = !(fetchers.isWayland config homeManager.enable);
+    # In an attempt to make suspend-to-ram work
+    powerManagement.enable = true;
   };
 
-  persistenceHome.directories = [
-    ".cache/nvidia"
-  ];
+  # Fixes extra ghost display
+  boot.kernelParams = [ "nvidia-drm.fbdev=1" ];
+
+  persistenceHome.directories = [ ".cache/nvidia" ];
 }

@@ -40,6 +40,7 @@ in
 
     firefox = {
       enable = mkEnableOption "Firefox";
+      hideToolbar = mkEnableOption "automatic toolbar hiding";
       runInRam = mkEnableOption "running Firefox in RAM";
     };
   };

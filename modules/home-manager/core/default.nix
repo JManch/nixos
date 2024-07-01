@@ -13,9 +13,8 @@ in
   imports = utils.scanPaths ./.;
 
   options.modules.core = {
-    configManager = mkEnableOption ''
-      Whether this host manages the NixOS config.
-    '';
+    configManager = mkEnableOption "this host as a NixOS config manager";
+    backupFiles = mkEnableOption "backing up of ~/files";
   };
 
   config = {
@@ -42,7 +41,7 @@ in
         paths = [ ".config/nixos" ];
       };
 
-      files = {
+      files = mkIf cfg.backupFiles {
         paths = [ "files" ];
         restore.removeExisting = false;
         exclude =

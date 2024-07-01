@@ -1,4 +1,3 @@
-{ pkgs, username, ... }:
 {
   imports = [
     ./disko.nix
@@ -34,7 +33,7 @@
 
   modules = {
     core = {
-      homeManager.enable = false;
+      homeManager.enable = true;
       autoUpgrade = true;
     };
 
@@ -77,9 +76,4 @@
       # };
     };
   };
-
-  users.users.${username}.packages = with pkgs; [
-    prismlauncher
-    chromium
-  ];
 }

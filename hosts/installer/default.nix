@@ -127,6 +127,7 @@ let
       # the build will likely fail as it runs out of space. We workaround this
       # by creating the tmpdir ourselves.
       tmpdir="$(mktemp -d -p "$rootDir")"
+      # shellcheck disable=SC2016
       add_exit_trap 'rm -rf $tmpdir'
       TMPDIR="$tmpdir" nixos-install \
         --no-root-passwd \

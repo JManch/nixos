@@ -134,6 +134,14 @@ in
               night-theme-switcher.extensionUuid
             ]);
           };
+
+          "org/gnome/shell/extensions/nightthemeswitcher/time" = {
+            manual-schedule = false;
+          };
+
+          "org/gnome/system/location" = {
+            enabled = true;
+          };
         };
       };
     })

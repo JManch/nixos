@@ -92,6 +92,49 @@ in
       # Only enable the power management feature on laptops
       services.upower.enable = mkForce (config.device.type == "laptop");
       services.power-profiles-daemon.enable = mkForce (config.device.type == "laptop");
+
+      environment.gnome.excludePackages = with pkgs; [
+        gnome-tour
+        gnome.epiphany
+      ];
+
+      environment.systemPackages = with pkgs.gnomeExtensions; [
+        appindicator
+        night-theme-switcher
+      ];
+
+      hm = mkIf homeManager.enable {
+        dconf.settings = {
+          "org/gnome/desktop/peripherals/mouse" = {
+            accel-profile = "flat";
+          };
+
+          "org/gnome/mutter" = {
+            edge-tiling = true;
+          };
+
+          "org/gnome/settings-daemon/plugins/color" = {
+            night-light-enabled = true;
+            night-light-schedule-automatic = true;
+          };
+
+          # Disable auto-suspend and power button suspend on nvidia
+          "org/gnome/settings-daemon/plugins/power" = mkIf (gpu.type == "nvidia") {
+            power-button-action = "interactive";
+            sleep-inactive-ac-type = "nothing";
+          };
+
+          "org/gnome/shell" = {
+            enabled-extensions = [
+              "system-monitor@gnome-shell-extensions.gcampax.github.com"
+              "drive-menu@gnome-shell-extensions.gcampax.github.com"
+            ] ++ (with pkgs.gnomeExtensions; [
+              appindicator.extensionUuid
+              night-theme-switcher.extensionUuid
+            ]);
+          };
+        };
+      };
     })
 
     (mkIf (windowManager == "Hyprland") {

@@ -3,6 +3,7 @@
   home.packages = with pkgs; [
     chromium
     discord
+    libreoffice
   ];
 
   modules.programs = {

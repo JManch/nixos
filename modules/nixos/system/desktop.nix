@@ -24,6 +24,7 @@ in
 
   config = mkIf cfg.enable (mkMerge [
     {
+      i18n.defaultLocale = "en_GB.UTF-8";
       services.xserver.excludePackages = [ pkgs.xterm ];
 
       # Enables wayland for all apps that support it

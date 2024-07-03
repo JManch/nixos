@@ -109,7 +109,7 @@ in
 
       setWallpaperCmd = mkOption {
         type = types.nullOr types.str;
-        default = "";
+        default = null;
         description = ''
           Command for setting the wallpaper. Must accept the wallpaper image path appended as an argument.
         '';

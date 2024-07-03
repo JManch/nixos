@@ -38,6 +38,10 @@ in
   options.modules.desktop = {
     enable = mkEnableOption "home-manager desktop modules";
 
+    xdg.lowercaseUserDirs = mkEnableOption "lowercase user dirs" // {
+      default = osConfig.modules.system.desktop.desktopEnvironment == null;
+    };
+
     windowManager = mkOption {
       type = types.nullOr (types.enum [ "Hyprland" ]);
       default = null;

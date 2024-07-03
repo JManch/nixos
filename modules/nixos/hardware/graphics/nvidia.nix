@@ -21,8 +21,32 @@ mkIf (config.device.gpu.type == "nvidia")
     modesetting.enable = true;
     open = true;
     nvidiaSettings = !(fetchers.isWayland config homeManager.enable);
-    # In an attempt to make suspend-to-ram work
-    powerManagement.enable = true;
+    # Enable this for suspend
+    powerManagement.enable = false;
+  };
+
+  # Completely disable suspend and hibernate as it seems broken on nvidia and
+  # accidentally pressing the button in gnome can put the system in a broken
+  # state
+  systemd = {
+    targets = {
+      sleep = {
+        enable = false;
+        unitConfig.DefaultDependencies = "no";
+      };
+      suspend = {
+        enable = false;
+        unitConfig.DefaultDependencies = "no";
+      };
+      hibernate = {
+        enable = false;
+        unitConfig.DefaultDependencies = "no";
+      };
+      hybrid-sleep = {
+        enable = false;
+        unitConfig.DefaultDependencies = "no";
+      };
+    };
   };
 
   # Fixes extra ghost display

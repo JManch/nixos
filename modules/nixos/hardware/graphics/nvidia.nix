@@ -16,7 +16,7 @@ mkIf (config.device.gpu.type == "nvidia")
   services.xserver.videoDrivers = mkIf config.modules.system.desktop.enable [ "nvidia" ];
 
   hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
     # Major issues if this is disabled
     modesetting.enable = true;
     open = true;

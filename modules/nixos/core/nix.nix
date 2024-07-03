@@ -36,7 +36,7 @@ let
   rebuildScripts = map
     (cmd: pkgs.writeShellApplication {
       name = "rebuild-${cmd}";
-      runtimeInputs = with pkgs; [ nixos-rebuild nvd ];
+      runtimeInputs = with pkgs; [ nixos-rebuild ];
       # Always rebuild in ~ because I once had a bad experience where I
       # accidentally built in /nix/store and caused irrepairable corruption
       text = /*bash*/ ''
@@ -117,7 +117,7 @@ let
             'cd /tmp/nixos-diff-config && \
             tar -xf nixos-diff-config.tar && \
             nixos-rebuild build --flake .#$hostname && \
-            ${getExe pkgs.nvd} --color always diff /run/current-system ./result; \
+            nvd --color always diff /run/current-system ./result; \
             rm -rf /tmp/nixos-diff-config'"
 
         '' else /*bash*/ ''

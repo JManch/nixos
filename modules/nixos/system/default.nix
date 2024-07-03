@@ -4,7 +4,7 @@ let
   cfg = config.modules.system;
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = utils.scanPaths ./.;
 
   options.modules.system = {
     bluetooth.enable = mkEnableOption "bluetooth";
@@ -17,20 +17,6 @@ in
         Whether to enable impermanence. /persist will be used for the
         persistent filesystem.
       '';
-    };
-
-    desktop = {
-      enable = mkEnableOption "desktop functionality";
-
-      desktopEnvironment = mkOption {
-        type = with types; nullOr (enum [ "xfce" "plasma" "gnome" ]);
-        default = null;
-        description = ''
-          The desktop environment to use. The window manager is configured in
-          home manager. Some windows managers don't require a desktop
-          environment and some desktop environments include a window manager.
-        '';
-      };
     };
 
     reservedIDs = mkOption {

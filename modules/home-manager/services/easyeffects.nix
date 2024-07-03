@@ -14,7 +14,7 @@ mkIf (cfg.enable && audio.enable)
 {
   assertions = utils.asserts [
     dconf.enable
-    "Waybar requires dconf to be enabled"
+    "Easyeffects requires dconf to be enabled"
   ];
 
   services.easyeffects.enable = true;

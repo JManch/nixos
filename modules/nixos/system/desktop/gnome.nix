@@ -5,9 +5,9 @@ let
   inherit (config.device) gpu;
   cfg = config.modules.system.desktop;
   extensions = with pkgs.gnomeExtensions; [
-    hot-edge
     appindicator
     night-theme-switcher
+    dash-to-dock
   ];
 in
 mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
@@ -64,13 +64,20 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
 
       "org/gnome/shell" = {
         enabled-extensions = (map (e: e.extensionUuid) extensions) ++ [
-          "system-monitor@gnome-shell-extensions.gcampax.github.com"
           "drive-menu@gnome-shell-extensions.gcampax.github.com"
+          "launch-new-instance@gnome-shell-extensions.gcampax.github.com"
         ];
       };
 
       "org/gnome/shell/extensions/nightthemeswitcher/time" = {
         manual-schedule = false;
+      };
+
+      "org/gnome/shell/extensions/dash-to-dock" = {
+        click-action = "focus-or-appspread";
+        scroll-action = "cycle-windows";
+        apply-custom-theme = true;
+        show-trash = false;
       };
 
       "org/gnome/system/location" = {

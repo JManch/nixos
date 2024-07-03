@@ -86,7 +86,10 @@ mkIf (desktopEnabled && desktopCfg.windowManager == "Hyprland") {
     '';
 
   xdg.portal = {
-    extraPortals = [ hyprlandPkgs.xdg-desktop-portal-hyprland ];
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+      hyprlandPkgs.xdg-desktop-portal-hyprland
+    ];
     configPackages = [ hyprland ];
   };
 

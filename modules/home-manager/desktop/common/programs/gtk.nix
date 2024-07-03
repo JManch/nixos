@@ -48,8 +48,6 @@ mkIf desktopEnabled
       ${gsettings} set org.gnome.desktop.interface color-scheme prefer-${theme}
     '';
 
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-
   # Also sets gtk.cursorTheme
   home.pointerCursor = {
     gtk.enable = true;

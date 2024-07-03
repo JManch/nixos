@@ -76,7 +76,7 @@ mkIf cfg.enable
       btop = getExe config.programs.btop.package;
       terminal = config.modules.desktop.terminal.exePath;
     in
-    mkIf osConfig.modules.system.desktop.enable {
+    mkIf config.modules.desktop.enable {
       name = "btop";
       genericName = "Resource Monitor";
       exec = "${terminal} --title btop -e ${btop}";

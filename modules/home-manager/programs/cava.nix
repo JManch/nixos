@@ -48,7 +48,7 @@ mkIf (cfg.enable && osConfig.modules.system.audio.enable) {
       cava = getExe config.programs.cava.package;
       terminal = config.modules.desktop.terminal.exePath;
     in
-    mkIf osConfig.modules.system.desktop.enable {
+    mkIf config.modules.desktop.enable {
       name = "Cava";
       genericName = "Audio Visualizer";
       exec = "${terminal} --title Cava -e ${cava}";

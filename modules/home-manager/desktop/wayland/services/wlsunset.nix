@@ -46,4 +46,8 @@ mkIf (cfg.enable && desktopEnabled && isWayland)
       };
     in
     mkForce "${getExe pkgs.wlsunset} ${args}";
+
+  # wlsunset has a tendency to disable itself after DPMS. Restarting the
+  # service fixes it.
+  modules.desktop.programs.swaylock.postUnlockScript = "systemctl restart --user wlsunset";
 }

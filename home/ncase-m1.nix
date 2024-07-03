@@ -14,6 +14,7 @@
     desktop = {
       enable = true;
       windowManager = "Hyprland";
+      xdg.lowercaseUserDirs = true;
 
       hyprland = {
         # Disable for now until I can get it working on kernel 6.8 without the

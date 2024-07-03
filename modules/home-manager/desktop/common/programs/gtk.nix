@@ -8,15 +8,16 @@
 let
   inherit (lib) mkIf getExe';
   inherit (config.modules) colorScheme;
-  inherit (config.modules.desktop.style) cursor;
   inherit (config.modules.desktop.services) darkman;
+  inherit (config.modules.desktop.style) cursor;
   inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) gtkThemeFromScheme;
+  cfg = config.modules.desktop;
   darkTheme = gtkThemeFromScheme { scheme = colorScheme.dark; };
   lightTheme = gtkThemeFromScheme { scheme = colorScheme.light; };
 in
 mkIf desktopEnabled
 {
-  home.packages = [
+  home.packages = mkIf (cfg.style.customTheme) [
     darkTheme
     lightTheme
   ];
@@ -26,12 +27,12 @@ mkIf desktopEnabled
 
     # If darkman is enabled the theme will be applied using gsettings in the
     # switch script
-    theme = mkIf (!darkman.enable) {
+    theme = mkIf (cfg.style.customTheme && !darkman.enable) {
       name = darkTheme.slug;
       package = darkTheme;
     };
 
-    iconTheme = {
+    iconTheme = mkIf cfg.style.customTheme {
       name = "Papirus-Dark";
       package = pkgs.papirus-icon-theme;
     };
@@ -49,7 +50,7 @@ mkIf desktopEnabled
     '';
 
   # Also sets gtk.cursorTheme
-  home.pointerCursor = {
+  home.pointerCursor = mkIf cursor.enable {
     gtk.enable = true;
     name = cursor.name;
     package = cursor.package;

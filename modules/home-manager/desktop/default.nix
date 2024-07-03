@@ -55,6 +55,10 @@ in
     };
 
     style = {
+      customTheme = mkEnableOption "custom GTK theme derived from base16 colorscheme" // {
+        default = osConfig.modules.system.desktop.desktopEnvironment == null;
+      };
+
       font = {
         family = mkOption {
           type = types.str;
@@ -72,6 +76,10 @@ in
       };
 
       cursor = {
+        enable = mkEnableOption "custom cursor theme" // {
+          default = osConfig.modules.system.desktop.desktopEnvironment == null;
+        };
+
         package = mkPackageOption pkgs "bibata-cursors" { };
 
         name = mkOption {

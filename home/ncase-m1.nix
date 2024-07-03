@@ -1,3 +1,4 @@
+{ lib, config, ... }:
 {
   modules = {
     core = {
@@ -22,6 +23,11 @@
         # error: connector D-1: Failed to page-flip output: a page-flip is already pending
         directScanout = false;
         logging = false;
+      };
+
+      terminal = {
+        exePath = lib.getExe config.programs.alacritty.package;
+        class = "Alacritty";
       };
 
       programs = {

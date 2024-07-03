@@ -10,7 +10,6 @@ let
     utils
     mkOption
     mkPackageOption
-    getExe
     length
     types
     literalExpression
@@ -47,10 +46,7 @@ in
 
     terminal = mkOption {
       type = types.submodule terminalSubmodule;
-      default = {
-        exePath = getExe config.programs.alacritty.package;
-        class = "Alacritty";
-      };
+      default = null;
       description = "Information about the default terminal";
     };
 
@@ -120,6 +116,8 @@ in
         "You cannot use a desktop environment with a window manager"
         (cfg.windowManager != null -> length osConfig.device.monitors != 0)
         "Device monitors must be configured to use a window manager"
+        (cfg.terminal != null)
+        "Desktop default terminal must be set"
       ]);
 
       _module.args = {

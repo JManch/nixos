@@ -39,6 +39,5 @@ mkIf desktopEnabled
     videos = "${home}/videos";
   };
 
-  xdg.mime.enable = true;
-  xdg.mimeApps.enable = true;
+  xdg.mimeApps.enable = osConfig.modules.system.desktop.desktopEnvironment == null;
 }

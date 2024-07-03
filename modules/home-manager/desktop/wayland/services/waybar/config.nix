@@ -85,6 +85,8 @@ mkIf (cfg.enable && desktopEnabled && isWayland)
           sort-by-number = true;
           active-only = false;
           format = "{icon}";
+          on-scroll-up = "hyprctl dispatch workspace r-1";
+          on-scroll-down = "hyprctl dispatch workspace r+1";
 
           format-icons = {
             TWITCH = "󰕃";

@@ -47,6 +47,14 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
         accel-profile = "flat";
       };
 
+      "org/gnome/desktop/wm/preferences" = {
+        action-middle-click-titlebar = "toggle-maximize-vertically";
+        button-layout = "appmenu:minimize,maximize,close";
+        # Focus follows mouse
+        focus-mode = "sloppy";
+        resize-with-right-button = true;
+      };
+
       "org/gnome/mutter" = {
         edge-tiling = true;
       };
@@ -69,8 +77,10 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
         ];
       };
 
-      "org/gnome/shell/extensions/nightthemeswitcher/time" = {
-        manual-schedule = false;
+      "org/gnome/shell/extensions/nightthemeswitcher/commands" = {
+        enabled = true;
+        sunset = "gsettings set org.gnome.desktop.interface cursor-theme Bibata-Modern-Classic";
+        sunrise = "gsettings set org.gnome.desktop.interface cursor-theme Bibata-Modern-Ice";
       };
 
       "org/gnome/shell/extensions/dash-to-dock" = {
@@ -82,14 +92,6 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
 
       "org/gnome/system/location" = {
         enabled = true;
-      };
-
-      "org/gnome/desktop/wm/preferences" = {
-        action-middle-click-titlebar = "toggle-maximize-vertically";
-        button-layout = "appmenu:minimize,maximize,close";
-        # Focus follows mouse
-        focus-mode = "sloppy";
-        resize-with-right-button = true;
       };
     };
   };

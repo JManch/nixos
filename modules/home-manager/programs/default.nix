@@ -37,6 +37,7 @@ in
     zed.enable = mkEnableOption "Zed Editor";
     foliate.enable = mkEnableOption "Foliate Ebook Reader";
     rnote.enable = mkEnableOption "Rnote";
+    jellyfin-media-player.enable = mkEnableOption "Jellyfin Media Player";
 
     firefox = {
       enable = mkEnableOption "Firefox";

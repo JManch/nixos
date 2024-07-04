@@ -82,6 +82,7 @@
       multiviewerF1.enable = true;
       foliate.enable = true;
       rnote.enable = true;
+      jellyfin-media-player.enable = true;
 
       firefox = {
         enable = true;

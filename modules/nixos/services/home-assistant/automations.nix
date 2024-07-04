@@ -13,6 +13,9 @@ let
       path = "SgtBatten/frigate_notifications.yaml";
       input = {
         camera = "camera.driveway";
+        state_filter = true;
+        state_entity = "input_boolean.high_alert_surveillance";
+        state_filter_states = [ "off" ];
         notify_device = (head (attrValues devices)).id;
         notify_group = "All Notify Devices";
         base_url = "https://home.${fqDomain}";

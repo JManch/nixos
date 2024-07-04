@@ -2,7 +2,6 @@
 {
   home.packages = with pkgs; [
     chromium
-    discord
     libreoffice
     spotify
   ];
@@ -22,6 +21,7 @@
       rnote.enable = true;
       multiviewerF1.enable = true;
       cava.enable = true;
+      discord.enable = true;
 
       gaming = {
         mangohud.enable = true;

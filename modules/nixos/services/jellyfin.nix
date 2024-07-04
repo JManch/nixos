@@ -37,72 +37,64 @@ mkMerge [
     };
   }
 
-  (mkIf cfg.enable
-    {
-      environment.systemPackages = optional cfg.mediaPlayer pkgs.jellyfin-media-player;
+  (mkIf cfg.enable {
+    services.jellyfin = {
+      enable = true;
+      openFirewall = cfg.openFirewall;
+    };
 
-      services.jellyfin = {
-        enable = true;
-        openFirewall = cfg.openFirewall;
+    users.users.jellyfin.uid = uid;
+    users.groups.jellyfin.gid = gid;
+
+    systemd.services.jellyfin = {
+      wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
+
+      serviceConfig = {
+        # Bind mount home media directories so jellyfin can access them
+        BindReadOnlyPaths = mapAttrsToList
+          (name: dir: "${dir}:/var/lib/jellyfin/media${optionalString (name != "") "/${name}"}")
+          cfg.mediaDirs;
+        SocketBindDeny = publicPorts;
       };
+    };
 
-      users.users.jellyfin.uid = uid;
-      users.groups.jellyfin.gid = gid;
+    networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
+      allowedTCPPorts = [ 8096 8920 ];
+      allowedUDPPorts = [ 1900 7359 ];
+    });
 
-      systemd.services.jellyfin = {
-        wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
+    # Jellyfin module has good default hardening
 
-        serviceConfig = {
-          # Bind mount home media directories so jellyfin can access them
-          BindReadOnlyPaths = mapAttrsToList
-            (name: dir: "${dir}:/var/lib/jellyfin/media${optionalString (name != "") "/${name}"}")
-            cfg.mediaDirs;
-          SocketBindDeny = publicPorts;
+    systemd.tmpfiles.rules = map
+      (name: "d /var/lib/jellyfin/media${optionalString (name != "") "/${name}"} 0700 ${jellyfin.user} ${jellyfin.group}")
+      (attrNames cfg.mediaDirs);
+
+    backups.jellyfin = {
+      paths = [ "/var/lib/jellyfin" ];
+      exclude = [ "transcodes" "media" "log" "metadata" ];
+      restore = {
+        preRestoreScript = "sudo systemctl stop jellyfin";
+        pathOwnership = {
+          "/var/lib/jellyfin" = { user = "jellyfin"; group = "jellyfin"; };
         };
       };
+    };
 
-      networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
-        allowedTCPPorts = [ 8096 8920 ];
-        allowedUDPPorts = [ 1900 7359 ];
-      });
-
-      # Jellyfin module has good default hardening
-
-      systemd.tmpfiles.rules = map
-        (name: "d /var/lib/jellyfin/media${optionalString (name != "") "/${name}"} 0700 ${jellyfin.user} ${jellyfin.group}")
-        (attrNames cfg.mediaDirs);
-
-      backups.jellyfin = {
-        paths = [ "/var/lib/jellyfin" ];
-        exclude = [ "transcodes" "media" "log" "metadata" ];
-        restore = {
-          preRestoreScript = "sudo systemctl stop jellyfin";
-          pathOwnership = {
-            "/var/lib/jellyfin" = { user = "jellyfin"; group = "jellyfin"; };
-          };
-        };
-      };
-
-      persistence.directories = [
-        {
-          directory = "/var/lib/jellyfin";
-          user = jellyfin.user;
-          group = jellyfin.group;
-          mode = "700";
-        }
-        {
-          directory = "/var/cache/jellyfin";
-          user = jellyfin.user;
-          group = jellyfin.group;
-          mode = "700";
-        }
-      ];
-
-      persistenceHome.directories = mkIf cfg.mediaPlayer [
-        ".local/share/Jellyfin Media Player"
-        ".local/share/jellyfinmediaplayer"
-      ];
-    }
+    persistence.directories = [
+      {
+        directory = "/var/lib/jellyfin";
+        user = jellyfin.user;
+        group = jellyfin.group;
+        mode = "700";
+      }
+      {
+        directory = "/var/cache/jellyfin";
+        user = jellyfin.user;
+        group = jellyfin.group;
+        mode = "700";
+      }
+    ];
+  }
   )
 
   (mkIf cfg.reverseProxy.enable {

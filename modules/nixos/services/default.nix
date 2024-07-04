@@ -121,7 +121,6 @@ in
 
     jellyfin = {
       enable = mkEnableOption "Jellyfin";
-      mediaPlayer = mkEnableOption "Jellyfin Media Player";
       openFirewall = mkEnableOption "opening the firewall";
 
       reverseProxy = {

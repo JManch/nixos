@@ -55,6 +55,11 @@
       ssh.enable = true;
       networking.primaryInterface = "enp3s0";
 
+      windows.bootEntry = {
+        enable = true;
+        fsAlias = "HD0b65535a1";
+      };
+
       desktop = {
         enable = true;
         desktopEnvironment = "gnome";

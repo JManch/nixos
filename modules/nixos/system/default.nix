@@ -160,7 +160,16 @@ in
 
     windows = {
       enable = mkEnableOption "features for systems dual-booting Window";
-      bootEntry = mkEnableOption "Windows systemd-boot boot entry";
+      bootEntry = {
+        enable = mkEnableOption "Windows systemd-boot boot entry";
+        bootstrap = mkEnableOption "edk2-shell for Windows boot entry setup";
+
+        fsAlias = mkOption {
+          type = types.str;
+          default = "";
+          description = "The fs alias of the windows partition";
+        };
+      };
     };
   };
 

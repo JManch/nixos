@@ -70,7 +70,7 @@ in
 
   config = mkIf osGaming.enable {
     modules.programs.gaming.gameClasses =
-      optional osGaming.gamescope.enable "\\.gamescope.*";
+      optional osGaming.gamescope.enable "\\.?gamescope.*";
 
     desktop.hyprland.settings.windowrulev2 = [
       "workspace name:GAME, class:${cfg.gameRegex}"

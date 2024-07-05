@@ -13,6 +13,10 @@ let
 in
 mkIf cfg.enable
 {
+  # WARN: For some reason mangohud toggle does not work in gamescope with the
+  # --mangoapp argument. If mangohud is initially hidden with no_display=true,
+  # it never shows. If no_display is not set, mangohud will be displayed until
+  # the first toggle, after which it hides and never shows again.
   programs.mangohud = {
     enable = true;
     package = utils.addPatches pkgs.mangohud [ ../../../../patches/mangoHud.diff ];

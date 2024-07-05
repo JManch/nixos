@@ -9,7 +9,7 @@ mkIf cfg.enable
   # -- Common steam launch commands --
   # Standard  : mangohud gamemoderun %command%
   # FPS Limit : MANGOHUD_CONFIG=read_cfg,fps_limit=200 mangohud gamemoderun %command%
-  # Gamescope : gamescope -W 2560 -H 1440 -f -r 165 -- mangohud gamemoderun %command%
+  # Gamescope : gamescope -W 2560 -H 1440 -f -r 165 --mangoapp -- gamemoderun %command%
   environment.systemPackages = with pkgs; [
     steam-run
     protontricks

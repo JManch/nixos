@@ -60,6 +60,7 @@ in
         "met" # weather
         "mobile_app"
         "profiler"
+        "local_todo"
         "generic_thermostat"
         "generic_hygrostat"
         "mold_indicator"

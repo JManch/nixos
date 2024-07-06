@@ -62,6 +62,7 @@ mkIf cfg.enable
     gameClasses = [
       "steam_app.*"
       "cs2"
+      "factorio"
     ];
 
     tearingExcludedClasses = map (game: "steam_app_${steamAppIDs.${game}}") [
@@ -87,4 +88,8 @@ mkIf cfg.enable
   programs.zsh.shellAliases = {
     beam-mp = "${getExe' pkgs.protontricks "protontricks-launch"} --appid 284160 ${dataHome}/Steam/steamapps/compatdata/284160/pfx/dosdevices/c:/users/steamuser/AppData/Roaming/BeamMP-Launcher/BeamMP-Launcher.exe";
   };
+
+  persistence.directories = [
+    ".factorio"
+  ];
 }

@@ -45,6 +45,5 @@ mkIf cfg.enable
   persistenceHome.directories = [
     ".steam"
     ".local/share/Steam"
-    ".factorio"
   ];
 }

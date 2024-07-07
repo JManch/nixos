@@ -1,5 +1,6 @@
 { lib
 , self
+, pkgs'
 , inputs
 , config
 , username
@@ -24,7 +25,7 @@ in
       sharedModules = [ ../../home-manager ];
 
       extraSpecialArgs = {
-        inherit inputs self username hostname vmVariant;
+        inherit inputs self username hostname vmVariant pkgs';
       };
     };
   };

@@ -11,13 +11,17 @@
       systems = [ "x86_64-linux" ];
       forEachSystem = f:
         genAttrs systems (system:
-          f (nixpkgs.legacyPackages.${system}));
+          f (import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          }));
 
       mkHost = hostname: username: system: {
         ${hostname} = nixosSystem {
           inherit system;
           specialArgs = {
             inherit self inputs hostname username lib;
+            pkgs' = self.packages.${system};
           };
           modules =
             if (hasPrefix "installer" hostname) then

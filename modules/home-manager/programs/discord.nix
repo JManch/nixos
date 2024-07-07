@@ -1,4 +1,9 @@
-{ lib, self, pkgs, config, ... }:
+{ lib
+, pkgs
+, pkgs'
+, config
+, ...
+}:
 let
   cfg = config.modules.programs.discord;
 in
@@ -6,7 +11,7 @@ lib.mkIf cfg.enable
 {
   home.packages = [
     pkgs.discord
-    (self.packages.${pkgs.system}.vesktop.override {
+    (pkgs'.vesktop.override {
       withMiddleClickScroll = true;
     })
   ];

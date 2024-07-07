@@ -7,6 +7,7 @@
 { lib
 , pkgs
 , self
+, pkgs'
 , config
 , inputs
 , ...
@@ -29,7 +30,7 @@ let
   cfg = config.modules.services.dns-server-stack;
 
   # Patch Ctrld to enable loading endpoints from environment variables
-  ctrld = utils.addPatches self.packages.${pkgs.system}.ctrld [ ../../../patches/ctrldSecretEndpoint.patch ];
+  ctrld = utils.addPatches pkgs'.ctrld [ ../../../patches/ctrldSecretEndpoint.patch ];
 
   # Declares hostnames for all devices on my local network
   homeHosts = inputs.nix-resources.secrets.homeHosts // {

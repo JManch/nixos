@@ -1,6 +1,6 @@
 { lib
 , pkgs
-, self
+, pkgs'
 , config
 , inputs
 , hostname
@@ -85,7 +85,7 @@ let
         EnvironmentFile = resticNotifVars.path;
         ExecStart =
           let
-            shoutrrr = getExe self.packages.${pkgs.system}.shoutrrr;
+            shoutrrr = getExe pkgs'.shoutrrr;
           in
           pkgs.writeShellScript "${name}" ''
             ${shoutrrr} send \

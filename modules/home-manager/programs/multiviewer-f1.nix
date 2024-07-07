@@ -5,164 +5,279 @@
 , ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) mkIf;
+  inherit (config.modules.desktop) windowManager;
   cfg = config.modules.programs.multiviewerF1;
 
-  # This script acts as a replacement for the Multiviewer layout saving which
-  # doesn't work with a tiling window manager. The idea is that Multiviewer
-  # layouts are still used to load all the windows. The windows get dumped onto
-  # the F1 workspace then I press a keybind to run this script and position the
-  # windows.
-  multiviewerWorkspaceScript = pkgs.writeShellApplication {
-    name = "hypr-multiviewer-workspace";
+  # This script acts as a replacement for Multiviewer's layout saving/loading
+  # system which doesn't work with a tiling window manager. The idea is that
+  # Multiviewer layouts are still used to load all the windows. The windows get
+  # dumped onto the F1 workspace then I press a keybind to run this script and
+  # position the windows.
 
-    runtimeInputs = [
-      config.wayland.windowManager.hyprland.package
-      pkgs.jaq
-    ];
+  # The script uses the Multiviewer's graphql api to order driver windows based
+  # on their current position in the race.
+  hyprlandMultiviewerTiler = pkgs.writers.writePython3 "hyprland-multiviewer-tiler"
+    {
+      libraries = (with pkgs.python3Packages; [ gql aiohttp ]) ++ [ pkgs'.hyprpy ];
+    }
+    /*python*/ ''
+    import re
+    import math
+    import time
+    from hyprpy import Hyprland
+    from gql import gql, Client
+    from gql.transport.aiohttp import AIOHTTPTransport
 
-    text = /*bash*/ ''
-      active_monitor=$(hyprctl monitors -j | jaq -r 'first(.[] | select(.focused == true))')
-      m_name=$(echo "$active_monitor" | jaq -r '.name')
-      m_pos_x=$(echo "$active_monitor" | jaq -r '.x')
-      m_pos_y=$(echo "$active_monitor" | jaq -r '.y')
-      m_res_x=$(echo "$active_monitor" | jaq -r '.width')
-      m_res_y=$(echo "$active_monitor" | jaq -r '.height')
+    instance = Hyprland()
+    transport = AIOHTTPTransport(url="http://localhost:10101/api/graphql")
+    client = Client(transport=transport, fetch_schema_from_transport=False)
+    query = gql(
+        """
+        query Query {
+          f1LiveTimingState {
+            TimingAppData
+          }
+        }
+    """
+    )
 
-      secondary_monitor=$(hyprctl monitors -j | jaq -r "first(.[] | select(.disabled == false and .name != \"$m_name\"))")
-      if [ -n "$secondary_monitor" ]; then
-        sm=true
-        sm_pos_x=$(echo "$secondary_monitor" | jaq -r '.x')
-        sm_pos_y=$(echo "$secondary_monitor" | jaq -r '.y')
-        sm_res_x=$(echo "$secondary_monitor" | jaq -r '.width')
-        sm_res_y=$(echo "$secondary_monitor" | jaq -r '.height')
-      else
-        sm=false
-      fi
+    driver_numbers = {
+        "Max Verstappen": 1,
+        "Logan Sargeant": 2,
+        "Daniel Ricciardo": 3,
+        "Lando Norris": 4,
+        "Pierre Gasly": 10,
+        "Sergio Perez": 11,
+        "Fernando Alonso": 14,
+        "Charles Leclerc": 16,
+        "Lance Stroll": 18,
+        "Kevin Magnussen": 20,
+        "Yuki Tsunoda": 22,
+        "Alex Albon": 23,
+        "Guanyu Zhou": 24,
+        "Nico Hulkenberg": 27,
+        "Esteban Ocon": 31,
+        "Lewis Hamilton": 44,
+        "Carlos Sainz": 55,
+        "George Russell": 63,
+        "Valtteri Bottas": 77,
+        "Oscar Piastri": 81,
+    }
 
-      # Get window address and title of all F1 windows
-      windows=$(hyprctl clients -j | jaq -r '((.[] | select(.class == "MultiViewer for F1")) | "\(.address),\(.title)")')
 
-      hyprctl_cmd="hyprctl --batch \""
-      hyprctl_cmd+="dispatch moveworkspacetomonitor F1 $m_name;"
-      active_workspace=$(hyprctl activeworkspace -j | jaq -r '.name')
-      if [[ "$active_workspace" != "F1" ]]; then
-        hyprctl_cmd+="dispatch workspace name:F1;"
-      fi
-      declare -a drivers
-      declare -A driver_prio
+    def get_monitors():
+        global monitors
+        _monitors = instance.get_monitors()
+        monitors = list()
 
-      driver_prio["Esteban Ocon"]=20
-      driver_prio["Pierre Gasly"]=20
-      driver_prio["Fernando Alonso"]=2
-      driver_prio["Lance Stroll"]=20
-      driver_prio["Carlos Sainz"]=4
-      driver_prio["Charles Leclerc"]=3
-      driver_prio["Kevin Magnussen"]=20
-      driver_prio["Nico Hulkenberg"]=20
-      driver_prio["Guanyu Zhou"]=20
-      driver_prio["Valtteri Bottas"]=20
-      driver_prio["Lando Norris"]=6
-      driver_prio["Oscar Piastri"]=5
-      driver_prio["George Russell"]=20
-      driver_prio["Lewis Hamilton"]=20
-      driver_prio["Daniel Ricciardo"]=20
-      driver_prio["Yuki Tsunoda"]=20
-      driver_prio["Max Verstappen"]=1
-      driver_prio["Sergio Perez"]=20
-      driver_prio["Alexander Albon"]=20
-      driver_prio["Logan Sergeant"]=20
+        for monitor in _monitors:
+            if monitor.is_focused:
+                monitors.append(monitor)
+                _monitors.remove(monitor)
 
-      while IFS=, read -r address title; do
-        case $title in
-          "20"*|"MultiViewer")
-            # Ignore the main multiviewer window
-            ;;
-          "Live Timing"*|"Replay Live Timing"*)
-            res_x=$((m_res_x * 1 / 4))
-            res_y=$((m_res_y * 3 / 4))
-            hyprctl_cmd+="dispatch movetoworkspacesilent name:F1,address:$address;"
-            hyprctl_cmd+="dispatch resizewindowpixel exact $res_x $res_y,address:$address;"
-            hyprctl_cmd+="dispatch movewindowpixel exact $m_pos_x $m_pos_y,address:$address;"
-            ;;
-          "F1 Live"*)
-            res_x=$((m_res_x * 3 / 4))
-            res_y=$((m_res_y * 3 / 4))
-            hyprctl_cmd+="dispatch movetoworkspacesilent name:F1,address:$address;"
-            hyprctl_cmd+="dispatch resizewindowpixel exact $res_x $res_y,address:$address;"
-            hyprctl_cmd+="dispatch movewindowpixel exact $((m_pos_x + (m_res_x - res_x))) $m_pos_y,address:$address;"
-            hyprctl_cmd+="dispatch alterzorder bottom,address:$address;"
-            ;;
-          "Track Map"*)
-            res_x="480"
-            res_y="300"
-            hyprctl_cmd+="dispatch movetoworkspacesilent name:F1,address:$address;"
-            hyprctl_cmd+="dispatch resizewindowpixel exact $res_x $res_y,address:$address;"
-            hyprctl_cmd+="dispatch movewindowpixel exact $((m_pos_x + m_res_x - res_x)) $((m_pos_y + (m_res_y * 3 / 4) - (res_y + 60))),address:$address;"
-            hyprctl_cmd+="dispatch alterzorder top,address:$address;"
-            hyprctl_cmd+="dispatch pin address:$address;"
-            ;;
-          "Radio Transcriptions"*|"Race Control"*)
-            res_x=$((m_res_x * 1 / 4))
-            res_y=$((m_res_y * 1 / 4))
-            hyprctl_cmd+="dispatch movetoworkspacesilent name:F1,address:$address;"
-            hyprctl_cmd+="dispatch resizewindowpixel exact $res_x $res_y,address:$address;"
-            hyprctl_cmd+="dispatch movewindowpixel exact $m_pos_x $((m_pos_y + (m_res_y * 3 / 4))),address:$address;"
-            ;;
-          *)
-            # Assume it's a driver cam
-            regex="^([^—]+)"
-            if [[ $title =~ $regex ]]; then
-              driver=''${BASH_REMATCH[1]}
-              driver="''${driver%?}"
-              if [[ -v driver_prio["$driver"] ]]; then
-                drivers+=("''${driver_prio["$driver"]},$address")
-              else
-                # Reserve drivers
-                drivers+=("100,$address")
-              fi
-            fi
-            ;;
-        esac
-      done <<< "$windows"
+        _monitors.sort(key=lambda m: m.position_x)
 
-      # Sort the driver windows according to priority
-      sorted_drivers=$(printf "%s\n" "''${drivers[@]}" | sort -n -t ',' -k 1)
+        left_side = True
+        while len(_monitors) > 0:
+            if left_side:
+                for i, m in enumerate(_monitors):
+                    if (m.position_x >= monitors[0].position_x
+                            or i == len(_monitors)):
+                        monitors.append(m)
+                        _monitors.remove(m)
+            else:
+                for i, m in enumerate(reversed(_monitors)):
+                    if m.position_x <= monitors[0].position_x or i == 0:
+                        monitors.append(m)
+                        _monitors.remove(m)
+            left_side = not left_side
 
-      # Iterate through sorted driver windows and place in a grid-style layout
-      counter=0
-      while IFS=, read -r _ address; do
 
-        # First 3 drivers go on primary monitor and rest overflow onto secondary
-        if [ "$counter" -lt 3 ]; then
-          res_x=$((m_res_x * 1 / 4))
-          res_y=$((m_res_y * 1 / 4))
-          hyprctl_cmd+="dispatch movetoworkspacesilent name:F1,address:$address;"
-          hyprctl_cmd+="dispatch resizewindowpixel exact $res_x $res_y,address:$address;"
-          hyprctl_cmd+="dispatch movewindowpixel exact $((m_pos_x + (counter + 1) * res_x)) $((m_pos_y + (m_res_y * 3 / 4))),address:$address;"
-        elif [ "$sm" = true ]; then
-          res_x=$((sm_res_x * 1 / 4))
-          res_y=$((sm_res_y * 1 / 4))
-          column=$(((counter-3) / 4))
-          row=$(((counter-3) % 4))
-          # Start tiling on left or right depending on relative position of secondary monitor
-          if [ "$((sm_pos_x > m_pos_x))" -eq 1 ]; then
-              pos_x=$((sm_pos_x + column * res_x))
-          else
-              pos_x=$((sm_pos_x + (3 - column) * res_x))
-          fi
-          pos_y=$((sm_pos_y + row * res_y))
-          hyprctl_cmd+="dispatch movetoworkspacesilent name:F1,address:$address;"
-          hyprctl_cmd+="dispatch resizewindowpixel exact $res_x $res_y,address:$address;"
-          hyprctl_cmd+="dispatch movewindowpixel exact $pos_x $pos_y,address:$address;"
-        fi
-        ((++counter))
-      done <<< "$sorted_drivers"
+    class Tile:
+        tile_factor = 4
 
-      hyprctl_cmd+="\""
-      eval "$hyprctl_cmd"
-    '';
-  };
+        def __init__(self, number):
+            relative_tile = (number - 1) % (Tile.tile_factor**2) + 1
+            monitor = monitors[math.ceil(number / (Tile.tile_factor**2)) - 1]
+            row = (relative_tile - 1) % Tile.tile_factor + 1
+            col = math.ceil(relative_tile / Tile.tile_factor)
+
+            if (monitor.id != monitors[0].id
+                    and monitor.position_x < monitors[0].position_x):
+                col = 4 - (col - 1)
+
+            self.number = number
+            self.posX = round(
+                monitor.position_x + (col - 1) * (monitor.width / Tile.tile_factor)
+            )
+            self.posY = round(
+                monitor.position_y + (row - 1) *
+                (monitor.height / Tile.tile_factor)
+            )
+            self.width = round(monitor.width / Tile.tile_factor)
+            self.height = round(monitor.height / Tile.tile_factor)
+
+        def __eq__(self, other):
+            return (
+                self.posX == other.posX
+                and self.posY == other.posY
+                and self.width == other.width
+                and self.height == other.height
+            )
+
+
+    class Window:
+        def __init__(self, window, tiles):
+            self.window = window
+            self.tlTile = tiles[0]
+            if len(tiles) > 1:
+                self.brTile = tiles[1]
+            else:
+                self.brTile = None
+            self.dispatch_transform()
+
+        def dispatch_transform(self):
+            height = self.tlTile.height
+            width = self.tlTile.width
+
+            if self.brTile is not None:
+                height = (self.brTile.posY - self.tlTile.posY) + self.brTile.height
+                width = self.brTile.posX - self.tlTile.posX + self.brTile.width
+
+            instance.dispatch(
+                ["movetoworkspacesilent", f"name:F1,address:{self.window.address}"]
+            )
+            instance.dispatch(
+                [
+                    "movewindowpixel",
+                    f"exact {self.tlTile.posX} {self.tlTile.posY},"
+                    f"address:{self.window.address}",
+                ]
+            )
+            instance.dispatch(
+                [
+                    "resizewindowpixel",
+                    f"exact {width} {height},address:{self.window.address}",
+                ]
+            )
+
+        def place_on_tiles(self, tiles):
+            self.tlTile = tiles[0]
+            if tiles[1] is not None:
+                self.brTile = tiles[1]
+            self.dispatch_transform()
+
+
+    class DriverCam(Window):
+        _driver_cams = dict()
+
+        def __init__(self, window, driver_name):
+            self.driver_name = driver_name
+            self.number = driver_numbers[driver_name]
+            self.window = window
+            self.position = len(DriverCam._driver_cams) + 1
+            super().__init__(
+                window, (DriverCam.index_to_driver_tile(self.position),)
+            )
+            DriverCam._driver_cams[driver_name] = self
+
+        def __lt__(self, other):
+            return self.position < other.position
+
+        @staticmethod
+        def update_driver_positions(positions):
+            driver_cams = DriverCam.get_driver_cams()
+            for driver_cam in driver_cams:
+                driver_cam.position = positions[
+                    str(driver_numbers[driver_cam.driver_name])
+                ]["Line"]
+
+            s_driver_cams = sorted(driver_cams, key=lambda d: d.position)
+            for i, driver_cam in enumerate(s_driver_cams, start=1):
+                newTile = DriverCam.index_to_driver_tile(i)
+                if newTile != driver_cam.tlTile:
+                    driver_cam.tlTile = newTile
+                    driver_cam.dispatch_transform()
+
+        @staticmethod
+        def get_driver_cams(windows=None):
+            if windows is None:
+                windows = instance.get_windows()
+
+            found_drivers = dict()
+            for window in windows:
+                if window.wm_class != "MultiViewer for F1":
+                    continue
+                match = re.search(r"^([^—]+)", window.title)
+                if match:
+                    name = match.group(1).strip()
+                    if name in driver_numbers:
+                        found_drivers[name] = True
+                        if name not in DriverCam._driver_cams:
+                            DriverCam(window, name)
+
+            old_drivers = list()
+            for driver_cam in DriverCam._driver_cams.values():
+                if driver_cam.driver_name not in found_drivers:
+                    old_drivers.append(driver_cam.driver_name)
+
+            for driver in old_drivers:
+                del DriverCam._driver_cams[driver]
+
+            return DriverCam._driver_cams.values()
+
+        @staticmethod
+        def index_to_driver_tile(index):
+            tile = 13 + index
+            if index <= 3:
+                tile = 4 * (index + 1)
+            return Tile(tile)
+
+
+    def update_driver_window_positions():
+        try:
+            timingData = client.execute(query)
+        except Exception:
+            print("Multiviewer is not running. Exiting...")
+            exit(0)
+        DriverCam.update_driver_positions(
+            timingData["f1LiveTimingState"]["TimingAppData"]["Lines"]
+        )
+
+
+    def place_windows():
+        windows = instance.get_windows()
+        for window in windows:
+            title = window.title
+            if window.wm_class != "MultiViewer for F1":
+                continue
+            elif re.match(r"20|MultiViewer|Home", title):
+                continue
+            elif re.match(r"(Replay )?Live Timing", title):
+                Window(window, (Tile(1), Tile(3)))
+            elif re.match(r"F1 Live", title):
+                Window(window, (Tile(5), Tile(15)))
+            elif re.match(r"Radio Transcriptions|Race Control Messages", title):
+                Window(window, (Tile(4),))
+            elif re.match(r"Track Map", title):
+                Window(window, (Tile(15),))
+                instance.dispatch(
+                    [
+                        "alterzorder",
+                        f"top,address:{window.address}",
+                    ]
+                )
+        DriverCam.get_driver_cams(windows)
+
+
+    if __name__ == "__main__":
+        get_monitors()
+        place_windows()
+        while True:
+            time.sleep(5)
+            update_driver_window_positions()
+  '';
 in
 mkIf cfg.enable
 {
@@ -180,7 +295,7 @@ mkIf cfg.enable
       bind = [
         "${modKey}, F, workspace, name:F1"
         "${modKey}SHIFT, F, movetoworkspace, name:F1"
-        "${modKey}SHIFTCONTROL, F, exec, ${getExe multiviewerWorkspaceScript}"
+        "${modKey}SHIFTCONTROL, F, exec, systemctl restart --user hyprland-multiviewer-tiler"
       ];
 
       windowrulev2 = [
@@ -192,6 +307,17 @@ mkIf cfg.enable
         "noborder, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
       ];
     };
+
+  systemd.user.services.hyprland-multiviewer-tiler = mkIf (windowManager == "Hyprland") {
+    Unit = {
+      Description = "Hyprland Multiviewer F1 Tiler";
+    };
+
+    Service = {
+      Environment = [ "PYTHONUNBUFFERED=1" ];
+      ExecStart = hyprlandMultiviewerTiler;
+    };
+  };
 
   persistence.directories = [
     ".config/MultiViewer for F1"

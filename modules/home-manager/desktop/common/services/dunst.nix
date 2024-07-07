@@ -6,12 +6,12 @@
 , ...
 }:
 let
-  inherit (lib) mkIf fetchers getExe';
+  inherit (lib) mkIf getExe';
   inherit (config.modules) desktop;
   inherit (config.modules.colorScheme) light colorMap;
+  inherit (osConfig.device) primaryMonitor;
   cfg = desktop.services.dunst;
   colors = config.colorScheme.palette;
-  primaryMonitor = fetchers.primaryMonitor osConfig;
   systemctl = getExe' pkgs.systemd "systemctl";
 in
 mkIf (cfg.enable && desktopEnabled)

@@ -13,7 +13,7 @@
 
     desktop = {
       enable = true;
-      windowManager = "Hyprland";
+      windowManager = "hyprland";
       xdg.lowercaseUserDirs = true;
 
       hyprland = {

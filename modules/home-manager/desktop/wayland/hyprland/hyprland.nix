@@ -17,15 +17,13 @@ let
     concatMap
     imap
     optionalString
-    optionals
-    fetchers;
-  inherit (osConfig.device) monitors;
+    optionals;
+  inherit (osConfig.device) monitors primaryMonitor;
   inherit (desktopCfg.style) gapSize borderWidth;
 
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
-  primaryMonitor = fetchers.primaryMonitor osConfig;
 
   hyprlandPkgs = utils.flakePkgs args "hyprland";
 
@@ -37,7 +35,7 @@ let
     ../../../../../patches/hyprlandDispatcherError.patch
   ];
 in
-mkIf (desktopEnabled && desktopCfg.windowManager == "Hyprland") {
+mkIf (desktopEnabled && desktopCfg.windowManager == "hyprland") {
   modules.desktop = {
     # Optimise for performance in VM variant
     # TODO: When I update hyprland, add a hook to disable hardware cursors when
@@ -139,7 +137,7 @@ mkIf (desktopEnabled && desktopCfg.windowManager == "Hyprland") {
           if !m.enabled then
             "${m.name},disable"
           else
-            fetchers.getMonitorHyprlandCfgStr m
+            utils.getMonitorHyprlandCfgStr m
         )
         monitors
       ) ++ [

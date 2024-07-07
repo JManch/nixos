@@ -308,7 +308,7 @@ mkIf cfg.enable
       ];
     };
 
-  systemd.user.services.hyprland-multiviewer-tiler = mkIf (windowManager == "Hyprland") {
+  systemd.user.services.hyprland-multiviewer-tiler = mkIf (windowManager == "hyprland") {
     Unit = {
       Description = "Hyprland Multiviewer F1 Tiler";
     };

@@ -1,6 +1,6 @@
 { lib, config, inputs, ... }:
 let
-  inherit (lib) mkEnableOption mkOption types;
+  inherit (lib) mkEnableOption mkOption types findFirst;
   inherit (inputs.nix-resources.secrets) fqDomain;
 
   monitorSubmodule = {
@@ -40,7 +40,7 @@ let
 
       gamingRefreshRate = mkOption {
         type = types.float;
-        default = (lib.fetchers.primaryMonitor config).refreshRate;
+        default = (config.device.primaryMonitor config).refreshRate;
         description = ''
           Higher refresh to use during gaming and any other scenario where
           smoothness is preferred. Only affects the primary monitor.
@@ -146,6 +146,16 @@ in
     monitors = mkOption {
       type = types.listOf (types.submodule monitorSubmodule);
       default = [ ];
+    };
+
+    primaryMonitor = mkOption {
+      type = types.submodule monitorSubmodule;
+      readOnly = true;
+      internal = true;
+      default = findFirst
+        (m: m.number == 1)
+        (throw "Attempted to access primary monitors but monitors have not been configured")
+        config.device.monitors;
     };
 
     ipAddress = mkOption {

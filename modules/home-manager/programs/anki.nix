@@ -1,18 +1,14 @@
-{ lib
-, pkgs
-, config
-, osConfig
-, ...
-}:
+{ lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf fetchers;
+  inherit (lib) mkIf;
+  inherit (config.modules.desktop) isWayland;
   cfg = config.modules.programs.anki;
 in
 mkIf cfg.enable
 {
   home = {
     packages = [ pkgs.anki-bin ];
-    sessionVariables = mkIf (fetchers.isWayland osConfig config) {
+    sessionVariables = mkIf isWayland {
       ANKI_WAYLAND = 1;
     };
   };

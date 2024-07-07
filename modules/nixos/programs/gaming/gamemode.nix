@@ -10,13 +10,13 @@ let
 
   startStopScript =
     let
-      inherit (lib) optionalString fetchers boolToString substring stringLength toUpper optional;
+      inherit (lib) optionalString utils boolToString substring stringLength toUpper optional;
       inherit (homeConfig.modules.desktop) hyprland;
       inherit (config.modules.core) homeManager;
       inherit (config.modules.system) desktop;
+      inherit (config.device) primaryMonitor;
       homeConfig = config.home-manager.users.${username};
       isHyprland = homeManager.enable && homeConfig.modules.desktop.windowManager == "Hyprland";
-      monitor = fetchers.primaryMonitor config;
 
       # Remap the killactive key to use the shift modifier
       killActiveRebind = isEnd: ''
@@ -25,9 +25,9 @@ let
 
       refreshRate = m: toString (
         if (m == "start") then
-          monitor.gamingRefreshRate
+          primaryMonitor.gamingRefreshRate
         else
-          monitor.refreshRate
+          primaryMonitor.refreshRate
       );
 
       isEnd = m: boolToString (m == "end");
@@ -57,7 +57,7 @@ let
             hyprctl --instance 0 --batch "\
               ${optionalString hyprland.blur "keyword decoration:blur:enabled ${blur mode};\\"}
               keyword animations:enabled ${animate mode}; \
-              keyword monitor ${fetchers.getMonitorHyprlandCfgStr (monitor // {refreshRate = refreshRate mode;})}; \
+              keyword monitor ${utils.getMonitorHyprlandCfgStr (primaryMonitor // {refreshRate = refreshRate mode;})}; \
               ${killActiveRebind (mode == "end")}"
           ''
         }

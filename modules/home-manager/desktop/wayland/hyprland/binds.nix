@@ -16,7 +16,6 @@ let
     getExe'
     range
     concatMap
-    fetchers
     concatMapStringsSep;
   inherit (osConfig.modules.system) audio;
   inherit (osConfig.device) monitors;
@@ -28,7 +27,7 @@ let
   notifySend = getExe pkgs.libnotify;
   hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 
-  getMonitorByNumber = number: fetchers.getMonitorByNumber osConfig number;
+  getMonitorByNumber = number: utils.getMonitorByNumber osConfig number;
 
   disableShadersCommand =
     command: "${cfg.disableShaders}; ${command}; ${cfg.enableShaders}";
@@ -120,7 +119,7 @@ let
       'string:x-canonical-private-synchronous:hypr-scale-tablet' 'Hyprland' 'Scaled tablet to active window'
   '';
 in
-mkIf (desktopEnabled && desktopCfg.windowManager == "Hyprland")
+mkIf (desktopEnabled && desktopCfg.windowManager == "hyprland")
 {
   # Force secondaryModKey VM variant because binds are repeated on host
   modules.desktop.hyprland.modKey = mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);
@@ -264,7 +263,7 @@ mkIf (desktopEnabled && desktopCfg.windowManager == "Hyprland")
       ${concatMapStringsSep "\n  " (m: "monitor_num_to_name[${toString m.number}]='${m.name}'") monitors}
 
       declare -A monitor_name_to_cfg
-      ${concatMapStringsSep "\n  " (m: "monitor_name_to_cfg[${m.name}]='${fetchers.getMonitorHyprlandCfgStr m}'") monitors}
+      ${concatMapStringsSep "\n  " (m: "monitor_name_to_cfg[${m.name}]='${utils.getMonitorHyprlandCfgStr m}'") monitors}
 
       if [[ ! -v monitor_num_to_name[$1] ]]; then
         echo "Error: monitor with number '$1' does not exist"

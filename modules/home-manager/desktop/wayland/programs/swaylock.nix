@@ -8,6 +8,7 @@
 }:
 let
   inherit (lib) mkIf optionalString getExe;
+  inherit (osConfig.device) primaryMonitor;
   cfg = desktopCfg.programs.swaylock;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
@@ -89,8 +90,8 @@ mkIf (cfg.enable && desktopEnabled && isWayland) {
 
       indicator = true;
       indicator-caps-lock = true;
-      indicator-y-position = builtins.floor ((lib.fetchers.primaryMonitor osConfig).height * 0.5);
-      indicator-radius = builtins.floor ((lib.fetchers.primaryMonitor osConfig).width * 0.04);
+      indicator-y-position = builtins.floor (primaryMonitor.height * 0.5);
+      indicator-radius = builtins.floor (primaryMonitor.width * 0.04);
 
       text-color = "#${colors.base07}";
 

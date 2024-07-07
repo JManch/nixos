@@ -1,7 +1,7 @@
 { lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf fetchers;
-  inherit (config.modules.core) homeManager;
+  inherit (lib) mkIf;
+  inherit (config.modules.system.desktop) isWayland;
 in
 mkIf (config.device.gpu.type == "nvidia")
 {
@@ -20,7 +20,7 @@ mkIf (config.device.gpu.type == "nvidia")
     # Major issues if this is disabled
     modesetting.enable = true;
     open = true;
-    nvidiaSettings = !(fetchers.isWayland config homeManager.enable);
+    nvidiaSettings = !isWayland;
     # Enable this for suspend
     powerManagement.enable = false;
   };

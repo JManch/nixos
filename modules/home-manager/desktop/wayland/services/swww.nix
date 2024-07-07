@@ -7,11 +7,11 @@
 , ...
 }:
 let
-  inherit (lib) mkIf fetchers getExe getExe';
+  inherit (lib) mkIf getExe getExe';
   cfg = config.modules.desktop.programs.swww;
   transition =
     let
-      primaryMonitor = fetchers.primaryMonitor osConfig;
+      inherit (osConfig.device) primaryMonitor;
       refreshRate = toString (builtins.floor primaryMonitor.refreshRate);
     in
     "--transition-bezier .43,1.19,1,.4 --transition-type center --transition-duration 1 --transition-fps ${refreshRate}";

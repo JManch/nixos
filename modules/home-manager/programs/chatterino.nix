@@ -6,7 +6,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf optional getExe fetchers;
+  inherit (lib) mkIf optional getExe utils;
   inherit (config.modules.programs) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
   cfg = config.modules.programs.chatterino;
@@ -100,7 +100,7 @@ mkIf cfg.enable
 
   desktop.hyprland.settings =
     let
-      secondMonitor = fetchers.getMonitorByNumber osConfig 2;
+      secondMonitor = utils.getMonitorByNumber osConfig 2;
     in
     {
       exec-once = [ (getExe twitchWorkspaceScript) ];

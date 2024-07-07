@@ -6,6 +6,8 @@ let
     imap0
     hasAttr
     head
+    findFirst
+    optionalString
     tail
     concatStrings
     toUpper
@@ -53,6 +55,14 @@ in
     }
   '';
 
+  getMonitorByNumber = osConfig:
+    number: findFirst (m: m.number == number)
+      (head osConfig.device.monitors)
+      osConfig.device.monitors;
+
+  getMonitorHyprlandCfgStr = m:
+    "${m.name},${toString m.width}x${toString m.height}@${toString m.refreshRate},${toString m.position.x}x${toString m.position.y},1,transform,${toString m.transform}${optionalString (m.mirror != null) ",mirror,${m.mirror}"}";
+
   asserts = asserts:
     concatMap (a: a) (
       imap0
@@ -65,6 +75,14 @@ in
 
   wgInterfaceEnabled = interface: osConfig:
     (hasAttr interface osConfig.modules.services.wireguard) && (osConfig.modules.services.wireguard.${interface}.enable);
+
+  waylandWindowManagers = [
+    "hyprland"
+  ];
+
+  waylandDesktopEnvironments = [
+    "gnome"
+  ];
 
   hardeningBaseline = config: overrides: {
     DynamicUser = true;

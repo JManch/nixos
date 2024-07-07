@@ -11,9 +11,11 @@ let
     mkOption
     mkPackageOption
     length
+    elem
     types
     literalExpression
     mkEnableOption;
+  cfg = config.modules.desktop;
 
   terminalSubmodule = {
     options = {
@@ -43,7 +45,7 @@ in
     };
 
     windowManager = mkOption {
-      type = types.nullOr (types.enum [ "Hyprland" ]);
+      type = types.nullOr (types.enum [ "hyprland" ]);
       default = null;
       description = "Window manager to use";
     };
@@ -52,6 +54,16 @@ in
       type = types.submodule terminalSubmodule;
       default = null;
       description = "Information about the default terminal";
+    };
+
+    isWayland = mkOption {
+      type = types.bool;
+      internal = true;
+      readOnly = true;
+      default =
+        (elem cfg.windowManager utils.waylandWindowManagers)
+        ||
+        (elem osConfig.modules.system.desktop.desktopEnvironment utils.waylandDesktopEnvironments);
     };
 
     style = {
@@ -133,8 +145,8 @@ in
       ]);
 
       _module.args = {
+        inherit (cfg) isWayland;
         desktopEnabled = cfg.enable;
-        isWayland = lib.fetchers.isWayland osConfig config;
       };
     };
 }

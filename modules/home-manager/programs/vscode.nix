@@ -1,12 +1,8 @@
-{ lib
-, pkgs
-, config
-, osConfig
-, ...
-}:
+{ lib, pkgs, config, ... }:
 let
-  inherit (lib) mkIf fetchers;
+  inherit (lib) mkIf;
   inherit (config.modules) desktop;
+  inherit (desktop) isWayland;
   cfg = config.modules.programs.vscode;
 in
 mkIf cfg.enable
@@ -50,9 +46,9 @@ mkIf cfg.enable
       gdb
     ]);
 
-    userSettings = mkIf (fetchers.isWayland osConfig config) {
-      # Prevents crash on launch
-      "window.titleBarStyle" = "custom";
+    userSettings = {
+      # Prevents wayland crash on launch
+      "window.titleBarStyle" = mkIf isWayland "custom";
       "window.menuBarVisibility" = "toggle";
       "editor.fontFamily" = desktop.style.font.family;
       "git.autofetch" = true;

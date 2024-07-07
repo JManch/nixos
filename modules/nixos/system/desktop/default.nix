@@ -2,14 +2,15 @@
 , pkgs
 , config
 , inputs
+, username
 , ...
 }:
 let
-  inherit (lib) mkIf fetchers utils types mkEnableOption mkOption;
+  inherit (lib) mkIf utils types mkEnableOption mkOption elem;
   inherit (config.modules.core) homeManager;
   inherit (config.device) gpu;
+  inherit (config.modules.system.desktop) isWayland;
   cfg = config.modules.system.desktop;
-  isWayland = fetchers.isWayland config homeManager.enable;
 in
 {
   imports = (utils.scanPaths ./.) ++ [
@@ -27,6 +28,17 @@ in
         home manager. Some windows managers don't require a desktop
         environment and some desktop environments include a window manager.
       '';
+    };
+
+    isWayland = mkOption {
+      type = types.bool;
+      internal = true;
+      readOnly = true;
+      default = (if config.modules.core.homeManager.enable then
+        (elem config.home-manager.users.${username}.modules.desktop.windowManager utils.waylandWindowManagers)
+      else
+        false) ||
+      (elem cfg.desktopEnvironment utils.waylandDesktopEnvironments);
     };
   };
 

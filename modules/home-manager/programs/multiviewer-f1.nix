@@ -1,31 +1,12 @@
-{ lib, pkgs, config, ... }:
+{ lib
+, pkgs
+, pkgs'
+, config
+, ...
+}:
 let
   inherit (lib) mkIf getExe;
   cfg = config.modules.programs.multiviewerF1;
-
-  multiviewer-for-f1 =
-    pkgs.multiviewer-for-f1.overrideAttrs (_: rec {
-      version = "1.34.2";
-
-      src = pkgs.fetchurl {
-        url = "https://releases.multiviewer.app/download/176624873/multiviewer-for-f1_${version}_amd64.deb";
-        sha256 = "sha256-4QCcNT+eSauFcJmvOpCkbcYo+nTfGRjzair3WOA4eYo=";
-      };
-
-      # Add libglvnd to library path for hardware acceleration
-      installPhase = ''
-        runHook preInstall
-
-        mkdir -p $out/bin $out/share
-        mv -t $out/share usr/share/* usr/lib/multiviewer-for-f1
-
-        makeWrapper "$out/share/multiviewer-for-f1/MultiViewer for F1" $out/bin/multiviewer-for-f1 \
-        --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform=wayland --enable-features=WaylandWindowDecorations}}" \
-        --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ pkgs.libudev0-shim pkgs.libglvnd ]}:\"$out/share/Multiviewer for F1\""
-
-        runHook postInstall
-      '';
-    });
 
   # This script acts as a replacement for the Multiviewer layout saving which
   # doesn't work with a tiling window manager. The idea is that Multiviewer
@@ -185,7 +166,7 @@ let
 in
 mkIf cfg.enable
 {
-  home.packages = [ multiviewer-for-f1 ];
+  home.packages = [ pkgs'.multiviewer-for-f1 ];
 
   desktop.hyprland.settings =
     let

@@ -14,4 +14,5 @@ in
   beammp-server = callPackage ./beammp-server { };
   heatmiser = pkgs.home-assistant.python.pkgs.callPackage ./heatmiser.nix { };
   vesktop = callPackage ./vesktop.nix { };
+  multiviewer-for-f1 = callPackage ./multiviewer-for-f1.nix { };
 }

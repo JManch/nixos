@@ -17,8 +17,7 @@ let
     mapAttrsToList
     optionalString
     mkForce
-    concatStringsSep
-    getExe;
+    concatStringsSep;
   inherit (config.modules.system) impermanence;
   cfg = config.modules.core;
   configDir = "/home/${username}/.config/nixos";
@@ -250,6 +249,9 @@ in
   # possible with the standard /tmp dir because bind mounting /tmp on a running
   # system would break things.
   # Relevant github issue: https://github.com/NixOS/nixpkgs/issues/54707
+
+  # NOTE: When nix updates to 2.23, replace this with the new build-dir conf
+  # https://hydra.nixos.org/build/263397466/download/1/manual/command-ref/conf-file.html?highlight=build-dir#conf-build-dir
 
   # List of programs that require the bind mount to compile:
   # - mongodb

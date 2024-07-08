@@ -37,49 +37,6 @@ in
         Whether the host's primary user is part of the wheel group
       '';
     };
-
-    loadNixResourcesKey = mkOption {
-      type = types.lines;
-      internal = true;
-      readOnly = true;
-      default = /*bash*/ ''
-        tmp_key=$(mktemp)
-        ssh_dir="/home/${username}/.ssh"
-        flake="/home/${username}/.config/nixos"
-        if [ ! -d $flake ]; then
-          echo "Flake does not exist locally so using remote from github"
-          flake="github:JManch/nixos"
-        fi
-
-        ${utils.exitTrapBuilder}
-        reset_key() {
-          if [ -s "$tmp_key" ]; then
-            mv "$tmp_key" "$ssh_dir/id_ed25519"
-          fi
-          rm -f "$tmp_key"
-        }
-        add_exit_trap reset_key
-
-        # On users that are not my own, temporarily copy the nix-resources key
-        # to .ssh/ed25519. This is because there's no way (that I'm aware of)
-        # to specify the SSH key that nixos-rebuild uses for authentication. My
-        # own user does not need this workaround because my main ssh key gives
-        # access.
-        # shellcheck disable=SC2050
-        if [ "${username}" != "joshua" ]; then
-          if [ -f "$ssh_dir/id_ed25519" ]; then
-            mv "$ssh_dir/id_ed25519" "$tmp_key"
-          fi
-          cp "$ssh_dir/id_nix-resources" "$ssh_dir/id_ed25519"
-        fi
-      '';
-      description = ''
-        Bash script for temporarily replacing the user's primary ssh key with
-        my nix-resources access key. This enables access to my private
-        nix-resources flake on hosts that do not have my main ssh key
-        installed. The script also sets a $flake variable for convenience.
-      '';
-    };
   };
 
   config = {

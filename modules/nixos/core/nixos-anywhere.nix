@@ -60,7 +60,11 @@ let
         exit 1
       fi
 
-      ${config.modules.core.loadNixResourcesKey}
+      flake="/home/${adminUsername}/.config/nixos"
+      if [ ! -d $flake ]; then
+        echo "Flake does not exist locally so using remote from github"
+        flake="github:JManch/nixos"
+      fi
 
       host_config="$flake#nixosConfigurations.$hostname.config"
       username=$(nix eval --raw "$host_config.modules.core.username")

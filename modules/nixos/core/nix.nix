@@ -39,8 +39,12 @@ let
       # Always rebuild in ~ because I once had a bad experience where I
       # accidentally built in /nix/store and caused irrepairable corruption
       text = /*bash*/ ''
-        ${cfg.loadNixResourcesKey}
-        add_exit_trap "popd >/dev/null 2>&1 || true"
+        flake="/home/${adminUsername}/.config/nixos"
+        if [ ! -d $flake ]; then
+          echo "Flake does not exist locally so using remote from github"
+          flake="github:JManch/nixos"
+        fi
+        trap "popd >/dev/null 2>&1 || true" EXIT
         pushd ~ >/dev/null 2>&1
 
         nixos-rebuild ${if (cmd == "diff") then "build" else cmd} \
@@ -80,7 +84,11 @@ let
             exit 1
           fi
 
-          ${cfg.loadNixResourcesKey}
+          flake="/home/${adminUsername}/.config/nixos"
+          if [ ! -d $flake ]; then
+            echo "Flake does not exist locally so using remote from github"
+            flake="github:JManch/nixos"
+          fi
         '';
       in
       pkgs.writeShellApplication {
@@ -124,7 +132,7 @@ let
           # Always build and store result to prevent GC deleting builds for remote hosts
           remote_builds="/home/${adminUsername}/.remote-builds/$hostname"
           mkdir -p "$remote_builds"
-          add_exit_trap "popd >/dev/null 2>&1 || true"
+          trap "popd >/dev/null 2>&1 || true" EXIT
           pushd "$remote_builds" >/dev/null 2>&1
           nixos-rebuild build --flake "$flake#$hostname" "''${@:2}"
           ${optionalString (cmd != "build") /*bash*/ ''

@@ -7,7 +7,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf mkMerge mkVMOverride mod;
+  inherit (lib) mkIf utils mkMerge mkVMOverride mod;
   inherit (config.home-manager.users.${username}.modules.desktop) terminal;
   inherit (config.device) monitors cpu memory;
   inherit (config.modules.core) homeManager;
@@ -39,7 +39,13 @@ let
       fi
       hostname=$1
 
-      ${config.modules.core.loadNixResourcesKey}
+      flake="/home/${username}/.config/nixos"
+      if [ ! -d $flake ]; then
+        echo "Flake does not exist locally so using remote from github"
+        flake="github:JManch/nixos"
+      fi
+
+      ${utils.exitTrapBuilder}
 
       # Build the VM
       runscript="/home/${adminUsername}/result/bin/run-$hostname-vm"
@@ -50,9 +56,6 @@ let
 
       # Check if the VM uses impermanence
       impermanence=$(nix eval "$flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.modules.system.impermanence.enable")
-
-      # Reset ssh key early as we no longer need flake access
-      reset_key
 
       # Print ports mapped to the VM
       printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"

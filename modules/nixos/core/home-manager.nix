@@ -31,6 +31,7 @@ in
           modules = {
             core.standalone = true;
             shell.enable = true;
+            shell.promptColor = "purple";
             programs.neovim.enable = true;
           };
         };

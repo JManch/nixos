@@ -3,6 +3,7 @@
 , pkgs'
 , config
 , inputs
+, adminUsername
 , ...
 }:
 let
@@ -132,7 +133,7 @@ mkIf cfg.enable
   systemd.timers.backup-vaultwarden.timerConfig.OnCalendar = "08,20:00";
   systemd.services.backup-vaultwarden.wantedBy = mkForce [ ];
 
-  environment.systemPackages = [ restoreScript ];
+  users.users.${adminUsername}.packages = [ restoreScript ];
 
   systemd.services.vaultwarden-cloud-backup =
     let

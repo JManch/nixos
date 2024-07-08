@@ -3,6 +3,7 @@
 , config
 , inputs
 , username
+, adminUsername
 , ...
 }:
 let
@@ -17,12 +18,16 @@ in
     inputs.impermanence.nixosModules.impermanence
 
     (mkAliasOptionModule
+      [ "persistence" ]
+      [ "environment" "persistence" "/persist" ])
+
+    (mkAliasOptionModule
       [ "persistenceHome" ]
       [ "environment" "persistence" "/persist" "users" username ])
 
     (mkAliasOptionModule
-      [ "persistence" ]
-      [ "environment" "persistence" "/persist" ])
+      [ "persistenceAdminHome" ]
+      [ "environment" "persistence" "/persist" "users" adminUsername ])
   ];
 
   config = mkMerge [

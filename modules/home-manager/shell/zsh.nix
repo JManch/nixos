@@ -1,10 +1,4 @@
-{ lib
-, pkgs
-, config
-, username
-, hostname
-, ...
-}:
+{ lib, pkgs, config, ... }:
 let
   inherit (lib) mkIf getExe';
   cfg = config.modules.shell;

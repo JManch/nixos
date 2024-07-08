@@ -2,7 +2,7 @@
 , pkgs
 , self
 , config
-, username
+, adminUsername
 , ...
 }:
 let
@@ -79,26 +79,37 @@ let
         rootDir="persist"
       fi
 
-      install -d -m755 "$temp/$rootDir/etc/ssh"
-      install -d -m755 "$temp/$rootDir/home"
-      install -d -m700 "$temp/$rootDir/home/$username"
-      install -d -m700 "$temp/$rootDir/home/$username/.ssh"
-      install -d -m755 "$temp/$rootDir/home/$username/.config"
+      install -d -m755 "$temp/$rootDir/etc/ssh" "$temp/$rootDir/home"
+      install -d -m700 "$temp/$rootDir/home/$username" "$temp/$rootDir/home/${adminUsername}"
+      install -d -m700 "$temp/$rootDir/home/$username/.ssh" "$temp/$rootDir/home/${adminUsername}/.ssh"
 
       kit_path="${../../../hosts/ssh-bootstrap-kit}"
       age -d "$kit_path" | tar -xf - -C "$secret_temp"
+
+      # Install host keys
       mv "$secret_temp/$hostname"/* "$temp/$rootDir/etc/ssh"
 
-      mv "$secret_temp"/id_nix-resources* "$temp/$rootDir/home/$username/.ssh"
+      # Install user keys
       if [ -d "$secret_temp/$username" ]; then
         mv "$secret_temp/$username"/* "$temp/$rootDir/home/$username/.ssh"
       fi
+
+      # Install admin user keys
+      if [ -d "$secret_temp/${adminUsername}" ]; then
+        mv "$secret_temp/${adminUsername}"/* "$temp/$rootDir/home/${adminUsername}/.ssh"
+      fi
+
       rm -rf "$secret_temp"
 
       sudo chown -R root:root "$temp/$rootDir"
-      # It's fine if the username here does not match the new host's username
-      # as the UID will match and that's all that matters
-      sudo chown -R ${username}:users "$temp/$rootDir/home"
+
+      # user:users
+      sudo chown -R 1000:100 "$temp/$rootDir/home/$username"
+
+      if [ "$username" != "${adminUsername}" ]; then
+        # admin_user:wheel
+        sudo chown -R 1:1 "$temp/$rootDir/home/${adminUsername}"
+      fi
 
       nixos-anywhere --extra-files "$temp" --flake "$flake#$hostname" "root@$ip_address"
       sudo rm -rf "$temp"
@@ -106,5 +117,5 @@ let
   };
 in
 {
-  environment.systemPackages = [ deployScript ];
+  users.users.${adminUsername}.packages = [ deployScript ];
 }

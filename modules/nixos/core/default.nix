@@ -1,4 +1,9 @@
-{ lib, pkgs, username, ... }:
+{ lib
+, pkgs
+, config
+, username
+, ...
+}:
 let
   inherit (lib) utils mkOption mkEnableOption types;
 in
@@ -14,8 +19,22 @@ in
       internal = true;
       readOnly = true;
       default = username;
+      description = "The username of the primary user of the nixosConfiguration";
+    };
+
+    adminUsername = mkOption {
+      type = types.str;
+      internal = true;
+      readOnly = true;
+      default = "joshua";
+      description = "The username of the admin user that exists on all hosts";
+    };
+
+    priviledgedUser = mkOption {
+      type = types.bool;
+      default = true;
       description = ''
-        Used for getting the username of a given nixosConfiguration.
+        Whether the host's primary user is part of the wheel group
       '';
     };
 
@@ -64,15 +83,14 @@ in
   };
 
   config = {
-    environment.systemPackages = [
-      pkgs.git
-    ];
+    programs.zsh.enable = true;
+    environment.systemPackages = [ pkgs.git ];
+
+    _module.args = { inherit (config.modules.core) adminUsername; };
 
     security.sudo.extraConfig = "Defaults lecture=never";
     time.timeZone = "Europe/London";
     system.stateVersion = "23.05";
-
-    programs.zsh.enable = true;
 
     environment.sessionVariables = {
       XDG_CACHE_HOME = "$HOME/.cache";

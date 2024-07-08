@@ -3,8 +3,8 @@
 , self
 , config
 , inputs
-, username
 , hostname
+, adminUsername
 , ...
 }:
 let
@@ -20,7 +20,7 @@ let
     concatStringsSep;
   inherit (config.modules.system) impermanence;
   cfg = config.modules.core;
-  configDir = "/home/${username}/.config/nixos";
+  configDir = "/home/${adminUsername}/.config/nixos";
 
   rebuildCmds = [
     "switch"
@@ -96,7 +96,7 @@ let
           # executed with --build-host we first run build locally with
           # --target-host to ensure that a cached build is on the host and it
           # won't end up trying to build everything itself
-          nixos-rebuild build --flake "${configDir}#$hostname" --target-host "root@$hostname.lan"
+          nixos-rebuild build --flake "${configDir}#$hostname" --target-host "${adminUsername}@$hostname.lan"
 
           # For some reason running nixos-rebuild build --target-host sends a
           # system with a different root system hash to the one built locally.
@@ -106,13 +106,13 @@ let
 
           # Package current config and send to remote host
           tar -cf /tmp/nixos-diff-config.tar -C ${configDir} .
-          ssh "${username}@$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
-          scp /tmp/nixos-diff-config.tar "${username}@$hostname.lan:/tmp/nixos-diff-config"
+          ssh "${adminUsername}@$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
+          scp /tmp/nixos-diff-config.tar "${adminUsername}@$hostname.lan:/tmp/nixos-diff-config"
 
           # Build new configuration on remote host and generate result
           # symlink. Diff the result with the current system
           # shellcheck disable=SC2029
-          ssh "${username}@$hostname.lan" "sh -c \
+          ssh "${adminUsername}@$hostname.lan" "sh -c \
             'cd /tmp/nixos-diff-config && \
             tar -xf nixos-diff-config.tar && \
             nixos-rebuild build --flake .#$hostname && \
@@ -122,13 +122,13 @@ let
         '' else /*bash*/ ''
 
           # Always build and store result to prevent GC deleting builds for remote hosts
-          remote_builds="/home/${username}/files/remote-builds/$hostname"
+          remote_builds="/home/${adminUsername}/.remote-builds/$hostname"
           mkdir -p "$remote_builds"
           add_exit_trap "popd >/dev/null 2>&1 || true"
           pushd "$remote_builds" >/dev/null 2>&1
           nixos-rebuild build --flake "$flake#$hostname" "''${@:2}"
           ${optionalString (cmd != "build") /*bash*/ ''
-            nixos-rebuild ${cmd} --use-remote-sudo --flake "$flake#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
+            nixos-rebuild ${cmd} --use-remote-sudo --flake "$flake#$hostname" --target-host "${adminUsername}@$hostname.lan" "''${@:2}"
           ''}
 
         '');
@@ -136,7 +136,8 @@ let
     rebuildCmds;
 in
 {
-  environment.systemPackages = [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts;
+  users.users.${adminUsername}.packages = [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts;
+  persistenceAdminHome.directories = [ ".remote-builds" ];
 
   # Nice explanation of overlays: https://archive.is/f8goR
   #
@@ -205,8 +206,7 @@ in
         # Do not load the default global registry
         # https://channels.nixos.org/flake-registry.json
         flake-registry = "";
-        # Fixes builds using --build-host
-        trusted-users = [ username ];
+        trusted-users = [ adminUsername ];
         # Workaround for https://github.com/NixOS/nix/issues/9574
         nix-path = config.nix.nixPath;
       };
@@ -261,8 +261,8 @@ in
     "d /persist/var/nix-tmp 0755 root root"
   ];
 
-  programs.zsh = {
-    interactiveShellInit = /*bash*/ ''
+  hmAdmin.programs.zsh = {
+    initExtra = /*bash*/ ''
       inspect-host() {
         if [ -z "$1" ]; then
           echo "Usage: inspect-host <hostname>"

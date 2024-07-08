@@ -4,6 +4,7 @@
 , config
 , username
 , hostname
+, adminUsername
 , ...
 }:
 let
@@ -20,7 +21,8 @@ in
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
-      AllowUsers = [ "root" username ];
+      PermitRootLogin = "no";
+      AllowUsers = [ adminUsername ];
     };
 
     hostKeys = [{
@@ -29,19 +31,11 @@ in
     }];
   };
 
-  users.users.root = {
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
-    ];
-  };
-
-  users.users.${username} = {
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDU68qiZQoWPMKZwaNu1CJikH0t4bV8OgjpOkpj6AwPW joshua@pixelbook"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPV7Ay4E3moAYtBDsVlSaIWHm1wabZU+qLnllAZdQibc joshua@pixel5"
-    ];
-  };
+  users.users.${adminUsername}.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDU68qiZQoWPMKZwaNu1CJikH0t4bV8OgjpOkpj6AwPW joshua@pixelbook"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPV7Ay4E3moAYtBDsVlSaIWHm1wabZU+qLnllAZdQibc joshua@pixel5"
+  ];
 
   programs.ssh = {
     startAgent = true;
@@ -92,6 +86,11 @@ in
   ];
 
   persistenceHome.directories = [{
+    directory = ".ssh";
+    mode = "0700";
+  }];
+
+  persistenceAdminHome.directories = mkIf (username != adminUsername) [{
     directory = ".ssh";
     mode = "0700";
   }];

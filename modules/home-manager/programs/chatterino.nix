@@ -2,13 +2,13 @@
 , pkgs
 , config
 , osConfig
-, username
 , ...
 }:
 let
   inherit (lib) mkIf optional getExe utils;
   inherit (config.modules.programs) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
+  inherit (config.home) homeDirectory;
   cfg = config.modules.programs.chatterino;
   desktopCfg = config.modules.desktop;
 
@@ -17,7 +17,7 @@ let
     nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.makeWrapper ];
     postInstall = ''
       wrapProgram $out/bin/streamlink \
-        --add-flags "--config /home/${username}/.config/streamlink/config" \
+        --add-flags "--config ${homeDirectory}/.config/streamlink/config" \
         --add-flags '--config "${streamlinkTwitchAuth.path}"'
     '';
   });

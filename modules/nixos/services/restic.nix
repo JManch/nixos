@@ -5,6 +5,7 @@
 , inputs
 , hostname
 , username
+, adminUsername
 , ...
 }:
 let
@@ -188,11 +189,11 @@ in
 mkMerge [
   # To allow testing backup restores in the VM
   (mkIf (cfg.enable || cfg.server.enable || (cfg.enable && vmVariant)) {
-    environment.systemPackages = [ pkgs.restic restoreScript ];
+    users.users.${adminUsername}.packages = [ pkgs.restic restoreScript ];
 
     # WARN: Always interact with the repository using the REST server, even on
     # the same machine. It ensures correct repo file ownership.
-    programs.zsh.shellAliases =
+    hmAdmin.programs.zsh.shellAliases =
       let
         systemctl = getExe' pkgs.systemd "systemctl";
       in

@@ -29,4 +29,6 @@
       };
     };
   };
+
+  backups.documents.paths = [ "documents" ];
 }

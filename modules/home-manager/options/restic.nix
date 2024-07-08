@@ -1,6 +1,7 @@
-{ lib, username, ... }:
+{ lib, config, ... }:
 let
   inherit (lib) mkOption types mapAttrs' nameValuePair;
+  inherit (config.home) homeDirectory;
 in
 {
   options.backups = mkOption {
@@ -81,7 +82,7 @@ in
     default = { };
     apply = v: mapAttrs'
       (name: value: nameValuePair "home-${name}" (value // {
-        paths = map (path: "/home/${username}/${path}") value.paths;
+        paths = map (path: "${homeDirectory}/${path}") value.paths;
       }))
       v;
     description = ''

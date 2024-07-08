@@ -43,6 +43,11 @@ let
         git clone https://github.com/JManch/nixos "$config"
       fi
 
+      host_config="$config#nixosConfigurations.$hostname.config"
+      username=$(nix eval --raw "$host_config.modules.core.username")
+      admin_username=$(nix eval --raw "$host_config.modules.core.adminUsername")
+      impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
+
       vmInstall=false
       read -p "Are you installing this host in a virtual machine? (y/N): " -n 1 -r
       echo
@@ -83,22 +88,21 @@ let
 
       # Temporarily copy nix-resources keys to id_ed25519 as they are used for
       # accessing the private repo
-      cp "$temp_keys/id_nix-resources" "$ssh_dir/id_ed25519"
-      cp "$temp_keys/id_nix-resources.pub" "$ssh_dir/id_ed25519.pub"
+      cp "$temp_keys/$admin_username/id_nix-resources" "$ssh_dir/id_ed25519"
+      cp "$temp_keys/$admin_username/id_nix-resources.pub" "$ssh_dir/id_ed25519.pub"
 
       echo "Starting disko format and mount..."
       disko --mode disko --flake "$config#$hostname"
       echo "Disko finished"
 
-      host_config="$config#nixosConfigurations.$hostname.config"
-      impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
       rootDir="/mnt"
       if [ "$impermanence" = "true" ]; then
         rootDir="/mnt/persist"
       fi
 
-      username=$(nix eval --raw "$host_config.modules.core.username")
-      mkdir -p "$rootDir"/{etc/ssh,"home/$username/.ssh"}
+      install -d -m755 "$rootDir/etc/ssh" "$rootDir/home"
+      install -d -m700 "$rootDir/home/$username" "$rootDir/home/$admin_username"
+      install -d -m700 "$rootDir/home/$username/.ssh" "$rootDir/home/$admin_username/.ssh"
 
       # Install host keys
       mv "$temp_keys/$hostname"/* "$rootDir/etc/ssh"
@@ -108,11 +112,19 @@ let
         mv "$temp_keys/$username"/* "$rootDir/home/$username/.ssh"
       fi
 
-      # Install user nix-resources key
-      mv "$temp_keys"/id_nix-resources* "$rootDir/home/$username/.ssh"
+      # Install admin user keys
+      if [ -d "$temp_keys/$admin_username" ]; then
+        mv "$temp_keys/$admin_username"/* "$rootDir/home/$admin_username/.ssh"
+      fi
 
       rm -rf "$temp_keys"
-      chown -R nixos:users "$rootDir/home/$username"
+      # user:users
+      chown -R 1000:100 "$rootDir/home/$username"
+
+      if [ "$username" != "$admin_username" ]; then
+        # admin_user:wheel
+        chown -R 1:1 "$rootDir/home/$admin_username"
+      fi
 
       # WARN: nixos-install has a bunch of options that are not documented in
       # the man page. The source is here: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/installer/tools/nixos-install.sh
@@ -164,9 +176,7 @@ in
     enable = true;
     settings.PasswordAuthentication = false;
     settings.KbdInteractiveAuthentication = false;
-    knownHosts = {
-      "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
-    };
+    knownHosts."github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
   };
 
   users.users.root = {

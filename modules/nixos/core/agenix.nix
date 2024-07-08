@@ -2,6 +2,7 @@
 , pkgs
 , config
 , inputs
+, adminUsername
 , ...
 }:
 let
@@ -28,7 +29,6 @@ let
     name = "agenix-edit";
     runtimeInputs = scriptInputs;
     text = /*bash*/ ''
-
       if [ "$#" -ne 1 ]; then
         echo "Usage: agenix-edit <file_path>"
         exit 1
@@ -43,7 +43,6 @@ let
       done
 
       eval agenix -e "$1" "$keys"
-
     '';
   };
 
@@ -51,7 +50,6 @@ let
     name = "agenix-rekey";
     runtimeInputs = scriptInputs;
     text = /*bash*/ ''
-
       ${decryptKit}
 
       keys=""
@@ -61,7 +59,6 @@ let
       done
 
       eval agenix -r "$keys"
-
     '';
   };
 in
@@ -71,7 +68,7 @@ in
     nix-resources.nixosModules.secrets
   ];
 
-  environment.systemPackages = [
+  users.users.${adminUsername}.packages = [
     agenix.packages.${pkgs.system}.default
     editSecretScript
     rekeySecretScript

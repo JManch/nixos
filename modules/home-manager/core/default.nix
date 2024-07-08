@@ -1,9 +1,4 @@
-{ lib
-, config
-, username
-, osConfig
-, ...
-}:
+{ lib, config, osConfig, ... }:
 let
   inherit (lib) mkIf utils optionalString mkEnableOption optional;
   inherit (osConfig.modules.system) impermanence;
@@ -18,13 +13,7 @@ in
   };
 
   config = {
-    programs.home-manager.enable = true;
-
-    home = {
-      username = username;
-      homeDirectory = "/home/${username}";
-      stateVersion = "23.05";
-    };
+    home.stateVersion = "23.05";
 
     persistence.directories = [
       "downloads"
@@ -46,13 +35,12 @@ in
         restore.removeExisting = false;
         exclude =
           let
-            absPath = "${optionalString impermanence.enable "/persist"}/home/${username}";
+            absPath = "${optionalString impermanence.enable "/persist"}${config.home.homeDirectory}";
           in
           [
             "${absPath}/files/games"
             "${absPath}/files/repos"
             "${absPath}/files/software"
-            "${absPath}/files/remote-builds"
           ];
       };
     };

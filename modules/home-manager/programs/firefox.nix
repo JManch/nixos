@@ -2,7 +2,6 @@
 , pkgs
 , config
 , osConfig
-, username
 , ...
 }:
 let
@@ -10,6 +9,7 @@ let
   inherit (config.modules.programs) mpv;
   inherit (config.modules) desktop;
   inherit (osConfig.modules.system) impermanence;
+  inherit (config.home) homeDirectory;
   cfg = config.modules.programs.firefox;
 in
 mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
@@ -233,8 +233,8 @@ mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
     let
       rsync = getExe pkgs.rsync;
       fd = getExe pkgs.fd;
-      persistDir = "/persist/home/${username}/.mozilla/";
-      tmpfsDir = "/home/${username}/.mozilla/";
+      persistDir = "/persist/${homeDirectory}/.mozilla/";
+      tmpfsDir = "${homeDirectory}/.mozilla/";
 
       syncToTmpfs = /*bash*/ ''
         # Do not delete the existing Nix store links when syncing

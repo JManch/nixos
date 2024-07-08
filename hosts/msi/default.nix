@@ -33,6 +33,7 @@
 
   modules = {
     core = {
+      priviledgedUser = false;
       homeManager.enable = true;
       autoUpgrade = true;
     };
@@ -75,10 +76,10 @@
     };
 
     services = {
-      # restic = {
-      #   enable = true;
-      #   backupSchedule = "*-*-* 15:00:00";
-      # };
+      restic = {
+        enable = false;
+        backupSchedule = "*-*-* 14:00:00";
+      };
     };
   };
 }

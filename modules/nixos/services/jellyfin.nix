@@ -4,12 +4,7 @@
 # every couple of seconds (presumably to update the cast progress bar?). With
 # multiple clients watching this can easily throttle the web server and make
 # Jellyfin unusable.
-{ lib
-, pkgs
-, config
-, inputs
-, ...
-}:
+{ lib, config, inputs, ... }:
 let
   inherit (lib)
     mkIf

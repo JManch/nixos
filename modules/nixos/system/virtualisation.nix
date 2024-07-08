@@ -3,6 +3,7 @@
 , config
 , inputs
 , username
+, adminUsername
 , ...
 }:
 let
@@ -41,8 +42,8 @@ let
       ${config.modules.core.loadNixResourcesKey}
 
       # Build the VM
-      runscript="/home/${username}/result/bin/run-$hostname-vm"
-      pushd "/home/${username}" > /dev/null
+      runscript="/home/${adminUsername}/result/bin/run-$hostname-vm"
+      pushd "/home/${adminUsername}" > /dev/null
       add_exit_trap "popd >/dev/null 2>&1 || true"
       nixos-rebuild build-vm --flake "$flake#$hostname"
       popd > /dev/null
@@ -56,7 +57,7 @@ let
       # Print ports mapped to the VM
       printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
 
-      if [[ "$no_secrets" = false && ! -e "/home/${username}/$hostname.qcow2" ]]; then
+      if [[ "$no_secrets" = false && ! -e "/home/${adminUsername}/$hostname.qcow2" ]]; then
         tmp=$(mktemp -d)
         # shellcheck disable=SC2016
         add_exit_trap 'rm -rf $tmp'
@@ -74,7 +75,7 @@ let
         (scp -P 50022 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
           -o LogLevel=QUIET -o ConnectionAttempts=30 \
           "$tmp/ssh_host_ed25519_key" "$tmp/ssh_host_ed25519_key.pub" \
-          root@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$tmp") &
+          ${adminUsername}@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$tmp") &
       fi
 
       # For non-graphical VMs, launch VM and start ssh session in new
@@ -230,10 +231,11 @@ in
           "keepaspectratio, class:^(\\.?qemu.*|virt-manager)$"
         ];
       };
+
+      users.users.${adminUsername}.packages = [ runVMScript ];
     }
 
     (mkIf cfg.libvirt.enable {
-      environment.systemPackages = [ runVMScript ];
       programs.virt-manager.enable = true;
       users.users.${username}.extraGroups = [ "libvirtd" ];
 
@@ -257,8 +259,7 @@ in
 
       virtualisation.libvirtd.enable = true;
 
-      programs.zsh.interactiveShellInit = /*bash*/ ''
-
+      hmAdmin.programs.zsh.initExtra = /*bash*/ ''
         ssh-vm() {
           ssh-add-quiet
           echo "Attempting SSH connection to VM..."; 
@@ -268,9 +269,8 @@ in
             -o "UserKnownHostsFile=/dev/null" \
             -o "LogLevel=QUIET" \
             -o "ConnectionAttempts=30" \
-            ${username}@127.0.0.1 -p 50022;
+            ${adminUsername}@127.0.0.1 -p 50022;
         }
-
       '';
 
       persistence.directories = [ "/var/lib/libvirt" ];

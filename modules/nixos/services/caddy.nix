@@ -3,6 +3,7 @@
 , config
 , inputs
 , hostname
+, adminUsername
 , ...
 }:
 let
@@ -76,7 +77,7 @@ let
 in
 mkMerge [
   {
-    environment.systemPackages = [ generateCerts ];
+    users.users.${adminUsername}.packages = [ generateCerts ];
   }
   (mkIf cfg.enable {
     assertions = utils.asserts [

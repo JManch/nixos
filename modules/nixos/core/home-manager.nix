@@ -9,8 +9,8 @@
 , ...
 }:
 let
-  cfg = config.modules.core.homeManager;
   inherit (config.modules.system.virtualisation) vmVariant;
+  cfg = config.modules.core.homeManager;
 in
 {
   imports = [
@@ -29,6 +29,7 @@ in
       } // lib.optionalAttrs (username != adminUsername) {
         ${adminUsername} = {
           modules = {
+            core.standalone = true;
             shell.enable = true;
             programs.neovim.enable = true;
           };

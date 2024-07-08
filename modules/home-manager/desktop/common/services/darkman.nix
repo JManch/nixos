@@ -27,7 +27,7 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , vmVariant
 , desktopEnabled
 , ...
@@ -50,7 +50,7 @@ let
     optionalAttrs
     listToAttrs;
   inherit (config.modules) desktop;
-  inherit (osConfig.device) hassIntegration;
+  inherit (osConfig'.device) hassIntegration;
   inherit (config.modules.services.hass) curlCommand;
   cfg = config.modules.desktop.services.darkman;
   darkmanPackage = config.services.darkman.package;

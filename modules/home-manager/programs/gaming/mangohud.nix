@@ -1,14 +1,14 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , ...
 }:
 let
   inherit (lib) mkIf utils;
-  inherit (osConfig) device;
   inherit (config.modules.desktop.style) cornerRadius;
   cfg = config.modules.programs.gaming.mangohud;
+  device = osConfig'.device or null;
   colors = config.colorScheme.palette;
 in
 mkIf cfg.enable
@@ -51,7 +51,7 @@ mkIf cfg.enable
       gpu_core_clock = true;
       gpu_mem_clock = true;
       gpu_power = true;
-      gpu_text = device.gpu.name;
+      gpu_text = mkIf (device != null) device.gpu.name;
       gpu_load_change = true;
       gpu_fan = true;
       gpu_voltage = true;
@@ -63,7 +63,7 @@ mkIf cfg.enable
       cpu_stats = true;
       cpu_temp = true;
       cpu_power = true;
-      cpu_text = device.cpu.name;
+      cpu_text = mkIf (device != null) device.cpu.name;
       cpu_mhz = true;
       cpu_load_change = true;
       cpu_load_color = "${colors.base0B},${colors.base0A},${colors.base08}";

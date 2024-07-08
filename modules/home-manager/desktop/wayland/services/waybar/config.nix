@@ -2,7 +2,7 @@
 , pkgs
 , config
 , hostname
-, osConfig
+, osConfig'
 , isWayland
 , desktopEnabled
 , ...
@@ -22,15 +22,15 @@ let
     sort
     concatLines;
   inherit (config.modules.desktop.services) hypridle;
-  inherit (osConfig.device) gpu;
+  inherit (osConfig'.device) gpu;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
   isHyprland = desktopCfg.windowManager == "hyprland";
   colors = config.colorScheme.palette;
 
-  audio = osConfig.modules.system.audio;
-  wgnord = osConfig.modules.services.wgnord;
-  gamemode = osConfig.modules.programs.gaming.gamemode;
+  audio = osConfig'.modules.system.audio;
+  wgnord = osConfig'.modules.services.wgnord;
+  gamemode = osConfig'.modules.programs.gaming.gamemode;
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
   systemctl = getExe' pkgs.systemd "systemctl";
 in
@@ -272,7 +272,7 @@ mkIf (cfg.enable && desktopEnabled && isWayland)
       inherit (config.modules.desktop.hyprland) modKey;
       hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
       jaq = getExe pkgs.jaq;
-      monitors = filter (m: m.mirror == null) osConfig.device.monitors;
+      monitors = filter (m: m.mirror == null) osConfig'.device.monitors;
       # Waybar bars are ordered based on x pos so we need to sort
       sortedMonitors = sort (a: b: a.position.x < b.position.x) monitors;
 

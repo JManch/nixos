@@ -2,12 +2,12 @@
 , pkgs
 , config
 , hostname
-, osConfig
+, osConfig'
 , ...
 }:
 let
   inherit (lib) mkIf getExe getExe' optionalString toLower;
-  inherit (osConfig.device) hassIntegration;
+  inherit (osConfig'.device) hassIntegration;
   inherit (config.age.secrets) hassToken;
 
   curlCommand = { endpoint, data ? null }:
@@ -22,7 +22,7 @@ let
     endpoint = "webhook/${toLower hostname}-active";
   });
 in
-mkIf osConfig.device.hassIntegration.enable
+mkIf (osConfig'.device.hassIntegration.enable or false)
 {
   modules.services.hass.curlCommand = curlCommand;
 

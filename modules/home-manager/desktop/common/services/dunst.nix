@@ -1,7 +1,7 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , desktopEnabled
 , ...
 }:
@@ -9,7 +9,7 @@ let
   inherit (lib) mkIf getExe';
   inherit (config.modules) desktop;
   inherit (config.modules.colorScheme) light colorMap;
-  inherit (osConfig.device) primaryMonitor;
+  inherit (osConfig'.device) primaryMonitor;
   cfg = desktop.services.dunst;
   colors = config.colorScheme.palette;
   systemctl = getExe' pkgs.systemd "systemctl";

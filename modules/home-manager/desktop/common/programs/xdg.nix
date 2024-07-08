@@ -1,7 +1,7 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , desktopEnabled
 , ...
 }:
@@ -17,7 +17,7 @@ mkIf desktopEnabled
   home.packages = [ pkgs.xdg-utils ];
 
   # Only configure xdg-portal in home-manager if it is disabled in NixOS
-  xdg.portal = mkIf (!osConfig.xdg.portal.enable) {
+  xdg.portal = mkIf (!osConfig'.xdg.portal.enable) {
     enable = true;
     # https://github.com/NixOS/nixpkgs/issues/160923
     # WARN: This only works if the necessary environment variables (most
@@ -39,5 +39,5 @@ mkIf desktopEnabled
     videos = "${home}/videos";
   };
 
-  xdg.mimeApps.enable = osConfig.modules.system.desktop.desktopEnvironment == null;
+  xdg.mimeApps.enable = osConfig'.modules.system.desktop.desktopEnvironment == null;
 }

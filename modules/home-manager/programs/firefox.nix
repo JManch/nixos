@@ -1,21 +1,21 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , ...
 }:
 let
   inherit (lib) mkIf utils getExe getExe' optional;
   inherit (config.modules.programs) mpv;
   inherit (config.modules) desktop;
-  inherit (osConfig.modules.system) impermanence;
   inherit (config.home) homeDirectory;
+  impermanence = osConfig'.modules.system.impermanence or null;
   cfg = config.modules.programs.firefox;
 in
-mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
+mkIf (cfg.enable && (osConfig'.modules.system.desktop.enable or true))
 {
   assertions = utils.asserts [
-    (cfg.runInRam -> impermanence.enable)
+    (cfg.runInRam -> (impermanence.enable or false))
     "Firefox run in RAM option can only be used on hosts with impermanence enabled"
   ];
 
@@ -59,7 +59,7 @@ mkIf (cfg.enable && osConfig.modules.system.desktop.enable)
           # Firefox only support VAAPI acceleration. This is natively supported
           # by AMD cards but NVIDIA cards need a translation library to go from
           # VDPAU to VAAPI.
-          "media.ffmpeg.vaapi.enabled" = (osConfig.device.gpu.type != null);
+          "media.ffmpeg.vaapi.enabled" = ((osConfig'.device.gpu.type or true) != null);
 
           # Scrolling
           "mousewheel.default.delta_multiplier_x" = 99;

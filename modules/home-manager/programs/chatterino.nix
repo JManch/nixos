@@ -1,7 +1,7 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , ...
 }:
 let
@@ -100,7 +100,7 @@ mkIf cfg.enable
 
   desktop.hyprland.settings =
     let
-      secondMonitor = utils.getMonitorByNumber osConfig 2;
+      secondMonitor = utils.getMonitorByNumber osConfig' 2;
     in
     {
       exec-once = [ (getExe twitchWorkspaceScript) ];

@@ -1,7 +1,12 @@
-{ lib, config, osConfig, ... }:
+{ lib
+, config
+, osConfig
+, osConfig'
+, ...
+}:
 let
-  inherit (lib) mkIf utils optionalString mkEnableOption optional;
-  inherit (osConfig.modules.system) impermanence;
+  inherit (lib) mkIf utils optionalString types mkEnableOption optional mkOption;
+  impermanence = osConfig'.modules.system.impermanence or null;
   cfg = config.modules.core;
 in
 {
@@ -10,10 +15,21 @@ in
   options.modules.core = {
     configManager = mkEnableOption "this host as a NixOS config manager";
     backupFiles = mkEnableOption "backing up of ~/files";
+
+    standalone = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether this home-manager config is deployed alongside a NixOS config
+        or is standalone. Standalone configurations can be deployed on
+        non-NixOS hosts.
+      '';
+    };
   };
 
   config = {
     home.stateVersion = "23.05";
+    _module.args.osConfig' = if cfg.standalone then null else osConfig;
 
     persistence.directories = [
       "downloads"
@@ -35,7 +51,7 @@ in
         restore.removeExisting = false;
         exclude =
           let
-            absPath = "${optionalString impermanence.enable "/persist"}${config.home.homeDirectory}";
+            absPath = "${optionalString (impermanence.enable or false) "/persist"}${config.home.homeDirectory}";
           in
           [
             "${absPath}/files/games"

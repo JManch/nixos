@@ -1,7 +1,7 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , vmVariant
 , desktopEnabled
 , ...
@@ -17,8 +17,8 @@ let
     range
     concatMap
     concatMapStringsSep;
-  inherit (osConfig.modules.system) audio;
-  inherit (osConfig.device) monitors;
+  inherit (osConfig'.modules.system) audio;
+  inherit (osConfig'.device) monitors;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
 
@@ -27,7 +27,7 @@ let
   notifySend = getExe pkgs.libnotify;
   hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 
-  getMonitorByNumber = number: utils.getMonitorByNumber osConfig number;
+  getMonitorByNumber = number: utils.getMonitorByNumber osConfig' number;
 
   disableShadersCommand =
     command: "${cfg.disableShaders}; ${command}; ${cfg.enableShaders}";

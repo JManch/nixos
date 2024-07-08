@@ -1,21 +1,21 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , isWayland
 , desktopEnabled
 , ...
 }:
 let
   inherit (lib) mkIf optionalString getExe;
-  inherit (osConfig.device) primaryMonitor;
+  inherit (osConfig'.device) primaryMonitor;
   cfg = desktopCfg.programs.swaylock;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
 
   lockScript =
     let
-      osAudio = osConfig.modules.system.audio;
+      osAudio = osConfig'.modules.system.audio;
       preLock = /*bash*/ ''
         ${optionalString osAudio.enable ''
           wpctl set-mute @DEFAULT_AUDIO_SINK@ 1

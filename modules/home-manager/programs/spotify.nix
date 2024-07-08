@@ -1,7 +1,7 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , ...
 }:
 let
@@ -33,7 +33,7 @@ let
         -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${new_volume}%"
     '';
 in
-mkIf (cfg.enable && osConfig.modules.system.audio.enable)
+mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true))
 {
   home.packages = [
     (pkgs.spotify.overrideAttrs (old: {

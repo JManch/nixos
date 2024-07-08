@@ -1,16 +1,16 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , desktopEnabled
 , ...
 }:
 let
   inherit (lib) mkIf concatMap concatLines any getExe getExe';
-  inherit (osConfig.device) monitors;
+  inherit (osConfig'.device) monitors;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.modules.desktop;
-  isGammaCustom = any (m: m.gamma != 1.0) osConfig.device.monitors;
+  isGammaCustom = any (m: m.gamma != 1.0) osConfig'.device.monitors;
 
   monitorGammaConditionals = (concatMap
     (m:

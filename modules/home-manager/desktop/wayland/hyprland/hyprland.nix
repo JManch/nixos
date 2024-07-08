@@ -1,7 +1,7 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , vmVariant
 , desktopEnabled
 , ...
@@ -18,7 +18,7 @@ let
     imap
     optionalString
     optionals;
-  inherit (osConfig.device) monitors primaryMonitor;
+  inherit (osConfig'.device) monitors primaryMonitor;
   inherit (desktopCfg.style) gapSize borderWidth;
 
   cfg = desktopCfg.hyprland;
@@ -123,7 +123,7 @@ mkIf (desktopEnabled && desktopCfg.windowManager == "hyprland") {
       ] ++ optionals (cfg.hyprcursor.package != null) [
         "HYPRCURSOR_THEME,${cfg.hyprcursor.name}"
         "HYPRCURSOR_SIZE,${toString config.modules.desktop.style.cursor.size}"
-      ] ++ optionals (osConfig.device.gpu.type == "nvidia") [
+      ] ++ optionals (osConfig'.device.gpu.type == "nvidia") [
         "LIBVA_DRIVER_NAME,nvidia"
         "GBM_BACKEND,nvidia-drm"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"

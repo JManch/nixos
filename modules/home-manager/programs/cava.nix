@@ -1,9 +1,9 @@
-{ lib, config, osConfig, ... }:
+{ lib, config, osConfig', ... }:
 let
   inherit (lib) mkIf getExe;
   cfg = config.modules.programs.cava;
 in
-mkIf (cfg.enable && osConfig.modules.system.audio.enable) {
+mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true)) {
   programs.cava = {
     enable = true;
 

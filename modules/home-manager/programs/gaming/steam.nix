@@ -1,13 +1,14 @@
 { lib
 , pkgs
 , config
-, osConfig
+, osConfig'
 , ...
 }:
 let
-  inherit (lib) mkIf getExe' mapAttrs' nameValuePair;
+  inherit (lib) mkIf utils getExe' mapAttrs' nameValuePair;
   inherit (config.xdg) dataHome;
-  cfg = osConfig.modules.programs.gaming.steam;
+  osSteam = osConfig'.modules.programs.gaming.steam or null;
+  cfg = config.modules.programs.gaming.steam;
 
   steamAppIDs = {
     "BeamNG.drive" = 284160;
@@ -19,6 +20,11 @@ let
 in
 mkIf cfg.enable
 {
+  assertions = utils.asserts [
+    (osSteam.enable or true)
+    "The Steam home-manager module requires the system module to be enabled"
+  ];
+
   # Fix slow steam client downloads https://redd.it/16e1l4h
   home.file.".steam/steam/steam_dev.cfg".text = ''
     @nClientDownloadEnableHTTP2PlatformLinux 0

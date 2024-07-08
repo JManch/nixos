@@ -1,4 +1,4 @@
-{ lib, config, osConfig, ... }:
+{ lib, config, osConfig', ... }:
 let
   inherit (lib)
     mkIf
@@ -11,12 +11,13 @@ let
     optional;
   inherit (config.modules.desktop) hyprland;
   cfg = config.modules.programs.gaming;
-  osGaming = osConfig.modules.programs.gaming;
+  osGaming = osConfig'.modules.programs.gaming or null;
 in
 {
   imports = utils.scanPaths ./.;
 
   options.modules.programs.gaming = {
+    steam.enable = mkEnableOption "Steam configuration";
     mangohud.enable = mkEnableOption "MangoHud";
     r2modman.enable = mkEnableOption "r2modman";
     lutris.enable = mkEnableOption "Lutris";
@@ -68,7 +69,7 @@ in
     };
   };
 
-  config = mkIf osGaming.enable {
+  config = mkIf (osGaming.enable or false) {
     modules.programs.gaming.gameClasses =
       optional osGaming.gamescope.enable "\\.?gamescope.*";
 

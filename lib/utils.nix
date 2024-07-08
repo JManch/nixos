@@ -74,7 +74,7 @@ in
         asserts);
 
   wgInterfaceEnabled = interface: osConfig:
-    (hasAttr interface osConfig.modules.services.wireguard) && (osConfig.modules.services.wireguard.${interface}.enable);
+    (hasAttr interface (osConfig.modules.services.wireguard or { })) && (osConfig.modules.services.wireguard.${interface}.enable);
 
   waylandWindowManagers = [
     "hyprland"

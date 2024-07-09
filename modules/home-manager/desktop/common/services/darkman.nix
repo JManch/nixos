@@ -10,7 +10,7 @@
 # To generate the light theme, we use a script that runs every time hm
 # activates. The script uses sed to replace all occurences of base16 dark
 # colors with their base16 light counterpart. This generates a new file at
-# darkman/variants/PATH.light. Now we have a light and dark variant; but the
+# darkman/variants/PATH.light. Now we have a light and dark variant, but the
 # original config file does not exist. We create a new xdg.configFile entry
 # with a target of PATH (the original config path) and source being an
 # outOfStoreSymlink that points to darkman/variant/PATH. The file
@@ -22,8 +22,8 @@
 #
 # Key points:
 # - All theme variants are stored in ~/.config/darkman/variants
-# - Application config files are replaced with outOfStoreSymlinks to ~/.config/darkman/variants/...
-# - Configs in ~/.config/darkman/variants/... are modified to switch themes
+# - Application config files are replaced with outOfStoreSymlinks to ~/.config/darkman/variants/*
+# - Configs in ~/.config/darkman/variants/* are modified to switch themes
 { lib
 , pkgs
 , config
@@ -88,7 +88,6 @@ let
             '';
           in
             /*bash*/ ''
-
             if [[ -v DRY_RUN ]]; then
               cat <<EOF
                 ${sedCommand}
@@ -104,11 +103,10 @@ let
             if [ "$theme" = "light" ]; then
               run --quiet cp "${configHome}/darkman/variants/${path}.light" "${configHome}/darkman/variants/${path}"
             else
-              # Use dark config as a placeholder incase darkman fails or is too
-              # late to start
+              # Use dark config as a placeholder in case darkman fails or is
+              # too late to start
               run --quiet install -m644 "${configHome}/darkman/variants/${path}.dark" "${configHome}/darkman/variants/${path}"
             fi
-
           '')
         paths;
 

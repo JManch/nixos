@@ -209,8 +209,14 @@ in
       nixPath = mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
 
       settings = {
-        experimental-features = "nix-command flakes";
+        experimental-features = [
+          "flakes"
+          "nix-command"
+          "auto-allocate-uids"
+        ];
         auto-optimise-store = true;
+        # Do not create a bunch of nixbld users
+        auto-allocate-uids = true;
         # Do not load the default global registry
         # https://channels.nixos.org/flake-registry.json
         flake-registry = "";

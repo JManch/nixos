@@ -251,39 +251,45 @@ mkMerge [
         (name: value: (backupDefaults name) // (removeAttrs value [ "restore" "preBackupScript" "postBackupScript" ]))
         backups;
 
-    systemd.services =
-      (mapAttrs'
-        (name: value: nameValuePair "restic-backups-${name}" {
-          enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
-          environment.RESTIC_CACHE_DIR = mkForce "";
-          onFailure = [ "restic-backups-${name}-failure-notif.service" ];
+    systemd.services = mkMerge [
+      (
+        mapAttrs'
+          (name: value:
+            nameValuePair "restic-backups-${name}" {
+              enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
+              environment.RESTIC_CACHE_DIR = mkForce "";
+              onFailure = [ "restic-backups-${name}-failure-notif.service" ];
 
-          preStart = mkBefore /*bash*/ ''
-            ${value.preBackupScript}
-            ${resticExe} cat config --no-cache || ${resticExe} init
-          '';
-          postStop = mkAfter value.postBackupScript;
+              preStart = mkBefore /*bash*/ ''
+                ${value.preBackupScript}
+                ${resticExe} cat config --no-cache || ${resticExe} init
+              '';
+              postStop = mkAfter ''
+                ${value.postBackupScript}
+              '';
 
-          serviceConfig = {
-            EnvironmentFile = resticNotifVars.path;
-            CacheDirectory = mkForce "";
-          };
-        })
-        backups)
-      //
-      (mapAttrs'
-        (name: value:
-          let
-            failureServiceName = "restic-backups-${name}-failure-notif";
-            capitalisedNamed = utils.upperFirstChar name;
-            service = failureNotifService failureServiceName
-              "Restic Backup ${capitalisedNamed} Failed"
-              "${capitalisedNamed} backup";
-          in
-          nameValuePair failureServiceName service.${failureServiceName}
-        )
-        backups)
-      //
+              serviceConfig = {
+                EnvironmentFile = resticNotifVars.path;
+                CacheDirectory = mkForce "";
+              };
+            }
+          )
+          backups
+      )
+      (
+        mapAttrs'
+          (name: value:
+            let
+              failureServiceName = "restic-backups-${name}-failure-notif";
+              capitalisedNamed = utils.upperFirstChar name;
+              service = failureNotifService failureServiceName
+                "Restic Backup ${capitalisedNamed} Failed"
+                "${capitalisedNamed} backup";
+            in
+            nameValuePair failureServiceName service.${failureServiceName}
+          )
+          backups
+      )
       {
         # Rather than pruning and checking integrity with every backup service
         # we run a single maintenance service after all backups have completed
@@ -313,11 +319,12 @@ mkMerge [
           };
         };
       }
-      // (
+      (
         failureNotifService "restic-repo-maintenance-failure-notif"
           "Restic Repo Maintenance Failed"
           "Repo maintenance"
-      );
+      )
+    ];
 
     systemd.timers.restic-repo-maintenance = {
       enable = !inputs.firstBoot.value;
@@ -355,83 +362,89 @@ mkMerge [
       ];
     };
 
-    systemd.services = {
-      restic-remote-copy = {
-        enable = !inputs.firstBoot.value;
-        wants = [ "network-online.target" ];
-        after = [ "network-online.target" "restic-repo-maintenance.service" ];
-        onFailure = [ "restic-remote-copy-failure-notif.service" ];
-        restartIfChanged = false;
+    systemd.services = mkMerge [
+      {
+        restic-remote-copy = {
+          enable = !inputs.firstBoot.value;
+          wants = [ "network-online.target" ];
+          after = [ "network-online.target" "restic-repo-maintenance.service" ];
+          onFailure = [ "restic-remote-copy-failure-notif.service" ];
+          restartIfChanged = false;
 
-        environment = {
-          RESTIC_CACHE_DIR = "/var/cache/restic-remote-copy";
-          RESTIC_FROM_REPOSITORY_FILE = resticRepositoryFile.path;
-          RESTIC_FROM_PASSWORD_FILE = resticPasswordFile.path;
-          RESTIC_PASSWORD_FILE = resticPasswordFile.path;
+          environment = {
+            RESTIC_CACHE_DIR = "/var/cache/restic-remote-copy";
+            RESTIC_FROM_REPOSITORY_FILE = resticRepositoryFile.path;
+            RESTIC_FROM_PASSWORD_FILE = resticPasswordFile.path;
+            RESTIC_PASSWORD_FILE = resticPasswordFile.path;
+          };
+
+          preStart = ''
+            # Initialise with copied chunker params to ensure good deduplication
+            ${resticExe} cat config || ${resticExe} init --copy-chunker-params
+          '';
+
+          serviceConfig = {
+            Type = "oneshot";
+            EnvironmentFile = resticReadWriteBackblazeVars.path;
+            ExecStart = [
+              "${resticExe} copy"
+              "${resticExe} check --with-cache --retry-lock 5m"
+            ];
+            ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckResticRemoteCopy.path})\"'";
+
+            PrivateTmp = true;
+            RuntimeDirectory = "restic-remote-copy";
+            CacheDirectory = "restic-remote-copy";
+            CacheDirectoryMode = "0700";
+          };
         };
 
-        preStart = ''
-          # Initialise with copied chunker params to ensure good deduplication
-          ${resticExe} cat config || ${resticExe} init --copy-chunker-params
-        '';
+        restic-remote-maintenance = {
+          enable = !inputs.firstBoot.value;
+          wants = [ "network-online.target" ];
+          after = [ "network-online.target" "restic-remote-copy.service" ];
+          onFailure = [ "restic-remote-maintenance-failure-notif.service" ];
+          restartIfChanged = false;
 
-        serviceConfig = {
-          Type = "oneshot";
-          EnvironmentFile = resticReadWriteBackblazeVars.path;
-          ExecStart = [
-            "${resticExe} copy"
-            "${resticExe} check --with-cache --retry-lock 5m"
-          ];
-          ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckResticRemoteCopy.path})\"'";
+          environment = {
+            RESTIC_CACHE_DIR = "/var/cache/restic-remote-maintenance";
+            RESTIC_FROM_REPOSITORY_FILE = resticRepositoryFile.path;
+            RESTIC_FROM_PASSWORD_FILE = resticPasswordFile.path;
+            RESTIC_PASSWORD_FILE = resticPasswordFile.path;
+          };
 
-          PrivateTmp = true;
-          RuntimeDirectory = "restic-remote-copy";
-          CacheDirectory = "restic-remote-copy";
-          CacheDirectoryMode = "0700";
+          preStart = ''
+            # Ensure the repository exists
+            ${resticExe} cat config
+          '';
+
+          serviceConfig = {
+            Type = "oneshot";
+            EnvironmentFile = resticReadWriteBackblazeVars.path;
+            ExecStart = [
+              "${resticExe} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
+              # In practice bandwidth usage seems to be data-subset * 2
+              "${resticExe} check --read-data-subset=400M --retry-lock 5m"
+            ];
+
+            PrivateTmp = true;
+            RuntimeDirectory = "restic-remote-maintenance";
+            CacheDirectory = "restic-remote-maintenance";
+            CacheDirectoryMode = "0700";
+          };
         };
-      };
-
-      restic-remote-maintenance = {
-        enable = !inputs.firstBoot.value;
-        wants = [ "network-online.target" ];
-        after = [ "network-online.target" "restic-remote-copy.service" ];
-        onFailure = [ "restic-remote-maintenance-failure-notif.service" ];
-        restartIfChanged = false;
-
-        environment = {
-          RESTIC_CACHE_DIR = "/var/cache/restic-remote-maintenance";
-          RESTIC_FROM_REPOSITORY_FILE = resticRepositoryFile.path;
-          RESTIC_FROM_PASSWORD_FILE = resticPasswordFile.path;
-          RESTIC_PASSWORD_FILE = resticPasswordFile.path;
-        };
-
-        preStart = ''
-          # Ensure the repository exists
-          ${resticExe} cat config
-        '';
-
-        serviceConfig = {
-          Type = "oneshot";
-          EnvironmentFile = resticReadWriteBackblazeVars.path;
-          ExecStart = [
-            "${resticExe} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
-            # In practice bandwidth usage seems to be data-subset * 2
-            "${resticExe} check --read-data-subset=400M --retry-lock 5m"
-          ];
-
-          PrivateTmp = true;
-          RuntimeDirectory = "restic-remote-maintenance";
-          CacheDirectory = "restic-remote-maintenance";
-          CacheDirectoryMode = "0700";
-        };
-      };
-    } // (failureNotifService "restic-remote-copy-failure-notif"
-      "Restic Remote Copy Failed"
-      "Remote copy"
-    ) // (failureNotifService "restic-remote-maintenance-failure-notif"
-      "Restic Remote Maintenance Failed"
-      "Remote maintenance"
-    );
+      }
+      (
+        failureNotifService "restic-remote-copy-failure-notif"
+          "Restic Remote Copy Failed"
+          "Remote copy"
+      )
+      (
+        failureNotifService "restic-remote-maintenance-failure-notif"
+          "Restic Remote Maintenance Failed"
+          "Remote maintenance"
+      )
+    ];
 
     systemd.timers = {
       restic-remote-copy = {

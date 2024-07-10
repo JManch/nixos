@@ -91,6 +91,7 @@
       };
 
       gaming = {
+        steam.enable = true;
         mangohud.enable = true;
         r2modman.enable = true;
         lutris.enable = true;

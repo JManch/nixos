@@ -91,9 +91,20 @@ mkIf cfg.enable
     "center, class:^(steam)$, title:^(Friends List)$"
   ];
 
-  programs.zsh.shellAliases = {
-    beam-mp = "${getExe' pkgs.protontricks "protontricks-launch"} --appid 284160 ${dataHome}/Steam/steamapps/compatdata/284160/pfx/dosdevices/c:/users/steamuser/AppData/Roaming/BeamMP-Launcher/BeamMP-Launcher.exe";
-  };
+  xdg.desktopEntries.beam-mp =
+    let
+      terminal = config.modules.desktop.terminal.exePath;
+      protontrick-launch = getExe' pkgs.protontricks "protontricks-launch";
+      launcherDir = "${dataHome}/Steam/steamapps/compatdata/284160/pfx/dosdevices/c:/users/steamuser/AppData/Roaming/BeamMP-Launcher";
+      appID = toString steamAppIDs."BeamNG.drive";
+    in
+    mkIf config.modules.desktop.enable {
+      name = "BeamMP";
+      exec = "${terminal} --title BeamMP -e ${protontrick-launch} --appid ${appID} ${launcherDir}/BeamMP-Launcher.exe";
+      terminal = false;
+      type = "Application";
+      categories = [ "Game" ];
+    };
 
   persistence.directories = [
     ".factorio"

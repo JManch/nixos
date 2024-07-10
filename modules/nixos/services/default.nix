@@ -246,7 +246,6 @@ in
 
       allowAddresses = mkOption {
         type = types.functionTo types.lines;
-        internal = true;
         readOnly = true;
         default = addresses: ''
           @block {
@@ -302,14 +301,12 @@ in
 
       dnsmasqConfig = mkOption {
         type = types.attrs;
-        internal = true;
         readOnly = true;
         description = "Dnsmasq settings";
       };
 
       generateDnsmasqConfig = mkOption {
         type = types.functionTo (types.functionTo types.pathInStore);
-        internal = true;
         readOnly = true;
         description = "Internal function for generate dnsmasq config from attrset";
       };
@@ -700,7 +697,6 @@ in
         mshConfig = mkOption {
           type = jsonFormat.type;
           apply = jsonFormat.generate "msh-config.json";
-          internal = true;
           description = "Minecraft server hibernation config";
         };
 

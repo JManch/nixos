@@ -151,7 +151,6 @@ in
     primaryMonitor = mkOption {
       type = types.submodule monitorSubmodule;
       readOnly = true;
-      internal = true;
       default = findFirst
         (m: m.number == 1)
         (throw "Attempted to access primary monitors but monitors have not been configured")

@@ -84,7 +84,6 @@ in
 
       dependencyUnit = mkOption {
         type = types.str;
-        internal = true;
         default = "graphical-session.target";
         example = "swww.service";
         description = ''

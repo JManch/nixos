@@ -36,7 +36,6 @@ in
 
     gameRegex = mkOption {
       type = types.str;
-      internal = true;
       readOnly = true;
       apply = _: "^(${concatStringsSep "|" config.modules.programs.gaming.gameClasses})$";
     };
@@ -51,7 +50,6 @@ in
 
     tearingRegex = mkOption {
       type = types.str;
-      internal = true;
       readOnly = true;
       apply =
         let

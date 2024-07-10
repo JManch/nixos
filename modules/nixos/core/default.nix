@@ -16,7 +16,6 @@ in
 
     username = mkOption {
       type = types.str;
-      internal = true;
       readOnly = true;
       default = username;
       description = "The username of the primary user of the nixosConfiguration";
@@ -24,7 +23,6 @@ in
 
     adminUsername = mkOption {
       type = types.str;
-      internal = true;
       readOnly = true;
       default = "joshua";
       description = "The username of the admin user that exists on all hosts";

@@ -58,7 +58,6 @@ in
 
     isWayland = mkOption {
       type = types.bool;
-      internal = true;
       readOnly = true;
       default =
         cfg.enable &&

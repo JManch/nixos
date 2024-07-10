@@ -32,7 +32,6 @@ in
 
     isWayland = mkOption {
       type = types.bool;
-      internal = true;
       readOnly = true;
       default = (if config.modules.core.homeManager.enable then
         (elem config.home-manager.users.${username}.modules.desktop.windowManager utils.waylandWindowManagers)

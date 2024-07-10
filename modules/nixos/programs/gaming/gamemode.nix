@@ -31,7 +31,6 @@ let
 
       isEnd = m: boolToString (m == "end");
       blur = m: if hyprland.blur then isEnd m else "false";
-      animate = m: if hyprland.animations then isEnd m else "false";
       notifBody = m: ((toUpper (substring 0 1 m)) + (substring 1 ((stringLength m) - 1) m));
     in
     mode: pkgs.writeShellApplication {
@@ -55,7 +54,6 @@ let
           optionalString isHyprland /*bash*/ ''
             hyprctl --instance 0 --batch "\
               ${optionalString hyprland.blur "keyword decoration:blur:enabled ${blur mode};\\"}
-              keyword animations:enabled ${animate mode}; \
               keyword monitor ${utils.getMonitorHyprlandCfgStr (primaryMonitor // {refreshRate = refreshRate mode;})}; \
               ${killActiveRebind (mode == "end")}"
           ''

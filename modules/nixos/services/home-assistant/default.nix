@@ -219,6 +219,24 @@ in
       startAt = [ ];
     };
 
+    # WARN: When upgrading postgresql to a new major version, make sure to use
+    # the pq_dump and pq_restore binaries from the version you're upgrading to. 
+
+    # Postgresql stateVersion upgrade steps:
+    # - Stop home-assistant service
+    # - nix shell n#postgresql-<new-version>
+    # - sudo -i -u postgres; pg_dump -C -Fc hass | cat > /var/backup/postgresql/hass-migration-<version>.sql
+    # - Stop postgresql.service
+    # - Move /persist/var/lib/postgresql to /persist/var/lib/postgresql-<version> as a backup
+    # - In Nix configuration, disable the home-assistant target below and upgrade the stateVersion
+    # - rebuild-boot the host then reboot
+    # - sudo -i -u postgres; pg_restore -U postgres --dbname postgres --clean --create /var/backup/...
+    # - Re-enable the home-assistant target then rebuild-switch
+
+    # Set this to false to prevent home-assistant from starting on the boot
+    # after the database has been updated and the old dump needs to be restored
+    systemd.targets.home-assistant.enable = true;
+
     backups.hass = {
       paths = [
         "/var/lib/hass"

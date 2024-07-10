@@ -3,7 +3,6 @@
 , inputs
 , config
 , isWayland
-, desktopEnabled
 , ...
 } @ args:
 let
@@ -16,7 +15,7 @@ in
     inputs.anyrun.homeManagerModules.default
   ];
 
-  config = mkIf (cfg.enable && desktopEnabled && isWayland) {
+  config = mkIf (cfg.enable && isWayland) {
     programs.anyrun =
       let
         color = base:

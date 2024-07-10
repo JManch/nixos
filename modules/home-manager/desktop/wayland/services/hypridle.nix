@@ -3,7 +3,6 @@
 , inputs
 , config
 , isWayland
-, desktopEnabled
 , ...
 }:
 let
@@ -11,7 +10,7 @@ let
   inherit (config.modules.desktop.programs) swaylock;
   cfg = config.modules.desktop.services.hypridle;
 in
-mkIf (cfg.enable && desktopEnabled && isWayland) {
+mkIf (cfg.enable && isWayland) {
   assertions = utils.asserts [
     swaylock.enable
     "Hypridle requires Swaylock to be enabled"

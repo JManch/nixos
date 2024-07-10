@@ -3,7 +3,6 @@
 , config
 , osConfig'
 , isWayland
-, desktopEnabled
 , ...
 }:
 let
@@ -65,7 +64,7 @@ let
       '';
     };
 in
-mkIf (cfg.enable && desktopEnabled && isWayland) {
+mkIf (cfg.enable && isWayland) {
   modules.desktop.programs.swaylock.lockScript = getExe lockScript;
 
   programs.swaylock = {

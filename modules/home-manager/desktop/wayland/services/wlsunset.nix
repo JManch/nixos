@@ -2,7 +2,6 @@
 , pkgs
 , config
 , isWayland
-, desktopEnabled
 , ...
 }:
 let
@@ -22,7 +21,7 @@ let
     night = 4000;
   };
 in
-mkIf (cfg.enable && desktopEnabled && isWayland)
+mkIf (cfg.enable && isWayland)
 {
   # WARN: Wlsunset (or any other gamma adjuster) will cause system audio to
   # stutter during gamma adjustments if audio is coming from monitors. This

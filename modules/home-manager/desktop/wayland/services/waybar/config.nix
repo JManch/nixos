@@ -4,7 +4,6 @@
 , hostname
 , osConfig'
 , isWayland
-, desktopEnabled
 , ...
 }:
 let
@@ -34,7 +33,7 @@ let
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
   systemctl = getExe' pkgs.systemd "systemctl";
 in
-mkIf (cfg.enable && desktopEnabled && isWayland)
+mkIf (cfg.enable && isWayland)
 {
   programs.waybar = {
     enable = true;

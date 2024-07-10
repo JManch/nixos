@@ -61,9 +61,10 @@ in
       internal = true;
       readOnly = true;
       default =
-        (elem cfg.windowManager utils.waylandWindowManagers)
+        cfg.enable &&
+        ((elem cfg.windowManager utils.waylandWindowManagers)
         ||
-        (elem osConfig'.modules.system.desktop.desktopEnvironment utils.waylandDesktopEnvironments);
+        (elem osConfig'.modules.system.desktop.desktopEnvironment utils.waylandDesktopEnvironments));
     };
 
     style = {

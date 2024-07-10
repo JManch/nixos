@@ -11,4 +11,6 @@
     # https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1447664
     kernelParams = [ "iommu=pt" ];
   };
+
+  system.stateVersion = "24.05";
 }

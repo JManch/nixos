@@ -75,7 +75,7 @@ mkIf cfg.enable
     paths = [ themePath ];
   };
 
-  xdg.desktopEntries."btop" =
+  xdg.desktopEntries.btop =
     let
       btop = getExe config.programs.btop.package;
       terminal = config.modules.desktop.terminal.exePath;

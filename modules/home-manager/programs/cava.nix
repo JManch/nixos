@@ -43,7 +43,7 @@ mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true)) {
     };
   };
 
-  xdg.desktopEntries."cava" =
+  xdg.desktopEntries.cava =
     let
       cava = getExe config.programs.cava.package;
       terminal = config.modules.desktop.terminal.exePath;

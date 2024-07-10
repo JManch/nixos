@@ -111,7 +111,7 @@ mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true))
       '';
   };
 
-  xdg.desktopEntries."spotify-player" = mkIf config.modules.desktop.enable {
+  xdg.desktopEntries.spotify-player = mkIf config.modules.desktop.enable {
     name = "Spotify";
     genericName = "Music Player";
     exec = "${desktopCfg.terminal.exePath} --title Spotify --option font.size=11 -e ${spotifyPlayer}";

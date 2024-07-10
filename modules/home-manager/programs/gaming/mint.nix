@@ -8,7 +8,7 @@ mkIf cfg.enable
 {
   home.packages = optional cfg.enable mint;
 
-  xdg.desktopEntries."mint" = {
+  xdg.desktopEntries.mint = {
     name = "mint";
     genericName = "Mod Loader";
     exec = "${getExe mint}";

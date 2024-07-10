@@ -30,7 +30,6 @@ let
       systemd
     ];
     text = /*bash*/ ''
-
       if [ "$#" -ne 2 ]; then
         echo "Usage: vaultwarden-restore-backup <backup> <encrypted_private_key>"
         exit 1
@@ -86,7 +85,6 @@ let
 
       chown -R vaultwarden:vaultwarden "$vault"
       echo "Vault successfully restored. The vaultwarden service must be manually started again."
-
     '';
   };
 in
@@ -150,7 +148,6 @@ mkIf cfg.enable
           rclone
         ]) ++ [ pkgs'.shoutrrr ];
         text = /*bash*/ ''
-
           set -o errtrace
           umask 0077
           time=$(date +%s)
@@ -224,7 +221,6 @@ mkIf cfg.enable
           Size: $(stat -c%s "$time" | numfmt --to=iec-i --suffix=B --format="%.1f")
           EOF
           )"
-
         '';
       };
     in

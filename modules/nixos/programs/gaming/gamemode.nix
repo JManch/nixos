@@ -12,11 +12,10 @@ let
     let
       inherit (lib) optionalString utils boolToString substring stringLength toUpper optional;
       inherit (homeConfig.modules.desktop) hyprland;
-      inherit (config.modules.core) homeManager;
       inherit (config.modules.system) desktop;
       inherit (config.device) primaryMonitor;
       homeConfig = config.home-manager.users.${username};
-      isHyprland = homeManager.enable && homeConfig.modules.desktop.windowManager == "Hyprland";
+      isHyprland = utils.isHyprland config;
 
       # Remap the killactive key to use the shift modifier
       killActiveRebind = isEnd: ''

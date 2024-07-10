@@ -3,7 +3,6 @@
 , config
 , osConfig'
 , vmVariant
-, desktopEnabled
 , ...
 } @ args:
 let
@@ -119,7 +118,7 @@ let
       'string:x-canonical-private-synchronous:hypr-scale-tablet' 'Hyprland' 'Scaled tablet to active window'
   '';
 in
-mkIf (desktopEnabled && desktopCfg.windowManager == "hyprland")
+mkIf (utils.isHyprland config)
 {
   # Force secondaryModKey VM variant because binds are repeated on host
   modules.desktop.hyprland.modKey = mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);

@@ -5,8 +5,7 @@
 , ...
 }:
 let
-  inherit (lib) mkIf;
-  inherit (config.modules.desktop) windowManager;
+  inherit (lib) mkIf utils;
   cfg = config.modules.programs.multiviewerF1;
 
   # This script acts as a replacement for Multiviewer's layout saving/loading
@@ -308,7 +307,7 @@ mkIf cfg.enable
       ];
     };
 
-  systemd.user.services.hyprland-multiviewer-tiler = mkIf (windowManager == "hyprland") {
+  systemd.user.services.hyprland-multiviewer-tiler = mkIf (utils.isHyprland config) {
     Unit = {
       Description = "Hyprland Multiviewer F1 Tiler";
     };

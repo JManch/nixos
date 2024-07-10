@@ -1,13 +1,11 @@
 { lib, config, username, ... }:
 let
-  inherit (lib) mkIf mkForce;
-  inherit (config.modules.core) homeManager;
+  inherit (lib) mkIf utils mkForce;
   cfg = config.modules.system.desktop;
   homeConfig = config.home-manager.users.${username};
-  windowManager = if homeManager.enable then homeConfig.modules.desktop.windowManager else null;
   hyprlandPackage = homeConfig.wayland.windowManager.hyprland.package;
 in
-mkIf (cfg.enable && windowManager == "hyprland")
+mkIf (cfg.enable && utils.isHyprland config)
 {
   # The purpose of enabling hyprland here (in addition to enabling it in
   # home-manager) is to create the hyprland.desktop session file which

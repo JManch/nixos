@@ -25,7 +25,7 @@ let
   inherit (osConfig'.device) gpu;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
-  isHyprland = desktopCfg.windowManager == "hyprland";
+  isHyprland = utils.isHyprland config;
   colors = config.colorScheme.palette;
 
   audio = osConfig'.modules.system.audio;

@@ -129,4 +129,10 @@ in
             )
           )
           (builtins.readDir path)));
+
+  isHyprland = config:
+    let
+      modules = config.home-manager.users.${config.modules.core.username or ""}.modules or config.modules or null;
+    in
+    (modules.desktop.enable or false) && modules.desktop.windowManager == "hyprland";
 }

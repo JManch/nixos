@@ -32,5 +32,5 @@
 
   backups.documents.paths = [ "documents" ];
 
-  home.stateVersion = "23.05";
+  home.stateVersion = "24.05";
 }

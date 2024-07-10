@@ -35,6 +35,11 @@ let
   ];
 in
 mkIf (utils.isHyprland config) {
+  assertions = utils.asserts [
+    (!(osConfig'.xdg.portal.enable or false))
+    "The os xdg portal must be disabled when using Hyprland as it is configured using home-manager"
+  ];
+
   modules.desktop = {
     # Optimise for performance in VM variant
     # TODO: When I update hyprland, add a hook to disable hardware cursors when
@@ -83,6 +88,7 @@ mkIf (utils.isHyprland config) {
     '';
 
   xdg.portal = {
+    enable = true;
     extraPortals = [
       pkgs.xdg-desktop-portal-gtk
       hyprlandPkgs.xdg-desktop-portal-hyprland

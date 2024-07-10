@@ -16,16 +16,12 @@ mkIf desktopEnabled
   # rarely include is as a dependency for some reason
   home.packages = [ pkgs.xdg-utils ];
 
-  # Only configure xdg-portal in home-manager if it is disabled in NixOS
-  xdg.portal = mkIf (!osConfig'.xdg.portal.enable) {
-    enable = true;
-    # https://github.com/NixOS/nixpkgs/issues/160923
-    # WARN: This only works if the necessary environment variables (most
-    # importantly PATH and XDG_DATA_DIRS) have been imported using
-    # dbus-update-activation-environment --systemd in the window-manager
-    # start-up.
-    xdgOpenUsePortal = true;
-  };
+  # https://github.com/NixOS/nixpkgs/issues/160923
+  # WARN: This only works if the necessary environment variables (most
+  # importantly PATH and XDG_DATA_DIRS) have been imported using
+  # dbus-update-activation-environment --systemd in the window-manager
+  # start-up.
+  xdg.portal.xdgOpenUsePortal = true;
 
   xdg.userDirs = {
     enable = true;

@@ -34,6 +34,7 @@ in
             shell.promptColor = "purple";
             programs.neovim.enable = true;
           };
+          home.stateVersion = config.home-manager.users.${username}.home.stateVersion;
         };
       };
 

@@ -28,7 +28,6 @@ in
   };
 
   config = {
-    home.stateVersion = "23.05";
     _module.args.osConfig' = if cfg.standalone then null else osConfig;
 
     persistence.directories = [

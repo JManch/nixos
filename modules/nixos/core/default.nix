@@ -45,7 +45,6 @@ in
 
     security.sudo.extraConfig = "Defaults lecture=never";
     time.timeZone = "Europe/London";
-    system.stateVersion = "23.05";
 
     environment.sessionVariables = {
       XDG_CACHE_HOME = "$HOME/.cache";

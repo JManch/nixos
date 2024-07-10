@@ -268,6 +268,8 @@ mkIf cfg.enable
 
   persistence.directories = [
     {
+      # WARN: This directory will change to /var/lib/vaultwarden in
+      # stateVersion 24.11
       directory = "/var/lib/bitwarden_rs";
       user = "vaultwarden";
       group = "vaultwarden";

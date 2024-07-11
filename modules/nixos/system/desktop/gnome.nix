@@ -30,11 +30,14 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
   environment.gnome.excludePackages = with pkgs; [
     gnome-tour
     gnome.epiphany
+    # Broken on nvidia, using clapper instead
+    gnome.totem
   ];
 
-  environment.systemPackages = extensions ++ [
-    pkgs.gnome.gnome-tweaks
-  ];
+  environment.systemPackages = extensions ++ (with pkgs; [
+    gnome.gnome-tweaks
+    clapper
+  ]);
 
   hm = mkIf homeManager.enable {
     modules.desktop.terminal = {

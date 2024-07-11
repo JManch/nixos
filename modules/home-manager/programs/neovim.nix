@@ -77,18 +77,14 @@ mkIf cfg.enable
       inherit (config.modules.programs) alacritty;
     in
     optionalString alacritty.enable /*bash*/ ''
-
       # Disables alacritty opacity when launching nvim
       nvim() {
         if [[ -z "$DISPLAY" ]]; then
           command nvim "$@"
         else
-          alacritty msg config window.opacity=1 \
-            && command nvim "$@" && alacritty msg config \
-            window.opacity="$(grep "^opacity" ${config.xdg.configHome}/alacritty/alacritty.toml | sed 's/opacity = //')"
+          alacritty msg config window.opacity=1; command nvim "$@"; alacritty msg config --reset
         fi
       }
-
     '';
 
   # Change theme of all active Neovim instances

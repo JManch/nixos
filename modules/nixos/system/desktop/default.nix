@@ -8,7 +8,6 @@
 let
   inherit (lib) mkIf utils types mkEnableOption mkOption elem;
   inherit (config.modules.core) homeManager;
-  inherit (config.device) gpu;
   inherit (config.modules.system.desktop) isWayland;
   cfg = config.modules.system.desktop;
 in
@@ -48,11 +47,6 @@ in
 
     # Enables wayland for all apps that support it
     environment.sessionVariables.NIXOS_OZONE_WL = mkIf isWayland "1";
-
-    # To workaround Nvidia explicit sync crashing, temporarily force Firefox
-    # to use xwayland. Remove once this issue gets resolved:
-    # https://bugzilla.mozilla.org/show_bug.cgi?id=1898476
-    environment.sessionVariables.MOZ_ENABLE_WAYLAND = mkIf (gpu.type == "nvidia") 0;
 
     # Necessary for xdg-portal home-manager module to work with useUserPackages enabled
     # https://github.com/nix-community/home-manager/pull/5184

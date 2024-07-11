@@ -12,10 +12,9 @@ lib.mkIf cfg.enable
   };
 
   programs.zsh.interactiveShellInit = /*bash*/ ''
-
     fanatec-load-profile() {
       if [ -z "$1" ]; then
-        echo "Usage: fanatec-load-profile (beamng|assetto corsa)"
+        echo "Usage: fanatec-load-profile (beamng|assetto-corsa|iracing)"
         return 1
       fi
 
@@ -31,6 +30,5 @@ lib.mkIf cfg.enable
       echo 0 | sudo tee "$dir/NIN"
       echo 2 | sudo tee "$dir/INT"
     }
-
   '';
 }

@@ -1,13 +1,19 @@
-{ lib, pkgs, config, ... }:
+{ lib
+, pkgs
+, config
+, osConfig'
+, ...
+}:
 let
+  inherit (lib) mkIf;
   inherit (lib.hm.gvariant) mkTuple;
   cfg = config.modules.programs.rnote;
 in
-lib.mkIf cfg.enable
+mkIf cfg.enable
 {
   home.packages = [ pkgs.rnote ];
 
-  dconf.settings = {
+  dconf.settings = mkIf (osConfig'.modules.system.impermanence.enable or false) {
     "com/github/flxzt/rnote" = {
       active-fill-color = mkTuple [ 0.0 0.0 0.0 0.0 ];
       active-stroke-color = mkTuple [ 0.0 0.0 0.0 1.0 ];

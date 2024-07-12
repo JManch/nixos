@@ -63,6 +63,9 @@
 
       desktop = {
         enable = true;
+        # Suspend is very close to being stable but it sometimes causes
+        # applications to crash
+        suspend.enable = false;
         desktopEnvironment = "gnome";
       };
     };

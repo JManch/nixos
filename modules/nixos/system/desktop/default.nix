@@ -19,6 +19,15 @@ in
   options.modules.system.desktop = {
     enable = mkEnableOption "desktop functionality";
 
+    suspend.enable = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Whether to enable suspend to RAM. Disable on hosts where the hardware
+        does not support it.
+      '';
+    };
+
     desktopEnvironment = mkOption {
       type = with types; nullOr (enum [ "xfce" "plasma" "gnome" ]);
       default = null;
@@ -40,7 +49,6 @@ in
     };
   };
 
-
   config = mkIf cfg.enable {
     i18n.defaultLocale = "en_GB.UTF-8";
     services.xserver.excludePackages = [ pkgs.xterm ];
@@ -54,5 +62,26 @@ in
     # merged this may no longer be needed
     environment.pathsToLink = mkIf homeManager.enable
       [ "/share/xdg-desktop-portal" "/share/applications" ];
+
+    systemd = mkIf (!cfg.suspend.enable) {
+      targets = {
+        sleep = {
+          enable = false;
+          unitConfig.DefaultDependencies = "no";
+        };
+        suspend = {
+          enable = false;
+          unitConfig.DefaultDependencies = "no";
+        };
+        hibernate = {
+          enable = false;
+          unitConfig.DefaultDependencies = "no";
+        };
+        hybrid-sleep = {
+          enable = false;
+          unitConfig.DefaultDependencies = "no";
+        };
+      };
+    };
   };
 }

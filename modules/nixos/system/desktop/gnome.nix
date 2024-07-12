@@ -2,7 +2,6 @@
 let
   inherit (lib) mkIf getExe mkForce mkDefault;
   inherit (config.modules.core) homeManager;
-  inherit (config.device) gpu;
   cfg = config.modules.system.desktop;
   extensions = with pkgs.gnomeExtensions; [
     appindicator
@@ -15,8 +14,7 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
   services.xserver = {
     enable = true;
     displayManager.gdm.enable = true;
-    # Suspend is temperamental on nvidia GPUs
-    displayManager.gdm.autoSuspend = !(gpu.type == "nvidia");
+    displayManager.gdm.autoSuspend = cfg.suspend.enable;
     desktopManager.gnome.enable = true;
   };
 
@@ -67,10 +65,10 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
         night-light-schedule-automatic = true;
       };
 
-      # Disable auto-suspend and power button suspend on nvidia
-      "org/gnome/settings-daemon/plugins/power" = mkIf (gpu.type == "nvidia") {
+      "org/gnome/settings-daemon/plugins/power" = {
         power-button-action = "interactive";
-        sleep-inactive-ac-type = "nothing";
+        sleep-inactive-ac-type = if cfg.suspend.enable then "suspend" else "nothing";
+        sleep-inactive-ac-timeout = 1200;
       };
 
       "org/gnome/shell" = {

@@ -1,7 +1,7 @@
 { lib, pkgs, config, ... }:
 let
   inherit (lib) mkIf;
-  inherit (config.modules.system.desktop) isWayland;
+  inherit (config.modules.system.desktop) isWayland suspend;
 in
 mkIf (config.device.gpu.type == "nvidia")
 {
@@ -22,32 +22,7 @@ mkIf (config.device.gpu.type == "nvidia")
     # Eventually enable this
     open = false;
     nvidiaSettings = !isWayland;
-    # Enable this for suspend
-    powerManagement.enable = false;
-  };
-
-  # Completely disable suspend and hibernate as it seems broken on nvidia and
-  # accidentally pressing the button in gnome can put the system in a broken
-  # state
-  systemd = {
-    targets = {
-      sleep = {
-        enable = false;
-        unitConfig.DefaultDependencies = "no";
-      };
-      suspend = {
-        enable = false;
-        unitConfig.DefaultDependencies = "no";
-      };
-      hibernate = {
-        enable = false;
-        unitConfig.DefaultDependencies = "no";
-      };
-      hybrid-sleep = {
-        enable = false;
-        unitConfig.DefaultDependencies = "no";
-      };
-    };
+    powerManagement.enable = suspend.enable;
   };
 
   # Fixes extra ghost display

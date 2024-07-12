@@ -4,6 +4,7 @@
     libreoffice
     spotify
     discord
+    chromium
   ];
 
   modules = {
@@ -16,7 +17,8 @@
     };
 
     programs = {
-      firefox.enable = true;
+      firefox.enable = false;
+      firefox.backup = false;
       anki.enable = true;
       rnote.enable = true;
       multiviewerF1.enable = true;

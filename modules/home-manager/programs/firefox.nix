@@ -315,7 +315,7 @@ mkIf (cfg.enable && (osConfig'.modules.system.desktop.enable or true))
     "x-scheme-handler/mpv" = [ "open-in-mpv.desktop" ];
   };
 
-  backups.firefox = {
+  backups.firefox = mkIf cfg.backup {
     paths = [ ".mozilla" ];
     restore = mkIf cfg.runInRam {
       preRestoreScript = "systemctl stop --user firefox-persist-init";

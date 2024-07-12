@@ -41,6 +41,7 @@ in
 
     firefox = {
       enable = mkEnableOption "Firefox";
+      backup = mkEnableOption "Firefox backup" // { default = true; };
       hideToolbar = mkEnableOption "automatic toolbar hiding";
       runInRam = mkEnableOption "running Firefox in RAM";
     };

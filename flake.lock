@@ -869,7 +869,9 @@
           "nixpkgs"
         ],
         "pre-commit-hooks-nix": [],
-        "rust-overlay": "rust-overlay_2"
+        "rust-overlay": [
+          "rust-overlay"
+        ]
       },
       "locked": {
         "lastModified": 1719818887,
@@ -1147,7 +1149,7 @@
         "nix-resources": "nix-resources",
         "nixpkgs": "nixpkgs",
         "nixpkgs-xr": "nixpkgs-xr",
-        "rust-overlay": "rust-overlay_3",
+        "rust-overlay": "rust-overlay_2",
         "vmInstall": "vmInstall",
         "yaml2nix": "yaml2nix"
       }
@@ -1195,31 +1197,6 @@
       }
     },
     "rust-overlay_2": {
-      "inputs": {
-        "flake-utils": [
-          "lanzaboote",
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "lanzaboote",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1718504420,
-        "narHash": "sha256-F2HT/abCfr0CDpkvXwYCscJyD66XDTLMVfdrIMRp2ck=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "0043c3f92304823cc2c0a4354b0feaa61dfb4cd9",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "rust-overlay_3": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"

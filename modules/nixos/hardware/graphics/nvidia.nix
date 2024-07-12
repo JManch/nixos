@@ -19,7 +19,8 @@ mkIf (config.device.gpu.type == "nvidia")
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     # Major issues if this is disabled
     modesetting.enable = true;
-    open = true;
+    # Eventually enable this
+    open = false;
     nvidiaSettings = !isWayland;
     # Enable this for suspend
     powerManagement.enable = false;

@@ -71,6 +71,10 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
         sleep-inactive-ac-timeout = 1200;
       };
 
+      "org/gnome/desktop/session" = {
+        idle-delay = lib.hm.gvariant.mkUint32 180;
+      };
+
       "org/gnome/shell" = {
         enabled-extensions = (map (e: e.extensionUuid) extensions) ++ [
           "drive-menu@gnome-shell-extensions.gcampax.github.com"

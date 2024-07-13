@@ -25,7 +25,8 @@ mkIf desktopEnabled
 
   xdg.userDirs = {
     enable = true;
-    extraConfig.XDG_SCREENSHOTS_DIR = "${home}/pictures/screenshots";
+    createDirectories = true;
+    extraConfig.XDG_SCREENSHOTS_DIR = "${home}/Pictures/Screenshots";
   } // optionalAttrs cfg.lowercaseUserDirs {
     desktop = "${home}/desktop";
     documents = "${home}/documents";
@@ -33,6 +34,7 @@ mkIf desktopEnabled
     music = "${home}/music";
     pictures = "${home}/pictures";
     videos = "${home}/videos";
+    extraConfig.XDG_SCREENSHOTS_DIR = "${home}/pictures/screenshots";
   };
 
   xdg.mimeApps.enable = osConfig'.modules.system.desktop.desktopEnvironment == null;

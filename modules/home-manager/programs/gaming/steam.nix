@@ -15,6 +15,7 @@ let
     "Red Dead Redemption 2" = 1174180;
     "Deep Rock Galactic" = 548430;
     Noita = 881100;
+    iRacing = 266410;
   };
 
 in

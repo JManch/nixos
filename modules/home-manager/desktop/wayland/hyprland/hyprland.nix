@@ -125,6 +125,9 @@ mkIf (utils.isHyprland config) {
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
         "XDG_SESSION_DESKTOP,Hyprland"
+        # Disable for cursor on mirrored monitors. After update should be able
+        # to toggle this at runtime.
+        "WLR_NO_HARDWARE_CURSORS,1"
       ] ++ optionals (cfg.hyprcursor.package != null) [
         "HYPRCURSOR_THEME,${cfg.hyprcursor.name}"
         "HYPRCURSOR_SIZE,${toString config.modules.desktop.style.cursor.size}"

@@ -289,6 +289,7 @@ in
     shellAliases = {
       mount-nix-tmp = mkIf impermanence.enable "sudo mount --bind /persist/var/nix-tmp /var/nix-tmp";
       build-iso = "nix build ${configDir}#nixosConfigurations.installer.config.system.build.isoImage";
+      system-size = "nix path-info --closure-size --human-readable /run/current-system";
     };
   };
 }

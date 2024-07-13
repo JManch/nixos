@@ -104,7 +104,7 @@ let
           # executed with --build-host we first run build locally with
           # --target-host to ensure that a cached build is on the host and it
           # won't end up trying to build everything itself
-          nixos-rebuild build --flake "${configDir}#$hostname" --target-host "${adminUsername}@$hostname.lan"
+          nixos-rebuild build --flake "${configDir}#$hostname" --target-host "root@$hostname.lan"
 
           # For some reason running nixos-rebuild build --target-host sends a
           # system with a different root system hash to the one built locally.
@@ -114,13 +114,13 @@ let
 
           # Package current config and send to remote host
           tar -cf /tmp/nixos-diff-config.tar -C ${configDir} .
-          ssh "${adminUsername}@$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
-          scp /tmp/nixos-diff-config.tar "${adminUsername}@$hostname.lan:/tmp/nixos-diff-config"
+          ssh "root$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
+          scp /tmp/nixos-diff-config.tar "root@$hostname.lan:/tmp/nixos-diff-config"
 
           # Build new configuration on remote host and generate result
           # symlink. Diff the result with the current system
           # shellcheck disable=SC2029
-          ssh "${adminUsername}@$hostname.lan" "sh -c \
+          ssh "root@$hostname.lan" "sh -c \
             'cd /tmp/nixos-diff-config && \
             tar -xf nixos-diff-config.tar && \
             nixos-rebuild build --flake .#$hostname && \
@@ -136,7 +136,7 @@ let
           pushd "$remote_builds" >/dev/null 2>&1
           nixos-rebuild build --flake "$flake#$hostname" "''${@:2}"
           ${optionalString (cmd != "build") /*bash*/ ''
-            nixos-rebuild ${cmd} --use-remote-sudo --flake "$flake#$hostname" --target-host "${adminUsername}@$hostname.lan" "''${@:2}"
+            nixos-rebuild ${cmd} --use-remote-sudo --flake "$flake#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
           ''}
 
         '');

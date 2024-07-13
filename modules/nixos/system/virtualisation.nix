@@ -78,7 +78,7 @@ let
         (scp -P 50022 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
           -o LogLevel=QUIET -o ConnectionAttempts=30 \
           "$tmp/ssh_host_ed25519_key" "$tmp/ssh_host_ed25519_key.pub" \
-          ${adminUsername}@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$tmp") &
+          root@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$tmp") &
       fi
 
       # For non-graphical VMs, launch VM and start ssh session in new

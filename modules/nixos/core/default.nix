@@ -39,6 +39,7 @@ in
 
   config = {
     programs.zsh.enable = true;
+    environment.defaultPackages = [ ];
     environment.systemPackages = [ pkgs.gitMinimal ];
 
     _module.args = { inherit (config.modules.core) adminUsername; };

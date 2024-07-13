@@ -15,7 +15,7 @@ index 9010ae6..82daf69 100755
  if [[ -n ${extra_files-} ]]; then
    step Copying extra files
 -  tar -C "$extra_files" -cpf- . | ssh_ "${maybe_sudo} tar -C /mnt -xf- --no-same-owner"
-+  tar -C "$extra_files" -cpf- . | ssh_ "${maybe_sudo} tar -C /mnt -xf- --same-owner"
++  sudo tar -C "$extra_files" -cpf- . | ssh_ "${maybe_sudo} tar -C /mnt -xf- --same-owner"
    ssh_ "chmod 755 /mnt" # tar also changes permissions of /mnt
  fi
  

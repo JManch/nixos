@@ -80,7 +80,7 @@
 
     services = {
       restic = {
-        enable = false;
+        enable = true;
         backupSchedule = "*-*-* 14:00:00";
       };
     };

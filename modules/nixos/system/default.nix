@@ -90,8 +90,11 @@ in
 
       primaryInterface = mkOption {
         type = types.str;
-        example = "eno1";
-        description = "Primary wired network interface of the device";
+        example = "enp5s0";
+        description = ''
+          Primary wired network interface of the device. Be careful to use the
+          actual interface name instead of an altname.
+        '';
       };
 
       staticIPAddress = mkOption {

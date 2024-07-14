@@ -143,7 +143,7 @@
       };
 
       networking = {
-        primaryInterface = "eno1";
+        primaryInterface = "enp5s0";
         defaultGateway = "192.168.88.1";
         tcpOptimisations = true;
         resolved.enable = true;

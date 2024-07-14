@@ -128,7 +128,7 @@ in
         enable = mkEnableOption "Firewall" // { default = true; };
         defaultInterfaces = mkOption {
           type = types.listOf types.str;
-          default = [ config.modules.system.networking.primaryInterface ];
+          default = [ cfg.networking.primaryInterface ];
           example = [ "eno1" "wlp6s0" ];
           description = ''
             List of interfaces to which default firewall rules should be applied.

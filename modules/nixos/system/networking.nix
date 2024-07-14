@@ -14,6 +14,7 @@ let
     listToAttrs
     toInt
     optional
+    optionalAttrs
     imap0
     attrNames
     length
@@ -106,7 +107,7 @@ in
     firewall = {
       enable = cfg.firewall.enable;
       defaultInterfaces = cfg.firewall.defaultInterfaces;
-    } // (mkIf homeManager.enable {
+    } // (optionalAttrs homeManager.enable {
       inherit (homeFirewall)
         allowedTCPPorts
         allowedTCPPortRanges

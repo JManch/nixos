@@ -32,6 +32,7 @@ in
             core.standalone = true;
             shell.enable = true;
             shell.promptColor = "purple";
+            programs.git.enable = true;
             programs.neovim.enable = true;
           };
           home.stateVersion = config.home-manager.users.${username}.home.stateVersion;

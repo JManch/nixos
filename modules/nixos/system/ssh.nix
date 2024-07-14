@@ -12,7 +12,7 @@ let
   cfg = config.modules.system.ssh;
 in
 {
-  services.openssh = mkIf cfg.enable {
+  services.openssh = mkIf cfg.server.enable {
     enable = true;
 
     # Some devices are weird with port 22
@@ -41,7 +41,7 @@ in
   ];
 
   programs.ssh = {
-    startAgent = true;
+    startAgent = cfg.agent.enable;
     agentTimeout = "1h";
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
 
@@ -78,7 +78,12 @@ in
       '';
   };
 
-  security.pam.sshAgentAuth = {
+  # WARN: For some reason enabling the agent on hosts where the primary user
+  # does not have admin priviledges causes sudo commands to fail after `su
+  # adminUser` with "pam_ssh_agent_auth: fatal: uid `adminUid`` attempted to
+  # open an agent socket owned by uid `userUid`". I don't need the agent on
+  # these hosts anyway so it's disabled by default.
+  security.pam.sshAgentAuth = mkIf cfg.agent.enable {
     enable = true;
     authorizedKeysFiles = [ "/etc/ssh/authorized_keys.d/%u" ];
   };
@@ -100,6 +105,7 @@ in
 
   virtualisation.vmVariant = {
     services.openssh = {
+      enable = mkVMOverride true;
       ports = mkVMOverride [ 22 ];
 
       # Root access needed for copying SSH keys to VM for secret decryption

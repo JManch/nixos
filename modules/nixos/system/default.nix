@@ -1,4 +1,9 @@
-{ lib, config, ... }:
+{ lib
+, config
+, username
+, adminUsername
+, ...
+}:
 let
   inherit (lib) utils mkEnableOption mkOption types mapAttrsToList all allUnique;
   cfg = config.modules.system;
@@ -8,7 +13,13 @@ in
 
   options.modules.system = {
     bluetooth.enable = mkEnableOption "bluetooth";
-    ssh.enable = mkEnableOption "Whether to enable ssh server";
+
+    ssh = {
+      server.enable = mkEnableOption "SSH server";
+      agent.enable = mkEnableOption "SSH authentication agent" // {
+        default = username == adminUsername;
+      };
+    };
 
     impermanence.enable = mkOption {
       type = types.bool;

@@ -132,7 +132,7 @@
     };
 
     system = {
-      ssh.enable = true;
+      ssh.server.enable = true;
       windows.enable = true;
       bluetooth.enable = true;
       virtualisation.libvirt.enable = true;

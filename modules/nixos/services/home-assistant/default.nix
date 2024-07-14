@@ -201,6 +201,12 @@ in
         name = "hass";
         ensureDBOwnership = true;
       }];
+
+      # Version 15 enabled checkout logging by default which is quite verbose.
+      # It's useful for debugging performance problems though this is unlikely
+      # with my simple deployment.
+      # https://git.postgresql.org/gitweb/?p=postgresql.git;a=commit;h=64da07c41a8c0a680460cdafc79093736332b6cf
+      settings.log_checkpoints = false;
     };
 
     systemd.services.postgresql.serviceConfig = utils.hardeningBaseline config {

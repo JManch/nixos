@@ -74,18 +74,25 @@ in
       ] ++ optional mosquitto.enable "mqtt";
 
       customComponents = [
-        pkgs.home-assistant-custom-components.miele
+        (pkgs.home-assistant-custom-components.miele.overrideAttrs {
+          src = pkgs.fetchFromGitHub {
+            owner = "astrandb";
+            repo = "miele";
+            rev = "refs/tags/v2024.5.0";
+            hash = "sha256-rZSAhH19B0VzIQ6AwJN07zkvIdDHdYvUjizHLmDGh6Y=";
+          };
+        })
         pkgs.home-assistant-custom-components.adaptive_lighting
         pkgs'.heatmiser
         pkgs'.thermal-comfort
-      ] ++ optional frigate.enable (pkgs.home-assistant-custom-components.frigate.overrideAttrs (_: {
+      ] ++ optional frigate.enable (pkgs.home-assistant-custom-components.frigate.overrideAttrs {
         src = pkgs.fetchFromGitHub {
           owner = "blakeblackshear";
           repo = "frigate-hass-integration";
           rev = "v5.2.0";
           hash = "sha256-OWpOYNVzowdn0iZfJwhdMrAYeqDpNJvSwHpsJX9fDk4=";
         };
-      }));
+      });
 
       configWritable = false;
       config = {

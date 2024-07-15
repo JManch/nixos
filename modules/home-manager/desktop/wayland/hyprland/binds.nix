@@ -55,6 +55,19 @@ let
       'string:x-canonical-private-synchronous:hypr-swallow' 'Hyprland' "$message"
   '';
 
+  # Same as `fullscreen, 1` except will not do anything if active workspace
+  # contains a single non-fullscreen tiled window
+  toggleFullscreen = pkgs.writeShellScript "hypr-toggle-fullscreen" /*bash*/ ''
+    active_workspace=$(${hyprctl} activeworkspace -j)
+    windows=$(echo $active_workspace | ${jaq} -r '.windows')
+    hasfullscreen=$(echo $active_workspace | ${jaq} -r '.hasfullscreen')
+    if [[ $windows == 1 && $hasfullscreen == "false" ]]; then
+      floating=$(${hyprctl} activewindow -j | ${jaq} -r '.floating')
+      if [ $floating = "false" ]; then exit 0; fi
+    fi
+    ${hyprctl} dispatch fullscreen 1
+  '';
+
   toggleGaps =
     let
       inherit (config.wayland.windowManager.hyprland.settings) general decoration;
@@ -139,7 +152,7 @@ mkIf (utils.isHyprland config)
           "${modShiftCtrl}, Q, exit,"
           "${mod}, ${cfg.killActiveKey}, killactive,"
           "${mod}, C, exec, ${toggleFloating}"
-          "${mod}, E, fullscreen, 1"
+          "${mod}, E, exec, ${toggleFullscreen}"
           "${modShift}, E, fullscreen, 0"
           "${mod}, Z, pin, active"
           "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"

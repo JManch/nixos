@@ -35,7 +35,7 @@ mkIf cfg.enable
       nixd
 
       # Formatters
-      nixpkgs-fmt
+      nixfmt-rfc-style
       stylua
 
       # NOTE: These 'extra' lsp and formatters should be installed on a

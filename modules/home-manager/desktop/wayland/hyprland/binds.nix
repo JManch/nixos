@@ -14,7 +14,7 @@ let
     optional
     getExe
     getExe'
-    range
+    flatten
     concatMap
     concatMapStringsSep
     ;
@@ -226,32 +226,30 @@ mkIf (utils.isHyprland config) {
           "${mod}, V, workspace, name:VM"
           "${modShift}, V, movetoworkspace, name:VM"
         ]
-        ++ (
-          # Go to empty workspace on all monitors
-          concatMap (
-            m:
-            optionals (m.mirror == null) [
-              "${mod}, D, focusmonitor, ${m.name}"
-              "${mod}, D, workspace, name:DESKTOP ${toString m.number}"
+        ++ (concatMap (
+          m:
+          optionals (m.mirror == null) [
+            "${mod}, D, focusmonitor, ${m.name}"
+            "${mod}, D, workspace, name:DESKTOP ${toString m.number}"
+          ]
+        ) monitors)
+        ++ (flatten (
+          builtins.genList (
+            x:
+            let
+              key = toString x;
+              w = toString (if x == 0 then 10 else x);
+            in
+            [
+              "${mod}, ${key}, workspace, ${w}"
+              "${modShift}, ${key}, movetoworkspace, ${w}"
+              "${modShiftCtrl}, ${key}, movetoworkspacesilent, ${w}"
             ]
-          ) monitors
-        )
-        ++ (
-          # Workspaces
-          let
-            workspaceNumbers = map (w: toString w) (range 1 9);
-            workspaceBinds = w: [
-              "${mod}, ${w}, workspace, ${w}"
-              "${modShift}, ${w}, movetoworkspace, ${w}"
-              "${modShiftCtrl}, ${w}, movetoworkspacesilent, ${w}"
-            ];
-          in
-          concatMap workspaceBinds workspaceNumbers
-        )
+          ) 10
+        ))
         ++ (optional audio.enable ", XF86AudioMute, exec, ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle");
 
       settings.bindm = [
-        # Mouse window interaction
         "${mod}, mouse:272, movewindow"
         "${mod}, mouse:273, resizewindow"
       ];

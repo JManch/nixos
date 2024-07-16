@@ -970,11 +970,11 @@
     "neovim-config": {
       "flake": false,
       "locked": {
-        "lastModified": 1719749743,
-        "narHash": "sha256-K8CDE4KIi2nY1hnhX3xhXhdcZz+EbPbxwqophy2vZbE=",
+        "lastModified": 1721169090,
+        "narHash": "sha256-X0LNEo255sVohg6HKyCDnPIQHL8HJAYRqqdfBQUJ5fA=",
         "owner": "JManch",
         "repo": "nvim",
-        "rev": "c46a80a5b9d7fc7d94e68a0414a2f1ae3739158c",
+        "rev": "7f62d35e0915dff37abadd26957be13bc9de201f",
         "type": "github"
       },
       "original": {

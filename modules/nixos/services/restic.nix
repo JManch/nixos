@@ -1,12 +1,13 @@
-{ lib
-, pkgs
-, pkgs'
-, config
-, inputs
-, hostname
-, username
-, adminUsername
-, ...
+{
+  lib,
+  pkgs,
+  pkgs',
+  config,
+  inputs,
+  hostname,
+  username,
+  adminUsername,
+  ...
 }:
 let
   inherit (lib)
@@ -30,7 +31,8 @@ let
     mkForce
     mkBefore
     mkAfter
-    optionalString;
+    optionalString
+    ;
   inherit (config.modules.services) caddy;
   inherit (config.modules.system) impermanence;
   inherit (config.modules.core) homeManager;
@@ -44,7 +46,8 @@ let
     resticReadWriteBackblazeVars
     resticReadOnlyBackblazeVars
     resticNotifVars
-    healthCheckResticRemoteCopy;
+    healthCheckResticRemoteCopy
+    ;
   cfg = config.modules.services.restic;
   isServer = (config.device.type == "server");
   resticExe = getExe pkgs.restic;
@@ -53,18 +56,18 @@ let
   # WARN: On impermanence hosts paths are prefixed with /persist. We don't
   # modify exclude or include paths to allow non-absolute patterns. Be careful
   # with those.
-  backups = mapAttrs
-    (name: value:
-      value // {
-        paths = map (path: "${optionalString impermanence.enable "/persist"}${path}") value.paths;
-        restore = value.restore // {
-          pathOwnership = mapAttrs'
-            (path: value: nameValuePair "${optionalString impermanence.enable "/persist"}${path}" value)
-            value.restore.pathOwnership;
-        };
-      }
-    )
-    (cfg.backups // homeBackups);
+  backups = mapAttrs (
+    name: value:
+    value
+    // {
+      paths = map (path: "${optionalString impermanence.enable "/persist"}${path}") value.paths;
+      restore = value.restore // {
+        pathOwnership = mapAttrs' (
+          path: value: nameValuePair "${optionalString impermanence.enable "/persist"}${path}" value
+        ) value.restore.pathOwnership;
+      };
+    }
+  ) (cfg.backups // homeBackups);
 
   backupTimerConfig = {
     OnCalendar = cfg.backupSchedule;
@@ -95,7 +98,9 @@ let
               --message "${message} failed on host ${hostname}"
 
             ${shoutrrr} send \
-              --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${replaceStrings [ " " ] [ "%20" ] title}" \
+              --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${
+                replaceStrings [ " " ] [ "%20" ] title
+              }" \
               --message "${name} failed on ${hostname}"
           '';
       };
@@ -104,92 +109,114 @@ let
 
   restoreScript = pkgs.writeShellApplication {
     name = "restic-restore";
-    runtimeInputs = with pkgs; [ restic coreutils systemd bash ];
-    text = /*bash*/ ''
-      echo "Leave empty to restore from the default repo"
-      echo "Enter 'remote' to restore from the backblaze remote repo"
-      echo "Otherwise, enter a custom repo passed to the -r flag"
-      read -p "Enter the repo to restore from: " -r repo
+    runtimeInputs = with pkgs; [
+      restic
+      coreutils
+      systemd
+      bash
+    ];
+    text = # bash
+      ''
+        echo "Leave empty to restore from the default repo"
+        echo "Enter 'remote' to restore from the backblaze remote repo"
+        echo "Otherwise, enter a custom repo passed to the -r flag"
+        read -p "Enter the repo to restore from: " -r repo
 
-      env_vars="RESTIC_PASSWORD_FILE=\"${resticPasswordFile.path}\""
-      if [ -z "$repo" ]; then
-        env_vars+=" RESTIC_REPOSITORY_FILE=\"${resticRepositoryFile.path}\""
-      elif [ ! "remote" = "$repo" ]; then
-        env_vars+=" RESTIC_REPOSITORY=\"$repo\""
-      fi
-
-      load_vars="set -a; if [[ \"$repo\" = \"remote\" ]]; then source ${resticReadOnlyBackblazeVars.path}; fi; set +a; export $env_vars;"
-      sudo sh -c "$load_vars restic snapshots --compact --no-lock --group-by tags"
-
-      read -p "Do you want to proceed with this repo? (y/N): " -n 1 -r
-      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
-      echo
-
-      ${concatStrings (mapAttrsToList (name: value: /*bash*/ ''
-        read -p "Restore backup ${name}? (y/N): " -n 1 -r
-        if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-            echo
-            sudo sh -c "$load_vars restic snapshots --tag ${name} --host ${hostname} --no-lock"
-            read -p "Enter the snapshot ID to restore (leave empty for latest): " -r snapshot
-            if [ -z "$snapshot" ]; then snapshot="latest"; fi
-
-            target="/"
-            custom_target=false
-            read -p "Would you like to restore to a custom path instead of the original? Restore scripts will NOT run. (y/N): " -n 1 -r
-            if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-              echo
-              read -p "Enter an absolute path to a restore directory: " -r target
-              if [[ -z "$target" || -e "$target" ]]; then
-                echo "Invalid path, make sure it does not already exist" >&2
-                exit 1
-              fi
-              mkdir -p "$target"
-              custom_target=true
-            fi
-
-            echo "Restoring snapshot $snapshot to $target..."
-
-            restore_snapshot() {
-              echo "Restoring snapshot..."
-              sudo sh -c "$load_vars restic restore $snapshot --target $target --verify --tag ${name} --host ${hostname} --no-lock"
-            }
-
-            restore_ownership() {
-              echo "Restoring ownership..."
-              # Update ownership because UID/GID mappings are not guaranteed to match between hosts
-              # Modules with statically mapped IDs don't need this https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix
-              ${concatStringsSep ";" (mapAttrsToList (path: ownership:
-                (optionalString (ownership.user != null) "sudo chown -R ${ownership.user} ${path}") +
-                (optionalString (ownership.group != null) ";sudo chgrp -R ${ownership.group} ${path}")
-                ) value.restore.pathOwnership)}
-            }
-
-            if [ "$custom_target" = true ]; then
-              restore_snapshot
-              restore_ownership
-            else
-              read -p "Existing files are about to be replaced by the backup. Are you sure you want to continue? (y/N): " -n 1 -r
-              if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
-              echo
-              ${optionalString value.restore.removeExisting (
-                concatMapStringsSep ";" (path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}") value.paths
-              )}
-              echo "Running pre-restore script..."
-              ${value.restore.preRestoreScript}
-              restore_snapshot
-              restore_ownership
-              echo "Running post-restore script..."
-              ${value.restore.postRestoreScript}
-            fi
+        env_vars="RESTIC_PASSWORD_FILE=\"${resticPasswordFile.path}\""
+        if [ -z "$repo" ]; then
+          env_vars+=" RESTIC_REPOSITORY_FILE=\"${resticRepositoryFile.path}\""
+        elif [ ! "remote" = "$repo" ]; then
+          env_vars+=" RESTIC_REPOSITORY=\"$repo\""
         fi
-      '') backups)}
-    '';
+
+        load_vars="set -a; if [[ \"$repo\" = \"remote\" ]]; then source ${resticReadOnlyBackblazeVars.path}; fi; set +a; export $env_vars;"
+        sudo sh -c "$load_vars restic snapshots --compact --no-lock --group-by tags"
+
+        read -p "Do you want to proceed with this repo? (y/N): " -n 1 -r
+        if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
+        echo
+
+        ${concatStrings (
+          mapAttrsToList (
+            name: value: # bash
+            ''
+              read -p "Restore backup ${name}? (y/N): " -n 1 -r
+              if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+                  echo
+                  sudo sh -c "$load_vars restic snapshots --tag ${name} --host ${hostname} --no-lock"
+                  read -p "Enter the snapshot ID to restore (leave empty for latest): " -r snapshot
+                  if [ -z "$snapshot" ]; then snapshot="latest"; fi
+
+                  target="/"
+                  custom_target=false
+                  read -p "Would you like to restore to a custom path instead of the original? Restore scripts will NOT run. (y/N): " -n 1 -r
+                  if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+                    echo
+                    read -p "Enter an absolute path to a restore directory: " -r target
+                    if [[ -z "$target" || -e "$target" ]]; then
+                      echo "Invalid path, make sure it does not already exist" >&2
+                      exit 1
+                    fi
+                    mkdir -p "$target"
+                    custom_target=true
+                  fi
+
+                  echo "Restoring snapshot $snapshot to $target..."
+
+                  restore_snapshot() {
+                    echo "Restoring snapshot..."
+                    sudo sh -c "$load_vars restic restore $snapshot --target $target --verify --tag ${name} --host ${hostname} --no-lock"
+                  }
+
+                  restore_ownership() {
+                    echo "Restoring ownership..."
+                    # Update ownership because UID/GID mappings are not guaranteed to match between hosts
+                    # Modules with statically mapped IDs don't need this https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix
+                    ${
+                      concatStringsSep ";" (
+                        mapAttrsToList (
+                          path: ownership:
+                          (optionalString (ownership.user != null) "sudo chown -R ${ownership.user} ${path}")
+                          + (optionalString (ownership.group != null) ";sudo chgrp -R ${ownership.group} ${path}")
+                        ) value.restore.pathOwnership
+                      )
+                    }
+                  }
+
+                  if [ "$custom_target" = true ]; then
+                    restore_snapshot
+                    restore_ownership
+                  else
+                    read -p "Existing files are about to be replaced by the backup. Are you sure you want to continue? (y/N): " -n 1 -r
+                    if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
+                    echo
+                    ${
+                      optionalString value.restore.removeExisting (
+                        concatMapStringsSep ";" (
+                          path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}"
+                        ) value.paths
+                      )
+                    }
+                    echo "Running pre-restore script..."
+                    ${value.restore.preRestoreScript}
+                    restore_snapshot
+                    restore_ownership
+                    echo "Running post-restore script..."
+                    ${value.restore.postRestoreScript}
+                  fi
+              fi
+            '') backups
+        )}
+      '';
   };
 in
 mkMerge [
   # To allow testing backup restores in the VM
   (mkIf (cfg.enable || cfg.server.enable || (cfg.enable && vmVariant)) {
-    users.users.${adminUsername}.packages = [ pkgs.restic restoreScript ];
+    users.users.${adminUsername}.packages = [
+      pkgs.restic
+      restoreScript
+    ];
 
     # WARN: Always interact with the repository using the REST server, even on
     # the same machine. It ensures correct repo file ownership.
@@ -202,8 +229,13 @@ mkMerge [
         restic-snapshots = "sudo restic snapshots --no-cache --compact --group-by tags --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
         restic-restore-size = "sudo restic stats --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
         restic-repo-size = "sudo restic stats --no-cache --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-        backup-all = concatStringsSep ";" (mapAttrsToList (name: _: "sudo ${systemctl} start restic-backups-${name}") backups);
-      } // (mapAttrs' (name: _: nameValuePair "backup-${name}" "sudo ${systemctl} start restic-backups-${name}") backups);
+        backup-all = concatStringsSep ";" (
+          mapAttrsToList (name: _: "sudo ${systemctl} start restic-backups-${name}") backups
+        );
+      }
+      // (mapAttrs' (
+        name: _: nameValuePair "backup-${name}" "sudo ${systemctl} start restic-backups-${name}"
+      ) backups);
 
     # Backblaze bucket setup:
     # backblaze-b2 create-bucket --defaultServerSideEncryption=SSE-B2 <bucket_name> --lifecycleRule '{"daysFromHidingToDeleting": 7, "daysFromUploadingToHiding": null, "fileNamePrefix": ""}' allPrivate
@@ -223,11 +255,22 @@ mkMerge [
 
   (mkIf (cfg.enable && !vmVariant) {
     assertions = utils.asserts [
-      (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: elem path backup.paths) (attrNames backup.restore.pathOwnership))) backups))
+      (all (v: v == true) (
+        mapAttrsToList (
+          _: backup:
+          all (v: v == true) (map (path: elem path backup.paths) (attrNames backup.restore.pathOwnership))
+        ) backups
+      ))
       "Restic pathOwnership paths must also be defined as backup paths"
-      (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "") backup.paths)) cfg.backups))
+      (all (v: v == true) (
+        mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "") backup.paths)) cfg.backups
+      ))
       "Restic backup paths cannot be empty"
-      (all (v: v == true) (mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "/home/${username}/") backup.paths)) homeBackups))
+      (all (v: v == true) (
+        mapAttrsToList (
+          _: backup: all (v: v == true) (map (path: path != "/home/${username}/") backup.paths)
+        ) homeBackups
+      ))
       "Restic home backup paths cannot be empty"
     ];
 
@@ -247,49 +290,51 @@ mkMerge [
           ];
         };
       in
-      mapAttrs
-        (name: value: (backupDefaults name) // (removeAttrs value [ "restore" "preBackupScript" "postBackupScript" ]))
-        backups;
+      mapAttrs (
+        name: value:
+        (backupDefaults name)
+        // (removeAttrs value [
+          "restore"
+          "preBackupScript"
+          "postBackupScript"
+        ])
+      ) backups;
 
     systemd.services = mkMerge [
-      (
-        mapAttrs'
-          (name: value:
-            nameValuePair "restic-backups-${name}" {
-              enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
-              environment.RESTIC_CACHE_DIR = mkForce "";
-              onFailure = [ "restic-backups-${name}-failure-notif.service" ];
+      (mapAttrs' (
+        name: value:
+        nameValuePair "restic-backups-${name}" {
+          enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
+          environment.RESTIC_CACHE_DIR = mkForce "";
+          onFailure = [ "restic-backups-${name}-failure-notif.service" ];
 
-              preStart = mkBefore /*bash*/ ''
-                ${value.preBackupScript}
-                ${resticExe} cat config --no-cache || ${resticExe} init
-              '';
-              postStop = mkAfter ''
-                ${value.postBackupScript}
-              '';
+          preStart =
+            # bash
+            mkBefore ''
+              ${value.preBackupScript}
+              ${resticExe} cat config --no-cache || ${resticExe} init
+            '';
+          postStop = mkAfter ''
+            ${value.postBackupScript}
+          '';
 
-              serviceConfig = {
-                EnvironmentFile = resticNotifVars.path;
-                CacheDirectory = mkForce "";
-              };
-            }
-          )
-          backups
-      )
-      (
-        mapAttrs'
-          (name: value:
-            let
-              failureServiceName = "restic-backups-${name}-failure-notif";
-              capitalisedNamed = utils.upperFirstChar name;
-              service = failureNotifService failureServiceName
-                "Restic Backup ${capitalisedNamed} Failed"
-                "${capitalisedNamed} backup";
-            in
-            nameValuePair failureServiceName service.${failureServiceName}
-          )
-          backups
-      )
+          serviceConfig = {
+            EnvironmentFile = resticNotifVars.path;
+            CacheDirectory = mkForce "";
+          };
+        }
+      ) backups)
+      (mapAttrs' (
+        name: value:
+        let
+          failureServiceName = "restic-backups-${name}-failure-notif";
+          capitalisedNamed = utils.upperFirstChar name;
+          service =
+            failureNotifService failureServiceName "Restic Backup ${capitalisedNamed} Failed"
+              "${capitalisedNamed} backup";
+        in
+        nameValuePair failureServiceName service.${failureServiceName}
+      ) backups)
       {
         # Rather than pruning and checking integrity with every backup service
         # we run a single maintenance service after all backups have completed
@@ -319,10 +364,8 @@ mkMerge [
           };
         };
       }
-      (
-        failureNotifService "restic-repo-maintenance-failure-notif"
-          "Restic Repo Maintenance Failed"
-          "Repo maintenance"
+      (failureNotifService "restic-repo-maintenance-failure-notif" "Restic Repo Maintenance Failed"
+        "Repo maintenance"
       )
     ];
 
@@ -334,10 +377,12 @@ mkMerge [
 
     # Persist maintenance service cache otherwise forget command can be very
     # expensive
-    persistence.directories = [{
-      directory = "/var/cache/restic-repo-maintenance";
-      mode = "700";
-    }];
+    persistence.directories = [
+      {
+        directory = "/var/cache/restic-repo-maintenance";
+        mode = "700";
+      }
+    ];
   })
 
   (mkIf (cfg.server.enable && !vmVariant) {
@@ -367,7 +412,10 @@ mkMerge [
         restic-remote-copy = {
           enable = !inputs.firstBoot.value;
           wants = [ "network-online.target" ];
-          after = [ "network-online.target" "restic-repo-maintenance.service" ];
+          after = [
+            "network-online.target"
+            "restic-repo-maintenance.service"
+          ];
           onFailure = [ "restic-remote-copy-failure-notif.service" ];
           restartIfChanged = false;
 
@@ -402,7 +450,10 @@ mkMerge [
         restic-remote-maintenance = {
           enable = !inputs.firstBoot.value;
           wants = [ "network-online.target" ];
-          after = [ "network-online.target" "restic-remote-copy.service" ];
+          after = [
+            "network-online.target"
+            "restic-remote-copy.service"
+          ];
           onFailure = [ "restic-remote-maintenance-failure-notif.service" ];
           restartIfChanged = false;
 
@@ -434,15 +485,9 @@ mkMerge [
           };
         };
       }
-      (
-        failureNotifService "restic-remote-copy-failure-notif"
-          "Restic Remote Copy Failed"
-          "Remote copy"
-      )
-      (
-        failureNotifService "restic-remote-maintenance-failure-notif"
-          "Restic Remote Maintenance Failed"
-          "Remote maintenance"
+      (failureNotifService "restic-remote-copy-failure-notif" "Restic Remote Copy Failed" "Remote copy")
+      (failureNotifService "restic-remote-maintenance-failure-notif" "Restic Remote Maintenance Failed"
+        "Remote maintenance"
       )
     ];
 

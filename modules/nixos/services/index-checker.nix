@@ -1,39 +1,39 @@
-{ lib
-, pkgs
-, pkgs'
-, config
-, ...
+{
+  lib,
+  pkgs,
+  pkgs',
+  config,
+  ...
 }:
 let
   inherit (lib) mkIf getExe;
   cfg = config.modules.services.index-checker;
   shoutrrr = getExe pkgs'.shoutrrr;
 
-  pythonScript = pkgs.writers.writePython3 "index-checker"
-    {
-      libraries = [ pkgs.python3Packages.google-search-results ];
-    } /*python*/ ''
-    import os
-    from serpapi import GoogleSearch
+  pythonScript =
+    pkgs.writers.writePython3 "index-checker"
+      { libraries = [ pkgs.python3Packages.google-search-results ]; } # python
+      ''
+        import os
+        from serpapi import GoogleSearch
 
 
-    if __name__ == "__main__":
-        query = f'site:{os.environ["URL"]}'
-        params = {
-            'q': query,
-            'engine': 'google',
-            'api_key': os.environ['API_KEY']
-        }
-        search = GoogleSearch(params)
-        indexed_results = search.get_dict().get('organic_results', [])
-        if len(indexed_results) == 0:
-            exit(1)
-        print(indexed_results)
-        exit(0)
-  '';
+        if __name__ == "__main__":
+            query = f'site:{os.environ["URL"]}'
+            params = {
+                'q': query,
+                'engine': 'google',
+                'api_key': os.environ['API_KEY']
+            }
+            search = GoogleSearch(params)
+            indexed_results = search.get_dict().get('organic_results', [])
+            if len(indexed_results) == 0:
+                exit(1)
+            print(indexed_results)
+            exit(0)
+      '';
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   systemd.services.index-checker = {
     description = "Google site indexed checker";
     after = [ "network-online.target" ];
@@ -44,33 +44,39 @@ mkIf cfg.enable
     serviceConfig = {
       EnvironmentFile = config.age.secrets.indexCheckerVars.path;
       StateDirectory = "index-checker";
-      ExecStart = getExe (pkgs.writeShellApplication {
-        name = "index-checker";
-        runtimeInputs = [ pkgs.coreutils pkgs'.shoutrrr ];
-        text = /*bash*/ ''
-          set +e
-          send_notif() {
-            ${shoutrrr} send \
-              --url "$DISCORD_AUTH" \
-              --title "Index Status Changed" \
-              --message "$1"
-          }
+      ExecStart = getExe (
+        pkgs.writeShellApplication {
+          name = "index-checker";
+          runtimeInputs = [
+            pkgs.coreutils
+            pkgs'.shoutrrr
+          ];
+          text = # bash
+            ''
+              set +e
+              send_notif() {
+                ${shoutrrr} send \
+                  --url "$DISCORD_AUTH" \
+                  --title "Index Status Changed" \
+                  --message "$1"
+              }
 
-          while true
-          do
-            ${pythonScript}
-            status=$?
-            if [[ $status -eq 0 && ! -e /var/lib/index-checker/indexed ]]; then
-              touch /var/lib/index-checker/indexed
-              send_notif "Yay $URL is now indexed!"
-            elif [[ $status -ne 0 && -e /var/lib/index-checker/indexed ]]; then
-              rm -f /var/lib/index-checker/indexed
-              send_notif "Nooo $URL is no longer indexed"
-            fi
-            sleep 8h
-          done
-        '';
-      });
+              while true
+              do
+                ${pythonScript}
+                status=$?
+                if [[ $status -eq 0 && ! -e /var/lib/index-checker/indexed ]]; then
+                  touch /var/lib/index-checker/indexed
+                  send_notif "Yay $URL is now indexed!"
+                elif [[ $status -ne 0 && -e /var/lib/index-checker/indexed ]]; then
+                  rm -f /var/lib/index-checker/indexed
+                  send_notif "Nooo $URL is no longer indexed"
+                fi
+                sleep 8h
+              done
+            '';
+        }
+      );
     };
   };
 

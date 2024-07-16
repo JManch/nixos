@@ -1,6 +1,16 @@
-{ lib, config, inputs, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 let
-  inherit (lib) mkEnableOption mkOption types findFirst;
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    types
+    findFirst
+    ;
   inherit (inputs.nix-resources.secrets) fqDomain;
 
   monitorSubmodule = {
@@ -19,9 +29,7 @@ let
         example = "DP-1";
       };
 
-      number = mkOption {
-        type = types.int;
-      };
+      number = mkOption { type = types.int; };
 
       width = mkOption {
         type = types.int;
@@ -90,13 +98,21 @@ in
 {
   options.device = {
     type = mkOption {
-      type = types.enum [ "laptop" "desktop" "server" "vm" ];
+      type = types.enum [
+        "laptop"
+        "desktop"
+        "server"
+        "vm"
+      ];
       description = "The type/purpose of the device";
     };
 
     cpu = {
       type = mkOption {
-        type = types.enum [ "intel" "amd" ];
+        type = types.enum [
+          "intel"
+          "amd"
+        ];
         description = "The device's CPU manufacturer";
       };
 
@@ -119,7 +135,12 @@ in
 
     gpu = {
       type = mkOption {
-        type = with types; nullOr (enum [ "nvidia" "amd" ]);
+        type =
+          with types;
+          nullOr (enum [
+            "nvidia"
+            "amd"
+          ]);
         default = null;
         description = ''
           The device's GPU manufacturer. Leave null if device does not have a
@@ -151,10 +172,10 @@ in
     primaryMonitor = mkOption {
       type = types.submodule monitorSubmodule;
       readOnly = true;
-      default = findFirst
-        (m: m.number == 1)
-        (throw "Attempted to access primary monitors but monitors have not been configured")
-        config.device.monitors;
+      default =
+        findFirst (m: m.number == 1)
+          (throw "Attempted to access primary monitors but monitors have not been configured")
+          config.device.monitors;
     };
 
     ipAddress = mkOption {
@@ -181,7 +202,15 @@ in
 
   config =
     let
-      inherit (lib) utils sort zipListsWith init tail head all;
+      inherit (lib)
+        utils
+        sort
+        zipListsWith
+        init
+        tail
+        head
+        all
+        ;
       inherit (config.device) monitors;
     in
     {

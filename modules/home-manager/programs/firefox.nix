@@ -1,19 +1,25 @@
-{ lib
-, pkgs
-, config
-, osConfig'
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  ...
 }:
 let
-  inherit (lib) mkIf utils getExe getExe' optional;
+  inherit (lib)
+    mkIf
+    utils
+    getExe
+    getExe'
+    optional
+    ;
   inherit (config.modules.programs) mpv;
   inherit (config.modules) desktop;
   inherit (config.home) homeDirectory;
   impermanence = osConfig'.modules.system.impermanence or null;
   cfg = config.modules.programs.firefox;
 in
-mkIf (cfg.enable && (osConfig'.modules.system.desktop.enable or true))
-{
+mkIf (cfg.enable && (osConfig'.modules.system.desktop.enable or true)) {
   assertions = utils.asserts [
     (cfg.runInRam -> (impermanence.enable or false))
     "Firefox run in RAM option can only be used on hosts with impermanence enabled"
@@ -36,7 +42,9 @@ mkIf (cfg.enable && (osConfig'.modules.system.desktop.enable or true))
             systemctl = getExe' pkgs.systemd "systemctl";
             notifySend = getExe pkgs.libnotify;
           in
-          old.buildCommand + /*bash*/ ''
+          old.buildCommand
+          # bash
+          + ''
             wrapProgram $out/bin/firefox --run "${systemctl} is-active --quiet --user firefox-persist-init \
               || { ${notifySend} -u critical -t 3000 'Firefox' 'Initial sync has not yet finished'; exit 0; }"
           '';
@@ -133,96 +141,98 @@ mkIf (cfg.enable && (osConfig'.modules.system.desktop.enable or true))
           "network.connectivity-service.enabled" = false;
         };
 
-        userChrome = mkIf cfg.hideToolbar /* css */ ''
-          * {
-            font-family: "${desktop.style.font.family}" !important;
-            font-size: 15px !important;
-          }
+        userChrome =
+          mkIf cfg.hideToolbar # css
+            ''
+              * {
+                font-family: "${desktop.style.font.family}" !important;
+                font-size: 15px !important;
+              }
 
-          /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/autohide_toolbox.css made available under Mozilla Public License v. 2.0
-          See the above repository for updates as well as full license text. */
+              /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/autohide_toolbox.css made available under Mozilla Public License v. 2.0
+              See the above repository for updates as well as full license text. */
 
-          /* Hide the whole toolbar area unless urlbar is focused or cursor is over the toolbar */
-          /* Dimensions on non-Win10 OS probably needs to be adjusted */
+              /* Hide the whole toolbar area unless urlbar is focused or cursor is over the toolbar */
+              /* Dimensions on non-Win10 OS probably needs to be adjusted */
 
-          /* Compatibility options for hide_tabs_toolbar.css and tabs_on_bottom.css at the end of this file */
+              /* Compatibility options for hide_tabs_toolbar.css and tabs_on_bottom.css at the end of this file */
 
-          :root{
-            --uc-autohide-toolbox-delay: 200ms; /* Wait 0.1s before hiding toolbars */
-            --uc-toolbox-rotation: 70deg;  /* This may need to be lower on mac - like 75 or so */
-          }
+              :root{
+                --uc-autohide-toolbox-delay: 200ms; /* Wait 0.1s before hiding toolbars */
+                --uc-toolbox-rotation: 70deg;  /* This may need to be lower on mac - like 75 or so */
+              }
 
-          :root[sizemode="maximized"]{
-            --uc-toolbox-rotation: 70deg;
-          }
+              :root[sizemode="maximized"]{
+                --uc-toolbox-rotation: 70deg;
+              }
 
-          @media {
-            :root:not([lwtheme]) #navigator-toolbox{ background-color: -moz-dialog !important; }
-          }
+              @media {
+                :root:not([lwtheme]) #navigator-toolbox{ background-color: -moz-dialog !important; }
+              }
 
-          :root[sizemode="fullscreen"],
-          :root[sizemode="fullscreen"] #navigator-toolbox{ margin-top: 0 !important; }
+              :root[sizemode="fullscreen"],
+              :root[sizemode="fullscreen"] #navigator-toolbox{ margin-top: 0 !important; }
 
-          #navigator-toolbox{
-            position: fixed !important;
-            display: block;
-            background-color: var(--lwt-accent-color,black) !important;
-            transition: transform 82ms linear, opacity 82ms linear !important;
-            transition-delay: var(--uc-autohide-toolbox-delay) !important;
-            transform-origin: top;
-            transform: rotateX(var(--uc-toolbox-rotation));
-            opacity: 0;
-            line-height: 0;
-            z-index: 1;
-            pointer-events: none;
-          }
+              #navigator-toolbox{
+                position: fixed !important;
+                display: block;
+                background-color: var(--lwt-accent-color,black) !important;
+                transition: transform 82ms linear, opacity 82ms linear !important;
+                transition-delay: var(--uc-autohide-toolbox-delay) !important;
+                transform-origin: top;
+                transform: rotateX(var(--uc-toolbox-rotation));
+                opacity: 0;
+                line-height: 0;
+                z-index: 1;
+                pointer-events: none;
+              }
 
-          #navigator-toolbox:hover,
-          #navigator-toolbox:focus-within{
-            transition-delay: 33ms !important;
-            transform: rotateX(0);
-            opacity: 1;
-          }
-          /* This ruleset is separate, because not having :has support breaks other selectors as well */
-          #mainPopupSet:has(> #appMenu-popup:hover) ~ toolbox{
-            transition-delay: 33ms !important;
-            transform: rotateX(0);
-            opacity: 1;
-          }
+              #navigator-toolbox:hover,
+              #navigator-toolbox:focus-within{
+                transition-delay: 33ms !important;
+                transform: rotateX(0);
+                opacity: 1;
+              }
+              /* This ruleset is separate, because not having :has support breaks other selectors as well */
+              #mainPopupSet:has(> #appMenu-popup:hover) ~ toolbox{
+                transition-delay: 33ms !important;
+                transform: rotateX(0);
+                opacity: 1;
+              }
 
-          #navigator-toolbox > *{ line-height: normal; pointer-events: auto }
+              #navigator-toolbox > *{ line-height: normal; pointer-events: auto }
 
-          #navigator-toolbox,
-          #navigator-toolbox > *{
-            width: 100vw;
-            -moz-appearance: none !important;
-          }
+              #navigator-toolbox,
+              #navigator-toolbox > *{
+                width: 100vw;
+                -moz-appearance: none !important;
+              }
 
-          /* These two exist for oneliner compatibility */
-          #nav-bar{ width: var(--uc-navigationbar-width,100vw) }
-          #TabsToolbar{ width: calc(100vw - var(--uc-navigationbar-width,0px)) }
+              /* These two exist for oneliner compatibility */
+              #nav-bar{ width: var(--uc-navigationbar-width,100vw) }
+              #TabsToolbar{ width: calc(100vw - var(--uc-navigationbar-width,0px)) }
 
-          /* Don't apply transform before window has been fully created */
-          :root:not([sessionrestored]) #navigator-toolbox{ transform:none !important }
+              /* Don't apply transform before window has been fully created */
+              :root:not([sessionrestored]) #navigator-toolbox{ transform:none !important }
 
-          :root[customizing] #navigator-toolbox{
-            position: relative !important;
-            transform: none !important;
-            opacity: 1 !important;
-          }
+              :root[customizing] #navigator-toolbox{
+                position: relative !important;
+                transform: none !important;
+                opacity: 1 !important;
+              }
 
-          #navigator-toolbox[inFullscreen] > #PersonalToolbar,
-          #PersonalToolbar[collapsed="true"]{ display: none }
+              #navigator-toolbox[inFullscreen] > #PersonalToolbar,
+              #PersonalToolbar[collapsed="true"]{ display: none }
 
-          /* Uncomment this if tabs toolbar is hidden with hide_tabs_toolbar.css */
-           /*#titlebar{ margin-bottom: -9px }*/
+              /* Uncomment this if tabs toolbar is hidden with hide_tabs_toolbar.css */
+               /*#titlebar{ margin-bottom: -9px }*/
 
-          /* Uncomment the following for compatibility with tabs_on_bottom.css - this isn't well tested though */
-          /*
-          #navigator-toolbox{ flex-direction: column; display: flex; }
-          #titlebar{ order: 2 }
-          */
-        '';
+              /* Uncomment the following for compatibility with tabs_on_bottom.css - this isn't well tested though */
+              /*
+              #navigator-toolbox{ flex-direction: column; display: flex; }
+              #titlebar{ order: 2 }
+              */
+            '';
       };
     };
   };
@@ -236,17 +246,19 @@ mkIf (cfg.enable && (osConfig'.modules.system.desktop.enable or true))
       persistDir = "/persist/${homeDirectory}/.mozilla/";
       tmpfsDir = "${homeDirectory}/.mozilla/";
 
-      syncToTmpfs = /*bash*/ ''
-        # Do not delete the existing Nix store links when syncing
-        ${fd} -Ht l --base-directory "${tmpfsDir}" | \
-          ${rsync} -ah --no-links --delete --info=stats1 \
-          --exclude-from=- "${persistDir}" "${tmpfsDir}"
-      '';
+      syncToTmpfs = # bash
+        ''
+          # Do not delete the existing Nix store links when syncing
+          ${fd} -Ht l --base-directory "${tmpfsDir}" | \
+            ${rsync} -ah --no-links --delete --info=stats1 \
+            --exclude-from=- "${persistDir}" "${tmpfsDir}"
+        '';
 
-      syncToPersist = /*bash*/ ''
-        ${rsync} -ah --no-links --delete --info=stats1 \
-          "${tmpfsDir}" "${persistDir}"
-      '';
+      syncToPersist = # bash
+        ''
+          ${rsync} -ah --no-links --delete --info=stats1 \
+            "${tmpfsDir}" "${persistDir}"
+        '';
     in
     mkIf cfg.runInRam {
       services.firefox-persist-init = {
@@ -261,13 +273,16 @@ mkIf (cfg.enable && (osConfig'.modules.system.desktop.enable or true))
 
         Service = {
           Type = "oneshot";
-          ExecStart = (pkgs.writeShellScript "firefox-persist-init" /*bash*/ ''
-            if [ ! -e "${persistDir}" ]; then
-              ${syncToPersist}
-            else
-              ${syncToTmpfs}
-            fi
-          '').outPath;
+          ExecStart =
+            (pkgs.writeShellScript "firefox-persist-init" # bash
+              ''
+                if [ ! -e "${persistDir}" ]; then
+                  ${syncToPersist}
+                else
+                  ${syncToTmpfs}
+                fi
+              ''
+            ).outPath;
           # Backup on shutdown
           ExecStop = syncToPersist;
           RemainAfterExit = true;
@@ -281,16 +296,20 @@ mkIf (cfg.enable && (osConfig'.modules.system.desktop.enable or true))
           Description = "Firefox persist synchroniser";
           X-SwitchMethod = "keep-old";
           After = [ "firefox-persist-init.service" ];
-          Requisite = [ "firefox-persist-init.service" "graphical-session.target" ];
+          Requisite = [
+            "firefox-persist-init.service"
+            "graphical-session.target"
+          ];
         };
 
         Service = {
           Type = "oneshot";
           CPUSchedulingPolicy = "idle";
           IOSchedulingClass = "idle";
-          ExecStart = (pkgs.writeShellScript "firefox-persist-sync" ''
-            ${syncToPersist}
-          '').outPath;
+          ExecStart =
+            (pkgs.writeShellScript "firefox-persist-sync" ''
+              ${syncToPersist}
+            '').outPath;
         };
       };
 

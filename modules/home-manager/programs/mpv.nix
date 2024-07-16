@@ -1,18 +1,16 @@
-{ lib
-, pkgs
-, pkgs'
-, config
-, ...
+{
+  lib,
+  pkgs,
+  pkgs',
+  config,
+  ...
 }:
 let
   inherit (lib) mkIf optional;
   cfg = config.modules.programs.mpv;
 in
-mkIf cfg.enable
-{
-  home.packages = [
-    pkgs.yt-dlp
-  ] ++ optional cfg.jellyfinShim.enable pkgs.jellyfin-mpv-shim;
+mkIf cfg.enable {
+  home.packages = [ pkgs.yt-dlp ] ++ optional cfg.jellyfinShim.enable pkgs.jellyfin-mpv-shim;
 
   programs.mpv = {
     enable = true;
@@ -96,7 +94,8 @@ mkIf cfg.enable
       mpv = lib.getExe config.programs.mpv.package;
       ytDlp = lib.getExe pkgs.yt-dlp;
     in
-      /*bash*/ ''
+    # bash
+    ''
       screenshare () {
         if [[ -z "$1" ]]; then
             echo "Usage: screenshare <ip:port>"

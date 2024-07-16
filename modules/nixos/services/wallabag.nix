@@ -1,9 +1,10 @@
-{ lib
-, pkgs
-, config
-, inputs
-, hostname
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  hostname,
+  ...
 }:
 let
   inherit (lib) mkIf toUpper utils;
@@ -11,8 +12,7 @@ let
   inherit (config.modules.system) virtualisation;
   cfg = config.modules.services.wallabag;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     virtualisation.containerisation.enable
     "Wallabag requires containerised virtualisation to be enabled"
@@ -77,7 +77,5 @@ mkIf cfg.enable
     "d /var/lib/wallabag/images 0755 root root"
   ];
 
-  persistence.directories = [{
-    directory = "/var/lib/wallabag";
-  }];
+  persistence.directories = [ { directory = "/var/lib/wallabag"; } ];
 }

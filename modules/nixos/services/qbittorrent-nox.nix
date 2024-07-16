@@ -1,9 +1,10 @@
-{ lib
-, pkgs
-, config
-, inputs
-, username
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  username,
+  ...
 }:
 let
   inherit (lib) mkIf utils getExe';
@@ -11,12 +12,9 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.modules.services.qbittorrent-nox;
-  qbittorrent-nox = pkgs.qbittorrent.override {
-    guiSupport = false;
-  };
+  qbittorrent-nox = pkgs.qbittorrent.override { guiSupport = false; };
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     wgnord.enable
     "qBittorrent nox requires wgnord to be enabled"
@@ -34,7 +32,10 @@ mkIf cfg.enable
 
   systemd.services.qbittorrent-nox = {
     description = "qBittorrent-nox";
-    after = [ "network-online.target" "wgnord.service" ];
+    after = [
+      "network-online.target"
+      "wgnord.service"
+    ];
     wants = [ "network-online.target" ];
     requires = [ "wgnord.service" ];
 
@@ -50,7 +51,12 @@ mkIf cfg.enable
       StateDirectory = "qbittorrent-nox";
       ExecStart = getExe' qbittorrent-nox "qbittorrent-nox";
       Restart = "always";
-      RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
+      RestrictAddressFamilies = [
+        "AF_UNIX"
+        "AF_INET"
+        "AF_INET6"
+        "AF_NETLINK"
+      ];
       UMask = "0002";
     };
 
@@ -70,14 +76,16 @@ mkIf cfg.enable
     let
       inherit (config.modules.system.reservedIDs.jellyfin) uid gid;
     in
-    [{
-      path = "jellyfin";
-      clients = {
-        # all_squash doesn't change the ownership of existing files
-        # It just affects the access priviledges somehow through NFS I think?
-        "ncase-m1.lan" = "ro,no_subtree_check,all_squash,anonuid=${toString uid},anongid=${toString gid}";
-      };
-    }];
+    [
+      {
+        path = "jellyfin";
+        clients = {
+          # all_squash doesn't change the ownership of existing files
+          # It just affects the access priviledges somehow through NFS I think?
+          "ncase-m1.lan" = "ro,no_subtree_check,all_squash,anonuid=${toString uid},anongid=${toString gid}";
+        };
+      }
+    ];
 
   services.caddy.virtualHosts."torrents.${fqDomain}".extraConfig = ''
     ${allowAddresses trustedAddresses}
@@ -90,18 +98,27 @@ mkIf cfg.enable
     in
     {
       paths = [ configPath ];
-      exclude = [ "ipc-socket" "lockfile" "*.lock" ];
+      exclude = [
+        "ipc-socket"
+        "lockfile"
+        "*.lock"
+      ];
 
       restore = {
         removeExisting = false;
-        pathOwnership.${configPath} = { user = "qbittorrent-nox"; group = "qbittorrent-nox"; };
+        pathOwnership.${configPath} = {
+          user = "qbittorrent-nox";
+          group = "qbittorrent-nox";
+        };
       };
     };
 
-  persistence.directories = [{
-    directory = "/var/lib/qbittorrent-nox";
-    user = "qbittorrent-nox";
-    group = "qbittorrent-nox";
-    mode = "750";
-  }];
+  persistence.directories = [
+    {
+      directory = "/var/lib/qbittorrent-nox";
+      user = "qbittorrent-nox";
+      group = "qbittorrent-nox";
+      mode = "750";
+    }
+  ];
 }

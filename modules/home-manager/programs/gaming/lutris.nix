@@ -1,16 +1,21 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   cfg = config.modules.programs.gaming.lutris;
 
   lutris = pkgs.lutris.override {
-    extraPkgs = pkgs: with pkgs; [
-      wineWowPackages.stable
-      wineWowPackages.staging
-    ];
+    extraPkgs =
+      pkgs: with pkgs; [
+        wineWowPackages.stable
+        wineWowPackages.staging
+      ];
   };
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   home.packages = [ lutris ];
 
   modules.programs.gaming.gameClasses = [

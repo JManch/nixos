@@ -1,4 +1,9 @@
-{ lib, config, inputs, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 let
   inherit (lib) mkIf optional;
   inherit (config.modules.services) frigate;
@@ -25,23 +30,74 @@ let
       {
         type = "entities";
         entities = [
-          { entity = "sensor.outdoor_temperature"; name = "Temperature"; }
-          { entity = "sensor.outdoor_humidity"; name = "Humidity"; }
-          { entity = "sensor.outdoor_thermal_comfort_absolute_humidity"; name = "Absolute Humidity"; }
-          { entity = "sensor.outdoor_thermal_comfort_dew_point"; name = "Dew Point"; }
-          { entity = "sensor.outdoor_thermal_comfort_dew_point_perception"; name = "Dew Point Perception"; }
-          { entity = "sensor.outdoor_thermal_comfort_frost_point"; name = "Frost Point"; }
-          { entity = "sensor.outdoor_thermal_comfort_frost_risk"; name = "Frost Risk"; }
-          { entity = "sensor.outdoor_thermal_comfort_heat_index"; name = "Heat Index"; }
-          { entity = "sensor.outdoor_thermal_comfort_humidex"; name = "Humidex"; }
-          { entity = "sensor.outdoor_thermal_comfort_humidex_perception"; name = "Humidex Perception"; }
-          { entity = "sensor.outdoor_thermal_comfort_moist_air_enthalpy"; name = "Moist Air Enthalpy"; }
-          { entity = "sensor.outdoor_thermal_comfort_relative_strain_perception"; name = "Relative Strain"; }
-          { entity = "sensor.outdoor_thermal_comfort_summer_scharlau_perception"; name = "Summer Scharlau"; }
-          { entity = "sensor.outdoor_thermal_comfort_summer_simmer_index"; name = "Summer Simmer Index"; }
-          { entity = "sensor.outdoor_thermal_comfort_summer_simmer_perception"; name = "Summer Simmer Perception"; }
-          { entity = "sensor.outdoor_thermal_comfort_thoms_discomfort_perception"; name = "Thoms Discomfort"; }
-          { entity = "sensor.outdoor_thermal_comfort_winter_scharlau_perception"; name = "Winter Scharlau"; }
+          {
+            entity = "sensor.outdoor_temperature";
+            name = "Temperature";
+          }
+          {
+            entity = "sensor.outdoor_humidity";
+            name = "Humidity";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_absolute_humidity";
+            name = "Absolute Humidity";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_dew_point";
+            name = "Dew Point";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_dew_point_perception";
+            name = "Dew Point Perception";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_frost_point";
+            name = "Frost Point";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_frost_risk";
+            name = "Frost Risk";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_heat_index";
+            name = "Heat Index";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_humidex";
+            name = "Humidex";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_humidex_perception";
+            name = "Humidex Perception";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_moist_air_enthalpy";
+            name = "Moist Air Enthalpy";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_relative_strain_perception";
+            name = "Relative Strain";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_summer_scharlau_perception";
+            name = "Summer Scharlau";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_summer_simmer_index";
+            name = "Summer Simmer Index";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_summer_simmer_perception";
+            name = "Summer Simmer Perception";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_thoms_discomfort_perception";
+            name = "Thoms Discomfort";
+          }
+          {
+            entity = "sensor.outdoor_thermal_comfort_winter_scharlau_perception";
+            name = "Winter Scharlau";
+          }
         ];
       }
     ];
@@ -91,7 +147,10 @@ let
           }
         ];
       }
-      { type = "thermostat"; entity = "climate.lounge"; }
+      {
+        type = "thermostat";
+        entity = "climate.lounge";
+      }
     ];
   };
 
@@ -102,7 +161,10 @@ let
       {
         type = "vertical-stack";
         cards = [
-          { type = "light"; entity = "light.joshua_room"; }
+          {
+            type = "light";
+            entity = "light.joshua_room";
+          }
           {
             type = "entities";
             state_color = true;
@@ -119,11 +181,26 @@ let
             type = "entities";
             state_color = true;
             entities = [
-              { entity = "switch.adaptive_lighting_joshua_room"; name = "Adaptive Lighting"; }
-              { entity = "switch.adaptive_lighting_adapt_brightness_joshua_room"; name = "Adapt Brightness"; }
-              { entity = "switch.adaptive_lighting_adapt_color_joshua_room"; name = "Adapt Color"; }
-              { entity = "switch.adaptive_lighting_sleep_mode_joshua_room"; name = "Sleep Mode"; }
-              { entity = "input_boolean.joshua_room_wake_up_lights"; name = "Wake Up Lights"; }
+              {
+                entity = "switch.adaptive_lighting_joshua_room";
+                name = "Adaptive Lighting";
+              }
+              {
+                entity = "switch.adaptive_lighting_adapt_brightness_joshua_room";
+                name = "Adapt Brightness";
+              }
+              {
+                entity = "switch.adaptive_lighting_adapt_color_joshua_room";
+                name = "Adapt Color";
+              }
+              {
+                entity = "switch.adaptive_lighting_sleep_mode_joshua_room";
+                name = "Sleep Mode";
+              }
+              {
+                entity = "input_boolean.joshua_room_wake_up_lights";
+                name = "Wake Up Lights";
+              }
             ];
           }
         ];
@@ -148,28 +225,60 @@ let
           {
             type = "entities";
             entities = [
-              { entity = "sensor.joshua_thermal_comfort_summer_scharlau_perception"; name = "Summer Scharlau"; }
-              { entity = "sensor.joshua_thermal_comfort_thoms_discomfort_perception"; name = "Thoms Discomfort"; }
+              {
+                entity = "sensor.joshua_thermal_comfort_summer_scharlau_perception";
+                name = "Summer Scharlau";
+              }
+              {
+                entity = "sensor.joshua_thermal_comfort_thoms_discomfort_perception";
+                name = "Thoms Discomfort";
+              }
             ];
           }
         ];
       }
       {
         type = "history-graph";
-        entities = [{ entity = "binary_sensor.ncase_m1_active"; name = "NCASE-M1"; }];
+        entities = [
+          {
+            entity = "binary_sensor.ncase_m1_active";
+            name = "NCASE-M1";
+          }
+        ];
       }
       {
         title = "Dehumidifier";
         state_color = true;
         type = "entities";
         entities = [
-          { entity = "switch.joshua_dehumidifier"; name = "Enabled"; }
-          { entity = "sensor.joshua_dehumidifier_tank_status"; name = "Tank Status"; }
-          { entity = "sensor.joshua_dehumidifier_energy"; name = "Energy"; }
-          { entity = "sensor.joshua_dehumidifier_power"; name = "Power"; }
-          { entity = "sensor.joshua_mold_indicator"; name = "Mold Indicator"; }
-          { entity = "sensor.joshua_critical_temperature"; name = "Critical Temperature"; }
-          { entity = "sensor.joshua_dew_point"; name = "Dew Point"; }
+          {
+            entity = "switch.joshua_dehumidifier";
+            name = "Enabled";
+          }
+          {
+            entity = "sensor.joshua_dehumidifier_tank_status";
+            name = "Tank Status";
+          }
+          {
+            entity = "sensor.joshua_dehumidifier_energy";
+            name = "Energy";
+          }
+          {
+            entity = "sensor.joshua_dehumidifier_power";
+            name = "Power";
+          }
+          {
+            entity = "sensor.joshua_mold_indicator";
+            name = "Mold Indicator";
+          }
+          {
+            entity = "sensor.joshua_critical_temperature";
+            name = "Critical Temperature";
+          }
+          {
+            entity = "sensor.joshua_dew_point";
+            name = "Dew Point";
+          }
         ];
       }
     ];
@@ -250,8 +359,14 @@ let
             logarithmic_scale = false;
 
             entities = [
-              { entity = "binary_sensor.washing_machine_running"; name = "Washing M"; }
-              { entity = "binary_sensor.dishwasher_running"; name = "Dishwasher"; }
+              {
+                entity = "binary_sensor.washing_machine_running";
+                name = "Washing M";
+              }
+              {
+                entity = "binary_sensor.dishwasher_running";
+                name = "Dishwasher";
+              }
             ];
           }
           {
@@ -277,7 +392,7 @@ let
           }
           {
             type = "history-graph";
-            entities = [{ entity = "binary_sensor.powerwall_grid_charge_status"; }];
+            entities = [ { entity = "binary_sensor.powerwall_grid_charge_status"; } ];
             hours_to_show = 12;
             logarithmic_scale = false;
           }
@@ -291,9 +406,18 @@ let
             type = "entities";
             state_color = true;
             entities = [
-              { entity = "sensor.powerwall_backup_reserve"; name = "Battery Reserve"; }
-              { entity = "binary_sensor.powerwall_grid_status"; name = "Grid Status"; }
-              { entity = "switch.powerwall_off_grid_operation"; name = "Off-grid Operation"; }
+              {
+                entity = "sensor.powerwall_backup_reserve";
+                name = "Battery Reserve";
+              }
+              {
+                entity = "binary_sensor.powerwall_grid_status";
+                name = "Grid Status";
+              }
+              {
+                entity = "switch.powerwall_off_grid_operation";
+                name = "Off-grid Operation";
+              }
             ];
           }
         ];
@@ -311,7 +435,7 @@ let
           }
           {
             type = "history-graph";
-            entities = [{ entity = "binary_sensor.powerwall_battery_charge_status"; }];
+            entities = [ { entity = "binary_sensor.powerwall_battery_charge_status"; } ];
             hours_to_show = 12;
           }
           {
@@ -325,10 +449,22 @@ let
             state_color = true;
 
             entities = [
-              { entity = "sensor.powerwall_gateway_battery_capacity"; name = "Battery Capacity"; }
-              { entity = "sensor.powerwall_gateway_battery_remaining"; name = "Battery Remaining"; }
-              { entity = "sensor.powerwall_gateway_battery_voltage"; name = "Battery Voltage"; }
-              { entity = "sensor.powerwall_battery_remaining_time"; name = "Battery Time"; }
+              {
+                entity = "sensor.powerwall_gateway_battery_capacity";
+                name = "Battery Capacity";
+              }
+              {
+                entity = "sensor.powerwall_gateway_battery_remaining";
+                name = "Battery Remaining";
+              }
+              {
+                entity = "sensor.powerwall_gateway_battery_voltage";
+                name = "Battery Voltage";
+              }
+              {
+                entity = "sensor.powerwall_battery_remaining_time";
+                name = "Battery Time";
+              }
             ];
           }
         ];
@@ -348,10 +484,22 @@ let
             type = "entities";
             state_color = true;
             entities = [
-              { entity = "sensor.power_production_now"; name = "Estimated Production Now"; }
-              { entity = "sensor.energy_production_today"; name = "Estimated Production Today"; }
-              { entity = "sensor.energy_production_tomorrow"; name = "Estimated Production Tomorrow"; }
-              { entity = "sensor.power_highest_peak_time_today"; name = "Peak Time Today"; }
+              {
+                entity = "sensor.power_production_now";
+                name = "Estimated Production Now";
+              }
+              {
+                entity = "sensor.energy_production_today";
+                name = "Estimated Production Today";
+              }
+              {
+                entity = "sensor.energy_production_tomorrow";
+                name = "Estimated Production Tomorrow";
+              }
+              {
+                entity = "sensor.power_highest_peak_time_today";
+                name = "Peak Time Today";
+              }
             ];
           }
         ];
@@ -364,8 +512,14 @@ let
             period = "hour";
             type = "statistics-graph";
             entities = [
-              { entity = "sensor.powerwall_site_import_cost"; name = "Month Import Cost"; }
-              { entity = "sensor.powerwall_site_export_compensation"; name = "Month Export Compensation"; }
+              {
+                entity = "sensor.powerwall_site_import_cost";
+                name = "Month Import Cost";
+              }
+              {
+                entity = "sensor.powerwall_site_export_compensation";
+                name = "Month Export Compensation";
+              }
             ];
             stat_types = [ "sum" ];
           }
@@ -373,7 +527,12 @@ let
             chart_type = "line";
             period = "hour";
             type = "statistics-graph";
-            entities = [{ entity = "sensor.powerwall_aggregate_cost"; name = "Month Aggregate Cost"; }];
+            entities = [
+              {
+                entity = "sensor.powerwall_aggregate_cost";
+                name = "Month Aggregate Cost";
+              }
+            ];
             stat_types = [ "sum" ];
           }
         ];
@@ -386,12 +545,14 @@ let
       frigateCameraCard = camera: {
         type = "custom:frigate-card";
         performance.profile = "low";
-        cameras = [{
-          camera_entity = "camera.${camera}";
-          frigate.url = "https://cctv.${fqDomain}";
-          live_provider = "go2rtc";
-          go2rtc.modes = [ (if frigate.webrtc.enable then "webrtc" else "mse") ];
-        }];
+        cameras = [
+          {
+            camera_entity = "camera.${camera}";
+            frigate.url = "https://cctv.${fqDomain}";
+            live_provider = "go2rtc";
+            go2rtc.modes = [ (if frigate.webrtc.enable then "webrtc" else "mse") ];
+          }
+        ];
         live = {
           transition_effect = "none";
           show_image_during_load = true;
@@ -442,7 +603,7 @@ let
             (frigateCameraCard "poolhouse")
             {
               type = "entities";
-              entities = [{ entity = "input_boolean.high_alert_surveillance"; }];
+              entities = [ { entity = "input_boolean.high_alert_surveillance"; } ];
               state_color = true;
             }
           ];
@@ -453,25 +614,24 @@ let
     };
 
 in
-mkIf cfg.enableInternal
-{
+mkIf cfg.enableInternal {
   services.home-assistant = {
     lovelaceConfig = {
       title = "Dashboard";
 
-      views = [
-        home
-        power
-      ]
-      ++ optional frigate.enable surveillance
-      ++
-      [
-        heating
-        lounge
-        joshuaRoom
-        room1
-        garden
-      ];
+      views =
+        [
+          home
+          power
+        ]
+        ++ optional frigate.enable surveillance
+        ++ [
+          heating
+          lounge
+          joshuaRoom
+          room1
+          garden
+        ];
     };
   };
 }

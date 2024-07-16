@@ -1,12 +1,21 @@
-{ lib
-, pkgs
-, config
-, inputs
-, hostname
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  hostname,
+  ...
 }:
 let
-  inherit (lib) mkIf mkMerge utils toUpper mkForce getExe' mkVMOverride;
+  inherit (lib)
+    mkIf
+    mkMerge
+    utils
+    toUpper
+    mkForce
+    getExe'
+    mkVMOverride
+    ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -26,13 +35,20 @@ mkMerge [
         api.endpoint =
           if cfg.server.enable then
             "http://127.0.0.1:${toString cfg.server.port}"
-          else "https://disks.${fqDomain}";
+          else
+            "https://disks.${fqDomain}";
       };
     };
 
     systemd.services.scrutiny-collector = {
-      after = [ "network-online.target" "nss-lookup.target" ];
-      wants = [ "network-online.target" "nss-lookup.target" ];
+      after = [
+        "network-online.target"
+        "nss-lookup.target"
+      ];
+      wants = [
+        "network-online.target"
+        "nss-lookup.target"
+      ];
     };
   })
 
@@ -71,7 +87,10 @@ mkMerge [
       User = "scrutiny";
       Group = "scrutiny";
       DynamicUser = mkForce false;
-      SystemCallFilter = [ "@system-service" "~@privileged" ];
+      SystemCallFilter = [
+        "@system-service"
+        "~@privileged"
+      ];
       EnvironmentFile = scrutinyVars.path;
     };
 
@@ -100,15 +119,22 @@ mkMerge [
       restore = {
         preRestoreScript = "sudo systemctl stop scrutiny";
 
-        postRestoreScript = /*bash*/ ''
-          echo "Restoring Scrutiny influxdb database"
-          sudo -u influxdb2 ${influx} restore /var/backup/influxdb2/scrutiny --full \
-            -t scrutiny-default-admin-token
-        '';
+        postRestoreScript = # bash
+          ''
+            echo "Restoring Scrutiny influxdb database"
+            sudo -u influxdb2 ${influx} restore /var/backup/influxdb2/scrutiny --full \
+              -t scrutiny-default-admin-token
+          '';
 
         pathOwnership = {
-          "/var/lib/scrutiny" = { user = "scrutiny"; group = "scrutiny"; };
-          "/var/backup/influxdb2/scrutiny" = { user = "influxdb2"; group = "influxdb2"; };
+          "/var/lib/scrutiny" = {
+            user = "scrutiny";
+            group = "scrutiny";
+          };
+          "/var/backup/influxdb2/scrutiny" = {
+            user = "influxdb2";
+            group = "influxdb2";
+          };
         };
       };
     };

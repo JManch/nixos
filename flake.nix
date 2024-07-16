@@ -1,35 +1,52 @@
 {
   description = "Joshua's NixOS Flake";
 
-  outputs = { self, nixpkgs, home-manager, ... } @ inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      ...
+    }@inputs:
     let
       inherit (lib) nixosSystem genAttrs hasPrefix;
 
-      lib = nixpkgs.lib.extend
-        (final: prev: (import ./lib final) // home-manager.lib);
+      lib = nixpkgs.lib.extend (final: prev: (import ./lib final) // home-manager.lib);
 
       systems = [ "x86_64-linux" ];
-      forEachSystem = f:
-        genAttrs systems (system:
-          f (import nixpkgs {
-            inherit system;
-            config.allowUnfree = true;
-          }));
+      forEachSystem =
+        f:
+        genAttrs systems (
+          system:
+          f (
+            import nixpkgs {
+              inherit system;
+              config.allowUnfree = true;
+            }
+          )
+        );
 
       mkHost = hostname: username: system: {
         ${hostname} = nixosSystem {
           inherit system;
           specialArgs = {
-            inherit self inputs hostname username lib;
+            inherit
+              self
+              inputs
+              hostname
+              username
+              lib
+              ;
             pkgs' = self.packages.${system};
           };
           modules =
             if (hasPrefix "installer" hostname) then
               [ ./hosts/installer ]
-            else [
-              ./hosts/${hostname}
-              ./modules/nixos
-            ];
+            else
+              [
+                ./hosts/${hostname}
+                ./modules/nixos
+              ];
         };
       };
     in
@@ -39,11 +56,11 @@
       templates = import ./templates;
 
       nixosConfigurations =
-        mkHost "ncase-m1" "joshua" "x86_64-linux" //
-        mkHost "homelab" "joshua" "x86_64-linux" //
-        mkHost "msi" "lauren" "x86_64-linux" //
-        mkHost "installer" "joshua" "x86_64-linux" //
-        mkHost "installer-arm" "joshua" "aarch64-linux";
+        mkHost "ncase-m1" "joshua" "x86_64-linux"
+        // mkHost "homelab" "joshua" "x86_64-linux"
+        // mkHost "msi" "lauren" "x86_64-linux"
+        // mkHost "installer" "joshua" "x86_64-linux"
+        // mkHost "installer-arm" "joshua" "aarch64-linux";
     };
 
   inputs = {

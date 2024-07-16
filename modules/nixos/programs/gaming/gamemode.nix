@@ -1,8 +1,9 @@
-{ lib
-, pkgs
-, config
-, username
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  username,
+  ...
 }:
 let
   inherit (lib) mkIf getExe;
@@ -10,7 +11,15 @@ let
 
   startStopScript =
     let
-      inherit (lib) optionalString utils boolToString substring stringLength toUpper optional;
+      inherit (lib)
+        optionalString
+        utils
+        boolToString
+        substring
+        stringLength
+        toUpper
+        optional
+        ;
       inherit (homeConfig.modules.desktop) hyprland;
       inherit (config.modules.system) desktop;
       inherit (config.device) primaryMonitor;
@@ -22,18 +31,16 @@ let
         keyword unbind ${hyprland.modKey}${optionalString isEnd "SHIFTCONTROL"}, W; \
         keyword bind ${hyprland.modKey}${optionalString (!isEnd) "SHIFTCONTROL"}, W, killactive;'';
 
-      refreshRate = m: toString (
-        if (m == "start") then
-          primaryMonitor.gamingRefreshRate
-        else
-          primaryMonitor.refreshRate
-      );
+      refreshRate =
+        m:
+        toString (if (m == "start") then primaryMonitor.gamingRefreshRate else primaryMonitor.refreshRate);
 
       isEnd = m: boolToString (m == "end");
       blur = m: if hyprland.blur then isEnd m else "false";
       notifBody = m: ((toUpper (substring 0 1 m)) + (substring 1 ((stringLength m) - 1) m));
     in
-    mode: pkgs.writeShellApplication {
+    mode:
+    pkgs.writeShellApplication {
       name = "gamemode-${mode}";
 
       runtimeInputs = [
@@ -50,19 +57,21 @@ let
           rm "$args_file"
         fi
 
-        ${
-          optionalString isHyprland /*bash*/ ''
+        ${optionalString isHyprland # bash
+          ''
             hyprctl --instance 0 --batch "\
               ${optionalString hyprland.blur "keyword decoration:blur:enabled ${blur mode};\\"}
-              keyword monitor ${utils.getMonitorHyprlandCfgStr (primaryMonitor // {refreshRate = refreshRate mode;})}; \
+              keyword monitor ${
+                utils.getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = refreshRate mode; })
+              }; \
               ${killActiveRebind (mode == "end")}"
           ''
         }
 
         ${if mode == "start" then cfg.startScript else cfg.stopScript}
 
-        ${
-          optionalString (desktop.desktopEnvironment == null) /*bash*/ ''
+        ${optionalString (desktop.desktopEnvironment == null) # bash
+          ''
             notify-send --urgency=critical -t 2000 \
               -h 'string:x-canonical-private-synchronous:gamemode-toggle' 'GameMode' '${notifBody mode}ed'
           ''
@@ -70,8 +79,7 @@ let
       '';
     };
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   # Do not start gamemoded for system users. This prevents gamemoded starting
   # during login when greetd temporarily runs as the greeter user.
   systemd.user.services.gamemoded = {
@@ -96,23 +104,25 @@ mkIf cfg.enable
         # tmp dir. Any files we write there will not be accessible from our
         # gamemoderun start script. Our home directory is bind mounted in the
         # chroot so that is accessible.
-        postFixup = old.postFixup + ''
-          wrapProgram $out/bin/gamemoderun --run '
-          rm -f /home/${username}/.gamemode-custom-args
-          while test $# -gt 0
-          do
-            case "$1" in
-              --high-perf)
-                ;&
-              --low-perf) echo -n "$1 " >> /home/${username}/.gamemode-custom-args;
-                ;;
-              *) break
-                ;;
-            esac
-            shift
-          done
-          '
-        '';
+        postFixup =
+          old.postFixup
+          + ''
+            wrapProgram $out/bin/gamemoderun --run '
+            rm -f /home/${username}/.gamemode-custom-args
+            while test $# -gt 0
+            do
+              case "$1" in
+                --high-perf)
+                  ;&
+                --low-perf) echo -n "$1 " >> /home/${username}/.gamemode-custom-args;
+                  ;;
+                *) break
+                  ;;
+              esac
+              shift
+            done
+            '
+          '';
       });
     })
   ];

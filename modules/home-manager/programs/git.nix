@@ -3,8 +3,7 @@ let
   inherit (lib) mkIf getExe;
   cfg = config.modules.programs.git;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   programs.git = {
     enable = true;
     userEmail = "JManch@protonmail.com";
@@ -34,15 +33,14 @@ mkIf cfg.enable
       lg = "lazygit";
     };
 
-    initExtra = /*bash*/ ''
-      lazygit() {
-        ssh-add-quiet
-        command ${getExe config.programs.lazygit.package} "$@"
-      }
-    '';
+    initExtra = # bash
+      ''
+        lazygit() {
+          ssh-add-quiet
+          command ${getExe config.programs.lazygit.package} "$@"
+        }
+      '';
   };
 
-  persistence.files = [
-    ".config/lazygit/state.yml"
-  ];
+  persistence.files = [ ".config/lazygit/state.yml" ];
 }

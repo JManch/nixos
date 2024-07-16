@@ -20,15 +20,17 @@
       type = "nvidia";
     };
 
-    monitors = [{
-      name = "placeholder";
-      number = 1;
-      refreshRate = 60;
-      width = 1920;
-      height = 1080;
-      position.x = 0;
-      position.y = 0;
-    }];
+    monitors = [
+      {
+        name = "placeholder";
+        number = 1;
+        refreshRate = 60;
+        width = 1920;
+        height = 1080;
+        position.x = 0;
+        position.y = 0;
+      }
+    ];
   };
 
   modules = {

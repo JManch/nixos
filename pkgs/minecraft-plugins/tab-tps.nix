@@ -1,7 +1,8 @@
-{ lib
-, fetchurl
-, stdenvNoCC
-, ...
+{
+  lib,
+  fetchurl,
+  stdenvNoCC,
+  ...
 }:
 stdenvNoCC.mkDerivation rec {
   pname = "tab-tps";

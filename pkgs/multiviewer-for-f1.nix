@@ -1,9 +1,10 @@
-{ lib
-, multiviewer-for-f1
-, fetchurl
-, libudev0-shim
-, libglvnd
-, ...
+{
+  lib,
+  multiviewer-for-f1,
+  fetchurl,
+  libudev0-shim,
+  libglvnd,
+  ...
 }:
 multiviewer-for-f1.overrideAttrs rec {
   version = "1.35.1";
@@ -22,7 +23,12 @@ multiviewer-for-f1.overrideAttrs rec {
 
     makeWrapper "$out/share/multiviewer-for-f1/MultiViewer for F1" $out/bin/multiviewer-for-f1 \
     --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform=wayland --enable-features=WaylandWindowDecorations}}" \
-    --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ libudev0-shim libglvnd ]}:\"$out/share/Multiviewer for F1\""
+    --prefix LD_LIBRARY_PATH : "${
+      lib.makeLibraryPath [
+        libudev0-shim
+        libglvnd
+      ]
+    }:\"$out/share/Multiviewer for F1\""
 
     runHook postInstall
   '';

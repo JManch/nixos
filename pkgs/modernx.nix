@@ -1,7 +1,8 @@
-{ lib
-, fetchFromGitHub
-, makeFontsConf
-, stdenvNoCC
+{
+  lib,
+  fetchFromGitHub,
+  makeFontsConf,
+  stdenvNoCC,
 }:
 stdenvNoCC.mkDerivation (finalAttrs: rec {
   pname = "mpv-modernx";

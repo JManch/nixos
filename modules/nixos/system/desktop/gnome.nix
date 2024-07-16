@@ -1,6 +1,16 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
-  inherit (lib) mkIf getExe mkForce mkDefault;
+  inherit (lib)
+    mkIf
+    getExe
+    mkForce
+    mkDefault
+    ;
   inherit (config.modules.core) homeManager;
   cfg = config.modules.system.desktop;
   extensions = with pkgs.gnomeExtensions; [
@@ -9,8 +19,7 @@ let
     dash-to-dock
   ];
 in
-mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
-{
+mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
   services.xserver = {
     enable = true;
     displayManager.gdm.enable = true;
@@ -32,10 +41,12 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome")
     gnome.totem
   ];
 
-  environment.systemPackages = extensions ++ (with pkgs; [
-    gnome.gnome-tweaks
-    clapper
-  ]);
+  environment.systemPackages =
+    extensions
+    ++ (with pkgs; [
+      gnome.gnome-tweaks
+      clapper
+    ]);
 
   hm = mkIf homeManager.enable {
     modules.desktop.terminal = {

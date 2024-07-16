@@ -2,8 +2,7 @@
 let
   cfg = config.modules.shell;
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   programs.starship = {
     enable = true;
 

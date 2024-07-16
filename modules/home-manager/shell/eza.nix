@@ -1,6 +1,5 @@
 { lib, config, ... }:
-lib.mkIf config.modules.shell.enable
-{
+lib.mkIf config.modules.shell.enable {
   programs.eza = {
     enable = true;
     git = true;

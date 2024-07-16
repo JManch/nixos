@@ -1,10 +1,11 @@
-{ lib
-, pkgs
-, config
-, osConfig'
-, vmVariant
-, ...
-} @ args:
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  vmVariant,
+  ...
+}@args:
 let
   inherit (lib)
     mkIf
@@ -16,7 +17,8 @@ let
     concatMap
     imap
     optionalString
-    optionals;
+    optionals
+    ;
   inherit (osConfig'.device) monitors primaryMonitor;
   inherit (desktopCfg.style) gapSize borderWidth;
 
@@ -57,8 +59,7 @@ mkIf (utils.isHyprland config) {
 
   # Install Hyprcursor package
   home.file = mkIf (cfg.hyprcursor.package != null) {
-    ".icons/${cfg.hyprcursor.name}".source =
-      "${cfg.hyprcursor.package}/share/icons/${cfg.hyprcursor.name}";
+    ".icons/${cfg.hyprcursor.name}".source = "${cfg.hyprcursor.package}/share/icons/${cfg.hyprcursor.name}";
   };
 
   # Generate hyprland debug config
@@ -66,7 +67,8 @@ mkIf (utils.isHyprland config) {
     let
       hyprDir = "${config.xdg.configHome}/hypr";
     in
-      /*bash*/ ''
+    # bash
+    ''
       ${getExe pkgs.gnused} \
         -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
         -e 's/enable_stdout_logs=false/enable_stdout_logs=true/' \
@@ -81,9 +83,13 @@ mkIf (utils.isHyprland config) {
         ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf
       ${
         # Add monitor config
-        concatMapStringsSep "\n" (m: let res = "${toString m.width}x${toString m.height}"; in
-          "echo \"monitor=WL-${toString m.number},${res},${toString m.position.x}x${toString m.position.y},1\" >> ${hyprDir}/hyprlandd.conf")
-          monitors
+        concatMapStringsSep "\n" (
+          m:
+          let
+            res = "${toString m.width}x${toString m.height}";
+          in
+          "echo \"monitor=WL-${toString m.number},${res},${toString m.position.x}x${toString m.position.y},1\" >> ${hyprDir}/hyprlandd.conf"
+        ) monitors
       }
     '';
 
@@ -121,36 +127,32 @@ mkIf (utils.isHyprland config) {
     };
 
     settings = {
-      env = [
-        "XDG_CURRENT_DESKTOP,Hyprland"
-        "XDG_SESSION_TYPE,wayland"
-        "XDG_SESSION_DESKTOP,Hyprland"
-        # Disable for cursor on mirrored monitors. After update should be able
-        # to toggle this at runtime.
-        "WLR_NO_HARDWARE_CURSORS,1"
-      ] ++ optionals (cfg.hyprcursor.package != null) [
-        "HYPRCURSOR_THEME,${cfg.hyprcursor.name}"
-        "HYPRCURSOR_SIZE,${toString config.modules.desktop.style.cursor.size}"
-      ] ++ optionals (osConfig'.device.gpu.type == "nvidia") [
-        "LIBVA_DRIVER_NAME,nvidia"
-        "GBM_BACKEND,nvidia-drm"
-        "__GLX_VENDOR_LIBRARY_NAME,nvidia"
-        "__GL_GSYNC_ALLOWED,0"
-        "__GL_VRR_ALLOWED,0"
-      ];
+      env =
+        [
+          "XDG_CURRENT_DESKTOP,Hyprland"
+          "XDG_SESSION_TYPE,wayland"
+          "XDG_SESSION_DESKTOP,Hyprland"
+          # Disable for cursor on mirrored monitors. After update should be able
+          # to toggle this at runtime.
+          "WLR_NO_HARDWARE_CURSORS,1"
+        ]
+        ++ optionals (cfg.hyprcursor.package != null) [
+          "HYPRCURSOR_THEME,${cfg.hyprcursor.name}"
+          "HYPRCURSOR_SIZE,${toString config.modules.desktop.style.cursor.size}"
+        ]
+        ++ optionals (osConfig'.device.gpu.type == "nvidia") [
+          "LIBVA_DRIVER_NAME,nvidia"
+          "GBM_BACKEND,nvidia-drm"
+          "__GLX_VENDOR_LIBRARY_NAME,nvidia"
+          "__GL_GSYNC_ALLOWED,0"
+          "__GL_VRR_ALLOWED,0"
+        ];
 
-      monitor = (map
-        (
-          m:
-          if !m.enabled then
-            "${m.name},disable"
-          else
-            utils.getMonitorHyprlandCfgStr m
-        )
-        monitors
-      ) ++ [
-        ",preferred,auto,1" # automatic monitor detection
-      ];
+      monitor =
+        (map (m: if !m.enabled then "${m.name},disable" else utils.getMonitorHyprlandCfgStr m) monitors)
+        ++ [
+          ",preferred,auto,1" # automatic monitor detection
+        ];
 
       exec-once =
         let
@@ -274,24 +276,21 @@ mkIf (utils.isHyprland config) {
         enable_stdout_logs = false;
       };
 
-      workspace = (concatMap
-        (
-          m: (
-            imap
-              (
-                i: w: "${toString w}, monitor:${m.name}" +
-                  optionalString (i == 1) ", default:true" +
-                  optionalString (i < 3) ", persistent:true"
-              )
-              m.workspaces
-          )
-        )
-        monitors
-      ) ++ [
-        "name:GAME, monitor:${primaryMonitor.name}"
-        "name:VM, monitor:${primaryMonitor.name}"
-        "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
-      ];
+      workspace =
+        (concatMap (
+          m:
+          (imap (
+            i: w:
+            "${toString w}, monitor:${m.name}"
+            + optionalString (i == 1) ", default:true"
+            + optionalString (i < 3) ", persistent:true"
+          ) m.workspaces)
+        ) monitors)
+        ++ [
+          "name:GAME, monitor:${primaryMonitor.name}"
+          "name:VM, monitor:${primaryMonitor.name}"
+          "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
+        ];
 
       # plugin = {
       #   hyprexpo = {

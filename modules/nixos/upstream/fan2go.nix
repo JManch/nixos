@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   inherit (lib)
     mkIf
@@ -7,7 +12,8 @@ let
     mkOption
     types
     getExe'
-    literalExpression;
+    literalExpression
+    ;
   cfg = config.programs.fan2go;
   yamlFormat = pkgs.formats.yaml { };
   configFile = yamlFormat.generate "fan2go.yaml" cfg.settings;
@@ -36,9 +42,7 @@ in
   config = mkIf cfg.enable (mkMerge [
     {
       environment.systemPackages = [ cfg.package ];
-      environment.etc."fan2go/fan2go.yaml" = mkIf (cfg.settings != { }) {
-        source = configFile;
-      };
+      environment.etc."fan2go/fan2go.yaml" = mkIf (cfg.settings != { }) { source = configFile; };
     }
 
     (mkIf cfg.systemd.enable {

@@ -4,9 +4,7 @@ let
   vmInstall = inputs.vmInstall.value;
 in
 {
-  imports = [
-    inputs.disko.nixosModules.default
-  ];
+  imports = [ inputs.disko.nixosModules.default ];
 
   disko.devices = {
     disk."1TB-NVME" = {
@@ -30,7 +28,10 @@ in
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
-              mountOptions = [ "defaults" "umask=0077" ];
+              mountOptions = [
+                "defaults"
+                "umask=0077"
+              ];
             };
           };
           zfs = {
@@ -47,7 +48,10 @@ in
 
     nodev."/" = {
       fsType = "tmpfs";
-      mountOptions = [ "defaults" "mode=755" ];
+      mountOptions = [
+        "defaults"
+        "mode=755"
+      ];
     };
 
     # TODO: Next install change zpool name to zroot to match homelab disko
@@ -55,17 +59,19 @@ in
       type = "zpool";
       options.ashift = "12";
 
-      rootFsOptions = {
-        atime = "off";
-        mountpoint = "none";
-        xattr = "sa";
-        acltype = "posixacl";
-        compression = "lz4";
-      } // optionalAttrs (!vmInstall) {
-        encryption = "aes-256-gcm";
-        keyformat = "passphrase";
-        keylocation = "prompt";
-      };
+      rootFsOptions =
+        {
+          atime = "off";
+          mountpoint = "none";
+          xattr = "sa";
+          acltype = "posixacl";
+          compression = "lz4";
+        }
+        // optionalAttrs (!vmInstall) {
+          encryption = "aes-256-gcm";
+          keyformat = "passphrase";
+          keylocation = "prompt";
+        };
 
       datasets = {
         nix = {

@@ -1,15 +1,15 @@
-{ lib
-, pkgs'
-, config
-, hostname
-, ...
+{
+  lib,
+  pkgs',
+  config,
+  hostname,
+  ...
 }:
 let
   inherit (lib) mkIf genAttrs optional;
   cfg = config.modules.services.beammp-server;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   services.beammp-server = {
     enable = true;
     autoStart = cfg.autoStart;
@@ -41,16 +41,20 @@ mkIf cfg.enable
   networking.firewall = {
     allowedTCPPorts = optional cfg.openFirewall cfg.port;
     allowedUDPPorts = optional cfg.openFirewall cfg.port;
-    interfaces = (genAttrs cfg.interfaces (_: {
-      allowedTCPPorts = [ cfg.port ];
-      allowedUDPPorts = [ cfg.port ];
-    }));
+    interfaces = (
+      genAttrs cfg.interfaces (_: {
+        allowedTCPPorts = [ cfg.port ];
+        allowedUDPPorts = [ cfg.port ];
+      })
+    );
   };
 
-  persistence.directories = [{
-    directory = "/var/lib/beammp-server";
-    user = "beammp";
-    group = "beammp";
-    mode = "755";
-  }];
+  persistence.directories = [
+    {
+      directory = "/var/lib/beammp-server";
+      user = "beammp";
+      group = "beammp";
+      mode = "755";
+    }
+  ];
 }

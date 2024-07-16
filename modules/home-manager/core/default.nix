@@ -1,11 +1,20 @@
-{ lib
-, config
-, osConfig
-, osConfig'
-, ...
+{
+  lib,
+  config,
+  osConfig,
+  osConfig',
+  ...
 }:
 let
-  inherit (lib) mkIf utils optionalString types mkEnableOption optional mkOption;
+  inherit (lib)
+    mkIf
+    utils
+    optionalString
+    types
+    mkEnableOption
+    optional
+    mkOption
+    ;
   impermanence = osConfig'.modules.system.impermanence or null;
   cfg = config.modules.core;
 in
@@ -41,9 +50,7 @@ in
     ] ++ optional cfg.configManager ".config/nixos";
 
     backups = {
-      nixos = mkIf cfg.configManager {
-        paths = [ ".config/nixos" ];
-      };
+      nixos = mkIf cfg.configManager { paths = [ ".config/nixos" ]; };
 
       files = mkIf cfg.backupFiles {
         paths = [ "files" ];

@@ -1,4 +1,9 @@
-{ lib, config, inputs, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 let
   inherit (lib) mkIf utils;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -8,8 +13,7 @@ let
   inherit (config.services.zigbee2mqtt) dataDir;
   cfg = config.modules.services.zigbee2mqtt;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     (cfg.enable -> mosquitto.enable)
     "Zigbee2mqtt requires mosquitto to be enabled"
@@ -72,13 +76,18 @@ mkIf cfg.enable
   backups.zigbee2mqtt = {
     paths = [ dataDir ];
     exclude = [ "log" ];
-    restore.pathOwnership.${dataDir} = { user = "zigbee2mqtt"; group = "zigbee2mqtt"; };
+    restore.pathOwnership.${dataDir} = {
+      user = "zigbee2mqtt";
+      group = "zigbee2mqtt";
+    };
   };
 
-  persistence.directories = [{
-    directory = dataDir;
-    user = "zigbee2mqtt";
-    group = "zigbee2mqtt";
-    mode = "770";
-  }];
+  persistence.directories = [
+    {
+      directory = dataDir;
+      user = "zigbee2mqtt";
+      group = "zigbee2mqtt";
+      mode = "770";
+    }
+  ];
 }

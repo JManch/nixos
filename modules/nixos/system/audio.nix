@@ -1,6 +1,17 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
-  inherit (lib) mkMerge mkIf getExe getExe' mkForce;
+  inherit (lib)
+    mkMerge
+    mkIf
+    getExe
+    getExe'
+    mkForce
+    ;
   cfg = config.modules.system.audio;
 
   toggleMic =
@@ -9,14 +20,12 @@ let
       notifySend = getExe pkgs.libnotify;
     in
     pkgs.writeShellScript "toggle-mic" ''
-
       ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle
       status=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@)
       message=$([[ "$status" == *MUTED* ]] && echo "Muted" || echo "Unmuted")
       ${notifySend} -u critical -t 2000 \
         -h 'string:x-canonical-private-synchronous:microphone-toggle' 'Microphone' "$message"
-
-  '';
+    '';
 in
 {
   imports = [

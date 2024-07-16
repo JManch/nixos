@@ -1,12 +1,20 @@
-{ lib
-, pkgs
-, inputs
-, config
-, isWayland
-, ...
+{
+  lib,
+  pkgs,
+  inputs,
+  config,
+  isWayland,
+  ...
 }:
 let
-  inherit (lib) mkIf utils optional getExe getExe' escapeShellArg;
+  inherit (lib)
+    mkIf
+    utils
+    optional
+    getExe
+    getExe'
+    escapeShellArg
+    ;
   inherit (config.modules.desktop.programs) swaylock;
   cfg = config.modules.desktop.services.hypridle;
 in
@@ -25,13 +33,17 @@ mkIf (cfg.enable && isWayland) {
         ignore_dbus_inhibit = false;
       };
 
-      listener = [{
-        timeout = cfg.lockTime;
-        on-timeout = swaylock.lockScript;
-      }] ++ optional cfg.debug {
-        timeout = 5;
-        on-timeout = "${lib.getExe pkgs.libnotify} 'Hypridle' 'Idle timeout triggered'";
-      };
+      listener =
+        [
+          {
+            timeout = cfg.lockTime;
+            on-timeout = swaylock.lockScript;
+          }
+        ]
+        ++ optional cfg.debug {
+          timeout = 5;
+          on-timeout = "${lib.getExe pkgs.libnotify} 'Hypridle' 'Idle timeout triggered'";
+        };
     };
   };
 
@@ -40,8 +52,8 @@ mkIf (cfg.enable && isWayland) {
       hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
       jaq = getExe pkgs.jaq;
     in
-      /*bash*/ ''
-
+    # bash
+    ''
       # Turn off the display after locking. I've found that doing this in the
       # lock script is more reliable than adding another listener.
       while true; do
@@ -55,7 +67,6 @@ mkIf (cfg.enable && isWayland) {
         # give screens time to turn off and prolong next countdown
         sleep ${toString cfg.lockTime}
       done &
-
     '';
 
   wayland.windowManager.hyprland.settings.bind =
@@ -73,7 +84,5 @@ mkIf (cfg.enable && isWayland) {
         }
       '';
     in
-    [
-      "${modKey}, U, exec, ${toggleHypridle}"
-    ];
+    [ "${modKey}, U, exec, ${toggleHypridle}" ];
 }

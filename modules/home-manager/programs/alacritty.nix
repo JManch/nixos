@@ -7,14 +7,16 @@ let
   normalFontSize = 12;
   largeFontSize = 17;
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   programs.alacritty = {
     enable = true;
 
     settings = {
       window = {
-        padding = { x = 5; y = 5; };
+        padding = {
+          x = 5;
+          y = 5;
+        };
         dynamic_padding = true;
         decorations = "none";
         opacity = 0.7;

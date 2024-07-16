@@ -1,19 +1,20 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, lua5_3
-, fmt
-, openssl
-, doctest
-, zlib
-, boost
-, httplib
-, libzip
-, rapidjson-unstable
-, sol2
-, toml11
-, nlohmann_json
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  lua5_3,
+  fmt,
+  openssl,
+  doctest,
+  zlib,
+  boost,
+  httplib,
+  libzip,
+  rapidjson-unstable,
+  sol2,
+  toml11,
+  nlohmann_json,
 }:
 stdenv.mkDerivation rec {
   pname = "beammp-server";
@@ -27,9 +28,7 @@ stdenv.mkDerivation rec {
     fetchSubmodules = true;
   };
 
-  patches = [
-    ./cmake.patch
-  ];
+  patches = [ ./cmake.patch ];
 
   nativeBuildInputs = [
     cmake
@@ -47,9 +46,7 @@ stdenv.mkDerivation rec {
     lua5_3
   ];
 
-  cmakeFlags = [
-    "-DCMAKE_BUILD_TYPE=Release"
-  ];
+  cmakeFlags = [ "-DCMAKE_BUILD_TYPE=Release" ];
 
   enableParallelBuilding = true;
 

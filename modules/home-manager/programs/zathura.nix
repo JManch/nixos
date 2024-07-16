@@ -1,10 +1,14 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   cfg = config.modules.programs.zathura;
   colors = config.colorScheme.palette;
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   programs.zathura = {
     enable = true;
     # recolor-reverse-video does not work with mupdf so disable it. Poppler is

@@ -1,9 +1,14 @@
-{ lib, pkgs, config, username, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  username,
+  ...
+}:
 let
   cfg = config.modules.programs.wireshark;
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   programs.wireshark = {
     enable = true;
     package = pkgs.wireshark;

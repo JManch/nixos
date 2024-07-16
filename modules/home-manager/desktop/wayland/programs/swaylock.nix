@@ -1,9 +1,10 @@
-{ lib
-, pkgs
-, config
-, osConfig'
-, isWayland
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  isWayland,
+  ...
 }:
 let
   inherit (lib) mkIf optionalString getExe;
@@ -15,23 +16,25 @@ let
   lockScript =
     let
       osAudio = osConfig'.modules.system.audio;
-      preLock = /*bash*/ ''
-        ${optionalString osAudio.enable ''
-          wpctl set-mute @DEFAULT_AUDIO_SINK@ 1
-          wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1
-        ''}
-        ${cfg.preLockScript}
-      '';
+      preLock = # bash
+        ''
+          ${optionalString osAudio.enable ''
+            wpctl set-mute @DEFAULT_AUDIO_SINK@ 1
+            wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1
+          ''}
+          ${cfg.preLockScript}
+        '';
 
       postLock = cfg.postLockScript;
 
-      postUnlock = /*bash*/ ''
-        ${optionalString osAudio.enable ''
-          wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
-          wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0
-        ''}
-        ${cfg.postUnlockScript}
-      '';
+      postUnlock = # bash
+        ''
+          ${optionalString osAudio.enable ''
+            wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
+            wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0
+          ''}
+          ${cfg.postUnlockScript}
+        '';
     in
     pkgs.writeShellApplication {
       name = "swaylock-lock-script";
@@ -43,25 +46,24 @@ let
         coreutils
       ];
 
-      text = /*bash*/ ''
+      text = # bash
+        ''
+          # Exit if swaylock is running
+          pgrep -x swaylock && exit 1
 
-        # Exit if swaylock is running
-        pgrep -x swaylock && exit 1
+          # Create a unique lock file so forked processes can track if precisely
+          # this instance of swaylock is still running
+          lockfile="/tmp/swaylock-lock-$$-$(date +%s)"
+          touch "$lockfile"
+          trap 'rm -f "$lockfile"' EXIT
 
-        # Create a unique lock file so forked processes can track if precisely
-        # this instance of swaylock is still running
-        lockfile="/tmp/swaylock-lock-$$-$(date +%s)"
-        touch "$lockfile"
-        trap 'rm -f "$lockfile"' EXIT
-
-        ${preLock}
-        ${getExe config.programs.swaylock.package} &
-        SWAYLOCK_PID=$!
-        ${postLock}
-        wait $SWAYLOCK_PID
-        ${postUnlock}
-
-      '';
+          ${preLock}
+          ${getExe config.programs.swaylock.package} &
+          SWAYLOCK_PID=$!
+          ${postLock}
+          wait $SWAYLOCK_PID
+          ${postUnlock}
+        '';
     };
 in
 mkIf (cfg.enable && isWayland) {
@@ -90,7 +92,7 @@ mkIf (cfg.enable && isWayland) {
       indicator = true;
       indicator-caps-lock = true;
       indicator-y-position = builtins.floor (primaryMonitor.height * 0.5);
-      indicator-radius = builtins.floor (primaryMonitor.width * 0.04);
+      indicator-radius = builtins.floor (primaryMonitor.width * 4.0e-2);
 
       text-color = "#${colors.base07}";
 

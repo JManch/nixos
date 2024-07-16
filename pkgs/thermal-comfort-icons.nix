@@ -1,7 +1,8 @@
-{ lib
-, stdenvNoCC
-, fetchFromGitHub
-, ...
+{
+  lib,
+  stdenvNoCC,
+  fetchFromGitHub,
+  ...
 }:
 stdenvNoCC.mkDerivation rec {
   pname = "thermal-comfort-icons";
@@ -23,7 +24,10 @@ stdenvNoCC.mkDerivation rec {
   meta = with lib; {
     homepage = "https://github.com/rautesamtr/thermal_comfort_icons";
     description = "Thermal Comfort custom icons for Home Assistant";
-    license = with licenses; [ mit asl20 ];
+    license = with licenses; [
+      mit
+      asl20
+    ];
     maintainers = with maintainers; [ JManch ];
     platforms = platforms.linux;
   };

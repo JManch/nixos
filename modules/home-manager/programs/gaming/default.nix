@@ -1,4 +1,9 @@
-{ lib, config, osConfig', ... }:
+{
+  lib,
+  config,
+  osConfig',
+  ...
+}:
 let
   inherit (lib)
     mkIf
@@ -8,7 +13,8 @@ let
     types
     concatStringsSep
     concatStrings
-    optional;
+    optional
+    ;
   inherit (config.modules.desktop) hyprland;
   cfg = config.modules.programs.gaming;
   osGaming = osConfig'.modules.programs.gaming or null;
@@ -55,9 +61,7 @@ in
         let
           inherit (config.modules.programs.gaming) tearingExcludedClasses gameClasses;
           tearingRegex = concatStringsSep "|" gameClasses;
-          tearingExcludedRegex = concatStrings (
-            map (class: "(?!${class}$)") tearingExcludedClasses
-          );
+          tearingExcludedRegex = concatStrings (map (class: "(?!${class}$)") tearingExcludedClasses);
         in
         _: "^${tearingExcludedRegex}(${tearingRegex})$";
       description = ''
@@ -68,8 +72,7 @@ in
   };
 
   config = mkIf (osGaming.enable or false) {
-    modules.programs.gaming.gameClasses =
-      optional osGaming.gamescope.enable "\\.?gamescope.*";
+    modules.programs.gaming.gameClasses = optional osGaming.gamescope.enable "\\.?gamescope.*";
 
     desktop.hyprland.settings.windowrulev2 = [
       "workspace name:GAME, class:${cfg.gameRegex}"

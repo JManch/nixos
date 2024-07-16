@@ -1,12 +1,16 @@
-{ lib, config, username, ... }:
+{
+  lib,
+  config,
+  username,
+  ...
+}:
 let
   inherit (lib) mkIf utils mkForce;
   cfg = config.modules.system.desktop;
   homeConfig = config.home-manager.users.${username};
   hyprlandPackage = homeConfig.wayland.windowManager.hyprland.package;
 in
-mkIf (cfg.enable && utils.isHyprland config)
-{
+mkIf (cfg.enable && utils.isHyprland config) {
   # The purpose of enabling hyprland here (in addition to enabling it in
   # home-manager) is to create the hyprland.desktop session file which
   # enables login GUI managers to launch hyprland. However we use greetd
@@ -32,7 +36,5 @@ mkIf (cfg.enable && utils.isHyprland config)
   # We configure xdg-portal with home-manager
   xdg.portal.enable = mkForce false;
 
-  modules.services.greetd.sessionDirs = [
-    "${hyprlandPackage}/share/wayland-sessions"
-  ];
+  modules.services.greetd.sessionDirs = [ "${hyprlandPackage}/share/wayland-sessions" ];
 }

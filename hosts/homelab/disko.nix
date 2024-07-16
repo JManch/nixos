@@ -1,8 +1,6 @@
 { inputs, ... }:
 {
-  imports = [
-    inputs.disko.nixosModules.default
-  ];
+  imports = [ inputs.disko.nixosModules.default ];
 
   disko.devices = {
     # The attribute name of the disk gets used for the disk partlabel
@@ -24,7 +22,10 @@
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
-              mountOptions = [ "defaults" "umask=0077" ];
+              mountOptions = [
+                "defaults"
+                "umask=0077"
+              ];
             };
           };
           zfs = {
@@ -40,7 +41,10 @@
 
     nodev."/" = {
       fsType = "tmpfs";
-      mountOptions = [ "defaults" "mode=755" ];
+      mountOptions = [
+        "defaults"
+        "mode=755"
+      ];
     };
 
     zpool.zroot = {

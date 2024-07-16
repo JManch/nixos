@@ -1,10 +1,14 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   cfg = config.modules.programs.zed;
   jsonFormat = pkgs.formats.json { };
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   home.packages = [ pkgs.zed-editor ];
 
   xdg.configFile."zed/settings.json".source = jsonFormat.generate "settings.json" {
@@ -28,7 +32,5 @@ lib.mkIf cfg.enable
     inlay_hints.enabled = true;
   };
 
-  persistence.directories = [
-    ".local/share/zed"
-  ];
+  persistence.directories = [ ".local/share/zed" ];
 }

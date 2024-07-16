@@ -1,9 +1,13 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   cfg = config.modules.programs.qbittorrent;
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   home.packages = [ pkgs.qbittorrent ];
 
   persistence.directories = [

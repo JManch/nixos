@@ -3,8 +3,7 @@ let
   inherit (config.modules.desktop) style;
   cfg = config.modules.programs.foot;
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   programs.foot = {
     enable = true;
 

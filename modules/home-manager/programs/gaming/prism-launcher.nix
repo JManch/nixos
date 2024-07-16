@@ -1,15 +1,15 @@
-{ lib
-, pkgs
-, config
-, osConfig'
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  ...
 }:
 let
   inherit (lib) mkIf utils;
   cfg = config.modules.programs.gaming.prism-launcher;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   home.packages = [ pkgs.prismlauncher ];
 
   modules.programs.gaming.gameClasses = [ "Minecraft.*" ];

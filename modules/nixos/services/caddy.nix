@@ -1,10 +1,11 @@
-{ lib
-, pkgs
-, config
-, inputs
-, hostname
-, adminUsername
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  hostname,
+  adminUsername,
+  ...
 }:
 let
   inherit (lib)
@@ -17,7 +18,8 @@ let
     toUpper
     concatMapStrings
     concatMapStringsSep
-    genAttrs;
+    genAttrs
+    ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
   cfg = config.modules.services.caddy;
@@ -26,59 +28,58 @@ let
     let
       # We define these here rather than in the modules where they are used so that
       # certificates can be generated on devices other than the server
-      certDomains = [
-        "home-wan"
-      ];
+      certDomains = [ "home-wan" ];
 
-      genDomain = domain: /*bash*/ ''
-        openssl genrsa -out "$temp/${domain}.key" 4096
-        openssl req -new -sha256 -key "$temp/${domain}.key" -out "$temp/${domain}.csr" \
-          -subj "/C=GB/O=${toUpper hostname}/CN=${domain}.${fqDomain}"
-        openssl x509 -req -in "$temp/${domain}.csr" -CA "$temp/rootCA.crt" -CAkey "$temp/rootCA.key" -CAcreateserial -out "$temp/${domain}.crt" -days 365 -sha256
-        cat "$temp/${domain}.crt" "$temp/${domain}.key" > "$temp/${domain}.pem"
-        openssl pkcs12 -export -out "$dir/${domain}.p12" -inkey "$temp/${domain}.key" -in "$temp/${domain}.pem" 
-        mv "$temp/${domain}.crt" "$dir"
-      '';
+      genDomain =
+        domain: # bash
+        ''
+          openssl genrsa -out "$temp/${domain}.key" 4096
+          openssl req -new -sha256 -key "$temp/${domain}.key" -out "$temp/${domain}.csr" \
+            -subj "/C=GB/O=${toUpper hostname}/CN=${domain}.${fqDomain}"
+          openssl x509 -req -in "$temp/${domain}.csr" -CA "$temp/rootCA.crt" -CAkey "$temp/rootCA.key" -CAcreateserial -out "$temp/${domain}.crt" -days 365 -sha256
+          cat "$temp/${domain}.crt" "$temp/${domain}.key" > "$temp/${domain}.pem"
+          openssl pkcs12 -export -out "$dir/${domain}.p12" -inkey "$temp/${domain}.key" -in "$temp/${domain}.pem" 
+          mv "$temp/${domain}.crt" "$dir"
+        '';
     in
     pkgs.writeShellApplication {
       name = "generate-caddy-certs";
       runtimeInputs = [ pkgs.openssl ];
-      text = /*bash*/ ''
-        umask 077
-        dir="generated-certs"
-        if [ ! -d "$dir" ]; then
-            mkdir "$dir"
-        else
-            echo "Output directory '$dir' already exists"
-            exit 1
-        fi
+      text = # bash
+        ''
+          umask 077
+          dir="generated-certs"
+          if [ ! -d "$dir" ]; then
+              mkdir "$dir"
+          else
+              echo "Output directory '$dir' already exists"
+              exit 1
+          fi
 
-        temp=$(mktemp -d)
-        cleanup() {
-          rm -rf "$temp"
-        }
-        trap cleanup EXIT
+          temp=$(mktemp -d)
+          cleanup() {
+            rm -rf "$temp"
+          }
+          trap cleanup EXIT
 
-        # Generate new root certificate authority
-        openssl genrsa -out "$temp/rootCA.key" 4096
-        openssl req -x509 -new -nodes -key "$temp/rootCA.key" -sha256 -days 365 -out "$temp/rootCA.crt" \
-          -subj "/C=GB/O=${toUpper hostname}/CN=Joshua's Root Certificate"
+          # Generate new root certificate authority
+          openssl genrsa -out "$temp/rootCA.key" 4096
+          openssl req -x509 -new -nodes -key "$temp/rootCA.key" -sha256 -days 365 -out "$temp/rootCA.crt" \
+            -subj "/C=GB/O=${toUpper hostname}/CN=Joshua's Root Certificate"
 
-        # Generate leaf certificate for each domain
-        ${concatMapStrings (d: genDomain d) certDomains}
+          # Generate leaf certificate for each domain
+          ${concatMapStrings (d: genDomain d) certDomains}
 
-        mv "$temp/rootCA.crt" "$dir"
-        echo "Update the encrypted certificates in agenix with the new *.crt files in $dir"
-        echo "Import the *.p12 files into browsers and devices you want to grant access to"
-        echo "Unfortunately custom certs do not work on firefox mobile https://bugzilla.mozilla.org/show_bug.cgi?id=1813930, have to use chrome for that now"
-        echo "Remember to backup the *.p12 files somewhere safe"
-      '';
+          mv "$temp/rootCA.crt" "$dir"
+          echo "Update the encrypted certificates in agenix with the new *.crt files in $dir"
+          echo "Import the *.p12 files into browsers and devices you want to grant access to"
+          echo "Unfortunately custom certs do not work on firefox mobile https://bugzilla.mozilla.org/show_bug.cgi?id=1813930, have to use chrome for that now"
+          echo "Remember to backup the *.p12 files somewhere safe"
+        '';
     };
 in
 mkMerge [
-  {
-    users.users.${adminUsername}.packages = [ generateCerts ];
-  }
+  { users.users.${adminUsername}.packages = [ generateCerts ]; }
   (mkIf cfg.enable {
     assertions = utils.asserts [
       (cfg.trustedAddresses != [ ])
@@ -107,12 +108,21 @@ mkMerge [
       '';
     };
 
-    networking.firewall.allowedTCPPorts = [ 443 80 ];
+    networking.firewall.allowedTCPPorts = [
+      443
+      80
+    ];
     networking.firewall.allowedUDPPorts = [ 443 ];
-    modules.system.networking.publicPorts = [ 443 80 ];
+    modules.system.networking.publicPorts = [
+      443
+      80
+    ];
 
     networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
-      allowedTCPPorts = [ 443 80 ];
+      allowedTCPPorts = [
+        443
+        80
+      ];
       allowedUDPPorts = [ 443 ];
     });
 
@@ -120,11 +130,17 @@ mkMerge [
     systemd.services.caddy.serviceConfig = utils.hardeningBaseline config {
       DynamicUser = false;
       PrivateUsers = false;
-      SystemCallFilter = [ "@system-service" "~@resources" ];
+      SystemCallFilter = [
+        "@system-service"
+        "~@resources"
+      ];
       CapabilityBoundingSet = [ "CAP_NET_BIND_SERVICE" ];
       AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
       SocketBindDeny = "any";
-      SocketBindAllow = [ 443 80 ];
+      SocketBindAllow = [
+        443
+        80
+      ];
     };
 
     systemd.services.goaccess =
@@ -151,7 +167,10 @@ mkMerge [
         unitConfig = {
           Description = "GoAccess log analyzer";
           PartOf = [ "caddy.service" ];
-          After = [ "caddy.service" "network.target" ];
+          After = [
+            "caddy.service"
+            "network.target"
+          ];
           StartLimitBurst = 3;
           StartLimitIntervalSec = 30;
         };
@@ -163,9 +182,7 @@ mkMerge [
           User = "caddy";
           Group = "caddy";
           StateDirectory = [ "goaccess" ];
-        } // utils.hardeningBaseline config {
-          DynamicUser = false;
-        };
+        } // utils.hardeningBaseline config { DynamicUser = false; };
 
         wantedBy = [ "multi-user.target" ];
       };
@@ -190,12 +207,14 @@ mkMerge [
       let
         inherit (config.services) caddy;
       in
-      [{
-        directory = "/var/lib/caddy";
-        user = caddy.user;
-        group = caddy.group;
-        mode = "700";
-      }];
+      [
+        {
+          directory = "/var/lib/caddy";
+          user = caddy.user;
+          group = caddy.group;
+          mode = "700";
+        }
+      ];
 
     virtualisation.vmVariant = {
       modules.services.caddy.trustedAddresses = [ "10.0.2.2/32" ];
@@ -211,7 +230,9 @@ mkMerge [
 
         # Prefix every hostname with http://
         virtualHosts = mkVMOverride (
-          mapAttrs (_: value: value // { hostName = ("http://" + value.hostName); }) config.services.caddy.virtualHosts
+          mapAttrs (
+            _: value: value // { hostName = ("http://" + value.hostName); }
+          ) config.services.caddy.virtualHosts
         );
       };
     };

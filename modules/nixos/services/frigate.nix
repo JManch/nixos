@@ -1,11 +1,18 @@
-{ lib
-, config
-, inputs
-, hostname
-, ...
+{
+  lib,
+  config,
+  inputs,
+  hostname,
+  ...
 }:
 let
-  inherit (lib) mkIf mkVMOverride optionalString utils optional;
+  inherit (lib)
+    mkIf
+    mkVMOverride
+    optionalString
+    utils
+    optional
+    ;
   inherit (config.device) ipAddress;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.services) hass mosquitto caddy;
@@ -14,8 +21,7 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.frigate;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     (hostname == "homelab")
     "Frigate is only intended to work on host 'homelab'"
@@ -27,10 +33,18 @@ mkIf cfg.enable
     "The Frigate service requires hardware acceleration. Set `hardware.graphics.enable`."
   ];
 
-  modules.services.frigate.rtspAddress = { channel, subtype, go2rtc ? false }:
+  modules.services.frigate.rtspAddress =
+    {
+      channel,
+      subtype,
+      go2rtc ? false,
+    }:
     "rtsp://${optionalString go2rtc "$"}{FRIGATE_RTSP_USER}:${optionalString go2rtc "$"}{FRIGATE_RTSP_PASSWORD}@${cfg.nvrAddress}:554/cam/realmonitor?channel=${toString channel}&subtype=${toString subtype}";
 
-  users.groups.cctv.members = [ "frigate" "go2rtc" ];
+  users.groups.cctv.members = [
+    "frigate"
+    "go2rtc"
+  ];
 
   networking.hosts.${cfg.nvrAddress} = [ "cctv" ];
 
@@ -54,8 +68,20 @@ mkIf cfg.enable
       # web interface. Frigate actually uses go2rtc for those streams rather
       # than the camera RTSP stream.
       go2rtc.streams = {
-        driveway = (cfg.rtspAddress { channel = 2; subtype = 0; go2rtc = true; });
-        poolhouse = (cfg.rtspAddress { channel = 1; subtype = 0; go2rtc = true; });
+        driveway = (
+          cfg.rtspAddress {
+            channel = 2;
+            subtype = 0;
+            go2rtc = true;
+          }
+        );
+        poolhouse = (
+          cfg.rtspAddress {
+            channel = 1;
+            subtype = 0;
+            go2rtc = true;
+          }
+        );
       };
 
       cameras = {
@@ -67,11 +93,21 @@ mkIf cfg.enable
               # because go2rtc adds overhead. I'd rather have the extra cam
               # connections which 99% of the time will just be 1 for the detect
               # stream.
-              path = (cfg.rtspAddress { channel = 2; subtype = 0; });
+              path = (
+                cfg.rtspAddress {
+                  channel = 2;
+                  subtype = 0;
+                }
+              );
               roles = [ "record" ];
             }
             {
-              path = (cfg.rtspAddress { channel = 2; subtype = 1; });
+              path = (
+                cfg.rtspAddress {
+                  channel = 2;
+                  subtype = 1;
+                }
+              );
               roles = [ "detect" ];
             }
           ];
@@ -89,11 +125,21 @@ mkIf cfg.enable
         poolhouse = {
           ffmpeg.inputs = [
             {
-              path = (cfg.rtspAddress { channel = 1; subtype = 0; });
+              path = (
+                cfg.rtspAddress {
+                  channel = 1;
+                  subtype = 0;
+                }
+              );
               roles = [ "record" ];
             }
             {
-              path = (cfg.rtspAddress { channel = 1; subtype = 1; });
+              path = (
+                cfg.rtspAddress {
+                  channel = 1;
+                  subtype = 1;
+                }
+              );
               roles = [ "detect" ];
             }
           ];
@@ -115,9 +161,7 @@ mkIf cfg.enable
         height = 576;
       };
 
-      objects.track = [
-        "person"
-      ];
+      objects.track = [ "person" ];
 
       record = {
         enabled = true;
@@ -137,7 +181,10 @@ mkIf cfg.enable
     DynamicUser = false;
     ProtectProc = "default";
     ProcSubset = "all";
-    SystemCallFilter = [ "@system-service" "~@privileged" ];
+    SystemCallFilter = [
+      "@system-service"
+      "~@privileged"
+    ];
     # Device access for hw accel
     PrivateDevices = false;
     DeviceAllow = [ ];
@@ -190,8 +237,20 @@ mkIf cfg.enable
       };
 
       streams = {
-        driveway = (cfg.rtspAddress { channel = 2; subtype = 0; go2rtc = true; });
-        poolhouse = (cfg.rtspAddress { channel = 1; subtype = 0; go2rtc = true; });
+        driveway = (
+          cfg.rtspAddress {
+            channel = 2;
+            subtype = 0;
+            go2rtc = true;
+          }
+        );
+        poolhouse = (
+          cfg.rtspAddress {
+            channel = 1;
+            subtype = 0;
+            go2rtc = true;
+          }
+        );
       };
 
       # We not using ffmpeg sources so hardware acceleration isn't needed
@@ -201,10 +260,21 @@ mkIf cfg.enable
 
   systemd.services.go2rtc.serviceConfig = utils.hardeningBaseline config {
     EnvironmentFile = cctvVars.path;
-    RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
-    SystemCallFilter = [ "@system-service" "~@privileged" ];
+    RestrictAddressFamilies = [
+      "AF_UNIX"
+      "AF_INET"
+      "AF_INET6"
+      "AF_NETLINK"
+    ];
+    SystemCallFilter = [
+      "@system-service"
+      "~@privileged"
+    ];
     SocketBindDeny = "any";
-    SocketBindAllow = [ 8554 1984 ] ++ optional cfg.webrtc.enable cfg.webrtc.port;
+    SocketBindAllow = [
+      8554
+      1984
+    ] ++ optional cfg.webrtc.enable cfg.webrtc.port;
     # go2rtc sometimes randomly crashes
     Restart = "on-failure";
     RestartSec = 10;
@@ -217,22 +287,26 @@ mkIf cfg.enable
     allowedUDPPorts = cfg.webrtc.port;
   };
 
-  services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = [{
-    addr = "127.0.0.1";
-    port = cfg.port;
-  }];
+  services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = [
+    {
+      addr = "127.0.0.1";
+      port = cfg.port;
+    }
+  ];
 
   services.caddy.virtualHosts."cctv.${fqDomain}".extraConfig = ''
     ${allowAddresses trustedAddresses}
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 
-  persistence.directories = [{
-    directory = "/var/lib/frigate";
-    user = "frigate";
-    group = "frigate";
-    mode = "700";
-  }];
+  persistence.directories = [
+    {
+      directory = "/var/lib/frigate";
+      user = "frigate";
+      group = "frigate";
+      mode = "700";
+    }
+  ];
 
   virtualisation.vmVariant = {
     services.frigate.settings = {
@@ -247,13 +321,19 @@ mkIf cfg.enable
       rtsp.listen = mkVMOverride ":8554";
     };
 
-    services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = mkVMOverride [{
-      addr = "0.0.0.0";
-      port = cfg.port;
-    }];
+    services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = mkVMOverride [
+      {
+        addr = "0.0.0.0";
+        port = cfg.port;
+      }
+    ];
 
     # NOTE: I can't get the WebRTC stream to work from the VM
-    networking.firewall.allowedTCPPorts = [ cfg.port 1984 8554 ];
+    networking.firewall.allowedTCPPorts = [
+      cfg.port
+      1984
+      8554
+    ];
     networking.firewall.allowedUDPPorts = [ 8554 ];
   };
 }

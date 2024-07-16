@@ -1,11 +1,17 @@
-{ lib
-, pkgs
-, config
-, osConfig'
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  ...
 }:
 let
-  inherit (lib) mkIf optional getExe utils;
+  inherit (lib)
+    mkIf
+    optional
+    getExe
+    utils
+    ;
   inherit (config.modules.programs) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
   inherit (config.home) homeDirectory;
@@ -28,65 +34,63 @@ let
     in
     pkgs.writeShellApplication {
       name = "hypr-twitch-workspace";
-      runtimeInputs = (with pkgs; [
-        coreutils
-        chatterino2
-        socat
-      ]) ++ [
-        config.programs.firefox.finalPackage
-        config.wayland.windowManager.hyprland.package
-      ];
-      text = /*bash*/ ''
-
-        # If a new window is created in the twitch workspace correct the
-        # splitratio and move firefox and MPV windows to the left
-        open_window() {
-          IFS=',' read -r -a args <<< "$1"
-          window_address="''${args[0]#*>>}"
-          workspace_name="''${args[1]}"
-          window_class="''${args[2]}"
-          if [[ "$workspace_name" =~ ^(name:|)TWITCH$ ]]; then
-            if [[ "$window_class" == "mpv" || "$window_class" == "firefox" ]]; then
-              hyprctl --batch "dispatch focuswindow address:0x$window_address; dispatch movewindow l"
-              hyprctl dispatch splitratio exact ${toString chatterinoRatio}
+      runtimeInputs =
+        (with pkgs; [
+          coreutils
+          chatterino2
+          socat
+        ])
+        ++ [
+          config.programs.firefox.finalPackage
+          config.wayland.windowManager.hyprland.package
+        ];
+      text = # bash
+        ''
+          # If a new window is created in the twitch workspace correct the
+          # splitratio and move firefox and MPV windows to the left
+          open_window() {
+            IFS=',' read -r -a args <<< "$1"
+            window_address="''${args[0]#*>>}"
+            workspace_name="''${args[1]}"
+            window_class="''${args[2]}"
+            if [[ "$workspace_name" =~ ^(name:|)TWITCH$ ]]; then
+              if [[ "$window_class" == "mpv" || "$window_class" == "firefox" ]]; then
+                hyprctl --batch "dispatch focuswindow address:0x$window_address; dispatch movewindow l"
+                hyprctl dispatch splitratio exact ${toString chatterinoRatio}
+              fi
             fi
-          fi
-        }
+          }
 
-        # Initialise the twitch workspace with firefox and chatterino
-        create_workspace() {
-          workspace_name="''${1#*>>}"
-          if [[ "$workspace_name" == "TWITCH" ]]; then
-            chatterino > /dev/null 2>&1 &
-            sleep 0.5
-            firefox --new-window twitch.tv/directory > /dev/null 2>&1 &
-          fi
-        }
+          # Initialise the twitch workspace with firefox and chatterino
+          create_workspace() {
+            workspace_name="''${1#*>>}"
+            if [[ "$workspace_name" == "TWITCH" ]]; then
+              chatterino > /dev/null 2>&1 &
+              sleep 0.5
+              firefox --new-window twitch.tv/directory > /dev/null 2>&1 &
+            fi
+          }
 
-        handle() {
-          case $1 in
-            openwindow\>*) open_window "$1" ;;
-            createworkspace\>*) create_workspace "$1" ;;
-          esac
-        }
+          handle() {
+            case $1 in
+              openwindow\>*) open_window "$1" ;;
+              createworkspace\>*) create_workspace "$1" ;;
+            esac
+          }
 
-        # If initial workspace tracking is enabled, Hyprland sets this token in
-        # all exec-once and exec scripts. It makes sense for scripts that
-        # immediately launch clients but because this is a long-running script
-        # that reacts to socket events it doesn't make sense here. It causes
-        # chatterino to unexpectedly open on workspace 1 when the bind is first
-        # used.
-        unset HL_INITIAL_WORKSPACE_TOKEN
-        socat -U - UNIX-CONNECT:"/$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" | while read -r line; do handle "$line"; done
-
-      '';
+          # If initial workspace tracking is enabled, Hyprland sets this token in
+          # all exec-once and exec scripts. It makes sense for scripts that
+          # immediately launch clients but because this is a long-running script
+          # that reacts to socket events it doesn't make sense here. It causes
+          # chatterino to unexpectedly open on workspace 1 when the bind is first
+          # used.
+          unset HL_INITIAL_WORKSPACE_TOKEN
+          socat -U - UNIX-CONNECT:"/$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" | while read -r line; do handle "$line"; done
+        '';
     };
 in
-mkIf cfg.enable
-{
-  home.packages = [
-    pkgs.chatterino2
-  ] ++ optional mpv.enable streamlink;
+mkIf cfg.enable {
+  home.packages = [ pkgs.chatterino2 ] ++ optional mpv.enable streamlink;
 
   # WARNING: Enabling the MPV audio compression adds 4 seconds of latency
   xdg.configFile = mkIf mpv.enable {

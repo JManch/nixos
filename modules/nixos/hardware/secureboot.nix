@@ -1,8 +1,9 @@
-{ lib
-, pkgs
-, config
-, inputs
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  ...
 }:
 let
   inherit (lib) mkIf mkForce optionalString;
@@ -12,9 +13,7 @@ in
 {
   # Requires manual initial setup
   # https://github.com/nix-community/lanzaboote/blob/master/docs/QUICK_START.md
-  imports = [
-    inputs.lanzaboote.nixosModules.lanzaboote
-  ];
+  imports = [ inputs.lanzaboote.nixosModules.lanzaboote ];
 
   # Secure boot is disabled for the very first build of a newly installed
   # system so that I can set it up

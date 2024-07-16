@@ -1,8 +1,9 @@
-{ lib
-, pkgs
-, config
-, inputs
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  ...
 }:
 let
   inherit (lib)
@@ -22,7 +23,8 @@ let
     nameValuePair
     attrNames
     removePrefix
-    substring;
+    substring
+    ;
   inherit (config.modules.services) dns-server-stack;
   inherit (inputs.nix-resources.secrets) fqDomain;
   interfaces = filterAttrs (_: cfg: cfg.enable) config.modules.services.wireguard;
@@ -31,7 +33,8 @@ let
   # NCASE-M1 PFt9p3zx8nAYjU9pbNVRGS4QIvU/Tb18DdVowbcLuFc=
   # HOMELAB 6dVabb2p5miQ5NR0SQJ9oxhgjLMsNnuGhbHJGvanYS4=
 
-  dnsmasqConfig = name: cfg:
+  dnsmasqConfig =
+    name: cfg:
     let
       # Use dns-server-stack dnsmsaq config as baseline
       settings = dns-server-stack.dnsmasqConfig // {
@@ -42,9 +45,9 @@ let
           "/${fqDomain}/"
         ];
 
-        host-record = mapAttrsToList
-          (address: hostname: "${hostname}.lan,${address}")
-          inputs.nix-resources.secrets."${name}WGHosts";
+        host-record = mapAttrsToList (
+          address: hostname: "${hostname}.lan,${address}"
+        ) inputs.nix-resources.secrets."${name}WGHosts";
       };
 
       configFile = dns-server-stack.generateDnsmasqConfig "dnsmasq-wg-${name}.conf" settings;
@@ -60,8 +63,16 @@ let
       serviceConfig = baseline.serviceConfig // {
         ExecStartPre = "${dnsmasq} -C ${configFile} --test";
         ExecStart = "${dnsmasq} -k --user=dnsmasq -C ${configFile}";
-        CapabilityBoundingSet = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" ];
-        AmbientCapabilities = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" ];
+        CapabilityBoundingSet = [
+          "CAP_CHOWN"
+          "CAP_SETUID"
+          "CAP_SETGID"
+        ];
+        AmbientCapabilities = [
+          "CAP_CHOWN"
+          "CAP_SETUID"
+          "CAP_SETGID"
+        ];
         SocketBindAllow = cfg.dns.port;
       };
 
@@ -106,7 +117,8 @@ let
   # Be careful when adding custom routes as their subnets must not encapsulate
   # the subnets of any existing routes.
 
-  interfaceConfig = name: cfg:
+  interfaceConfig =
+    name: cfg:
     let
       iptables = getExe' pkgs.iptables "iptables";
     in
@@ -123,12 +135,14 @@ let
       privateKeyFile = config.age.secrets."wg-${name}-key".path;
       dns = mkIf cfg.dns.enable [ cfg.dns.address ];
 
-      peers = cfg.peers ++ optional (cfg.routerPeer) {
-        publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
-        allowedIPs = cfg.routerAllowedIPs;
-        endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:13232";
-        persistentKeepalive = 25;
-      };
+      peers =
+        cfg.peers
+        ++ optional (cfg.routerPeer) {
+          publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
+          allowedIPs = cfg.routerAllowedIPs;
+          endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:13232";
+          persistentKeepalive = 25;
+        };
 
       # Route incoming DNS traffic on the wireguard interface to the DNS server
       # port. We do not use standard port 53 for the wireguard DNS server
@@ -147,48 +161,62 @@ let
 in
 {
   assertions = utils.asserts (
-    (concatMap
-      (interface:
-        let
-          name = interface.name;
-          cfg = interface.value;
-        in
-        [
-          (config.age.secrets."wg-${name}-key" != null)
-          "A private key secret for the Wireguard VPN interface ${name} is missing"
-          (cfg.dns.host -> dns-server-stack.enable)
-          "The dns server stack must be enabled on this host to allow VPN dns hosting"
-          (cfg.routerPeer -> (cfg.routerAllowedIPs != [ ]))
-          "The routerAllowedIPs list for VPN ${name} must not be empty if routerPeer is enabled"
-        ])
-      (attrsToList interfaces)) ++ [
+    (concatMap (
+      interface:
+      let
+        name = interface.name;
+        cfg = interface.value;
+      in
+      [
+        (config.age.secrets."wg-${name}-key" != null)
+        "A private key secret for the Wireguard VPN interface ${name} is missing"
+        (cfg.dns.host -> dns-server-stack.enable)
+        "The dns server stack must be enabled on this host to allow VPN dns hosting"
+        (cfg.routerPeer -> (cfg.routerAllowedIPs != [ ]))
+        "The routerAllowedIPs list for VPN ${name} must not be empty if routerPeer is enabled"
+      ]
+    ) (attrsToList interfaces))
+    ++ [
       # Check that all interfaces starting with "wg-" in networking.firewall.interfaces are configured wireguard interfaces that are enabled
-      (all (v: v == true) (map (interface: (if (substring 0 3 interface) != "wg-" then true else elem (removePrefix "wg-" interface) (attrNames interfaces))) (attrNames config.networking.firewall.interfaces)))
+      (all (v: v == true) (
+        map (
+          interface:
+          (
+            if (substring 0 3 interface) != "wg-" then
+              true
+            else
+              elem (removePrefix "wg-" interface) (attrNames interfaces)
+          )
+        ) (attrNames config.networking.firewall.interfaces)
+      ))
       "At least one of the wireguard interfaces (interface starting with 'wg-') added to `networking.firewall.interfaces` is not a valid/enabled wireguard interface"
     ]
   );
 
-  networking.wg-quick.interfaces = mapAttrs'
-    (name: cfg: nameValuePair ("wg-" + name) (interfaceConfig name cfg))
-    interfaces;
+  networking.wg-quick.interfaces = mapAttrs' (
+    name: cfg: nameValuePair ("wg-" + name) (interfaceConfig name cfg)
+  ) interfaces;
 
-  networking.firewall.interfaces = mapAttrs'
-    (name: cfg: nameValuePair ("wg-" + name) (mkIf cfg.dns.host {
-      allowedTCPPorts = [ cfg.dns.port ];
-      allowedUDPPorts = [ cfg.dns.port ];
-    }))
-    interfaces;
+  networking.firewall.interfaces = mapAttrs' (
+    name: cfg:
+    nameValuePair ("wg-" + name) (
+      mkIf cfg.dns.host {
+        allowedTCPPorts = [ cfg.dns.port ];
+        allowedUDPPorts = [ cfg.dns.port ];
+      }
+    )
+  ) interfaces;
 
-  systemd.services = mapAttrs'
-    (name: cfg: nameValuePair ("dnsmasq-wg-" + name) (mkIf (cfg.dns.host) (dnsmasqConfig name cfg)))
-    interfaces;
+  systemd.services = mapAttrs' (
+    name: cfg: nameValuePair ("dnsmasq-wg-" + name) (mkIf (cfg.dns.host) (dnsmasqConfig name cfg))
+  ) interfaces;
 
   programs.zsh = {
-    shellAliases = listToAttrs (concatMap
-      (interface: [
+    shellAliases = listToAttrs (
+      concatMap (interface: [
         (nameValuePair "wg-${interface}-up" "sudo systemctl start wg-quick-wg-${interface}")
         (nameValuePair "wg-${interface}-down" "sudo systemctl stop wg-quick-wg-${interface}")
-      ])
-      (attrNames (filterAttrs (_: cfg: !cfg.autoStart) interfaces)));
+      ]) (attrNames (filterAttrs (_: cfg: !cfg.autoStart) interfaces))
+    );
   };
 }

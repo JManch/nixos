@@ -1,11 +1,17 @@
-{ lib
-, pkgs
-, config
-, inputs
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  ...
 }:
 let
-  inherit (lib) mkIf mkMerge utils mkForce;
+  inherit (lib)
+    mkIf
+    mkMerge
+    utils
+    mkForce
+    ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -36,12 +42,14 @@ mkMerge [
     services.printing.enable = true;
 
     hardware.printers = {
-      ensurePrinters = [{
-        name = "Brother-DCP-9015CDW";
-        deviceUri = "ipp://${cfg.client.serverAddress}/printers/Brother-DCP-9015CDW";
-        model = "everywhere";
-        ppdOptions.PageSize = "A4";
-      }];
+      ensurePrinters = [
+        {
+          name = "Brother-DCP-9015CDW";
+          deviceUri = "ipp://${cfg.client.serverAddress}/printers/Brother-DCP-9015CDW";
+          model = "everywhere";
+          ppdOptions.PageSize = "A4";
+        }
+      ];
       ensureDefaultPrinter = "Brother-DCP-9015CDW";
     };
   })
@@ -105,12 +113,14 @@ mkMerge [
 
     # Keep an eye on this for https://github.com/NixOS/nixpkgs/issues/78535
     hardware.printers = {
-      ensurePrinters = [{
-        name = "Brother-DCP-9015CDW";
-        deviceUri = "ipp://printer.lan/ipp/print";
-        model = "everywhere";
-        ppdOptions.PageSize = "A4";
-      }];
+      ensurePrinters = [
+        {
+          name = "Brother-DCP-9015CDW";
+          deviceUri = "ipp://printer.lan/ipp/print";
+          model = "everywhere";
+          ppdOptions.PageSize = "A4";
+        }
+      ];
       ensureDefaultPrinter = "Brother-DCP-9015CDW";
     };
 
@@ -124,8 +134,14 @@ mkMerge [
 
   (mkIf (cfg.client.enable || cfg.server.enable) {
     systemd.services.ensure-printers = {
-      after = [ "network-online.target" "nss-lookup.target" ];
-      wants = [ "network-online.target" "nss-lookup.target" ];
+      after = [
+        "network-online.target"
+        "nss-lookup.target"
+      ];
+      wants = [
+        "network-online.target"
+        "nss-lookup.target"
+      ];
     };
   })
 ]

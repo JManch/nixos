@@ -1,10 +1,11 @@
-{ lib
-, pkgs
-, config
-, hostname
-, osConfig'
-, isWayland
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  hostname,
+  osConfig',
+  isWayland,
+  ...
 }:
 let
   inherit (lib)
@@ -19,7 +20,8 @@ let
     escapeShellArg
     imap1
     sort
-    concatLines;
+    concatLines
+    ;
   inherit (config.modules.desktop.services) hypridle;
   inherit (osConfig'.device) gpu;
   cfg = desktopCfg.services.waybar;
@@ -33,8 +35,7 @@ let
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
   systemctl = getExe' pkgs.systemd "systemctl";
 in
-mkIf (cfg.enable && isWayland)
-{
+mkIf (cfg.enable && isWayland) {
   programs.waybar = {
     enable = true;
     systemd.enable = true;
@@ -47,30 +48,32 @@ mkIf (cfg.enable && isWayland)
     # The output bar patch allows for toggling the bar on specific outputs by
     # sending the SIGRTMIN+<output_number> signal. It disables the custom
     # module signal functionality that I don't use.
-    package = (utils.addPatches pkgs.waybar [
-      ../../../../../../patches/waybarDisableReload.patch
-      ../../../../../../patches/waybarOutputBarToggle.patch
-    ]).override {
-      cavaSupport = false;
-      evdevSupport = true;
-      experimentalPatches = false;
-      hyprlandSupport = true;
-      inputSupport = false;
-      jackSupport = false;
-      mpdSupport = false;
-      mprisSupport = false;
-      nlSupport = true;
-      pulseSupport = true;
-      rfkillSupport = false;
-      runTests = false;
-      sndioSupport = false;
-      swaySupport = false;
-      traySupport = true;
-      udevSupport = false;
-      upowerSupport = false;
-      wireplumberSupport = false;
-      withMediaPlayer = false;
-    };
+    package =
+      (utils.addPatches pkgs.waybar [
+        ../../../../../../patches/waybarDisableReload.patch
+        ../../../../../../patches/waybarOutputBarToggle.patch
+      ]).override
+        {
+          cavaSupport = false;
+          evdevSupport = true;
+          experimentalPatches = false;
+          hyprlandSupport = true;
+          inputSupport = false;
+          jackSupport = false;
+          mpdSupport = false;
+          mprisSupport = false;
+          nlSupport = true;
+          pulseSupport = true;
+          rfkillSupport = false;
+          runTests = false;
+          sndioSupport = false;
+          swaySupport = false;
+          traySupport = true;
+          udevSupport = false;
+          upowerSupport = false;
+          wireplumberSupport = false;
+          withMediaPlayer = false;
+        };
 
     settings = {
       bar = {
@@ -231,23 +234,18 @@ mkIf (cfg.enable && isWayland)
           "hyprland/window"
         ];
 
-        modules-center = [
-          "clock"
-        ];
+        modules-center = [ "clock" ];
 
         modules-right =
           optional hypridle.enable "custom/hypridle"
+          ++ [ "network" ]
+          ++ optional wgnord.enable "custom/vpn"
+          ++ [ "cpu" ]
+          ++ optional gpuModuleEnabled "custom/gpu"
+          ++ optional gamemode.enable "gamemode"
+          ++ [ "memory" ]
+          ++ optional audio.enable "pulseaudio"
           ++ [
-            "network"
-          ] ++
-          optional wgnord.enable "custom/vpn" ++ [
-            "cpu"
-          ] ++
-          optional gpuModuleEnabled "custom/gpu" ++
-          optional gamemode.enable "gamemode" ++ [
-            "memory"
-          ] ++
-          optional audio.enable "pulseaudio" ++ [
             "tray"
             "custom/poweroff"
             "network#hostname"
@@ -262,7 +260,10 @@ mkIf (cfg.enable && isWayland)
   };
 
   darkman.switchApps.waybar = {
-    paths = [ "waybar/config" "waybar/style.css" ];
+    paths = [
+      "waybar/config"
+      "waybar/style.css"
+    ];
     reloadScript = "${systemctl} restart --user waybar";
   };
 

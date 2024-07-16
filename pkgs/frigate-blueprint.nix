@@ -1,4 +1,9 @@
-{ lib, stdenvNoCC, fetchFromGitHub, ... }:
+{
+  lib,
+  stdenvNoCC,
+  fetchFromGitHub,
+  ...
+}:
 stdenvNoCC.mkDerivation rec {
   pname = "frigate-blueprint";
   version = "0.12.0.4";

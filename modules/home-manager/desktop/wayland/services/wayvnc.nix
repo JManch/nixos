@@ -1,11 +1,15 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf getExe';
   cfg = config.modules.desktop.services.wayvnc;
 in
 # TODO: WIP
-mkIf false
-{
+mkIf false {
   home.packages = [ pkgs.wayvnc ];
   systemd.user.services.wayvnc = {
     Unit = {

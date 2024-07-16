@@ -1,8 +1,9 @@
-{ lib
-, pkgs
-, config
-, inputs
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  ...
 }:
 let
   inherit (lib)
@@ -18,7 +19,8 @@ let
     elem
     mapAttrsToList
     getExe
-    mkForce;
+    mkForce
+    ;
   inherit (config.services.minecraft-server) dataDir;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy wireguard;
@@ -27,7 +29,8 @@ let
   serverPackage = pkgs.papermcServers.papermc-1_20_4;
   pluginEnabled = p: elem p cfg.plugins;
 
-  availablePlugins = (import ../../../pkgs/minecraft-plugins { inherit lib pkgs; }).minecraft-plugins
+  availablePlugins =
+    (import ../../../pkgs/minecraft-plugins { inherit lib pkgs; }).minecraft-plugins
     // inputs.nix-resources.packages.${pkgs.system}.minecraft-plugins;
 
   serverIcon = pkgs.fetchurl {
@@ -35,8 +38,7 @@ let
     sha256 = "sha256-rU+Lg9EQGlSiXT5TQ7A7TITSwLRT5RpsbE3JdFDtot8=";
   };
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   services.minecraft-server = {
     enable = true;
     openFirewall = false;
@@ -128,49 +130,53 @@ mkIf cfg.enable
 
   modules.services.minecraft-server.files = mkMerge [
     {
-      "spigot.yml".value = /*yaml*/ ''
-        world-settings:
-          default:
-            entity-tracking-range:
-              players: 128
-              animals: 64
-              monsters: 64
-            merge-radius:
-              exp: 0
-              item: 0
-      '';
+      "spigot.yml".value = # yaml
+        ''
+          world-settings:
+            default:
+              entity-tracking-range:
+                players: 128
+                animals: 64
+                monsters: 64
+              merge-radius:
+                exp: 0
+                item: 0
+        '';
     }
 
     (mkIf (pluginEnabled "aura-skills") {
-      "plugins/AuraSkills/config.yml".value = /*yaml*/ ''
-        on_death:
-          reset_xp: true
-      '';
+      "plugins/AuraSkills/config.yml".value = # yaml
+        ''
+          on_death:
+            reset_xp: true
+        '';
     })
 
     (mkIf (pluginEnabled "vivecraft") {
-      "plugins/Vivecraft-Spigot-Extensions/config.yml".value = /*yaml*/ ''
-        bow:
-          standingmultiplier: 1
-          seatedheadshotmultiplier: 2
-        welcomemsg:
-          enabled: true
-          welcomeVanilla: '&player has joined with non-VR!'
-        crawling:
-          enabled: true
-        teleport:
-          enable: false
-      '';
+      "plugins/Vivecraft-Spigot-Extensions/config.yml".value = # yaml
+        ''
+          bow:
+            standingmultiplier: 1
+            seatedheadshotmultiplier: 2
+          welcomemsg:
+            enabled: true
+            welcomeVanilla: '&player has joined with non-VR!'
+          crawling:
+            enabled: true
+          teleport:
+            enable: false
+        '';
     })
 
     (mkIf (pluginEnabled "squaremap") {
-      "plugins/squaremap/config.yml".value = /*yaml*/ ''
-        settings:
-          web-address: https://squaremap.${fqDomain}
-          internal-webserver:
-            bind: 127.0.0.1
-            port: 25566
-      '';
+      "plugins/squaremap/config.yml".value = # yaml
+        ''
+          settings:
+            web-address: https://squaremap.${fqDomain}
+            internal-webserver:
+              bind: 127.0.0.1
+              port: 25566
+        '';
     })
 
     # Some plugins need config to be applied in context of the default config.
@@ -212,58 +218,66 @@ mkIf cfg.enable
       # minecraft-hibernate does it for us
       ExecStop = mkForce "";
     };
-    preStart = mkAfter /*bash*/ ''
-      # Msh setup
-      install -m 640 "${cfg.mshConfig}" "${dataDir}/msh-config.json"
-      ln -fs "${getExe serverPackage}" "${dataDir}/minecraft-server"
-      ln -fs "${serverIcon}" "${dataDir}/server-icon-frozen.png"
+    preStart =
+      # bash
+      mkAfter ''
+        # Msh setup
+        install -m 640 "${cfg.mshConfig}" "${dataDir}/msh-config.json"
+        ln -fs "${getExe serverPackage}" "${dataDir}/minecraft-server"
+        ln -fs "${serverIcon}" "${dataDir}/server-icon-frozen.png"
 
-      # Remove existing plugins
-      readarray -d "" links < <(find "${dataDir}/plugins" -maxdepth 5 -type l -print0)
-        for link in "''${links[@]}"; do
-          if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
-            rm "$link"
-          fi
-        done
+        # Remove existing plugins
+        readarray -d "" links < <(find "${dataDir}/plugins" -maxdepth 5 -type l -print0)
+          for link in "''${links[@]}"; do
+            if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
+              rm "$link"
+            fi
+          done
 
-      # Install new plugins
-      mkdir -p plugins
-      ${concatMapStringsSep "\n" (plugin: /*bash*/ ''
-        ln -fs "${availablePlugins.${plugin}}"/*.jar "${dataDir}/plugins"
-      '') cfg.plugins}
+        # Install new plugins
+        mkdir -p plugins
+        ${concatMapStringsSep "\n" (
+          plugin: # bash
+          ''
+            ln -fs "${availablePlugins.${plugin}}"/*.jar "${dataDir}/plugins"
+          '') cfg.plugins}
 
-      # Install config files
-      # We can't symlink from store because plugins need config write privs as
-      # they merge our provided config with the default config
-      ${concatLines (mapAttrsToList (path: file: /*bash*/ 
-        if file.value != null then ''
-          rm -f "${dataDir}/${path}"
-          install -m 640 -D "${pkgs.writeText "${baseNameOf path}" file.value}" "${dataDir}/${path}"
-        ''
-        else ''
-          rm -f "${dataDir}/${path}"
-          mkdir -p $(dirname "${path}")
-          ${getExe pkgs.patch} -u "${file.reference}" "${pkgs.writeText "${baseNameOf path}.diff" file.diff}" -o "${dataDir}/${path}"
-        ''
-      ) cfg.files)}
-    '';
+        # Install config files
+        # We can't symlink from store because plugins need config write privs as
+        # they merge our provided config with the default config
+        ${concatLines (
+          mapAttrsToList (
+            path: file: # bash
+            if file.value != null then
+              ''
+                rm -f "${dataDir}/${path}"
+                install -m 640 -D "${pkgs.writeText "${baseNameOf path}" file.value}" "${dataDir}/${path}"
+              ''
+            else
+              ''
+                rm -f "${dataDir}/${path}"
+                mkdir -p $(dirname "${path}")
+                ${getExe pkgs.patch} -u "${file.reference}" "${pkgs.writeText "${baseNameOf path}.diff" file.diff}" -o "${dataDir}/${path}"
+              ''
+          ) cfg.files
+        )}
+      '';
   };
 
-  services.caddy.virtualHosts =
-    mkIf (pluginEnabled "squaremap") {
-      "squaremap.${fqDomain}".extraConfig =
-        let
-          addressRange = toString wireguard.friends.address + "/" + toString wireguard.friends.subnet;
-          wgAddresses = optional wireguard.friends.enable addressRange;
-        in
-        ''
-          ${allowAddresses (trustedAddresses ++ wgAddresses)}
-          reverse_proxy http://127.0.0.1:25566
-          handle_errors {
-            respond "Minecraft server is hibernating or offline" 503
-          }
-        '';
-    };
+  services.caddy.virtualHosts = mkIf (pluginEnabled "squaremap") {
+    "squaremap.${fqDomain}".extraConfig =
+      let
+        addressRange = toString wireguard.friends.address + "/" + toString wireguard.friends.subnet;
+        wgAddresses = optional wireguard.friends.enable addressRange;
+      in
+      ''
+        ${allowAddresses (trustedAddresses ++ wgAddresses)}
+        reverse_proxy http://127.0.0.1:25566
+        handle_errors {
+          respond "Minecraft server is hibernating or offline" 503
+        }
+      '';
+  };
 
   networking.firewall = {
     allowedTCPPorts = [ cfg.port ];
@@ -271,84 +285,92 @@ mkIf cfg.enable
   };
 
   # Open ports on additional interfaces
-  networking.firewall.interfaces = (genAttrs cfg.interfaces (_: {
-    allowedTCPPorts = [ cfg.port ];
-    allowedUDPPorts = [ cfg.port ];
-  }));
+  networking.firewall.interfaces = (
+    genAttrs cfg.interfaces (_: {
+      allowedTCPPorts = [ cfg.port ];
+      allowedUDPPorts = [ cfg.port ];
+    })
+  );
 
   backups.minecraft-server =
     let
-      functions = /*bash*/ ''
-        run_cmd_wait_for_message() {
-            local found=false
-            (sleep 5; echo "$1" > "/run/minecraft-server.stdin") &
-            while read -r line; do
-                if [[ $line == *"$2"* ]]; then
-                    found=true;
-                    break;
-                fi
-            done < <(timeout 30 journalctl -u minecraft-server -fqn0)
-            echo $found
-        }
+      functions = # bash
+        ''
+          run_cmd_wait_for_message() {
+              local found=false
+              (sleep 5; echo "$1" > "/run/minecraft-server.stdin") &
+              while read -r line; do
+                  if [[ $line == *"$2"* ]]; then
+                      found=true;
+                      break;
+                  fi
+              done < <(timeout 30 journalctl -u minecraft-server -fqn0)
+              echo $found
+          }
 
-        server_say() {
-            echo "mine say $1" > "/run/minecraft-server.stdin"
-            echo "$1"
-        }
-      '';
+          server_say() {
+              echo "mine say $1" > "/run/minecraft-server.stdin"
+              echo "$1"
+          }
+        '';
 
       preBackupScript = pkgs.writeShellApplication {
         name = "minecraft-server-pre-backup";
         runtimeInputs = with pkgs; [ coreutils ];
-        text = /*bash*/ ''
-          if [ ! -p "/run/minecraft-server.stdin" ]; then exit 0; fi
+        text = # bash
+          ''
+            if [ ! -p "/run/minecraft-server.stdin" ]; then exit 0; fi
 
-          ${functions}
+            ${functions}
 
-          rm -f "/tmp/minecraft-server-save-off"
-          server_running=$(run_cmd_wait_for_message "mine say Performing scheduled backup" "[Server] Performing scheduled backup")
-          if $server_running; then
-              server_say "Disabling auto-save..."
-              if [ "$(run_cmd_wait_for_message "mine save-off" ": Automatic saving is now disabled")" == "false" ]; then
-                  server_say "Failed to disable auto-save, aborting backup"
-                  exit 1
-              fi
-              touch "/tmp/minecraft-server-save-off"
-              sleep 10
-              server_say "Auto-save disabled"
+            rm -f "/tmp/minecraft-server-save-off"
+            server_running=$(run_cmd_wait_for_message "mine say Performing scheduled backup" "[Server] Performing scheduled backup")
+            if $server_running; then
+                server_say "Disabling auto-save..."
+                if [ "$(run_cmd_wait_for_message "mine save-off" ": Automatic saving is now disabled")" == "false" ]; then
+                    server_say "Failed to disable auto-save, aborting backup"
+                    exit 1
+                fi
+                touch "/tmp/minecraft-server-save-off"
+                sleep 10
+                server_say "Auto-save disabled"
 
-              server_say "Flushing pending disk writes..."
-              if [ "$(run_cmd_wait_for_message "mine save-all" ": Saved the game")" == "false" ]; then
-                  server_say "Failed to flush pending disk writes, aborting backup"
-                  exit 1
-              fi
-              sleep 10
-              server_say "Pending disk writes flushed"
-              server_say "Performing backup..."
-          fi
-        '';
+                server_say "Flushing pending disk writes..."
+                if [ "$(run_cmd_wait_for_message "mine save-all" ": Saved the game")" == "false" ]; then
+                    server_say "Failed to flush pending disk writes, aborting backup"
+                    exit 1
+                fi
+                sleep 10
+                server_say "Pending disk writes flushed"
+                server_say "Performing backup..."
+            fi
+          '';
       };
 
       postBackupScript = pkgs.writeShellApplication {
         name = "minecraft-server-post-backup";
         runtimeInputs = with pkgs; [ coreutils ];
-        text = /*bash*/ ''
-          ${functions}
-          if [ -e "/tmp/minecraft-server-save-off" ]; then
-              server_say "Re-enabling auto-save..."
-              if [ "$(run_cmd_wait_for_message "mine save-on" ": Automatic saving is now enabled")" == "false" ]; then
-                  server_say "Failed to re-enable auto-save, reporting failure"
-                  exit 1
-              fi
-              server_say "Auto-save re-enabled"
-              server_say "Backup completed"
-          fi
-        '';
+        text = # bash
+          ''
+            ${functions}
+            if [ -e "/tmp/minecraft-server-save-off" ]; then
+                server_say "Re-enabling auto-save..."
+                if [ "$(run_cmd_wait_for_message "mine save-on" ": Automatic saving is now enabled")" == "false" ]; then
+                    server_say "Failed to re-enable auto-save, reporting failure"
+                    exit 1
+                fi
+                server_say "Auto-save re-enabled"
+                server_say "Backup completed"
+            fi
+          '';
       };
     in
     {
       paths = [ "/var/lib/minecraft" ];
-      exclude = [ "cache" ".cache" ];
+      exclude = [
+        "cache"
+        ".cache"
+      ];
 
       preBackupScript = getExe preBackupScript;
       postBackupScript = getExe postBackupScript;
@@ -357,14 +379,19 @@ mkIf cfg.enable
         preRestoreScript = ''
           sudo systemctl stop minecraft-server
         '';
-        pathOwnership."/var/lib/minecraft" = { user = "minecraft"; group = "minecraft"; };
+        pathOwnership."/var/lib/minecraft" = {
+          user = "minecraft";
+          group = "minecraft";
+        };
       };
     };
 
-  persistence.directories = [{
-    directory = "/var/lib/minecraft";
-    user = "minecraft";
-    group = "minecraft";
-    mode = "755";
-  }];
+  persistence.directories = [
+    {
+      directory = "/var/lib/minecraft";
+      user = "minecraft";
+      group = "minecraft";
+      mode = "755";
+    }
+  ];
 }

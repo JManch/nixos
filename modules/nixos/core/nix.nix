@@ -1,11 +1,12 @@
-{ lib
-, pkgs
-, self
-, config
-, inputs
-, hostname
-, adminUsername
-, ...
+{
+  lib,
+  pkgs,
+  self,
+  config,
+  inputs,
+  hostname,
+  adminUsername,
+  ...
 }:
 let
   inherit (lib)
@@ -17,7 +18,8 @@ let
     mapAttrsToList
     optionalString
     mkForce
-    concatStringsSep;
+    concatStringsSep
+    ;
   inherit (config.modules.system) impermanence;
   cfg = config.modules.core;
   configDir = "/home/${adminUsername}/.config/nixos";
@@ -32,34 +34,39 @@ let
     "diff"
   ];
 
-  rebuildScripts = map
-    (cmd: pkgs.writeShellApplication {
+  rebuildScripts = map (
+    cmd:
+    pkgs.writeShellApplication {
       name = "rebuild-${cmd}";
       runtimeInputs = with pkgs; [ nixos-rebuild ];
       # Always rebuild in ~ because I once had a bad experience where I
       # accidentally built in /nix/store and caused irrepairable corruption
-      text = /*bash*/ ''
-        flake="/home/${adminUsername}/.config/nixos"
-        if [ ! -d $flake ]; then
-          echo "Flake does not exist locally so using remote from github"
-          flake="github:JManch/nixos"
-        fi
-        trap "popd >/dev/null 2>&1 || true" EXIT
-        pushd ~ >/dev/null 2>&1
+      text = # bash
+        ''
+          flake="/home/${adminUsername}/.config/nixos"
+          if [ ! -d $flake ]; then
+            echo "Flake does not exist locally so using remote from github"
+            flake="github:JManch/nixos"
+          fi
+          trap "popd >/dev/null 2>&1 || true" EXIT
+          pushd ~ >/dev/null 2>&1
 
-        nixos-rebuild ${if (cmd == "diff") then "build" else cmd} \
-          --use-remote-sudo --flake "$flake#${hostname}" "$@"
-        ${optionalString (cmd == "diff") /*bash*/ ''
-          nvd diff /run/current-system result
-        ''}
-      '';
-    })
-    rebuildCmds;
+          nixos-rebuild ${if (cmd == "diff") then "build" else cmd} \
+            --use-remote-sudo --flake "$flake#${hostname}" "$@"
+          ${optionalString (cmd == "diff") # bash
+            ''
+              nvd diff /run/current-system result
+            ''
+          }
+        '';
+    }
+  ) rebuildCmds;
 
-  remoteRebuildScripts = map
-    (cmd:
-      let
-        validation = /*bash*/ ''
+  remoteRebuildScripts = map (
+    cmd:
+    let
+      validation = # bash
+        ''
           if [ "$#" = 0 ]; then
             echo "Usage: host-rebuild-${cmd} <hostname>"
             exit 1
@@ -90,58 +97,68 @@ let
             flake="github:JManch/nixos"
           fi
         '';
-      in
-      pkgs.writeShellApplication {
-        name = "host-rebuild-${cmd}";
-        runtimeInputs = with pkgs; [ nixos-rebuild openssh ];
-        text = validation + (if (cmd == "diff") then /*bash*/ ''
-          if [ ! -d "${configDir}" ]; then
-            echo "rebuild-diff requires the flake to exist locally in ${configDir}"
-            exit 1
-          fi
+    in
+    pkgs.writeShellApplication {
+      name = "host-rebuild-${cmd}";
+      runtimeInputs = with pkgs; [
+        nixos-rebuild
+        openssh
+      ];
+      text =
+        validation
+        + (
+          if (cmd == "diff") then # bash
+            ''
+              if [ ! -d "${configDir}" ]; then
+                echo "rebuild-diff requires the flake to exist locally in ${configDir}"
+                exit 1
+              fi
 
-          # Because nixos-rebuild doesn't create a 'result' symlink when
-          # executed with --build-host we first run build locally with
-          # --target-host to ensure that a cached build is on the host and it
-          # won't end up trying to build everything itself
-          nixos-rebuild build --flake "${configDir}#$hostname" --target-host "root@$hostname.lan"
+              # Because nixos-rebuild doesn't create a 'result' symlink when
+              # executed with --build-host we first run build locally with
+              # --target-host to ensure that a cached build is on the host and it
+              # won't end up trying to build everything itself
+              nixos-rebuild build --flake "${configDir}#$hostname" --target-host "root@$hostname.lan"
 
-          # For some reason running nixos-rebuild build --target-host sends a
-          # system with a different root system hash to the one built locally.
-          # Therefore we have to generate the "result" symlink on the remote host
-          # by building locally. Downside is the remote host has to run nix
-          # evaluation itself.
+              # For some reason running nixos-rebuild build --target-host sends a
+              # system with a different root system hash to the one built locally.
+              # Therefore we have to generate the "result" symlink on the remote host
+              # by building locally. Downside is the remote host has to run nix
+              # evaluation itself.
 
-          # Package current config and send to remote host
-          tar -cf /tmp/nixos-diff-config.tar -C ${configDir} .
-          ssh "root$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
-          scp /tmp/nixos-diff-config.tar "root@$hostname.lan:/tmp/nixos-diff-config"
+              # Package current config and send to remote host
+              tar -cf /tmp/nixos-diff-config.tar -C ${configDir} .
+              ssh "root$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
+              scp /tmp/nixos-diff-config.tar "root@$hostname.lan:/tmp/nixos-diff-config"
 
-          # Build new configuration on remote host and generate result
-          # symlink. Diff the result with the current system
-          # shellcheck disable=SC2029
-          ssh "root@$hostname.lan" "sh -c \
-            'cd /tmp/nixos-diff-config && \
-            tar -xf nixos-diff-config.tar && \
-            nixos-rebuild build --flake .#$hostname && \
-            nvd --color always diff /run/current-system ./result; \
-            rm -rf /tmp/nixos-diff-config'"
-
-        '' else /*bash*/ ''
-
-          # Always build and store result to prevent GC deleting builds for remote hosts
-          remote_builds="/home/${adminUsername}/.remote-builds/$hostname"
-          mkdir -p "$remote_builds"
-          trap "popd >/dev/null 2>&1 || true" EXIT
-          pushd "$remote_builds" >/dev/null 2>&1
-          nixos-rebuild build --flake "$flake#$hostname" "''${@:2}"
-          ${optionalString (cmd != "build") /*bash*/ ''
-            nixos-rebuild ${cmd} --use-remote-sudo --flake "$flake#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
-          ''}
-
-        '');
-      })
-    rebuildCmds;
+              # Build new configuration on remote host and generate result
+              # symlink. Diff the result with the current system
+              # shellcheck disable=SC2029
+              ssh "root@$hostname.lan" "sh -c \
+                'cd /tmp/nixos-diff-config && \
+                tar -xf nixos-diff-config.tar && \
+                nixos-rebuild build --flake .#$hostname && \
+                nvd --color always diff /run/current-system ./result; \
+                rm -rf /tmp/nixos-diff-config'"
+            ''
+          # bash
+          else
+            ''
+              # Always build and store result to prevent GC deleting builds for remote hosts
+              remote_builds="/home/${adminUsername}/.remote-builds/$hostname"
+              mkdir -p "$remote_builds"
+              trap "popd >/dev/null 2>&1 || true" EXIT
+              pushd "$remote_builds" >/dev/null 2>&1
+              nixos-rebuild build --flake "$flake#$hostname" "''${@:2}"
+              ${optionalString (cmd != "build") # bash
+                ''
+                  nixos-rebuild ${cmd} --use-remote-sudo --flake "$flake#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
+                ''
+              }
+            ''
+        );
+    }
+  ) rebuildCmds;
 in
 {
   users.users.${adminUsername}.packages = [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts;
@@ -276,15 +293,16 @@ in
   ];
 
   hmAdmin.programs.zsh = {
-    initExtra = /*bash*/ ''
-      inspect-host() {
-        if [ -z "$1" ]; then
-          echo "Usage: inspect-host <hostname>"
-          return 1
-        fi
-        nixos-rebuild repl --flake "${configDir}#$1"
-      }
-    '';
+    initExtra = # bash
+      ''
+        inspect-host() {
+          if [ -z "$1" ]; then
+            echo "Usage: inspect-host <hostname>"
+            return 1
+          fi
+          nixos-rebuild repl --flake "${configDir}#$1"
+        }
+      '';
 
     shellAliases = {
       mount-nix-tmp = mkIf impermanence.enable "sudo mount --bind /persist/var/nix-tmp /var/nix-tmp";

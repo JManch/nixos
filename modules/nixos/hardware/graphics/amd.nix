@@ -1,16 +1,23 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf mkBefore;
 
   amdgpu_top = pkgs.amdgpu_top.overrideAttrs (oldAttrs: {
-    postInstall = oldAttrs.postInstall + /*bash*/ ''
-      substituteInPlace $out/share/applications/amdgpu_top.desktop \
-        --replace "Name=AMDGPU TOP (GUI)" "Name=AMDGPU Top"
-    '';
+    postInstall =
+      oldAttrs.postInstall
+      # bash
+      + ''
+        substituteInPlace $out/share/applications/amdgpu_top.desktop \
+          --replace "Name=AMDGPU TOP (GUI)" "Name=AMDGPU Top"
+      '';
   });
 in
-mkIf (config.device.gpu.type == "amd")
-{
+mkIf (config.device.gpu.type == "amd") {
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
   environment.systemPackages = [ amdgpu_top ];
   services.xserver.videoDrivers = [ "modesetting" ];

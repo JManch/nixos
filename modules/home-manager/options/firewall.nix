@@ -23,15 +23,17 @@
 let
   inherit (lib) mkOption types;
 
-  canonicalizePortList =
-    ports: lib.unique (builtins.sort builtins.lessThan ports);
+  canonicalizePortList = ports: lib.unique (builtins.sort builtins.lessThan ports);
 
   commonOptions = {
     allowedTCPPorts = mkOption {
       type = types.listOf types.port;
       default = [ ];
       apply = canonicalizePortList;
-      example = [ 22 80 ];
+      example = [
+        22
+        80
+      ];
       description = ''
         List of TCP ports on which incoming connections are
         accepted.
@@ -41,7 +43,12 @@ let
     allowedTCPPortRanges = mkOption {
       type = types.listOf (types.attrsOf types.port);
       default = [ ];
-      example = [{ from = 8999; to = 9003; }];
+      example = [
+        {
+          from = 8999;
+          to = 9003;
+        }
+      ];
       description = ''
         A range of TCP ports on which incoming connections are
         accepted.
@@ -61,7 +68,12 @@ let
     allowedUDPPortRanges = mkOption {
       type = types.listOf (types.attrsOf types.port);
       default = [ ];
-      example = [{ from = 60000; to = 61000; }];
+      example = [
+        {
+          from = 60000;
+          to = 61000;
+        }
+      ];
       description = ''
         Range of open UDP ports.
       '';
@@ -72,7 +84,7 @@ in
   options.firewall = {
     interfaces = mkOption {
       default = { };
-      type = with types; attrsOf (submodule [{ options = commonOptions; }]);
+      type = with types; attrsOf (submodule [ { options = commonOptions; } ]);
       description = ''
         Interface-specific open ports.
       '';

@@ -1,11 +1,16 @@
 { lib, config, ... }:
 let
-  inherit (lib) mkIf utils genAttrs elem remove;
+  inherit (lib)
+    mkIf
+    utils
+    genAttrs
+    elem
+    remove
+    ;
   inherit (config.modules.system.networking) primaryInterface;
   cfg = config.modules.services.avahi;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     (cfg.interfaces != [ ])
     "Avahi interface list cannot be empty"

@@ -1,9 +1,10 @@
-{ lib
-, pkgs
-, config
-, osConfig'
-, ...
-} @ args:
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  ...
+}@args:
 let
   inherit (lib)
     mkIf
@@ -14,7 +15,8 @@ let
     elem
     types
     literalExpression
-    mkEnableOption;
+    mkEnableOption
+    ;
   cfg = config.modules.desktop;
 
   terminalSubmodule = {
@@ -60,10 +62,11 @@ in
       type = types.bool;
       readOnly = true;
       default =
-        cfg.enable &&
-        ((elem cfg.windowManager utils.waylandWindowManagers)
-        ||
-        (elem osConfig'.modules.system.desktop.desktopEnvironment utils.waylandDesktopEnvironments));
+        cfg.enable
+        && (
+          (elem cfg.windowManager utils.waylandWindowManagers)
+          || (elem osConfig'.modules.system.desktop.desktopEnvironment utils.waylandDesktopEnvironments)
+        );
     };
 
     style = {
@@ -133,18 +136,20 @@ in
       osDesktop = osConfig'.modules.system.desktop;
     in
     {
-      assertions = mkIf cfg.enable (utils.asserts [
-        (osConfig' != null)
-        "Desktop modules are not supported on standalone home-manager deployments"
-        osDesktop.enable
-        "You cannot enable home-manager desktop if NixOS desktop is not enabled"
-        (cfg.windowManager != null -> osDesktop.desktopEnvironment == null)
-        "You cannot use a desktop environment with a window manager"
-        (cfg.windowManager != null -> length osConfig'.device.monitors != 0)
-        "Device monitors must be configured to use a window manager"
-        (cfg.terminal != null)
-        "Desktop default terminal must be set"
-      ]);
+      assertions = mkIf cfg.enable (
+        utils.asserts [
+          (osConfig' != null)
+          "Desktop modules are not supported on standalone home-manager deployments"
+          osDesktop.enable
+          "You cannot enable home-manager desktop if NixOS desktop is not enabled"
+          (cfg.windowManager != null -> osDesktop.desktopEnvironment == null)
+          "You cannot use a desktop environment with a window manager"
+          (cfg.windowManager != null -> length osConfig'.device.monitors != 0)
+          "Device monitors must be configured to use a window manager"
+          (cfg.terminal != null)
+          "Desktop default terminal must be set"
+        ]
+      );
 
       _module.args = {
         inherit (cfg) isWayland;

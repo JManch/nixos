@@ -1,7 +1,8 @@
-{ lib
-, fetchurl
-, stdenvNoCC
-, ...
+{
+  lib,
+  fetchurl,
+  stdenvNoCC,
+  ...
 }:
 let
   squaremarker = fetchurl {

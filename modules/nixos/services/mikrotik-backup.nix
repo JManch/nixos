@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   inherit (lib) utils mkIf getExe;
   inherit (config.age.secrets) mikrotikBackupKey;
@@ -6,33 +11,37 @@ let
   backupDir = "/var/backup/mikrotik";
   backupScript = pkgs.writeShellApplication {
     name = "mikrotik-backup-script";
-    runtimeInputs = with pkgs; [ coreutils openssh gnugrep ];
-    text = /*bash*/ ''
-      get_backup_file() {
-        # Unfortunately I don't think there's a way to just preserve the time and not the mode
-        scp -p -i ${mikrotikBackupKey.path} "backup@${cfg.routerAddress}:/$1" "${backupDir}/$1.latest"
-        chmod 600 "${backupDir}/$1.latest"
+    runtimeInputs = with pkgs; [
+      coreutils
+      openssh
+      gnugrep
+    ];
+    text = # bash
+      ''
+        get_backup_file() {
+          # Unfortunately I don't think there's a way to just preserve the time and not the mode
+          scp -p -i ${mikrotikBackupKey.path} "backup@${cfg.routerAddress}:/$1" "${backupDir}/$1.latest"
+          chmod 600 "${backupDir}/$1.latest"
 
-        if [ -e "${backupDir}/$1" ]; then
-          if [ ! "${backupDir}/$1.latest" -nt "${backupDir}/$1" ]; then
-            echo "Error: new backup of $1 is not newer than the current"
-            rm "${backupDir}/$1.latest"
-            exit 1
+          if [ -e "${backupDir}/$1" ]; then
+            if [ ! "${backupDir}/$1.latest" -nt "${backupDir}/$1" ]; then
+              echo "Error: new backup of $1 is not newer than the current"
+              rm "${backupDir}/$1.latest"
+              exit 1
+            fi
+            cp -p "${backupDir}/$1" "${backupDir}/$1.last"
           fi
-          cp -p "${backupDir}/$1" "${backupDir}/$1.last"
-        fi
 
-        # cp to preserve original timestamp
-        cp -p "${backupDir}/$1.latest" "${backupDir}/$1"
-        rm "${backupDir}/$1.latest"
-      }
-      get_backup_file "export.rsc"
-      get_backup_file "backup.backup"
-    '';
+          # cp to preserve original timestamp
+          cp -p "${backupDir}/$1.latest" "${backupDir}/$1"
+          rm "${backupDir}/$1.latest"
+        }
+        get_backup_file "export.rsc"
+        get_backup_file "backup.backup"
+      '';
   };
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     config.modules.services.restic.enable
     "Mikrotik backup requires Restic backups to be enabled"
@@ -67,14 +76,19 @@ mkIf cfg.enable
   backups.mikrotik = {
     paths = [ backupDir ];
     restore.pathOwnership = {
-      "${backupDir}" = { user = "mikrotik-backup"; group = "mikrotik-backup"; };
+      "${backupDir}" = {
+        user = "mikrotik-backup";
+        group = "mikrotik-backup";
+      };
     };
   };
 
-  persistence.directories = [{
-    directory = backupDir;
-    user = "mikrotik-backup";
-    group = "mikrotik-backup";
-    mode = "700";
-  }];
+  persistence.directories = [
+    {
+      directory = backupDir;
+      user = "mikrotik-backup";
+      group = "mikrotik-backup";
+      mode = "700";
+    }
+  ];
 }

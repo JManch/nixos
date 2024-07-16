@@ -1,9 +1,10 @@
-{ lib
-, pkgs
-, config
-, inputs
-, desktopEnabled
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  desktopEnabled,
+  ...
 }:
 let
   inherit (lib) mkIf getExe';
@@ -15,8 +16,7 @@ let
   darkTheme = gtkThemeFromScheme { scheme = colorScheme.dark; };
   lightTheme = gtkThemeFromScheme { scheme = colorScheme.light; };
 in
-mkIf desktopEnabled
-{
+mkIf desktopEnabled {
   home.packages = mkIf (cfg.style.customTheme) [
     darkTheme
     lightTheme
@@ -43,7 +43,8 @@ mkIf desktopEnabled
       schemas = pkgs.gsettings-desktop-schemas;
       gsettings = getExe' pkgs.glib "gsettings";
     in
-    theme: /*bash*/ ''
+    theme: # bash
+    ''
       export XDG_DATA_DIRS=${schemas}/share/gsettings-schemas/${schemas.name}
       ${gsettings} set org.gnome.desktop.interface gtk-theme ${colorScheme.${theme}.slug}
       ${gsettings} set org.gnome.desktop.interface color-scheme prefer-${theme}

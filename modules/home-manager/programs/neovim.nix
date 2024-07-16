@@ -1,17 +1,17 @@
-{ lib
-, pkgs
-, config
-, inputs
-, osConfig'
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  osConfig',
+  ...
 }:
 let
   inherit (lib) mkIf optionalString optional;
   inherit (config.modules.desktop.services) darkman;
   cfg = config.modules.programs.neovim;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   home.packages = optional cfg.neovide.enable pkgs.neovide;
 
   programs.neovim = {
@@ -76,22 +76,25 @@ mkIf cfg.enable
     let
       inherit (config.modules.programs) alacritty;
     in
-    optionalString alacritty.enable /*bash*/ ''
-      # Disables alacritty opacity when launching nvim
-      nvim() {
-        if [[ -z "$DISPLAY" ]]; then
-          command nvim "$@"
-        else
-          alacritty msg config window.opacity=1; command nvim "$@"; alacritty msg config --reset
-        fi
-      }
-    '';
+    optionalString alacritty.enable # bash
+      ''
+        # Disables alacritty opacity when launching nvim
+        nvim() {
+          if [[ -z "$DISPLAY" ]]; then
+            command nvim "$@"
+          else
+            alacritty msg config window.opacity=1; command nvim "$@"; alacritty msg config --reset
+          fi
+        }
+      '';
 
   # Change theme of all active Neovim instances
-  darkman.switchScripts.neovim = theme: /*bash*/ ''
-    ls "$XDG_RUNTIME_DIR"/nvim.*.0 | xargs -I {} \
-      nvim --server {} --remote-expr "execute('Sunset${if theme == "dark" then "Night" else "Day"}')"
-  '';
+  darkman.switchScripts.neovim =
+    theme: # bash
+    ''
+      ls "$XDG_RUNTIME_DIR"/nvim.*.0 | xargs -I {} \
+        nvim --server {} --remote-expr "execute('Sunset${if theme == "dark" then "Night" else "Day"}')"
+    '';
 
   persistence.directories = [
     ".cache/nvim"

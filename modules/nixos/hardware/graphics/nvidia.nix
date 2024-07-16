@@ -1,10 +1,14 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf;
   inherit (config.modules.system.desktop) isWayland suspend;
 in
-mkIf (config.device.gpu.type == "nvidia")
-{
+mkIf (config.device.gpu.type == "nvidia") {
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [

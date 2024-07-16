@@ -1,12 +1,16 @@
-{ lib, config, inputs, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 let
   inherit (lib) mkIf;
   inherit (secretCfg.templates) gridSellPrice gridBuyPrice;
   cfg = config.modules.services.hass;
   secretCfg = inputs.nix-resources.secrets.hass { inherit lib config; };
 in
-mkIf cfg.enableInternal
-{
+mkIf cfg.enableInternal {
   services.home-assistant.config = {
     recorder.exclude.entities = [ "sensor.powerwall_battery_remaining_time" ];
 
@@ -134,17 +138,26 @@ mkIf cfg.enableInternal
       (
         let
           threshold = 0.8;
-          triggers = (map
-            (enable: {
-              platform = "numeric_state";
-              entity_id = [ "sensor.smoothed_solar_power" ];
-              above = mkIf enable threshold;
-              below = mkIf (!enable) threshold;
-              for.minutes = 10;
-            }) [ true false ]) ++ [{
-            platform = "homeassistant";
-            event = "start";
-          }];
+          triggers =
+            (map
+              (enable: {
+                platform = "numeric_state";
+                entity_id = [ "sensor.smoothed_solar_power" ];
+                above = mkIf enable threshold;
+                below = mkIf (!enable) threshold;
+                for.minutes = 10;
+              })
+              [
+                true
+                false
+              ]
+            )
+            ++ [
+              {
+                platform = "homeassistant";
+                event = "start";
+              }
+            ];
         in
         {
           trigger = triggers;
@@ -171,82 +184,94 @@ mkIf cfg.enableInternal
         name = "Smoothed Solar Power";
         platform = "filter";
         entity_id = "sensor.powerwall_solar_power";
-        filters = [{
-          # The solar power sensor updates every 30 secs
-          filter = "time_simple_moving_average";
-          window_size = "00:05";
-          precision = 2;
-        }];
+        filters = [
+          {
+            # The solar power sensor updates every 30 secs
+            filter = "time_simple_moving_average";
+            window_size = "00:05";
+            precision = 2;
+          }
+        ];
       }
     ];
 
-    switch = [{
-      platform = "template";
-      switches = {
-        hallway_thermostat = {
-          friendly_name = "Hallway Thermostat Switch";
-          value_template = "{{ is_state_attr('climate.hallway', 'hvac_action', 'heating') }}";
+    switch = [
+      {
+        platform = "template";
+        switches = {
+          hallway_thermostat = {
+            friendly_name = "Hallway Thermostat Switch";
+            value_template = "{{ is_state_attr('climate.hallway', 'hvac_action', 'heating') }}";
 
-          turn_on = [{
-            service = "climate.set_temperature";
-            target.entity_id = "climate.hallway";
-            data = {
-              temperature = "{{ state_attr('climate.joshua_thermostat', 'temperature') |float + 2 }}";
-              hvac_mode = "heat";
-            };
-          }];
+            turn_on = [
+              {
+                service = "climate.set_temperature";
+                target.entity_id = "climate.hallway";
+                data = {
+                  temperature = "{{ state_attr('climate.joshua_thermostat', 'temperature') |float + 2 }}";
+                  hvac_mode = "heat";
+                };
+              }
+            ];
 
-          turn_off = [{
-            service = "climate.set_temperature";
-            target.entity_id = "climate.hallway";
-            data = {
-              temperature = 5;
-              hvac_mode = "heat";
-            };
-          }];
+            turn_off = [
+              {
+                service = "climate.set_temperature";
+                target.entity_id = "climate.hallway";
+                data = {
+                  temperature = 5;
+                  hvac_mode = "heat";
+                };
+              }
+            ];
+          };
         };
-      };
-    }];
+      }
+    ];
 
-    climate = [{
-      platform = "generic_thermostat";
-      name = "Joshua Thermostat";
-      heater = "switch.hallway_thermostat";
-      target_sensor = "sensor.joshua_temperature";
-      min_temp = 17;
-      max_temp = 24;
-      target_temp = 19;
-      eco_temp = 17;
-      comfort_temp = 21;
-      # Difference to target temp required to switch on
-      cold_tolerance = 1;
-      # Minimum amount of time before reacting to new switch state
-      min_cycle_duration.minutes = 10;
-      away_temp = 16;
-      precision = 0.5;
-    }];
+    climate = [
+      {
+        platform = "generic_thermostat";
+        name = "Joshua Thermostat";
+        heater = "switch.hallway_thermostat";
+        target_sensor = "sensor.joshua_temperature";
+        min_temp = 17;
+        max_temp = 24;
+        target_temp = 19;
+        eco_temp = 17;
+        comfort_temp = 21;
+        # Difference to target temp required to switch on
+        cold_tolerance = 1;
+        # Minimum amount of time before reacting to new switch state
+        min_cycle_duration.minutes = 10;
+        away_temp = 16;
+        precision = 0.5;
+      }
+    ];
 
-    thermal_comfort = [{
-      custom_icons = true;
-      sensor = [
-        # The unique IDs here are random and have no meaning
-        {
-          name = "Outdoor Thermal Comfort";
-          temperature_sensor = "sensor.outdoor_temperature";
-          humidity_sensor = "sensor.outdoor_humidity";
-          unique_id = "63eaf56b-9edf-42c7-83c7-cbab6f16fec4";
-        }
-        {
-          name = "Joshua Thermal Comfort";
-          temperature_sensor = "sensor.joshua_temperature";
-          humidity_sensor = "sensor.joshua_humidity";
-          sensor_types = [
-            "summer_scharlau_perception"
-            "thoms_discomfort_perception"
-          ];
-          unique_id = "df0a2172-04da-4c25-85ae-a7e40e775abb";
-        }
-      ];
-    }];
+    thermal_comfort = [
+      {
+        custom_icons = true;
+        sensor = [
+          # The unique IDs here are random and have no meaning
+          {
+            name = "Outdoor Thermal Comfort";
+            temperature_sensor = "sensor.outdoor_temperature";
+            humidity_sensor = "sensor.outdoor_humidity";
+            unique_id = "63eaf56b-9edf-42c7-83c7-cbab6f16fec4";
+          }
+          {
+            name = "Joshua Thermal Comfort";
+            temperature_sensor = "sensor.joshua_temperature";
+            humidity_sensor = "sensor.joshua_humidity";
+            sensor_types = [
+              "summer_scharlau_perception"
+              "thoms_discomfort_perception"
+            ];
+            unique_id = "df0a2172-04da-4c25-85ae-a7e40e775abb";
+          }
+        ];
+      }
+    ];
   };
 }

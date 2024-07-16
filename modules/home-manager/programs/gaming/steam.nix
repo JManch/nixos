@@ -1,11 +1,18 @@
-{ lib
-, pkgs
-, config
-, osConfig'
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  ...
 }:
 let
-  inherit (lib) mkIf utils getExe' mapAttrs' nameValuePair;
+  inherit (lib)
+    mkIf
+    utils
+    getExe'
+    mapAttrs'
+    nameValuePair
+    ;
   inherit (config.xdg) dataHome;
   osSteam = osConfig'.modules.programs.gaming.steam or null;
   cfg = config.modules.programs.gaming.steam;
@@ -19,8 +26,7 @@ let
   };
 
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     (osSteam.enable or true)
     "The Steam home-manager module requires the system module to be enabled"
@@ -32,11 +38,12 @@ mkIf cfg.enable
   '';
 
   # Create compatdata symlinks to make finding proton prefixes easier
-  xdg.dataFile = mapAttrs'
-    (gameName: appID: nameValuePair "Steam/steamapps/compatdata/${gameName}" {
+  xdg.dataFile = mapAttrs' (
+    gameName: appID:
+    nameValuePair "Steam/steamapps/compatdata/${gameName}" {
       source = config.lib.file.mkOutOfStoreSymlink "${dataHome}/Steam/steamapps/compatdata/${toString appID}";
-    })
-    steamAppIDs;
+    }
+  ) steamAppIDs;
 
   # WARN: Having third mirrored monitor enabled before launching seems to break
   # games (black screen in content manager). The issue doesn't occur if I
@@ -107,7 +114,5 @@ mkIf cfg.enable
       categories = [ "Game" ];
     };
 
-  persistence.directories = [
-    ".factorio"
-  ];
+  persistence.directories = [ ".factorio" ];
 }

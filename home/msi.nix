@@ -1,4 +1,4 @@
-{ lib, pkgs, ... } @ args:
+{ lib, pkgs, ... }@args:
 {
   home.packages = with pkgs; [
     libreoffice

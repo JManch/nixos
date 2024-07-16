@@ -1,6 +1,16 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
-  inherit (lib) mkIf types mkOption getExe;
+  inherit (lib)
+    mkIf
+    types
+    mkOption
+    getExe
+    ;
   cfg = config.services.beammp-server;
   settingsFormat = pkgs.formats.toml { };
   configFile = settingsFormat.generate "ServerConfig.toml" cfg.settings;
@@ -39,7 +49,14 @@ in
           AuthKey = "";
         };
       };
-      apply = v: v // { General = v.General // { AuthKey = ""; }; };
+      apply =
+        v:
+        v
+        // {
+          General = v.General // {
+            AuthKey = "";
+          };
+        };
       description = ''
         Settings for the BeamMP server. Do not include the auth key, it will
         automatically be added from the authentication key file.
@@ -100,12 +117,19 @@ in
         ProtectKernelTunables = true;
         ProcSubset = "pid";
         RemoveIPC = true;
-        RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" ];
+        RestrictAddressFamilies = [
+          "AF_UNIX"
+          "AF_INET"
+          "AF_INET6"
+        ];
         RestrictNamespaces = true;
         RestrictRealtime = true;
         RestrictSUIDSGID = true;
         SystemCallArchitectures = "native";
-        SystemCallFilter = [ "@system-service" "~@resources" ];
+        SystemCallFilter = [
+          "@system-service"
+          "~@resources"
+        ];
         CapabilityBoundingSet = "";
         AmbientCapabilities = "";
         DeviceAllow = "";

@@ -1,8 +1,9 @@
-{ lib
-, pkgs
-, config
-, osConfig'
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  ...
 }:
 let
   inherit (lib) mkIf utils;
@@ -11,8 +12,7 @@ let
   device = osConfig'.device or null;
   colors = config.colorScheme.palette;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   # WARN: For some reason mangohud toggle does not work in gamescope with the
   # --mangoapp argument. If mangohud is initially hidden with no_display=true,
   # it never shows. If no_display is not set, mangohud will be displayed until

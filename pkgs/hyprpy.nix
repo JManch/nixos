@@ -1,8 +1,9 @@
-{ buildPythonPackage
-, fetchPypi
-, setuptools
-, pydantic
-, ...
+{
+  buildPythonPackage,
+  fetchPypi,
+  setuptools,
+  pydantic,
+  ...
 }:
 buildPythonPackage rec {
   pname = "hyprpy";
@@ -15,11 +16,7 @@ buildPythonPackage rec {
 
   format = "pyproject";
 
-  build-system = [
-    setuptools
-  ];
+  build-system = [ setuptools ];
 
-  dependencies = [
-    pydantic
-  ];
+  dependencies = [ pydantic ];
 }

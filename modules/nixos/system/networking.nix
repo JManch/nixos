@@ -1,10 +1,11 @@
-{ lib
-, pkgs
-, config
-, inputs
-, username
-, hostname
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  username,
+  hostname,
+  ...
 }:
 let
   inherit (lib)
@@ -19,7 +20,8 @@ let
     attrNames
     length
     getExe'
-    allUnique;
+    allUnique
+    ;
   inherit (config.modules.core) homeManager;
   cfg = config.modules.system.networking;
   homeFirewall = config.home-manager.users.${username}.firewall;
@@ -66,8 +68,9 @@ in
           networkConfig.DHCP = true;
           dhcpV4Config.RouteMetric = 1025;
         };
-      } // listToAttrs (imap0
-        (i: vlanId: {
+      }
+      // listToAttrs (
+        imap0 (i: vlanId: {
           name = "2${toString i}-vlan${vlanId}";
           value = {
             matchConfig = {
@@ -77,8 +80,8 @@ in
             networkConfig = cfg.vlans.${vlanId};
             dhcpV4Config.ClientIdentifier = "mac";
           };
-        })
-        vlanIds)
+        }) vlanIds
+      )
     );
 
     # Useful VLAN guide:
@@ -86,8 +89,8 @@ in
     # https://archive.ph/t6bJg
 
     # Netdevs have to be defined before physical interfaces
-    netdevs = listToAttrs (imap0
-      (i: vlanId: {
+    netdevs = listToAttrs (
+      imap0 (i: vlanId: {
         name = "${toString i}-vlan${vlanId}";
         value = {
           netdevConfig = {
@@ -96,25 +99,28 @@ in
           };
           vlanConfig.Id = toInt vlanId;
         };
-      })
-      vlanIds);
+      }) vlanIds
+    );
   };
 
   networking = {
     hostName = hostname;
     useNetworkd = cfg.useNetworkd;
 
-    firewall = {
-      enable = cfg.firewall.enable;
-      defaultInterfaces = cfg.firewall.defaultInterfaces;
-    } // (optionalAttrs homeManager.enable {
-      inherit (homeFirewall)
-        allowedTCPPorts
-        allowedTCPPortRanges
-        allowedUDPPorts
-        allowedUDPPortRanges
-        interfaces;
-    });
+    firewall =
+      {
+        enable = cfg.firewall.enable;
+        defaultInterfaces = cfg.firewall.defaultInterfaces;
+      }
+      // (optionalAttrs homeManager.enable {
+        inherit (homeFirewall)
+          allowedTCPPorts
+          allowedTCPPortRanges
+          allowedUDPPorts
+          allowedUDPPortRanges
+          interfaces
+          ;
+      });
 
     wireless = mkIf cfg.wireless.enable {
       enable = true;
@@ -136,24 +142,22 @@ in
   environment.systemPackages = optional cfg.wireless.enable pkgs.wpa_supplicant_gui;
   systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";
 
-  systemd.services."disable-wifi-on-boot" = mkIf
-    (cfg.wireless.enable && cfg.wireless.disableOnBoot)
-    {
-      restartIfChanged = false;
+  systemd.services."disable-wifi-on-boot" = mkIf (cfg.wireless.enable && cfg.wireless.disableOnBoot) {
+    restartIfChanged = false;
 
-      unitConfig = {
-        Description = "Disable wireless interface on boot";
-        After = [ "systemd-networkd.service" ];
-      };
-
-      serviceConfig = {
-        ExecStart = "${rfkill} block wifi";
-        Type = "oneshot";
-        RemainAfterExit = true;
-      };
-
-      wantedBy = [ "multi-user.target" ];
+    unitConfig = {
+      Description = "Disable wireless interface on boot";
+      After = [ "systemd-networkd.service" ];
     };
+
+    serviceConfig = {
+      ExecStart = "${rfkill} block wifi";
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+
+    wantedBy = [ "multi-user.target" ];
+  };
 
   programs.zsh.shellAliases =
     let

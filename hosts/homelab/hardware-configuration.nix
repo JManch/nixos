@@ -3,7 +3,12 @@
   hardware.cpu.amd.updateMicrocode = true;
 
   boot = {
-    initrd.availableKernelModules = [ "xhci_pci" "ahci" "ehci_pci" "nvme" ];
+    initrd.availableKernelModules = [
+      "xhci_pci"
+      "ahci"
+      "ehci_pci"
+      "nvme"
+    ];
     kernelModules = [ "kvm-amd" ];
 
     # Fixes intermittent ethernet failure

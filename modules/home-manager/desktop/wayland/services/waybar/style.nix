@@ -1,20 +1,29 @@
-{ lib, config, isWayland, ... }:
+{
+  lib,
+  config,
+  isWayland,
+  ...
+}:
 let
   inherit (lib) mkIf;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
 in
-mkIf (cfg.enable && isWayland)
-{
+mkIf (cfg.enable && isWayland) {
   programs.waybar.style =
     let
-      inherit (desktopCfg.style) cornerRadius borderWidth gapSize font;
+      inherit (desktopCfg.style)
+        cornerRadius
+        borderWidth
+        gapSize
+        font
+        ;
       halfCornerRadius = toString (cornerRadius / 2);
       borderWidthStr = toString borderWidth;
     in
-      /*css*/ ''
-
+    # css
+    ''
       @define-color background #${colors.base00};
       @define-color border #${colors.base05};
       @define-color text-dark #${colors.base00};
@@ -112,6 +121,5 @@ mkIf (cfg.enable && isWayland)
       #custom-vpn {
           margin-right: 3px;
       }
-
     '';
 }

@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   inherit (lib)
     mkIf
@@ -6,7 +11,8 @@ let
     mkEnableOption
     mkOption
     types
-    mkPackageOption;
+    mkPackageOption
+    ;
   cfg = config.services.lact;
 in
 {
@@ -25,9 +31,7 @@ in
   config = mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
 
-    environment.etc."lact/config.yaml" = mkIf (cfg.settings != "") {
-      text = cfg.settings;
-    };
+    environment.etc."lact/config.yaml" = mkIf (cfg.settings != "") { text = cfg.settings; };
 
     systemd.services.lact = {
       unitConfig = {

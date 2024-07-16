@@ -1,10 +1,11 @@
-{ lib
-, pkgs
-, pkgs'
-, config
-, inputs
-, hostname
-, ...
+{
+  lib,
+  pkgs,
+  pkgs',
+  config,
+  inputs,
+  hostname,
+  ...
 }:
 let
   inherit (lib)
@@ -18,7 +19,8 @@ let
     mkVMOverride
     mapAttrsToList
     concatStringsSep
-    escapeShellArg;
+    escapeShellArg
+    ;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets) mqttHassPassword;
@@ -28,9 +30,7 @@ let
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 in
 {
-  imports = (utils.scanPaths ./.) ++ [
-    inputs.nix-resources.nixosModules.home-assistant
-  ];
+  imports = (utils.scanPaths ./.) ++ [ inputs.nix-resources.nixosModules.home-assistant ];
 
   config = mkIf cfg.enable {
     assertions = utils.asserts [
@@ -73,26 +73,30 @@ in
         "roborock"
       ] ++ optional mosquitto.enable "mqtt";
 
-      customComponents = [
-        (pkgs.home-assistant-custom-components.miele.overrideAttrs {
-          src = pkgs.fetchFromGitHub {
-            owner = "astrandb";
-            repo = "miele";
-            rev = "refs/tags/v2024.5.0";
-            hash = "sha256-rZSAhH19B0VzIQ6AwJN07zkvIdDHdYvUjizHLmDGh6Y=";
-          };
-        })
-        pkgs.home-assistant-custom-components.adaptive_lighting
-        pkgs'.heatmiser
-        pkgs'.thermal-comfort
-      ] ++ optional frigate.enable (pkgs.home-assistant-custom-components.frigate.overrideAttrs {
-        src = pkgs.fetchFromGitHub {
-          owner = "blakeblackshear";
-          repo = "frigate-hass-integration";
-          rev = "v5.2.0";
-          hash = "sha256-OWpOYNVzowdn0iZfJwhdMrAYeqDpNJvSwHpsJX9fDk4=";
-        };
-      });
+      customComponents =
+        [
+          (pkgs.home-assistant-custom-components.miele.overrideAttrs {
+            src = pkgs.fetchFromGitHub {
+              owner = "astrandb";
+              repo = "miele";
+              rev = "refs/tags/v2024.5.0";
+              hash = "sha256-rZSAhH19B0VzIQ6AwJN07zkvIdDHdYvUjizHLmDGh6Y=";
+            };
+          })
+          pkgs.home-assistant-custom-components.adaptive_lighting
+          pkgs'.heatmiser
+          pkgs'.thermal-comfort
+        ]
+        ++ optional frigate.enable (
+          pkgs.home-assistant-custom-components.frigate.overrideAttrs {
+            src = pkgs.fetchFromGitHub {
+              owner = "blakeblackshear";
+              repo = "frigate-hass-integration";
+              rev = "v5.2.0";
+              hash = "sha256-OWpOYNVzowdn0iZfJwhdMrAYeqDpNJvSwHpsJX9fDk4=";
+            };
+          }
+        );
 
       configWritable = false;
       config = {
@@ -113,14 +117,19 @@ in
           ip_ban_enabled = true;
           login_attempts_threshold = 3;
           use_x_forwarded_for = true;
-          trusted_proxies = [ "127.0.0.1" "::1" ];
+          trusted_proxies = [
+            "127.0.0.1"
+            "::1"
+          ];
         };
 
-        camera = [{
-          platform = "local_file";
-          file_path = "/var/lib/hass/media/lounge_floorplan.png";
-          name = "Lounge Floorplan";
-        }];
+        camera = [
+          {
+            platform = "local_file";
+            file_path = "/var/lib/hass/media/lounge_floorplan.png";
+            name = "Lounge Floorplan";
+          }
+        ];
 
         lovelace.resources = [
           {
@@ -133,11 +142,13 @@ in
           })
         ];
 
-        notify = [{
-          platform = "group";
-          name = "All Notify Devices";
-          services = mapAttrsToList (name: _: { service = name; }) devices;
-        }];
+        notify = [
+          {
+            platform = "group";
+            name = "All Notify Devices";
+            services = mapAttrsToList (name: _: { service = name; }) devices;
+          }
+        ];
       };
     };
 
@@ -166,32 +177,35 @@ in
 
         # Removing existing symbolic links so that packages will uninstall if
         # they're removed from config
-        removeExistingLinks = subdir: /*bash*/ ''
-          readarray -d "" links < <(find "${configDir}/${subdir}" -maxdepth 1 -type l -print0)
-            for link in "''${links[@]}"; do
-              if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
-                rm "$link"
-              fi
-            done
-        '';
+        removeExistingLinks =
+          subdir: # bash
+          ''
+            readarray -d "" links < <(find "${configDir}/${subdir}" -maxdepth 1 -type l -print0)
+              for link in "''${links[@]}"; do
+                if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
+                  rm "$link"
+                fi
+              done
+          '';
       in
-        /*bash*/ ''
-
+      # bash
+      ''
         mkdir -p "${configDir}/www"
         ${removeExistingLinks "www"}
         [[ -d ${configDir}/blueprints/automation/SgtBatten ]] && rm -rf "${configDir}/blueprints/automation/SgtBatten"
         ln -fsn "${thermal-comfort-icons}" "${configDir}/www/thermal_comfort_icons.js"
 
-        ${optionalString frigate.enable /*bash*/ ''
-          ln -fsn "${frigate-hass-card}/frigate-hass-card" "${configDir}/www"
+        ${optionalString frigate.enable # bash
+          ''
+            ln -fsn "${frigate-hass-card}/frigate-hass-card" "${configDir}/www"
 
-          # For reasons I don't understand, blueprints will not work if they
-          # are in a symlinked directory. The blueprint file has to be
-          # symlinked directly.
-          mkdir -p "${configDir}/blueprints/automation/SgtBatten"
-          ln -fsn "${frigate-blueprint}/frigate_notifications.yaml" "${configDir}/blueprints/automation/SgtBatten/frigate_notifications.yaml"
-        ''}
-
+            # For reasons I don't understand, blueprints will not work if they
+            # are in a symlinked directory. The blueprint file has to be
+            # symlinked directly.
+            mkdir -p "${configDir}/blueprints/automation/SgtBatten"
+            ln -fsn "${frigate-blueprint}/frigate_notifications.yaml" "${configDir}/blueprints/automation/SgtBatten/frigate_notifications.yaml"
+          ''
+        }
       '';
 
     modules.services.mosquitto.users = {
@@ -204,10 +218,12 @@ in
     services.postgresql = {
       enable = true;
       ensureDatabases = [ "hass" ];
-      ensureUsers = [{
-        name = "hass";
-        ensureDBOwnership = true;
-      }];
+      ensureUsers = [
+        {
+          name = "hass";
+          ensureDBOwnership = true;
+        }
+      ];
 
       # Version 15 enabled checkout logging by default which is quite verbose.
       # It's useful for debugging performance problems though this is unlikely
@@ -267,9 +283,10 @@ in
             sudo systemctl stop home-assistant
           '';
 
-          postRestoreScript = /*bash*/ ''
-            sudo -u postgres ${pg_restore} -U postgres --dbname postgres --clean --create ${backup}
-          '';
+          postRestoreScript = # bash
+            ''
+              sudo -u postgres ${pg_restore} -U postgres --dbname postgres --clean --create ${backup}
+            '';
         };
     };
 

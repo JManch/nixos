@@ -33,15 +33,23 @@
 # base0D: "#36A3D9"
 # base0E: "#A37ACC"
 # base0F: "#E6BA7E"
-{ lib, config, inputs, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 let
-  inherit (lib) types mkOption genAttrs attrNames;
+  inherit (lib)
+    types
+    mkOption
+    genAttrs
+    attrNames
+    ;
   inherit (config.modules.colorScheme) light dark;
 in
 {
-  imports = [
-    inputs.nix-colors.homeManagerModules.default
-  ];
+  imports = [ inputs.nix-colors.homeManagerModules.default ];
 
   options.modules.colorScheme = {
     dark = mkOption {
@@ -56,18 +64,23 @@ in
       description = ''
         Light color scheme. Uses first eight from dark color scheme.
       '';
-      apply = v: v // {
-        palette = v.palette // (with dark.palette; {
-          base00 = base07;
-          base01 = base06;
-          base02 = base05;
-          base03 = base04;
-          base04 = base03;
-          base05 = base02;
-          base06 = base01;
-          base07 = base00;
-        });
-      };
+      apply =
+        v:
+        v
+        // {
+          palette =
+            v.palette
+            // (with dark.palette; {
+              base00 = base07;
+              base01 = base06;
+              base02 = base05;
+              base03 = base04;
+              base04 = base03;
+              base05 = base02;
+              base06 = base01;
+              base07 = base00;
+            });
+        };
     };
 
     colorMap = mkOption {

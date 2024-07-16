@@ -4,13 +4,14 @@
 # Ctrld and makes it possible to setup custom DNS resolution for devices on the
 # local network. We use the Ctrld dns forwarding proxy because it provides
 # extra statistics to the web UI for monitoring and enables DoH/3.
-{ lib
-, pkgs
-, self
-, pkgs'
-, config
-, inputs
-, ...
+{
+  lib,
+  pkgs,
+  self,
+  pkgs',
+  config,
+  inputs,
+  ...
 }:
 let
   inherit (lib)
@@ -25,7 +26,8 @@ let
     utils
     getExe
     getExe'
-    genAttrs;
+    genAttrs
+    ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.dns-server-stack;
 
@@ -33,16 +35,18 @@ let
   ctrld = utils.addPatches pkgs'.ctrld [ ../../../patches/ctrldSecretEndpoint.patch ];
 
   # Declares hostnames for all devices on my local network
-  homeHosts = inputs.nix-resources.secrets.homeHosts // {
-    "${cfg.routerAddress}" = "router";
-  } //
-    # Add all hosts that have a static local address
-    mapAttrs'
-      (host: v: nameValuePair v.config.device.ipAddress host)
-      (filterAttrs (host: v: v.config.device.ipAddress != null) (utils.hosts self));
+  homeHosts =
+    inputs.nix-resources.secrets.homeHosts
+    // {
+      "${cfg.routerAddress}" = "router";
+    }
+    //
+      # Add all hosts that have a static local address
+      mapAttrs' (host: v: nameValuePair v.config.device.ipAddress host) (
+        filterAttrs (host: v: v.config.device.ipAddress != null) (utils.hosts self)
+      );
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     (config.device.type == "server")
     "DNS server stack can only be used on server devices"
@@ -86,7 +90,12 @@ mkIf cfg.enable
       listener."0".policy = {
         name = "Failover DNS";
         networks = [
-          { "network.0" = [ "upstream.0" "upstream.1" ]; }
+          {
+            "network.0" = [
+              "upstream.0"
+              "upstream.1"
+            ];
+          }
         ];
       };
 
@@ -170,18 +179,18 @@ mkIf cfg.enable
 
     # Host records create PTR entries as well. Using addn-hosts created
     # duplicate entries for some reason so using this instead.
-    host-record = mapAttrsToList
-      (address: hostname: "${hostname}.lan,${address}")
-      homeHosts;
+    host-record = mapAttrsToList (address: hostname: "${hostname}.lan,${address}") homeHosts;
   };
 
   # Open DNS ports in firewall
   networking.firewall.allowedTCPPorts = [ cfg.listenPort ];
   networking.firewall.allowedUDPPorts = [ cfg.listenPort ];
-  networking.firewall.interfaces = (genAttrs cfg.interfaces (_: {
-    allowedTCPPorts = [ cfg.listenPort ];
-    allowedUDPPorts = [ cfg.listenPort ];
-  }));
+  networking.firewall.interfaces = (
+    genAttrs cfg.interfaces (_: {
+      allowedTCPPorts = [ cfg.listenPort ];
+      allowedUDPPorts = [ cfg.listenPort ];
+    })
+  );
 
   # Set nameserver to localhost
   networking.nameservers = mkForce [ "127.0.0.1" ];
@@ -193,19 +202,19 @@ mkIf cfg.enable
     let
       formatKeyValue =
         name: value:
-        if value == true
-        then name
-        else if value == false
-        then "# setting `${name}` explicitly set to false"
-        else lib.generators.mkKeyValueDefault { } "=" name value;
+        if value == true then
+          name
+        else if value == false then
+          "# setting `${name}` explicitly set to false"
+        else
+          lib.generators.mkKeyValueDefault { } "=" name value;
 
       settingsFormat = pkgs.formats.keyValue {
         mkKeyValue = formatKeyValue;
         listsAsDuplicateKeys = true;
       };
     in
-    name: settings:
-      settingsFormat.generate name settings;
+    name: settings: settingsFormat.generate name settings;
 
   systemd.services.dnsmasq =
     let
@@ -227,10 +236,30 @@ mkIf cfg.enable
 
         DynamicUser = false;
         PrivateUsers = false;
-        RestrictAddressFamilies = [ "AF_UNIX" "AF_NETLINK" "AF_INET" "AF_INET6" ];
-        SystemCallFilter = [ "@system-service" "~@resources" ];
-        CapabilityBoundingSet = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
-        AmbientCapabilities = [ "CAP_CHOWN" "CAP_SETUID" "CAP_SETGID" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
+        RestrictAddressFamilies = [
+          "AF_UNIX"
+          "AF_NETLINK"
+          "AF_INET"
+          "AF_INET6"
+        ];
+        SystemCallFilter = [
+          "@system-service"
+          "~@resources"
+        ];
+        CapabilityBoundingSet = [
+          "CAP_CHOWN"
+          "CAP_SETUID"
+          "CAP_SETGID"
+          "CAP_NET_BIND_SERVICE"
+          "CAP_NET_RAW"
+        ];
+        AmbientCapabilities = [
+          "CAP_CHOWN"
+          "CAP_SETUID"
+          "CAP_SETGID"
+          "CAP_NET_BIND_SERVICE"
+          "CAP_NET_RAW"
+        ];
         SocketBindDeny = "any";
         SocketBindAllow = cfg.listenPort;
       };

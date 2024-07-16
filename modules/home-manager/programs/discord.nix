@@ -1,19 +1,17 @@
-{ lib
-, pkgs
-, pkgs'
-, config
-, ...
+{
+  lib,
+  pkgs,
+  pkgs',
+  config,
+  ...
 }:
 let
   cfg = config.modules.programs.discord;
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   home.packages = [
     pkgs.discord
-    (pkgs'.vesktop.override {
-      withMiddleClickScroll = true;
-    })
+    (pkgs'.vesktop.override { withMiddleClickScroll = true; })
   ];
 
   desktop.hyprland.settings.windowrulev2 = [

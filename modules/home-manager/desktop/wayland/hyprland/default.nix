@@ -1,4 +1,4 @@
-{ lib, config, ... } @ args:
+{ lib, config, ... }@args:
 let
   inherit (lib)
     utils
@@ -7,19 +7,41 @@ let
     mkOption
     types
     getExe'
-    escapeShellArg;
+    escapeShellArg
+    ;
   cfg = config.modules.desktop.hyprland;
   hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 in
 {
   imports = lib.utils.scanPaths ./. ++ [
     (mkAliasOptionModule
-      [ "desktop" "hyprland" "binds" ]
-      [ "wayland" "windowManager" "hyprland" "settings" "bind" ])
+      [
+        "desktop"
+        "hyprland"
+        "binds"
+      ]
+      [
+        "wayland"
+        "windowManager"
+        "hyprland"
+        "settings"
+        "bind"
+      ]
+    )
 
     (mkAliasOptionModule
-      [ "desktop" "hyprland" "settings" ]
-      [ "wayland" "windowManager" "hyprland" "settings" ])
+      [
+        "desktop"
+        "hyprland"
+        "settings"
+      ]
+      [
+        "wayland"
+        "windowManager"
+        "hyprland"
+        "settings"
+      ]
+    )
   ];
 
   options.modules.desktop.hyprland = {

@@ -1,6 +1,18 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
-  inherit (lib) mkIf mkEnableOption mkOption types getExe getExe';
+  inherit (lib)
+    mkIf
+    mkEnableOption
+    mkOption
+    types
+    getExe
+    getExe'
+    ;
   cfg = config.services.wgnord;
 in
 {

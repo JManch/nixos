@@ -3,8 +3,7 @@ let
   inherit (lib) mkIf;
   cfg = config.modules.services.fail2ban;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   services.fail2ban = {
     enable = true;
     maxretry = 3;

@@ -4,7 +4,12 @@
 # every couple of seconds (presumably to update the cast progress bar?). With
 # multiple clients watching this can easily throttle the web server and make
 # Jellyfin unusable.
-{ lib, config, inputs, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 let
   inherit (lib)
     mkIf
@@ -15,7 +20,8 @@ let
     optionalString
     mapAttrsToList
     genAttrs
-    attrNames;
+    attrNames
+    ;
   inherit (config.modules.system.networking) publicPorts;
   inherit (config.modules.services) caddy wireguard;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -46,31 +52,48 @@ mkMerge [
 
       serviceConfig = {
         # Bind mount home media directories so jellyfin can access them
-        BindReadOnlyPaths = mapAttrsToList
-          (name: dir: "${dir}:/var/lib/jellyfin/media${optionalString (name != "") "/${name}"}")
-          cfg.mediaDirs;
+        BindReadOnlyPaths = mapAttrsToList (
+          name: dir: "${dir}:/var/lib/jellyfin/media${optionalString (name != "") "/${name}"}"
+        ) cfg.mediaDirs;
         SocketBindDeny = publicPorts;
       };
     };
 
     networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
-      allowedTCPPorts = [ 8096 8920 ];
-      allowedUDPPorts = [ 1900 7359 ];
+      allowedTCPPorts = [
+        8096
+        8920
+      ];
+      allowedUDPPorts = [
+        1900
+        7359
+      ];
     });
 
     # Jellyfin module has good default hardening
 
-    systemd.tmpfiles.rules = map
-      (name: "d /var/lib/jellyfin/media${optionalString (name != "") "/${name}"} 0700 ${jellyfin.user} ${jellyfin.group}")
-      (attrNames cfg.mediaDirs);
+    systemd.tmpfiles.rules = map (
+      name:
+      "d /var/lib/jellyfin/media${
+        optionalString (name != "") "/${name}"
+      } 0700 ${jellyfin.user} ${jellyfin.group}"
+    ) (attrNames cfg.mediaDirs);
 
     backups.jellyfin = {
       paths = [ "/var/lib/jellyfin" ];
-      exclude = [ "transcodes" "media" "log" "metadata" ];
+      exclude = [
+        "transcodes"
+        "media"
+        "log"
+        "metadata"
+      ];
       restore = {
         preRestoreScript = "sudo systemctl stop jellyfin";
         pathOwnership = {
-          "/var/lib/jellyfin" = { user = "jellyfin"; group = "jellyfin"; };
+          "/var/lib/jellyfin" = {
+            user = "jellyfin";
+            group = "jellyfin";
+          };
         };
       };
     };
@@ -89,8 +112,7 @@ mkMerge [
         mode = "700";
       }
     ];
-  }
-  )
+  })
 
   (mkIf cfg.reverseProxy.enable {
     assertions = utils.asserts [

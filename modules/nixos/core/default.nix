@@ -1,11 +1,17 @@
-{ lib
-, pkgs
-, config
-, username
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  username,
+  ...
 }:
 let
-  inherit (lib) utils mkOption mkEnableOption types;
+  inherit (lib)
+    utils
+    mkOption
+    mkEnableOption
+    types
+    ;
 in
 {
   imports = utils.scanPaths ./.;
@@ -42,7 +48,9 @@ in
     environment.defaultPackages = [ ];
     environment.systemPackages = [ pkgs.gitMinimal ];
 
-    _module.args = { inherit (config.modules.core) adminUsername; };
+    _module.args = {
+      inherit (config.modules.core) adminUsername;
+    };
 
     security.sudo.extraConfig = "Defaults lecture=never";
     time.timeZone = "Europe/London";

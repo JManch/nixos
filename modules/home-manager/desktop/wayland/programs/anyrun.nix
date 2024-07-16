@@ -1,25 +1,24 @@
-{ lib
-, pkgs
-, inputs
-, config
-, isWayland
-, ...
-} @ args:
+{
+  lib,
+  pkgs,
+  inputs,
+  config,
+  isWayland,
+  ...
+}@args:
 let
   inherit (lib) mkIf utils getExe';
   cfg = desktopCfg.programs.anyrun;
   desktopCfg = config.modules.desktop;
 in
 {
-  imports = [
-    inputs.anyrun.homeManagerModules.default
-  ];
+  imports = [ inputs.anyrun.homeManagerModules.default ];
 
   config = mkIf (cfg.enable && isWayland) {
     programs.anyrun =
       let
-        color = base:
-          inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorScheme.palette.${base};
+        color =
+          base: inputs.nix-colors.lib.conversions.hexToRGBString "," config.colorScheme.palette.${base};
       in
       {
         enable = true;
@@ -41,8 +40,8 @@ in
           let
             cornerRadius = toString desktopCfg.style.cornerRadius;
           in
-            /*css*/ ''
-
+          # css
+          ''
             * {
               all: unset;
               font-size: 2rem;
@@ -81,7 +80,6 @@ in
               border-radius: ${cornerRadius}px;
               padding: 0.3rem;
             }
-
           '';
       };
 
@@ -91,9 +89,7 @@ in
         anyrun = getExe' config.programs.anyrun.package "anyrun";
       in
       {
-        bindr = [
-          "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} anyrun || ${anyrun}"
-        ];
+        bindr = [ "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} anyrun || ${anyrun}" ];
 
         layerrule = [
           "blur, anyrun"

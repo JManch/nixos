@@ -1,13 +1,22 @@
-{ lib
-, pkgs
-, pkgs'
-, config
-, inputs
-, adminUsername
-, ...
+{
+  lib,
+  pkgs,
+  pkgs',
+  config,
+  inputs,
+  adminUsername,
+  ...
 }:
 let
-  inherit (lib) mkIf getExe getExe' mkForce mkVMOverride optional utils;
+  inherit (lib)
+    mkIf
+    getExe
+    getExe'
+    mkForce
+    mkVMOverride
+    optional
+    utils
+    ;
   inherit (config.modules.system.virtualisation) vmVariant;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -17,7 +26,8 @@ let
     vaultwardenVars
     vaultwardenSMTPVars
     vaultwardenPublicBackupKey
-    healthCheckVaultwarden;
+    healthCheckVaultwarden
+    ;
   cfg = config.modules.services.vaultwarden;
 
   restoreScript = pkgs.writeShellApplication {
@@ -29,67 +39,67 @@ let
       gnutar
       systemd
     ];
-    text = /*bash*/ ''
-      if [ "$#" -ne 2 ]; then
-        echo "Usage: vaultwarden-restore-backup <backup> <encrypted_private_key>"
-        exit 1
-      fi
-
-      if [ "$(id -u)" != "0" ]; then
-         echo "This script must be run as root" >&2
-         exit 1
-      fi
-
-      echo "Tip: if you've restored from the Restic backup you can use the backup at /var/backup/vaultwarden-archive/latest";
-      echo "Be careful to ensure that it's the latest backup because Restic backups do not run as frequently";
-
-      backup=$1
-      key=$2
-      vault="/var/lib/bitwarden_rs"
-
-      if [ ! -d "$vault" ]; then
-        echo "Error: The vaultwarden state directory $vault does not exist" >&2
-        exit 1
-      fi
-
-      if [ ! -e "$backup" ]; then
-        echo "Error: $backup file does not exist" >&2
-        exit 1
-      fi
-
-      if [ ! -e "$key" ]; then
-        echo "Error: $key file does not exist" >&2
-        exit 1
-      fi
-
-      echo "WARNING: All data in the current vault ($vault) will be destroyed and replaced with the backup"
-      read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
-      echo
-      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-          echo "Aborting"
+    text = # bash
+      ''
+        if [ "$#" -ne 2 ]; then
+          echo "Usage: vaultwarden-restore-backup <backup> <encrypted_private_key>"
           exit 1
-      fi;
+        fi
 
-      echo "Hash: $(sha256sum "$backup")"
-      read -p "Does the hash match the expected value? (compare with both email and the hash file) (y/N): " -n 1 -r
-      echo
-      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-          echo "Aborting"
+        if [ "$(id -u)" != "0" ]; then
+           echo "This script must be run as root" >&2
+           exit 1
+        fi
+
+        echo "Tip: if you've restored from the Restic backup you can use the backup at /var/backup/vaultwarden-archive/latest";
+        echo "Be careful to ensure that it's the latest backup because Restic backups do not run as frequently";
+
+        backup=$1
+        key=$2
+        vault="/var/lib/bitwarden_rs"
+
+        if [ ! -d "$vault" ]; then
+          echo "Error: The vaultwarden state directory $vault does not exist" >&2
           exit 1
-      fi;
+        fi
 
-      systemctl stop vaultwarden
-      rm -rf "''${vault:?}/"*
+        if [ ! -e "$backup" ]; then
+          echo "Error: $backup file does not exist" >&2
+          exit 1
+        fi
 
-      age -d "$key" | age -d -i - "$backup" | tar -xjf - -C "$vault"
+        if [ ! -e "$key" ]; then
+          echo "Error: $key file does not exist" >&2
+          exit 1
+        fi
 
-      chown -R vaultwarden:vaultwarden "$vault"
-      echo "Vault successfully restored. The vaultwarden service must be manually started again."
-    '';
+        echo "WARNING: All data in the current vault ($vault) will be destroyed and replaced with the backup"
+        read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
+        echo
+        if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+            echo "Aborting"
+            exit 1
+        fi;
+
+        echo "Hash: $(sha256sum "$backup")"
+        read -p "Does the hash match the expected value? (compare with both email and the hash file) (y/N): " -n 1 -r
+        echo
+        if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+            echo "Aborting"
+            exit 1
+        fi;
+
+        systemctl stop vaultwarden
+        rm -rf "''${vault:?}/"*
+
+        age -d "$key" | age -d -i - "$backup" | tar -xjf - -C "$vault"
+
+        chown -R vaultwarden:vaultwarden "$vault"
+        echo "Vault successfully restored. The vaultwarden service must be manually started again."
+      '';
   };
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     caddy.enable
     "Vaultwarden requires Caddy to be enabled"
@@ -121,10 +131,13 @@ mkIf cfg.enable
 
   # Upstream has good systemd hardening
   systemd.services.vaultwarden.serviceConfig = {
-    EnvironmentFile = (optional (!vmVariant) vaultwardenSMTPVars.path)
-      ++ (optional (!cfg.adminInterface) (pkgs.writeText "vaultwarden-disable-admin" ''
-      ADMIN_TOKEN=""
-    ''));
+    EnvironmentFile =
+      (optional (!vmVariant) vaultwardenSMTPVars.path)
+      ++ (optional (!cfg.adminInterface) (
+        pkgs.writeText "vaultwarden-disable-admin" ''
+          ADMIN_TOKEN=""
+        ''
+      ));
   };
 
   # Run backup twice a day
@@ -139,95 +152,101 @@ mkIf cfg.enable
       publicKey = vaultwardenPublicBackupKey.path;
       cloudBackupScript = pkgs.writeShellApplication {
         name = "vaultwarden-cloud-backup";
-        runtimeInputs = (with pkgs; [
-          coreutils
-          diffutils
-          gnutar
-          bzip2
-          age
-          rclone
-        ]) ++ [ pkgs'.shoutrrr ];
-        text = /*bash*/ ''
-          set -o errtrace
-          umask 0077
-          time=$(date +%s)
+        runtimeInputs =
+          (with pkgs; [
+            coreutils
+            diffutils
+            gnutar
+            bzip2
+            age
+            rclone
+          ])
+          ++ [ pkgs'.shoutrrr ];
+        text = # bash
+          ''
+            set -o errtrace
+            umask 0077
+            time=$(date +%s)
 
-          send_notification() {
-            if [ "$1" = "Failure" ]; then
-              discord_auth=$DISCORD_AUTH_FAILURE
-            else
-              discord_auth=$DISCORD_AUTH_SUCCESS
+            send_notification() {
+              if [ "$1" = "Failure" ]; then
+                discord_auth=$DISCORD_AUTH_FAILURE
+              else
+                discord_auth=$DISCORD_AUTH_SUCCESS
+              fi
+
+              shoutrrr send \
+                --url "discord://$discord_auth" \
+                --title "Vaultwarden Backup $1 $time" \
+                --message "$2"
+
+              shoutrrr send \
+                --url "smtp://$SMTP_URL_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=Vaultwarden%20Backup%20$1%20$time" \
+                --message "$2"
+            }
+
+            on_failure() {
+              echo "Sending failure email"
+              send_notification "Failure" "$(cat <<EOF
+            Time: $(date +"%Y-%m-%d %H:%M:%S")
+            Error: line $LINENO: $BASH_COMMAND failed
+            EOF
+            )"
+            }
+            trap on_failure ERR
+
+            tmp=$(mktemp -d)
+            cleanup() {
+              rm -rf "$tmp"
+            }
+            trap cleanup EXIT
+            cd "$tmp"
+
+            tar -cjf - -C "${backupDir}" . | age -R ${publicKey} -o "$time"
+
+            hash=$(sha256sum "$time")
+            echo "$hash" > "$time-sha256"
+
+            archive_dir="/var/backup/vaultwarden-archive"
+
+            # Archive locally
+            mkdir -p "$archive_dir"
+            for file in "$archive_dir"/latest*; do
+              if [ -e "$file" ]; then
+                mv "$file" "''${file/latest/last}"
+              fi
+            done
+            cp "$time" "$archive_dir/latest"
+            cp "$time-sha256" "$archive_dir/latest-sha256"
+
+            # Because rclone has writes refresh client keys to it's configuration
+            # we have to maintain a writeable copy of the config. When we detect
+            # that the agenix config has been changed we replace it.
+            state_dir="/var/lib/vaultwarden-cloud-backup"
+            if ! cmp -s "$state_dir/rcloneConfigOriginal" "${rcloneConfig.path}"; then
+              # If they have changed replace the writeable config with the agenix one
+              install -m660 "${rcloneConfig.path}" "$state_dir/rcloneConfig"
             fi
+            install -m660 "${rcloneConfig.path}" "$state_dir/rcloneConfigOriginal"
 
-            shoutrrr send \
-              --url "discord://$discord_auth" \
-              --title "Vaultwarden Backup $1 $time" \
-              --message "$2"
+            rclone --config "$state_dir/rcloneConfig" copy . remote:backups/vaultwarden
 
-            shoutrrr send \
-              --url "smtp://$SMTP_URL_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=Vaultwarden%20Backup%20$1%20$time" \
-              --message "$2"
-          }
-
-          on_failure() {
-            echo "Sending failure email"
-            send_notification "Failure" "$(cat <<EOF
-          Time: $(date +"%Y-%m-%d %H:%M:%S")
-          Error: line $LINENO: $BASH_COMMAND failed
-          EOF
-          )"
-          }
-          trap on_failure ERR
-
-          tmp=$(mktemp -d)
-          cleanup() {
-            rm -rf "$tmp"
-          }
-          trap cleanup EXIT
-          cd "$tmp"
-
-          tar -cjf - -C "${backupDir}" . | age -R ${publicKey} -o "$time"
-
-          hash=$(sha256sum "$time")
-          echo "$hash" > "$time-sha256"
-
-          archive_dir="/var/backup/vaultwarden-archive"
-
-          # Archive locally
-          mkdir -p "$archive_dir"
-          for file in "$archive_dir"/latest*; do
-            if [ -e "$file" ]; then
-              mv "$file" "''${file/latest/last}"
-            fi
-          done
-          cp "$time" "$archive_dir/latest"
-          cp "$time-sha256" "$archive_dir/latest-sha256"
-
-          # Because rclone has writes refresh client keys to it's configuration
-          # we have to maintain a writeable copy of the config. When we detect
-          # that the agenix config has been changed we replace it.
-          state_dir="/var/lib/vaultwarden-cloud-backup"
-          if ! cmp -s "$state_dir/rcloneConfigOriginal" "${rcloneConfig.path}"; then
-            # If they have changed replace the writeable config with the agenix one
-            install -m660 "${rcloneConfig.path}" "$state_dir/rcloneConfig"
-          fi
-          install -m660 "${rcloneConfig.path}" "$state_dir/rcloneConfigOriginal"
-
-          rclone --config "$state_dir/rcloneConfig" copy . remote:backups/vaultwarden
-
-          send_notification "Success" "$(cat <<EOF
-          Timestamp: $time ($(date -d @"$time" +"%Y-%m-%d %H:%M:%S"))
-          Hash: $(echo "$hash" | cut -d ' ' -f 1)
-          Size: $(stat -c%s "$time" | numfmt --to=iec-i --suffix=B --format="%.1f")
-          EOF
-          )"
-        '';
+            send_notification "Success" "$(cat <<EOF
+            Timestamp: $time ($(date -d @"$time" +"%Y-%m-%d %H:%M:%S"))
+            Hash: $(echo "$hash" | cut -d ' ' -f 1)
+            Size: $(stat -c%s "$time" | numfmt --to=iec-i --suffix=B --format="%.1f")
+            EOF
+            )"
+          '';
       };
     in
     {
       unitConfig = {
         Description = "Vaultwarden cloud backup";
-        After = [ "backup-vaultwarden.service" "network-online.target" ];
+        After = [
+          "backup-vaultwarden.service"
+          "network-online.target"
+        ];
         Requires = [ "backup-vaultwarden.service" ];
         Wants = [ "network-online.target" ];
       };
@@ -262,7 +281,10 @@ mkIf cfg.enable
   backups.vaultwarden = {
     paths = [ "/var/backup/vaultwarden-archive" ];
     restore.pathOwnership = {
-      "/var/backup/vaultwarden-archive" = { user = "vaultwarden"; group = "vaultwarden"; };
+      "/var/backup/vaultwarden-archive" = {
+        user = "vaultwarden";
+        group = "vaultwarden";
+      };
     };
   };
 

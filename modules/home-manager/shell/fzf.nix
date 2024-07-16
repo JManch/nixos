@@ -1,11 +1,15 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 let
   inherit (lib) mkIf getExe;
   fd = getExe pkgs.fd;
   bat = getExe pkgs.bat;
 in
-mkIf config.modules.shell.enable
-{
+mkIf config.modules.shell.enable {
   programs.fzf = {
     enable = true;
     defaultCommand = "${fd} -H --type f";

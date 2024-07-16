@@ -1,10 +1,14 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf getExe';
   cfg = config.modules.shell;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   programs.zsh = {
     enable = true;
     autosuggestion.enable = true;
@@ -37,8 +41,8 @@ mkIf cfg.enable
       let
         reboot = getExe' pkgs.systemd "reboot";
       in
-        /*bash*/ ''
-
+      # bash
+      ''
         setopt interactivecomments
 
         reboot() {
@@ -62,7 +66,6 @@ mkIf cfg.enable
           cat "$file_path" > "$copy_path" && rm "$file_path" && mv "$copy_path" "$file_path"
           $EDITOR "$file_path"
         }
-
       '';
   };
 

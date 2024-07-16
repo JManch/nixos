@@ -22,9 +22,7 @@ in
     files = mkOption {
       type = with types; listOf (coercedTo str (f: { file = f; }) attrs);
       default = [ ];
-      example = [
-        ".screenrc"
-      ];
+      example = [ ".screenrc" ];
       description = "Files relative to home to bind mount in persistent storage";
     };
   };

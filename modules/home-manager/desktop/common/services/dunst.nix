@@ -1,9 +1,10 @@
-{ lib
-, pkgs
-, config
-, osConfig'
-, desktopEnabled
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  desktopEnabled,
+  ...
 }:
 let
   inherit (lib) mkIf getExe';
@@ -14,15 +15,19 @@ let
   colors = config.colorScheme.palette;
   systemctl = getExe' pkgs.systemd "systemctl";
 in
-mkIf (cfg.enable && desktopEnabled)
-{
+mkIf (cfg.enable && desktopEnabled) {
   services.dunst = {
     enable = true;
 
     settings = {
       global =
         let
-          inherit (desktop.style) font cornerRadius gapSize borderWidth;
+          inherit (desktop.style)
+            font
+            cornerRadius
+            gapSize
+            borderWidth
+            ;
         in
         {
           monitor = toString cfg.monitorNumber;
@@ -37,7 +42,10 @@ mkIf (cfg.enable && desktopEnabled)
           corner_radius = cornerRadius;
           width = builtins.floor (primaryMonitor.width * 0.14);
           height = builtins.floor (primaryMonitor.height * 0.25);
-          offset = let offset = (gapSize * 2) + borderWidth; in
+          offset =
+            let
+              offset = (gapSize * 2) + borderWidth;
+            in
             "${toString offset}x${toString offset}";
           gap_size = gapSize;
           frame_width = borderWidth;
@@ -53,7 +61,9 @@ mkIf (cfg.enable && desktopEnabled)
           markup = "full";
         };
 
-      fullscreen_delay_everything = { fullscreen = "show"; };
+      fullscreen_delay_everything = {
+        fullscreen = "show";
+      };
 
       urgency_critical = {
         background = "#${colors.base00}b3";

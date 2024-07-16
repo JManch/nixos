@@ -1,20 +1,31 @@
-{ lib
-, pkgs
-, config
-, inputs
-, username
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  username,
+  ...
 }:
 let
-  inherit (lib) mkEnableOption mkOption types concatStringsSep mkAliasOptionModule attrNames mkDefault;
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    types
+    concatStringsSep
+    mkAliasOptionModule
+    attrNames
+    mkDefault
+    ;
   cfg = config.modules.services;
 in
 {
   imports = lib.utils.scanPaths ./. ++ [
-    (mkAliasOptionModule
-      [ "backups" ]
-      [ "modules" "services" "restic" "backups" ]
-    )
+    (mkAliasOptionModule [ "backups" ] [
+      "modules"
+      "services"
+      "restic"
+      "backups"
+    ])
   ];
 
   options.modules.services = {
@@ -228,7 +239,10 @@ in
       trustedAddresses = mkOption {
         type = types.listOf types.str;
         default = [ ];
-        example = [ "192.168.89.2/32" "192.168.88.0/24" ];
+        example = [
+          "192.168.89.2/32"
+          "192.168.88.0/24"
+        ];
         description = ''
           List of address ranges representing the trusted local network. Use in
           combination with allowAddresses to restrict access to virtual hosts.
@@ -337,7 +351,9 @@ in
       };
 
       webrtc = {
-        enable = (mkEnableOption "WebRTC streams with Go2RTC") // { default = true; };
+        enable = (mkEnableOption "WebRTC streams with Go2RTC") // {
+          default = true;
+        };
 
         port = mkOption {
           type = types.port;
@@ -467,32 +483,38 @@ in
         };
 
         fileSystems = mkOption {
-          type = types.listOf (types.submodule {
-            options = {
-              path = mkOption {
-                type = types.str;
-                example = "jellyfin";
-                description = "Export path relative to /export";
-              };
+          type = types.listOf (
+            types.submodule {
+              options = {
+                path = mkOption {
+                  type = types.str;
+                  example = "jellyfin";
+                  description = "Export path relative to /export";
+                };
 
-              clients = mkOption {
-                type = types.attrsOf types.str;
-                example = { "homelab.lan" = "ro,no_subtree_check"; };
-                description = ''
-                  Attribute set of client machine names associated with a comma
-                  separated list of NFS export options
-                '';
+                clients = mkOption {
+                  type = types.attrsOf types.str;
+                  example = {
+                    "homelab.lan" = "ro,no_subtree_check";
+                  };
+                  description = ''
+                    Attribute set of client machine names associated with a comma
+                    separated list of NFS export options
+                  '';
+                };
               };
-            };
-          });
+            }
+          );
           default = [ ];
-          example = [{
-            path = "jellyfin";
-            clients = {
-              "homelab.lan" = "ro,no_subtree_check";
-              "192.168.88.254" = "ro,no_subtree_check";
-            };
-          }];
+          example = [
+            {
+              path = "jellyfin";
+              clients = {
+                "homelab.lan" = "ro,no_subtree_check";
+                "192.168.88.254" = "ro,no_subtree_check";
+              };
+            }
+          ];
           description = "List of local file systems that are exported by the NFS server";
         };
       };
@@ -507,43 +529,51 @@ in
         };
 
         fileSystems = mkOption {
-          type = types.listOf (types.submodule {
-            options = {
-              path = mkOption {
-                type = types.str;
-                example = "jellyfin";
-                description = "Mount path relative to /mnt/nfs";
-              };
+          type = types.listOf (
+            types.submodule {
+              options = {
+                path = mkOption {
+                  type = types.str;
+                  example = "jellyfin";
+                  description = "Mount path relative to /mnt/nfs";
+                };
 
-              machine = mkOption {
-                type = types.str;
-                description = "NFS machine identifier according to exports(5)";
-              };
+                machine = mkOption {
+                  type = types.str;
+                  description = "NFS machine identifier according to exports(5)";
+                };
 
-              user = mkOption {
-                type = types.str;
-                description = "User owning the mounted directory";
-              };
+                user = mkOption {
+                  type = types.str;
+                  description = "User owning the mounted directory";
+                };
 
-              group = mkOption {
-                type = types.str;
-                description = "Group owning the mounted directory";
-              };
+                group = mkOption {
+                  type = types.str;
+                  description = "Group owning the mounted directory";
+                };
 
-              options = mkOption {
-                type = types.listOf types.str;
-                default = [ "x-systemd.automount" "noauto" "x-systemd.idle-timeout=600" ];
-                description = "List of options for the NFS file system";
+                options = mkOption {
+                  type = types.listOf types.str;
+                  default = [
+                    "x-systemd.automount"
+                    "noauto"
+                    "x-systemd.idle-timeout=600"
+                  ];
+                  description = "List of options for the NFS file system";
+                };
               };
-            };
-          });
+            }
+          );
           default = [ ];
-          example = [{
-            name = "jellyfin";
-            machine = "homelab.lan";
-            user = "jellyfin";
-            group = "jellyfin";
-          }];
+          example = [
+            {
+              name = "jellyfin";
+              machine = "homelab.lan";
+              user = "jellyfin";
+              group = "jellyfin";
+            }
+          ];
           description = "List of remote NFS file systems to mount";
         };
       };
@@ -573,76 +603,80 @@ in
       enable = mkEnableOption "Restic backups";
 
       backups = mkOption {
-        type = types.attrsOf (types.submodule {
-          freeformType = types.attrsOf types.anything;
-          options = {
-            preBackupScript = mkOption {
-              type = types.lines;
-              default = "";
-              description = "Script to run before backing up";
-            };
-
-            postBackupScript = mkOption {
-              type = types.lines;
-              default = "";
-              description = "Script to run after backing up";
-            };
-
-            restore = {
-              pathOwnership = mkOption {
-                type = types.attrsOf (types.submodule {
-                  options = {
-                    user = mkOption {
-                      type = types.nullOr types.str;
-                      default = null;
-                      description = ''
-                        User to set restored files to. If null, user will not
-                        be changed. Useful for modules that do not have static
-                        IDs https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix.
-                      '';
-                    };
-
-                    group = mkOption {
-                      type = types.nullOr types.str;
-                      default = null;
-                      description = ''
-                        Group to set restored files to. If null, group will not
-                        be changed.
-                      '';
-                    };
-                  };
-                });
-                default = { };
-                description = ''
-                  Attribute for assigning ownership user and group for each
-                  backup path.
-                '';
-              };
-
-              removeExisting = mkOption {
-                type = types.bool;
-                default = true;
-                description = ''
-                  Whether to delete all files and directories in the backup
-                  paths before restoring backup.
-                '';
-              };
-
-              preRestoreScript = mkOption {
+        type = types.attrsOf (
+          types.submodule {
+            freeformType = types.attrsOf types.anything;
+            options = {
+              preBackupScript = mkOption {
                 type = types.lines;
                 default = "";
-                description = "Script to run before restoring the backup";
+                description = "Script to run before backing up";
               };
 
-              postRestoreScript = mkOption {
+              postBackupScript = mkOption {
                 type = types.lines;
                 default = "";
-                description = "Script to run after restoring the backup";
+                description = "Script to run after backing up";
               };
-            };
 
-          };
-        });
+              restore = {
+                pathOwnership = mkOption {
+                  type = types.attrsOf (
+                    types.submodule {
+                      options = {
+                        user = mkOption {
+                          type = types.nullOr types.str;
+                          default = null;
+                          description = ''
+                            User to set restored files to. If null, user will not
+                            be changed. Useful for modules that do not have static
+                            IDs https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix.
+                          '';
+                        };
+
+                        group = mkOption {
+                          type = types.nullOr types.str;
+                          default = null;
+                          description = ''
+                            Group to set restored files to. If null, group will not
+                            be changed.
+                          '';
+                        };
+                      };
+                    }
+                  );
+                  default = { };
+                  description = ''
+                    Attribute for assigning ownership user and group for each
+                    backup path.
+                  '';
+                };
+
+                removeExisting = mkOption {
+                  type = types.bool;
+                  default = true;
+                  description = ''
+                    Whether to delete all files and directories in the backup
+                    paths before restoring backup.
+                  '';
+                };
+
+                preRestoreScript = mkOption {
+                  type = types.lines;
+                  default = "";
+                  description = "Script to run before restoring the backup";
+                };
+
+                postRestoreScript = mkOption {
+                  type = types.lines;
+                  default = "";
+                  description = "Script to run after restoring the backup";
+                };
+              };
+
+            };
+          }
+        );
         default = { };
         description = ''
           Attribute set of Restic backups matching the upstream module backups
@@ -687,7 +721,8 @@ in
 
     minecraft-server =
       let
-        availablePlugins = (import ../../../pkgs/minecraft-plugins { inherit lib pkgs; }).minecraft-plugins
+        availablePlugins =
+          (import ../../../pkgs/minecraft-plugins { inherit lib pkgs; }).minecraft-plugins
           // inputs.nix-resources.packages.${pkgs.system}.minecraft-plugins;
         jsonFormat = pkgs.formats.json { };
       in
@@ -731,30 +766,32 @@ in
         };
 
         files = mkOption {
-          type = types.attrsOf (types.submodule {
-            options = {
-              value = mkOption {
-                type = types.nullOr types.lines;
-                default = null;
-                description = "Lines of text to copy into target config file";
-              };
+          type = types.attrsOf (
+            types.submodule {
+              options = {
+                value = mkOption {
+                  type = types.nullOr types.lines;
+                  default = null;
+                  description = "Lines of text to copy into target config file";
+                };
 
-              diff = mkOption {
-                type = types.nullOr types.lines;
-                default = null;
-                description = ''
-                  Diff file to be applied to reference config file. Use diff -u
-                  to generate diff.
-                '';
-              };
+                diff = mkOption {
+                  type = types.nullOr types.lines;
+                  default = null;
+                  description = ''
+                    Diff file to be applied to reference config file. Use diff -u
+                    to generate diff.
+                  '';
+                };
 
-              reference = mkOption {
-                type = types.nullOr types.pathInStore;
-                default = null;
-                description = "Reference config file that diff is applied to";
+                reference = mkOption {
+                  type = types.nullOr types.pathInStore;
+                  default = null;
+                  description = "Reference config file that diff is applied to";
+                };
               };
-            };
-          });
+            }
+          );
           default = { };
           description = ''
             Attribute set where keys are paths to files relative to the dataDir

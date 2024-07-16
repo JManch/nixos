@@ -1,6 +1,18 @@
-{ lib, pkgs, config, ... } @ args:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}@args:
 let
-  inherit (lib) utils mkEnableOption mkOption types mkIf optionals;
+  inherit (lib)
+    utils
+    mkEnableOption
+    mkOption
+    types
+    mkIf
+    optionals
+    ;
   cfg = config.modules.shell;
 
   tomato-c = pkgs.tomato-c.overrideAttrs (_: {
@@ -39,27 +51,31 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = (with pkgs; [
-      unzip
-      zip
-      tree
-      wget
-      fd
-      ripgrep
-      bat
-      tokei
-      rename
-      nurl # tool for generating nix fetcher calls from urls
-    ])
-    ++ [
-      (utils.flakePkgs args "yaml2nix").default
-      tomato-c
-    ]
-    ++ optionals cfg.sillyTools (with pkgs; [
-      fortune
-      cowsay
-      lolcat
-    ]);
+    home.packages =
+      (with pkgs; [
+        unzip
+        zip
+        tree
+        wget
+        fd
+        ripgrep
+        bat
+        tokei
+        rename
+        nurl # tool for generating nix fetcher calls from urls
+      ])
+      ++ [
+        (utils.flakePkgs args "yaml2nix").default
+        tomato-c
+      ]
+      ++ optionals cfg.sillyTools (
+        with pkgs;
+        [
+          fortune
+          cowsay
+          lolcat
+        ]
+      );
 
     home.sessionVariables.COLORTERM = "truecolor";
   };

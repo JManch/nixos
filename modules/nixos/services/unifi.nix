@@ -1,9 +1,10 @@
-{ lib
-, pkgs
-, config
-, inputs
-, hostname
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  hostname,
+  ...
 }:
 let
   inherit (lib) mkIf utils;
@@ -12,8 +13,7 @@ let
   inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.modules.services.unifi;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     (hostname == "homelab")
     "Unifi is only intended to work on host 'homelab'"
@@ -68,12 +68,14 @@ mkIf cfg.enable
   #   };
   # };
 
-  persistence.directories = [{
-    directory = "/var/lib/unifi";
-    user = "unifi";
-    group = "unifi";
-    mode = "750";
-  }];
+  persistence.directories = [
+    {
+      directory = "/var/lib/unifi";
+      user = "unifi";
+      group = "unifi";
+      mode = "750";
+    }
+  ];
 
   virtualisation.vmVariant = {
     networking.firewall.allowedTCPPorts = [ 8443 ];

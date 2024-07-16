@@ -1,9 +1,13 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   cfg = config.modules.programs.jellyfin-media-player;
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   home.packages = [ pkgs.jellyfin-media-player ];
 
   persistence.directories = [

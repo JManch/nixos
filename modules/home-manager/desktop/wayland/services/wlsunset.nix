@@ -1,8 +1,9 @@
-{ lib
-, pkgs
-, config
-, isWayland
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  isWayland,
+  ...
 }:
 let
   inherit (lib) mkIf getExe mkForce;
@@ -21,8 +22,7 @@ let
     night = 4000;
   };
 in
-mkIf (cfg.enable && isWayland)
-{
+mkIf (cfg.enable && isWayland) {
   # WARN: Wlsunset (or any other gamma adjuster) will cause system audio to
   # stutter during gamma adjustments if audio is coming from monitors. This
   # includes using the headphone jack on a monitor.

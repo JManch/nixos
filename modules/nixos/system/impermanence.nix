@@ -1,13 +1,22 @@
-{ lib
-, pkgs
-, config
-, inputs
-, username
-, adminUsername
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  username,
+  adminUsername,
+  ...
 }:
 let
-  inherit (lib) mkIf mkForce mkMerge utils mkAliasOptionModule concatStringsSep hasAttr;
+  inherit (lib)
+    mkIf
+    mkForce
+    mkMerge
+    utils
+    mkAliasOptionModule
+    concatStringsSep
+    hasAttr
+    ;
   inherit (config.modules.core) homeManager;
   inherit (config.modules.system.virtualisation) vmVariant;
   cfg = config.modules.system.impermanence;
@@ -17,17 +26,27 @@ in
   imports = [
     inputs.impermanence.nixosModules.impermanence
 
-    (mkAliasOptionModule
-      [ "persistence" ]
-      [ "environment" "persistence" "/persist" ])
+    (mkAliasOptionModule [ "persistence" ] [
+      "environment"
+      "persistence"
+      "/persist"
+    ])
 
-    (mkAliasOptionModule
-      [ "persistenceHome" ]
-      [ "environment" "persistence" "/persist" "users" username ])
+    (mkAliasOptionModule [ "persistenceHome" ] [
+      "environment"
+      "persistence"
+      "/persist"
+      "users"
+      username
+    ])
 
-    (mkAliasOptionModule
-      [ "persistenceAdminHome" ]
-      [ "environment" "persistence" "/persist" "users" adminUsername ])
+    (mkAliasOptionModule [ "persistenceAdminHome" ] [
+      "environment"
+      "persistence"
+      "/persist"
+      "users"
+      adminUsername
+    ])
   ];
 
   config = mkMerge [
@@ -50,7 +69,8 @@ in
             "home/${username}/.config/darkman/variants"
           ];
         in
-          /*bash*/ ''
+        # bash
+        ''
           # Prints a list of all ephemeral system files
           impermanence() {
             sudo ${fd} --one-file-system --strip-cwd-prefix --base-directory / --type f \
@@ -76,7 +96,10 @@ in
           # user folder in /var/lib/private/<service>. I will add commented out
           # persistence definitions in the relevant services so their files are
           # still documented.
-          { directory = "/var/lib/private"; mode = "0700"; }
+          {
+            directory = "/var/lib/private";
+            mode = "0700";
+          }
         ];
 
         files = [

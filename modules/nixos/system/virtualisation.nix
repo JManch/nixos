@@ -1,13 +1,20 @@
-{ lib
-, pkgs
-, config
-, inputs
-, username
-, adminUsername
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  username,
+  adminUsername,
+  ...
 }:
 let
-  inherit (lib) mkIf utils mkMerge mkVMOverride mod;
+  inherit (lib)
+    mkIf
+    utils
+    mkMerge
+    mkVMOverride
+    mod
+    ;
   inherit (config.home-manager.users.${username}.modules.desktop) terminal;
   inherit (config.device) monitors cpu memory;
   inherit (config.modules.core) homeManager;
@@ -22,78 +29,81 @@ let
       age
       openssh
     ];
-    text = /*bash*/ ''
+    text = # bash
+      ''
+        no_secrets=false
+        while getopts 'n' flag; do
+          case "$flag" in
+            n) no_secrets=true ;;
+            *) ;;
+          esac
+        done
+        shift $(( OPTIND - 1 ))
 
-      no_secrets=false
-      while getopts 'n' flag; do
-        case "$flag" in
-          n) no_secrets=true ;;
-          *) ;;
-        esac
-      done
-      shift $(( OPTIND - 1 ))
-
-      if [ "$#" -ne 1 ]; then
-        echo "Usage: build-vm <hostname>"
-        exit 1
-      fi
-      hostname=$1
-
-      flake="/home/${username}/.config/nixos"
-      if [ ! -d $flake ]; then
-        echo "Flake does not exist locally so using remote from github"
-        flake="github:JManch/nixos"
-      fi
-
-      ${utils.exitTrapBuilder}
-
-      # Build the VM
-      runscript="/home/${adminUsername}/result/bin/run-$hostname-vm"
-      pushd "/home/${adminUsername}" > /dev/null
-      add_exit_trap "popd >/dev/null 2>&1 || true"
-      nixos-rebuild build-vm --flake "$flake#$hostname"
-      popd > /dev/null
-
-      # Check if the VM uses impermanence
-      impermanence=$(nix eval "$flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.modules.system.impermanence.enable")
-
-      # Print ports mapped to the VM
-      printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
-
-      if [[ "$no_secrets" = false && ! -e "/home/${adminUsername}/$hostname.qcow2" ]]; then
-        tmp=$(mktemp -d)
-        # shellcheck disable=SC2016
-        add_exit_trap 'rm -rf $tmp'
-
-        # Decrypt the relevant secrets from kit
-        kit_path="${../../../hosts/ssh-bootstrap-kit}"
-        age -d "$kit_path" | tar -xf - --strip-components=1 -C "$tmp" "$hostname"
-
-        # Copy keys to VM
-        printf "Copying SSH keys to VM...\nNOTE: Secret decryption will not work on the first VM launch"
-        rootDir=""
-        if [ "$impermanence" = "true" ]; then
-          rootDir="persist"
+        if [ "$#" -ne 1 ]; then
+          echo "Usage: build-vm <hostname>"
+          exit 1
         fi
-        (scp -P 50022 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-          -o LogLevel=QUIET -o ConnectionAttempts=30 \
-          "$tmp/ssh_host_ed25519_key" "$tmp/ssh_host_ed25519_key.pub" \
-          root@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$tmp") &
-      fi
+        hostname=$1
 
-      # For non-graphical VMs, launch VM and start ssh session in new
-      # terminal windows
-      if grep -q -- "-nographic" "$runscript"; then
-        ${if config.modules.system.desktop.enable then /*bash*/ ''
-          ${terminal.exePath} -e "zsh" "-i" "-c" "ssh-vm; zsh -i" &
-          ${terminal.exePath} --class qemu -e "$runscript"
-        ''
-        else "$runscript"}
-      else
-        $runscript
-      fi
+        flake="/home/${username}/.config/nixos"
+        if [ ! -d $flake ]; then
+          echo "Flake does not exist locally so using remote from github"
+          flake="github:JManch/nixos"
+        fi
 
-    '';
+        ${utils.exitTrapBuilder}
+
+        # Build the VM
+        runscript="/home/${adminUsername}/result/bin/run-$hostname-vm"
+        pushd "/home/${adminUsername}" > /dev/null
+        add_exit_trap "popd >/dev/null 2>&1 || true"
+        nixos-rebuild build-vm --flake "$flake#$hostname"
+        popd > /dev/null
+
+        # Check if the VM uses impermanence
+        impermanence=$(nix eval "$flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.modules.system.impermanence.enable")
+
+        # Print ports mapped to the VM
+        printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
+
+        if [[ "$no_secrets" = false && ! -e "/home/${adminUsername}/$hostname.qcow2" ]]; then
+          tmp=$(mktemp -d)
+          # shellcheck disable=SC2016
+          add_exit_trap 'rm -rf $tmp'
+
+          # Decrypt the relevant secrets from kit
+          kit_path="${../../../hosts/ssh-bootstrap-kit}"
+          age -d "$kit_path" | tar -xf - --strip-components=1 -C "$tmp" "$hostname"
+
+          # Copy keys to VM
+          printf "Copying SSH keys to VM...\nNOTE: Secret decryption will not work on the first VM launch"
+          rootDir=""
+          if [ "$impermanence" = "true" ]; then
+            rootDir="persist"
+          fi
+          (scp -P 50022 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -o LogLevel=QUIET -o ConnectionAttempts=30 \
+            "$tmp/ssh_host_ed25519_key" "$tmp/ssh_host_ed25519_key.pub" \
+            root@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$tmp") &
+        fi
+
+        # For non-graphical VMs, launch VM and start ssh session in new
+        # terminal windows
+        if grep -q -- "-nographic" "$runscript"; then
+          ${
+            if config.modules.system.desktop.enable then # bash
+              ''
+                ${terminal.exePath} -e "zsh" "-i" "-c" "ssh-vm; zsh -i" &
+                ${terminal.exePath} --class qemu -e "$runscript"
+              ''
+            else
+              "$runscript"
+          }
+        else
+          $runscript
+        fi
+      '';
   };
 in
 {
@@ -118,7 +128,12 @@ in
           "9p"
           "9pnet_virtio"
         ];
-        kernelModules = mkVMOverride [ "kvm-amd" "virtio_balloon" "virtio_console" "virtio_rng" ];
+        kernelModules = mkVMOverride [
+          "kvm-amd"
+          "virtio_balloon"
+          "virtio_console"
+          "virtio_rng"
+        ];
         kernelParams = mkVMOverride [ ];
       };
 
@@ -126,16 +141,28 @@ in
       # virtualisation enabled because it should be possible to create a VM of any host
       virtualisation.vmVariant = {
         device = {
-          monitors = mkIf (monitors != [ ]) (mkVMOverride [{
-            name = "Virtual-1";
-            number = 1;
-            refreshRate = 60.0;
-            width = 2048;
-            height = 1152;
-            position.x = 0;
-            position.y = 0;
-            workspaces = [ 1 2 3 4 5 6 7 8 9 ];
-          }]);
+          monitors = mkIf (monitors != [ ]) (mkVMOverride [
+            {
+              name = "Virtual-1";
+              number = 1;
+              refreshRate = 60.0;
+              width = 2048;
+              height = 1152;
+              position.x = 0;
+              position.y = 0;
+              workspaces = [
+                1
+                2
+                3
+                4
+                5
+                6
+                7
+                8
+                9
+              ];
+            }
+          ]);
           gpu.type = mkVMOverride null;
           hassIntegration.enable = mkVMOverride false;
         };
@@ -193,12 +220,11 @@ in
             forwardPorts =
               let
                 # It's important to use firewall rules from the vmVariant here
-                inherit (config.virtualisation.vmVariant.networking.firewall)
-                  allowedTCPPorts
-                  allowedUDPPorts;
+                inherit (config.virtualisation.vmVariant.networking.firewall) allowedTCPPorts allowedUDPPorts;
                 inherit (config.virtualisation.vmVariant.modules.system.virtualisation)
                   mappedTCPPorts
-                  mappedUDPPorts;
+                  mappedUDPPorts
+                  ;
 
                 forward = proto: mapped: port: {
                   from = "host";
@@ -212,12 +238,9 @@ in
                 };
               in
               map (forward "tcp" false) allowedTCPPorts
-              ++
-              map (forward "udp" false) allowedUDPPorts
-              ++
-              map (forward "tcp" true) mappedTCPPorts
-              ++
-              map (forward "udp" true) mappedUDPPorts;
+              ++ map (forward "udp" false) allowedUDPPorts
+              ++ map (forward "tcp" true) mappedTCPPorts
+              ++ map (forward "udp" true) mappedUDPPorts;
           };
 
         programs.zsh.shellAliases.p = "sudo systemctl poweroff";
@@ -262,19 +285,20 @@ in
 
       virtualisation.libvirtd.enable = true;
 
-      hmAdmin.programs.zsh.initExtra = /*bash*/ ''
-        ssh-vm() {
-          ssh-add-quiet
-          echo "Attempting SSH connection to VM..."; 
-          # Extra connection attempts as VM may be starting up
-          ssh \
-            -o "StrictHostKeyChecking=no" \
-            -o "UserKnownHostsFile=/dev/null" \
-            -o "LogLevel=QUIET" \
-            -o "ConnectionAttempts=30" \
-            ${adminUsername}@127.0.0.1 -p 50022;
-        }
-      '';
+      hmAdmin.programs.zsh.initExtra = # bash
+        ''
+          ssh-vm() {
+            ssh-add-quiet
+            echo "Attempting SSH connection to VM..."; 
+            # Extra connection attempts as VM may be starting up
+            ssh \
+              -o "StrictHostKeyChecking=no" \
+              -o "UserKnownHostsFile=/dev/null" \
+              -o "LogLevel=QUIET" \
+              -o "ConnectionAttempts=30" \
+              ${adminUsername}@127.0.0.1 -p 50022;
+          }
+        '';
 
       persistence.directories = [ "/var/lib/libvirt" ];
     })
@@ -285,8 +309,6 @@ in
       persistence.directories = [ "/var/lib/containers" ];
     })
 
-    (mkIf cfg.microvm.enable {
-      persistence.directories = [ "/var/lib/microvms" ];
-    })
+    (mkIf cfg.microvm.enable { persistence.directories = [ "/var/lib/microvms" ]; })
   ];
 }

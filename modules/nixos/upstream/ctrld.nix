@@ -19,7 +19,12 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -56,8 +61,14 @@ in
       unitConfig = {
         Description = "Multiclient DNS forwarding proxy";
         Before = [ "nss-lookup.target" ];
-        After = [ "network.target" "network-online.target" ];
-        Wants = [ "network-online.target" "nss-lookup.target" ];
+        After = [
+          "network.target"
+          "network-online.target"
+        ];
+        Wants = [
+          "network-online.target"
+          "nss-lookup.target"
+        ];
         StartLimitIntervalSec = 5;
         StartLimitBurst = 10;
       };
@@ -91,12 +102,20 @@ in
         ProtectKernelTunables = true;
         ProcSubset = "pid";
         RemoveIPC = true;
-        RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
+        RestrictAddressFamilies = [
+          "AF_UNIX"
+          "AF_INET"
+          "AF_INET6"
+          "AF_NETLINK"
+        ];
         RestrictNamespaces = true;
         RestrictRealtime = true;
         RestrictSUIDSGID = true;
         SystemCallArchitectures = "native";
-        SystemCallFilter = [ "@system-service" "~@privileged" ];
+        SystemCallFilter = [
+          "@system-service"
+          "~@privileged"
+        ];
         CapabilityBoundingSet = "";
         AmbientCapabilities = "";
         DeviceAllow = "";

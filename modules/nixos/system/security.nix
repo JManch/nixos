@@ -1,4 +1,9 @@
-{ lib, config, username, ... }:
+{
+  lib,
+  config,
+  username,
+  ...
+}:
 let
   inherit (lib) mkIf;
   inherit (homeConfig.programs) swaylock hyprlock;

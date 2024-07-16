@@ -1,9 +1,10 @@
-{ lib
-, pkgs
-, inputs
-, config
-, isWayland
-, ...
+{
+  lib,
+  pkgs,
+  inputs,
+  config,
+  isWayland,
+  ...
 }:
 let
   inherit (lib) mkIf;

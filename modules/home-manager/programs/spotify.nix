@@ -1,21 +1,23 @@
-{ lib
-, pkgs
-, config
-, osConfig'
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  ...
 }:
 let
-  inherit (lib) mkIf utils getExe getExe';
+  inherit (lib)
+    mkIf
+    utils
+    getExe
+    getExe'
+    ;
   cfg = config.modules.programs.spotify;
   desktopCfg = config.modules.desktop;
 
-  spotify-player = (
-    utils.addPatches
-      pkgs.spotify-player
-      [ ../../../patches/spotifyPlayerNotifs.patch ]
-  ).override {
-    withDaemon = false;
-  };
+  spotify-player =
+    (utils.addPatches pkgs.spotify-player [ ../../../patches/spotifyPlayerNotifs.patch ]).override
+      { withDaemon = false; };
 
   spotifyPlayer = getExe spotify-player;
 
@@ -33,14 +35,16 @@ let
         -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${new_volume}%"
     '';
 in
-mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true))
-{
+mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true)) {
   home.packages = [
     (pkgs.spotify.overrideAttrs (old: {
-      postInstall = (old.postInstall or "") + /*bash*/ ''
-        substituteInPlace $out/share/applications/spotify.desktop \
-          --replace-fail Spotify "Spotify Desktop"
-      '';
+      postInstall =
+        (old.postInstall or "")
+        # bash
+        + ''
+          substituteInPlace $out/share/applications/spotify.desktop \
+            --replace-fail Spotify "Spotify Desktop"
+        '';
     }))
     spotify-player
   ];
@@ -48,8 +52,8 @@ mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true))
   services.playerctld.enable = true;
 
   xdg.configFile = {
-    "spotify-player/app.toml".text = /* toml */ ''
-
+    "spotify-player/app.toml".text = # toml
+      ''
         theme = "default2"
         playback_format = """
         {track}
@@ -88,11 +92,10 @@ mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true))
         bitrate = 320
         audio_cache = true
         normalization = false
-
       '';
 
-    "spotify-player/theme.toml".text = /* toml */ ''
-
+    "spotify-player/theme.toml".text = # toml
+      ''
         [[themes]]
         name = "default2"
         [themes.component_style]
@@ -107,7 +110,6 @@ mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true))
         page_desc = { fg = "Blue", modifiers = ["Bold"] }
         table_header = { fg = "Blue" }
         selection = { modifiers = ["Bold", "Reversed"] }
-
       '';
   };
 

@@ -1,10 +1,19 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
-  inherit (lib) mkIf mkForce optional genAttrs;
+  inherit (lib)
+    mkIf
+    mkForce
+    optional
+    genAttrs
+    ;
   cfg = config.modules.services.ollama;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   environment.systemPackages = [ pkgs.oterm ];
 
   services.ollama = {
@@ -21,7 +30,10 @@ mkIf cfg.enable
   };
 
   networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
-    allowedTCPPorts = [ 11434 8000 ];
+    allowedTCPPorts = [
+      11434
+      8000
+    ];
   });
 
   persistence.directories = [

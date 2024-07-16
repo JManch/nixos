@@ -1,16 +1,25 @@
-{ lib
-, pkgs
-, inputs
-, ...
+{
+  lib,
+  pkgs,
+  inputs,
+  ...
 }:
 let
-  inherit (lib) mkEnableOption mkOption types mkAliasOptionModule;
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    types
+    mkAliasOptionModule
+    ;
 in
 {
   imports = lib.utils.scanPaths ./. ++ [
-    (mkAliasOptionModule
-      [ "darkman" ]
-      [ "modules" "desktop" "services" "darkman" ])
+    (mkAliasOptionModule [ "darkman" ] [
+      "modules"
+      "desktop"
+      "services"
+      "darkman"
+    ])
   ];
 
   options.modules.desktop.services = {
@@ -18,7 +27,11 @@ in
       enable = mkEnableOption "Darkman";
 
       switchMethod = mkOption {
-        type = types.enum [ "manual" "coordinates" "hass" ];
+        type = types.enum [
+          "manual"
+          "coordinates"
+          "hass"
+        ];
         default = "coordinates";
         description = ''
           Manual means the theme will not switch automatically. Coordinates

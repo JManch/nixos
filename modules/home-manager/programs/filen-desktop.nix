@@ -1,9 +1,13 @@
-{ lib, pkgs', config, ... }:
+{
+  lib,
+  pkgs',
+  config,
+  ...
+}:
 let
   cfg = config.modules.programs.filenDesktop;
 in
-lib.mkIf cfg.enable
-{
+lib.mkIf cfg.enable {
   home.packages = [ pkgs'.filen-desktop ];
 
   desktop.hyprland.settings.windowrulev2 = [

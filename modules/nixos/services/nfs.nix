@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   inherit (lib)
     mkIf
@@ -12,7 +17,8 @@ let
     mapAttrsToList
     concatMap
     attrNames
-    filterAttrs;
+    filterAttrs
+    ;
   cfg = config.modules.services.nfs;
 in
 mkMerge [
@@ -28,12 +34,12 @@ mkMerge [
         exports =
           let
             # Filter shared fileSystems to those containing supported machines
-            fileSystems = filter (f: f.clients != { }) (map
-              (f: {
+            fileSystems = filter (f: f.clients != { }) (
+              map (f: {
                 inherit (f) path;
                 clients = filterAttrs (machine: opts: elem machine cfg.server.supportedMachines) f.clients;
-              })
-              cfg.server.fileSystems);
+              }) cfg.server.fileSystems
+            );
 
             uniqueMachines = lib.lists.unique (concatMap (f: attrNames f.clients) fileSystems);
           in
@@ -44,12 +50,11 @@ mkMerge [
 
             # Create export entries for every file system
             ${concatMapStringsSep "\n" (
-                f: "/export/${f.path} ${concatStringsSep " " (
-                  mapAttrsToList (machine: opts: "${machine}(${opts})") f.clients
-                )}"
-              )
-              fileSystems
-            }
+              f:
+              "/export/${f.path} ${
+                concatStringsSep " " (mapAttrsToList (machine: opts: "${machine}(${opts})") f.clients)
+              }"
+            ) fileSystems}
           '';
       };
 
@@ -81,29 +86,25 @@ mkMerge [
   (
     let
       # Filter file systems to just those that this host supports
-      fileSystems = filter
-        (f: elem f.machine cfg.client.supportedMachines)
-        cfg.client.fileSystems;
+      fileSystems = filter (f: elem f.machine cfg.client.supportedMachines) cfg.client.fileSystems;
     in
     mkIf cfg.client.enable {
       boot.supportedFilesystems = [ "nfs" ];
       services.rpcbind.enable = true;
 
       # Need to do this as well
-      systemd.tmpfiles.rules = map
-        (f: "d /mnt/nfs/${f.path} 0775 ${f.user} ${f.group}")
-        fileSystems;
+      systemd.tmpfiles.rules = map (f: "d /mnt/nfs/${f.path} 0775 ${f.user} ${f.group}") fileSystems;
 
-      fileSystems = listToAttrs (map
-        (f: {
+      fileSystems = listToAttrs (
+        map (f: {
           name = "/mnt/nfs/${f.path}";
           value = {
             device = "${f.machine}:/${f.path}";
             fsType = "nfs";
             options = f.options;
           };
-        })
-        fileSystems);
+        }) fileSystems
+      );
     }
   )
 ]

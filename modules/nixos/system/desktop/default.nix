@@ -1,20 +1,26 @@
-{ lib
-, pkgs
-, config
-, inputs
-, username
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  username,
+  ...
 }:
 let
-  inherit (lib) mkIf utils types mkEnableOption mkOption elem;
+  inherit (lib)
+    mkIf
+    utils
+    types
+    mkEnableOption
+    mkOption
+    elem
+    ;
   inherit (config.modules.core) homeManager;
   inherit (config.modules.system.desktop) isWayland;
   cfg = config.modules.system.desktop;
 in
 {
-  imports = (utils.scanPaths ./.) ++ [
-    inputs.hyprland.nixosModules.default
-  ];
+  imports = (utils.scanPaths ./.) ++ [ inputs.hyprland.nixosModules.default ];
 
   options.modules.system.desktop = {
     enable = mkEnableOption "desktop functionality";
@@ -29,7 +35,13 @@ in
     };
 
     desktopEnvironment = mkOption {
-      type = with types; nullOr (enum [ "xfce" "plasma" "gnome" ]);
+      type =
+        with types;
+        nullOr (enum [
+          "xfce"
+          "plasma"
+          "gnome"
+        ]);
       default = null;
       description = ''
         The desktop environment to use. The window manager is configured in
@@ -41,11 +53,16 @@ in
     isWayland = mkOption {
       type = types.bool;
       readOnly = true;
-      default = (if config.modules.core.homeManager.enable then
-        (elem config.home-manager.users.${username}.modules.desktop.windowManager utils.waylandWindowManagers)
-      else
-        false) ||
-      (elem cfg.desktopEnvironment utils.waylandDesktopEnvironments);
+      default =
+        (
+          if config.modules.core.homeManager.enable then
+            (elem config.home-manager.users.${username}.modules.desktop.windowManager
+              utils.waylandWindowManagers
+            )
+          else
+            false
+        )
+        || (elem cfg.desktopEnvironment utils.waylandDesktopEnvironments);
     };
   };
 
@@ -60,8 +77,10 @@ in
     # https://github.com/nix-community/home-manager/pull/5184
     # NOTE: When https://github.com/nix-community/home-manager/pull/2548 gets
     # merged this may no longer be needed
-    environment.pathsToLink = mkIf homeManager.enable
-      [ "/share/xdg-desktop-portal" "/share/applications" ];
+    environment.pathsToLink = mkIf homeManager.enable [
+      "/share/xdg-desktop-portal"
+      "/share/applications"
+    ];
 
     systemd = mkIf (!cfg.suspend.enable) {
       targets = {

@@ -19,15 +19,16 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-{ lib
-, fetchFromGitHub
-, buildHomeAssistantComponent
-, buildPythonPackage
-, fetchPypi
-, pytest
-, pytest-asyncio
-, pytest-runner
-, websockets
+{
+  lib,
+  fetchFromGitHub,
+  buildHomeAssistantComponent,
+  buildPythonPackage,
+  fetchPypi,
+  pytest,
+  pytest-asyncio,
+  pytest-runner,
+  websockets,
 }:
 let
   async-property = buildPythonPackage rec {
@@ -41,8 +42,7 @@ let
       sha256 = "sha256-Bn8PDAGNLeL3/g6mB9lGQm1jblHIOJl2w248McJ3oaE=";
     };
 
-    propagatedBuildInputs = [
-    ];
+    propagatedBuildInputs = [ ];
 
     checkInputs = [
       pytest
@@ -99,9 +99,7 @@ buildHomeAssistantComponent {
     sha256 = "sha256-nrpAvPyo4OFJcGdZKshaAxXmk6LvyOnJv99XEejXCh4=";
   };
 
-  propagatedBuildInputs = [
-    neohubapi
-  ];
+  propagatedBuildInputs = [ neohubapi ];
 
   meta = with lib; {
     homepage = "https://github.com/MindrustUK/heatmiser-for-home-assistant";

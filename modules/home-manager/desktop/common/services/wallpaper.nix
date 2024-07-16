@@ -1,79 +1,90 @@
-{ lib
-, pkgs
-, config
-, desktopEnabled
-, ...
-} @ args:
+{
+  lib,
+  pkgs,
+  config,
+  desktopEnabled,
+  ...
+}@args:
 let
-  inherit (lib) mkIf mkMerge boolToString optional getExe utils;
+  inherit (lib)
+    mkIf
+    mkMerge
+    boolToString
+    optional
+    getExe
+    utils
+    ;
   inherit (config.modules.desktop.services) darkman;
   cfg = config.modules.desktop.services.wallpaper;
   wallpaperCache = "${config.xdg.cacheHome}/wallpaper";
-  wallpapers = type: "${(utils.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers"}/wallpapers";
+  wallpapers =
+    type: "${(utils.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers"}/wallpapers";
 
   setWallpaper = pkgs.writeShellApplication {
     name = "set-wallpaper";
     runtimeInputs = optional darkman.enable config.services.darkman.package;
-    text = /*bash*/ ''
+    text = # bash
+      ''
+        randomise=${boolToString cfg.randomise.enable};
+        if [ "$randomise" = true ]; then
+          darkman=${boolToString darkman.enable};
+          if [ "$darkman" = true ]; then
+            theme=$(darkman get)
+            random_wallpaper_cache="${wallpaperCache}/$theme-wallpaper"
+          else
+            random_wallpaper_cache="${wallpaperCache}/wallpaper"
+          fi
 
-      randomise=${boolToString cfg.randomise.enable};
-      if [ "$randomise" = true ]; then
-        darkman=${boolToString darkman.enable};
-        if [ "$darkman" = true ]; then
-          theme=$(darkman get)
-          random_wallpaper_cache="${wallpaperCache}/$theme-wallpaper"
-        else
-          random_wallpaper_cache="${wallpaperCache}/wallpaper"
-        fi
+          # If the cache file doesn't exist we need to randomise
+          if [ ! -f "$random_wallpaper_cache" ]; then
+            ${getExe randomiseWallpaper};
+          fi
 
-        # If the cache file doesn't exist we need to randomise
-        if [ ! -f "$random_wallpaper_cache" ]; then
-          ${getExe randomiseWallpaper};
-        fi
-
-        wallpaper=$(<"$random_wallpaper_cache")
-
-        # Cached wallpaper paths might be invalid after garbage collection
-        if [ ! -f "$wallpaper" ]; then
-          ${getExe randomiseWallpaper};
           wallpaper=$(<"$random_wallpaper_cache")
-        fi
-      else
-        wallpaper="${cfg.default}"
-      fi
-      ${cfg.setWallpaperCmd} "$wallpaper"
 
-    '';
+          # Cached wallpaper paths might be invalid after garbage collection
+          if [ ! -f "$wallpaper" ]; then
+            ${getExe randomiseWallpaper};
+            wallpaper=$(<"$random_wallpaper_cache")
+          fi
+        else
+          wallpaper="${cfg.default}"
+        fi
+        ${cfg.setWallpaperCmd} "$wallpaper"
+      '';
   };
 
   randomiseWallpaper = pkgs.writeShellApplication {
     name = "randomise-wallpaper";
-    runtimeInputs = (with pkgs; [ coreutils findutils ])
+    runtimeInputs =
+      (with pkgs; [
+        coreutils
+        findutils
+      ])
       ++ optional darkman.enable config.services.darkman.package;
-    text = /*bash*/ ''
+    text = # bash
+      ''
+        function randomise_cache() {
+          wallpapers="$1"
+          cache_file="$2"
+          previous_wallpaper=""
+          [[ -f "$cache_file" ]] && previous_wallpaper=$(<"$cache_file")
+          # Randomly select a wallpaper excluding the previous
+          new_wallpaper=$(
+            find "$wallpapers" -type f ! -name "$(basename "$previous_wallpaper")" -print0 |
+            shuf -z -n 1 | tr -d '\0'
+          )
+          echo "$new_wallpaper" > "$cache_file"
+        }
 
-      function randomise_cache() {
-        wallpapers="$1"
-        cache_file="$2"
-        previous_wallpaper=""
-        [[ -f "$cache_file" ]] && previous_wallpaper=$(<"$cache_file")
-        # Randomly select a wallpaper excluding the previous
-        new_wallpaper=$(
-          find "$wallpapers" -type f ! -name "$(basename "$previous_wallpaper")" -print0 |
-          shuf -z -n 1 | tr -d '\0'
-        )
-        echo "$new_wallpaper" > "$cache_file"
-      }
-
-      darkman=${boolToString darkman.enable}
-      if [ "$darkman" = true ]; then
-        randomise_cache "${wallpapers "dark"}" "${wallpaperCache}/dark-wallpaper"
-        randomise_cache "${wallpapers "light"}" "${wallpaperCache}/light-wallpaper"
-      else
-        randomise_cache "${wallpapers "all"}" "${wallpaperCache}/wallpaper"
-      fi
-
-    '';
+        darkman=${boolToString darkman.enable}
+        if [ "$darkman" = true ]; then
+          randomise_cache "${wallpapers "dark"}" "${wallpaperCache}/dark-wallpaper"
+          randomise_cache "${wallpapers "light"}" "${wallpaperCache}/light-wallpaper"
+        else
+          randomise_cache "${wallpapers "all"}" "${wallpaperCache}/wallpaper"
+        fi
+      '';
   };
 in
 mkIf (cfg.setWallpaperCmd != null && desktopEnabled) (mkMerge [
@@ -84,10 +95,10 @@ mkIf (cfg.setWallpaperCmd != null && desktopEnabled) (mkMerge [
         X-SwitchMethod = "keep-old";
         PartOf = [ cfg.dependencyUnit ];
         Requisite = [ cfg.dependencyUnit ];
-        After = [
-          cfg.dependencyUnit
-        ] ++ optional cfg.randomise.enable "randomise-wallpaper.service"
-        ++ optional darkman.enable "darkman.service";
+        After =
+          [ cfg.dependencyUnit ]
+          ++ optional cfg.randomise.enable "randomise-wallpaper.service"
+          ++ optional darkman.enable "darkman.service";
       };
 
       Service = {
@@ -104,9 +115,11 @@ mkIf (cfg.setWallpaperCmd != null && desktopEnabled) (mkMerge [
 
     programs.zsh.shellAliases.randomise-wallpaper = "systemctl start --user randomise-wallpaper";
 
-    darkman.switchScripts.wallpaper = _: /*bash*/ ''
-      systemctl start --user set-wallpaper
-    '';
+    darkman.switchScripts.wallpaper =
+      _: # bash
+      ''
+        systemctl start --user set-wallpaper
+      '';
 
     systemd.user = {
       services.randomise-wallpaper = {

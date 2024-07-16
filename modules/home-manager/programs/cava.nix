@@ -1,4 +1,9 @@
-{ lib, config, osConfig', ... }:
+{
+  lib,
+  config,
+  osConfig',
+  ...
+}:
 let
   inherit (lib) mkIf getExe;
   cfg = config.modules.programs.cava;
@@ -26,15 +31,19 @@ mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true)) {
         alacritty_sync = 1;
       };
 
-      color = let colors = config.colorScheme.palette; in {
-        gradient = 1;
-        gradient_count = 5;
-        gradient_color_1 = "'#${colors.base0C}'";
-        gradient_color_2 = "'#${colors.base0B}'";
-        gradient_color_3 = "'#${colors.base0A}'";
-        gradient_color_4 = "'#${colors.base09}'";
-        gradient_color_5 = "'#${colors.base08}'";
-      };
+      color =
+        let
+          colors = config.colorScheme.palette;
+        in
+        {
+          gradient = 1;
+          gradient_count = 5;
+          gradient_color_1 = "'#${colors.base0C}'";
+          gradient_color_2 = "'#${colors.base0B}'";
+          gradient_color_3 = "'#${colors.base0A}'";
+          gradient_color_4 = "'#${colors.base09}'";
+          gradient_color_5 = "'#${colors.base08}'";
+        };
 
       smoothing = {
         monstercat = 0;

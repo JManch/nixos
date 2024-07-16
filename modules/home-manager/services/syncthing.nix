@@ -1,4 +1,9 @@
-{ lib, config, vmVariant, ... }:
+{
+  lib,
+  config,
+  vmVariant,
+  ...
+}:
 let
   inherit (lib) mkIf optional;
   inherit (config.home) username;
@@ -23,7 +28,10 @@ mkIf (cfg.enable && !vmVariant) {
   };
 
   firewall.allowedTCPPorts = [ 22000 ] ++ optional cfg.exposeWebGUI cfg.port;
-  firewall.allowedUDPPorts = [ 22000 21027 ];
+  firewall.allowedUDPPorts = [
+    22000
+    21027
+  ];
 
   persistence.directories = [ ".config/syncthing" ];
 }

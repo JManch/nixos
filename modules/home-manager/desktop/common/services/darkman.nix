@@ -24,13 +24,14 @@
 # - All theme variants are stored in ~/.config/darkman/variants
 # - Application config files are replaced with outOfStoreSymlinks to ~/.config/darkman/variants/*
 # - Configs in ~/.config/darkman/variants/* are modified to switch themes
-{ lib
-, pkgs
-, config
-, osConfig'
-, vmVariant
-, desktopEnabled
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  osConfig',
+  vmVariant,
+  desktopEnabled,
+  ...
 }:
 let
   inherit (lib)
@@ -48,7 +49,8 @@ let
     attrValues
     mkVMOverride
     optionalAttrs
-    listToAttrs;
+    listToAttrs
+    ;
   inherit (config.modules) desktop;
   inherit (osConfig'.device) hassIntegration;
   inherit (config.modules.services.hass) curlCommand;
@@ -62,32 +64,44 @@ let
       inherit (lib.hm.dag) entryAfter;
       sed = getExe pkgs.gnused;
 
-      genVariants = { paths, format ? c: c, colors ? colorMap, ... }: concatMapStringsSep "\n"
-        (path:
+      genVariants =
+        {
+          paths,
+          format ? c: c,
+          colors ? colorMap,
+          ...
+        }:
+        concatMapStringsSep "\n" (
+          path:
           let
             baseColors = attrNames colors;
-            sedCommand = /*bash*/ ''
-              # Replacement have to be done over three commands to avoid cycles
-              ${sed} ${concatMapStringsSep " "
-                # Replace first four colors with their base name
-                (base: "-e 's/${format colors.${base}.dark}/${base}/g'")
-                (take 4 baseColors)
-              } "${configHome}/darkman/variants/${path}.dark" | \
-              \
-              ${sed} ${concatMapStringsSep " "
-                # Replace all but the first 4 colors with their light variant
-                (base: "-e 's/${format colors.${base}.dark}/${format colors.${base}.light}/g'")
-                (drop 4 baseColors)
-              } | \
-              \
-              ${sed} ${concatMapStringsSep " "
-                # Replace the first 4 base names with their light variant
-                (base: "-e 's/${base}/${format colors.${base}.light}/g'")
-                (take 4 baseColors)
-              } > "${configHome}/darkman/variants/${path}.light"
-            '';
+            sedCommand = # bash
+              ''
+                # Replacement have to be done over three commands to avoid cycles
+                ${sed} ${
+                  concatMapStringsSep " "
+                    # Replace first four colors with their base name
+                    (base: "-e 's/${format colors.${base}.dark}/${base}/g'")
+                    (take 4 baseColors)
+                } "${configHome}/darkman/variants/${path}.dark" | \
+                \
+                ${sed} ${
+                  concatMapStringsSep " "
+                    # Replace all but the first 4 colors with their light variant
+                    (base: "-e 's/${format colors.${base}.dark}/${format colors.${base}.light}/g'")
+                    (drop 4 baseColors)
+                } | \
+                \
+                ${sed} ${
+                  concatMapStringsSep " "
+                    # Replace the first 4 base names with their light variant
+                    (base: "-e 's/${base}/${format colors.${base}.light}/g'")
+                    (take 4 baseColors)
+                } > "${configHome}/darkman/variants/${path}.light"
+              '';
           in
-            /*bash*/ ''
+          # bash
+          ''
             if [[ -v DRY_RUN ]]; then
               cat <<EOF
                 ${sedCommand}
@@ -107,52 +121,45 @@ let
               # too late to start
               run --quiet install -m644 "${configHome}/darkman/variants/${path}.dark" "${configHome}/darkman/variants/${path}"
             fi
-          '')
-        paths;
+          ''
+        ) paths;
 
-      switchScript = { paths, theme }: concatMapStringsSep "\n"
-        (path: /*bash*/ ''
-          cp "${configHome}/darkman/variants/${path}.${theme}" "${configHome}/darkman/variants/${path}"
-        '')
-        paths;
+      switchScript =
+        { paths, theme }:
+        concatMapStringsSep "\n" (
+          path: # bash
+          ''
+            cp "${configHome}/darkman/variants/${path}.${theme}" "${configHome}/darkman/variants/${path}"
+          '') paths;
     in
     mkIf (cfg.enable && desktopEnabled) {
       xdg.configFile = listToAttrs (
-        concatMap
-          (value:
-            (concatMap
-              (path:
-                [
-                  (nameValuePair
-                    path
-                    {
-                      target = "darkman/variants/${path}.dark";
-                    })
-                  (nameValuePair
-                    "darkman-${path}"
-                    {
-                      target = path;
-                      source = config.lib.file.mkOutOfStoreSymlink "${configHome}/darkman/variants/${path}";
-                    })
-                ])
-              value.paths)
-          )
-          (attrValues cfg.switchApps));
+        concatMap (
+          value:
+          (concatMap (path: [
+            (nameValuePair path { target = "darkman/variants/${path}.dark"; })
+            (nameValuePair "darkman-${path}" {
+              target = path;
+              source = config.lib.file.mkOutOfStoreSymlink "${configHome}/darkman/variants/${path}";
+            })
+          ]) value.paths)
+        ) (attrValues cfg.switchApps)
+      );
 
-      home.activation."generate-darkman-variants" = entryAfter [ "linkGeneration" ]
-        (concatMapStringsSep "\n"
-          (app: genVariants cfg.switchApps.${app})
-          (attrNames cfg.switchApps)
-        );
+      home.activation."generate-darkman-variants" = entryAfter [ "linkGeneration" ] (
+        concatMapStringsSep "\n" (app: genVariants cfg.switchApps.${app}) (attrNames cfg.switchApps)
+      );
 
-      modules.desktop.services.darkman.switchScripts = mapAttrs
-        (_: value:
-          (theme: ''
-            ${switchScript { inherit (value) paths; inherit theme;}}
-            ${value.reloadScript or ""}
-          '')
-        )
-        cfg.switchApps;
+      modules.desktop.services.darkman.switchScripts = mapAttrs (
+        _: value:
+        (theme: ''
+          ${switchScript {
+            inherit (value) paths;
+            inherit theme;
+          }}
+          ${value.reloadScript or ""}
+        '')
+      ) cfg.switchApps;
     };
 in
 mkIf (cfg.enable && desktopEnabled) (mkMerge [
@@ -163,27 +170,30 @@ mkIf (cfg.enable && desktopEnabled) (mkMerge [
       "Darkman 'hass' switch mode requires the device to have hass integration enabled"
     ];
 
-    modules.desktop.services.darkman.switchMethod = mkIf vmVariant
-      (mkVMOverride "coordinates");
+    modules.desktop.services.darkman.switchMethod = mkIf vmVariant (mkVMOverride "coordinates");
 
     services.darkman = {
       enable = true;
       darkModeScripts = mapAttrs (_: v: v "dark") cfg.switchScripts;
       lightModeScripts = mapAttrs (_: v: v "light") cfg.switchScripts;
 
-      settings = {
-        usegeoclue = false;
-      } // optionalAttrs (cfg.switchMethod == "coordinates") {
-        lat = 50.8;
-        lng = -0.1;
-      };
+      settings =
+        {
+          usegeoclue = false;
+        }
+        // optionalAttrs (cfg.switchMethod == "coordinates") {
+          lat = 50.8;
+          lng = -0.1;
+        };
     };
 
     xdg.portal.config.common = {
       "org.freedesktop.impl.portal.Settings" = [ "darkman" ];
     };
 
-    desktop.hyprland.binds = [ "${desktop.hyprland.modKey}, F1, exec, ${getExe darkmanPackage} toggle" ];
+    desktop.hyprland.binds = [
+      "${desktop.hyprland.modKey}, F1, exec, ${getExe darkmanPackage} toggle"
+    ];
 
     systemd.user.services.darkman-solar-switcher = mkIf (cfg.switchMethod == "hass") {
       Unit = {
@@ -193,33 +203,42 @@ mkIf (cfg.enable && desktopEnabled) (mkMerge [
       };
 
       Service = {
-        ExecStart = getExe (pkgs.writeShellApplication {
-          name = "darkman-solar-switcher";
-          runtimeInputs = [ pkgs.coreutils pkgs.jaq darkmanPackage ];
-          text = /*bash*/ ''
-            set +e
-            current_theme=$(darkman get)
-            switch_theme() {
-              if [ "$1" != "$(darkman get)" ]; then
-                darkman set "$1"
-                current_theme="$1"
-              fi
-            }
+        ExecStart = getExe (
+          pkgs.writeShellApplication {
+            name = "darkman-solar-switcher";
+            runtimeInputs = [
+              pkgs.coreutils
+              pkgs.jaq
+              darkmanPackage
+            ];
+            text = # bash
+              ''
+                set +e
+                current_theme=$(darkman get)
+                switch_theme() {
+                  if [ "$1" != "$(darkman get)" ]; then
+                    darkman set "$1"
+                    current_theme="$1"
+                  fi
+                }
 
-            while true
-            do
-              state=$(${curlCommand { endpoint = "states/binary_sensor.dark_mode_brightness_threshold"; }} | jaq -r .state)
-              if [[ "$state" = "on" && ("$current_theme" = "dark" || "$current_theme" = "null") ]]; then
-                switch_theme "light"
-              elif [[ "$state" = "off" && ("$current_theme" = "light" || "$current_theme" = "null") ]]; then
-                switch_theme "dark"
-              elif [ "$current_theme" = "null" ]; then
-                darkman set dark
-              fi
-              sleep 180
-            done
-          '';
-        });
+                while true
+                do
+                  state=$(${
+                    curlCommand { endpoint = "states/binary_sensor.dark_mode_brightness_threshold"; }
+                  } | jaq -r .state)
+                  if [[ "$state" = "on" && ("$current_theme" = "dark" || "$current_theme" = "null") ]]; then
+                    switch_theme "light"
+                  elif [[ "$state" = "off" && ("$current_theme" = "light" || "$current_theme" = "null") ]]; then
+                    switch_theme "dark"
+                  elif [ "$current_theme" = "null" ]; then
+                    darkman set dark
+                  fi
+                  sleep 180
+                done
+              '';
+          }
+        );
       };
 
       Install.WantedBy = [ "darkman.service" ];

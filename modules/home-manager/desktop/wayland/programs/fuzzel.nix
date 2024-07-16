@@ -1,8 +1,9 @@
-{ lib
-, pkgs
-, config
-, isWayland
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  isWayland,
+  ...
 }:
 let
   inherit (lib) mkIf getExe getExe';
@@ -10,8 +11,7 @@ let
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
 in
-mkIf (cfg.enable && isWayland)
-{
+mkIf (cfg.enable && isWayland) {
   programs.fuzzel = {
     enable = true;
 
@@ -58,7 +58,5 @@ mkIf (cfg.enable && isWayland)
       inherit (desktopCfg.hyprland) modKey;
       fuzzel = getExe pkgs.fuzzel;
     in
-    [
-      "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} fuzzel || ${fuzzel}"
-    ];
+    [ "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} fuzzel || ${fuzzel}" ];
 }

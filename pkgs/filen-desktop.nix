@@ -1,8 +1,9 @@
-{ lib
-, fetchurl
-, makeWrapper
-, appimageTools
-, libappindicator-gtk3
+{
+  lib,
+  fetchurl,
+  makeWrapper,
+  appimageTools,
+  libappindicator-gtk3,
 }:
 let
   pname = "filen-desktop";

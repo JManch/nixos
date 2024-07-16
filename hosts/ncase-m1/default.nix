@@ -61,7 +61,6 @@
     ];
   };
 
-
   modules = {
     core.homeManager.enable = true;
 

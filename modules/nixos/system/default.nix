@@ -1,11 +1,20 @@
-{ lib
-, config
-, username
-, adminUsername
-, ...
+{
+  lib,
+  config,
+  username,
+  adminUsername,
+  ...
 }:
 let
-  inherit (lib) utils mkEnableOption mkOption types mapAttrsToList all allUnique;
+  inherit (lib)
+    utils
+    mkEnableOption
+    mkOption
+    types
+    mapAttrsToList
+    all
+    allUnique
+    ;
   cfg = config.modules.system;
 in
 {
@@ -31,12 +40,14 @@ in
     };
 
     reservedIDs = mkOption {
-      type = types.attrsOf (types.submodule {
-        options = {
-          uid = mkOption { type = types.int; };
-          gid = mkOption { type = types.int; };
-        };
-      });
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            uid = mkOption { type = types.int; };
+            gid = mkOption { type = types.int; };
+          };
+        }
+      );
       default = { };
       description = ''
         Manually allocated UIDs and GIDs for users. IDs must be > 1000 to
@@ -60,7 +71,12 @@ in
       mappedTCPPorts = mkOption {
         type = types.listOf (types.attrsOf types.port);
         default = [ ];
-        example = [{ vmPort = 8999; hostPort = 9003; }];
+        example = [
+          {
+            vmPort = 8999;
+            hostPort = 9003;
+          }
+        ];
         description = ''
           Map TCP ports from VM to host. Forceful alternative to opening the
           firewall as it does not attempt to avoid clashes by mapping port into
@@ -71,7 +87,12 @@ in
       mappedUDPPorts = mkOption {
         type = types.listOf (types.attrsOf types.port);
         default = [ ];
-        example = [{ vmPort = 8999; hostPort = 9003; }];
+        example = [
+          {
+            vmPort = 8999;
+            hostPort = 9003;
+          }
+        ];
         description = ''
           Map UDP ports from VM to host. Forceful alternative to opening the
           firewall as it does not attempt to avoid clashes by mapping port into
@@ -81,9 +102,13 @@ in
     };
 
     networking = {
-      useNetworkd = mkEnableOption ''
-        Whether to enable systemd-networkd network configuration.
-      '' // { default = true; };
+      useNetworkd =
+        mkEnableOption ''
+          Whether to enable systemd-networkd network configuration.
+        ''
+        // {
+          default = true;
+        };
 
       tcpOptimisations = mkEnableOption "TCP optimisations";
       resolved.enable = mkEnableOption "Resolved";
@@ -128,11 +153,16 @@ in
       };
 
       firewall = {
-        enable = mkEnableOption "Firewall" // { default = true; };
+        enable = mkEnableOption "Firewall" // {
+          default = true;
+        };
         defaultInterfaces = mkOption {
           type = types.listOf types.str;
           default = [ cfg.networking.primaryInterface ];
-          example = [ "eno1" "wlp6s0" ];
+          example = [
+            "eno1"
+            "wlp6s0"
+          ];
           description = ''
             List of interfaces to which default firewall rules should be applied.
           '';

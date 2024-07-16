@@ -1,14 +1,24 @@
-{ lib, config, inputs, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 let
-  inherit (lib) mkIf utils mkForce optional genAttrs optionalString;
+  inherit (lib)
+    mkIf
+    utils
+    mkForce
+    optional
+    genAttrs
+    optionalString
+    ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
   cfg = config.modules.services.broadcast-box;
 in
 {
-  imports = [
-    inputs.broadcast-box.nixosModules.default
-  ];
+  imports = [ inputs.broadcast-box.nixosModules.default ];
 
   config = mkIf cfg.enable {
     assertions = utils.asserts [
@@ -28,14 +38,14 @@ in
       };
     };
 
-    systemd.services.broadcast-box.wantedBy = mkForce (
-      optional cfg.autoStart "multi-user.target"
-    );
+    systemd.services.broadcast-box.wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
 
-    networking.firewall.interfaces = mkIf (!cfg.proxy) (genAttrs cfg.interfaces (_: {
-      allowedTCPPorts = [ cfg.port ];
-      allowedUDPPorts = [ cfg.udpMuxPort ];
-    }));
+    networking.firewall.interfaces = mkIf (!cfg.proxy) (
+      genAttrs cfg.interfaces (_: {
+        allowedTCPPorts = [ cfg.port ];
+        allowedUDPPorts = [ cfg.udpMuxPort ];
+      })
+    );
 
     modules.system.networking.publicPorts = [ cfg.udpMuxPort ];
     networking.firewall.allowedUDPPorts = mkIf cfg.proxy [ cfg.udpMuxPort ];

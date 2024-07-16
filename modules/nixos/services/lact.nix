@@ -1,11 +1,18 @@
-{ lib
-, pkgs
-, config
-, hostname
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  hostname,
+  ...
 }:
 let
-  inherit (lib) mkIf utils getExe' getExe concatMapStrings;
+  inherit (lib)
+    mkIf
+    utils
+    getExe'
+    getExe
+    concatMapStrings
+    ;
   inherit (config.device) gpu;
   cfg = config.modules.services.lact;
 
@@ -19,8 +26,7 @@ let
   ];
 in
 # This module is specifically for 7900XT on NCASE-M1 host
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     (hostname == "ncase-m1")
     "Lact is only intended to work on host 'ncase-m1'"
@@ -53,43 +59,45 @@ mkIf cfg.enable
     # Can't use nix yaml because the keys for fan curve have to be integers
     settings =
       let
-        gpuConfig = /*yaml*/ ''
-          fan_control_enabled: true
-          fan_control_settings:
-            mode: curve
-            static_speed: 0.5
-            temperature_key: edge
-            interval_ms: 500
-            curve:
-              60: 0.0
-              70: 0.5
-              75: 0.6
-              80: 0.65
-              90: 1
-          pmfw_options:
-            acoustic_limit: 3300
-            acoustic_target: 2000
-            minimum_pwm: 15
-            target_temperature: 80
-          # Run at 257 for slightly better performance but louder fans
-          power_cap: 231.0
-          performance_level: manual
-          max_core_clock: 2394
-          voltage_offset: -30
-          power_profile_mode_index: 0
-          power_states:
-            memory_clock:
-            - 0
-            - 1
-            - 2
-            - 3
-            core_clock:
-            - 0
-            - 1
-            - 2
-        '';
+        gpuConfig = # yaml
+          ''
+            fan_control_enabled: true
+            fan_control_settings:
+              mode: curve
+              static_speed: 0.5
+              temperature_key: edge
+              interval_ms: 500
+              curve:
+                60: 0.0
+                70: 0.5
+                75: 0.6
+                80: 0.65
+                90: 1
+            pmfw_options:
+              acoustic_limit: 3300
+              acoustic_target: 2000
+              minimum_pwm: 15
+              target_temperature: 80
+            # Run at 257 for slightly better performance but louder fans
+            power_cap: 231.0
+            performance_level: manual
+            max_core_clock: 2394
+            voltage_offset: -30
+            power_profile_mode_index: 0
+            power_states:
+              memory_clock:
+              - 0
+              - 1
+              - 2
+              - 3
+              core_clock:
+              - 0
+              - 1
+              - 2
+          '';
       in
-        /*yaml*/ ''
+      # yaml
+      ''
         daemon:
           log_level: info
           admin_groups:
@@ -98,13 +106,11 @@ mkIf cfg.enable
           disable_clocks_cleanup: false
         apply_settings_timer: 5
         gpus:
-        ${
-          concatMapStrings (gpuId: ''
-            # anchor for correct indendation
-              ${gpuId}:
-                ${lib.replaceStrings ["\n" ] ["\n    "] gpuConfig}
-          '') gpuIds
-        }
+        ${concatMapStrings (gpuId: ''
+          # anchor for correct indendation
+            ${gpuId}:
+              ${lib.replaceStrings [ "\n" ] [ "\n    " ] gpuConfig}
+        '') gpuIds}
       '';
   };
 
@@ -119,15 +125,19 @@ mkIf cfg.enable
       confirm = ''echo '{"command": "confirm_pending_config", "args": {"command": "confirm"}}' | ${ncat} -U /run/lactd.sock'';
       getId = ''echo '{"command": "list_devices"}' | ${ncat} -U /run/lactd.sock | ${jaq} -r ".data.[0].id"'';
 
-      setPowerCap = powerCap: /*bash*/ ''
-        echo "{\"command\": \"set_power_cap\", \"args\": {\"id\": \"$id\", \"cap\": ${toString powerCap}}}" | ${ncat} -U /run/lactd.sock
-        ${confirm}
-      '';
+      setPowerCap =
+        powerCap: # bash
+        ''
+          echo "{\"command\": \"set_power_cap\", \"args\": {\"id\": \"$id\", \"cap\": ${toString powerCap}}}" | ${ncat} -U /run/lactd.sock
+          ${confirm}
+        '';
 
-      setPowerProfile = profileIndex: /*bash*/ ''
-        echo "{\"command\": \"set_power_profile_mode\", \"args\": {\"id\": \"$id\", \"index\": ${toString profileIndex}}}" | ${ncat} -U /run/lactd.sock
-        ${confirm}
-      '';
+      setPowerProfile =
+        profileIndex: # bash
+        ''
+          echo "{\"command\": \"set_power_profile_mode\", \"args\": {\"id\": \"$id\", \"index\": ${toString profileIndex}}}" | ${ncat} -U /run/lactd.sock
+          ${confirm}
+        '';
     in
     {
       startScript = ''

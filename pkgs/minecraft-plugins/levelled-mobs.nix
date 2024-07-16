@@ -1,8 +1,9 @@
-{ lib
-, fetchurl
-, fetchFromGitHub
-, stdenvNoCC
-, ...
+{
+  lib,
+  fetchurl,
+  fetchFromGitHub,
+  stdenvNoCC,
+  ...
 }:
 let
   srcRepo = fetchFromGitHub {

@@ -1,18 +1,24 @@
-{ lib
-, pkgs
-, config
-, inputs
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  ...
 }:
 let
-  inherit (lib) mkIf mkBefore mkVMOverride getExe' utils;
+  inherit (lib)
+    mkIf
+    mkBefore
+    mkVMOverride
+    getExe'
+    utils
+    ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.modules.services.calibre;
 in
-mkIf cfg.enable
-{
+mkIf cfg.enable {
   assertions = utils.asserts [
     caddy.enable
     "Calibre requires Caddy to be enabled"
@@ -35,7 +41,12 @@ mkIf cfg.enable
 
   systemd.services.calibre-web.serviceConfig = utils.hardeningBaseline config {
     DynamicUser = false;
-    RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
+    RestrictAddressFamilies = [
+      "AF_UNIX"
+      "AF_INET"
+      "AF_INET6"
+      "AF_NETLINK"
+    ];
     ReadWritePaths = [ "/var/lib/calibre-library" ];
   };
 
@@ -55,7 +66,10 @@ mkIf cfg.enable
 
     restore.pathOwnership =
       let
-        ownership = { user = "calibre-web"; group = "calibre-web"; };
+        ownership = {
+          user = "calibre-web";
+          group = "calibre-web";
+        };
       in
       {
         "/var/lib/calibre-web" = ownership;

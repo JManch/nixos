@@ -1,11 +1,12 @@
-{ vesktop
-, pnpm
-, fetchFromGitHub
-, autoPatchelfHook
-, copyDesktopItems
-, makeWrapper
-, nodejs
-, ...
+{
+  vesktop,
+  pnpm,
+  fetchFromGitHub,
+  autoPatchelfHook,
+  copyDesktopItems,
+  makeWrapper,
+  nodejs,
+  ...
 }:
 vesktop.overrideAttrs (oldAttrs: rec {
   pname = "vesktop";
@@ -19,7 +20,12 @@ vesktop.overrideAttrs (oldAttrs: rec {
   };
 
   pnpmDeps = pnpm.fetchDeps {
-    inherit pname version src patches;
+    inherit
+      pname
+      version
+      src
+      patches
+      ;
     hash = "sha256-rizJu6v04wFEpJtakC2tfPg/uylz7gAOzJiXvUwdDI4=";
   };
 

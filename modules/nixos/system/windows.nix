@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf mkMerge optional;
   inherit (config.modules.hardware) secureBoot;
@@ -51,9 +56,11 @@ mkMerge [
         '';
       };
 
-      extraFiles."windows.nsh" = mkIf (cfg.bootEntry.fsAlias != "") (pkgs.writeText "windows.nsh" ''
-        ${cfg.bootEntry.fsAlias}:EFI\Microsoft\Boot\Bootmgfw.efi
-      '');
+      extraFiles."windows.nsh" = mkIf (cfg.bootEntry.fsAlias != "") (
+        pkgs.writeText "windows.nsh" ''
+          ${cfg.bootEntry.fsAlias}:EFI\Microsoft\Boot\Bootmgfw.efi
+        ''
+      );
     };
 
     programs.zsh.shellAliases = {

@@ -9,7 +9,12 @@
       ...
     }@inputs:
     let
-      inherit (lib) nixosSystem genAttrs hasPrefix;
+      inherit (lib)
+        nixosSystem
+        genAttrs
+        hasPrefix
+        listToAttrs
+        ;
 
       lib = nixpkgs.lib.extend (final: prev: (import ./lib final) // home-manager.lib);
 
@@ -27,7 +32,8 @@
         );
 
       mkHost = hostname: username: system: {
-        ${hostname} = nixosSystem {
+        name = hostname;
+        value = nixosSystem {
           inherit system;
           specialArgs = {
             inherit
@@ -55,12 +61,13 @@
       packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
       templates = import ./templates;
 
-      nixosConfigurations =
-        mkHost "ncase-m1" "joshua" "x86_64-linux"
-        // mkHost "homelab" "joshua" "x86_64-linux"
-        // mkHost "msi" "lauren" "x86_64-linux"
-        // mkHost "installer" "joshua" "x86_64-linux"
-        // mkHost "installer-arm" "joshua" "aarch64-linux";
+      nixosConfigurations = listToAttrs [
+        (mkHost "ncase-m1" "joshua" "x86_64-linux")
+        (mkHost "homelab" "joshua" "x86_64-linux")
+        (mkHost "msi" "lauren" "x86_64-linux")
+        (mkHost "installer" "joshua" "x86_64-linux")
+        (mkHost "installer-arm" "joshua" "aarch64-linux")
+      ];
     };
 
   inputs = {

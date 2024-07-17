@@ -7,7 +7,12 @@
   ...
 }:
 let
-  inherit (lib) mkIf utils getExe';
+  inherit (lib)
+    mkIf
+    utils
+    getExe'
+    singleton
+    ;
   inherit (config.modules.services) wgnord caddy nfs;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -113,12 +118,10 @@ mkIf cfg.enable {
       };
     };
 
-  persistence.directories = [
-    {
-      directory = "/var/lib/qbittorrent-nox";
-      user = "qbittorrent-nox";
-      group = "qbittorrent-nox";
-      mode = "750";
-    }
-  ];
+  persistence.directories = singleton {
+    directory = "/var/lib/qbittorrent-nox";
+    user = "qbittorrent-nox";
+    group = "qbittorrent-nox";
+    mode = "750";
+  };
 }

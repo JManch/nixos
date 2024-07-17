@@ -6,7 +6,12 @@
   ...
 }:
 let
-  inherit (lib) mkIf genAttrs optional;
+  inherit (lib)
+    mkIf
+    genAttrs
+    optional
+    singleton
+    ;
   cfg = config.modules.services.beammp-server;
 in
 mkIf cfg.enable {
@@ -49,12 +54,10 @@ mkIf cfg.enable {
     );
   };
 
-  persistence.directories = [
-    {
-      directory = "/var/lib/beammp-server";
-      user = "beammp";
-      group = "beammp";
-      mode = "755";
-    }
-  ];
+  persistence.directories = singleton {
+    directory = "/var/lib/beammp-server";
+    user = "beammp";
+    group = "beammp";
+    mode = "755";
+  };
 }

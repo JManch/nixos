@@ -14,6 +14,7 @@ let
     getExe
     getExe'
     escapeShellArg
+    singleton
     ;
   inherit (config.modules.desktop.programs) swaylock;
   cfg = config.modules.desktop.services.hypridle;
@@ -34,12 +35,10 @@ mkIf (cfg.enable && isWayland) {
       };
 
       listener =
-        [
-          {
-            timeout = cfg.lockTime;
-            on-timeout = swaylock.lockScript;
-          }
-        ]
+        (singleton {
+          timeout = cfg.lockTime;
+          on-timeout = swaylock.lockScript;
+        })
         ++ optional cfg.debug {
           timeout = 5;
           on-timeout = "${lib.getExe pkgs.libnotify} 'Hypridle' 'Idle timeout triggered'";

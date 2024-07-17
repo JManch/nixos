@@ -16,6 +16,7 @@ let
     utils
     optional
     getExe'
+    singleton
     ;
   cfg = config.modules.system.ssh;
 in
@@ -38,12 +39,10 @@ in
       ];
     };
 
-    hostKeys = [
-      {
-        path = "/etc/ssh/ssh_host_ed25519_key";
-        type = "ed25519";
-      }
-    ];
+    hostKeys = singleton {
+      path = "/etc/ssh/ssh_host_ed25519_key";
+      type = "ed25519";
+    };
   };
 
   users.users.root.openssh.authorizedKeys.keys = [
@@ -109,19 +108,15 @@ in
     "/etc/ssh/ssh_host_ed25519_key.pub"
   ];
 
-  persistenceHome.directories = [
-    {
-      directory = ".ssh";
-      mode = "0700";
-    }
-  ];
+  persistenceHome.directories = singleton {
+    directory = ".ssh";
+    mode = "0700";
+  };
 
-  persistenceAdminHome.directories = mkIf (username != adminUsername) [
-    {
-      directory = ".ssh";
-      mode = "0700";
-    }
-  ];
+  persistenceAdminHome.directories = mkIf (username != adminUsername) (singleton {
+    directory = ".ssh";
+    mode = "0700";
+  });
 
   virtualisation.vmVariant = {
     services.openssh = {

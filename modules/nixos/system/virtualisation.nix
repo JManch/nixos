@@ -150,17 +150,7 @@ in
               height = 1152;
               position.x = 0;
               position.y = 0;
-              workspaces = [
-                1
-                2
-                3
-                4
-                5
-                6
-                7
-                8
-                9
-              ];
+              workspaces = builtins.genList (i: i + 1) 9;
             }
           ]);
           gpu.type = mkVMOverride null;

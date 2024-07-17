@@ -12,6 +12,7 @@ let
     optional
     optionals
     attrValues
+    singleton
     ;
   inherit (secrets.general) devices;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -133,52 +134,42 @@ let
         false
       ];
 
-  joshuaDehumidifierTankFull = [
-    {
-      alias = "Joshua Dehumidifier Full Notify";
-      mode = "single";
-      trigger = [
-        {
-          platform = "state";
-          entity_id = "sensor.joshua_dehumidifier_tank_status";
-          to = "Full";
-          for.minutes = 1;
-        }
-      ];
-      condition = [ ];
-      action = [
-        {
-          service = "notify.mobile_app_joshua_pixel_5";
-          data = {
-            title = "Dehumidifier";
-            message = "Tank full";
-          };
-        }
-      ];
-    }
-  ];
+  joshuaDehumidifierTankFull = singleton {
+    alias = "Joshua Dehumidifier Full Notify";
+    mode = "single";
+    trigger = singleton {
+      platform = "state";
+      entity_id = "sensor.joshua_dehumidifier_tank_status";
+      to = "Full";
+      for.minutes = 1;
+    };
+    condition = [ ];
+    action = singleton {
+      service = "notify.mobile_app_joshua_pixel_5";
+      data = {
+        title = "Dehumidifier";
+        message = "Tank full";
+      };
+    };
+  };
 
   joshuaDehumidifierMoldToggle =
     map
       (enable: {
         alias = "Joshua Dehumidifier ${if enable then "Enable" else "Disable"}";
         mode = "single";
-        trigger = [
-          {
-            platform = "numeric_state";
-            entity_id = [ "sensor.joshua_mold_indicator" ];
-            above = mkIf enable 73;
-            below = mkIf (!enable) 67;
-            for.minutes = if enable then 0 else 30;
-          }
-        ];
+        trigger = singleton {
+          platform = "numeric_state";
+          entity_id = [ "sensor.joshua_mold_indicator" ];
+          above = mkIf enable 73;
+          below = mkIf (!enable) 67;
+          for.minutes = if enable then 0 else 30;
+        };
         condition = [ ];
-        action = [
-          {
-            service = "switch.turn_${if enable then "on" else "off"}";
-            target.entity_id = "switch.joshua_dehumidifier";
-          }
-        ];
+        action = singleton {
+          service = "switch.turn_${if enable then "on" else "off"}";
+          target.entity_id = "switch.joshua_dehumidifier";
+        };
       })
       [
         true
@@ -414,13 +405,11 @@ let
             }
           ]
           ++ optional (!enable) {
-            "if" = [
-              {
-                condition = "state";
-                entity_id = "light.joshua_room";
-                state = "on";
-              }
-            ];
+            "if" = singleton {
+              condition = "state";
+              entity_id = "light.joshua_room";
+              state = "on";
+            };
             "then" = [
               { delay.seconds = 2; }
               {

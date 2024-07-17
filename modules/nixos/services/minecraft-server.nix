@@ -20,6 +20,7 @@ let
     mapAttrsToList
     getExe
     mkForce
+    singleton
     ;
   inherit (config.services.minecraft-server) dataDir;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -386,12 +387,10 @@ mkIf cfg.enable {
       };
     };
 
-  persistence.directories = [
-    {
-      directory = "/var/lib/minecraft";
-      user = "minecraft";
-      group = "minecraft";
-      mode = "755";
-    }
-  ];
+  persistence.directories = singleton {
+    directory = "/var/lib/minecraft";
+    user = "minecraft";
+    group = "minecraft";
+    mode = "755";
+  };
 }

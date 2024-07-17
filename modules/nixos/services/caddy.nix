@@ -19,6 +19,7 @@ let
     concatMapStrings
     concatMapStringsSep
     genAttrs
+    singleton
     ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
@@ -207,14 +208,12 @@ mkMerge [
       let
         inherit (config.services) caddy;
       in
-      [
-        {
-          directory = "/var/lib/caddy";
-          user = caddy.user;
-          group = caddy.group;
-          mode = "700";
-        }
-      ];
+      singleton {
+        directory = "/var/lib/caddy";
+        user = caddy.user;
+        group = caddy.group;
+        mode = "700";
+      };
 
     virtualisation.vmVariant = {
       modules.services.caddy.trustedAddresses = [ "10.0.2.2/32" ];

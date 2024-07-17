@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf optional;
+  inherit (lib) mkIf optional singleton;
   inherit (config.modules.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (secrets.lovelace) heating room1;
@@ -239,12 +239,10 @@ let
       }
       {
         type = "history-graph";
-        entities = [
-          {
-            entity = "binary_sensor.ncase_m1_active";
-            name = "NCASE-M1";
-          }
-        ];
+        entities = singleton {
+          entity = "binary_sensor.ncase_m1_active";
+          name = "NCASE-M1";
+        };
       }
       {
         title = "Dehumidifier";
@@ -527,12 +525,10 @@ let
             chart_type = "line";
             period = "hour";
             type = "statistics-graph";
-            entities = [
-              {
-                entity = "sensor.powerwall_aggregate_cost";
-                name = "Month Aggregate Cost";
-              }
-            ];
+            entities = singleton {
+              entity = "sensor.powerwall_aggregate_cost";
+              name = "Month Aggregate Cost";
+            };
             stat_types = [ "sum" ];
           }
         ];

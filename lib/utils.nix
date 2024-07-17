@@ -16,6 +16,7 @@ let
     concatMap
     hasPrefix
     stringToCharacters
+    singleton
     ;
 in
 {
@@ -77,12 +78,10 @@ in
       imap0 (
         i: elem:
         if (mod i 2) == 0 then
-          [
-            {
-              assertion = elem;
-              message = (elemAt asserts (i + 1));
-            }
-          ]
+          singleton {
+            assertion = elem;
+            message = (elemAt asserts (i + 1));
+          }
         else
           [ ]
       ) asserts

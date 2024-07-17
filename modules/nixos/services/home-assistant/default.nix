@@ -20,6 +20,7 @@ let
     mapAttrsToList
     concatStringsSep
     escapeShellArg
+    singleton
     ;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -123,13 +124,11 @@ in
           ];
         };
 
-        camera = [
-          {
-            platform = "local_file";
-            file_path = "/var/lib/hass/media/lounge_floorplan.png";
-            name = "Lounge Floorplan";
-          }
-        ];
+        camera = singleton {
+          platform = "local_file";
+          file_path = "/var/lib/hass/media/lounge_floorplan.png";
+          name = "Lounge Floorplan";
+        };
 
         lovelace.resources = [
           {
@@ -218,12 +217,10 @@ in
     services.postgresql = {
       enable = true;
       ensureDatabases = [ "hass" ];
-      ensureUsers = [
-        {
-          name = "hass";
-          ensureDBOwnership = true;
-        }
-      ];
+      ensureUsers = singleton {
+        name = "hass";
+        ensureDBOwnership = true;
+      };
 
       # Version 15 enabled checkout logging by default which is quite verbose.
       # It's useful for debugging performance problems though this is unlikely

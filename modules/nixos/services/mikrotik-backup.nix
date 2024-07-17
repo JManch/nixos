@@ -5,7 +5,12 @@
   ...
 }:
 let
-  inherit (lib) utils mkIf getExe;
+  inherit (lib)
+    utils
+    mkIf
+    getExe
+    singleton
+    ;
   inherit (config.age.secrets) mikrotikBackupKey;
   cfg = config.modules.services.mikrotik-backup;
   backupDir = "/var/backup/mikrotik";
@@ -83,12 +88,10 @@ mkIf cfg.enable {
     };
   };
 
-  persistence.directories = [
-    {
-      directory = backupDir;
-      user = "mikrotik-backup";
-      group = "mikrotik-backup";
-      mode = "700";
-    }
-  ];
+  persistence.directories = singleton {
+    directory = backupDir;
+    user = "mikrotik-backup";
+    group = "mikrotik-backup";
+    mode = "700";
+  };
 }

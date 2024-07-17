@@ -5,7 +5,12 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe' utils;
+  inherit (lib)
+    mkIf
+    getExe'
+    utils
+    singleton
+    ;
   cfg = config.modules.services.greetd;
 in
 mkIf cfg.enable {
@@ -57,14 +62,12 @@ mkIf cfg.enable {
     enableGnomeKeyring = true;
   };
 
-  persistence.directories = [
-    {
-      directory = "/var/cache/tuigreet";
-      user = "greeter";
-      group = "greeter";
-      mode = "755";
-    }
-  ];
+  persistence.directories = singleton {
+    directory = "/var/cache/tuigreet";
+    user = "greeter";
+    group = "greeter";
+    mode = "755";
+  };
 
   persistenceHome.directories = [ ".local/share/keyrings" ];
 }

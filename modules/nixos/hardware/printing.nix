@@ -11,6 +11,7 @@ let
     mkMerge
     utils
     mkForce
+    singleton
     ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
@@ -113,15 +114,14 @@ mkMerge [
 
     # Keep an eye on this for https://github.com/NixOS/nixpkgs/issues/78535
     hardware.printers = {
-      ensurePrinters = [
-        {
-          name = "Brother-DCP-9015CDW";
-          deviceUri = "ipp://printer.lan/ipp/print";
-          model = "everywhere";
-          ppdOptions.PageSize = "A4";
-        }
-      ];
       ensureDefaultPrinter = "Brother-DCP-9015CDW";
+
+      ensurePrinters = singleton {
+        name = "Brother-DCP-9015CDW";
+        deviceUri = "ipp://printer.lan/ipp/print";
+        model = "everywhere";
+        ppdOptions.PageSize = "A4";
+      };
     };
 
     services.caddy.virtualHosts."printing.${fqDomain}".extraConfig = ''

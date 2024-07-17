@@ -12,6 +12,7 @@ let
     optionalString
     utils
     optional
+    singleton
     ;
   inherit (config.device) ipAddress;
   inherit (config.modules.system.networking) publicPorts;
@@ -287,26 +288,22 @@ mkIf cfg.enable {
     allowedUDPPorts = cfg.webrtc.port;
   };
 
-  services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = [
-    {
-      addr = "127.0.0.1";
-      port = cfg.port;
-    }
-  ];
+  services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = singleton {
+    addr = "127.0.0.1";
+    port = cfg.port;
+  };
 
   services.caddy.virtualHosts."cctv.${fqDomain}".extraConfig = ''
     ${allowAddresses trustedAddresses}
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 
-  persistence.directories = [
-    {
-      directory = "/var/lib/frigate";
-      user = "frigate";
-      group = "frigate";
-      mode = "700";
-    }
-  ];
+  persistence.directories = singleton {
+    directory = "/var/lib/frigate";
+    user = "frigate";
+    group = "frigate";
+    mode = "700";
+  };
 
   virtualisation.vmVariant = {
     services.frigate.settings = {
@@ -321,12 +318,10 @@ mkIf cfg.enable {
       rtsp.listen = mkVMOverride ":8554";
     };
 
-    services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = mkVMOverride [
-      {
-        addr = "0.0.0.0";
-        port = cfg.port;
-      }
-    ];
+    services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = mkVMOverride (singleton {
+      addr = "0.0.0.0";
+      port = cfg.port;
+    });
 
     # NOTE: I can't get the WebRTC stream to work from the VM
     networking.firewall.allowedTCPPorts = [

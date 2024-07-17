@@ -32,6 +32,7 @@ let
     mkBefore
     mkAfter
     optionalString
+    singleton
     ;
   inherit (config.modules.services) caddy;
   inherit (config.modules.system) impermanence;
@@ -377,12 +378,10 @@ mkMerge [
 
     # Persist maintenance service cache otherwise forget command can be very
     # expensive
-    persistence.directories = [
-      {
-        directory = "/var/cache/restic-repo-maintenance";
-        mode = "700";
-      }
-    ];
+    persistence.directories = singleton {
+      directory = "/var/cache/restic-repo-maintenance";
+      mode = "700";
+    };
   })
 
   (mkIf (cfg.server.enable && !vmVariant) {

@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf utils;
+  inherit (lib) mkIf utils singleton;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy mosquitto;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -82,12 +82,10 @@ mkIf cfg.enable {
     };
   };
 
-  persistence.directories = [
-    {
-      directory = dataDir;
-      user = "zigbee2mqtt";
-      group = "zigbee2mqtt";
-      mode = "770";
-    }
-  ];
+  persistence.directories = singleton {
+    directory = dataDir;
+    user = "zigbee2mqtt";
+    group = "zigbee2mqtt";
+    mode = "770";
+  };
 }

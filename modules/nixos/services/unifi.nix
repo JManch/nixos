@@ -7,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf utils;
+  inherit (lib) mkIf utils singleton;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -68,14 +68,12 @@ mkIf cfg.enable {
   #   };
   # };
 
-  persistence.directories = [
-    {
-      directory = "/var/lib/unifi";
-      user = "unifi";
-      group = "unifi";
-      mode = "750";
-    }
-  ];
+  persistence.directories = singleton {
+    directory = "/var/lib/unifi";
+    user = "unifi";
+    group = "unifi";
+    mode = "750";
+  };
 
   virtualisation.vmVariant = {
     networking.firewall.allowedTCPPorts = [ 8443 ];

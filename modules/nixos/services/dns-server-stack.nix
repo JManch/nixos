@@ -27,6 +27,7 @@ let
     getExe
     getExe'
     genAttrs
+    singleton
     ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.dns-server-stack;
@@ -89,14 +90,12 @@ mkIf cfg.enable {
 
       listener."0".policy = {
         name = "Failover DNS";
-        networks = [
-          {
-            "network.0" = [
-              "upstream.0"
-              "upstream.1"
-            ];
-          }
-        ];
+        networks = singleton {
+          "network.0" = [
+            "upstream.0"
+            "upstream.1"
+          ];
+        };
       };
 
       upstream = {

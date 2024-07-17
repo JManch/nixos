@@ -59,7 +59,6 @@ let
         pushd "/home/${adminUsername}" > /dev/null
         add_exit_trap "popd >/dev/null 2>&1 || true"
         nixos-rebuild build-vm --flake "$flake#$hostname"
-        popd > /dev/null
 
         # Check if the VM uses impermanence
         impermanence=$(nix eval "$flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.modules.system.impermanence.enable")

@@ -74,7 +74,7 @@ in
     nix-resources.nixosModules.secrets
   ];
 
-  users.users.${adminUsername}.packages = [
+  adminPackages = [
     agenix.packages.${pkgs.system}.default
     editSecretScript
     rekeySecretScript

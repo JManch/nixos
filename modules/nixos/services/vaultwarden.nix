@@ -144,7 +144,7 @@ mkIf cfg.enable {
   systemd.timers.backup-vaultwarden.timerConfig.OnCalendar = "08,20:00";
   systemd.services.backup-vaultwarden.wantedBy = mkForce [ ];
 
-  users.users.${adminUsername}.packages = [ restoreScript ];
+  adminPackages = [ restoreScript ];
 
   systemd.services.vaultwarden-cloud-backup =
     let

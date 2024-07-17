@@ -44,7 +44,7 @@ in
   # effort into optimising it.
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = with pkgs; [
+    userPackages = with pkgs; [
       opencomposite-helper
       index_camera_passthrough
     ];

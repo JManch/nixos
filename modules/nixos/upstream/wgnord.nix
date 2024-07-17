@@ -57,8 +57,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [ pkgs.wgnord ];
-
     systemd.services.wgnord = {
       unitConfig = {
         Description = "Nord Wireguard VPN";

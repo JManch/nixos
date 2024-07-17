@@ -80,7 +80,7 @@ let
     };
 in
 mkMerge [
-  { users.users.${adminUsername}.packages = [ generateCerts ]; }
+  { adminPackages = [ generateCerts ]; }
   (mkIf cfg.enable {
     assertions = utils.asserts [
       (cfg.trustedAddresses != [ ])

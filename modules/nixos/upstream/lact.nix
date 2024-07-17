@@ -29,8 +29,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [ cfg.package ];
-
     environment.etc."lact/config.yaml" = mkIf (cfg.settings != "") { text = cfg.settings; };
 
     systemd.services.lact = {

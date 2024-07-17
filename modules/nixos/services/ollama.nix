@@ -14,7 +14,7 @@ let
   cfg = config.modules.services.ollama;
 in
 mkIf cfg.enable {
-  environment.systemPackages = [ pkgs.oterm ];
+  userPackages = [ pkgs.oterm ];
 
   services.ollama = {
     enable = true;

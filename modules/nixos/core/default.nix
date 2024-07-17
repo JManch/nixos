@@ -3,6 +3,7 @@
   pkgs,
   config,
   username,
+  adminUsername,
   ...
 }:
 let
@@ -11,10 +12,25 @@ let
     mkOption
     mkEnableOption
     types
+    mkAliasOptionModule
     ;
 in
 {
-  imports = utils.scanPaths ./.;
+  imports = utils.scanPaths ./. ++ [
+    (mkAliasOptionModule [ "userPackages" ] [
+      "users"
+      "users"
+      username
+      "packages"
+    ])
+
+    (mkAliasOptionModule [ "adminPackages" ] [
+      "users"
+      "users"
+      adminUsername
+      "packages"
+    ])
+  ];
 
   options.modules.core = {
     homeManager.enable = mkEnableOption "Home Manager";

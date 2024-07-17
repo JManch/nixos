@@ -5,7 +5,7 @@ let
 in
 mkIf cfg.enable {
   # Install instructions: https://gitlab.com/doronbehar/nix-matlab
-  environment.systemPackages = [ (utils.flakePkgs args "nix-matlab").matlab ];
+  userPackages = [ (utils.flakePkgs args "nix-matlab").matlab ];
 
   persistenceHome.directories = [ ".config/matlab" ];
 }

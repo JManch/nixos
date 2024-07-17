@@ -9,7 +9,7 @@ let
   cfg = config.modules.programs.wine;
 in
 lib.mkIf (cfg.enable && desktop.enable) {
-  environment.systemPackages = [
+  userPackages = [
     cfg.package
     pkgs.winetricks
   ];

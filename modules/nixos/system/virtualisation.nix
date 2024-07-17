@@ -248,7 +248,7 @@ in
         ];
       };
 
-      users.users.${adminUsername}.packages = [ runVMScript ];
+      adminPackages = [ runVMScript ];
     }
 
     (mkIf cfg.libvirt.enable {

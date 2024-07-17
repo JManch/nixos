@@ -161,7 +161,7 @@ let
   ) rebuildCmds;
 in
 {
-  users.users.${adminUsername}.packages = [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts;
+  adminPackages = [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts;
   persistenceAdminHome.directories = [ ".remote-builds" ];
 
   # Nice explanation of overlays: https://archive.is/f8goR

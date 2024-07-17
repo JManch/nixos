@@ -130,5 +130,5 @@ let
   };
 in
 {
-  users.users.${adminUsername}.packages = [ deployScript ];
+  adminPackages = [ deployScript ];
 }

@@ -35,7 +35,7 @@ in
 
   config = mkMerge [
     (mkIf cfg.enable {
-      environment.systemPackages = [ pkgs.pavucontrol ];
+      userPackages = [ pkgs.pavucontrol ];
       hardware.pulseaudio.enable = mkForce false;
       modules.system.audio.scripts.toggleMic = toggleMic.outPath;
 
@@ -61,7 +61,7 @@ in
     })
 
     (mkIf (cfg.enable && cfg.extraAudioTools) {
-      environment.systemPackages = with pkgs; [
+      userPackages = with pkgs; [
         helvum
         qpwgraph
       ];

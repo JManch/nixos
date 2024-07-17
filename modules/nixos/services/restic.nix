@@ -214,7 +214,7 @@ in
 mkMerge [
   # To allow testing backup restores in the VM
   (mkIf (cfg.enable || cfg.server.enable || (cfg.enable && vmVariant)) {
-    users.users.${adminUsername}.packages = [
+    adminPackages = [
       pkgs.restic
       restoreScript
     ];

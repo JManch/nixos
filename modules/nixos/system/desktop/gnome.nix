@@ -41,7 +41,7 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
     gnome.totem
   ];
 
-  environment.systemPackages =
+  userPackages =
     extensions
     ++ (with pkgs; [
       gnome.gnome-tweaks

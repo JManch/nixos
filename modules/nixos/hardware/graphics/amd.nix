@@ -19,7 +19,7 @@ let
 in
 mkIf (config.device.gpu.type == "amd") {
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
-  environment.systemPackages = [ amdgpu_top ];
+  userPackages = [ amdgpu_top ];
   services.xserver.videoDrivers = [ "modesetting" ];
 
   # Make radv the default driver

@@ -8,12 +8,12 @@
 let
   inherit (lib) mkIf getExe mkForce;
   cfg = config.modules.desktop.services.wlsunset;
-  # TODO: Look into this issue
   # WARN: For some reason wlsunset causing system stuttering and graphical
   # artificating during gamma adjustments. If there's a long transition during
   # this means artifacts and freezes appear ~ every 30 seconds. To workaround
   # this we manually set duration to 0 and manually set sunrise and sunset (a
   # requirement for duration=0).
+
   duration = 0;
   sunrise = "06:00";
   sunset = "21:00";
@@ -33,20 +33,19 @@ mkIf (cfg.enable && isWayland) {
     latitude = "50.8";
   };
 
-  # The hm module is missing duration so we have to do this
-  systemd.user.services.wlsunset.Service.ExecStart =
-    let
-      args = lib.cli.toGNUCommandLineShell { } {
-        t = temperature.night;
-        T = temperature.day;
-        S = sunrise;
-        s = sunset;
-        d = duration;
-      };
-    in
-    mkForce "${getExe pkgs.wlsunset} ${args}";
+  # NOTE: The stutter issue might be fixed in the latest hyprland update so
+  # re-enabling transition mode to test
 
-  # wlsunset has a tendency to disable itself after DPMS. Restarting the
-  # service fixes it.
-  modules.desktop.programs.swaylock.postUnlockScript = "systemctl restart --user wlsunset";
+  # The hm module is missing duration so we have to do this
+  # systemd.user.services.wlsunset.Service.ExecStart =
+  #   let
+  #     args = lib.cli.toGNUCommandLineShell { } {
+  #       t = temperature.night;
+  #       T = temperature.day;
+  #       S = sunrise;
+  #       s = sunset;
+  #       d = duration;
+  #     };
+  #   in
+  #   mkForce "${getExe pkgs.wlsunset} ${args}";
 }

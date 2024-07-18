@@ -32,7 +32,6 @@ let
   # of moving the open special workspace to the active monitor
   hyprland = utils.addPatches hyprlandPkgs.hyprland [
     ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch
-    ../../../../../patches/hyprlandEmptyMonitorFix.patch
     ../../../../../patches/hyprlandDispatcherError.patch
   ];
 in
@@ -44,8 +43,9 @@ mkIf (utils.isHyprland config) {
 
   modules.desktop = {
     # Optimise for performance in VM variant
-    # TODO: When I update hyprland, add a hook to disable hardware cursors when
-    # launching a QEMU VM otherwise the cursor is upside down.
+    # TODO: Add a hook to disable hardware cursor when launching a QEMU VM
+    # otherwise the cursor is upside down. Also disable hardware cursor when
+    # enabling mirrored monitor.
     # https://github.com/hyprwm/Hyprland/issues/6428
     hyprland = mkIf vmVariant (mkVMOverride {
       tearing = false;
@@ -106,9 +106,7 @@ mkIf (utils.isHyprland config) {
     enable = true;
     package = hyprland;
 
-    # plugins = with utils.flakePkgs args "hyprland-plugins"; [
-    #   hyprexpo
-    # ];
+    plugins = with utils.flakePkgs args "hyprland-plugins"; [ hyprexpo ];
 
     systemd = {
       enable = true;
@@ -132,9 +130,6 @@ mkIf (utils.isHyprland config) {
           "XDG_CURRENT_DESKTOP,Hyprland"
           "XDG_SESSION_TYPE,wayland"
           "XDG_SESSION_DESKTOP,Hyprland"
-          # Disable for cursor on mirrored monitors. After update should be able
-          # to toggle this at runtime.
-          "WLR_NO_HARDWARE_CURSORS,1"
         ]
         ++ optionals (cfg.hyprcursor.package != null) [
           "HYPRCURSOR_THEME,${cfg.hyprcursor.name}"
@@ -154,21 +149,6 @@ mkIf (utils.isHyprland config) {
           ",preferred,auto,1" # automatic monitor detection
         ];
 
-      exec-once =
-        let
-          xclip = getExe pkgs.xclip;
-          wlPaste = getExe' pkgs.wl-clipboard "wl-paste";
-          cat = getExe' pkgs.coreutils "cat";
-          cmp = getExe' pkgs.diffutils "cmp";
-        in
-        [
-          # Temporary and buggy fix for pasting into wine applications
-          # https://github.com/hyprwm/Hyprland/issues/2319
-          # https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4359
-          # FIX: This is sometimes causing an extra linespace to be inserted on paste
-          "${wlPaste} -t text -w sh -c 'v=$(${cat}); ${cmp} -s <(${xclip} -selection clipboard -o)  <<< \"$v\" || ${xclip} -selection clipboard <<< \"$v\"'"
-        ];
-
       general = {
         gaps_in = gapSize / 2;
         gaps_out = gapSize;
@@ -179,7 +159,6 @@ mkIf (utils.isHyprland config) {
         "col.active_border" = "0xff${colors.base0D}";
         "col.inactive_border" = "0xff${colors.base00}";
         allow_tearing = cfg.tearing;
-        cursor_inactive_timeout = 3;
       };
 
       decoration = {
@@ -210,11 +189,16 @@ mkIf (utils.isHyprland config) {
             inherit (primaryMonitor) position width height;
           in
           {
-            # Custom transforms are currently broken
             transform = 1;
             region_position = "${toString position.x} ${toString position.y}";
             region_size = "${toString width} ${toString height}";
           };
+      };
+
+      cursor = {
+        inactive_timeout = 3;
+        enable_hyprcursor = cfg.hyprcursor.package != null;
+        hide_on_key_press = true;
       };
 
       animations = {
@@ -254,14 +238,11 @@ mkIf (utils.isHyprland config) {
         new_window_takes_over_fullscreen = 2;
         enable_swallow = false;
         swallow_regex = "^(${desktopCfg.terminal.class})$";
-        enable_hyprcursor = cfg.hyprcursor.package != null;
-        hide_cursor_on_key_press = true;
       };
 
       dwindle = {
         preserve_split = true;
         force_split = 2;
-        no_gaps_when_only = 0; # currently broken https://github.com/hyprwm/Hyprland/issues/5552
       };
 
       binds = {
@@ -274,6 +255,7 @@ mkIf (utils.isHyprland config) {
       debug = {
         disable_logs = !cfg.logging;
         enable_stdout_logs = false;
+        error_position = 1;
       };
 
       workspace =
@@ -292,14 +274,14 @@ mkIf (utils.isHyprland config) {
           "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
         ];
 
-      # plugin = {
-      #   hyprexpo = {
-      #     columns = 3;
-      #     gap_size = 0;
-      #     workspace_method = "first m~1";
-      #     enable_gesture = false;
-      #   };
-      # };
+      plugin = {
+        hyprexpo = {
+          columns = 3;
+          gap_size = 0;
+          workspace_method = "first m~1";
+          enable_gesture = false;
+        };
+      };
     };
   };
 

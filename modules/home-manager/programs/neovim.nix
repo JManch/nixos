@@ -33,6 +33,7 @@ mkIf cfg.enable {
       lua-language-server
       nil
       nixd
+      ltex-ls
 
       # Formatters
       nixfmt-rfc-style

@@ -43,11 +43,11 @@ mkIf cfg.enable {
 
     # Master branch fixes power profile modifications
     package = pkgs.lact.overrideAttrs (oldAttrs: rec {
-      version = "git";
+      version = "0.5.5";
       src = pkgs.fetchFromGitHub {
         owner = "ilya-zlobintsev";
         repo = "LACT";
-        rev = "4db593c73f7b46a8d1466bf5734e9a764c43afb7";
+        rev = "v0.5.5";
         hash = "sha256-ehJYUZ4Bdttqzs3/SSvhJRzPO7CPbeP8ormXQ7NUzXI=";
       };
       cargoDeps = oldAttrs.cargoDeps.overrideAttrs (_: {

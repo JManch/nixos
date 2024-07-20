@@ -13,6 +13,14 @@ let
       age
       disko
       gitMinimal
+      # The upstream package hardcodes the database path but we want to be able
+      # to modify it at runtime using the --export and --database-path flags
+      (sbctl.overrideAttrs {
+        ldflags = [
+          "-s"
+          "-w"
+        ];
+      })
     ];
     text = # bash
       ''
@@ -48,6 +56,7 @@ let
         username=$(nix eval --raw "$host_config.modules.core.username")
         admin_username=$(nix eval --raw "$host_config.modules.core.adminUsername")
         impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
+        secure_boot=$(nix eval "$host_config.modules.hardware.secureBoot.enable")
 
         vmInstall=false
         read -p "Are you installing this host in a virtual machine? (y/N): " -n 1 -r
@@ -125,6 +134,11 @@ let
         if [ "$username" != "$admin_username" ]; then
           # admin_user:wheel
           chown -R 1:1 "$rootDir/home/$admin_username"
+        fi
+
+        # If the host uses secure boot, generate keys
+        if [ "$secure_boot" = "true" ]; then
+          sbctl create-keys --export "$rootDir/etc/secureboot/keys/" --database-path "$rootDir/etc/secureboot/"
         fi
 
         # WARN: nixos-install has a bunch of options that are not documented in

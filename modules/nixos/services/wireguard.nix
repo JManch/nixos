@@ -141,7 +141,6 @@ let
           publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
           allowedIPs = cfg.routerAllowedIPs;
           endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:13232";
-          persistentKeepalive = 25;
         };
 
       # Route incoming DNS traffic on the wireguard interface to the DNS server

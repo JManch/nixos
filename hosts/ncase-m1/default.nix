@@ -68,7 +68,22 @@
       secureBoot.enable = true;
       vr.enable = true;
       fanatec.enable = true;
-      fileSystem.trim = true;
+
+      fileSystem = {
+        trim = true;
+        zfsPassphraseCred = ''
+          DHzAexF2RZGcSwvqCLwg/iAAAAABAAAADAAAABAAAACC7x/VG/f0sAMQRX0AAAAAgAAAA \
+          AAAAAALACMA8AAAACAAAAAAngAgFD/ouh3hJ2deKa9kL7wsQR8vpJjQF2B8ZeVi0qq+HF \
+          MAEL+ELOC9b+zMAXhtTemqTYjjzkxajL6W5vBnH0itpdMsdNiz1Ygi2Y1LJ3WOAAxMUJy \
+          i5fqwCs6zfMZf/PyWFp+BvwlLnmjUxE8HnpdP84V+Mk2yqdr8GynOPkKTCDsAAi4bGt9A \
+          2ZuEaWsIdKE8Mxk1EstoZxCO6v6PAE4ACAALAAAAEgAg4w/rD608CdGmVrgpix1PuZrHS \
+          98cp0+5EE5gROfkEEYAEAAge8wRM/plZ2+RlyuK9ildKgjNmWXOEnBUZZ3ZGZH2YmHjD+ \
+          sPrTwJ0aZWuCmLHU+5msdL3xynT7kQTmBE5+QQRgAAAAAIOn2j5mI7lQGIjKcSwOvOmRi \
+          f+oeb49Convojrvp7+E0nhJmuVkWn0AWp0zzmV9U1te8L2sKha/Cv361IVDq6FjjT6ctr \
+          rknsLUgwOdjVdG3ndl7gXB6LcEMQpem1nB/VZAQqLASE+CU/SWHZsHHcaicJyYkoJLe3F \
+          qqXoP2+xGUVNAgOaFYIZcQs856a2o52cxDDkDyq3A==
+        '';
+      };
 
       printing.client = {
         enable = true;

@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, config, ... }:
 let
   inherit (lib)
     utils
@@ -6,6 +6,8 @@ let
     mkEnableOption
     types
     mkDefault
+    mapAttrsToList
+    hasAttr
     ;
 in
 {
@@ -25,6 +27,28 @@ in
         an extended loader timeout of 30 seconds. Useful for switching to old
         generations on headless machines.
       '';
+
+      encrypted = mkOption {
+        type = types.bool;
+        readOnly = true;
+        default = lib.any (v: v == true) (
+          mapAttrsToList (_: pool: hasAttr "encryption" pool.rootFsOptions) config.disko.devices.zpool
+        );
+        description = ''
+          Whether the file system uses disk encryption. Derived from disko
+          config.
+        '';
+      };
+
+      zfsPassphraseCred = mkOption {
+        type = with types; nullOr lines;
+        default = null;
+        description = ''
+          Encrypted ZFS passphrase credential generated with
+          `systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2
+          --name=zfs-passphrase -p - -`
+        '';
+      };
     };
 
     printing = {

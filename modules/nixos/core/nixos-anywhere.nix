@@ -11,9 +11,6 @@ let
     concatStringsSep
     attrNames
     filterAttrs
-    mapAttrsToList
-    all
-    hasAttr
     ;
 
   deployScript = pkgs.writeShellApplication {
@@ -44,12 +41,7 @@ let
         hosts=(${
           concatStringsSep " " (
             attrNames (
-              filterAttrs (
-                _: value:
-                all (v: v == false) (
-                  mapAttrsToList (_: pool: hasAttr "encryption" pool.rootFsOptions) value.config.disko.devices.zpool
-                )
-              ) (utils.hosts self)
+              filterAttrs (_: value: !value.config.modules.hardware.fileSystem.encrypted) (utils.hosts self)
             )
           )
         })

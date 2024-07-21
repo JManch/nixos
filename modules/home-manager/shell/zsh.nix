@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe';
+  inherit (lib) mkIf getExe' singleton;
   cfg = config.modules.shell;
 in
 mkIf cfg.enable {
@@ -14,6 +14,12 @@ mkIf cfg.enable {
     autosuggestion.enable = true;
     enableCompletion = true;
     dotDir = ".config/zsh";
+
+    plugins = singleton {
+      name = "zsh-vi-mode";
+      file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
+      src = pkgs.zsh-vi-mode;
+    };
 
     syntaxHighlighting = {
       enable = true;
@@ -36,6 +42,35 @@ mkIf cfg.enable {
       cat = "bat -pp --theme=base16";
       reload = "exec zsh";
     };
+
+    initExtraFirst = # bash
+      ''
+        function zvm_config() {
+          ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+          ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
+          ZVM_KEYTIMEOUT=0.6
+          # Load the plugin straight away so we don't have to deal with keybind
+          # order for things like fzf
+          ZVM_INIT_MODE=sourcing
+        }
+
+        function jump_end_of_line() {
+          zvm_navigation_handler $
+        }
+
+        function jump_start_of_line() {
+          zvm_navigation_handler ^
+        }
+
+        function zvm_after_lazy_keybindings() {
+          zvm_define_widget jump_start_of_line
+          zvm_define_widget jump_end_of_line
+          zvm_bindkey vicmd 'H' jump_start_of_line
+          zvm_bindkey vicmd 'L' jump_end_of_line
+          zvm_bindkey visual 'H' jump_start_of_line
+          zvm_bindkey visual 'L' jump_end_of_line
+        }
+      '';
 
     initExtra =
       let

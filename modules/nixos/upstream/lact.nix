@@ -31,6 +31,8 @@ in
   config = mkIf cfg.enable {
     environment.etc."lact/config.yaml" = mkIf (cfg.settings != "") { text = cfg.settings; };
 
+    environment.systemPackages = [ cfg.package ];
+
     systemd.services.lact = {
       unitConfig = {
         Description = "AMDGPU Control Daemon";

@@ -1,14 +1,14 @@
 {
   lib,
   pkgs,
+  pkgs',
   config,
-  selfPkgs,
   ...
 }:
 let
   inherit (lib) mkIf getExe;
   cfg = config.modules.services.index-checker;
-  shoutrrr = getExe selfPkgs.shoutrrr;
+  shoutrrr = getExe pkgs'.shoutrrr;
 
   pythonScript =
     pkgs.writers.writePython3 "index-checker"
@@ -49,7 +49,7 @@ mkIf cfg.enable {
           name = "index-checker";
           runtimeInputs = [
             pkgs.coreutils
-            selfPkgs.shoutrrr
+            pkgs'.shoutrrr
           ];
           text = # bash
             ''

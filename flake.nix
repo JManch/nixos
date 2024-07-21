@@ -5,6 +5,7 @@
     {
       self,
       nixpkgs,
+      nixpkgs-small,
       home-manager,
       ...
     }@inputs:
@@ -43,8 +44,11 @@
               username
               lib
               ;
-            pkgs' = self.packages.${system};
             selfPkgs = self.packages.${system};
+            pkgs' = import nixpkgs-small {
+              inherit system;
+              config.allowUnfree = true;
+            };
           };
           modules =
             if (hasPrefix "installer" hostname) then
@@ -73,6 +77,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-small.url = "github:NixOS/nixpkgs/nixos-unstable-small";
     impermanence.url = "github:nix-community/impermanence";
     firstBoot.url = "github:JManch/false";
     vmInstall.url = "github:JManch/false";

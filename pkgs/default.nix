@@ -13,7 +13,6 @@ in
   thermal-comfort-icons = callPackage ./thermal-comfort-icons.nix { };
   beammp-server = callPackage ./beammp-server { };
   heatmiser = pkgs.home-assistant.python.pkgs.callPackage ./heatmiser.nix { };
-  vesktop = callPackage ./vesktop.nix { };
   multiviewer-for-f1 = callPackage ./multiviewer-for-f1.nix { };
   hyprpy = pkgs.python3Packages.callPackage ./hyprpy.nix { };
 }

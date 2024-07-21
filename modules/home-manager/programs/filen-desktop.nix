@@ -1,14 +1,14 @@
 {
   lib,
-  pkgs',
   config,
+  selfPkgs,
   ...
 }:
 let
   cfg = config.modules.programs.filenDesktop;
 in
 lib.mkIf cfg.enable {
-  home.packages = [ pkgs'.filen-desktop ];
+  home.packages = [ selfPkgs.filen-desktop ];
 
   desktop.hyprland.settings.windowrulev2 = [
     "nomaxsize, class:filen-desktop"

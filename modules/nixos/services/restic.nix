@@ -1,12 +1,11 @@
 {
   lib,
   pkgs,
-  pkgs',
   config,
   inputs,
+  selfPkgs,
   hostname,
   username,
-  adminUsername,
   ...
 }:
 let
@@ -90,7 +89,7 @@ let
         EnvironmentFile = resticNotifVars.path;
         ExecStart =
           let
-            shoutrrr = getExe pkgs'.shoutrrr;
+            shoutrrr = getExe selfPkgs.shoutrrr;
           in
           pkgs.writeShellScript "${name}" ''
             ${shoutrrr} send \

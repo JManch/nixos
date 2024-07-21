@@ -1,8 +1,8 @@
 {
   lib,
   pkgs,
-  pkgs',
   config,
+  selfPkgs,
   ...
 }:
 let
@@ -18,7 +18,7 @@ mkIf cfg.enable {
     scripts = [
       pkgs.mpvScripts.thumbfast
       pkgs.mpvScripts.sponsorblock-minimal
-      pkgs'.modernx
+      selfPkgs.modernx
     ];
 
     scriptOpts = {

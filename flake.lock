@@ -1099,6 +1099,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-small": {
+      "locked": {
+        "lastModified": 1721481798,
+        "narHash": "sha256-GOwbtcTDS7KnVseckF+H8OCRNrwYEqCZ34QOZ+i51e4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "a2aeb0fcca8ef063c03ef57fa5de49084d4e9687",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable-small",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-xr": {
       "inputs": {
         "fenix": "fenix",
@@ -1148,6 +1164,7 @@
         "nix-matlab": "nix-matlab",
         "nix-resources": "nix-resources",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-small": "nixpkgs-small",
         "nixpkgs-xr": "nixpkgs-xr",
         "rust-overlay": "rust-overlay_2",
         "vmInstall": "vmInstall",

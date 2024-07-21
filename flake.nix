@@ -44,6 +44,7 @@
               lib
               ;
             pkgs' = self.packages.${system};
+            selfPkgs = self.packages.${system};
           };
           modules =
             if (hasPrefix "installer" hostname) then

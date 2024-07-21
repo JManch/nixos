@@ -1,10 +1,9 @@
 {
   lib,
   pkgs,
-  pkgs',
   config,
   inputs,
-  adminUsername,
+  selfPkgs,
   ...
 }:
 let
@@ -161,7 +160,7 @@ mkIf cfg.enable {
             age
             rclone
           ])
-          ++ [ pkgs'.shoutrrr ];
+          ++ [ selfPkgs.shoutrrr ];
         text = # bash
           ''
             set -o errtrace

@@ -1,7 +1,7 @@
 {
   lib,
-  pkgs',
   config,
+  selfPkgs,
   hostname,
   ...
 }:
@@ -18,7 +18,7 @@ mkIf cfg.enable {
   services.beammp-server = {
     enable = true;
     autoStart = cfg.autoStart;
-    package = pkgs'.beammp-server;
+    package = selfPkgs.beammp-server;
     authenticationKeyFile = config.age.secrets.beammpAuthKey.path;
     settings = {
       General = {

@@ -1,10 +1,10 @@
 {
   lib,
   pkgs,
-  pkgs',
   config,
   inputs,
   hostname,
+  selfPkgs,
   ...
 }:
 let
@@ -85,8 +85,8 @@ in
             };
           })
           pkgs.home-assistant-custom-components.adaptive_lighting
-          pkgs'.heatmiser
-          pkgs'.thermal-comfort
+          selfPkgs.heatmiser
+          selfPkgs.thermal-comfort
         ]
         ++ optional frigate.enable (
           pkgs.home-assistant-custom-components.frigate.overrideAttrs {
@@ -172,7 +172,7 @@ in
     systemd.services.home-assistant.preStart =
       let
         inherit (config.services.home-assistant) configDir;
-        inherit (pkgs') frigate-hass-card frigate-blueprint thermal-comfort-icons;
+        inherit (selfPkgs) frigate-hass-card frigate-blueprint thermal-comfort-icons;
 
         # Removing existing symbolic links so that packages will uninstall if
         # they're removed from config

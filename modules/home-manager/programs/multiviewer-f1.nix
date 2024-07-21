@@ -1,8 +1,8 @@
 {
   lib,
   pkgs,
-  pkgs',
   config,
+  selfPkgs,
   ...
 }:
 let
@@ -25,7 +25,7 @@ let
             gql
             aiohttp
           ])
-          ++ [ pkgs'.hyprpy ];
+          ++ [ selfPkgs.hyprpy ];
       }
       # python
       ''
@@ -287,7 +287,7 @@ let
       '';
 in
 mkIf cfg.enable {
-  home.packages = [ pkgs'.multiviewer-for-f1 ];
+  home.packages = [ selfPkgs.multiviewer-for-f1 ];
 
   desktop.hyprland.settings =
     let

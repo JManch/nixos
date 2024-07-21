@@ -1,11 +1,12 @@
 {
   lib,
   self,
-  pkgs',
   inputs,
   config,
+  selfPkgs,
   username,
   hostname,
+  pkgsSmall,
   adminUsername,
   ...
 }:
@@ -56,9 +57,11 @@ in
         inherit
           inputs
           self
+          pkgs'
+          selfPkgs
           hostname
           vmVariant
-          pkgs'
+          pkgsSmall
           ;
       };
     };

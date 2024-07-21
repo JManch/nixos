@@ -1,8 +1,8 @@
 {
   lib,
   pkgs,
-  pkgs',
   config,
+  selfPkgs,
   ...
 }:
 let
@@ -11,7 +11,7 @@ in
 lib.mkIf cfg.enable {
   home.packages = [
     pkgs.discord
-    (pkgs'.vesktop.override { withMiddleClickScroll = true; })
+    (selfPkgs.vesktop.override { withMiddleClickScroll = true; })
   ];
 
   desktop.hyprland.settings.windowrulev2 = [

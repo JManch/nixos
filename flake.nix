@@ -71,7 +71,6 @@
         (mkHost "homelab" "joshua" "x86_64-linux")
         (mkHost "msi" "lauren" "x86_64-linux")
         (mkHost "installer" "joshua" "x86_64-linux")
-        (mkHost "installer-arm" "joshua" "aarch64-linux")
       ];
     };
 

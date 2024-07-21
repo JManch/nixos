@@ -22,6 +22,8 @@ mkIf (config.device.gpu.type == "amd") {
   userPackages = [ amdgpu_top ];
   services.xserver.videoDrivers = [ "modesetting" ];
 
+  # TODO: Use hardware.amdgpu option when I update my flake
+
   # Make radv the default driver
   environment.sessionVariables.AMD_VULKAN_ICD = "RADV";
 

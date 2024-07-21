@@ -1,12 +1,12 @@
 {
   lib,
   self,
+  pkgs',
   inputs,
   config,
   selfPkgs,
   username,
   hostname,
-  pkgsSmall,
   adminUsername,
   ...
 }:
@@ -61,7 +61,6 @@ in
           selfPkgs
           hostname
           vmVariant
-          pkgsSmall
           ;
       };
     };

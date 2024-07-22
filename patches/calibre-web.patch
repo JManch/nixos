@@ -11,10 +11,10 @@ index 5dd29534..787cf21c 100644
                  return tmp_cover_name
          else:
 diff --git a/cps/helper.py b/cps/helper.py
-index 0c526d01..90f02725 100644
+index e6d56bf6..b4f50846 100644
 --- a/cps/helper.py
 +++ b/cps/helper.py
-@@ -910,7 +910,6 @@ def save_cover(img, book_path):
+@@ -917,7 +917,6 @@ def save_cover(img, book_path):
              else:
                  imgc = Image(blob=io.BytesIO(img.content))
              imgc.format = 'jpeg'
@@ -23,15 +23,15 @@ index 0c526d01..90f02725 100644
          except (BlobError, MissingDelegateError):
              log.error("Invalid cover file content")
 diff --git a/cps/server.py b/cps/server.py
-index ed5913bb..16e8fb89 100644
+index c0f83403..942bdafe 100644
 --- a/cps/server.py
 +++ b/cps/server.py
-@@ -232,7 +232,7 @@ class WebServer(object):
+@@ -242,7 +242,7 @@ class WebServer(object):
+         try:
+             # Max Buffersize set to 200MB
+             http_server = HTTPServer(MyWSGIContainer(self.app),
+-                                     max_buffer_size=209700000,
++                                     max_buffer_size=2097152000,
+                                      ssl_options=self.ssl_args)
  
-         # Max Buffersize set to 200MB
-         http_server = HTTPServer(MyWSGIContainer(self.app),
--                                 max_buffer_size=209700000,
-+                                 max_buffer_size=2097152000,
-                                  ssl_options=self.ssl_args)
-         http_server.listen(self.listen_port, self.listen_address)
-         self.wsgiserver = IOLoop.current()
+             unix_socket_file = os.environ.get("CALIBRE_UNIX_SOCKET")

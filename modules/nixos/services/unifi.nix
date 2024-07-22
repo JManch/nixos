@@ -59,14 +59,19 @@ mkIf cfg.enable {
     }
   '';
 
+  # Auto-backups will not run unless this directory exists
+  systemd.tmpfiles.rules = [ "d /var/lib/unifi/data/backup/autobackup 0755 unifi unifi" ];
+
   # WARN: Auto-backups have to be configured in the UI
-  # Unifi auto-backup refuses to run so disabling until that gets fixed
-  # backups.unifi = {
-  #   paths = [ "/var/lib/unifi/data/backup/autobackup" ];
-  #   restore.pathOwnership = {
-  #     "/var/lib/unifi/data/backup/autobackup" = { user = "unifi"; group = "unifi"; };
-  #   };
-  # };
+  backups.unifi = {
+    paths = [ "/var/lib/unifi/data/backup/autobackup" ];
+    restore.pathOwnership = {
+      "/var/lib/unifi/data/backup/autobackup" = {
+        user = "unifi";
+        group = "unifi";
+      };
+    };
+  };
 
   persistence.directories = singleton {
     directory = "/var/lib/unifi";

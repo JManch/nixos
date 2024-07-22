@@ -139,6 +139,10 @@
 
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1&rev=e4e84064f2d07810e0c150bce1369a0a00503e9a";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
+    hyprland.inputs.xdph.follows = "xdph";
+
+    xdph.url = "github:hyprwm/xdg-desktop-portal-hyprland";
+    xdph.inputs.nixpkgs.follows = "nixpkgs";
 
     hyprland-plugins.url = "github:hyprwm/hyprland-plugins";
     hyprland-plugins.inputs.hyprland.follows = "hyprland";

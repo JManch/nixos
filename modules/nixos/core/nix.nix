@@ -128,13 +128,13 @@ let
 
               # Package current config and send to remote host
               tar -cf /tmp/nixos-diff-config.tar -C ${configDir} .
-              ssh "root$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
-              scp /tmp/nixos-diff-config.tar "root@$hostname.lan:/tmp/nixos-diff-config"
+              ssh "${adminUsername}@$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
+              scp /tmp/nixos-diff-config.tar "${adminUsername}@$hostname.lan:/tmp/nixos-diff-config"
 
               # Build new configuration on remote host and generate result
               # symlink. Diff the result with the current system
               # shellcheck disable=SC2029
-              ssh "root@$hostname.lan" "sh -c \
+              ssh "${adminUsername}@$hostname.lan" "sh -c \
                 'cd /tmp/nixos-diff-config && \
                 tar -xf nixos-diff-config.tar && \
                 nixos-rebuild build --flake .#$hostname && \

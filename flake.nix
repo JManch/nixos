@@ -108,7 +108,7 @@
     };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs?rev=57d6973abba7ea108bac64ae7629e7431e0199b6";
     nixpkgs-small.url = "github:NixOS/nixpkgs/nixos-unstable-small";
     impermanence.url = "github:nix-community/impermanence";
     firstBoot.url = "github:JManch/false";

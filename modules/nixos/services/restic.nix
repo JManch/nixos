@@ -24,6 +24,7 @@ let
     concatMapStringsSep
     nameValuePair
     optionalAttrs
+    optionals
     mapAttrs'
     getExe'
     attrNames
@@ -300,74 +301,78 @@ mkMerge [
         ])
       ) backups;
 
-    systemd.services = mkMerge [
-      (mapAttrs' (
-        name: value:
-        nameValuePair "restic-backups-${name}" {
-          enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
-          environment.RESTIC_CACHE_DIR = mkForce "";
-          onFailure = [ "restic-backups-${name}-failure-notif.service" ];
+    systemd.services = mkMerge (
+      [
+        (mapAttrs' (
+          name: value:
+          nameValuePair "restic-backups-${name}" {
+            enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
+            environment.RESTIC_CACHE_DIR = mkForce "";
+            onFailure = [ "restic-backups-${name}-failure-notif.service" ];
 
-          preStart =
-            # bash
-            mkBefore ''
-              ${value.preBackupScript}
-              ${resticExe} cat config --no-cache || ${resticExe} init
+            preStart =
+              # bash
+              mkBefore ''
+                ${value.preBackupScript}
+                ${resticExe} cat config --no-cache || ${resticExe} init
+              '';
+            postStop = mkAfter ''
+              ${value.postBackupScript}
             '';
-          postStop = mkAfter ''
-            ${value.postBackupScript}
-          '';
 
-          serviceConfig = {
-            EnvironmentFile = resticNotifVars.path;
-            CacheDirectory = mkForce "";
+            serviceConfig = {
+              EnvironmentFile = resticNotifVars.path;
+              CacheDirectory = mkForce "";
+            };
+          }
+        ) backups)
+        (mapAttrs' (
+          name: value:
+          let
+            failureServiceName = "restic-backups-${name}-failure-notif";
+            capitalisedNamed = utils.upperFirstChar name;
+            service =
+              failureNotifService failureServiceName "Restic Backup ${capitalisedNamed} Failed"
+                "${capitalisedNamed} backup";
+          in
+          nameValuePair failureServiceName service.${failureServiceName}
+        ) backups)
+      ]
+      ++ optionals cfg.runMaintenance [
+        {
+          # Rather than pruning and checking integrity with every backup service
+          # we run a single maintenance service after all backups have completed
+          restic-repo-maintenance = {
+            restartIfChanged = false;
+            after = map (backup: "restic-backups-${backup}.service") (attrNames backups);
+            onFailure = [ "restic-repo-maintenance-failure-notif.service" ];
+
+            environment = {
+              RESTIC_CACHE_DIR = "/var/cache/restic-repo-maintenance";
+              RESTIC_REPOSITORY_FILE = resticRepositoryFile.path;
+              RESTIC_PASSWORD_FILE = resticPasswordFile.path;
+            };
+
+            serviceConfig = {
+              Type = "oneshot";
+              ExecStart = [
+                "${resticExe} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
+                # Retry lock timeout in-case another host is performing a check
+                "${resticExe} check --read-data-subset=500M --retry-lock 5m"
+              ];
+
+              PrivateTmp = true;
+              RuntimeDirectory = "restic-repo-maintenance";
+              CacheDirectory = "restic-repo-maintenance";
+              CacheDirectoryMode = "0700";
+            };
           };
         }
-      ) backups)
-      (mapAttrs' (
-        name: value:
-        let
-          failureServiceName = "restic-backups-${name}-failure-notif";
-          capitalisedNamed = utils.upperFirstChar name;
-          service =
-            failureNotifService failureServiceName "Restic Backup ${capitalisedNamed} Failed"
-              "${capitalisedNamed} backup";
-        in
-        nameValuePair failureServiceName service.${failureServiceName}
-      ) backups)
-      {
-        # Rather than pruning and checking integrity with every backup service
-        # we run a single maintenance service after all backups have completed
-        restic-repo-maintenance = {
-          restartIfChanged = false;
-          after = map (backup: "restic-backups-${backup}.service") (attrNames backups);
-          onFailure = [ "restic-repo-maintenance-failure-notif.service" ];
-
-          environment = {
-            RESTIC_CACHE_DIR = "/var/cache/restic-repo-maintenance";
-            RESTIC_REPOSITORY_FILE = resticRepositoryFile.path;
-            RESTIC_PASSWORD_FILE = resticPasswordFile.path;
-          };
-
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart = [
-              "${resticExe} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
-              # Retry lock timeout in-case another host is performing a check
-              "${resticExe} check --read-data-subset=500M --retry-lock 5m"
-            ];
-
-            PrivateTmp = true;
-            RuntimeDirectory = "restic-repo-maintenance";
-            CacheDirectory = "restic-repo-maintenance";
-            CacheDirectoryMode = "0700";
-          };
-        };
-      }
-      (failureNotifService "restic-repo-maintenance-failure-notif" "Restic Repo Maintenance Failed"
-        "Repo maintenance"
-      )
-    ];
+        (failureNotifService "restic-repo-maintenance-failure-notif" "Restic Repo Maintenance Failed"
+          "Repo maintenance"
+        )
+      ]
+    );
 
     systemd.timers.restic-repo-maintenance = {
       enable = !inputs.firstBoot.value;

@@ -601,6 +601,9 @@ in
 
     restic = {
       enable = mkEnableOption "Restic backups";
+      runMaintenance = mkEnableOption "repo maintenance after performing backups" // {
+        default = true;
+      };
 
       backups = mkOption {
         type = types.attrsOf (

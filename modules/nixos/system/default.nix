@@ -118,7 +118,7 @@ in
         example = "enp5s0";
         description = ''
           Primary wired network interface of the device. Be careful to use the
-          actual interface name instead of an altname.
+          main interface name displayed in `ip a`, NOT the altname.
         '';
       };
 

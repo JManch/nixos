@@ -25,6 +25,7 @@ let
     nameValuePair
     optionalAttrs
     optionals
+    optional
     mapAttrs'
     getExe'
     attrNames
@@ -307,6 +308,8 @@ mkMerge [
           name: value:
           nameValuePair "restic-backups-${name}" {
             enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
+            after = optional cfg.server.enable "caddy.service";
+            requires = optional cfg.server.enable "caddy.service";
             environment.RESTIC_CACHE_DIR = mkForce "";
             onFailure = [ "restic-backups-${name}-failure-notif.service" ];
 
@@ -345,6 +348,7 @@ mkMerge [
           restic-repo-maintenance = {
             restartIfChanged = false;
             after = map (backup: "restic-backups-${backup}.service") (attrNames backups);
+            requires = optional cfg.server.enable "caddy.service";
             onFailure = [ "restic-repo-maintenance-failure-notif.service" ];
 
             environment = {
@@ -415,9 +419,11 @@ mkMerge [
         restic-remote-copy = {
           enable = !inputs.firstBoot.value;
           wants = [ "network-online.target" ];
+          requires = [ "caddy.service" ];
           after = [
             "network-online.target"
             "restic-repo-maintenance.service"
+            "caddy.service"
           ];
           onFailure = [ "restic-remote-copy-failure-notif.service" ];
           restartIfChanged = false;
@@ -453,9 +459,11 @@ mkMerge [
         restic-remote-maintenance = {
           enable = !inputs.firstBoot.value;
           wants = [ "network-online.target" ];
+          requires = [ "caddy.service" ];
           after = [
             "network-online.target"
             "restic-remote-copy.service"
+            "caddy.service"
           ];
           onFailure = [ "restic-remote-maintenance-failure-notif.service" ];
           restartIfChanged = false;

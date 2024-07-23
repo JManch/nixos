@@ -284,6 +284,10 @@ mkIf cfg.enableInternal {
           name = "Outdoor Thermal Comfort";
           temperature_sensor = "sensor.outdoor_temperature";
           humidity_sensor = "sensor.outdoor_humidity";
+          sensor_types = [
+            "frost_risk"
+            "heat_index"
+          ];
           unique_id = "63eaf56b-9edf-42c7-83c7-cbab6f16fec4";
         }
         {

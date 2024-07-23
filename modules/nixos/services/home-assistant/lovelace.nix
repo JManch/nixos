@@ -13,6 +13,7 @@ let
     singleton
     attrNames
     mapAttrs
+    concatMap
     ;
   inherit (config.modules.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -200,6 +201,19 @@ let
             }
             {
               type = "tile";
+              entity = "binary_sensor.powerwall_grid_status";
+              visibility = singleton {
+                condition = "state";
+                entity = "binary_sensor.powerwall_grid_status";
+                state_not = "on";
+              };
+              layout_options = {
+                grid_columns = 4;
+                grid_rows = 1;
+              };
+            }
+            {
+              type = "tile";
               entity = "sensor.powerwall_battery_percentage";
               name = "Powerwall Charge";
               visibility = singleton {
@@ -308,78 +322,40 @@ let
                 state = "on";
               };
             }
-            {
-              type = "tile";
-              entity = "switch.poolhouse_detect";
-              visibility = singleton {
-                condition = "state";
-                entity = "switch.poolhouse_detect";
-                state = "off";
-              };
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-            }
-            {
-              type = "tile";
-              entity = "switch.driveway_detect";
-              visibility = singleton {
-                condition = "state";
-                entity = "switch.driveway_detect";
-                state = "off";
-              };
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-            }
-            {
-              type = "tile";
-              entity = "binary_sensor.powerwall_grid_status";
-              visibility = singleton {
-                condition = "state";
-                entity = "binary_sensor.powerwall_grid_status";
-                state_not = "on";
-              };
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-            }
-            {
-              camera_view = "auto";
-              entity = "image.driveway_person";
-              show_name = true;
-              show_state = true;
-              type = "picture-entity";
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 5;
-              };
-              visibility = singleton {
-                condition = "state";
-                entity = "binary_sensor.driveway_person_recently_updated";
-                state = "on";
-              };
-            }
-            {
-              show_state = true;
-              show_name = true;
-              camera_view = "auto";
-              entity = "image.poolhouse_person";
-              type = "picture-entity";
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 5;
-              };
-              visibility = singleton {
-                condition = "state";
-                entity = "binary_sensor.poolhouse_person_recently_updated";
-                state = "on";
-              };
-            }
-          ];
+          ]
+          ++ (optionals frigate.enable (
+            concatMap (camera: [
+              {
+                type = "tile";
+                entity = "switch.${camera}_detect";
+                visibility = singleton {
+                  condition = "state";
+                  entity = "switch.${camera}_detect";
+                  state = "off";
+                };
+                layout_options = {
+                  grid_columns = 4;
+                  grid_rows = 1;
+                };
+              }
+              {
+                camera_view = "auto";
+                entity = "image.${camera}_person";
+                show_name = true;
+                show_state = true;
+                type = "picture-entity";
+                layout_options = {
+                  grid_columns = 4;
+                  grid_rows = 5;
+                };
+                visibility = singleton {
+                  condition = "state";
+                  entity = "binary_sensor.${camera}_person_recently_updated";
+                  state = "on";
+                };
+              }
+            ]) cameras
+          ));
       }
       {
         title = "Weather";
@@ -406,8 +382,8 @@ let
           }
           {
             type = "tile";
-            entity = "sensor.outdoor_thermal_comfort_humidex";
-            name = "Humidex Temperature";
+            entity = "sensor.outdoor_thermal_comfort_heat_index";
+            name = "Heat Index";
             layout_options = {
               grid_columns = 4;
               grid_rows = 1;

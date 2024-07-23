@@ -163,7 +163,7 @@ let
         };
         condition = singleton {
           condition = "state";
-          entity_id = "binary_sensor.joshua_dehumidifier_automatic_control";
+          entity_id = "input_boolean.joshua_dehumidifier_automatic_control";
           state = "on";
         };
         action = singleton {

@@ -1,0 +1,40 @@
+diff --git a/Frigate Camera Notifications/Stable b/Frigate Camera Notifications/Stable
+index 96cb0dc..8f41f04 100644
+--- a/Frigate Camera Notifications/Stable	
++++ b/Frigate Camera Notifications/Stable	
+@@ -1278,11 +1278,6 @@ action:
+                                     url: "{{tap_action}}"
+                                     attachment:
+                                       url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
+-                                    push:
+-                                      sound:
+-                                        name: "{{ iif(update, 'none', sound) }}"
+-                                        volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
+-                                        critical: "{{ iif(critical, 1, 0) }}"
+                                     entity_id: "{{ios_live_view}}"
+                                     # Actions
+                                     actions:
+@@ -1334,11 +1329,6 @@ action:
+                                       url: "{{tap_action}}"
+                                       attachment:
+                                         url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
+-                                      push:
+-                                        sound:
+-                                          name: "{{ iif(update, 'none', sound) }}"
+-                                          volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
+-                                          critical: "{{ iif(critical, 1, 0) }}"
+                                       entity_id: "{{ios_live_view}}"
+                                       # Actions
+                                       actions:
+@@ -1387,11 +1377,6 @@ action:
+                                   url: "{{tap_action}}"
+                                   attachment:
+                                     url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
+-                                  push:
+-                                    sound:
+-                                      name: "{{ iif(update, 'none', sound) }}"
+-                                      volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
+-                                      critical: "{{ iif(critical, 1, 0) }}"
+                                   entity_id: "{{ios_live_view}}"
+                                   # Actions
+                                   actions:

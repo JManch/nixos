@@ -1,7 +1,13 @@
 { lib, config, ... }:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib)
+    mkIf
+    utils
+    attrNames
+    singleton
+    ;
   cfg = config.modules.services.hass;
+  cameras = attrNames config.services.frigate.settings.cameras;
 in
 mkIf cfg.enableInternal {
   services.home-assistant.config = {
@@ -11,32 +17,39 @@ mkIf cfg.enableInternal {
     # necessarily remove sensors if they're removed from the config
     template = [
       {
-        binary_sensor = [
-          {
-            name = "Powerwall Grid Charge Status";
-            icon = "mdi:home-export-outline";
-            state = "{{ states('sensor.powerwall_site_power') | float(0) < -0.1 }}";
-            device_class = "battery_charging";
-          }
-          {
-            name = "Powerwall Battery Charge Status";
-            icon = "mdi:battery-charging";
-            state = "{{ states('sensor.powerwall_battery_power') | float(0) < -0.1 }}";
-            device_class = "battery_charging";
-          }
-          {
-            name = "Washing Machine Running";
-            icon = "mdi:washing-machine";
-            state = "{{ states('sensor.washing_machine_status') == 'running' }}";
-            device_class = "running";
-          }
-          {
-            name = "Dishwasher Running";
-            icon = "mdi:dishwasher";
-            state = "{{ states('sensor.dishwasher_status') == 'running' }}";
-            device_class = "running";
-          }
-        ];
+        binary_sensor =
+          [
+            {
+              name = "Powerwall Grid Charge Status";
+              icon = "mdi:home-export-outline";
+              state = "{{ states('sensor.powerwall_site_power') | float(0) < -0.1 }}";
+              device_class = "battery_charging";
+            }
+            {
+              name = "Powerwall Battery Charge Status";
+              icon = "mdi:battery-charging";
+              state = "{{ states('sensor.powerwall_battery_power') | float(0) < -0.1 }}";
+              device_class = "battery_charging";
+            }
+            {
+              name = "Washing Machine Running";
+              icon = "mdi:washing-machine";
+              state = "{{ states('sensor.washing_machine_status') == 'running' }}";
+              device_class = "running";
+            }
+            {
+              name = "Dishwasher Running";
+              icon = "mdi:dishwasher";
+              state = "{{ states('sensor.dishwasher_status') == 'running' }}";
+              device_class = "running";
+            }
+          ]
+          ++ map (camera: {
+            name = "${utils.upperFirstChar camera} Person Recently Updated";
+            icon = "mdi:walk";
+            state = "{{ (now().timestamp() - as_timestamp(states('image.${camera}_person'), default = 0)) < 5*60 }}";
+            device_class = "update";
+          }) cameras;
 
         sensor = [
           {
@@ -63,6 +76,12 @@ mkIf cfg.enableInternal {
                 {{ "%d minute%s %s" % (remaining_mins, ('s',''')[remaining_mins==1], message) }}
               {% endif %}
             '';
+          }
+          {
+            name = "Powerwall Battery Percentage";
+            icon = "mdi:home-battery";
+            state = "{{ ((states('sensor.powerwall_gateway_battery_remaining') | float(0) / states('sensor.powerwall_gateway_battery_capacity') | float(0)) * 100) | int }}";
+            unit_of_measurement = "%";
           }
           {
             name = "Lights On Count";

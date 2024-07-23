@@ -11,6 +11,7 @@ let
     head
     optional
     optionals
+    attrNames
     attrValues
     singleton
     ;
@@ -18,6 +19,7 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) frigate;
   cfg = config.modules.services.hass;
+  cameras = attrNames config.services.frigate.settings.cameras;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 
   frigateEntranceNotify = {
@@ -44,34 +46,28 @@ let
     };
   };
 
-  frigateHighAlertNotify =
-    map
-      (camera: {
-        alias = "High Alert ${utils.upperFirstChar camera} Notify";
-        use_blueprint = {
-          path = "SgtBatten/frigate_notifications.yaml";
-          input = {
-            camera = "camera.${camera}";
-            state_filter = true;
-            state_entity = "input_boolean.high_alert_surveillance";
-            state_filter_states = [ "on" ];
-            notify_device = (head (attrValues devices)).id;
-            sticky = true;
-            notify_group = "All Notify Devices";
-            group = "{{camera}}-frigate-notification";
-            base_url = "https://home.${fqDomain}";
-            title = "Security Alert";
-            ios_live_view = "camera.${camera}";
-            message = "A person was detected on the property";
-            color = "#f44336";
-            update_thumbnail = true;
-          };
-        };
-      })
-      [
-        "driveway"
-        "poolhouse"
-      ];
+  frigateHighAlertNotify = map (camera: {
+    alias = "High Alert ${utils.upperFirstChar camera} Notify";
+    use_blueprint = {
+      path = "SgtBatten/frigate_notifications.yaml";
+      input = {
+        camera = "camera.${camera}";
+        state_filter = true;
+        state_entity = "input_boolean.high_alert_surveillance";
+        state_filter_states = [ "on" ];
+        notify_device = (head (attrValues devices)).id;
+        sticky = true;
+        notify_group = "All Notify Devices";
+        group = "{{camera}}-frigate-notification";
+        base_url = "https://home.${fqDomain}";
+        title = "Security Alert";
+        ios_live_view = "camera.${camera}";
+        message = "A person was detected on the property";
+        color = "#f44336";
+        update_thumbnail = true;
+      };
+    };
+  }) cameras;
 
   heatingTimeToggle =
     map
@@ -153,7 +149,7 @@ let
     };
   };
 
-  joshuaDehumidifierMoldToggle =
+  joshuaDehumidifierToggle =
     map
       (enable: {
         alias = "Joshua Dehumidifier ${if enable then "Enable" else "Disable"}";
@@ -165,7 +161,11 @@ let
           below = mkIf (!enable) 67;
           for.minutes = if enable then 0 else 30;
         };
-        condition = [ ];
+        condition = singleton {
+          condition = "state";
+          entity_id = "binary_sensor.joshua_dehumidifier_automatic_control";
+          state = "on";
+        };
         action = singleton {
           service = "switch.turn_${if enable then "on" else "off"}";
           target.entity_id = "switch.joshua_dehumidifier";
@@ -428,7 +428,7 @@ mkIf cfg.enableInternal {
   services.home-assistant.config = {
     automation =
       heatingTimeToggle
-      ++ joshuaDehumidifierMoldToggle
+      ++ joshuaDehumidifierToggle
       ++ joshuaDehumidifierTankFull
       ++ joshuaLightsToggle
       ++ joshuaAdaptiveLightingSunTimes
@@ -452,6 +452,11 @@ mkIf cfg.enableInternal {
       heating_enabled = {
         name = "Heating Enabled";
         icon = "mdi:heating-coil";
+      };
+
+      joshua_dehumidifier_automatic_control = {
+        name = "Joshua Dehumidifier Automatic Control";
+        icon = "mdi:air-humidifier";
       };
 
       high_alert_surveillance = {

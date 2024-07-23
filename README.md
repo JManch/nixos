@@ -18,16 +18,16 @@
 ## Structure
 
 All system and Home Manager modules are stored under the `modules` directory.
-NixOS options are used heavily to enable, disable, or modify modules on each
-host. Each host has two entry points for module configuration:
+Options are used heavily to enable, disable, or modify modules on each host.
+Each host has two entry points for module configuration:
 `hosts/<hostname>/default.nix` for system configuration and
 `home/<hostname>.nix` for Home Manager configuration.
 
 Modules are split into categories using directories. Each directory contains a
-`default.nix` file. This file defines all options for modules in that category.
-The benefits of this are that (1) modules avoid an extra layer of nesting for
+`default.nix` file which defines all options for modules in that category. The
+benefits of this are that (1), modules avoid an extra layer of nesting for
 `config = {}` and (2), `default.nix` serves as a convenient location to view
-all available options.
+all options in a category.
 
 ## Deployment
 

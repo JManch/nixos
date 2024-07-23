@@ -21,6 +21,7 @@ let
     concatStringsSep
     escapeShellArg
     singleton
+    attrNames
     ;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -29,6 +30,7 @@ let
   inherit (secrets.general) devices;
   cfg = config.modules.services.hass;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
+  cameras = attrNames config.services.frigate.settings.cameras;
 in
 {
   imports = (utils.scanPaths ./.) ++ [ inputs.nix-resources.nixosModules.home-assistant ];
@@ -118,8 +120,34 @@ in
         # zone settings in the UI
         homeassistant.time_zone = null;
 
-        # We use postgresql instead of the default sqlite because it has better performance
-        recorder.db_url = "postgresql://@/hass";
+        recorder = {
+          # We use postgresql instead of the default sqlite because it has better performance
+          db_url = "postgresql://@/hass";
+
+          # Spammy entities that produce useless data should be excluded from
+          # the recorder. Note that recorder data is deleted after 10 days
+          # (long-term data is managed seperately). This postgresql command is
+          # useful for finding entities taking up db space. Run `\c hass` in
+          # pgsql then:
+          # SELECT
+          #   states_meta.entity_id, states.metadata_id,
+          #   COUNT(*) AS cnt
+          # FROM states
+          # LEFT JOIN states_meta ON states.metadata_id = states_meta.metadata_id
+          # GROUP BY
+          #   states_meta.entity_id, states.metadata_id
+          # ORDER BY
+          #   cnt DESC;
+          #
+          exclude = {
+            entities = [ "sun.sun" ] ++ (map (camera: "binary_sensor.${camera}_motion") cameras);
+            entity_globs = [
+              "sensor.sun*"
+              "switch.adaptive_lighting_*"
+              "image.roborock_s6_maxv_*"
+            ];
+          };
+        };
 
         http = {
           server_port = cfg.port;

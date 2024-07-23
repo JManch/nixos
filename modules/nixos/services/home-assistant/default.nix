@@ -84,6 +84,14 @@ in
               hash = "sha256-rZSAhH19B0VzIQ6AwJN07zkvIdDHdYvUjizHLmDGh6Y=";
             };
           })
+          (pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs {
+            src = pkgs.fetchFromGitHub {
+              owner = "mampfes";
+              repo = "hacs_waste_collection_schedule";
+              rev = "refs/tags/2.0.1";
+              hash = "sha256-nStfENwlPXPEvK13e8kUpPav6ul6XQO/rViHRHlZpKI=";
+            };
+          })
           pkgs.home-assistant-custom-components.adaptive_lighting
           selfPkgs.heatmiser
           selfPkgs.thermal-comfort
@@ -141,13 +149,11 @@ in
           })
         ];
 
-        notify = [
-          {
-            platform = "group";
-            name = "All Notify Devices";
-            services = mapAttrsToList (name: _: { service = name; }) devices;
-          }
-        ];
+        notify = singleton {
+          platform = "group";
+          name = "All Notify Devices";
+          services = mapAttrsToList (name: _: { service = name; }) devices;
+        };
       };
     };
 

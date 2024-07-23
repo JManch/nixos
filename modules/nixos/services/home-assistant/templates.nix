@@ -201,6 +201,27 @@ mkIf cfg.enableInternal {
           precision = 2;
         };
       }
+      # WARN: I don't declaratively configure the waste collection integration
+      # because it contains my address and I don't want that on github.
+      # Unfortunately the main integration must also be configured in yaml for
+      # the sensor to be. Copy this sensor config into the setup GUI:
+      # {
+      #   name = "Next Bin Collection";
+      #   platform = "waste_collection_schedule";
+      #   details_format = "upcoming";
+      #   leadtime = 2;
+      #   value_template = "{{ value.types|join(', ') }} {% if value.daysTo == 0 %}today{% elif value.daysTo == 1 %}tomorrow{% else %}in {{ value.daysTo }} days{% endif %}";
+      #   date_template = "{{ value.date.strftime('%a, %d.%m.%Y') }}";
+      # }
+      # This one is for the notification automation
+      # {
+      #   name = "Bin Collection Types";
+      #   platform = "waste_collection_schedule";
+      #   details_format = "hidden";
+      #   leadtime = 1;
+      #   value_template = "{{ value.types|join(', ') }}";
+      #   add_days_to = true;
+      # }
     ];
 
     switch = [

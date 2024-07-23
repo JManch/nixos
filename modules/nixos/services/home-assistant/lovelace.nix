@@ -10,7 +10,6 @@ let
     utils
     optional
     optionals
-    toLower
     singleton
     attrNames
     mapAttrs
@@ -182,6 +181,23 @@ let
             }) cameras
           ))
           ++ [
+            {
+              type = "tile";
+              entity = "sensor.next_bin_collection";
+              layout_options = {
+                grid_columns = 4;
+                grid_rows = 1;
+              };
+              visibility = singleton {
+                condition = "state";
+                entity = "sensor.next_bin_collection";
+                state_not = "unknown";
+              };
+              tap_action = {
+                action = "navigate";
+                navigation_path = "/calendar";
+              };
+            }
             {
               type = "tile";
               entity = "sensor.powerwall_battery_percentage";

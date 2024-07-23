@@ -423,6 +423,26 @@ let
         true
         false
       ];
+
+  binCollectionNotify = singleton {
+    alias = "Bin Collection Notify";
+    mode = "single";
+    trigger = singleton {
+      platform = "time";
+      at = "19:00:00";
+    };
+    condition = singleton {
+      condition = "template";
+      value_template = "{{ is_state_attr('sensor.bin_collection_types', 'daysTo', 1) }}";
+    };
+    action = singleton {
+      service = "notify.adult_notify_devices";
+      data = {
+        title = "Remember to take out the bins!";
+        message = "Tomorrow's collection(s): {{ states('sensor.bin_collection_types') }}";
+      };
+    };
+  };
 in
 mkIf cfg.enableInternal {
   services.home-assistant.config = {
@@ -433,6 +453,7 @@ mkIf cfg.enableInternal {
       ++ joshuaLightsToggle
       ++ joshuaAdaptiveLightingSunTimes
       ++ joshuaSleepModeToggle
+      ++ binCollectionNotify
       ++ optional frigate.enable frigateEntranceNotify
       ++ optionals frigate.enable frigateHighAlertNotify;
 

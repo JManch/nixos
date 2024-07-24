@@ -23,6 +23,7 @@
       rnote.enable = true;
       multiviewerF1.enable = true;
       cava.enable = true;
+      jellyfin-media-player.enable = true;
 
       gaming = {
         mangohud.enable = true;

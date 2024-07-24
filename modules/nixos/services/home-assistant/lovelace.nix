@@ -111,10 +111,10 @@ let
             (navigationButton "CCTV" "cctv" "mdi:cctv")
             (navigationButton "Heating" "heating" "mdi:heating-coil")
             (navigationButton "Lounge" "lounge" "mdi:sofa")
-            (navigationButton "Joshua's Room" "joshua-room" "mdi:bed")
-            (navigationButton "${upperPeople.person1}'s Room" "${people.person1}-room" "mdi:bed")
-            (navigationButton "${upperPeople.person2}'s Room" "${people.person2}-room" "mdi:bed")
-            (navigationButton "${upperPeople.person3}'s Room" "${people.person3}-room" "mdi:bed")
+            (navigationButton "Joshua" "joshua-room" "mdi:bed")
+            (navigationButton "${upperPeople.person1}" "${people.person1}-room" "mdi:bed")
+            (navigationButton "${upperPeople.person2}" "${people.person2}-room" "mdi:bed")
+            (navigationButton "${upperPeople.person3}" "${people.person3}-room" "mdi:bed")
           ];
       }
       {
@@ -271,7 +271,7 @@ let
                   {
                     condition = "state";
                     entity = "sensor.washing_machine_status";
-                    state_not = "Running";
+                    state_not = "running";
                   }
                 ];
               };

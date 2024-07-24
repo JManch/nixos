@@ -438,8 +438,8 @@ let
     action = singleton {
       service = "notify.adult_notify_devices";
       data = {
-        title = "Remember to take out the bins!";
-        message = "Tomorrow's collection(s): {{ states('sensor.bin_collection_types') }}";
+        title = "Bin Collection Tomorrow";
+        message = "{{ states('sensor.bin_collection_types') }}";
       };
     };
   };

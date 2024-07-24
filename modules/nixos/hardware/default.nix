@@ -17,6 +17,7 @@ in
     vr.enable = mkEnableOption "virtual reality";
     secureBoot.enable = mkEnableOption "secure boot";
     fanatec.enable = mkEnableOption "support for Fanatec hardware";
+    coral.enable = mkEnableOption "Google Coral PCIE support";
 
     fileSystem = {
       trim = mkEnableOption "ZFS automatic trimming";

@@ -15,7 +15,7 @@ let
     attrValues
     singleton
     ;
-  inherit (secrets.general) devices;
+  inherit (secrets.general) devices people;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) frigate;
   cfg = config.modules.services.hass;
@@ -443,6 +443,29 @@ let
       };
     };
   };
+
+  washingMachineNotify = singleton {
+    alias = "Washing Machine Notify";
+    mode = "single";
+    trigger = singleton {
+      platform = "state";
+      entity_id = [ "sensor.washing_machine_status" ];
+      from = "running";
+      to = "program_ended";
+    };
+    condition = singleton {
+      condition = "time";
+      after = "07:00:00";
+      before = "22:00:00";
+    };
+    action = singleton {
+      service = "notify.mobile_app_${people.person4}_iphone";
+      data = {
+        title = "Washing Machine Finished";
+        message = "Take out the damp clothes";
+      };
+    };
+  };
 in
 mkIf cfg.enableInternal {
   services.home-assistant.config = {
@@ -454,6 +477,7 @@ mkIf cfg.enableInternal {
       ++ joshuaAdaptiveLightingSunTimes
       ++ joshuaSleepModeToggle
       ++ binCollectionNotify
+      ++ washingMachineNotify
       ++ optional frigate.enable frigateEntranceNotify
       ++ optionals frigate.enable frigateHighAlertNotify;
 

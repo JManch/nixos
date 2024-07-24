@@ -185,6 +185,7 @@ let
             {
               type = "tile";
               entity = "sensor.next_bin_collection";
+              color = "light-green";
               layout_options = {
                 grid_columns = 4;
                 grid_rows = 1;

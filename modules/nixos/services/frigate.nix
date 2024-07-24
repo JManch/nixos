@@ -21,6 +21,12 @@ let
   inherit (config.age.secrets) cctvVars mqttFrigatePassword;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.frigate;
+
+  trackedObjects = [
+    "person"
+    "cat"
+    # "car"
+  ];
 in
 mkIf cfg.enable {
   assertions = utils.asserts [
@@ -69,20 +75,17 @@ mkIf cfg.enable {
       # web interface. Frigate actually uses go2rtc for those streams rather
       # than the camera RTSP stream.
       go2rtc.streams = {
-        driveway = (
-          cfg.rtspAddress {
-            channel = 2;
-            subtype = 0;
-            go2rtc = true;
-          }
-        );
-        poolhouse = (
-          cfg.rtspAddress {
-            channel = 1;
-            subtype = 0;
-            go2rtc = true;
-          }
-        );
+        driveway = cfg.rtspAddress {
+          channel = 2;
+          subtype = 0;
+          go2rtc = true;
+        };
+
+        poolhouse = cfg.rtspAddress {
+          channel = 1;
+          subtype = 0;
+          go2rtc = true;
+        };
       };
 
       cameras = {
@@ -94,21 +97,17 @@ mkIf cfg.enable {
               # because go2rtc adds overhead. I'd rather have the extra cam
               # connections which 99% of the time will just be 1 for the detect
               # stream.
-              path = (
-                cfg.rtspAddress {
-                  channel = 2;
-                  subtype = 0;
-                }
-              );
+              path = cfg.rtspAddress {
+                channel = 2;
+                subtype = 0;
+              };
               roles = [ "record" ];
             }
             {
-              path = (
-                cfg.rtspAddress {
-                  channel = 2;
-                  subtype = 1;
-                }
-              );
+              path = cfg.rtspAddress {
+                channel = 2;
+                subtype = 1;
+              };
               roles = [ "detect" ];
             }
           ];
@@ -118,29 +117,24 @@ mkIf cfg.enable {
           ];
 
           zones.entrance = {
-            coordinates = "543,66,548,119,591,134,501,148,408,157,411,76";
-            objects = [ "person" ];
+            coordinates = "541,39,591,134,501,148,408,157,412,42";
           };
         };
 
         poolhouse = {
           ffmpeg.inputs = [
             {
-              path = (
-                cfg.rtspAddress {
-                  channel = 1;
-                  subtype = 0;
-                }
-              );
+              path = cfg.rtspAddress {
+                channel = 1;
+                subtype = 0;
+              };
               roles = [ "record" ];
             }
             {
-              path = (
-                cfg.rtspAddress {
-                  channel = 1;
-                  subtype = 1;
-                }
-              );
+              path = cfg.rtspAddress {
+                channel = 1;
+                subtype = 1;
+              };
               roles = [ "detect" ];
             }
           ];
@@ -162,7 +156,7 @@ mkIf cfg.enable {
         height = 576;
       };
 
-      objects.track = [ "person" ];
+      objects.track = trackedObjects;
 
       record = {
         enabled = true;

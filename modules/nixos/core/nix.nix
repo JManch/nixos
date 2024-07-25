@@ -254,6 +254,7 @@ in
     flake = "github:JManch/nixos";
     operation = "boot";
     dates = "daily";
+    randomizedDelaySec = "2hours";
   };
 
   # Because one of our flake inputs is a private repo temporarily copy host ssh

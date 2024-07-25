@@ -191,9 +191,9 @@ let
                 grid_rows = 1;
               };
               visibility = singleton {
-                condition = "state";
-                entity = "sensor.next_bin_collection";
-                state_not = "unknown";
+                condition = "numeric_state";
+                entity = "sensor.days_to_bin_collection";
+                below = 2;
               };
               tap_action = {
                 action = "navigate";

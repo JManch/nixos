@@ -120,6 +120,12 @@ mkIf cfg.enableInternal {
             state = "{{ state_attr('sensor.joshua_mold_indicator', 'dewpoint') }}";
             unit_of_measurement = "°C";
           }
+          {
+            name = "Days To Bin Collection";
+            icon = "mdi:calendar";
+            state = "{{ state_attr('sensor.next_bin_collection', 'daysTo') }}";
+            unit_of_measurement = "d";
+          }
         ];
       }
       {
@@ -212,6 +218,7 @@ mkIf cfg.enableInternal {
       #   leadtime = 2;
       #   value_template = "{{ value.types|join(', ') }} {% if value.daysTo == 0 %}today{% elif value.daysTo == 1 %}tomorrow{% else %}in {{ value.daysTo }} days{% endif %}";
       #   date_template = "{{ value.date.strftime('%a, %d.%m.%Y') }}";
+      #   add_days_to = true;
       # }
       # This one is for the notification automation
       # {

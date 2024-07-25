@@ -22,7 +22,7 @@ let
   cameras = attrNames config.services.frigate.settings.cameras;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 
-  frigateEntranceNotify = {
+  frigateEntranceNotify = singleton {
     alias = "Entrance Person Notify";
     use_blueprint = {
       path = "SgtBatten/frigate_notifications.yaml";
@@ -34,9 +34,9 @@ let
         notify_device = (head (attrValues devices)).id;
         notify_group = "All Notify Devices";
         base_url = "https://home.${fqDomain}";
-        group = "{{camera}}-frigate-notification";
+        group = "frigate-entrance-notification";
         title = "Security Alert";
-        message = "A person was detected in the entrance";
+        message = "A person {{ label }} in the entrance";
         update_thumbnail = true;
         alert_once = true;
         zone_filter = true;
@@ -45,6 +45,27 @@ let
       };
     };
   };
+
+  frigateCatNotify = map (camera: {
+    alias = "${utils.upperFirstChar camera} Cat Notify";
+    use_blueprint = {
+      path = "SgtBatten/frigate_notifications.yaml";
+      input = {
+        camera = "camera.${camera}";
+        notify_device = (head (attrValues devices)).id;
+        notify_group = "All Notify Devices";
+        sticky = true;
+        group = "frigate-cat-notification";
+        base_url = "https://home.${fqDomain}";
+        ios_live_view = "camera.${camera}";
+        title = "Cat Detected";
+        message = "A cat {{ label }} on the {{ camera_name }} camera";
+        color = "#f44336";
+        update_thumbnail = true;
+        labels = [ "cat" ];
+      };
+    };
+  }) cameras;
 
   frigateHighAlertNotify = map (camera: {
     alias = "High Alert ${utils.upperFirstChar camera} Notify";
@@ -56,13 +77,13 @@ let
         state_entity = "input_boolean.high_alert_surveillance";
         state_filter_states = [ "on" ];
         notify_device = (head (attrValues devices)).id;
-        sticky = true;
         notify_group = "All Notify Devices";
-        group = "{{camera}}-frigate-notification";
+        sticky = true;
+        group = "frigate-notification";
         base_url = "https://home.${fqDomain}";
         title = "Security Alert";
         ios_live_view = "camera.${camera}";
-        message = "A person was detected on the property";
+        message = "A person {{ label }} on the {{ camera_name }} camera";
         color = "#f44336";
         update_thumbnail = true;
       };
@@ -110,19 +131,17 @@ let
                 }
               ];
             };
-          action = [
-            {
-              service = "climate.set_hvac_mode";
-              metadata = { };
-              data = {
-                hvac_mode = if enable then "heat" else "off";
-              };
-              target.entity_id = [
-                "climate.joshua_thermostat"
-                "climate.hallway"
-              ];
-            }
-          ];
+          action = singleton {
+            service = "climate.set_hvac_mode";
+            metadata = { };
+            data = {
+              hvac_mode = if enable then "heat" else "off";
+            };
+            target.entity_id = [
+              "climate.joshua_thermostat"
+              "climate.hallway"
+            ];
+          };
         }
       )
       [
@@ -478,8 +497,7 @@ mkIf cfg.enableInternal {
       ++ joshuaSleepModeToggle
       ++ binCollectionNotify
       ++ washingMachineNotify
-      ++ optional frigate.enable frigateEntranceNotify
-      ++ optionals frigate.enable frigateHighAlertNotify;
+      ++ optionals frigate.enable (frigateEntranceNotify ++ frigateCatNotify ++ frigateHighAlertNotify);
 
     input_datetime = {
       heating_disable_time = {

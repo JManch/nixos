@@ -21,12 +21,6 @@ let
   inherit (config.age.secrets) cctvVars mqttFrigatePassword;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.services.frigate;
-
-  trackedObjects = [
-    "person"
-    "cat"
-    # "car"
-  ];
 in
 mkIf cfg.enable {
   assertions = utils.asserts [
@@ -113,12 +107,14 @@ mkIf cfg.enable {
           ];
 
           motion.mask = [
-            "0,576,173,576,63,306,199,262,416,149,418,43,549,34,543,126,802,176,626,264,630,407,356,576,1024,576,1024,0,0,0"
+            "0,576,173,576,63,306,199,262,416,149,418,43,549,34,548,117,690,136,775,98,903,132,643,264,679,320,619,378,356,576,1024,576,1024,0,0,0"
           ];
 
           zones.entrance = {
             coordinates = "541,39,591,134,501,148,408,157,412,42";
           };
+
+          objects.filters.car.mask = [ "371,127,647,249,1024,576,0,576,0,102" ];
         };
 
         poolhouse = {
@@ -140,8 +136,10 @@ mkIf cfg.enable {
           ];
 
           motion.mask = [
-            "1024,0,1024,576,804,576,804,434,942,387,939,271,742,262,744,327,804,328,804,576,0,576,0,0"
+            "1024,0,1024,445,994,411,981,309,951,262,860,252,752,249,749,305,811,313,810,408,661,496,537,492,321,462,181,398,0,356,0,0"
           ];
+
+          objects.filters.car.mask = [ "1024,576,781,576,787,312,1024,316" ];
         };
       };
 
@@ -156,7 +154,11 @@ mkIf cfg.enable {
         height = 576;
       };
 
-      objects.track = trackedObjects;
+      objects.track = [
+        "person"
+        "car"
+        "cat"
+      ];
 
       record = {
         enabled = true;

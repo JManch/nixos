@@ -17,7 +17,6 @@ in
     vr.enable = mkEnableOption "virtual reality";
     secureBoot.enable = mkEnableOption "secure boot";
     fanatec.enable = mkEnableOption "support for Fanatec hardware";
-    coral.enable = mkEnableOption "Google Coral PCIE support";
 
     fileSystem = {
       trim = mkEnableOption "ZFS automatic trimming";
@@ -49,6 +48,17 @@ in
           `systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2
           --name=zfs-passphrase -p - -`
         '';
+      };
+    };
+
+    coral = {
+      enable = mkEnableOption "Google Coral TPU";
+      type = mkOption {
+        type = types.enum [
+          "pci"
+          "usb"
+        ];
+        description = "Connection type of Google Coral TPU";
       };
     };
 

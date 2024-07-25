@@ -1,3 +1,7 @@
+# I use this module with the Coral M.2 accelerator and it works perfectly in
+# Frigate. In theory it should also work with the USB accelerator. I packaged
+# libedgetpu following the instructions here:
+# https://github.com/NixOS/nixpkgs/issues/188719#issuecomment-2094575860
 {
   lib,
   pkgs,
@@ -6,6 +10,12 @@
   ...
 }:
 let
+  inherit (lib)
+    mkIf
+    listToAttrs
+    optional
+    singleton
+    ;
   cfg = config.modules.hardware.coral;
   libedgetpu = config.boot.kernelPackages.callPackage "${inputs.nix-resources}/pkgs/libedgetpu" { };
   gasket = config.boot.kernelPackages.gasket.overrideAttrs {
@@ -16,30 +26,30 @@ let
       sha256 = "sha256-O17+msok1fY5tdX1DvqYVw6plkUDF25i8sqwd6mxYf8=";
     };
   };
+  isPci = cfg.type == "pci";
 in
-lib.mkIf cfg.enable {
-  # I use this module with the Coral M.2 Accelerator and it works perfectly in
-  # frigate. I built the libedgetpu package following the instructions here:
-  # https://github.com/NixOS/nixpkgs/issues/188719#issuecomment-2094575860
+mkIf cfg.enable {
+  boot.extraModulePackages = optional isPci gasket;
 
-  services.udev.packages = [ libedgetpu ];
-  boot.extraModulePackages = [ gasket ];
+  users.groups = listToAttrs (singleton {
+    name = if isPci then "apex" else "plugdev";
+    value = { };
+  });
 
-  users.groups.plugdev = { };
-  users.groups.apex = { };
-
-  services.udev.extraRules = ''
-    SUBSYSTEM=="apex", MODE="0660", GROUP="apex"
-  '';
+  services.udev = {
+    packages = optional (!isPci) libedgetpu;
+    extraRules = mkIf isPci ''
+      SUBSYSTEM=="apex", MODE="0660", GROUP="apex"
+    '';
+  };
 
   systemd.services.frigate = {
-    serviceConfig.SupplementaryGroups = [
-      "plugdev"
-      "apex"
-    ];
+    serviceConfig.SupplementaryGroups = [ (if isPci then "apex" else "plugdev") ];
 
     environment.LD_LIBRARY_PATH = lib.makeLibraryPath [
       libedgetpu
+      # Even though this is technically not needed for pci version, Frigate
+      # throws an error without it
       pkgs.libusb
     ];
   };

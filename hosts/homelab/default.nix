@@ -21,7 +21,11 @@
       fileSystem.extendedLoaderTimeout = true;
       graphics.hardwareAcceleration = true;
       printing.server.enable = true;
-      coral.enable = true;
+
+      coral = {
+        enable = true;
+        type = "pci";
+      };
     };
 
     services = {

@@ -21,7 +21,7 @@
       fileSystem.extendedLoaderTimeout = true;
       graphics.hardwareAcceleration = true;
       printing.server.enable = true;
-      coral.enable = false;
+      coral.enable = true;
     };
 
     services = {

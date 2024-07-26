@@ -36,12 +36,11 @@ let
         base_url = "https://home.${fqDomain}";
         group = "frigate-entrance-notification";
         title = "Security Alert";
-        message = "A person {{ label }} in the entrance";
+        message = "A {{ label }} {{ 'is loitering' if loitering else 'was detected' }} in the entrance";
         update_thumbnail = true;
         alert_once = true;
         zone_filter = true;
         zones = [ "entrance" ];
-        labels = [ "person" ];
       };
     };
   };
@@ -59,7 +58,7 @@ let
         base_url = "https://home.${fqDomain}";
         ios_live_view = "camera.${camera}";
         title = "Cat Detected";
-        message = "A cat {{ label }} on the {{ camera_name }} camera";
+        mess = "A cat {{ 'is loitering' if loitering else 'was detected' }} on the {{ camera_name }} camera";
         color = "#f44336";
         update_thumbnail = true;
         labels = [ "cat" ];
@@ -83,7 +82,7 @@ let
         base_url = "https://home.${fqDomain}";
         title = "Security Alert";
         ios_live_view = "camera.${camera}";
-        message = "A person {{ label }} on the {{ camera_name }} camera";
+        message = "A {{ label }} {{ 'is loitering' if loitering else 'was detected' }} on the {{ camera_name }} camera";
         color = "#f44336";
         update_thumbnail = true;
       };

@@ -111,7 +111,7 @@ mkIf cfg.enable {
           ];
 
           zones.entrance = {
-            coordinates = "541,39,591,134,501,148,408,157,412,42";
+            coordinates = "547,92,575,129,414,138,412,99";
           };
 
           objects.filters.car.mask = [ "371,127,647,249,1024,576,0,576,0,102" ];

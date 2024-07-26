@@ -21,7 +21,7 @@ stdenvNoCC.mkDerivation rec {
 
   installPhase = ''
     mkdir -p "$out"
-    cp "Frigate Camera Notifications/Beta" "$out/frigate_notifications.yaml"
+    cp "Frigate Camera Notifications/Stable" "$out/frigate_notifications.yaml"
   '';
 
   meta = with lib; {

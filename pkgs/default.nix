@@ -15,4 +15,5 @@ in
   multiviewer-for-f1 = callPackage ./multiviewer-for-f1.nix { };
   hyprpy = pkgs.python3Packages.callPackage ./hyprpy.nix { };
   wg-nord = callPackage ./wg-nord.nix { };
+  formulaone-card = callPackage ./formulaone-card.nix { };
 }

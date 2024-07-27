@@ -356,7 +356,25 @@ let
                 };
               }
             ]) cameras
-          ));
+          ))
+          ++ [
+            {
+              type = "custom:formulaone-card";
+              card_type = "countdown";
+              f1_font = true;
+              show_raceinfo = true;
+              countdown_type = [
+                "race"
+                "qualifying"
+                "sprint"
+              ];
+              visibility = singleton {
+                condition = "numeric_state";
+                entity = "sensor.days_to_formula_1_event";
+                below = 2;
+              };
+            }
+          ];
       }
       {
         title = "Weather";

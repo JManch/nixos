@@ -64,6 +64,7 @@ in
         "mobile_app"
         "profiler"
         "local_todo"
+        "local_calendar"
         "generic_thermostat"
         "generic_hygrostat"
         "mold_indicator"
@@ -171,6 +172,10 @@ in
             type = "js";
             url = "/local/thermal_comfort_icons.js";
           }
+          {
+            type = "js";
+            url = "/local/formulaone-card/formulaone-card.js";
+          }
           (optionalAttrs frigate.enable {
             url = "/local/frigate-hass-card/frigate-hass-card.js";
             type = "module";
@@ -206,7 +211,12 @@ in
     systemd.services.home-assistant.preStart =
       let
         inherit (config.services.home-assistant) configDir;
-        inherit (selfPkgs) frigate-hass-card frigate-blueprint thermal-comfort-icons;
+        inherit (selfPkgs)
+          frigate-hass-card
+          frigate-blueprint
+          thermal-comfort-icons
+          formulaone-card
+          ;
 
         # Removing existing symbolic links so that packages will uninstall if
         # they're removed from config
@@ -227,6 +237,7 @@ in
         ${removeExistingLinks "www"}
         [[ -d ${configDir}/blueprints/automation/SgtBatten ]] && rm -rf "${configDir}/blueprints/automation/SgtBatten"
         ln -fsn "${thermal-comfort-icons}" "${configDir}/www/thermal_comfort_icons.js"
+        ln -fsn "${formulaone-card}/formulaone-card" "${configDir}/www"
 
         ${optionalString frigate.enable # bash
           ''

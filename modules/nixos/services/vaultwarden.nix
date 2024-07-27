@@ -15,6 +15,8 @@ let
     mkVMOverride
     optional
     utils
+    nameValuePair
+    mkMerge
     ;
   inherit (config.modules.system.virtualisation) vmVariant;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -286,6 +288,31 @@ mkIf cfg.enable {
       };
     };
   };
+
+  services.fail2ban.jails =
+    let
+      mkJail = name: failregex: {
+        ${name} = {
+          enabled = true;
+
+          settings = {
+            port = "${toString cfg.port},http,https";
+            backend = "systemd";
+          };
+
+          filter.Definition = {
+            inherit failregex;
+            ignoreregex = "";
+            journalmatch = "_SYSTEMD_UNIT=vaultwarden.service";
+          };
+        };
+      };
+    in
+    mkMerge [
+      (mkJail "vaultwarden-login" ''^.*Username or password is incorrect\. Try again\. IP: <ADDR>\..*$'')
+      (mkJail "vaultwarden-2fa" ''^.*Invalid TOTP code.*IP: <ADDR>.*$'')
+      (mkJail "vaultwarden-admin" ''^.*Invalid admin token\. IP: <ADDR>.*$'')
+    ];
 
   persistence.directories = [
     {

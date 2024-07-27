@@ -16,12 +16,8 @@ stdenvNoCC.mkDerivation rec {
   dontBuild = true;
 
   installPhase = ''
-    runHook preInstall
-
-    mkdir -p "$out/frigate-hass-card"
-    mv * "$out/frigate-hass-card"
-
-    runHook postInstall
+    mkdir -p $out/frigate-hass-card
+    mv * $out/frigate-hass-card
   '';
 
   meta = with lib; {

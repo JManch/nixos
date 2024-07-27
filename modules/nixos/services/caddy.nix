@@ -4,7 +4,6 @@
   config,
   inputs,
   hostname,
-  adminUsername,
   ...
 }:
 let
@@ -16,6 +15,7 @@ let
     getExe
     mkVMOverride
     toUpper
+    concatStringsSep
     concatMapStrings
     concatMapStringsSep
     genAttrs
@@ -192,6 +192,7 @@ mkMerge [
       enabled = true;
 
       settings = {
+        ignoreip = concatStringsSep " " cfg.trustedAddresses;
         logpath = "/var/log/caddy/access-*.log";
         port = "http,https";
         backend = "auto";

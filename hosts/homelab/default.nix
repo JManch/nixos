@@ -35,6 +35,7 @@
       qbittorrent-nox.enable = true;
       mikrotik-backup.enable = true;
       index-checker.enable = true;
+      fail2ban.enable = true;
 
       calibre = {
         enable = true;
@@ -120,17 +121,6 @@
       nfs.server = {
         enable = false;
         supportedMachines = [ "ncase-m1.lan" ];
-      };
-
-      fail2ban = {
-        enable = true;
-        ignoredIPs = [
-          "192.168.89.2/32"
-          "192.168.88.0/24"
-          "192.168.100.0/24"
-          "10.20.20.0/24"
-          "10.0.0.0/24"
-        ];
       };
 
       restic = {

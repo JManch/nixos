@@ -78,6 +78,9 @@ let
             esac
           }
 
+          # FIX: This workaround can be removed after
+          # https://github.com/hyprwm/Hyprland/commit/33a5c8ce325e1657ec5571b57e05c6378706f4cd
+
           # If initial workspace tracking is enabled, Hyprland sets this token in
           # all exec-once and exec scripts. It makes sense for scripts that
           # immediately launch clients but because this is a long-running script

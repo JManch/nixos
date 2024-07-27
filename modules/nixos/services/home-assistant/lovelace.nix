@@ -25,19 +25,31 @@ let
   cameras = attrNames config.services.frigate.settings.cameras;
   upperPeople = mapAttrs (_: p: utils.upperFirstChar p) people;
 
-  allLightingTile = room: {
-    type = "tile";
-    entity = "light.${room}";
-    name = "All Lighting";
-    layout_options = {
-      grid_columns = 4;
-      grid_rows = 1;
-    };
-    features = [
-      { type = "light-brightness"; }
-      { type = "light-color-temp"; }
-    ];
-  };
+  allLightsTiles = room: [
+    {
+      type = "button";
+      name = "Toggle";
+      entity = "light.${room}";
+      tap_action.action = "toggle";
+      layout_options = {
+        grid_columns = 1;
+        grid_rows = 3;
+      };
+    }
+    {
+      type = "tile";
+      entity = "light.${room}";
+      name = "All Lights";
+      layout_options = {
+        grid_columns = 3;
+        grid_rows = 3;
+      };
+      features = [
+        { type = "light-brightness"; }
+        { type = "light-color-temp"; }
+      ];
+    }
+  ];
 
   lightTile = entity: {
     type = "tile";
@@ -747,9 +759,9 @@ let
     sections = [
       {
         type = "grid";
-        cards = [
-          (allLightingTile "lounge")
-          {
+        cards =
+          (allLightsTiles "lounge")
+          ++ singleton {
             camera_image = "camera.lounge_floorplan";
             type = "picture-elements";
             elements =
@@ -778,8 +790,7 @@ let
                 (lightElem "09" 13 65)
                 (lightElem "10" 13 25)
               ];
-          }
-        ];
+          };
         title = "Lighting";
         visibility = singleton {
           condition = "state";
@@ -843,8 +854,8 @@ let
         title = "Lighting";
         type = "grid";
         cards =
-          [
-            (allLightingTile "joshua_room")
+          (allLightsTiles "joshua_room")
+          ++ [
             (lightTile "joshua_lamp_floor_01")
             (lightTile "joshua_strip_bed_01")
             (lightTile "joshua_lamp_bed_01")
@@ -979,10 +990,8 @@ let
           title = "Lighting";
           type = "grid";
           cards =
-            [
-              (allLightingTile "${person}_room")
-              (lightTile "${person}_lamp_desk_01")
-            ]
+            (allLightsTiles "${person}_room")
+            ++ [ (lightTile "${person}_lamp_desk_01") ]
             ++ (adaptiveLightingTiles "${person}_room")
             ++ [
               {
@@ -1051,8 +1060,7 @@ let
       sections = singleton {
         title = "Lighting";
         type = "grid";
-        cards = [
-          (allLightingTile "${person}_room")
+        cards = (allLightsTiles "${person}_room") ++ [
           (lightTile "${person}_spot_ceiling_01")
           (lightTile "${person}_spot_ceiling_02")
           (lightTile "${person}_spot_ceiling_03")
@@ -1077,8 +1085,7 @@ let
       sections = singleton {
         title = "Lighting";
         type = "grid";
-        cards = [
-          (allLightingTile "${person}_room")
+        cards = (allLightsTiles "${person}_room") ++ [
           (lightTile "${person}_spot_ceiling_01")
           (lightTile "${person}_spot_ceiling_02")
           (lightTile "${person}_spot_ceiling_03")

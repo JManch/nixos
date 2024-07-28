@@ -14,6 +14,8 @@ let
     attrNames
     mapAttrs
     concatMap
+    splitString
+    concatMapStringsSep
     ;
   inherit (config.modules.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -29,25 +31,24 @@ let
     {
       type = "button";
       name = "Toggle";
-      entity = "light.${room}";
+      entity = "light.${room}_lights";
       tap_action.action = "toggle";
       layout_options = {
         grid_columns = 1;
-        grid_rows = 3;
+        grid_rows = if room != "study" then 3 else 2;
       };
     }
     {
       type = "tile";
-      entity = "light.${room}";
+      entity = "light.${room}_lights";
       name = "All Lights";
       layout_options = {
         grid_columns = 3;
-        grid_rows = 3;
+        grid_rows = if room != "study" then 3 else 2;
       };
       features = [
         { type = "light-brightness"; }
-        { type = "light-color-temp"; }
-      ];
+      ] ++ (optional (room != "study") { type = "light-color-temp"; });
     }
   ];
 
@@ -123,6 +124,7 @@ let
             (navigationButton "CCTV" "cctv" "mdi:cctv")
             (navigationButton "Heating" "heating" "mdi:heating-coil")
             (navigationButton "Lounge" "lounge" "mdi:sofa")
+            (navigationButton "Study" "study" "mdi:chair-rolling")
             (navigationButton "Joshua" "joshua-room" "mdi:bed")
             (navigationButton "${upperPeople.person1}" "${people.person1}-room" "mdi:bed")
             (navigationButton "${upperPeople.person2}" "${people.person2}-room" "mdi:bed")
@@ -177,6 +179,22 @@ let
               };
             }
           ]
+          ++ (map (data: {
+            type = "tile";
+            entity = "light.${data.light}";
+            name =
+              concatMapStringsSep " " (string: utils.upperFirstChar string) (splitString "_" data.room)
+              + " Ceiling Lights";
+            layout_options = {
+              grid_columns = 4;
+              grid_rows = 1;
+            };
+            visibility = singleton {
+              condition = "state";
+              entity = "light.${data.light}";
+              state = "unavailable";
+            };
+          }) cfg.ceilingLightRooms)
           ++ (optionals frigate.enable (
             map (camera: {
               type = "tile";
@@ -400,14 +418,14 @@ let
           {
             graph = "line";
             type = "sensor";
-            entity = "sensor.outdoor_temperature";
+            entity = "sensor.outdoor_sensor_temperature";
             detail = 2;
             name = "Temperature";
           }
           {
             graph = "line";
             type = "sensor";
-            entity = "sensor.outdoor_humidity";
+            entity = "sensor.outdoor_sensor_humidity";
             detail = 2;
             name = "Humidity";
           }
@@ -767,7 +785,7 @@ let
             elements =
               let
                 lightElem = number: left: top: {
-                  entity = "light.lounge_spot_ceiling_${number}";
+                  entity = "light.lounge_spot_ceiling_${toString number}";
                   style = {
                     background = "rgba(0, 0, 0, 0.8)";
                     border-radius = "50%";
@@ -779,22 +797,22 @@ let
                 };
               in
               [
-                (lightElem "01" 85 65)
-                (lightElem "02" 85 25)
-                (lightElem "03" 72 45)
-                (lightElem "04" 59 65)
-                (lightElem "05" 59 25)
-                (lightElem "06" 39 65)
-                (lightElem "07" 39 25)
-                (lightElem "08" 26 45)
-                (lightElem "09" 13 65)
-                (lightElem "10" 13 25)
+                (lightElem 1 85 65)
+                (lightElem 2 85 25)
+                (lightElem 3 72 45)
+                (lightElem 4 59 65)
+                (lightElem 5 59 25)
+                (lightElem 6 39 65)
+                (lightElem 7 39 25)
+                (lightElem 8 26 45)
+                (lightElem 9 13 65)
+                (lightElem 10 13 25)
               ];
           };
         title = "Lighting";
         visibility = singleton {
           condition = "state";
-          entity = "light.lounge_spot_ceiling_01";
+          entity = "light.lounge_spot_ceiling_1";
           state_not = "unavailable";
         };
       }
@@ -843,6 +861,53 @@ let
     ];
   };
 
+  study = {
+    title = "Study";
+    path = "study";
+    type = "sections";
+    max_columns = 2;
+    subview = true;
+    sections = [
+      {
+        type = "grid";
+        cards =
+          (allLightsTiles "study")
+          ++ singleton {
+            camera_image = "camera.study_floorplan";
+            type = "picture-elements";
+            elements =
+              let
+                lightElem = number: left: top: {
+                  entity = "light.study_spot_ceiling_${toString number}";
+                  style = {
+                    background = "rgba(0, 0, 0, 0.8)";
+                    border-radius = "50%";
+                    left = "${toString left}%";
+                    top = "${toString top}%";
+                  };
+                  tap_action.action = "toggle";
+                  type = "state-icon";
+                };
+              in
+              [
+                (lightElem 1 78 52)
+                (lightElem 2 48 52)
+                (lightElem 3 48 20)
+                (lightElem 4 25 70)
+                (lightElem 5 25 40)
+              ];
+          };
+
+        title = "Lighting";
+        visibility = singleton {
+          condition = "state";
+          entity = "light.study_spot_ceiling_1";
+          state_not = "unavailable";
+        };
+      }
+    ];
+  };
+
   joshuaRoom = {
     title = "Joshua's Room";
     path = "joshua-room";
@@ -856,12 +921,11 @@ let
         cards =
           (allLightsTiles "joshua_room")
           ++ [
-            (lightTile "joshua_lamp_floor_01")
-            (lightTile "joshua_strip_bed_01")
-            (lightTile "joshua_lamp_bed_01")
-            (lightTile "joshua_bulb_ceiling_01")
-            (lightTile "joshua_play_desk_01")
-            (lightTile "joshua_play_desk_02")
+            (lightTile "joshua_lamp_floor")
+            (lightTile "joshua_lamp_bed")
+            (lightTile "joshua_bulb_ceiling")
+            (lightTile "joshua_play_desk_1")
+            (lightTile "joshua_play_desk_2")
           ]
           ++ (adaptiveLightingTiles "joshua_room")
           ++ (singleton {
@@ -881,7 +945,7 @@ let
           {
             graph = "line";
             type = "sensor";
-            entity = "sensor.joshua_temperature";
+            entity = "sensor.joshua_sensor_temperature";
             detail = 2;
             layout_options = {
               grid_columns = 4;
@@ -892,7 +956,7 @@ let
           {
             graph = "line";
             type = "sensor";
-            entity = "sensor.joshua_humidity";
+            entity = "sensor.joshua_sensor_humidity";
             detail = 2;
             layout_options = {
               grid_columns = 4;
@@ -991,7 +1055,7 @@ let
           type = "grid";
           cards =
             (allLightsTiles "${person}_room")
-            ++ [ (lightTile "${person}_lamp_desk_01") ]
+            ++ [ (lightTile "${person}_lamp_desk") ]
             ++ (adaptiveLightingTiles "${person}_room")
             ++ [
               {
@@ -1061,12 +1125,12 @@ let
         title = "Lighting";
         type = "grid";
         cards = (allLightsTiles "${person}_room") ++ [
-          (lightTile "${person}_spot_ceiling_01")
-          (lightTile "${person}_spot_ceiling_02")
-          (lightTile "${person}_spot_ceiling_03")
-          (lightTile "${person}_play_desk_01")
-          (lightTile "${person}_play_desk_02")
-          (lightTile "${person}_strip_desk_01")
+          (lightTile "${person}_spot_ceiling_1")
+          (lightTile "${person}_spot_ceiling_2")
+          (lightTile "${person}_spot_ceiling_3")
+          # (lightTile "${person}_play_desk_1")
+          # (lightTile "${person}_play_desk_2")
+          # (lightTile "${person}_strip_desk_1")
         ];
       };
       cards = [ ];
@@ -1086,12 +1150,12 @@ let
         title = "Lighting";
         type = "grid";
         cards = (allLightsTiles "${person}_room") ++ [
-          (lightTile "${person}_spot_ceiling_01")
-          (lightTile "${person}_spot_ceiling_02")
-          (lightTile "${person}_spot_ceiling_03")
-          (lightTile "${person}_play_shelf_01")
-          (lightTile "${person}_play_shelf_02")
-          (lightTile "${person}_strip_desk_01")
+          # (lightTile "${person}_spot_ceiling_1")
+          # (lightTile "${person}_spot_ceiling_2")
+          # (lightTile "${person}_spot_ceiling_3")
+          # (lightTile "${person}_play_shelf_1")
+          # (lightTile "${person}_play_shelf_2")
+          # (lightTile "${person}_strip_desk_1")
         ];
       };
       cards = [ ];
@@ -1112,6 +1176,7 @@ mkIf cfg.enableInternal {
         ++ [
           heating
           lounge
+          study
           joshuaRoom
           room1
           room2

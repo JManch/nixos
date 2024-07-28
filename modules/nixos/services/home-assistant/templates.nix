@@ -214,9 +214,9 @@ mkIf cfg.enableInternal {
       {
         name = "Joshua Mold Indicator";
         platform = "mold_indicator";
-        indoor_temp_sensor = "sensor.joshua_temperature";
-        indoor_humidity_sensor = "sensor.joshua_humidity";
-        outdoor_temp_sensor = "sensor.outdoor_temperature";
+        indoor_temp_sensor = "sensor.joshua_sensor_temperature";
+        indoor_humidity_sensor = "sensor.joshua_sensor_humidity";
+        outdoor_temp_sensor = "sensor.outdoor_sensor_temperature";
         calibration_factor = 1.754;
       }
       {
@@ -292,7 +292,7 @@ mkIf cfg.enableInternal {
       platform = "generic_thermostat";
       name = "Joshua Thermostat";
       heater = "switch.hallway_thermostat";
-      target_sensor = "sensor.joshua_temperature";
+      target_sensor = "sensor.joshua_sensor_temperature";
       min_temp = 17;
       max_temp = 24;
       target_temp = 19;
@@ -312,8 +312,8 @@ mkIf cfg.enableInternal {
         # The unique IDs here are random and have no meaning
         {
           name = "Outdoor Thermal Comfort";
-          temperature_sensor = "sensor.outdoor_temperature";
-          humidity_sensor = "sensor.outdoor_humidity";
+          temperature_sensor = "sensor.outdoor_sensor_temperature";
+          humidity_sensor = "sensor.outdoor_sensor_humidity";
           sensor_types = [
             "frost_risk"
             "heat_index"
@@ -322,8 +322,8 @@ mkIf cfg.enableInternal {
         }
         {
           name = "Joshua Thermal Comfort";
-          temperature_sensor = "sensor.joshua_temperature";
-          humidity_sensor = "sensor.joshua_humidity";
+          temperature_sensor = "sensor.joshua_sensor_temperature";
+          humidity_sensor = "sensor.joshua_sensor_humidity";
           sensor_types = [
             "summer_scharlau_perception"
             "thoms_discomfort_perception"

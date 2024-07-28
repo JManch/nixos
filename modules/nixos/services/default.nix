@@ -385,21 +385,6 @@ in
       };
     };
 
-    hass = {
-      enable = mkEnableOption "Home Assistant";
-
-      enableInternal = mkOption {
-        type = types.bool;
-        default = false;
-        internal = true;
-      };
-
-      port = mkOption {
-        type = types.port;
-        default = 8123;
-      };
-    };
-
     calibre = {
       enable = mkEnableOption "Calibre E-book Manager";
 

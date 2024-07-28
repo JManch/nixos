@@ -1,6 +1,15 @@
-{ lib, config, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 let
+  inherit (lib) utils mapAttrs;
+  inherit (secrets.general) people;
   cfg = config.modules.services.hass;
+  secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
+  upperPeople = mapAttrs (_: p: utils.upperFirstChar p) people;
 in
 lib.mkIf cfg.enableInternal {
   services.home-assistant.config = {
@@ -8,15 +17,15 @@ lib.mkIf cfg.enableInternal {
       {
         name = "Joshua Room";
         # Adding lights individually rather than adding all with
-        # light.joshua_room is preferred because, otherwise, adaptive lighting
-        # turns on all lights even when just a single light is turned on.
+        # light.joshua_room_lights is preferred because, otherwise, adaptive
+        # lighting turns on all lights even when just a single light is turned
+        # on.
         lights = [
-          "light.joshua_lamp_floor_01"
-          "light.joshua_strip_bed_01"
-          "light.joshua_lamp_bed_01"
-          "light.joshua_bulb_ceiling_01"
-          "light.joshua_play_desk_01"
-          "light.joshua_play_desk_02"
+          "light.joshua_lamp_floor"
+          "light.joshua_lamp_bed"
+          "light.joshua_bulb_ceiling"
+          "light.joshua_play_desk_1"
+          "light.joshua_play_desk_2"
         ];
         min_brightness = 20;
         max_brightness = 100;
@@ -24,6 +33,24 @@ lib.mkIf cfg.enableInternal {
         max_color_temp = 5000;
         sleep_brightness = 5;
         sleep_color_temp = 1000;
+        transition_until_sleep = false;
+        sunrise_time = "07:00:00";
+        sunset_time = "22:30:00";
+        brightness_mode = "tanh";
+        brightness_mode_time_dark = 2600;
+        brightness_mode_time_light = 900;
+        take_over_control = false;
+        skip_redundant_commands = true;
+        intercept = true;
+        multi_light_intercept = true;
+      }
+      {
+        name = "${upperPeople.person1} Room";
+        lights = [ "light.${people.person1}_lamp_desk" ];
+        min_brightness = 5;
+        max_brightness = 100;
+        min_color_temp = 2000;
+        max_color_temp = 5000;
         transition_until_sleep = false;
         sunrise_time = "07:00:00";
         sunset_time = "22:30:00";

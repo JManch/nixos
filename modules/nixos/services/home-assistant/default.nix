@@ -11,6 +11,9 @@ let
   inherit (lib)
     mkIf
     mkForce
+    mkOption
+    mkEnableOption
+    types
     optional
     optionalString
     optionalAttrs
@@ -27,13 +30,53 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets) mqttHassPassword;
   inherit (caddy) trustedAddresses;
-  inherit (secrets.general) devices;
+  inherit (secrets.general) devices people;
   cfg = config.modules.services.hass;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
   cameras = attrNames config.services.frigate.settings.cameras;
 in
 {
   imports = (utils.scanPaths ./.) ++ [ inputs.nix-resources.nixosModules.home-assistant ];
+
+  options.modules.services.hass = {
+    enable = mkEnableOption "Home Assistant";
+
+    enableInternal = mkOption {
+      type = types.bool;
+      default = false;
+      internal = true;
+    };
+
+    port = mkOption {
+      type = types.port;
+      default = 8123;
+    };
+
+    ceilingLightRooms = mkOption {
+      type = types.listOf types.attrs;
+      internal = true;
+      readOnly = true;
+      default = [
+        {
+          room = "joshua_room";
+          light = "joshua_bulb_ceiling";
+        }
+        {
+          room = "lounge";
+          light = "lounge_spot_ceiling_1";
+        }
+        {
+          room = "study";
+          light = "study_spot_ceiling_1";
+        }
+        {
+          room = "${people.person2}_room";
+          light = "${people.person2}_spot_ceiling_1";
+        }
+      ];
+      description = "Rooms with smart ceiling lights that should not be switched off";
+    };
+  };
 
   config = mkIf cfg.enable {
     assertions = utils.asserts [
@@ -68,7 +111,6 @@ in
         "generic_thermostat"
         "generic_hygrostat"
         "mold_indicator"
-        "hue"
         "webostv"
         "powerwall"
         "co2signal"
@@ -161,11 +203,18 @@ in
           ];
         };
 
-        camera = singleton {
-          platform = "local_file";
-          file_path = "/var/lib/hass/media/lounge_floorplan.png";
-          name = "Lounge Floorplan";
-        };
+        camera = [
+          {
+            platform = "local_file";
+            file_path = "/var/lib/hass/media/lounge_floorplan.png";
+            name = "Lounge Floorplan";
+          }
+          {
+            platform = "local_file";
+            file_path = "/var/lib/hass/media/study_floorplan.png";
+            name = "Study Floorplan";
+          }
+        ];
 
         lovelace.resources = [
           {

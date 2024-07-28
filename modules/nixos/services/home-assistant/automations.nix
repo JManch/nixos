@@ -14,6 +14,8 @@ let
     attrNames
     attrValues
     singleton
+    splitString
+    concatMapStringsSep
     ;
   inherit (secrets.general) devices people;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -265,7 +267,7 @@ let
           let
             lightService = {
               service = "light.turn_${if enable then "on" else "off"}";
-              target.entity_id = "light.joshua_room";
+              target.entity_id = "light.joshua_room_lights";
             };
           in
           optional enable lightService
@@ -383,7 +385,7 @@ let
           ]
           ++ optional enable {
             platform = "state";
-            entity_id = [ "light.joshua_room" ];
+            entity_id = [ "light.joshua_room_lights" ];
             to = "on";
           };
         condition =
@@ -419,20 +421,20 @@ let
             { delay.seconds = 2; }
             {
               service = "light.turn_off";
-              target.entity_id = "light.joshua_bulb_ceiling_01";
+              target.entity_id = "light.joshua_bulb_ceiling";
             }
           ]
           ++ optional (!enable) {
             "if" = singleton {
               condition = "state";
-              entity_id = "light.joshua_room";
+              entity_id = "light.joshua_room_lights";
               state = "on";
             };
             "then" = [
               { delay.seconds = 2; }
               {
                 service = "light.turn_on";
-                target.entity_id = "light.joshua_bulb_ceiling_01";
+                target.entity_id = "light.joshua_bulb_ceiling";
               }
             ];
           };
@@ -484,6 +486,57 @@ let
       };
     };
   };
+
+  formula1Notify = singleton {
+    alias = "Formula 1 Notify";
+    mode = "single";
+    trigger = singleton {
+      platform = "template";
+      value_template = "{{ now.timestamp() | round(0) == (as_timestamp(state_attr('calendar.formula_1', 'start_time'), default = 0) | round(0) - 15*60) }}";
+    };
+    condition = singleton {
+      condition = "time";
+      after = "07:00:00";
+      before = "00:00:00";
+    };
+    action =
+      let
+        mkNotify = device: {
+          service = "notify.mobile_app_${device}";
+          data = {
+            title = "Formula 1 About to Start";
+            message = "{{ state_attr('calendar.formula_1', 'message') }} in 15 mins!";
+          };
+        };
+      in
+      [ (mkNotify "joshua_pixel_5") ];
+  };
+
+  lightsAvailabilityNotify = map (
+    data:
+    let
+      formattedRoomName = concatMapStringsSep " " (string: utils.upperFirstChar string) (
+        splitString "_" data.room
+      );
+    in
+    {
+      alias = formattedRoomName + " Ceiling Lights Availability Notify";
+      mode = "single";
+      trigger = singleton {
+        platform = "state";
+        entity_id = [ "light.${data.light}" ];
+        from = "null";
+        to = "unavailable";
+      };
+      action = singleton {
+        service = "notify.mobile_app_joshua_pixel_5";
+        data = {
+          title = "${formattedRoomName} Lights Became Unavailable";
+          message = "Turn the switch back on";
+        };
+      };
+    }
+  ) cfg.ceilingLightRooms;
 in
 mkIf cfg.enableInternal {
   services.home-assistant.config = {
@@ -496,6 +549,8 @@ mkIf cfg.enableInternal {
       ++ joshuaSleepModeToggle
       ++ binCollectionNotify
       ++ washingMachineNotify
+      ++ formula1Notify
+      ++ lightsAvailabilityNotify
       ++ optionals frigate.enable (frigateEntranceNotify ++ frigateCatNotify ++ frigateHighAlertNotify);
 
     input_datetime = {

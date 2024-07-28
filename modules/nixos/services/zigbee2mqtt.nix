@@ -26,12 +26,24 @@ mkIf cfg.enable {
     dataDir = "/var/lib/zigbee2mqtt";
     settings = {
       permit_join = false;
-      serial.port = cfg.deviceNode;
+      serial = {
+        port = cfg.deviceNode;
+        adapter = "ember";
+      };
 
       homeassistant = {
         enable = true;
         legacy_entity_attributes = false;
         legacy_triggers = false;
+      };
+
+      # Availability is useful for detecting when people turn off switches for
+      # smart lights. Once all our switches get replaced with smart ones I can
+      # disable this. I've changed the default active timeout from 10 to 5
+      # mins.
+      availability = {
+        active.timeout = 5;
+        passive.timeout = 1500;
       };
 
       frontend = {
@@ -49,6 +61,8 @@ mkIf cfg.enable {
       advanced = {
         log_level = "warn";
         legacy_api = false;
+        legacy_availability_payload = false;
+        channel = 25;
         network_key = "!${zigbee2mqttYamlSecrets.path} network_key";
       };
     };

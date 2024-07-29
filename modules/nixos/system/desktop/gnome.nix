@@ -30,21 +30,17 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
   # Gnome uses network manager
   modules.system.networking.useNetworkd = mkForce false;
 
-  # Only enable the power management feature on laptops
-  services.upower.enable = mkForce (config.device.type == "laptop");
-  services.power-profiles-daemon.enable = mkForce (config.device.type == "laptop");
-
   environment.gnome.excludePackages = with pkgs; [
     gnome-tour
-    gnome.epiphany
+    epiphany
     # Broken on nvidia, using clapper instead
-    gnome.totem
+    totem
   ];
 
   userPackages =
     extensions
     ++ (with pkgs; [
-      gnome.gnome-tweaks
+      gnome-tweaks
       clapper
     ]);
 

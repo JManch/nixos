@@ -5,7 +5,12 @@
   ...
 }:
 let
-  inherit (lib) mkIf utils singleton;
+  inherit (lib)
+    mkIf
+    utils
+    singleton
+    mkForce
+    ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy mosquitto;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -59,7 +64,7 @@ mkIf cfg.enable {
       };
 
       advanced = {
-        log_level = "warn";
+        log_level = "error";
         legacy_api = false;
         legacy_availability_payload = false;
         channel = 25;
@@ -69,6 +74,17 @@ mkIf cfg.enable {
   };
 
   # Upstream module has good systemd hardening
+
+  systemd.services.zigbee2mqtt = {
+    startLimitBurst = 3;
+    startLimitIntervalSec = 60;
+    serviceConfig = {
+      # Presumably due to instability in the ember driver the service sometimes
+      # thinks the dongle has disconnected and stops gracefully
+      Restart = mkForce "always";
+      RestartSec = "30";
+    };
+  };
 
   modules.services.mosquitto.users = {
     zigbee2mqtt = {

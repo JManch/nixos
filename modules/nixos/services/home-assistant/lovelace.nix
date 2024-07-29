@@ -808,7 +808,8 @@ let
                 (lightElem 9 13 65)
                 (lightElem 10 13 25)
               ];
-          };
+          }
+          ++ (adaptiveLightingTiles "lounge");
         title = "Lighting";
         visibility = singleton {
           condition = "state";

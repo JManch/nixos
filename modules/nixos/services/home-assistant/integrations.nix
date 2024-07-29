@@ -28,12 +28,8 @@ lib.mkIf cfg.enableInternal {
           "light.joshua_play_desk_2"
         ];
         min_brightness = 20;
-        max_brightness = 100;
-        min_color_temp = 2000;
-        max_color_temp = 5000;
         sleep_brightness = 5;
         sleep_color_temp = 1000;
-        transition_until_sleep = false;
         sunrise_time = "07:00:00";
         sunset_time = "22:30:00";
         brightness_mode = "tanh";
@@ -41,17 +37,18 @@ lib.mkIf cfg.enableInternal {
         brightness_mode_time_light = 900;
         take_over_control = false;
         skip_redundant_commands = true;
-        intercept = true;
-        multi_light_intercept = true;
+      }
+      {
+        name = "Lounge";
+        lights = [ "light.lounge_lights" ];
+        min_brightness = 50;
+        take_over_control = true;
+        skip_redundant_commands = true;
       }
       {
         name = "${upperPeople.person1} Room";
         lights = [ "light.${people.person1}_lamp_desk" ];
         min_brightness = 5;
-        max_brightness = 100;
-        min_color_temp = 2000;
-        max_color_temp = 5000;
-        transition_until_sleep = false;
         sunrise_time = "07:00:00";
         sunset_time = "22:30:00";
         brightness_mode = "tanh";
@@ -59,8 +56,6 @@ lib.mkIf cfg.enableInternal {
         brightness_mode_time_light = 900;
         take_over_control = false;
         skip_redundant_commands = true;
-        intercept = true;
-        multi_light_intercept = true;
       }
     ];
   };

@@ -24,6 +24,9 @@ let
   cameras = attrNames config.services.frigate.settings.cameras;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 
+  formattedRoomName =
+    room: (concatMapStringsSep " " (string: utils.upperFirstChar string) (splitString "_" room));
+
   frigateEntranceNotify = singleton {
     alias = "Entrance Person Notify";
     use_blueprint = {
@@ -159,7 +162,6 @@ let
       to = "Full";
       for.minutes = 1;
     };
-    condition = [ ];
     action = singleton {
       service = "notify.mobile_app_joshua_pixel_5";
       data = {
@@ -512,31 +514,92 @@ let
       [ (mkNotify "joshua_pixel_5") ];
   };
 
-  lightsAvailabilityNotify = map (
-    data:
+  lightsAvailabilityNotify = map (data: {
+    alias = (formattedRoomName data.room) + " Ceiling Lights Availability Notify";
+    mode = "single";
+    trigger = singleton {
+      platform = "state";
+      entity_id = [ "light.${data.light}" ];
+      to = "unavailable";
+    };
+    action = singleton {
+      service = "notify.mobile_app_joshua_pixel_5";
+      data = {
+        title = "${formattedRoomName data.room} Lights Became Unavailable";
+        message = "Turn the switch back on";
+      };
+    };
+  }) cfg.ceilingLightRooms;
+
+  room2LightsToggle =
     let
-      formattedRoomName = concatMapStringsSep " " (string: utils.upperFirstChar string) (
-        splitString "_" data.room
-      );
+      room = "${people.person2}_room";
     in
-    {
-      alias = formattedRoomName + " Ceiling Lights Availability Notify";
+    singleton {
+      alias = (formattedRoomName room) + " Light Switch";
       mode = "single";
       trigger = singleton {
-        platform = "state";
-        entity_id = [ "light.${data.light}" ];
-        from = "null";
-        to = "unavailable";
+        platform = "device";
+        domain = "mqtt";
+        device_id = "670ac1ecf423f069757c7ab30bec3142";
+        type = "action";
+        subtype = "press_1";
       };
       action = singleton {
-        service = "notify.mobile_app_joshua_pixel_5";
-        data = {
-          title = "${formattedRoomName} Lights Became Unavailable";
-          message = "Turn the switch back on";
-        };
+        service = "light.toggle";
+        target.entity_id = "light.${room}_lights";
       };
-    }
-  ) cfg.ceilingLightRooms;
+    };
+
+  hueLightSwitch =
+    room: deviceId:
+    singleton {
+      alias = "${utils.upperFirstChar room} Light Switch";
+      mode = "single";
+      trigger =
+        let
+          buttonTrigger = button: id: {
+            inherit id;
+            platform = "device";
+            domain = "mqtt";
+            device_id = deviceId;
+            type = "action";
+            subtype = button;
+          };
+        in
+        [
+          (buttonTrigger "on_press_release" "on")
+          (buttonTrigger "off_press_release" "off")
+          (buttonTrigger "up_press_release" "brightness_up")
+          (buttonTrigger "down_press_release" "brightness_down")
+        ];
+      action = singleton {
+        choose =
+          let
+            condition = trigger: action: {
+              conditions = singleton {
+                condition = "trigger";
+                id = [ trigger ];
+              };
+              sequence = [ (action // { target.entity_id = "light.${room}_lights"; }) ];
+            };
+          in
+          [
+            (condition "on" { service = "light.turn_on"; })
+            (condition "off" { service = "light.turn_off"; })
+            (condition "brightness_up" {
+              service = "light.turn_on";
+              data.brightness_step_pct = 10;
+              data.transition = 2;
+            })
+            (condition "brightness_down" {
+              service = "light.turn_on";
+              data.brightness_step_pct = -10;
+              data.transition = 2;
+            })
+          ];
+      };
+    };
 in
 mkIf cfg.enableInternal {
   services.home-assistant.config = {
@@ -551,6 +614,9 @@ mkIf cfg.enableInternal {
       ++ washingMachineNotify
       ++ formula1Notify
       ++ lightsAvailabilityNotify
+      ++ room2LightsToggle
+      ++ (hueLightSwitch "lounge" "12a188fc9e93182d852924b602153741")
+      ++ (hueLightSwitch "study" "49d9c39a26397a8a228ee484114aca0b")
       ++ optionals frigate.enable (frigateEntranceNotify ++ frigateCatNotify ++ frigateHighAlertNotify);
 
     input_datetime = {

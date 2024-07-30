@@ -29,8 +29,5 @@ mkIf (config.device.gpu.type == "nvidia") {
     powerManagement.enable = suspend.enable;
   };
 
-  # Fixes extra ghost display
-  boot.kernelParams = [ "nvidia-drm.fbdev=1" ];
-
   persistenceHome.directories = [ ".cache/nvidia" ];
 }

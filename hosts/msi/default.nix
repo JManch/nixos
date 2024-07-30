@@ -66,9 +66,9 @@
       desktop = {
         enable = true;
         # Suspend is very close to being stable but it sometimes causes
-        # applications to crash. Forced to enable it because monitor dpms is
-        # broken...
-        suspend.enable = true;
+        # applications to crash and the system sometimes gets stuck in a
+        # suspend loop
+        suspend.enable = false;
         desktopEnvironment = "gnome";
       };
     };

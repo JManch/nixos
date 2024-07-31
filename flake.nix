@@ -35,7 +35,6 @@
       mkHost = hostname: username: system: {
         name = hostname;
         value = nixosSystem {
-          inherit system;
           specialArgs = {
             inherit
               self
@@ -50,27 +49,59 @@
               config.allowUnfree = true;
             };
           };
-          modules =
-            if (hasPrefix "installer" hostname) then
-              [ ./hosts/installer ]
-            else
-              [
-                ./hosts/${hostname}
-                ./modules/nixos
-              ];
+          modules = [
+            {
+              nixpkgs.hostPlatform = system;
+              nixpkgs.buildPlatform = "x86_64-linux";
+            }
+            ./hosts/${hostname}
+            ./modules/nixos
+          ];
         };
       };
+
+      mkInstaller =
+        name: system: base:
+        let
+          isIso = hasPrefix "cd-dvd" base;
+        in
+        {
+          inherit name;
+          value =
+            (nixosSystem {
+              specialArgs = {
+                inherit
+                  lib
+                  self
+                  base
+                  isIso
+                  ;
+              };
+              modules = [
+                {
+                  nixpkgs.hostPlatform = system;
+                  nixpkgs.buildPlatform = "x86_64-linux";
+                }
+                ./hosts/installer
+              ];
+            }).config.system.build.${if isIso then "isoImage" else "sdImage"};
+        };
     in
     {
       formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
-      packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
+      packages = forEachSystem (
+        pkgs:
+        import ./pkgs { inherit pkgs; }
+        // listToAttrs [
+          (mkInstaller "installer-x86_64" "x86_64-linux" "cd-dvd/installation-cd-minimal.nix")
+        ]
+      );
       templates = import ./templates;
 
       nixosConfigurations = listToAttrs [
         (mkHost "ncase-m1" "joshua" "x86_64-linux")
         (mkHost "homelab" "joshua" "x86_64-linux")
         (mkHost "msi" "lauren" "x86_64-linux")
-        (mkHost "installer" "joshua" "x86_64-linux")
       ];
     };
 

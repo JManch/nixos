@@ -2,11 +2,24 @@
   lib,
   pkgs,
   self,
+  base,
+  isIso,
   modulesPath,
   ...
 }:
 let
-  inherit (lib) utils concatStringsSep;
+  inherit (lib)
+    utils
+    concatStringsSep
+    mkIf
+    hasPrefix
+    optional
+    mkForce
+    mkMerge
+    singleton
+    listToAttrs
+    ;
+  isArm = hasPrefix "aarch64" pkgs.hostPlatform.system;
   installScript = pkgs.writeShellApplication {
     name = "install-host";
     runtimeInputs = with pkgs; [
@@ -20,6 +33,9 @@ let
           "-s"
           "-w"
         ];
+        # Do not install man pages or shell completition because it causes
+        # build to fail or aarch64 and isn't needed here
+        postInstall = "";
       })
     ];
     text = # bash
@@ -168,34 +184,50 @@ let
   };
 in
 {
-  imports = [ "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix" ];
+  imports = [ "${modulesPath}/installer/${base}" ];
 
-  environment.systemPackages =
-    (with pkgs; [
-      gitMinimal
-      neovim
-      zellij
-      btop
-    ])
-    ++ [ installScript ];
+  config = mkMerge [
+    (listToAttrs (singleton {
+      name = if isIso then "isoImage" else "sdImage";
+      value = {
+        compressImage = false;
+      };
+    }))
 
-  nix.settings = {
-    experimental-features = "nix-command flakes";
-    auto-optimise-store = true;
-  };
+    {
+      # zfs has a dependency on samba which is broken under cross compilation
+      boot.supportedFilesystems.zfs = mkIf isArm (mkForce false);
 
-  zramSwap.enable = true;
+      environment.systemPackages =
+        (with pkgs; [
+          gitMinimal
+          (zellij.overrideAttrs { postInstall = ""; })
+          btop
+        ])
+        ++ optional (!isArm) pkgs.neovim
+        ++ [ installScript ];
 
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = false;
-    settings.KbdInteractiveAuthentication = false;
-    knownHosts."github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
-  };
+      nix.settings = {
+        experimental-features = "nix-command flakes";
+        auto-optimise-store = true;
+      };
 
-  users.users.root = {
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
-    ];
-  };
+      zramSwap.enable = true;
+
+      services.openssh = {
+        enable = true;
+        settings.PasswordAuthentication = false;
+        settings.KbdInteractiveAuthentication = false;
+        knownHosts."github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+      };
+
+      users.users.root = {
+        openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
+        ];
+      };
+
+      system.stateVersion = "24.05";
+    }
+  ];
 }

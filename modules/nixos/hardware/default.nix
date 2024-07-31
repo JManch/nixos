@@ -9,6 +9,7 @@ let
     mapAttrsToList
     hasAttr
     ;
+  cfg = config.modules.hardware;
 in
 {
   imports = utils.scanPaths ./.;
@@ -19,36 +20,75 @@ in
     fanatec.enable = mkEnableOption "support for Fanatec hardware";
 
     fileSystem = {
-      trim = mkEnableOption "ZFS automatic trimming";
-      unstableZfs = mkEnableOption "unstable ZFS";
       tmpfsTmp = mkEnableOption "tmp on tmpfs";
-
       extendedLoaderTimeout = mkEnableOption ''
         an extended loader timeout of 30 seconds. Useful for switching to old
         generations on headless machines.
       '';
 
-      encrypted = mkOption {
-        type = types.bool;
-        readOnly = true;
-        default = lib.any (v: v == true) (
-          mapAttrsToList (_: pool: hasAttr "encryption" pool.rootFsOptions) config.disko.devices.zpool
-        );
+      type = mkOption {
+        type = types.enum [
+          "zfs"
+          "sdImage"
+        ];
+        default = null;
         description = ''
-          Whether the file system uses disk encryption. Derived from disko
-          config.
+          The type of filesystem on this host. Should be `sdImage` if the host
+          is installed using the sd-image.nix installer. In this case, the
+          system uses a ext4 root filesystem labelled NIXOS_SD.
         '';
       };
 
-      zfsPassphraseCred = mkOption {
-        type = with types; nullOr lines;
-        default = null;
-        description = ''
-          Encrypted ZFS passphrase credential generated with
-          `systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2
-          --name=zfs-passphrase -p - -`
-        '';
+      zfs = {
+        unstable = mkEnableOption "unstable ZFS";
+        trim = mkEnableOption "ZFS automatic trimming";
+
+        encryption = {
+          enable = mkOption {
+            type = types.bool;
+            readOnly = true;
+            default = lib.any (v: v == true) (
+              mapAttrsToList (_: pool: hasAttr "encryption" pool.rootFsOptions) config.disko.devices.zpool
+            );
+            description = ''
+              Whether the file system uses ZFS disk encryption. Derived from disko
+              config.
+            '';
+          };
+
+          passphraseCred = mkOption {
+            type = with types; nullOr lines;
+            default = null;
+            description = ''
+              Encrypted ZFS passphrase credential generated with
+              `systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2
+              --name=zfs-passphrase -p - -`
+            '';
+          };
+        };
       };
+
+      swap =
+        let
+          inherit (config.device) memory;
+        in
+        {
+          enable = mkEnableOption "swap" // {
+            default = cfg.fileSystem.type != "zfs" && memory <= 4 * 1024;
+          };
+
+          size = mkOption {
+            type = types.int;
+            default =
+              if memory <= 2 * 1024 then
+                memory * 2
+              else if memory <= 8 * 1024 then
+                memory
+              else
+                1024 * 4;
+            description = "Size of swap partition in megabytes";
+          };
+        };
     };
 
     coral = {

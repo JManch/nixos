@@ -17,10 +17,14 @@
     core.homeManager.enable = true;
 
     hardware = {
-      fileSystem.trim = true;
-      fileSystem.extendedLoaderTimeout = true;
       graphics.hardwareAcceleration = true;
       printing.server.enable = true;
+
+      fileSystem = {
+        type = "zfs";
+        extendedLoaderTimeout = true;
+        zfs.trim = true;
+      };
 
       coral = {
         enable = true;

@@ -19,54 +19,87 @@ let
     getExe'
     mkForce
     mkMerge
+    listToAttrs
+    singleton
+    optionalString
     replaceStrings
     ;
+  inherit (config.modules.system) impermanence;
   cfg = config.modules.hardware.fileSystem;
 in
-{
-  assertions = utils.asserts [
-    (cfg.tmpfsTmp -> !config.modules.system.impermanence.enable)
-    "Tmp on tmpfs should not be necessary if impermanence is enabled"
-  ];
+mkMerge [
+  {
+    assertions = utils.asserts [
+      (cfg.type != null)
+      "Filesystem type must be set"
+      (cfg.tmpfsTmp -> !config.modules.system.impermanence.enable)
+      "Tmp on tmpfs should not be necessary if impermanence is enabled"
+    ];
 
-  zramSwap.enable = true;
+    zramSwap.enable = true;
+    swapDevices = mkIf cfg.swap.enable (singleton {
+      device = "${optionalString impermanence.enable "/persist"}/var/lib/swapfile";
+      size = cfg.swap.size;
+    });
 
-  # We use legacy ZFS mountpoints and use systemd to mount them rather than
-  # ZFS' auto-mount. Might want to switch to using the ZFS native mountpoints
-  # and mounting with the zfs-mount-generator in the future.
-  # https://github.com/NixOS/nixpkgs/issues/62644
-  systemd.services.zfs-mount.enable = false;
+    boot = {
+      initrd.systemd.enable = true;
+      tmp.useTmpfs = cfg.tmpfsTmp;
 
-  boot = {
-    loader.efi.canTouchEfiVariables = true;
-    tmp.useTmpfs = cfg.tmpfsTmp;
-
-    # ZFS does not always support the latest kernel
-    kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
-    zfs.package = mkIf cfg.unstableZfs pkgs.zfs_unstable;
-
-    # Set zfs devNodes to "/dev/disk/by-path" for VM installs to fix zpool
-    # import failure. Make sure the disks in disko have VM install overrides
-    # configured.
-    # https://discourse.nixos.org/t/cannot-import-zfs-pool-at-boot/4805
-    zfs.devNodes = mkIf inputs.vmInstall.value (mkVMOverride "/dev/disk/by-path");
-
-    supportedFilesystems = [ "zfs" ];
-
-    loader.timeout = mkIf cfg.extendedLoaderTimeout 30;
-    loader.systemd-boot = {
-      enable = true;
-      editor = false;
-      consoleMode = "auto";
-      configurationLimit = 20;
+      loader = {
+        efi.canTouchEfiVariables = true;
+        timeout = mkIf cfg.extendedLoaderTimeout 30;
+        systemd-boot = {
+          enable = true;
+          editor = false;
+          consoleMode = "auto";
+          configurationLimit = 20;
+        };
+      };
     };
 
-    initrd.systemd = mkMerge [
-      { enable = true; }
+    programs.zsh.shellAliases = {
+      boot-bios = "systemctl reboot --firmware-setup";
+    };
+  }
+
+  (mkIf (cfg.type == "sdImage") {
+    # Filesystem created by the sd-image-aarch64.nix installer
+    # https://github.com/NixOS/nixpkgs/blob/7bc3f9074f4aa45b003fddf53cb44e2e9d7f9979/nixos/modules/installer/sd-card/sd-image.nix#L19C3-L19C14
+    fileSystems."/" = {
+      device = "/dev/disk/by-label/NIXOS_SD";
+      fsType = "ext4";
+    };
+  })
+
+  (mkIf (cfg.type == "zfs") {
+    # We use legacy ZFS mountpoints and use systemd to mount them rather than
+    # ZFS' auto-mount. Might want to switch to using the ZFS native mountpoints
+    # and mounting with the zfs-mount-generator in the future.
+    # https://github.com/NixOS/nixpkgs/issues/62644
+    systemd.services.zfs-mount.enable = false;
+
+    services.zfs = {
+      trim.enable = cfg.zfs.trim;
+      autoScrub.enable = true;
+    };
+
+    boot = {
+      supportedFilesystems.zfs = true;
+
+      # ZFS does not always support the latest kernel
+      kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
+      zfs.package = mkIf cfg.zfs.unstable pkgs.zfs_unstable;
+
+      # Set zfs devNodes to "/dev/disk/by-path" for VM installs to fix zpool
+      # import failure. Make sure the disks in disko have VM install overrides
+      # configured.
+      # https://discourse.nixos.org/t/cannot-import-zfs-pool-at-boot/4805
+      zfs.devNodes = mkIf inputs.vmInstall.value (mkVMOverride "/dev/disk/by-path");
 
       # Modify the ZFS import service to allow passwordless native ZFS
       # encryption unlocking using a passphrase decrypted with TPM 2.0
-      (
+      initrd.systemd =
         let
           nixosUtils = import "${inputs.nixpkgs}/nixos/lib/utils.nix" { inherit lib pkgs config; };
           zfsFilesystems = filter (x: x.fsType == "zfs") config.system.build.fileSystems;
@@ -74,7 +107,7 @@ in
           fsToPool = fs: datasetToPool fs.device;
           rootPools = unique (map fsToPool (filter nixosUtils.fsNeededForBoot zfsFilesystems));
         in
-        mkIf (cfg.encrypted && cfg.zfsPassphraseCred != null) {
+        mkIf (cfg.zfs.encryption.enable && cfg.zfs.encryption.passphraseCred != null) {
           # We have to add our custom script to storePaths so that it's available
           # in initrd. This isn't needed when using the "script" systemd
           # attribute as it makes a job script that gets automatically added to
@@ -83,7 +116,7 @@ in
             pool: config.boot.initrd.systemd.services."zfs-import-${pool}".serviceConfig.ExecStart
           ) rootPools;
 
-          services = lib.listToAttrs (
+          services = listToAttrs (
             map (
               pool:
               let
@@ -121,24 +154,15 @@ in
               nameValuePair "zfs-import-${pool}" {
                 after = [ "tpm2.target" ];
                 serviceConfig = {
-                  # Generate with: systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2 --name=zfs-passphrase -p - -
-                  SetCredentialEncrypted = "zfs-passphrase:${cfg.zfsPassphraseCred}";
+                  # Generate with: 
+                  # systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2 --name=zfs-passphrase -p - -
+                  SetCredentialEncrypted = "zfs-passphrase:${cfg.zfs.encryption.passphraseCred}";
                   ExecStart = mkForce customImportScript;
                 };
               }
             ) rootPools
           );
-        }
-      )
-    ];
-  };
-
-  services.zfs = {
-    trim.enable = cfg.trim;
-    autoScrub.enable = true;
-  };
-
-  programs.zsh.shellAliases = {
-    boot-bios = "systemctl reboot --firmware-setup";
-  };
-}
+        };
+    };
+  })
+]

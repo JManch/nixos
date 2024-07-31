@@ -41,7 +41,9 @@ let
         hosts=(${
           concatStringsSep " " (
             attrNames (
-              filterAttrs (_: value: !value.config.modules.hardware.fileSystem.encrypted) (utils.hosts self)
+              filterAttrs (
+                _: value: !(with value.config.modules.hardware.fileSystem; type == "zfs" && zfs.encryption.enable)
+              ) (utils.hosts self)
             )
           )
         })

@@ -42,8 +42,9 @@
 
     hardware = {
       fileSystem = {
-        trim = true;
+        type = "zfs";
         tmpfsTmp = true;
+        zfs.trim = true;
       };
 
       printing.client = {

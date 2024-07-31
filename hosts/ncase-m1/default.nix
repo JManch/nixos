@@ -70,8 +70,9 @@
       fanatec.enable = true;
 
       fileSystem = {
-        trim = true;
-        zfsPassphraseCred = ''
+        type = "zfs";
+        zfs.trim = true;
+        zfs.encryption.passphraseCred = ''
           DHzAexF2RZGcSwvqCLwg/iAAAAABAAAADAAAABAAAACC7x/VG/f0sAMQRX0AAAAAgAAAA \
           AAAAAALACMA8AAAACAAAAAAngAgFD/ouh3hJ2deKa9kL7wsQR8vpJjQF2B8ZeVi0qq+HF \
           MAEL+ELOC9b+zMAXhtTemqTYjjzkxajL6W5vBnH0itpdMsdNiz1Ygi2Y1LJ3WOAAxMUJy \

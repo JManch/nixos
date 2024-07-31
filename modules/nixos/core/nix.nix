@@ -293,8 +293,8 @@ in
     "d /persist/var/nix-tmp 0755 root root"
   ];
 
-  hmAdmin.programs.zsh = {
-    initExtra = # bash
+  programs.zsh = {
+    interactiveShellInit = # bash
       ''
         inspect-host() {
           if [ -z "$1" ]; then
@@ -307,7 +307,6 @@ in
 
     shellAliases = {
       mount-nix-tmp = mkIf impermanence.enable "sudo mount --bind /persist/var/nix-tmp /var/nix-tmp";
-      build-iso = "nix build ${configDir}#nixosConfigurations.installer.config.system.build.isoImage";
       system-size = "nix path-info --closure-size --human-readable /run/current-system";
     };
   };

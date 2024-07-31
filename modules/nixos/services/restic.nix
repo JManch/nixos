@@ -222,7 +222,7 @@ mkMerge [
 
     # WARN: Always interact with the repository using the REST server, even on
     # the same machine. It ensures correct repo file ownership.
-    hmAdmin.programs.zsh.shellAliases =
+    programs.zsh.shellAliases =
       let
         systemctl = getExe' pkgs.systemd "systemctl";
       in

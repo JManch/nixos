@@ -274,7 +274,7 @@ in
 
       virtualisation.libvirtd.enable = true;
 
-      hmAdmin.programs.zsh.initExtra = # bash
+      programs.zsh.interactiveShellInit = # bash
         ''
           ssh-vm() {
             ssh-add-quiet

@@ -7,7 +7,7 @@
   device = {
     type = "desktop";
     ipAddress = null;
-    memory = 16000;
+    memory = 1024 * 16;
 
     cpu = {
       name = "i7 6700k";

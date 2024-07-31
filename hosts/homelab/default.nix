@@ -8,7 +8,7 @@
     type = "server";
     cpu.type = "amd";
     cpu.cores = 4;
-    memory = 8000;
+    memory = 1024 * 8;
     gpu.type = null;
     ipAddress = "192.168.89.2";
   };

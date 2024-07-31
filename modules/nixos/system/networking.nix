@@ -36,6 +36,8 @@ in
     "Default gateway must be set when using a static IPV4 address"
     (allUnique cfg.publicPorts)
     "`networking.publicPorts` contains duplicate ports"
+    (vlanIds != [ ] -> cfg.useNetworkd)
+    "VLAN config only works with networkd"
     (length vlanIds <= 10)
     "A single interface cannot have more than 10 VLANs assigned (arbitrary limit because of VLAN name mapping)"
   ];

@@ -11,6 +11,7 @@
   ...
 }:
 let
+  inherit (lib) mkIf mkMerge;
   inherit (config.modules.system.virtualisation) vmVariant;
   cfg = config.modules.core.homeManager;
 in
@@ -29,16 +30,14 @@ in
     ])
   ];
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
 
-      users =
-        {
-          ${username} = import ../../../home/${hostname}.nix;
-        }
-        // lib.optionalAttrs (username != adminUsername) {
+      users = mkMerge [
+        { ${username} = import ../../../home/${hostname}.nix; }
+        (mkIf (username != adminUsername) {
           ${adminUsername} = {
             modules = {
               core.standalone = true;
@@ -49,7 +48,8 @@ in
             };
             home.stateVersion = config.home-manager.users.${username}.home.stateVersion;
           };
-        };
+        })
+      ];
 
       sharedModules = [ ../../home-manager ];
 

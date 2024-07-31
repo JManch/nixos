@@ -6,6 +6,8 @@
   ...
 }:
 let
+  inherit (lib) mkIf utils;
+  inherit (config.modules.core) homeManager;
   cfg = config.modules.hardware.vr;
 in
 {
@@ -43,7 +45,12 @@ in
   # Performance is noticeably worse than Windows but I haven't put a lot of
   # effort into optimising it.
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
+    assertions = utils.asserts [
+      homeManager.enable
+      "VR requires home manager to be enabled"
+    ];
+
     userPackages = with pkgs; [
       opencomposite-helper
       index_camera_passthrough

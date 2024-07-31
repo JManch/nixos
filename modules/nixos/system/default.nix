@@ -32,7 +32,7 @@ in
 
     impermanence.enable = mkOption {
       type = types.bool;
-      default = true;
+      default = false;
       description = ''
         Whether to enable impermanence. /persist will be used for the
         persistent filesystem.

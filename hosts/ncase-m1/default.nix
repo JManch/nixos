@@ -147,6 +147,7 @@
     };
 
     system = {
+      impermanence.enable = true;
       ssh.server.enable = true;
       windows.enable = true;
       bluetooth.enable = true;

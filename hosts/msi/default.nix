@@ -54,7 +54,6 @@
     };
 
     system = {
-      impermanence.enable = false;
       audio.enable = true;
       ssh.server.enable = true;
       networking.primaryInterface = "enp3s0";

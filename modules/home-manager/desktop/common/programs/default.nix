@@ -7,5 +7,5 @@
 {
   imports = lib.utils.scanPaths ./.;
 
-  config = lib.mkIf desktopEnabled { home.packages = [ pkgs.nautilus ]; };
+  config = lib.mkIf desktopEnabled { home.packages = [ pkgs.gnome.nautilus ]; };
 }

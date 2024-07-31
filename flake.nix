@@ -94,6 +94,7 @@
         import ./pkgs { inherit pkgs; }
         // listToAttrs [
           (mkInstaller "installer-x86_64" "x86_64-linux" "cd-dvd/installation-cd-minimal.nix")
+          (mkInstaller "installer-pi" "aarch64-linux" "sd-card/sd-image-aarch64.nix")
         ]
       );
       templates = import ./templates;
@@ -102,6 +103,7 @@
         (mkHost "ncase-m1" "joshua" "x86_64-linux")
         (mkHost "homelab" "joshua" "x86_64-linux")
         (mkHost "msi" "lauren" "x86_64-linux")
+        (mkHost "pi-3" "joshua" "aarch64-linux")
       ];
     };
 

@@ -232,8 +232,6 @@ in
         "Reserved UIDs must be greater than 1000 and less than 2000"
         (all (gid: gid > 1000 && gid < 2000) gids)
         "Reserved GIDs must be greater than 1000 and less than 2000"
-        (cfg.desktop.enable -> (lib.length config.device.monitors != 0))
-        "Device monitors must be configured to enable desktop environment"
       ];
   };
 }

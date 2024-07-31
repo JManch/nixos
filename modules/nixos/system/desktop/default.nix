@@ -39,7 +39,6 @@ in
         with types;
         nullOr (enum [
           "xfce"
-          "plasma"
           "gnome"
         ]);
       default = null;
@@ -69,6 +68,7 @@ in
   config = mkIf cfg.enable {
     i18n.defaultLocale = "en_GB.UTF-8";
     services.xserver.excludePackages = [ pkgs.xterm ];
+    hardware.graphics.enable = true;
 
     # Enables wayland for all apps that support it
     environment.sessionVariables.NIXOS_OZONE_WL = mkIf isWayland "1";

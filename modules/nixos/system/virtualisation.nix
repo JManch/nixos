@@ -91,7 +91,7 @@ let
         # terminal windows
         if grep -q -- "-nographic" "$runscript"; then
           ${
-            if config.modules.system.desktop.enable then # bash
+            if config.modules.system.desktop.enable && homeManager.enable then # bash
               ''
                 ${terminal.exePath} -e "zsh" "-i" "-c" "ssh-vm; zsh -i" &
                 ${terminal.exePath} --class qemu -e "$runscript"

@@ -520,50 +520,6 @@ let
         title = "House";
       }
       {
-        title = "Finances";
-        type = "grid";
-        cards = [
-          {
-            type = "tile";
-            entity = "sensor.grid_buy_price";
-            name = "Import Cost";
-            icon = "mdi:cash";
-          }
-          {
-            type = "tile";
-            entity = "sensor.grid_sell_price";
-            name = "Export Cost";
-            icon = "mdi:cash";
-          }
-          {
-            chart_type = "line";
-            entities = [
-              {
-                entity = "sensor.powerwall_site_import_cost";
-                name = "Month Import Cost";
-              }
-              {
-                entity = "sensor.powerwall_site_export_compensation";
-                name = "Month Export Compensation";
-              }
-            ];
-            period = "hour";
-            stat_types = [ "sum" ];
-            type = "statistics-graph";
-          }
-          {
-            chart_type = "line";
-            entities = singleton {
-              entity = "sensor.powerwall_aggregate_cost";
-              name = "Month Aggregate Cost";
-            };
-            period = "hour";
-            stat_types = [ "sum" ];
-            type = "statistics-graph";
-          }
-        ];
-      }
-      {
         title = "Site";
         type = "grid";
         cards = [
@@ -675,6 +631,50 @@ let
               grid_columns = 4;
               grid_rows = 1;
             };
+          }
+        ];
+      }
+      {
+        title = "Finances";
+        type = "grid";
+        cards = [
+          {
+            type = "tile";
+            entity = "sensor.grid_buy_price";
+            name = "Import Cost";
+            icon = "mdi:cash";
+          }
+          {
+            type = "tile";
+            entity = "sensor.grid_sell_price";
+            name = "Export Cost";
+            icon = "mdi:cash";
+          }
+          {
+            chart_type = "line";
+            entities = [
+              {
+                entity = "sensor.powerwall_site_import_cost";
+                name = "Month Import Cost";
+              }
+              {
+                entity = "sensor.powerwall_site_export_compensation";
+                name = "Month Export Compensation";
+              }
+            ];
+            period = "hour";
+            stat_types = [ "sum" ];
+            type = "statistics-graph";
+          }
+          {
+            chart_type = "line";
+            entities = singleton {
+              entity = "sensor.powerwall_aggregate_cost";
+              name = "Month Aggregate Cost";
+            };
+            period = "hour";
+            stat_types = [ "sum" ];
+            type = "statistics-graph";
           }
         ];
       }

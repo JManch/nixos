@@ -13,8 +13,8 @@ let
     filterAttrs
     ;
 
-  deployScript = pkgs.writeShellApplication {
-    name = "deploy-host";
+  remoteInstallScript = pkgs.writeShellApplication {
+    name = "install-remote";
     runtimeInputs = [
       pkgs.age
       # Nixos-anywhere does not allow passing extra flags to the nix build commands
@@ -32,7 +32,7 @@ let
     text = # bash
       ''
         if [ "$#" -ne 2 ]; then
-          echo "Usage: deploy-host <hostname> <ip_address>"
+          echo "Usage: install-remote <hostname> <ip_address>"
           exit 1
         fi
 
@@ -124,5 +124,5 @@ let
   };
 in
 {
-  adminPackages = [ deployScript ];
+  adminPackages = [ remoteInstallScript ];
 }

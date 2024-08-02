@@ -18,6 +18,7 @@ let
     getExe'
     singleton
     ;
+  inherit (config.modules.system) virtualisation;
   cfg = config.modules.system.ssh;
 in
 {
@@ -43,6 +44,11 @@ in
       path = "/etc/ssh/ssh_host_ed25519_key";
       type = "ed25519";
     };
+  };
+
+  # Enable using this host as a build host in VMs
+  networking.firewall.interfaces = mkIf virtualisation.libvirt.enable {
+    virbr0.allowedTCPPorts = [ 22 ];
   };
 
   users.users.root.openssh.authorizedKeys.keys = [

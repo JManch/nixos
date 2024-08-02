@@ -37,8 +37,8 @@ Everything, including secrets, will be installed.
 
 Run `build-iso` to get a custom install ISO. The ISO authenticates my SSH key
 for remote installs and provides an install script for installing locally.
-- Local: `install-host <hostname>` inside the ISO
-- Remote: `deploy-host <hostname> <ip_address>`
+- Local: `install-local <hostname>` inside the ISO
+- Remote: `install-remote <hostname> <ip_address>`
 
 The configuration also supports running a VM-variant of any host using `run-vm
 <hostname>`. This enables easy debugging/testing of host configurations. It's

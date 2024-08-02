@@ -21,7 +21,7 @@ let
     ;
   isArm = hasPrefix "aarch64" pkgs.hostPlatform.system;
   installScript = pkgs.writeShellApplication {
-    name = "install-host";
+    name = "install-local";
     runtimeInputs = with pkgs; [
       age
       disko
@@ -38,108 +38,130 @@ let
         postInstall = "";
       })
     ];
-    text = # bash
-      ''
-        if [ "$(id -u)" != "0" ]; then
-           echo "This script must be run as root" 1>&2
-           exit 1
-        fi
+    text = ''
+      if [ "$(id -u)" != "0" ]; then
+         echo "This script must be run as root" 1>&2
+         exit 1
+      fi
 
-        if [ "$#" -ne 1 ]; then
-          echo "Usage: install-host <hostname>"
-          exit 1
+      if [ "$#" -ne 1 ]; then
+        echo "Usage: install-local <hostname>"
+        exit 1
+      fi
+      ${utils.exitTrapBuilder}
+
+      hostname=$1
+      hosts=(${concatStringsSep " " (builtins.attrNames (utils.hosts self))})
+      match=0
+      for host in "''${hosts[@]}"; do
+        if [[ $host = "$hostname" ]]; then
+          match=1
+          break
         fi
-        hostname=$1
-        hosts=(${concatStringsSep " " (builtins.attrNames (utils.hosts self))})
-        match=0
-        for host in "''${hosts[@]}"; do
-          if [[ $host = "$hostname" ]]; then
-            match=1
-            break
+      done
+      if [[ $match = 0 ]]; then
+        echo "Error: Host '$hostname' does not exist" >&2
+        exit 1
+      fi
+
+      flake="/root/nixos"
+      if [ ! -d "$flake" ]; then
+        git clone https://github.com/JManch/nixos "$flake"
+      fi
+
+      temp_keys=$(mktemp -d)
+      ssh_dir="/root/.ssh"
+      clean_up_keys() {
+        rm -rf "$temp_keys"
+        rm -rf "$ssh_dir"
+      }
+      add_exit_trap clean_up_keys
+      echo "### Decrypting ssh-bootstrap-kit ###"
+      age -d "$flake/hosts/ssh-bootstrap-kit" | tar -xf - -C "$temp_keys"
+      rm -rf "$ssh_dir"
+      mkdir -p "$ssh_dir"
+      cp "$temp_keys/joshua/id_ed25519" "$ssh_dir"
+      cp "$temp_keys/joshua/id_ed25519.pub" "$ssh_dir"
+
+      vmInstall=false
+      read -p "Are you installing this host in a virtual machine? (y/N): " -n 1 -r
+      echo
+      if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+        vmInstall=true
+        echo "WARNING: The vmInstall flake input will only be overridden for the initial install"
+        echo "Any nixos-rebuild commands ran in the VM will need '--override-input vmInstall github:JManch/$vmInstall' manually added"
+        # Disko does not allow overriding inputs so instead we update the flake
+        # lock file of our downloaded config
+        nix flake lock \
+          --update-input vmInstall \
+          --override-input vmInstall "github:JManch/true" \
+          "$flake"
+      fi
+
+      echo "### Fetching host information ###"
+      host_config="$flake#nixosConfigurations.$hostname.config"
+      fs_type=$(nix eval --raw "$host_config.modules.hardware.fileSystem.type")
+      username=$(nix eval --raw "$host_config.modules.core.username")
+      admin_username=$(nix eval --raw "$host_config.modules.core.adminUsername")
+      impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
+      secure_boot=$(nix eval "$host_config.modules.hardware.secureBoot.enable")
+      has_disko=$(nix eval --impure --expr "(builtins.getFlake \"$flake\").nixosConfigurations.$hostname.config.disko.devices.disk or {} != {}")
+
+      if [[ "$has_disko" = "false" && "$fs_type" != "sdImage" ]]; then
+          echo "The host does not have a disko config"
+          echo "You'll need to manually formatted and partitioned the disk then mounted it to /mnt";
+          read -p "Have you done this? (y/N): " -n 1 -r
+          echo
+          if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+            echo "Aborting" >&2
+            exit 1
           fi
-        done
-        if [[ $match = 0 ]]; then
-          echo "Error: Host '$hostname' does not exist" >&2
+      fi
+
+      if [ "$fs_type" = "sdImage" ]; then
+        rootDir="/"
+      elif [ "$impermanence" = "true" ]; then
+        rootDir="/mnt/persist"
+      else
+        rootDir="/mnt"
+      fi
+
+      read -p "Enter the address of a remote build host (leave empty to build locally): " -r build_host
+      if [ -z "$build_host" ]; then
+        build_host=""
+      else
+        if ! nix store ping --store "ssh://$build_host" &> /dev/null; then
+          echo "Error: build host $build_host cannot be pinged, aborting" >&2
           exit 1
         fi
+      fi
 
-        config="/root/nixos"
-        if [ ! -d "$config" ]; then
-          git clone https://github.com/JManch/nixos "$config"
-        fi
-
-        host_config="$config#nixosConfigurations.$hostname.config"
-        username=$(nix eval --raw "$host_config.modules.core.username")
-        admin_username=$(nix eval --raw "$host_config.modules.core.adminUsername")
-        impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
-        secure_boot=$(nix eval "$host_config.modules.hardware.secureBoot.enable")
-
-        vmInstall=false
-        read -p "Are you installing this host in a virtual machine? (y/N): " -n 1 -r
-        echo
-        if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-          vmInstall=true
-          echo "WARNING: The vmInstall flake input will only be overridden for the initial install"
-          echo "Any nixos-rebuild commands ran in the VM will need '--override-input vmInstall github:JManch/$vmInstall' manually added"
-          # Disko does not allow overriding inputs so instead we update the flake
-          # lock file of our downloaded config
-          nix flake lock \
-            --update-input vmInstall \
-            --override-input vmInstall "github:JManch/true" \
-            "$config"
-        fi
-
+      if [ "$has_disko" = "true" ]; then
         echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"
         read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
         echo
         if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-            echo "Aborting"
-            exit 1
+          echo "Aborting" >&2
+          exit 1
         fi
+      fi
 
-        temp_keys=$(mktemp -d)
-        ssh_dir="/root/.ssh"
-        cleanup() {
-          rm -rf "$ssh_dir"
-          rm -rf "$temp_keys"
-        }
-        ${utils.exitTrapBuilder}
-        add_exit_trap cleanup
-
-        echo "Decrypting ssh-bootstrap-kit..."
-        age -d "$config/hosts/ssh-bootstrap-kit" | tar -xf - -C "$temp_keys"
-
-        rm -rf "$ssh_dir"
-        mkdir -p "$ssh_dir"
-
-        # Temporarily copy nix-resources keys to id_ed25519 as they are used for
-        # accessing the private repo
-        cp "$temp_keys/$admin_username/id_nix-resources" "$ssh_dir/id_ed25519"
-        cp "$temp_keys/$admin_username/id_nix-resources.pub" "$ssh_dir/id_ed25519.pub"
-
-        echo "Starting disko format and mount..."
-        disko --mode disko --flake "$config#$hostname"
-        echo "Disko finished"
-
-        rootDir="/mnt"
-        if [ "$impermanence" = "true" ]; then
-          rootDir="/mnt/persist"
-        fi
-
+      install_keys() {
+        echo "### Installing keys ###"
         install -d -m755 "$rootDir/etc/ssh" "$rootDir/home"
         install -d -m700 "$rootDir/home/$username" "$rootDir/home/$admin_username"
         install -d -m700 "$rootDir/home/$username/.ssh" "$rootDir/home/$admin_username/.ssh"
 
-        # Install host keys
+        # Host keys
         mv "$temp_keys/$hostname"/* "$rootDir/etc/ssh"
 
-        # Install user keys
+        # User keys
         if [ -d "$temp_keys/$username" ]; then
           mv "$temp_keys/$username"/* "$rootDir/home/$username/.ssh"
         fi
 
-        # Install admin user keys
-        if [ -d "$temp_keys/$admin_username" ]; then
+        # Admin user keys
+        if [[ -d "$temp_keys/$admin_username" && -n "$(ls -A "$temp_keys/$admin_username")" ]]; then
           mv "$temp_keys/$admin_username"/* "$rootDir/home/$admin_username/.ssh"
         fi
 
@@ -152,35 +174,92 @@ let
           chown -R 1:1 "$rootDir/home/$admin_username"
         fi
 
-        # If the host uses secure boot, generate keys
         if [ "$secure_boot" = "true" ]; then
           sbctl create-keys --export "$rootDir/etc/secureboot/keys/" --database-path "$rootDir/etc/secureboot/"
         fi
+      }
 
-        # WARN: nixos-install has a bunch of options that are not documented in
-        # the man page. The source is here: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/installer/tools/nixos-install.sh
+      run_disko() {
+        if [ "$has_disko" = "true" ]; then
+          echo "### Running disko format and mount ###"
+          disko --mode disko --flake "$flake#$hostname"
+        fi
+      }
 
-        # We have to clear the nix cache because previously cached paths refer to
-        # /nix/store whilst nixos-install expects store paths at /mnt/nix/store.
-        # Not sure why this isn't handled in the nixos-install script...
-        rm -rf /root/.cache/nix
+      install_nixos() {
+        if [ "$fs_type" = "sdImage" ]; then
+          echo "### Running nixos-rebuild boot ###"
+          # No need to run nixos-install on sdImage hosts as the install
+          # environment is our filesystem
+          nixos-rebuild boot \
+            --flake "$flake#$hostname" \
+            --override-input firstBoot "github:JManch/true" \
+            --override-input vmInstall "github:JManch/$vmInstall" \
+            "$build_host"
+        else
+          if [ -n "$build_host" ]; then
+            echo "### Generating system derivation ###"
+            drv=$(nix eval \
+              --raw \
+              --override-input firstBoot "github:JManch/true" \
+              --override-input vmInstall "github:JManch/$vmInstall" \
+              "$host_config.system.build.toplevel.drvPath")
 
-        # By default, nixos-install creates a tmpdir at `/mnt/$(mktmp -d)`. This
-        # is a problem on impermanence hosts as / is not a mounted filesystem so
-        # the build will likely fail as it runs out of space. We workaround this
-        # by creating the tmpdir ourselves.
-        tmpdir="$(mktemp -d -p "$rootDir")"
-        # shellcheck disable=SC2016
-        add_exit_trap 'rm -rf $tmpdir'
-        TMPDIR="$tmpdir" nixos-install \
-          --no-root-passwd \
-          --no-write-lock-file \
-          --no-channel-copy \
-          --override-input firstBoot "github:JManch/true" \
-          --override-input vmInstall "github:JManch/$vmInstall" \
-          --flake "$config#$hostname"
-        rm -rf "$ssh_dir"
-      '';
+            ssh_ctrl=$(mktemp -d)
+            cleanup_ssh_ctrl() {
+              for ctrl in "$ssh_ctrl"/ssh-*; do
+                ssh -o ControlPath="$ctrl" -O exit dummyhost 2>/dev/null || true
+              done
+              rm -rf "$ssh_ctrl"
+            }
+            ssh_opts="-o ControlMaster=auto -o ControlPath=$ssh_ctrl/ssh-%n -o ControlPersist=60"
+
+            echo "### Copying system derivation to remote host ###"
+            NIX_SSHOPTS="$ssh_opts" nix copy \
+              --to "ssh://$build_host" \
+              --derivation "$drv"
+
+            echo "### Realising system derivation on remote host ###"
+            ssh_opts="-o ControlMaster=auto -o ControlPath=$ssh_ctrl/ssh-%n -o ControlPersist=60"
+            nixos_system=$(eval ssh "$ssh_opts" "$build_host" nix-store --realise "$drv")
+
+            echo "### Copying system closure from remote host ###"
+            NIX_SSHOPTS="$ssh_opts" nix copy \
+              --from "ssh://$build_host" \
+              --to "/mnt" \
+              --no-check-sigs \
+              "$nixos_system"
+          else
+            echo "### Building system ###"
+            # nix build uses a tmpdir for build files. We need to make sure
+            # this is located in persistent storage on the mounted filesystem.
+            nix_build_tmp="$(mktemp -d -p "$rootDir")"
+            # shellcheck disable=SC2016
+            add_exit_trap 'rm -rf $nix_build_tmp'
+            nixos_system=$(
+              TMPDIR="$nix_build_tmp" nix build \
+                --store "/mnt" \
+                --no-link \
+                --print-out-paths \
+                --extra-experimental-features "nix-command flakes" \
+                --override-input firstBoot "github:JManch/true" \
+                --override-input vmInstall "github:JManch/$vmInstall" \
+                "$flake#nixosConfigurations.\"$hostname\".config.system.build.toplevel"
+            )
+          fi
+
+          echo "### Installing system ###"
+          nixos-install \
+            --root "/mnt" \
+            --no-root-passwd \
+            --no-channel-copy \
+            --system "$nixos_system"
+        fi
+      }
+      run_disko
+      install_keys
+      install_nixos
+    '';
   };
 in
 {
@@ -210,6 +289,8 @@ in
       nix.settings = {
         experimental-features = "nix-command flakes";
         auto-optimise-store = true;
+        # Causes a lot of spam in the install script otherwise
+        warn-dirty = false;
       };
 
       zramSwap.enable = true;
@@ -218,7 +299,15 @@ in
         enable = true;
         settings.PasswordAuthentication = false;
         settings.KbdInteractiveAuthentication = false;
-        knownHosts."github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+
+        knownHosts =
+          (lib.mapAttrs (host: _: {
+            publicKeyFile = ../${host}/ssh_host_ed25519_key.pub;
+            extraHostNames = [ "${host}.lan" ];
+          }) (utils.hosts self))
+          // {
+            "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+          };
       };
 
       users.users.root = {

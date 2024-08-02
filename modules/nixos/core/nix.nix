@@ -303,6 +303,21 @@ in
           fi
           nixos-rebuild repl --flake "${configDir}#$1"
         }
+
+        build-installer() {
+          if [ -z "$1" ]; then
+            echo "Usage: build-installer <name>"
+            return 1
+          fi
+
+          flake="/home/${adminUsername}/.config/nixos"
+          if [ ! -d $flake ]; then
+            echo "Flake does not exist locally so using remote from github"
+            flake="github:JManch/nixos"
+          fi
+
+          nix build "$flake#$1"
+        }
       '';
 
     shellAliases = {

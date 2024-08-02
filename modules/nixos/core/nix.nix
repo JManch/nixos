@@ -96,6 +96,13 @@ let
             echo "Flake does not exist locally so using remote from github"
             flake="github:JManch/nixos"
           fi
+
+          # Always build and store result to prevent GC deleting builds for remote hosts
+          remote_builds="/home/${adminUsername}/.remote-builds/$hostname"
+          mkdir -p "$remote_builds"
+          trap "popd >/dev/null 2>&1 || true" EXIT
+          pushd "$remote_builds" >/dev/null 2>&1
+          nixos-rebuild build --flake "$flake#$hostname" "''${@:2}"
         '';
     in
     pkgs.writeShellApplication {
@@ -103,6 +110,7 @@ let
       runtimeInputs = with pkgs; [
         nixos-rebuild
         openssh
+        nvd
       ];
       text =
         validation
@@ -114,54 +122,23 @@ let
                 exit 1
               fi
 
-              # Because nixos-rebuild doesn't create a 'result' symlink when
-              # executed with --build-host we first run build locally with
-              # --target-host to ensure that a cached build is on the host and it
-              # won't end up trying to build everything itself
-              nixos-rebuild build --flake "${configDir}#$hostname" --target-host "root@$hostname.lan"
-
-              # For some reason running nixos-rebuild build --target-host sends a
-              # system with a different root system hash to the one built locally.
-              # Therefore we have to generate the "result" symlink on the remote host
-              # by building locally. Downside is the remote host has to run nix
-              # evaluation itself.
-
-              # Package current config and send to remote host
-              tar -cf /tmp/nixos-diff-config.tar -C ${configDir} .
-              ssh "${adminUsername}@$hostname.lan" "rm -rf /tmp/nixos-diff-config; mkdir /tmp/nixos-diff-config"
-              scp /tmp/nixos-diff-config.tar "${adminUsername}@$hostname.lan:/tmp/nixos-diff-config"
-
-              # Build new configuration on remote host and generate result
-              # symlink. Diff the result with the current system
-              # shellcheck disable=SC2029
-              ssh "${adminUsername}@$hostname.lan" "sh -c \
-                'cd /tmp/nixos-diff-config && \
-                tar -xf nixos-diff-config.tar && \
-                nixos-rebuild build --flake .#$hostname && \
-                nvd --color always diff /run/current-system ./result; \
-                rm -rf /tmp/nixos-diff-config'"
+              remote_system=$(ssh "${adminUsername}@$hostname.lan" readlink /run/current-system)
+              nixos_system=$(readlink "$remote_builds/result")
+              nix-copy-closure --from "$hostname.lan" "$remote_system"
+              nvd --color always diff "$remote_system" "$nixos_system"
             ''
           # bash
           else
-            ''
-              # Always build and store result to prevent GC deleting builds for remote hosts
-              remote_builds="/home/${adminUsername}/.remote-builds/$hostname"
-              mkdir -p "$remote_builds"
-              trap "popd >/dev/null 2>&1 || true" EXIT
-              pushd "$remote_builds" >/dev/null 2>&1
-              nixos-rebuild build --flake "$flake#$hostname" "''${@:2}"
-              ${optionalString (cmd != "build") # bash
-                ''
-                  nixos-rebuild ${cmd} --use-remote-sudo --flake "$flake#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
-                ''
-              }
-            ''
+            optionalString (cmd != "build") # bash
+              ''
+                nixos-rebuild ${cmd} --use-remote-sudo --flake "$flake#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
+              ''
         );
     }
   ) rebuildCmds;
 in
 {
-  adminPackages = [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts;
+  adminPackages = rebuildScripts ++ remoteRebuildScripts;
   persistenceAdminHome.directories = [ ".remote-builds" ];
 
   # Nice explanation of overlays: https://archive.is/f8goR

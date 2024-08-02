@@ -241,6 +241,7 @@ let
               type = "tile";
               entity = "sensor.ac_on_count";
               name = "AC Units Running";
+              color = "purple";
               layout_options = {
                 grid_columns = 4;
                 grid_rows = 1;

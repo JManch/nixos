@@ -91,7 +91,16 @@ mkIf cfg.enableInternal {
           {
             name = "AC On Count";
             icon = "mdi:hvac";
-            state = "{{ states.climate | selectattr('entity_id', 'contains', 'ac_room_temperature') | rejectattr ( 'state' , 'eq' , 'off' ) | list | count }}";
+            state = ''
+              {{
+                states.climate
+                | selectattr('entity_id', 'contains', 'ac_room_temperature')
+                | rejectattr ( 'state' , 'eq' , 'unavailable' )
+                | rejectattr ( 'state' , 'eq' , 'off' )
+                | list
+                | count
+              }}
+            '';
           }
           {
             name = "Powerwall Aggregate Cost";

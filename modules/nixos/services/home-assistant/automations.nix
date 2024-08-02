@@ -142,8 +142,8 @@ let
               hvac_mode = if enable then "heat" else "off";
             };
             target.entity_id = [
-              "climate.joshua_thermostat"
-              "climate.hallway"
+              "climate.joshua_radiator_thermostat"
+              "climate.hallway_radiator_thermostat"
             ];
           };
         }
@@ -494,7 +494,7 @@ let
     mode = "single";
     trigger = singleton {
       platform = "template";
-      value_template = "{{ now.timestamp() | round(0) == (as_timestamp(state_attr('calendar.formula_1', 'start_time'), default = 0) | round(0) - 15*60) }}";
+      value_template = "{{ now().timestamp() | round(0) == (as_timestamp(state_attr('calendar.formula_1', 'start_time'), default = 0) | round(0) - 15*60) }}";
     };
     condition = singleton {
       condition = "time";

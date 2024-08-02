@@ -106,6 +106,7 @@ in
         "met" # weather
         "mobile_app"
         "profiler"
+        "isal" # https://www.home-assistant.io/integrations/isal
         "local_todo"
         "local_calendar"
         "generic_thermostat"
@@ -140,6 +141,7 @@ in
           pkgs.home-assistant-custom-components.adaptive_lighting
           selfPkgs.heatmiser
           selfPkgs.thermal-comfort
+          selfPkgs.daikin-onecta
         ]
         ++ optional frigate.enable (
           pkgs.home-assistant-custom-components.frigate.overrideAttrs {

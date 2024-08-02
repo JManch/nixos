@@ -19,7 +19,7 @@ let
     ;
   inherit (config.modules.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (secrets.lovelace) heating;
+  inherit (secrets.lovelace) heating hvac;
   inherit (secrets.general) people userIds;
 
   cfg = config.modules.services.hass;
@@ -61,6 +61,63 @@ let
       state_not = "unavailable";
     };
   };
+
+  acSection =
+    sensor:
+    singleton {
+      title = "Air Conditioning";
+      type = "grid";
+      cards = [
+        {
+          name = " ";
+          type = "thermostat";
+          entity = "climate.${sensor}_ac_room_temperature";
+          features = singleton { type = "climate-hvac-modes"; };
+        }
+        {
+          name = "Temperature";
+          type = "sensor";
+          graph = "line";
+          entity =
+            if sensor == "joshua" then
+              "sensor.joshua_sensor_temperature"
+            else
+              "sensor.${sensor}_ac_climatecontrol_room_temperature";
+          detail = 2;
+        }
+        {
+          name = "Humidity";
+          type = "sensor";
+          graph = "line";
+          entity =
+            if sensor == "joshua" then
+              "sensor.joshua_sensor_humidity"
+            else
+              "sensor.${sensor}_ac_climatecontrol_room_humidity";
+          detail = 2;
+        }
+      ];
+    };
+
+  underfloorHeatingSection =
+    sensor:
+    singleton {
+      title = "Underfloor Heating";
+      type = "grid";
+      cards = [
+        {
+          name = " ";
+          type = "thermostat";
+          entity = "climate.${sensor}_underfloor_heating";
+          features = singleton { type = "climate-hvac-modes"; };
+        }
+        {
+          type = "history-graph";
+          show_names = true;
+          entities = [ { entity = "climate.${sensor}_underfloor_heating"; } ];
+        }
+      ];
+    };
 
   adaptiveLightingTiles = room: [
     {
@@ -123,8 +180,10 @@ let
             (navigationButton "Energy" "energy" "mdi:home-lightning-bolt-outline")
             (navigationButton "CCTV" "cctv" "mdi:cctv")
             (navigationButton "Heating" "heating" "mdi:heating-coil")
+            (navigationButton "HVAC" "hvac" "mdi:hvac")
             (navigationButton "Lounge" "lounge" "mdi:sofa")
             (navigationButton "Study" "study" "mdi:chair-rolling")
+            (navigationButton "Master" "master-bedroom" "mdi:bed-king")
             (navigationButton "Joshua" "joshua-room" "mdi:bed")
             (navigationButton "${upperPeople.person1}" "${people.person1}-room" "mdi:bed")
             (navigationButton "${upperPeople.person2}" "${people.person2}-room" "mdi:bed")
@@ -176,6 +235,20 @@ let
                 condition = "state";
                 entity = "lawn_mower.lewis";
                 state_not = "docked";
+              };
+            }
+            {
+              type = "tile";
+              entity = "sensor.ac_on_count";
+              name = "AC Units Running";
+              layout_options = {
+                grid_columns = 4;
+                grid_rows = 1;
+              };
+              visibility = singleton {
+                condition = "numeric_state";
+                entity = "sensor.ac_on_count";
+                above = 0;
               };
             }
           ]
@@ -774,8 +847,8 @@ let
     type = "sections";
     max_columns = 2;
     subview = true;
-    sections = [
-      {
+    sections =
+      singleton {
         type = "grid";
         cards =
           (allLightsTiles "lounge")
@@ -817,23 +890,8 @@ let
           state_not = "unavailable";
         };
       }
-      {
-        title = "Heating";
-        type = "grid";
-        cards = [
-          {
-            type = "thermostat";
-            entity = "climate.lounge";
-            features = [ { type = "climate-hvac-modes"; } ];
-          }
-          {
-            type = "history-graph";
-            entities = [ { entity = "climate.lounge"; } ];
-            hours_to_show = 6;
-          }
-        ];
-      }
-      {
+      ++ (underfloorHeatingSection "lounge")
+      ++ singleton {
         title = "Devices";
         type = "grid";
         cards = [
@@ -858,8 +916,7 @@ let
             entity = "media_player.lounge_tv";
           }
         ];
-      }
-    ];
+      };
   };
 
   study = {
@@ -870,6 +927,7 @@ let
     subview = true;
     sections = [
       {
+        title = "Lighting";
         type = "grid";
         cards =
           (allLightsTiles "study")
@@ -898,15 +956,13 @@ let
                 (lightElem 5 25 40)
               ];
           };
-
-        title = "Lighting";
         visibility = singleton {
           condition = "state";
           entity = "light.study_spot_ceiling_1";
           state_not = "unavailable";
         };
       }
-    ];
+    ] ++ (acSection "study");
   };
 
   joshuaRoom = {
@@ -915,129 +971,95 @@ let
     type = "sections";
     max_columns = 2;
     subview = true;
-    sections = [
-      {
-        title = "Lighting";
-        type = "grid";
-        cards =
-          (allLightsTiles "joshua_room")
-          ++ [
-            (lightTile "joshua_lamp_floor")
-            (lightTile "joshua_lamp_bed")
-            (lightTile "joshua_bulb_ceiling")
-            (lightTile "joshua_play_desk_1")
-            (lightTile "joshua_play_desk_2")
-          ]
-          ++ (adaptiveLightingTiles "joshua_room")
-          ++ (singleton {
-            type = "tile";
-            entity = "input_boolean.joshua_room_wake_up_lights";
-            layout_options = {
-              grid_columns = 4;
-              grid_rows = 1;
-            };
-            name = "Wake Up Lights";
-          });
-      }
-      {
-        type = "grid";
-        title = "Climate";
-        cards = [
-          {
-            graph = "line";
-            type = "sensor";
-            entity = "sensor.joshua_sensor_temperature";
-            detail = 2;
-            layout_options = {
-              grid_columns = 4;
-              grid_rows = 3;
-            };
-            name = "Temperature";
-          }
-          {
-            graph = "line";
-            type = "sensor";
-            entity = "sensor.joshua_sensor_humidity";
-            detail = 2;
-            layout_options = {
-              grid_columns = 4;
-              grid_rows = 3;
-            };
-            name = "Humidity";
-          }
-          {
-            type = "tile";
-            entity = "sensor.joshua_thermal_comfort_summer_scharlau_perception";
-            name = "Summer Scharlau";
-          }
-          {
-            type = "tile";
-            entity = "sensor.joshua_thermal_comfort_thoms_discomfort_perception";
-            name = "Thoms Discomfort";
-          }
-        ];
-      }
-      {
-        title = "Dehumidifier";
-        type = "grid";
-        cards = [
-          {
-            type = "tile";
-            entity = "input_boolean.joshua_dehumidifier_automatic_control";
-            name = "Automatic Control";
-            layout_options = {
-              grid_columns = 2;
-              grid_rows = 1;
-            };
-          }
-          {
-            type = "tile";
-            entity = "switch.joshua_dehumidifier";
-            name = "Running";
-          }
-          {
-            type = "tile";
-            entity = "sensor.joshua_dehumidifier_tank_status";
-            name = "Tank Status";
-            visibility = singleton {
-              condition = "state";
+    sections =
+      [
+        {
+          title = "Lighting";
+          type = "grid";
+          cards =
+            (allLightsTiles "joshua_room")
+            ++ [
+              (lightTile "joshua_lamp_floor")
+              (lightTile "joshua_lamp_bed")
+              (lightTile "joshua_bulb_ceiling")
+              (lightTile "joshua_play_desk_1")
+              (lightTile "joshua_play_desk_2")
+            ]
+            ++ (adaptiveLightingTiles "joshua_room")
+            ++ (singleton {
+              type = "tile";
+              entity = "input_boolean.joshua_room_wake_up_lights";
+              layout_options = {
+                grid_columns = 4;
+                grid_rows = 1;
+              };
+              name = "Wake Up Lights";
+            });
+        }
+      ]
+      ++ (acSection "joshua")
+      ++ [
+        {
+          title = "Dehumidifier";
+          type = "grid";
+          cards = [
+            {
+              type = "tile";
+              entity = "input_boolean.joshua_dehumidifier_automatic_control";
+              name = "Automatic Control";
+              layout_options = {
+                grid_columns = 2;
+                grid_rows = 1;
+              };
+            }
+            {
+              type = "tile";
+              entity = "switch.joshua_dehumidifier";
+              name = "Running";
+            }
+            {
+              type = "tile";
               entity = "sensor.joshua_dehumidifier_tank_status";
-              state = "Full";
-            };
-            color = "red";
-            icon = "";
-            layout_options = {
-              grid_columns = 4;
-              grid_rows = 1;
-            };
-          }
-          {
-            type = "tile";
-            entity = "sensor.joshua_mold_indicator";
-            name = "Mold Indicator";
-            icon = "mdi:molecule";
-          }
-          {
-            type = "tile";
-            entity = "sensor.joshua_critical_temperature";
-            name = "Critical Temperature";
-          }
-        ];
-      }
-      {
-        type = "grid";
-        cards = singleton {
-          type = "history-graph";
-          entities = [ { entity = "binary_sensor.ncase_m1_active"; } ];
-          hours_to_show = 24;
-        };
-        title = "Devices";
-        visibility = singleton {
-          condition = "user";
-          users = [ userIds.joshua ];
-        };
-      }
-    ];
+              name = "Tank Status";
+              visibility = singleton {
+                condition = "state";
+                entity = "sensor.joshua_dehumidifier_tank_status";
+                state = "Full";
+              };
+              color = "red";
+              icon = "";
+              layout_options = {
+                grid_columns = 4;
+                grid_rows = 1;
+              };
+            }
+            {
+              type = "tile";
+              entity = "sensor.joshua_mold_indicator";
+              name = "Mold Indicator";
+              icon = "mdi:molecule";
+            }
+            {
+              type = "tile";
+              entity = "sensor.joshua_critical_temperature";
+              name = "Critical Temperature";
+            }
+          ];
+        }
+        {
+          type = "grid";
+          cards = singleton {
+            type = "history-graph";
+            entities = [ { entity = "binary_sensor.ncase_m1_active"; } ];
+            hours_to_show = 24;
+          };
+          title = "Devices";
+          visibility = singleton {
+            condition = "user";
+            users = [ userIds.joshua ];
+          };
+        }
+      ];
   };
 
   room1 =
@@ -1090,25 +1112,7 @@ let
               }
             ];
         }
-        {
-          type = "grid";
-          cards = [
-            {
-              type = "thermostat";
-              entity = "climate.${person}_room";
-              features = [ { type = "climate-hvac-modes"; } ];
-              show_current_as_primary = false;
-            }
-            {
-              type = "history-graph";
-              show_names = true;
-              entities = [ { entity = "climate.${person}_room"; } ];
-              hours_to_show = 6;
-            }
-          ];
-          title = "Heating";
-        }
-      ];
+      ] ++ (acSection person) ++ (underfloorHeatingSection person);
       cards = [ ];
     };
 
@@ -1122,18 +1126,20 @@ let
       type = "sections";
       max_columns = 2;
       subview = true;
-      sections = singleton {
-        title = "Lighting";
-        type = "grid";
-        cards = (allLightsTiles "${person}_room") ++ [
-          (lightTile "${person}_spot_ceiling_1")
-          (lightTile "${person}_spot_ceiling_2")
-          (lightTile "${person}_spot_ceiling_3")
-          # (lightTile "${person}_play_desk_1")
-          # (lightTile "${person}_play_desk_2")
-          # (lightTile "${person}_strip_desk_1")
-        ];
-      };
+      sections =
+        singleton {
+          title = "Lighting";
+          type = "grid";
+          cards = (allLightsTiles "${person}_room") ++ [
+            (lightTile "${person}_spot_ceiling_1")
+            (lightTile "${person}_spot_ceiling_2")
+            (lightTile "${person}_spot_ceiling_3")
+            # (lightTile "${person}_play_desk_1")
+            # (lightTile "${person}_play_desk_2")
+            # (lightTile "${person}_strip_desk_1")
+          ];
+        }
+        ++ (acSection person);
       cards = [ ];
     };
 
@@ -1147,20 +1153,31 @@ let
       type = "sections";
       max_columns = 2;
       subview = true;
-      sections = singleton {
-        title = "Lighting";
-        type = "grid";
-        cards = (allLightsTiles "${person}_room") ++ [
-          # (lightTile "${person}_spot_ceiling_1")
-          # (lightTile "${person}_spot_ceiling_2")
-          # (lightTile "${person}_spot_ceiling_3")
-          # (lightTile "${person}_play_shelf_1")
-          # (lightTile "${person}_play_shelf_2")
-          # (lightTile "${person}_strip_desk_1")
-        ];
-      };
+      sections =
+        singleton {
+          title = "Lighting";
+          type = "grid";
+          cards = (allLightsTiles "${person}_room") ++ [
+            # (lightTile "${person}_spot_ceiling_1")
+            # (lightTile "${person}_spot_ceiling_2")
+            # (lightTile "${person}_spot_ceiling_3")
+            # (lightTile "${person}_play_shelf_1")
+            # (lightTile "${person}_play_shelf_2")
+            # (lightTile "${person}_strip_desk_1")
+          ];
+        }
+        ++ (acSection person);
       cards = [ ];
     };
+
+  master = {
+    title = "Master Bedroom";
+    path = "master-bedroom";
+    type = "sections";
+    max_columns = 2;
+    subview = true;
+    sections = acSection "master";
+  };
 
 in
 mkIf cfg.enableInternal {
@@ -1176,8 +1193,10 @@ mkIf cfg.enableInternal {
         ++ optional frigate.enable cctv
         ++ [
           heating
+          hvac
           lounge
           study
+          master
           joshuaRoom
           room1
           room2

@@ -89,6 +89,11 @@ mkIf cfg.enableInternal {
             state = "{{ states.light | rejectattr('attributes.entity_id', 'defined') | selectattr('state', 'eq', 'on') | list | count }}";
           }
           {
+            name = "AC On Count";
+            icon = "mdi:hvac";
+            state = "{{ states.climate | selectattr('entity_id', 'contains', 'ac_room_temperature') | rejectattr ( 'state' , 'eq' , 'off' ) | list | count }}";
+          }
+          {
             name = "Powerwall Aggregate Cost";
             icon = "mdi:currency-gbp";
             state = "{{ states('sensor.powerwall_site_import_cost') | float(0) - states('sensor.powerwall_site_export_compensation') | float(0) }}";
@@ -260,14 +265,14 @@ mkIf cfg.enableInternal {
         switches = {
           hallway_thermostat = {
             friendly_name = "Hallway Thermostat Switch";
-            value_template = "{{ is_state_attr('climate.hallway', 'hvac_action', 'heating') }}";
+            value_template = "{{ is_state_attr('climate.hallway_radiator_thermostat', 'hvac_action', 'heating') }}";
 
             turn_on = [
               {
                 service = "climate.set_temperature";
-                target.entity_id = "climate.hallway";
+                target.entity_id = "climate.hallway_radiator_thermostat";
                 data = {
-                  temperature = "{{ state_attr('climate.joshua_thermostat', 'temperature') |float + 2 }}";
+                  temperature = "{{ state_attr('climate.joshua_radiator_thermostat', 'temperature') |float + 2 }}";
                   hvac_mode = "heat";
                 };
               }
@@ -276,7 +281,7 @@ mkIf cfg.enableInternal {
             turn_off = [
               {
                 service = "climate.set_temperature";
-                target.entity_id = "climate.hallway";
+                target.entity_id = "climate.hallway_radiator_thermostat";
                 data = {
                   temperature = 5;
                   hvac_mode = "heat";
@@ -290,7 +295,7 @@ mkIf cfg.enableInternal {
 
     climate = singleton {
       platform = "generic_thermostat";
-      name = "Joshua Thermostat";
+      name = "Joshua Radiator Thermostat";
       heater = "switch.hallway_thermostat";
       target_sensor = "sensor.joshua_sensor_temperature";
       min_temp = 17;
@@ -319,16 +324,6 @@ mkIf cfg.enableInternal {
             "heat_index"
           ];
           unique_id = "63eaf56b-9edf-42c7-83c7-cbab6f16fec4";
-        }
-        {
-          name = "Joshua Thermal Comfort";
-          temperature_sensor = "sensor.joshua_sensor_temperature";
-          humidity_sensor = "sensor.joshua_sensor_humidity";
-          sensor_types = [
-            "summer_scharlau_perception"
-            "thoms_discomfort_perception"
-          ];
-          unique_id = "df0a2172-04da-4c25-85ae-a7e40e775abb";
         }
       ];
     };

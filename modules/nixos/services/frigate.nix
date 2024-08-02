@@ -194,7 +194,7 @@ mkIf cfg.enable {
     SocketBindDeny = publicPorts;
   };
 
-  modules.services.mosquitto.users = {
+  modules.services.mosquitto.users = mkIf (hass.enable && mosquitto.enable) {
     frigate = {
       acl = [ "readwrite #" ];
       hashedPasswordFile = mqttFrigatePassword.path;

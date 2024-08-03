@@ -119,37 +119,51 @@ let
       ];
     };
 
-  adaptiveLightingTiles = room: [
+  adaptiveLightingTiles =
     {
+      room,
+      sleepModeToggle ? false,
+    }:
+    [
+      {
+        name = "Adaptive Lighting";
+        type = "tile";
+        entity = "switch.adaptive_lighting_${room}";
+        layout_options = {
+          grid_columns = 4;
+          grid_rows = 1;
+        };
+      }
+      {
+        name = "Adapt Brightness";
+        type = "tile";
+        entity = "switch.adaptive_lighting_adapt_brightness_${room}";
+        visibility = singleton {
+          condition = "state";
+          entity = "switch.adaptive_lighting_${room}";
+          state = "on";
+        };
+      }
+      {
+        name = "Adapt Colour";
+        type = "tile";
+        entity = "switch.adaptive_lighting_adapt_color_${room}";
+        visibility = singleton {
+          condition = "state";
+          entity = "switch.adaptive_lighting_${room}";
+          state = "on";
+        };
+      }
+    ]
+    ++ optional sleepModeToggle {
+      name = "Sleep Mode";
       type = "tile";
-      entity = "switch.adaptive_lighting_${room}";
+      entity = "switch.adaptive_lighting_sleep_mode_${room}";
       layout_options = {
         grid_columns = 4;
         grid_rows = 1;
       };
-      name = "Adaptive Lighting";
-    }
-    {
-      type = "tile";
-      entity = "switch.adaptive_lighting_adapt_brightness_${room}";
-      name = "Adapt Brightness";
-      visibility = singleton {
-        condition = "state";
-        entity = "switch.adaptive_lighting_${room}";
-        state = "on";
-      };
-    }
-    {
-      type = "tile";
-      entity = "switch.adaptive_lighting_adapt_color_${room}";
-      name = "Adapt Colour";
-      visibility = singleton {
-        condition = "state";
-        entity = "switch.adaptive_lighting_${room}";
-        state = "on";
-      };
-    }
-  ];
+    };
 
   home = {
     title = "Home";
@@ -250,6 +264,10 @@ let
                 condition = "numeric_state";
                 entity = "sensor.ac_on_count";
                 above = 0;
+              };
+              tap_action = {
+                action = "navigate";
+                navigation_path = "/lovelace/hvac";
               };
             }
           ]
@@ -883,7 +901,7 @@ let
                 (lightElem 10 13 25)
               ];
           }
-          ++ (adaptiveLightingTiles "lounge");
+          ++ (adaptiveLightingTiles { room = "lounge"; });
         title = "Lighting";
         visibility = singleton {
           condition = "state";
@@ -986,7 +1004,7 @@ let
               (lightTile "joshua_play_desk_1")
               (lightTile "joshua_play_desk_2")
             ]
-            ++ (adaptiveLightingTiles "joshua_room")
+            ++ (adaptiveLightingTiles { room = "joshua_room"; })
             ++ (singleton {
               type = "tile";
               entity = "input_boolean.joshua_room_wake_up_lights";
@@ -1080,7 +1098,7 @@ let
           cards =
             (allLightsTiles "${person}_room")
             ++ [ (lightTile "${person}_lamp_desk") ]
-            ++ (adaptiveLightingTiles "${person}_room")
+            ++ (adaptiveLightingTiles { room = "${person}_room"; })
             ++ [
               {
                 type = "tile";
@@ -1131,14 +1149,17 @@ let
         singleton {
           title = "Lighting";
           type = "grid";
-          cards = (allLightsTiles "${person}_room") ++ [
-            (lightTile "${person}_spot_ceiling_1")
-            (lightTile "${person}_spot_ceiling_2")
-            (lightTile "${person}_spot_ceiling_3")
-            # (lightTile "${person}_play_desk_1")
-            # (lightTile "${person}_play_desk_2")
-            # (lightTile "${person}_strip_desk_1")
-          ];
+          cards =
+            (allLightsTiles "${person}_room")
+            ++ [
+              (lightTile "${person}_spot_ceiling_1")
+              (lightTile "${person}_spot_ceiling_2")
+              (lightTile "${person}_spot_ceiling_3")
+              # (lightTile "${person}_play_desk_1")
+              # (lightTile "${person}_play_desk_2")
+              # (lightTile "${person}_strip_desk_1")
+            ]
+            ++ adaptiveLightingTiles { room = "${person}_room"; };
         }
         ++ (acSection person);
       cards = [ ];
@@ -1158,14 +1179,28 @@ let
         singleton {
           title = "Lighting";
           type = "grid";
-          cards = (allLightsTiles "${person}_room") ++ [
-            # (lightTile "${person}_spot_ceiling_1")
-            # (lightTile "${person}_spot_ceiling_2")
-            # (lightTile "${person}_spot_ceiling_3")
-            # (lightTile "${person}_play_shelf_1")
-            # (lightTile "${person}_play_shelf_2")
-            # (lightTile "${person}_strip_desk_1")
-          ];
+          cards =
+            (allLightsTiles "${person}_room")
+            ++ [
+              (lightTile "${person}_spot_ceiling_1")
+              (lightTile "${person}_spot_ceiling_2")
+              (lightTile "${person}_spot_ceiling_3")
+              (lightTile "${person}_spot_ceiling_4")
+              (lightTile "${person}_spot_ceiling_5")
+            ]
+            ++ (adaptiveLightingTiles {
+              room = "${person}_room";
+              sleepModeToggle = true;
+            })
+            ++ singleton {
+              type = "tile";
+              entity = "input_boolean.${person}_room_wake_up_lights";
+              name = "Wake Up Lights";
+              layout_options = {
+                grid_columns = 4;
+                grid_rows = 1;
+              };
+            };
         }
         ++ (acSection person);
       cards = [ ];

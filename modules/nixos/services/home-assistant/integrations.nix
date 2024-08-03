@@ -57,6 +57,20 @@ lib.mkIf cfg.enableInternal {
         take_over_control = false;
         skip_redundant_commands = true;
       }
+      {
+        name = "${upperPeople.person3} Room";
+        lights = [ "light.${people.person3}_room_lights" ];
+        min_brightness = 20;
+        sleep_brightness = 5;
+        sleep_color_temp = 1000;
+        sunrise_time = "07:00:00";
+        sunset_time = "22:30:00";
+        brightness_mode = "tanh";
+        brightness_mode_time_dark = 2600;
+        brightness_mode_time_light = 900;
+        take_over_control = false;
+        skip_redundant_commands = true;
+      }
     ];
   };
 }

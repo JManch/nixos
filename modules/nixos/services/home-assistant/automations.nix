@@ -199,6 +199,9 @@ let
       ];
 
   joshuaLightsToggle =
+    let
+      wakeUpTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) | round(0))";
+    in
     map
       (enable: {
         alias = "Joshua Lights ${if enable then "On" else "Off"}";
@@ -222,7 +225,7 @@ let
           ]
           ++ optional enable {
             platform = "template";
-            value_template = "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 60*60) }}";
+            value_template = "{{ now().timestamp() | round(0) == (${wakeUpTimestamp} - 60*60) }}";
             id = "Wake Up Time";
           };
         condition =
@@ -303,59 +306,78 @@ let
         false
       ];
 
-  joshuaWakeUpTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) | round(0))";
+  alarmWakeUpTimestamp =
+    device: "(as_timestamp(states('sensor.${device}_next_alarm'), default = 0) | round(0))";
 
-  joshuaAdaptiveLightingSunTimes = [
-    {
-      alias = "Joshua Room Lighting Sun Times";
+  adaptiveLightingAlarmSync =
+    room_entity: device:
+    singleton {
+      alias = "${formattedRoomName room_entity} Lighting Sun Times";
       mode = "single";
       trigger = [
-        {
-          platform = "state";
-          entity_id = [ "sensor.joshua_pixel_5_next_alarm" ];
-        }
         {
           platform = "homeassistant";
           event = "start";
         }
-      ];
-      action = [
         {
-          "if" = [
-            {
-              condition = "template";
-              value_template = "{{ has_value('sensor.joshua_pixel_5_next_alarm') }}";
-            }
-          ];
-          "then" = [
-            {
-              service = "adaptive_lighting.change_switch_settings";
-              data = {
-                use_defaults = "configuration";
-                entity_id = "switch.adaptive_lighting_joshua_room";
-                sunrise_time = "{{ ${joshuaWakeUpTimestamp} | timestamp_custom('%H:%M:%S') }}";
-                # Set sunset 1 hour before sleep time so that lights will reach
-                # minimum brightness 30 mins before sleep time. Sleep mode enables 30
-                # mins before sleep time.
-                sunset_time = "{{ (${joshuaWakeUpTimestamp} - 9*60*60) | timestamp_custom('%H:%M:%S') }}";
-              };
-            }
-          ];
-          "else" = [
-            {
-              service = "adaptive_lighting.change_switch_settings";
-              data = {
-                entity_id = "switch.adaptive_lighting_joshua_room";
-                use_default = "configuration";
-              };
-            }
-          ];
+          platform = "state";
+          entity_id = [ "sensor.${device}_next_alarm" ];
         }
       ];
-    }
-  ];
+      action = singleton {
+        "if" = singleton {
+          condition = "template";
+          value_template = "{{ has_value('sensor.${device}_next_alarm') }}";
+        };
+        "then" = {
+          service = "adaptive_lighting.change_switch_settings";
+          data = {
+            use_defaults = "configuration";
+            entity_id = "switch.adaptive_lighting_${room_entity}";
+            sunrise_time = "{{ ${alarmWakeUpTimestamp device} | timestamp_custom('%H:%M:%S') }}";
+            # Set sunset 1 hour before sleep time so that lights will reach
+            # minimum brightness 30 mins before sleep time. Sleep mode enables 30
+            # mins before sleep time.
+            sunset_time = "{{ (${alarmWakeUpTimestamp device} - 9*60*60) | timestamp_custom('%H:%M:%S') }}";
+          };
+        };
+        "else" = singleton {
+          service = "adaptive_lighting.change_switch_settings";
+          data = {
+            entity_id = "switch.adaptive_lighting_${room_entity}";
+            use_default = "configuration";
+          };
+        };
+      };
+    };
+
+  # TODO: Group these light automations into a full config so that everything
+  # gets created with a single option. This includes the wake_up switch entity
+  # etc...
+  wakeUpLights =
+    room_entity: wake_up_timestamp:
+    singleton {
+      alias = "${formattedRoomName room_entity} Wake Up Lights";
+      mode = "single";
+      trigger = singleton {
+        platform = "template";
+        value_template = "{{ (now().timestamp() + 60*60) | round(0) == ${wake_up_timestamp} }}";
+      };
+      condition = singleton {
+        condition = "state";
+        entity_id = "input_boolean.${room_entity}_wake_up_lights";
+        state = "on";
+      };
+      action = singleton {
+        service = "light.turn_on";
+        target.entity_id = "light.${room_entity}_lights";
+      };
+    };
 
   joshuaSleepModeToggle =
+    let
+      wakeUpTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) | round(0))";
+    in
     map
       (enable: {
         alias = "Joshua Room Sleep Mode ${if enable then "Enable" else "Disable"}";
@@ -370,9 +392,9 @@ let
               platform = "template";
               value_template =
                 if enable then
-                  "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 8.5*60*60) }}"
+                  "{{ now().timestamp() | round(0) == (${wakeUpTimestamp} - 8.5*60*60) }}"
                 else
-                  "{{ now().timestamp() | round(0) == (${joshuaWakeUpTimestamp} - 60*60) }}";
+                  "{{ now().timestamp() | round(0) == (${wakeUpTimestamp} - 60*60) }}";
             }
             {
               platform = "state";
@@ -391,20 +413,18 @@ let
             to = "on";
           };
         condition =
-          [
-            {
-              condition = "template";
-              value_template = ''
-                {% set time_to_wake = ${joshuaWakeUpTimestamp} - (now().timestamp() | round(0)) %}
-                {{ (${joshuaWakeUpTimestamp} != 0) and ${
-                  if enable then
-                    "(time_to_wake <= 8.5*60*60) and (time_to_wake > 60*60)"
-                  else
-                    "((time_to_wake <= 60*60) or (time_to_wake > 8.5*60*60))"
-                } }}
-              '';
-            }
-          ]
+          singleton {
+            condition = "template";
+            value_template = ''
+              {% set time_to_wake = ${wakeUpTimestamp} - (now().timestamp() | round(0)) %}
+              {{ (${wakeUpTimestamp} != 0) and ${
+                if enable then
+                  "(time_to_wake <= 8.5*60*60) and (time_to_wake > 60*60)"
+                else
+                  "((time_to_wake <= 60*60) or (time_to_wake > 8.5*60*60))"
+              } }}
+            '';
+          }
           ++ optional enable {
             condition = "state";
             entity_id = "binary_sensor.ncase_m1_active";
@@ -608,7 +628,9 @@ mkIf cfg.enableInternal {
       ++ joshuaDehumidifierToggle
       ++ joshuaDehumidifierTankFull
       ++ joshuaLightsToggle
-      ++ joshuaAdaptiveLightingSunTimes
+      ++ (adaptiveLightingAlarmSync "joshua_room" "joshua_pixel_5")
+      ++ (adaptiveLightingAlarmSync "${people.person3}_room" "${people.person3}_pixel_6")
+      ++ (wakeUpLights "${people.person3}_room" (alarmWakeUpTimestamp "${people.person3}_pixel_6"))
       ++ joshuaSleepModeToggle
       ++ binCollectionNotify
       ++ washingMachineNotify
@@ -649,6 +671,11 @@ mkIf cfg.enableInternal {
 
       joshua_room_wake_up_lights = {
         name = "Joshua Room Wake Up Lights";
+        icon = "mdi:weather-sunset-up";
+      };
+
+      "${people.person3}_room_wake_up_lights" = {
+        name = "${formattedRoomName "${people.person3}_room"} Wake Up Lights";
         icon = "mdi:weather-sunset-up";
       };
     };

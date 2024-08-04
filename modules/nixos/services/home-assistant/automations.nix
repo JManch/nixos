@@ -8,11 +8,9 @@ let
   inherit (lib)
     mkIf
     utils
-    head
     optional
     optionals
     attrNames
-    attrValues
     singleton
     splitString
     concatMapStringsSep
@@ -36,8 +34,8 @@ let
         state_filter = true;
         state_entity = "input_boolean.high_alert_surveillance";
         state_filter_states = [ "off" ];
-        notify_device = (head (attrValues devices)).id;
-        notify_group = "All Notify Devices";
+        notify_device = devices.joshua.id;
+        notify_group = "Adult Notify Devices";
         base_url = "https://home.${fqDomain}";
         group = "frigate-entrance-notification";
         title = "Security Alert";
@@ -56,8 +54,8 @@ let
       path = "SgtBatten/frigate_notifications.yaml";
       input = {
         camera = "camera.${camera}";
-        notify_device = (head (attrValues devices)).id;
-        notify_group = "All Notify Devices";
+        notify_device = devices.joshua.id;
+        notify_group = "Adult Notify Devices";
         sticky = true;
         group = "frigate-cat-notification";
         base_url = "https://home.${fqDomain}";
@@ -80,8 +78,8 @@ let
         state_filter = true;
         state_entity = "input_boolean.high_alert_surveillance";
         state_filter_states = [ "on" ];
-        notify_device = (head (attrValues devices)).id;
-        notify_group = "All Notify Devices";
+        notify_device = devices.joshua.id;
+        notify_group = "Adult Notify Devices";
         sticky = true;
         group = "frigate-notification";
         base_url = "https://home.${fqDomain}";
@@ -163,7 +161,7 @@ let
       for.minutes = 1;
     };
     action = singleton {
-      service = "notify.mobile_app_joshua_pixel_5";
+      service = "notify.${devices.joshua.name}";
       data = {
         title = "Dehumidifier";
         message = "Tank full";
@@ -501,7 +499,7 @@ let
       before = "22:00:00";
     };
     action = singleton {
-      service = "notify.mobile_app_${people.person4}_iphone";
+      service = "notify.${devices.${people.person4}.name}";
       data = {
         title = "Washing Machine Finished";
         message = "Take out the damp clothes";
@@ -523,15 +521,15 @@ let
     };
     action =
       let
-        mkNotify = device: {
-          service = "notify.mobile_app_${device}";
+        mkNotify = person: {
+          service = "notify.${devices.${person}.name}";
           data = {
             title = "Formula 1 About to Start";
             message = "{{ state_attr('calendar.formula_1', 'message') }} in 15 mins!";
           };
         };
       in
-      [ (mkNotify "joshua_pixel_5") ];
+      [ (mkNotify "joshua") ];
   };
 
   lightsAvailabilityNotify = map (data: {
@@ -543,7 +541,7 @@ let
       to = "unavailable";
     };
     action = singleton {
-      service = "notify.mobile_app_joshua_pixel_5";
+      service = "notify.${devices.joshua.name}";
       data = {
         title = "${formattedRoomName data.room} Lights Became Unavailable";
         message = "Turn the switch back on";

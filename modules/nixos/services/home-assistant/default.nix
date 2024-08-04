@@ -20,7 +20,6 @@ let
     utils
     getExe'
     mkVMOverride
-    mapAttrsToList
     concatStringsSep
     escapeShellArg
     singleton
@@ -30,7 +29,7 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets) mqttHassPassword;
   inherit (caddy) trustedAddresses;
-  inherit (secrets.general) devices people;
+  inherit (secrets.general) people;
   cfg = config.modules.services.hass;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
   cameras = attrNames config.services.frigate.settings.cameras;
@@ -232,12 +231,6 @@ in
             type = "module";
           })
         ];
-
-        notify = singleton {
-          platform = "group";
-          name = "All Notify Devices";
-          services = mapAttrsToList (name: _: { service = name; }) devices;
-        };
       };
     };
 

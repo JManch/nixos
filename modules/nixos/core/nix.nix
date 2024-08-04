@@ -15,6 +15,7 @@ let
     mapAttrs
     filterAttrs
     isType
+    optional
     mapAttrsToList
     optionalString
     mkForce
@@ -38,7 +39,7 @@ let
     cmd:
     pkgs.writeShellApplication {
       name = "rebuild-${cmd}";
-      runtimeInputs = with pkgs; [ nixos-rebuild ];
+      runtimeInputs = [ pkgs.nixos-rebuild ] ++ optional (cmd == "diff") pkgs.nvd;
       # Always rebuild in ~ because I once had a bad experience where I
       # accidentally built in /nix/store and caused irrepairable corruption
       text = # bash

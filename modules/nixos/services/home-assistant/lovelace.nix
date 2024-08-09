@@ -1149,17 +1149,14 @@ let
         singleton {
           title = "Lighting";
           type = "grid";
-          cards =
-            (allLightsTiles "${person}_room")
-            ++ [
-              (lightTile "${person}_spot_ceiling_1")
-              (lightTile "${person}_spot_ceiling_2")
-              (lightTile "${person}_spot_ceiling_3")
-              # (lightTile "${person}_play_desk_1")
-              # (lightTile "${person}_play_desk_2")
-              # (lightTile "${person}_strip_desk_1")
-            ]
-            ++ adaptiveLightingTiles { room = "${person}_room"; };
+          cards = (allLightsTiles "${person}_room") ++ [
+            (lightTile "${person}_spot_ceiling_1")
+            (lightTile "${person}_spot_ceiling_2")
+            (lightTile "${person}_spot_ceiling_3")
+            # (lightTile "${person}_play_desk_1")
+            # (lightTile "${person}_play_desk_2")
+            # (lightTile "${person}_strip_desk_1")
+          ];
         }
         ++ (acSection person);
       cards = [ ];

@@ -539,6 +539,7 @@ let
       platform = "state";
       entity_id = [ "light.${data.light}" ];
       to = "unavailable";
+      for.minutes = 1;
     };
     action = singleton {
       service = "notify.${devices.joshua.name}";

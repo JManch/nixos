@@ -11,7 +11,7 @@
   boost,
   httplib,
   libzip,
-  rapidjson-unstable,
+  rapidjson,
   sol2,
   toml11,
   nlohmann_json,
@@ -38,7 +38,7 @@ stdenv.mkDerivation rec {
     boost
     httplib
     libzip
-    rapidjson-unstable
+    rapidjson
     sol2
     toml11
     nlohmann_json

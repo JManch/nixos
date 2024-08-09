@@ -16,13 +16,13 @@ let
     escapeShellArg
     singleton
     ;
-  inherit (config.modules.desktop.programs) swaylock;
+  inherit (config.modules.desktop.programs) locking;
   cfg = config.modules.desktop.services.hypridle;
 in
 mkIf (cfg.enable && isWayland) {
   assertions = utils.asserts [
-    swaylock.enable
-    "Hypridle requires Swaylock to be enabled"
+    (locking.package != null)
+    "Hypridle requires a locker to be enabled"
   ];
 
   services.hypridle = {
@@ -30,14 +30,14 @@ mkIf (cfg.enable && isWayland) {
     package = inputs.hypridle.packages.${pkgs.system}.default;
     settings = {
       general = {
-        lock_cmd = swaylock.lockScript;
+        lock_cmd = locking.lockScript;
         ignore_dbus_inhibit = false;
       };
 
       listener =
         (singleton {
           timeout = cfg.lockTime;
-          on-timeout = swaylock.lockScript;
+          on-timeout = locking.lockScript;
         })
         ++ optional cfg.debug {
           timeout = 5;
@@ -46,27 +46,28 @@ mkIf (cfg.enable && isWayland) {
     };
   };
 
-  modules.desktop.programs.swaylock.postLockScript =
+  modules.desktop.programs.locking.postLockScript =
     let
       hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
       jaq = getExe pkgs.jaq;
     in
-    # bash
-    ''
-      # Turn off the display after locking. I've found that doing this in the
-      # lock script is more reliable than adding another listener.
-      while true; do
-        # If the display is on, wait screenOffTime seconds then turn off
-        # display. Then wait the full lock time before checking again.
-        if ${escapeShellArg hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" >/dev/null 2>&1; then
-          sleep ${toString cfg.screenOffTime}
-          if [ ! -e "$lockfile" ]; then exit 1; fi
-          ${escapeShellArg hyprctl} dispatch dpms off
-        fi
-        # give screens time to turn off and prolong next countdown
-        sleep ${toString cfg.lockTime}
-      done &
-    '';
+    mkIf (utils.isHyprland config)
+      # bash
+      ''
+        # Turn off the display after locking. I've found that doing this in the
+        # lock script is more reliable than adding another listener.
+        while true; do
+          # If the display is on, wait screenOffTime seconds then turn off
+          # display. Then wait the full lock time before checking again.
+          if ${escapeShellArg hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" >/dev/null 2>&1; then
+            sleep ${toString cfg.screenOffTime}
+            if [ ! -e "$lockfile" ]; then exit 1; fi
+            ${escapeShellArg hyprctl} dispatch dpms off
+          fi
+          # give screens time to turn off and prolong next countdown
+          sleep ${toString cfg.lockTime}
+        done &
+      '';
 
   wayland.windowManager.hyprland.settings.bind =
     let

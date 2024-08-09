@@ -44,8 +44,7 @@ mkIf (utils.isHyprland config) {
   modules.desktop = {
     # Optimise for performance in VM variant
     # TODO: Add a hook to disable hardware cursor when launching a QEMU VM
-    # otherwise the cursor is upside down. Also disable hardware cursor when
-    # enabling mirrored monitor.
+    # otherwise the cursor is upside down
     # https://github.com/hyprwm/Hyprland/issues/6428
     hyprland = mkIf vmVariant (mkVMOverride {
       tearing = false;
@@ -73,7 +72,7 @@ mkIf (utils.isHyprland config) {
         -e 's/${cfg.modKey}/${cfg.secondaryModKey}/g' \
         -e 's/enable_stdout_logs=false/enable_stdout_logs=true/' \
         -e 's/disable_hyprland_logo=true/disable_hyprland_logo=false/' \
-        -e 's/no_direct_scanout=false/no_direct_scanout=true/' \
+        -e 's/direct_scanout=false/direct_scanout=true/' \
         -e '/ALTALT/d' \
         -e '/screen_shader/d' \
         -e '/^exec-once/d' \
@@ -231,13 +230,16 @@ mkIf (utils.isHyprland config) {
         disable_autoreload = true;
         disable_hyprland_logo = true;
         focus_on_activate = false;
-        no_direct_scanout = !cfg.directScanout;
         mouse_move_enables_dpms = true;
         key_press_enables_dpms = true;
         background_color = "0xff${colors.base00}";
         new_window_takes_over_fullscreen = 2;
         enable_swallow = false;
         swallow_regex = "^(${desktopCfg.terminal.class})$";
+      };
+
+      render = {
+        direct_scanout = cfg.directScanout;
       };
 
       dwindle = {

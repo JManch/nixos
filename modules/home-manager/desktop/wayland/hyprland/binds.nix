@@ -173,6 +173,7 @@ mkIf (utils.isHyprland config) {
           "${mod}, A, exec, ${toggleSwallowing}"
           "${modShift}, T, exec, ${scaleTabletToWindow}"
           "${modShiftCtrl}, T, exec, ${toggleGaps}"
+          "${mod}, Space, exec, ${config.modules.desktop.programs.locking.lockScript}"
 
           # Movement
           "${mod}, H, movefocus, l"

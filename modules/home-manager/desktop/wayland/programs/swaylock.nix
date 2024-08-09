@@ -7,67 +7,27 @@
   ...
 }:
 let
-  inherit (lib) mkIf optionalString getExe;
+  inherit (lib) mkIf utils getExe';
   inherit (osConfig'.device) primaryMonitor;
   cfg = desktopCfg.programs.swaylock;
   desktopCfg = config.modules.desktop;
   colors = config.colorScheme.palette;
-
-  lockScript =
-    let
-      osAudio = osConfig'.modules.system.audio;
-      preLock = # bash
-        ''
-          ${optionalString osAudio.enable ''
-            wpctl set-mute @DEFAULT_AUDIO_SINK@ 1
-            wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1
-          ''}
-          ${cfg.preLockScript}
-        '';
-
-      postLock = cfg.postLockScript;
-
-      postUnlock = # bash
-        ''
-          ${optionalString osAudio.enable ''
-            wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
-            wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0
-          ''}
-          ${cfg.postUnlockScript}
-        '';
-    in
-    pkgs.writeShellApplication {
-      name = "swaylock-lock-script";
-
-      runtimeInputs = with pkgs; [
-        wireplumber
-        gnugrep
-        procps
-        coreutils
-      ];
-
-      text = # bash
-        ''
-          # Exit if swaylock is running
-          pgrep -x swaylock && exit 1
-
-          # Create a unique lock file so forked processes can track if precisely
-          # this instance of swaylock is still running
-          lockfile="/tmp/swaylock-lock-$$-$(date +%s)"
-          touch "$lockfile"
-          trap 'rm -f "$lockfile"' EXIT
-
-          ${preLock}
-          ${getExe config.programs.swaylock.package} &
-          SWAYLOCK_PID=$!
-          ${postLock}
-          wait $SWAYLOCK_PID
-          ${postUnlock}
-        '';
-    };
+  isHyprland = utils.isHyprland config;
 in
 mkIf (cfg.enable && isWayland) {
-  modules.desktop.programs.swaylock.lockScript = getExe lockScript;
+  modules.desktop.programs.locking = {
+    package = config.programs.swaylock.package;
+
+    # Temporarily disable hyprland shader so that screenshot doesn't get shader
+    # applied twice
+    preLockScript = mkIf isHyprland ''
+      ${config.modules.desktop.hyprland.disableShaders}
+    '';
+
+    postLockScript = mkIf isHyprland ''
+      (${getExe' pkgs.coreutils "sleep"} 0.1; ${config.modules.desktop.hyprland.enableShaders}) &
+    '';
+  };
 
   programs.swaylock = {
     enable = true;
@@ -123,10 +83,4 @@ mkIf (cfg.enable && isWayland) {
   darkman.switchApps.swaylock = {
     paths = [ "swaylock/config" ];
   };
-
-  desktop.hyprland.binds =
-    let
-      inherit (config.modules.desktop.hyprland) modKey;
-    in
-    [ "${modKey}, Space, exec, ${getExe lockScript}" ];
 }

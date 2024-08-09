@@ -59,7 +59,7 @@ mkIf (osConfig'.device.hassIntegration.enable or false) {
   };
 
   # Update the active state when locking
-  modules.desktop.programs.swaylock = {
+  modules.desktop.programs.locking = {
     postLockScript = "systemctl stop --user hass-active-heartbeat";
     postUnlockScript = "systemctl start --user hass-active-heartbeat";
   };

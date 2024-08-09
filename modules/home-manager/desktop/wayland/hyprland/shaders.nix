@@ -93,14 +93,4 @@ mkIf (utils.isHyprland config) {
       decoration.screen_shader = "${config.xdg.configHome}/hypr/shaders/monitorGamma.frag";
       bind = [ "${cfg.modKey}, O, exec, ${toggleShader}" ];
     };
-
-  modules.desktop.programs.swaylock = {
-    preLockScript = ''
-      ${cfg.disableShaders}
-    '';
-
-    postLockScript = ''
-      (${getExe' pkgs.coreutils "sleep"} 0.1; ${cfg.enableShaders}) &
-    '';
-  };
 }

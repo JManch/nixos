@@ -80,7 +80,7 @@ mkIf cfg.enableInternal {
           {
             name = "Powerwall Battery Percentage";
             icon = "mdi:home-battery";
-            state = "{{ ((states('sensor.powerwall_gateway_battery_remaining') | float(0) / states('sensor.powerwall_gateway_battery_capacity') | float(0)) * 100) | int }}";
+            state = "{{ ((states('sensor.powerwall_gateway_battery_remaining') | float(0) / states('sensor.powerwall_gateway_battery_capacity') | float(1)) * 100) | int }}";
             unit_of_measurement = "%";
           }
           {

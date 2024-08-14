@@ -343,7 +343,7 @@ let
           service = "adaptive_lighting.change_switch_settings";
           data = {
             entity_id = "switch.adaptive_lighting_${room_entity}";
-            use_default = "configuration";
+            use_defaults = "configuration";
           };
         };
       };

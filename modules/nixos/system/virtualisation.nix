@@ -157,6 +157,11 @@ in
         };
 
         modules = {
+          hardware = {
+            coral.enable = mkVMOverride false;
+            printing.client.enable = mkVMOverride false;
+          };
+
           system = {
             bluetooth.enable = mkVMOverride false;
             audio.enable = mkVMOverride false;
@@ -185,6 +190,7 @@ in
             zigbee2mqtt.enable = mkVMOverride false;
             minecraft-server.enable = mkVMOverride false;
             mikrotik-backup.enable = mkVMOverride false;
+            index-checker.enable = mkVMOverride false;
           };
         };
 

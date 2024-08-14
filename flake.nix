@@ -109,6 +109,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # nixpkgs.url = "git+file:///home/joshua/files/repos/nixpkgs";
     nixpkgs-small.url = "github:NixOS/nixpkgs/nixos-unstable-small";
     impermanence.url = "github:nix-community/impermanence";
     firstBoot.url = "github:JManch/false";

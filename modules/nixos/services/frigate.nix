@@ -31,7 +31,7 @@ mkIf cfg.enable {
     (cfg.nvrAddress != "")
     "The Frigate service requires nvrAddress to be set"
     config.hardware.graphics.enable
-    "The Frigate service requires hardware acceleration. Set `hardware.graphics.enable`."
+    "The Frigate service requires hardware acceleration"
   ];
 
   modules.services.frigate.rtspAddress =
@@ -307,6 +307,7 @@ mkIf cfg.enable {
       detect.enabled = mkVMOverride false;
       record.enabled = mkVMOverride false;
       snapshots.enabled = mkVMOverride false;
+      ffmpeg.hwaccel_args = mkVMOverride null;
     };
 
     services.go2rtc.settings = {

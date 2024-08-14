@@ -72,12 +72,14 @@ mkMerge [
 
     # Jellyfin module has good default hardening
 
-    systemd.tmpfiles.rules = map (
-      name:
-      "d /var/lib/jellyfin/media${
-        optionalString (name != "") "/${name}"
-      } 0700 ${jellyfin.user} ${jellyfin.group}"
-    ) (attrNames cfg.mediaDirs);
+    systemd.tmpfiles.rules =
+      [ "d /var/lib/jellyfin/media 0700 ${jellyfin.user} ${jellyfin.group}" ]
+      ++ map (
+        name:
+        "d /var/lib/jellyfin/media${
+          optionalString (name != "") "/${name}"
+        } 0700 ${jellyfin.user} ${jellyfin.group}"
+      ) (attrNames cfg.mediaDirs);
 
     backups.jellyfin = {
       paths = [ "/var/lib/jellyfin" ];

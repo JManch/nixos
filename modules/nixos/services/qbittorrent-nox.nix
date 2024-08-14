@@ -69,6 +69,7 @@ mkIf cfg.enable {
   };
 
   systemd.tmpfiles.rules = [
+    "d /var/lib/qbittorrent-nox/qBittorrent/downloads 0775 qbittorrent-nox qbittorrent-nox"
     "d /var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin 0775 qbittorrent-nox qbittorrent-nox"
   ];
 

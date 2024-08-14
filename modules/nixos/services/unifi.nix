@@ -60,7 +60,11 @@ mkIf cfg.enable {
   '';
 
   # Auto-backups will not run unless this directory exists
-  systemd.tmpfiles.rules = [ "d /var/lib/unifi/data/backup/autobackup 0755 unifi unifi" ];
+  systemd.tmpfiles.rules = [
+    "d /var/lib/unifi/data 0700 unifi unifi"
+    "d /var/lib/unifi/data/backup 0700 unifi unifi"
+    "d /var/lib/unifi/data/backup/autobackup 0700 unifi unifi"
+  ];
 
   # WARN: Auto-backups have to be configured in the UI
   backups.unifi = {

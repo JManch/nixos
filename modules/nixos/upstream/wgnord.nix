@@ -14,6 +14,7 @@ let
     getExe'
     ;
   cfg = config.services.wgnord;
+  template = pkgs.writeText "template.conf" cfg.template;
 in
 {
   options.services.wgnord = {
@@ -34,11 +35,14 @@ in
     country = mkOption {
       type = types.str;
       default = "United States";
-      description = "The country which wgnord will try to connect to from https://github.com/phirecc/wgnord/blob/master/countries.txt";
+      description = ''
+        The country which wgnord will try to connect to from
+        https://github.com/phirecc/wgnord/blob/master/countries.txt
+      '';
     };
 
     template = mkOption {
-      type = types.str;
+      type = types.lines;
       default = ''
         [Interface]
         PrivateKey = PRIVKEY
@@ -62,19 +66,16 @@ in
         Description = "Nord Wireguard VPN";
         After = [ "network-online.target" ];
         Wants = [ "network-online.target" ];
-        StartLimitBurst = 2;
-        StartLimitIntervalSec = 10;
+        StartLimitBurst = 3;
+        StartLimitIntervalSec = 30;
       };
 
       serviceConfig = {
         Type = "oneshot";
-        # https://discourse.nixos.org/t/creating-directories-and-files-declararively/9349/2
         StateDirectory = "wgnord";
         ExecStartPre = [
-          "-${getExe' pkgs.coreutils "ln"} -s /etc/wgnord/template.conf /var/lib/wgnord/template.conf"
-          # The login command is broken, returns exit code 1 even on success
-          # We use '-' prefix to ignore this failure
-          "-${getExe' pkgs.bash "sh"} -c '${cfg.package}/bin/wgnord login \"$(<${cfg.tokenFile})\"'"
+          "${getExe' pkgs.coreutils "ln"} -fs ${template} /var/lib/wgnord/template.conf"
+          "${getExe' pkgs.bash "sh"} -c '${getExe cfg.package} login \"$(<${cfg.tokenFile})\"'"
         ];
         ExecStart = "${getExe cfg.package} connect \"${cfg.country}\"";
         ExecStop = "-${getExe cfg.package} disconnect";
@@ -83,12 +84,5 @@ in
         RemainAfterExit = "yes";
       };
     };
-
-    environment.etc."wgnord/template.conf".text = cfg.template;
-
-    systemd.tmpfiles.rules = [
-      "d /etc/wireguard 0755 root root"
-      "f /etc/wireguard/wgnord.conf 600 root root"
-    ];
   };
 }

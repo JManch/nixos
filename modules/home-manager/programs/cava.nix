@@ -63,6 +63,7 @@ mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true)) {
       exec = "${terminal} --title Cava -e ${cava}";
       terminal = false;
       type = "Application";
+      icon = "audio-x-generic";
       categories = [ "Audio" ];
     };
 }

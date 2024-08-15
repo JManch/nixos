@@ -85,6 +85,7 @@ mkIf cfg.enable {
     mkIf config.modules.desktop.enable {
       name = "btop";
       genericName = "Resource Monitor";
+      icon = "application-x-generic";
       exec = "${terminal} --title btop -e ${btop}";
       terminal = false;
       type = "Application";

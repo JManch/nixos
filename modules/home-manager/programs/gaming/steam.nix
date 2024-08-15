@@ -111,6 +111,7 @@ mkIf cfg.enable {
       exec = "${terminal} --title BeamMP -e ${protontrick-launch} --appid ${appID} ${launcherDir}/BeamMP-Launcher.exe";
       terminal = false;
       type = "Application";
+      icon = "application-x-generic";
       categories = [ "Game" ];
     };
 

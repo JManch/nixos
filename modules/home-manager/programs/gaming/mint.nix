@@ -18,6 +18,7 @@ mkIf cfg.enable {
     exec = "${getExe mint}";
     terminal = false;
     type = "Application";
+    icon = "application-x-generic";
     categories = [ "Game" ];
   };
 

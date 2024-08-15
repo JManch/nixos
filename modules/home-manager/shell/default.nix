@@ -63,6 +63,7 @@ in
         tokei
         rename
         nurl # tool for generating nix fetcher calls from urls
+        file
       ])
       ++ [
         (utils.flakePkgs args "yaml2nix").default

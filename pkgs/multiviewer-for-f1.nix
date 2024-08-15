@@ -4,6 +4,7 @@
   fetchurl,
   libudev0-shim,
   libglvnd,
+  icoutils,
   ...
 }:
 multiviewer-for-f1.overrideAttrs rec {
@@ -31,5 +32,10 @@ multiviewer-for-f1.overrideAttrs rec {
     }:\"$out/share/Multiviewer for F1\""
 
     runHook postInstall
+  '';
+
+  # Fix the icon because it uses an unreadable windows format
+  postInstall = ''
+    ${lib.getExe' icoutils "icotool"} -x -w 256 -o $out/share/pixmaps/multiviewer-for-f1.png $out/share/pixmaps/multiviewer-for-f1.png
   '';
 }

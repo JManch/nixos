@@ -125,8 +125,8 @@ in
             src = pkgs.fetchFromGitHub {
               owner = "astrandb";
               repo = "miele";
-              rev = "refs/tags/v2024.8.1";
-              hash = "sha256-XwaOQJvosCUXMZYrKX7sMWJIrMx36RhuVYUq163vvNg=";
+              rev = "refs/tags/v2024.8.0";
+              hash = "sha256-aoEFes3crmoI+n5kPHtyaAuefD3hVWwgas8P8j04a48=";
             };
           })
           (pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs {
@@ -214,6 +214,11 @@ in
             platform = "local_file";
             file_path = "/var/lib/hass/media/study_floorplan.png";
             name = "Study Floorplan";
+          }
+          {
+            platform = "local_file";
+            file_path = "/var/lib/hass/media/${people.person3}_room_floorplan.png";
+            name = "${utils.upperFirstChar people.person3} Room Floorplan";
           }
         ];
 

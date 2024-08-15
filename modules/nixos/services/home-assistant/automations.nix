@@ -7,6 +7,7 @@
 let
   inherit (lib)
     mkIf
+    imap
     utils
     optional
     optionals
@@ -196,274 +197,6 @@ let
         false
       ];
 
-  joshuaLightsToggle =
-    let
-      wakeUpTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) | round(0))";
-    in
-    map
-      (enable: {
-        alias = "Joshua Lights ${if enable then "On" else "Off"}";
-        mode = "single";
-        trigger =
-          [
-            {
-              platform = "numeric_state";
-              entity_id = [ "sensor.smoothed_solar_power" ];
-              above = mkIf (!enable) 2;
-              below = mkIf enable 2;
-              id = "Brightness";
-            }
-            {
-              platform = "state";
-              entity_id = [ "binary_sensor.ncase_m1_active" ];
-              from = if enable then "off" else "on";
-              to = if enable then "on" else "off";
-              for.seconds = if enable then 0 else 30;
-            }
-          ]
-          ++ optional enable {
-            platform = "template";
-            value_template = "{{ now().timestamp() | round(0) == (${wakeUpTimestamp} - 60*60) }}";
-            id = "Wake Up Time";
-          };
-        condition =
-          let
-            mainCondition = {
-              condition = if enable then "and" else "or";
-              conditions = [
-                {
-                  condition = "numeric_state";
-                  entity_id = "sensor.smoothed_solar_power";
-                  above = mkIf (!enable) 2;
-                  below = mkIf enable 2;
-                }
-                {
-                  condition = "state";
-                  entity_id = "binary_sensor.ncase_m1_active";
-                  state = if enable then "on" else "off";
-                }
-              ];
-            };
-            wakeUpCondition = {
-              condition = "or";
-              conditions = [
-                mainCondition
-                {
-                  condition = "and";
-                  conditions = [
-                    {
-                      condition = "trigger";
-                      id = "Wake Up Time";
-                    }
-                    {
-                      condition = "state";
-                      entity_id = "input_boolean.joshua_room_wake_up_lights";
-                      state = "on";
-                    }
-                  ];
-                }
-              ];
-            };
-          in
-          optional (!enable) mainCondition ++ optional enable wakeUpCondition;
-        action =
-          let
-            lightService = {
-              service = "light.turn_${if enable then "on" else "off"}";
-              target.entity_id = "light.joshua_room_lights";
-            };
-          in
-          optional enable lightService
-          ++ optional (!enable) {
-            "if" = [
-              {
-                condition = "not";
-                conditions = [
-                  {
-                    condition = "and";
-                    conditions = [
-                      {
-                        condition = "trigger";
-                        id = [ "Brightness" ];
-                      }
-                      {
-                        condition = "numeric_state";
-                        entity_id = "sensor.joshua_pixel_5_sleep_confidence";
-                        above = 90;
-                      }
-                    ];
-                  }
-                ];
-              }
-            ];
-            "then" = [ lightService ];
-          };
-      })
-      [
-        true
-        false
-      ];
-
-  alarmWakeUpTimestamp =
-    device: "(as_timestamp(states('sensor.${device}_next_alarm'), default = 0) | round(0))";
-
-  adaptiveLightingAlarmSync =
-    room_entity: device:
-    singleton {
-      alias = "${formattedRoomName room_entity} Lighting Sun Times";
-      mode = "single";
-      trigger = [
-        {
-          platform = "homeassistant";
-          event = "start";
-        }
-        {
-          platform = "state";
-          entity_id = [ "sensor.${device}_next_alarm" ];
-        }
-      ];
-      action = singleton {
-        "if" = singleton {
-          condition = "template";
-          value_template = "{{ has_value('sensor.${device}_next_alarm') }}";
-        };
-        "then" = {
-          service = "adaptive_lighting.change_switch_settings";
-          data = {
-            use_defaults = "configuration";
-            entity_id = "switch.adaptive_lighting_${room_entity}";
-            sunrise_time = "{{ ${alarmWakeUpTimestamp device} | timestamp_custom('%H:%M:%S') }}";
-            # Set sunset 1 hour before sleep time so that lights will reach
-            # minimum brightness 30 mins before sleep time. Sleep mode enables 30
-            # mins before sleep time.
-            sunset_time = "{{ (${alarmWakeUpTimestamp device} - 9*60*60) | timestamp_custom('%H:%M:%S') }}";
-          };
-        };
-        "else" = singleton {
-          service = "adaptive_lighting.change_switch_settings";
-          data = {
-            entity_id = "switch.adaptive_lighting_${room_entity}";
-            use_defaults = "configuration";
-          };
-        };
-      };
-    };
-
-  # TODO: Group these light automations into a full config so that everything
-  # gets created with a single option. This includes the wake_up switch entity
-  # etc...
-  wakeUpLights =
-    room_entity: wake_up_timestamp:
-    singleton {
-      alias = "${formattedRoomName room_entity} Wake Up Lights";
-      mode = "single";
-      trigger = singleton {
-        platform = "template";
-        value_template = "{{ (now().timestamp() + 60*60) | round(0) == ${wake_up_timestamp} }}";
-      };
-      condition = singleton {
-        condition = "state";
-        entity_id = "input_boolean.${room_entity}_wake_up_lights";
-        state = "on";
-      };
-      action = singleton {
-        service = "light.turn_on";
-        target.entity_id = "light.${room_entity}_lights";
-      };
-    };
-
-  joshuaSleepModeToggle =
-    let
-      wakeUpTimestamp = "(as_timestamp(states('sensor.joshua_pixel_5_next_alarm'), default = 0) | round(0))";
-    in
-    map
-      (enable: {
-        alias = "Joshua Room Sleep Mode ${if enable then "Enable" else "Disable"}";
-        mode = "single";
-        trigger =
-          [
-            {
-              platform = "state";
-              entity_id = [ "sensor.joshua_pixel_5_next_alarm" ];
-            }
-            {
-              platform = "template";
-              value_template =
-                if enable then
-                  "{{ now().timestamp() | round(0) == (${wakeUpTimestamp} - 8.5*60*60) }}"
-                else
-                  "{{ now().timestamp() | round(0) == (${wakeUpTimestamp} - 60*60) }}";
-            }
-            {
-              platform = "state";
-              entity_id = [ "binary_sensor.ncase_m1_active" ];
-              from = if enable then "on" else "off";
-              to = if enable then "off" else "on";
-            }
-            {
-              platform = "homeassistant";
-              event = "start";
-            }
-          ]
-          ++ optional enable {
-            platform = "state";
-            entity_id = [ "light.joshua_room_lights" ];
-            to = "on";
-          };
-        condition =
-          singleton {
-            condition = "template";
-            value_template = ''
-              {% set time_to_wake = ${wakeUpTimestamp} - (now().timestamp() | round(0)) %}
-              {{ (${wakeUpTimestamp} != 0) and ${
-                if enable then
-                  "(time_to_wake <= 8.5*60*60) and (time_to_wake > 60*60)"
-                else
-                  "((time_to_wake <= 60*60) or (time_to_wake > 8.5*60*60))"
-              } }}
-            '';
-          }
-          ++ optional enable {
-            condition = "state";
-            entity_id = "binary_sensor.ncase_m1_active";
-            state = "off";
-          };
-        action =
-          [
-            {
-              service = "switch.turn_${if enable then "on" else "off"}";
-              target.entity_id = "switch.adaptive_lighting_sleep_mode_joshua_room";
-            }
-          ]
-          ++ optionals enable [
-            # Delay to wait for 1 second adaptive lighting transition as turning
-            # off lights during transition doesn't work
-            { delay.seconds = 2; }
-            {
-              service = "light.turn_off";
-              target.entity_id = "light.joshua_bulb_ceiling";
-            }
-          ]
-          ++ optional (!enable) {
-            "if" = singleton {
-              condition = "state";
-              entity_id = "light.joshua_room_lights";
-              state = "on";
-            };
-            "then" = [
-              { delay.seconds = 2; }
-              {
-                service = "light.turn_on";
-                target.entity_id = "light.joshua_bulb_ceiling";
-              }
-            ];
-          };
-      })
-      [
-        true
-        false
-      ];
-
   binCollectionNotify = singleton {
     alias = "Bin Collection Notify";
     mode = "single";
@@ -550,23 +283,82 @@ let
     };
   }) cfg.ceilingLightRooms;
 
-  room2LightsToggle =
+  hueTapLightSwitch =
+    room: deviceId:
     let
-      room = "${people.person2}_room";
+      smartLightingCfg = config.modules.services.hass.smartLightingRooms.${room};
+      roomId = smartLightingCfg.roomId or room;
+      hasAdaptiveLighting = smartLightingCfg.adaptiveLighting.enable or false;
     in
     singleton {
-      alias = (formattedRoomName room) + " Light Switch";
+      alias = "${formattedRoomName roomId} Hue Tap Light Switch";
       mode = "single";
-      trigger = singleton {
+      trigger = map (button: {
         platform = "device";
         domain = "mqtt";
-        device_id = "670ac1ecf423f069757c7ab30bec3142";
+        device_id = deviceId;
         type = "action";
-        subtype = "press_1";
-      };
+        subtype = "press_${toString button}";
+        id = "press_${toString button}";
+      }) (builtins.genList (x: x + 1) 4);
       action = singleton {
-        service = "light.toggle";
-        target.entity_id = "light.${room}_lights";
+        choose =
+          imap
+            (button: sequence: {
+              inherit sequence;
+              conditions = singleton {
+                condition = "trigger";
+                id = [ "press_${toString button}" ];
+              };
+            })
+            # Button 1: Toggle lights
+            # Button 2: Toggle adaptive lighting or increase brightness
+            # Button 3: Toggle adaptive lighting sleep mode or decrease brightness
+            # Button 4: Set lights to max brightness
+            [
+              (singleton {
+                service = "light.toggle";
+                target.entity_id = "light.${roomId}_lights";
+              })
+              (singleton (
+                if hasAdaptiveLighting then
+                  {
+                    service = "switch.toggle";
+                    target.entity_id = "switch.adaptive_lighting_${roomId}";
+                  }
+                else
+                  {
+                    service = "light.turn_on";
+                    data.brightness_step_pct = 10;
+                    data.transition = 2;
+                  }
+              ))
+              (singleton (
+                if hasAdaptiveLighting then
+                  {
+                    service = "switch.toggle";
+                    target.entity_id = "switch.adaptive_lighting_sleep_mode_${roomId}";
+                  }
+                else
+                  {
+                    service = "light.turn_on";
+                    data.brightness_step_pct = -10;
+                    data.transition = 2;
+                  }
+              ))
+              (
+                optional hasAdaptiveLighting {
+                  service = "switch.turn_off";
+                  target.entity_id = "switch.adaptive_lighting_${roomId}";
+                }
+                ++ singleton {
+                  service = "light.turn_on";
+                  target.entity_id = "light.${roomId}_lights";
+                  data.brightness_pct = 100;
+                  data.kelvin = 6500;
+                }
+              )
+            ];
       };
     };
 
@@ -626,18 +418,14 @@ mkIf cfg.enableInternal {
       heatingTimeToggle
       ++ joshuaDehumidifierToggle
       ++ joshuaDehumidifierTankFull
-      ++ joshuaLightsToggle
-      ++ (adaptiveLightingAlarmSync "joshua_room" "joshua_pixel_5")
-      ++ (adaptiveLightingAlarmSync "${people.person3}_room" "${people.person3}_pixel_6")
-      ++ (wakeUpLights "${people.person3}_room" (alarmWakeUpTimestamp "${people.person3}_pixel_6"))
-      ++ joshuaSleepModeToggle
       ++ binCollectionNotify
       ++ washingMachineNotify
       ++ formula1Notify
       ++ lightsAvailabilityNotify
-      ++ room2LightsToggle
       ++ (hueLightSwitch "lounge" "12a188fc9e93182d852924b602153741")
       ++ (hueLightSwitch "study" "49d9c39a26397a8a228ee484114aca0b")
+      ++ (hueTapLightSwitch "${people.person2}Room" "670ac1ecf423f069757c7ab30bec3142")
+      ++ (hueTapLightSwitch "${people.person3}Room" "0097121e144203512aeacef37a03650c")
       ++ optionals frigate.enable (frigateEntranceNotify ++ frigateCatNotify ++ frigateHighAlertNotify);
 
     input_datetime = {
@@ -666,16 +454,6 @@ mkIf cfg.enableInternal {
       high_alert_surveillance = {
         name = "High Alert Surveillance";
         icon = "mdi:cctv";
-      };
-
-      joshua_room_wake_up_lights = {
-        name = "Joshua Room Wake Up Lights";
-        icon = "mdi:weather-sunset-up";
-      };
-
-      "${people.person3}_room_wake_up_lights" = {
-        name = "${formattedRoomName "${people.person3}_room"} Wake Up Lights";
-        icon = "mdi:weather-sunset-up";
       };
     };
   };

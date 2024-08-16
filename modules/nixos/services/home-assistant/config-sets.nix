@@ -183,7 +183,6 @@ in
                 default =
                   let
                     inherit (config) adaptiveLighting roomId wakeUpLights;
-                    inherit (adaptiveLighting) sleepMode;
                   in
                   {
                     individualLights ? [ ],
@@ -238,7 +237,16 @@ in
                       type = "tile";
                       entity = "switch.adaptive_lighting_${roomId}";
                       layout_options = {
-                        grid_columns = 4;
+                        grid_columns = 2;
+                        grid_rows = 1;
+                      };
+                    }
+                    {
+                      name = "Sleep Mode";
+                      type = "tile";
+                      entity = "switch.adaptive_lighting_sleep_mode_${roomId}";
+                      layout_options = {
+                        grid_columns = 2;
                         grid_rows = 1;
                       };
                     }
@@ -263,15 +271,6 @@ in
                       };
                     }
                   ]
-                  ++ optional (adaptiveLighting.enable && (!sleepMode.automate)) {
-                    name = "Sleep Mode";
-                    type = "tile";
-                    entity = "switch.adaptive_lighting_sleep_mode_${roomId}";
-                    layout_options = {
-                      grid_columns = 4;
-                      grid_rows = 1;
-                    };
-                  }
                   ++ optionals wakeUpLights.enable (
                     [
                       {
@@ -377,11 +376,11 @@ in
                 action = singleton {
                   "if" = singleton {
                     condition = "template";
-                    value_template = "{{ has_value('input_number.${cfg'.roomDeviceId}_sleep_duration') and ${
+                    value_template = "{{ has_value('input_number.${cfg'.roomId}_sleep_duration') and ${
                       if (cfg'.wakeUpLights.type == "alarm") then
                         "has_value('sensor.${cfg'.roomDeviceId}_next_alarm')"
                       else
-                        "has_value('input_datetime.${cfg'.roomDeviceId}_wake_up_time')"
+                        "has_value('input_datetime.${cfg'.roomId}_wake_up_time')"
                     } }}";
                   };
                   "then" = {
@@ -429,34 +428,31 @@ in
           })
 
           (mkIf cfg'.adaptiveLighting.enable {
-            adaptive_lighting = singleton {
-              name = "${formattedRoomName} ";
-              lights =
-                if cfg'.adaptiveLighting.lights == null then
-                  [ "light.${cfg'.roomId}_lights" ]
-                else
-                  cfg'.adaptiveLighting.lights;
-              min_brightness = cfg'.adaptiveLighting.minBrightness;
-              sleep_brightness = 5;
-              sunrise_time = "07:00:00";
-              sunset_time = "22:30:00";
-              brightness_mode = "tanh";
-              brightness_mode_time_dark = 3600;
-              brightness_mode_time_light = 900;
-              take_over_control = cfg'.adaptiveLighting.takeOverControl;
-              skip_redundant_commands = true;
-              sleep_rgb_or_color_temp =
-                if (cfg'.adaptiveLighting.sleepMode.color == null) then "color_temp" else "rgb_color";
-              sleep_color_temp = mkIf (cfg'.adaptiveLighting.sleepMode.color == null) 1000;
-              sleep_rgb_color = mkIf (
-                cfg'.adaptiveLighting.sleepMode.color != null
-              ) cfg'.adaptiveLighting.sleepMode.color;
-            };
-          })
-
-          (mkIf (cfg'.adaptiveLighting.enable && cfg'.adaptiveLighting.sleepMode.automate) {
-            automation =
-              optional (cfg'.adaptiveLighting.sleepMode.disabledLights != [ ]) {
+            adaptive_lighting =
+              singleton {
+                name = "${formattedRoomName} ";
+                lights =
+                  if cfg'.adaptiveLighting.lights == null then
+                    [ "light.${cfg'.roomId}_lights" ]
+                  else
+                    cfg'.adaptiveLighting.lights;
+                min_brightness = cfg'.adaptiveLighting.minBrightness;
+                sleep_brightness = 5;
+                sunrise_time = "07:00:00";
+                sunset_time = "22:30:00";
+                brightness_mode = "tanh";
+                brightness_mode_time_dark = 3600;
+                brightness_mode_time_light = 900;
+                take_over_control = cfg'.adaptiveLighting.takeOverControl;
+                skip_redundant_commands = true;
+                sleep_rgb_or_color_temp =
+                  if (cfg'.adaptiveLighting.sleepMode.color == null) then "color_temp" else "rgb_color";
+                sleep_color_temp = mkIf (cfg'.adaptiveLighting.sleepMode.color == null) 1000;
+                sleep_rgb_color = mkIf (
+                  cfg'.adaptiveLighting.sleepMode.color != null
+                ) cfg'.adaptiveLighting.sleepMode.color;
+              }
+              ++ optional (cfg'.adaptiveLighting.sleepMode.disabledLights != [ ]) {
                 alias = "${formattedRoomName} Sleep Mode Lights Toggle";
                 mode = "single";
                 trigger = [
@@ -524,42 +520,43 @@ in
                   }
                 ];
               }
-              ++ optional cfg'.wakeUpLights.enable {
+              ++ optional (cfg'.adaptiveLighting.sleepMode.automate && cfg'.wakeUpLights.enable) {
                 alias = "${formattedRoomName} Sleep Mode Toggle";
                 mode = "single";
-                trigger = [
-                  {
-                    platform = "state";
-                    entity_id = [ "binary_sensor.${cfg'.roomDeviceId}_is_charging" ];
-                    from = "off";
-                    to = "on";
-                  }
-                  {
-                    # 1 hour before wake-up time (1 min earlier to run before wake-up lights)
-                    platform = "template";
-                    value_template = "{{ (now().timestamp() + 61*60) | round(0) == ${wakeUpTimestamp} }}";
-                  }
-                  {
-                    # 1 hour after sleep time
-                    platform = "template";
-                    value_template = "{{ (now().timestamp() + (${sleepDuration} - 1)*60*60) | round(0) == ${wakeUpTimestamp} }}";
-                  }
-                  {
-                    platform = "state";
-                    entity_id = [ "sensor.${cfg'.roomDeviceId}_next_alarm" ];
-                    from = null;
-                  }
-                  {
+                trigger =
+                  [
+                    {
+                      platform = "state";
+                      entity_id = [ "binary_sensor.${cfg'.roomDeviceId}_is_charging" ];
+                      from = "off";
+                      to = "on";
+                    }
+                    {
+                      # 1 hour before wake-up time (1 min earlier to run before wake-up lights)
+                      platform = "template";
+                      value_template = "{{ (now().timestamp() + 61*60) | round(0) == ${wakeUpTimestamp} }}";
+                    }
+                    {
+                      # 1 hour after sleep time
+                      platform = "template";
+                      value_template = "{{ (now().timestamp() + (${sleepDuration} - 1)*60*60) | round(0) == ${wakeUpTimestamp} }}";
+                    }
+                    {
+                      platform = "state";
+                      entity_id = [ "input_number.${cfg'.roomId}_sleep_duration" ];
+                      from = null;
+                    }
+                  ]
+                  ++ optional (cfg'.wakeUpLights.type == "manual") {
                     platform = "state";
                     entity_id = [ "input_datetime.${cfg'.roomId}_wake_up_time" ];
                     from = null;
                   }
-                  {
+                  ++ optional (cfg'.wakeUpLights.type == "alarm") {
                     platform = "state";
-                    entity_id = [ "input_number.${cfg'.roomId}_sleep_duration" ];
+                    entity_id = [ "sensor.${cfg'.roomDeviceId}_next_alarm" ];
                     from = null;
-                  }
-                ];
+                  };
                 condition = singleton {
                   condition = "state";
                   entity_id = "switch.adaptive_lighting_${cfg'.roomId}";
@@ -761,16 +758,16 @@ in
           in
           {
             roomId = "${person}_room";
-            # roomDeviceId = devices.${person}.name;
+            roomDeviceId = devices.${person}.name;
 
             wakeUpLights = {
-              enable = false;
+              enable = true;
               type = "alarm";
             };
 
             adaptiveLighting = {
               enable = true;
-              sleepMode.automate = false;
+              sleepMode.automate = true;
               sleepMode.color = [
                 255
                 0

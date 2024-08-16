@@ -162,7 +162,7 @@ let
       for.minutes = 1;
     };
     action = singleton {
-      service = "notify.${devices.joshua.name}";
+      service = "notify.mobile_app_${devices.joshua.name}";
       data = {
         title = "Dehumidifier";
         message = "Tank full";
@@ -232,7 +232,7 @@ let
       before = "22:00:00";
     };
     action = singleton {
-      service = "notify.${devices.${people.person4}.name}";
+      service = "notify.mobile_app_${devices.${people.person4}.name}";
       data = {
         title = "Washing Machine Finished";
         message = "Take out the damp clothes";
@@ -255,7 +255,7 @@ let
     action =
       let
         mkNotify = person: {
-          service = "notify.${devices.${person}.name}";
+          service = "notify.mobile_app_${devices.${person}.name}";
           data = {
             title = "Formula 1 About to Start";
             message = "{{ state_attr('calendar.formula_1', 'message') }} in 15 mins!";
@@ -275,7 +275,7 @@ let
       for.minutes = 1;
     };
     action = singleton {
-      service = "notify.${devices.joshua.name}";
+      service = "notify.mobile_app_${devices.joshua.name}";
       data = {
         title = "${formattedRoomName data.room} Lights Became Unavailable";
         message = "Turn the switch back on";

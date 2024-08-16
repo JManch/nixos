@@ -49,10 +49,20 @@ mkIf (cfg.enable && isWayland) {
     # sending the SIGRTMIN+<output_number> signal. It disables the custom
     # module signal functionality that I don't use.
     package =
-      (utils.addPatches pkgs.waybar [
-        ../../../../../../patches/waybarDisableReload.patch
-        ../../../../../../patches/waybarOutputBarToggle.patch
-      ]).override
+      (utils.addPatches
+        (pkgs.waybar.overrideAttrs {
+          src = pkgs.fetchFromGitHub {
+            owner = "Alexays";
+            repo = "Waybar";
+            rev = "21906f07b312d56f51ce7cd2b26925cd12880ada";
+            hash = "sha256-7FBkX2hJrnX1VSKiE1jawHWitA4hTHnSgD4g7RjvhM8=";
+          };
+        })
+        [
+          ../../../../../../patches/waybarDisableReload.patch
+          ../../../../../../patches/waybarOutputBarToggle.patch
+        ]
+      ).override
         {
           cavaSupport = false;
           evdevSupport = true;

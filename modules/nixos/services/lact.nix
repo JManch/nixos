@@ -110,7 +110,7 @@ mkIf cfg.enable {
       ncat = getExe' pkgs.nmap "ncat";
       jaq = getExe pkgs.jaq;
       confirm = ''echo '{"command": "confirm_pending_config", "args": {"command": "confirm"}}' | ${ncat} -U /run/lactd.sock'';
-      getId = ''echo '{"command": "list_devices"}' | ${ncat} -U /run/lactd.sock | ${jaq} -r ".data.[0].id"'';
+      getId = ''echo '{"command": "list_devices"}' | ${ncat} -U /run/lactd.sock | ${jaq} -r ".data[0].id"'';
 
       setPowerCap =
         powerCap: # bash

@@ -237,37 +237,8 @@ in
                       type = "tile";
                       entity = "switch.adaptive_lighting_${roomId}";
                       layout_options = {
-                        grid_columns = 2;
+                        grid_columns = 4;
                         grid_rows = 1;
-                      };
-                    }
-                    {
-                      name = "Sleep Mode";
-                      type = "tile";
-                      entity = "switch.adaptive_lighting_sleep_mode_${roomId}";
-                      layout_options = {
-                        grid_columns = 2;
-                        grid_rows = 1;
-                      };
-                    }
-                    {
-                      name = "Adapt Brightness";
-                      type = "tile";
-                      entity = "switch.adaptive_lighting_adapt_brightness_${roomId}";
-                      visibility = singleton {
-                        condition = "state";
-                        entity = "switch.adaptive_lighting_${roomId}";
-                        state = "on";
-                      };
-                    }
-                    {
-                      name = "Adapt Colour";
-                      type = "tile";
-                      entity = "switch.adaptive_lighting_adapt_color_${roomId}";
-                      visibility = singleton {
-                        condition = "state";
-                        entity = "switch.adaptive_lighting_${roomId}";
-                        state = "on";
                       };
                     }
                   ]
@@ -278,20 +249,11 @@ in
                         type = "tile";
                         entity = "input_boolean.${roomId}_wake_up_lights";
                         layout_options = {
-                          grid_columns = if (wakeUpLights.type == "manual") then 4 else 2;
+                          grid_columns = 2;
                           grid_rows = 1;
                         };
                       }
                     ]
-                    ++ optional (wakeUpLights.type == "manual") {
-                      name = "Wake Up Time";
-                      type = "tile";
-                      entity = "input_datetime.${roomId}_wake_up_time";
-                      layout_options = {
-                        grid_columns = 2;
-                        grid_rows = 1;
-                      };
-                    }
                     ++ [
                       {
                         name = "Sleep Duration";
@@ -303,7 +265,25 @@ in
                         };
                       }
                     ]
-                  );
+                  )
+                  ++ optional adaptiveLighting.enable {
+                    name = "Sleep Mode";
+                    type = "tile";
+                    entity = "switch.adaptive_lighting_sleep_mode_${roomId}";
+                    layout_options = {
+                      grid_columns = if (wakeUpLights.enable && wakeUpLights.type == "manual") then 2 else 4;
+                      grid_rows = 1;
+                    };
+                  }
+                  ++ optional (wakeUpLights.enable && wakeUpLights.type == "manual") {
+                    name = "Wake Up Time";
+                    type = "tile";
+                    entity = "input_datetime.${roomId}_wake_up_time";
+                    layout_options = {
+                      grid_columns = 2;
+                      grid_rows = 1;
+                    };
+                  };
               };
             };
           }

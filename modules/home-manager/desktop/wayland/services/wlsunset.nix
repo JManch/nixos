@@ -14,13 +14,10 @@
   ...
 }:
 let
-  inherit (lib)
-    mkIf
-    getExe
-    optionalAttrs
-    cli
-    ;
+  inherit (lib) mkIf getExe;
   cfg = config.modules.desktop.services.wlsunset;
+  latitude = "50.8";
+  longitude = "-0.1";
 in
 mkIf (cfg.enable && isWayland) {
   # We don't use the home-manager module because it's missing options
@@ -32,24 +29,27 @@ mkIf (cfg.enable && isWayland) {
 
     Service.ExecStart =
       let
-        args = cli.toGNUCommandLineShell { } (
-          {
-            t = 4000; # temp night
-            T = 6500; # temp day
-          }
-          // optionalAttrs cfg.transition {
-            l = 50.8; # latitude
-            L = -0.1; # longitude
-          }
-          // optionalAttrs (!cfg.transition) {
-            d = 0; # duration
-            # Duration 0 requires manual sunrise/sunset times
-            S = "06:00"; # sunrise
-            s = "21:00"; # sunset
-          }
-        );
+        args = "-t 4000 -T 6500";
+        wlsunset = getExe pkgs.wlsunset;
+        sunwait = getExe pkgs.sunwait;
+        grep = getExe pkgs.gnugrep;
       in
-      "${getExe pkgs.wlsunset} ${args}";
+      if cfg.transition then
+        "${wlsunset} ${args} -l ${latitude} -L ${longitude}"
+      else
+        # If starting in no-transition mode we have to calculate the sunrise
+        # and sunset times ourselves because duration=0 only works with manual
+        # sunrise and sunset times
+        (pkgs.writeShellScript "wlsunset-manual-sun-times" ''
+          line=$(
+            ${sunwait} report offset 30 ${latitude}N ${longitude}E \
+            | ${grep} 'twilight & offset')
+
+          sunrise=$(echo "$line" | awk '{print $6}')
+          sunset=$(echo "$line" | awk '{print $8}')
+
+          exec ${wlsunset} ${args} -d 0 -S "$sunrise" -s "$sunset"
+        '');
 
     Install.WantedBy = [ "graphical-session.target" ];
   };

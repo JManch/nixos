@@ -279,8 +279,7 @@ mkMerge [
     services.restic.backups =
       let
         backupDefaults = name: {
-          # We use our own initialize script because the upstream one is inefficient
-          initialize = false;
+          initialize = true;
           repositoryFile = resticRepositoryFile.path;
           passwordFile = resticPasswordFile.path;
           timerConfig = backupTimerConfig;
@@ -313,12 +312,10 @@ mkMerge [
             environment.RESTIC_CACHE_DIR = mkForce "";
             onFailure = [ "restic-backups-${name}-failure-notif.service" ];
 
-            preStart =
-              # bash
-              mkBefore ''
-                ${value.preBackupScript}
-                ${resticExe} cat config --no-cache || ${resticExe} init
-              '';
+            preStart = mkBefore ''
+              ${value.preBackupScript}
+            '';
+
             postStop = mkAfter ''
               ${value.postBackupScript}
             '';

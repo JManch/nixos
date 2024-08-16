@@ -146,6 +146,18 @@ let
                 grid_rows = 2;
               };
             };
+
+            blankButton = {
+              name = "";
+              icon = "";
+              type = "button";
+              tap_action.action = "none";
+              hold_action.action = "none";
+              layout_options = {
+                grid_columns = 1;
+                grid_rows = 2;
+              };
+            };
           in
           [
             (navigationButton "Energy" "energy" "mdi:home-lightning-bolt-outline")
@@ -155,10 +167,11 @@ let
             (navigationButton "Lounge" "lounge" "mdi:sofa")
             (navigationButton "Study" "study" "mdi:chair-rolling")
             (navigationButton "Master" "master-bedroom" "mdi:bed-king")
+            blankButton
             (navigationButton "Joshua" "joshua-room" "mdi:bed")
-            (navigationButton "${upperPeople.person1}" "${people.person1}-room" "mdi:bed")
-            (navigationButton "${upperPeople.person2}" "${people.person2}-room" "mdi:bed")
             (navigationButton "${upperPeople.person3}" "${people.person3}-room" "mdi:bed")
+            (navigationButton "${upperPeople.person2}" "${people.person2}-room" "mdi:bed")
+            (navigationButton "${upperPeople.person1}" "${people.person1}-room" "mdi:bed")
           ];
       }
       {

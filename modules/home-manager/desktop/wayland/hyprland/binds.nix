@@ -144,6 +144,20 @@ let
         ${notifySend} --urgency=low -t 2000 -h \
           'string:x-canonical-private-synchronous:hypr-scale-tablet' 'Hyprland' 'Scaled tablet to active window'
       '';
+
+  # By design, the wayland clipboard does not sync with unfocused x clients.
+  # It's possible to workaround this but constantly syncing the X clipboard but
+  # in my experience the workaround is quite buggy and breaks basic clipboard
+  # functionality. Since I don't paste into wine applications very frequently,
+  # having a bind to manually sync is an acceptable workaround.
+  # https://github.com/hyprwm/Hyprland/issues/2319
+  syncClipboard =
+    pkgs.writeShellScript "sync-clipboard" # bash
+      ''
+        echo -n "$(wl-paste -n)" | ${getExe pkgs.xclip} -selection clipboard && \
+          ${notifySend} --urgency=low -t 2000 'Hyprland' 'Synced Wayland clipboard with X11' || \
+          ${notifySend} --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
+      '';
 in
 mkIf (utils.isHyprland config) {
   # Force secondaryModKey VM variant because binds are repeated on host
@@ -174,6 +188,7 @@ mkIf (utils.isHyprland config) {
           "${modShift}, T, exec, ${scaleTabletToWindow}"
           "${modShiftCtrl}, T, exec, ${toggleGaps}"
           "${mod}, Space, exec, ${config.modules.desktop.programs.locking.lockScript}"
+          "${modShiftCtrl}, V, exec, ${syncClipboard}"
 
           # Movement
           "${mod}, H, movefocus, l"

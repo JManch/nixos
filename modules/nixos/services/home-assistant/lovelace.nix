@@ -21,6 +21,7 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (secrets.lovelace) heating hvac;
   inherit (secrets.general) people userIds;
+  inherit (config.modules.services.hass) smartLightingRooms;
 
   cfg = config.modules.services.hass;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
@@ -39,138 +40,7 @@ let
     type = "state-icon";
   };
 
-  lightingCards =
-    {
-      room,
-      individualLights ? [ ],
-      floorPlanLights ? null,
-    }:
-    let
-      smartLightingCfg = config.modules.services.hass.smartLightingRooms.${room};
-      roomId = smartLightingCfg.roomId or room;
-      adaptiveLighting = smartLightingCfg.adaptiveLighting.enable or false;
-      automatedSleepMode = smartLightingCfg.adaptiveLighting.sleepMode.automate or false;
-      wakeUpLights = smartLightingCfg.wakeUpLights.enable or false;
-      manualWakeUpLights = (smartLightingCfg.wakeUpLights.type or null) == "manual";
-    in
-    [
-      {
-        type = "button";
-        name = "Toggle";
-        entity = "light.${roomId}_lights";
-        tap_action.action = "toggle";
-        layout_options = {
-          grid_columns = 1;
-          grid_rows = 3;
-        };
-      }
-      {
-        type = "tile";
-        entity = "light.${roomId}_lights";
-        name = "All Lights";
-        layout_options = {
-          grid_columns = 3;
-          grid_rows = 3;
-        };
-        features = [
-          { type = "light-brightness"; }
-          { type = "light-color-temp"; }
-        ];
-      }
-    ]
-    ++ (
-      if (floorPlanLights != null) then
-        singleton {
-          camera_image = "camera.${roomId}_floorplan";
-          type = "picture-elements";
-          elements = floorPlanLights;
-        }
-      else
-        (map (l: {
-          type = "tile";
-          entity = "light.${l}";
-          visibility = singleton {
-            condition = "state";
-            entity = "light.${l}";
-            state_not = "unavailable";
-          };
-        }) individualLights)
-    )
-    ++ optionals adaptiveLighting [
-      {
-        name = "Adaptive Lighting";
-        type = "tile";
-        entity = "switch.adaptive_lighting_${roomId}";
-        layout_options = {
-          grid_columns = 4;
-          grid_rows = 1;
-        };
-      }
-      {
-        name = "Adapt Brightness";
-        type = "tile";
-        entity = "switch.adaptive_lighting_adapt_brightness_${roomId}";
-        visibility = singleton {
-          condition = "state";
-          entity = "switch.adaptive_lighting_${roomId}";
-          state = "on";
-        };
-      }
-      {
-        name = "Adapt Colour";
-        type = "tile";
-        entity = "switch.adaptive_lighting_adapt_color_${roomId}";
-        visibility = singleton {
-          condition = "state";
-          entity = "switch.adaptive_lighting_${roomId}";
-          state = "on";
-        };
-      }
-    ]
-    ++ optional (adaptiveLighting && (!automatedSleepMode)) {
-      name = "Sleep Mode";
-      type = "tile";
-      entity = "switch.adaptive_lighting_sleep_mode_${roomId}";
-      layout_options = {
-        grid_columns = 4;
-        grid_rows = 1;
-      };
-    }
-    ++ optionals wakeUpLights (
-      [
-        {
-          name = "Wake Up Lights";
-          type = "tile";
-          entity = "input_boolean.${roomId}_wake_up_lights";
-          layout_options = {
-            grid_columns = if manualWakeUpLights then 4 else 2;
-            grid_rows = 1;
-          };
-        }
-      ]
-      ++ optional manualWakeUpLights {
-        name = "Wake Up Time";
-        type = "tile";
-        entity = "input_datetime.${roomId}_wake_up_time";
-        layout_options = {
-          grid_columns = 2;
-          grid_rows = 1;
-        };
-      }
-      ++ [
-        {
-          name = "Sleep Duration";
-          type = "tile";
-          entity = "input_number.${roomId}_sleep_duration";
-          layout_options = {
-            grid_columns = 2;
-            grid_rows = 1;
-          };
-        }
-      ]
-    );
-
-  allLightsTiles = room: [
+  basicLightsCards = room: [
     {
       type = "button";
       name = "Toggle";
@@ -194,16 +64,6 @@ let
       ] ++ (optional (room != "study") { type = "light-color-temp"; });
     }
   ];
-
-  lightTile = entity: {
-    type = "tile";
-    entity = "light.${entity}";
-    visibility = singleton {
-      condition = "state";
-      entity = "light.${entity}";
-      state_not = "unavailable";
-    };
-  };
 
   acSection =
     sensor:
@@ -972,8 +832,7 @@ let
           entity = "light.lounge_spot_ceiling_1";
           state_not = "unavailable";
         };
-        cards = lightingCards {
-          room = "lounge";
+        cards = smartLightingRooms.lounge.lovelaceCards {
           floorPlanLights = [
             (floorPlanLight "lounge_spot_ceiling_1" 85 65)
             (floorPlanLight "lounge_spot_ceiling_2" 85 25)
@@ -1028,7 +887,7 @@ let
         title = "Lighting";
         type = "grid";
         cards =
-          (allLightsTiles "study")
+          (basicLightsCards "study")
           ++ singleton {
             camera_image = "camera.study_floorplan";
             type = "picture-elements";
@@ -1073,8 +932,7 @@ let
       singleton {
         title = "Lighting";
         type = "grid";
-        cards = lightingCards {
-          room = "joshuaRoom";
+        cards = smartLightingRooms.joshuaRoom.lovelaceCards {
           individualLights = [
             "joshua_lamp_floor"
             "joshua_lamp_bed"
@@ -1163,7 +1021,7 @@ let
         {
           title = "Lighting";
           type = "grid";
-          cards = lightingCards { room = "${person}Room"; };
+          cards = smartLightingRooms."${person}Room".lovelaceCards { };
         }
       ] ++ (acSection person) ++ (underfloorHeatingSection person);
     };
@@ -1182,8 +1040,7 @@ let
         singleton {
           title = "Lighting";
           type = "grid";
-          cards = lightingCards {
-            room = "${person}Room";
+          cards = smartLightingRooms."${person}Room".lovelaceCards {
             individualLights = [
               "${person}_spot_ceiling_1"
               "${person}_spot_ceiling_2"
@@ -1211,8 +1068,7 @@ let
         singleton {
           title = "Lighting";
           type = "grid";
-          cards = lightingCards {
-            room = "${person}Room";
+          cards = smartLightingRooms."${person}Room".lovelaceCards {
             floorPlanLights = [
               (floorPlanLight "${person}_spot_ceiling_1" 75 75)
               (floorPlanLight "${person}_spot_ceiling_2" 75 25)

@@ -13,6 +13,7 @@ let
     mkOption
     mkIf
     optional
+    optionals
     singleton
     attrValues
     mkMerge
@@ -29,141 +30,285 @@ in
   options.modules.services.hass = {
     smartLightingRooms = mkOption {
       type = types.attrsOf (
-        types.submodule {
-          options = {
-            roomId = mkOption {
-              type = types.str;
-              example = "joshua_room";
-            };
+        types.submodule (
+          { config, ... }:
+          {
+            options = {
+              roomId = mkOption {
+                type = types.str;
+                example = "joshua_room";
+              };
 
-            roomDeviceId = mkOption {
-              type = types.str;
-              example = "joshua_pixel_5";
-              description = ''
-                Mobile device associated with the room owner. Used for
-                alarm time in wake-up lights and charging status for
-                enabling sleep mode.
-              '';
-            };
-
-            wakeUpLights = {
-              enable = mkEnableOption ''
-                automatically turning on the lights 1 hour before the
-                alarm/wake-up time
-              '';
-              type = mkOption {
-                type = types.enum [
-                  "alarm"
-                  "manual"
-                ];
-                default = "manual";
+              roomDeviceId = mkOption {
+                type = types.str;
+                example = "joshua_pixel_5";
                 description = ''
-                  The method used for determining the wake-up time. Alarm using
-                  the next alarm sensor from the `roomDeviceId` device (android
-                  only). Manual gets the wake-up time from a datetime input on
-                  the dashboard.
-                '';
-              };
-            };
-
-            adaptiveLighting = {
-              enable = mkEnableOption "adaptive lighting";
-
-              lights = mkOption {
-                type = with types; nullOr (listOf str);
-                default = null;
-                description = ''
-                  Lights that adaptive lighting controls. When null adaptive
-                  lighting controls all lights in the room as a group. This is
-                  preferred as it results in less zigbee network traffic.
+                  Mobile device associated with the room owner. Used for
+                  alarm time in wake-up lights and charging status for
+                  enabling sleep mode.
                 '';
               };
 
-              takeOverControl =
-                mkEnableOption ''
-                  allowing manual controls to override adaptive lighting. This
-                  should only be enabled if really necessary as it has a
-                  performance impact.
-                ''
-                // {
-                  default = false;
-                };
-
-              minBrightness = mkOption {
-                type = types.int;
-                default = 20;
-              };
-
-              sleepMode = {
-                automate = mkEnableOption ''
-                  automated sleep mode. Sleep mode enables 1 hour after sleep
-                  time (or earlier if phone is plugged in time t satisfies
-                  `sleep_time - 30mins <= t < wake_up_time - 1hour`). Sleep
-                  mode always disables 1 hour before wake-up time.
+              wakeUpLights = {
+                enable = mkEnableOption ''
+                  automatically turning on the lights 1 hour before the
+                  alarm/wake-up time
                 '';
-
-                disabledLights = mkOption {
-                  type = with types; listOf str;
-                  default = [ ];
-                  example = [ "light.joshua_bulb_ceiling" ];
-                  description = "Entity ids of lights to turn off when sleep mode is enabled";
+                type = mkOption {
+                  type = types.enum [
+                    "alarm"
+                    "manual"
+                  ];
+                  default = "manual";
+                  description = ''
+                    The method used for determining the wake-up time. Alarm using
+                    the next alarm sensor from the `roomDeviceId` device (android
+                    only). Manual gets the wake-up time from a datetime input on
+                    the dashboard.
+                  '';
                 };
               };
-            };
 
-            automatedToggle = {
-              enable = mkEnableOption ''
-                automaticlly toggle the lights based on outdoor solar generation.
-                Requires some sort of presence detection in the room.
-              '';
+              adaptiveLighting = {
+                enable = mkEnableOption "adaptive lighting";
 
-              presenceTriggers = mkOption {
-                type = with types; listOf attrs;
-                example = singleton {
-                  platform = "state";
-                  entity_id = "binary_sensor.ncase_m1_active";
-                  from = null;
+                lights = mkOption {
+                  type = with types; nullOr (listOf str);
+                  default = null;
+                  description = ''
+                    Lights that adaptive lighting controls. When null adaptive
+                    lighting controls all lights in the room as a group. This is
+                    preferred as it results in less zigbee network traffic.
+                  '';
                 };
-                description = ''
-                  Custom additional triggers that signify a change to presence
-                  in the room. This can be presence enabling or disabling. Must
-                  be used in conjunction with `presenceConditions` and
-                  `noPresenceConditions` to have an effect.
-                '';
+
+                takeOverControl =
+                  mkEnableOption ''
+                    allowing manual controls to override adaptive lighting. This
+                    should only be enabled if really necessary as it has a
+                    performance impact.
+                  ''
+                  // {
+                    default = false;
+                  };
+
+                minBrightness = mkOption {
+                  type = types.int;
+                  default = 20;
+                };
+
+                sleepMode = {
+                  automate = mkEnableOption ''
+                    automated sleep mode. Sleep mode enables 1 hour after sleep
+                    time (or earlier if phone is plugged in time t satisfies
+                    `sleep_time - 30mins <= t < wake_up_time - 1hour`). Sleep
+                    mode always disables 1 hour before wake-up time.
+                  '';
+
+                  disabledLights = mkOption {
+                    type = with types; listOf str;
+                    default = [ ];
+                    example = [ "light.joshua_bulb_ceiling" ];
+                    description = "Entity ids of lights to turn off when sleep mode is enabled";
+                  };
+
+                  color = mkOption {
+                    type = with types; nullOr (listOf int);
+                    default = null;
+                    example = [
+                      255
+                      0
+                      0
+                    ];
+                    description = "Sleep mode rgb color. Leave null to use color temp";
+                  };
+                };
               };
 
-              presenceConditions = mkOption {
-                type = with types; listOf attrs;
-                example = [
-                  {
-                    condition = "state";
+              automatedToggle = {
+                enable = mkEnableOption ''
+                  automaticlly toggle the lights based on outdoor solar generation.
+                  Requires some sort of presence detection in the room.
+                '';
+
+                presenceTriggers = mkOption {
+                  type = with types; listOf attrs;
+                  example = singleton {
+                    platform = "state";
                     entity_id = "binary_sensor.ncase_m1_active";
-                    state = "on";
-                  }
-                ];
-                description = ''
-                  Conditions for room presence that signifies lights should be
-                  turned on
-                '';
+                    from = null;
+                  };
+                  description = ''
+                    Custom additional triggers that signify a change to presence
+                    in the room. This can be presence enabling or disabling. Must
+                    be used in conjunction with `presenceConditions` and
+                    `noPresenceConditions` to have an effect.
+                  '';
+                };
+
+                presenceConditions = mkOption {
+                  type = with types; listOf attrs;
+                  example = [
+                    {
+                      condition = "state";
+                      entity_id = "binary_sensor.ncase_m1_active";
+                      state = "on";
+                    }
+                  ];
+                  description = ''
+                    Conditions for room presence that signifies lights should be
+                    turned on
+                  '';
+                };
+
+                noPresenceConditions = mkOption {
+                  type = with types; listOf attrs;
+                  example = [
+                    {
+                      condition = "state";
+                      entity_id = "binary_sensor.ncase_m1_active";
+                      state = "off";
+                    }
+                  ];
+                  description = ''
+                    Conditions for no room presence that signifies lights should
+                    be turned off
+                  '';
+                };
               };
 
-              noPresenceConditions = mkOption {
-                type = with types; listOf attrs;
-                example = [
+              lovelaceCards = mkOption {
+                type = with types; functionTo (listOf attrs);
+                readOnly = true;
+                default =
+                  let
+                    inherit (config) adaptiveLighting roomId wakeUpLights;
+                    inherit (adaptiveLighting) sleepMode;
+                  in
                   {
-                    condition = "state";
-                    entity_id = "binary_sensor.ncase_m1_active";
-                    state = "off";
+                    individualLights ? [ ],
+                    floorPlanLights ? null,
+                  }:
+                  [
+                    {
+                      type = "button";
+                      name = "Toggle";
+                      entity = "light.${roomId}_lights";
+                      tap_action.action = "toggle";
+                      layout_options = {
+                        grid_columns = 1;
+                        grid_rows = 3;
+                      };
+                    }
+                    {
+                      type = "tile";
+                      entity = "light.${roomId}_lights";
+                      name = "All Lights";
+                      layout_options = {
+                        grid_columns = 3;
+                        grid_rows = 3;
+                      };
+                      features = [
+                        { type = "light-brightness"; }
+                        { type = "light-color-temp"; }
+                      ];
+                    }
+                  ]
+                  ++ (
+                    if (floorPlanLights != null) then
+                      singleton {
+                        camera_image = "camera.${roomId}_floorplan";
+                        type = "picture-elements";
+                        elements = floorPlanLights;
+                      }
+                    else
+                      (map (l: {
+                        type = "tile";
+                        entity = "light.${l}";
+                        visibility = singleton {
+                          condition = "state";
+                          entity = "light.${l}";
+                          state_not = "unavailable";
+                        };
+                      }) individualLights)
+                  )
+                  ++ optionals adaptiveLighting.enable [
+                    {
+                      name = "Adaptive Lighting";
+                      type = "tile";
+                      entity = "switch.adaptive_lighting_${roomId}";
+                      layout_options = {
+                        grid_columns = 4;
+                        grid_rows = 1;
+                      };
+                    }
+                    {
+                      name = "Adapt Brightness";
+                      type = "tile";
+                      entity = "switch.adaptive_lighting_adapt_brightness_${roomId}";
+                      visibility = singleton {
+                        condition = "state";
+                        entity = "switch.adaptive_lighting_${roomId}";
+                        state = "on";
+                      };
+                    }
+                    {
+                      name = "Adapt Colour";
+                      type = "tile";
+                      entity = "switch.adaptive_lighting_adapt_color_${roomId}";
+                      visibility = singleton {
+                        condition = "state";
+                        entity = "switch.adaptive_lighting_${roomId}";
+                        state = "on";
+                      };
+                    }
+                  ]
+                  ++ optional (adaptiveLighting.enable && (!sleepMode.automate)) {
+                    name = "Sleep Mode";
+                    type = "tile";
+                    entity = "switch.adaptive_lighting_sleep_mode_${roomId}";
+                    layout_options = {
+                      grid_columns = 4;
+                      grid_rows = 1;
+                    };
                   }
-                ];
-                description = ''
-                  Conditions for no room presence that signifies lights should
-                  be turned off
-                '';
+                  ++ optionals wakeUpLights.enable (
+                    [
+                      {
+                        name = "Wake Up Lights";
+                        type = "tile";
+                        entity = "input_boolean.${roomId}_wake_up_lights";
+                        layout_options = {
+                          grid_columns = if (wakeUpLights.type == "manual") then 4 else 2;
+                          grid_rows = 1;
+                        };
+                      }
+                    ]
+                    ++ optional (wakeUpLights.type == "manual") {
+                      name = "Wake Up Time";
+                      type = "tile";
+                      entity = "input_datetime.${roomId}_wake_up_time";
+                      layout_options = {
+                        grid_columns = 2;
+                        grid_rows = 1;
+                      };
+                    }
+                    ++ [
+                      {
+                        name = "Sleep Duration";
+                        type = "tile";
+                        entity = "input_number.${roomId}_sleep_duration";
+                        layout_options = {
+                          grid_columns = 2;
+                          grid_rows = 1;
+                        };
+                      }
+                    ]
+                  );
               };
             };
-          };
-        }
+          }
+        )
       );
     };
   };
@@ -293,7 +438,6 @@ in
                   cfg'.adaptiveLighting.lights;
               min_brightness = cfg'.adaptiveLighting.minBrightness;
               sleep_brightness = 5;
-              sleep_color_temp = 1000;
               sunrise_time = "07:00:00";
               sunset_time = "22:30:00";
               brightness_mode = "tanh";
@@ -301,6 +445,12 @@ in
               brightness_mode_time_light = 900;
               take_over_control = cfg'.adaptiveLighting.takeOverControl;
               skip_redundant_commands = true;
+              sleep_rgb_or_color_temp =
+                if (cfg'.adaptiveLighting.sleepMode.color == null) then "color_temp" else "rgb_color";
+              sleep_color_temp = mkIf (cfg'.adaptiveLighting.sleepMode.color == null) 1000;
+              sleep_rgb_color = mkIf (
+                cfg'.adaptiveLighting.sleepMode.color != null
+              ) cfg'.adaptiveLighting.sleepMode.color;
             };
           })
 
@@ -621,6 +771,11 @@ in
             adaptiveLighting = {
               enable = true;
               sleepMode.automate = false;
+              sleepMode.color = [
+                255
+                0
+                0
+              ];
             };
           };
 

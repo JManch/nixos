@@ -29,6 +29,22 @@ in
 {
   options.modules.services.hass = {
     smartLightingRooms = mkOption {
+      description = ''
+        List of rooms to configure modular smart lighting functionality for.
+        Also generates  lovelace cards that can be added to the dashboard.
+        Smart lighting features include: (1) adaptive lighting that changes
+        lighting color and brightness to match the sun (in bedrooms, the
+        adaptive lighting schedule is synced with the users wake-up and
+        sleep-time determined from their next phone alarm and desired sleep
+        duration configured in the dashboard), (2) wake-up lighting that
+        automatically turns on the lights 1 hour before wake-up time and
+        gradually increases brightness, (3) automated lighting toggle based on
+        presence in the room and the natural outdoor brightness (inferred from
+        solar power generation), and (4), automated sleep mode that dims the
+        brightness and optionally turns off certain lights when the user's
+        phone is placed on charge around sleep time.
+      '';
+      default = [ ];
       type = types.attrsOf (
         types.submodule (
           { config, ... }:

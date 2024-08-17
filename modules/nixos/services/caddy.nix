@@ -192,7 +192,7 @@ mkMerge [
       enabled = true;
 
       settings = {
-        ignoreip = concatStringsSep " " cfg.trustedAddresses;
+        ignoreip = concatStringsSep " " (cfg.trustedAddresses ++ cfg.extraFail2banTrustedAddresses);
         logpath = "/var/log/caddy/access-*.log";
         port = "http,https";
         backend = "auto";

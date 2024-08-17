@@ -250,6 +250,15 @@ in
         '';
       };
 
+      extraFail2banTrustedAddresses = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          Caddy fail2ban filter addresses to trust in addition to trusted
+          addresses. Does not affect virtual host access.
+        '';
+      };
+
       goAccessExcludeIPRanges = mkOption {
         type = types.listOf types.str;
         default = [ ];

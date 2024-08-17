@@ -1058,9 +1058,9 @@ let
               "${person}_spot_ceiling_1"
               "${person}_spot_ceiling_2"
               "${person}_spot_ceiling_3"
-              # "${person}_play_desk_1")
-              # "${person}_play_desk_2")
-              # "${person}_strip_desk_1")
+              "${person}_play_desk_1"
+              "${person}_play_desk_2"
+              "${person}_strip_bed"
             ];
           };
         }

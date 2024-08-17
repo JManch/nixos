@@ -408,31 +408,32 @@ in
           })
 
           (mkIf cfg'.adaptiveLighting.enable {
-            adaptive_lighting =
-              singleton {
-                name = "${formattedRoomName} ";
-                lights =
-                  if cfg'.adaptiveLighting.lights == null then
-                    [ "light.${cfg'.roomId}_lights" ]
-                  else
-                    cfg'.adaptiveLighting.lights;
-                min_brightness = cfg'.adaptiveLighting.minBrightness;
-                sleep_brightness = 5;
-                sunrise_time = "07:00:00";
-                sunset_time = "22:30:00";
-                brightness_mode = "tanh";
-                brightness_mode_time_dark = 3600;
-                brightness_mode_time_light = 900;
-                take_over_control = cfg'.adaptiveLighting.takeOverControl;
-                skip_redundant_commands = true;
-                sleep_rgb_or_color_temp =
-                  if (cfg'.adaptiveLighting.sleepMode.color == null) then "color_temp" else "rgb_color";
-                sleep_color_temp = mkIf (cfg'.adaptiveLighting.sleepMode.color == null) 1000;
-                sleep_rgb_color = mkIf (
-                  cfg'.adaptiveLighting.sleepMode.color != null
-                ) cfg'.adaptiveLighting.sleepMode.color;
-              }
-              ++ optional (cfg'.adaptiveLighting.sleepMode.disabledLights != [ ]) {
+            adaptive_lighting = singleton {
+              name = "${formattedRoomName} ";
+              lights =
+                if cfg'.adaptiveLighting.lights == null then
+                  [ "light.${cfg'.roomId}_lights" ]
+                else
+                  cfg'.adaptiveLighting.lights;
+              min_brightness = cfg'.adaptiveLighting.minBrightness;
+              sleep_brightness = 5;
+              sunrise_time = "07:00:00";
+              sunset_time = "22:30:00";
+              brightness_mode = "tanh";
+              brightness_mode_time_dark = 3600;
+              brightness_mode_time_light = 900;
+              take_over_control = cfg'.adaptiveLighting.takeOverControl;
+              skip_redundant_commands = true;
+              sleep_rgb_or_color_temp =
+                if (cfg'.adaptiveLighting.sleepMode.color == null) then "color_temp" else "rgb_color";
+              sleep_color_temp = mkIf (cfg'.adaptiveLighting.sleepMode.color == null) 1000;
+              sleep_rgb_color = mkIf (
+                cfg'.adaptiveLighting.sleepMode.color != null
+              ) cfg'.adaptiveLighting.sleepMode.color;
+            };
+
+            automation =
+              optional (cfg'.adaptiveLighting.sleepMode.disabledLights != [ ]) {
                 alias = "${formattedRoomName} Sleep Mode Lights Toggle";
                 mode = "single";
                 trigger = [

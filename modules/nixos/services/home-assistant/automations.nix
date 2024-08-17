@@ -135,7 +135,7 @@ let
               ];
             };
           action = singleton {
-            service = "climate.set_hvac_mode";
+            action = "climate.set_hvac_mode";
             metadata = { };
             data = {
               hvac_mode = if enable then "heat" else "off";
@@ -162,7 +162,7 @@ let
       for.minutes = 1;
     };
     action = singleton {
-      service = "notify.mobile_app_${devices.joshua.name}";
+      action = "notify.mobile_app_${devices.joshua.name}";
       data = {
         title = "Dehumidifier";
         message = "Tank full";
@@ -188,7 +188,7 @@ let
           state = "on";
         };
         action = singleton {
-          service = "switch.turn_${if enable then "on" else "off"}";
+          action = "switch.turn_${if enable then "on" else "off"}";
           target.entity_id = "switch.joshua_dehumidifier";
         };
       })
@@ -209,7 +209,7 @@ let
       value_template = "{{ is_state_attr('sensor.bin_collection_types', 'daysTo', 1) }}";
     };
     action = singleton {
-      service = "notify.adult_notify_devices";
+      action = "notify.adult_notify_devices";
       data = {
         title = "Bin Collection Tomorrow";
         message = "{{ states('sensor.bin_collection_types') }}";
@@ -232,7 +232,7 @@ let
       before = "22:00:00";
     };
     action = singleton {
-      service = "notify.mobile_app_${devices.${people.person4}.name}";
+      action = "notify.mobile_app_${devices.${people.person4}.name}";
       data = {
         title = "Washing Machine Finished";
         message = "Take out the damp clothes";
@@ -255,7 +255,7 @@ let
     action =
       let
         mkNotify = person: {
-          service = "notify.mobile_app_${devices.${person}.name}";
+          action = "notify.mobile_app_${devices.${person}.name}";
           data = {
             title = "Formula 1 About to Start";
             message = "{{ state_attr('calendar.formula_1', 'message') }} in 15 mins!";
@@ -275,7 +275,7 @@ let
       for.minutes = 1;
     };
     action = singleton {
-      service = "notify.mobile_app_${devices.joshua.name}";
+      action = "notify.mobile_app_${devices.joshua.name}";
       data = {
         title = "${formattedRoomName data.room} Lights Became Unavailable";
         message = "Turn the switch back on";
@@ -317,18 +317,18 @@ let
             # Button 4: Set lights to max brightness
             [
               (singleton {
-                service = "light.toggle";
+                action = "light.toggle";
                 target.entity_id = "light.${roomId}_lights";
               })
               (singleton (
                 if hasAdaptiveLighting then
                   {
-                    service = "switch.toggle";
+                    action = "switch.toggle";
                     target.entity_id = "switch.adaptive_lighting_${roomId}";
                   }
                 else
                   {
-                    service = "light.turn_on";
+                    action = "light.turn_on";
                     data.brightness_step_pct = 10;
                     data.transition = 2;
                   }
@@ -336,23 +336,23 @@ let
               (singleton (
                 if hasAdaptiveLighting then
                   {
-                    service = "switch.toggle";
+                    action = "switch.toggle";
                     target.entity_id = "switch.adaptive_lighting_sleep_mode_${roomId}";
                   }
                 else
                   {
-                    service = "light.turn_on";
+                    action = "light.turn_on";
                     data.brightness_step_pct = -10;
                     data.transition = 2;
                   }
               ))
               (
                 optional hasAdaptiveLighting {
-                  service = "switch.turn_off";
+                  action = "switch.turn_off";
                   target.entity_id = "switch.adaptive_lighting_${roomId}";
                 }
                 ++ singleton {
-                  service = "light.turn_on";
+                  action = "light.turn_on";
                   target.entity_id = "light.${roomId}_lights";
                   data.brightness_pct = 100;
                   data.kelvin = 6500;
@@ -396,15 +396,15 @@ let
             };
           in
           [
-            (condition "on" { service = "light.turn_on"; })
-            (condition "off" { service = "light.turn_off"; })
+            (condition "on" { action = "light.turn_on"; })
+            (condition "off" { action = "light.turn_off"; })
             (condition "brightness_up" {
-              service = "light.turn_on";
+              action = "light.turn_on";
               data.brightness_step_pct = 10;
               data.transition = 2;
             })
             (condition "brightness_down" {
-              service = "light.turn_on";
+              action = "light.turn_on";
               data.brightness_step_pct = -10;
               data.transition = 2;
             })

@@ -276,27 +276,23 @@ mkIf cfg.enableInternal {
             friendly_name = "Hallway Thermostat Switch";
             value_template = "{{ is_state_attr('climate.hallway_radiator_thermostat', 'hvac_action', 'heating') }}";
 
-            turn_on = [
-              {
-                service = "climate.set_temperature";
-                target.entity_id = "climate.hallway_radiator_thermostat";
-                data = {
-                  temperature = "{{ state_attr('climate.joshua_radiator_thermostat', 'temperature') |float + 2 }}";
-                  hvac_mode = "heat";
-                };
-              }
-            ];
+            turn_on = singleton {
+              action = "climate.set_temperature";
+              target.entity_id = "climate.hallway_radiator_thermostat";
+              data = {
+                temperature = "{{ state_attr('climate.joshua_radiator_thermostat', 'temperature') |float + 2 }}";
+                hvac_mode = "heat";
+              };
+            };
 
-            turn_off = [
-              {
-                service = "climate.set_temperature";
-                target.entity_id = "climate.hallway_radiator_thermostat";
-                data = {
-                  temperature = 5;
-                  hvac_mode = "heat";
-                };
-              }
-            ];
+            turn_off = singleton {
+              action = "climate.set_temperature";
+              target.entity_id = "climate.hallway_radiator_thermostat";
+              data = {
+                temperature = 5;
+                hvac_mode = "heat";
+              };
+            };
           };
         };
       }

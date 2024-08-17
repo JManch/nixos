@@ -325,7 +325,7 @@ in
                   state = "on";
                 };
                 action = singleton {
-                  service = "light.turn_on";
+                  action = "light.turn_on";
                   target.entity_id = "light.${cfg'.roomId}_lights";
                 };
               }
@@ -364,7 +364,7 @@ in
                     } }}";
                   };
                   "then" = {
-                    service = "adaptive_lighting.change_switch_settings";
+                    action = "adaptive_lighting.change_switch_settings";
                     data = {
                       use_defaults = "configuration";
                       entity_id = "switch.adaptive_lighting_${cfg'.roomId}";
@@ -375,7 +375,7 @@ in
                     };
                   };
                   "else" = singleton {
-                    service = "adaptive_lighting.change_switch_settings";
+                    action = "adaptive_lighting.change_switch_settings";
                     data = {
                       entity_id = "switch.adaptive_lighting_${cfg'.roomId}";
                       use_defaults = "configuration";
@@ -464,7 +464,7 @@ in
                           state = "on";
                         };
                         sequence = singleton {
-                          service = "light.turn_off";
+                          action = "light.turn_off";
                           target.entity_id = cfg'.adaptiveLighting.sleepMode.disabledLights;
                         };
                       }
@@ -492,7 +492,7 @@ in
                           ];
                         };
                         sequence = singleton {
-                          service = "light.turn_on";
+                          action = "light.turn_on";
                           target.entity_id = cfg'.adaptiveLighting.sleepMode.disabledLights;
                         };
                       }
@@ -554,7 +554,7 @@ in
                           value_template = "{{ (${wakeUpTimestamp} != 0) and (${timeToWake} <= (${sleepDuration} + 0.5)*61*60) }}";
                         };
                         sequence = singleton {
-                          service = "switch.turn_on";
+                          action = "switch.turn_on";
                           target.entity_id = "switch.adaptive_lighting_sleep_mode_${cfg'.roomId}";
                         };
                       }
@@ -564,7 +564,7 @@ in
                           value_template = "{{ (${wakeUpTimestamp} == 0) or (${timeToWake} > (${sleepDuration} + 0.5)*61*60) }}";
                         };
                         sequence = singleton {
-                          service = "switch.turn_off";
+                          action = "switch.turn_off";
                           target.entity_id = "switch.adaptive_lighting_sleep_mode_${cfg'.roomId}";
                         };
                       }
@@ -615,7 +615,7 @@ in
                       ] ++ cfg'.automatedToggle.presenceConditions;
                     };
                     sequence = singleton {
-                      service = "light.turn_on";
+                      action = "light.turn_on";
                       target.entity_id = "light.${cfg'.roomId}_lights";
                     };
                   }
@@ -650,7 +650,7 @@ in
                     sequence = [
                       { delay.seconds = 30; }
                       {
-                        service = "light.turn_off";
+                        action = "light.turn_off";
                         target.entity_id = "light.${cfg'.roomId}_lights";
                       }
                     ];

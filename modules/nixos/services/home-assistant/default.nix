@@ -125,8 +125,8 @@ in
             src = pkgs.fetchFromGitHub {
               owner = "astrandb";
               repo = "miele";
-              rev = "refs/tags/v2024.8.0";
-              hash = "sha256-aoEFes3crmoI+n5kPHtyaAuefD3hVWwgas8P8j04a48=";
+              rev = "refs/tags/v2024.8.1";
+              hash = "sha256-XwaOQJvosCUXMZYrKX7sMWJIrMx36RhuVYUq163vvNg=";
             };
           })
           (pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs {

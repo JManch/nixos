@@ -126,9 +126,265 @@ let
     title = "Home";
     path = "home";
     type = "sections";
+    badges =
+      [
+        {
+          type = "entity";
+          display_type = "complete";
+          entity = "sensor.ac_on_count";
+          name = "AC Units Running";
+          color = "purple";
+          visibility = singleton {
+            condition = "numeric_state";
+            entity = "sensor.ac_on_count";
+            above = 0;
+          };
+          tap_action = {
+            action = "navigate";
+            navigation_path = "/lovelace/hvac";
+          };
+        }
+        {
+          type = "entity";
+          entity = "switch.lewis_enable_schedule";
+          icon = "mdi:robot-mower";
+          name = "Disabled";
+          state_content = "name";
+          color = "red";
+          visibility = singleton {
+            condition = "state";
+            entity = "switch.lewis_enable_schedule";
+            state = "off";
+          };
+        }
+        {
+          type = "entity";
+          entity = "sensor.lewis_mode";
+          icon = "mdi:robot-mower";
+          color = "green";
+          visibility = singleton {
+            condition = "state";
+            entity = "sensor.lewis_mode";
+            state_not = "home";
+          };
+        }
+        {
+          type = "entity";
+          entity = "sensor.lewis_error";
+          icon = "mdi:robot-mower";
+          color = "red";
+          visibility = singleton {
+            condition = "state";
+            entity = "sensor.lewis_error";
+            state_not = "no_error";
+          };
+        }
+        {
+          type = "entity";
+          entity = "input_boolean.high_alert_surveillance";
+          color = "red";
+          name = "High Alert Enabled";
+          state_content = "name";
+          tap_action = {
+            action = "navigate";
+            navigation_path = "/lovelace/cctv";
+          };
+          visibility = singleton {
+            condition = "state";
+            entity = "input_boolean.high_alert_surveillance";
+            state = "on";
+          };
+        }
+        {
+          type = "entity";
+          entity = "sensor.outdoor_thermal_comfort_heat_index";
+          display_type = "complete";
+          name = "Heat Index";
+          visibility = singleton {
+            condition = "or";
+            conditions = [
+              {
+                condition = "numeric_state";
+                entity = "sensor.outdoor_thermal_comfort_heat_index";
+                below = 5;
+              }
+              {
+                condition = "numeric_state";
+                entity = "sensor.outdoor_thermal_comfort_heat_index";
+                above = 22;
+              }
+            ];
+          };
+        }
+        {
+          type = "entity";
+          entity = "sensor.outdoor_thermal_comfort_frost_risk";
+          display_type = "complete";
+          color = "red";
+          name = "Frost Risk";
+          visibility = singleton {
+            condition = "state";
+            entity = "sensor.outdoor_thermal_comfort_frost_risk";
+            state_not = "no_risk";
+          };
+        }
+        {
+          type = "entity";
+          entity = "sensor.next_bin_collection";
+          color = "light-green";
+          visibility = singleton {
+            condition = "numeric_state";
+            entity = "sensor.days_to_bin_collection";
+            below = 2;
+          };
+          tap_action = {
+            action = "navigate";
+            navigation_path = "/calendar";
+          };
+        }
+        {
+          type = "entity";
+          entity = "sensor.powerwall_battery_percentage";
+          visibility = singleton {
+            condition = "or";
+            conditions = [
+              {
+                condition = "numeric_state";
+                entity = "sensor.powerwall_battery_percentage";
+                above = 95;
+              }
+              {
+                condition = "numeric_state";
+                entity = "sensor.powerwall_battery_percentage";
+                below = 30;
+              }
+            ];
+          };
+        }
+        {
+          type = "entity";
+          entity = "binary_sensor.powerwall_grid_charge_status";
+          name = "Exporting Excess Power";
+          visibility = singleton {
+            condition = "state";
+            entity = "binary_sensor.powerwall_grid_charge_status";
+            state = "on";
+          };
+          color = "purple";
+          state_content = "name";
+        }
+        {
+          type = "entity";
+          entity = "binary_sensor.powerwall_grid_status";
+          visibility = singleton {
+            condition = "state";
+            entity = "binary_sensor.powerwall_grid_status";
+            state_not = "on";
+          };
+        }
+        {
+          type = "entity";
+          entity = "binary_sensor.washing_machine_door";
+          display_type = "complete";
+          name = "Washing Machine Door";
+          visibility = singleton {
+            condition = "and";
+            conditions = [
+              {
+                condition = "state";
+                entity = "binary_sensor.washing_machine_door";
+                state = "off";
+              }
+              {
+                condition = "state";
+                entity = "sensor.washing_machine_status";
+                state_not = "running";
+              }
+            ];
+          };
+          color = "red";
+        }
+        {
+          type = "entity";
+          entity = "sensor.dishwasher_finish_at";
+          display_type = "complete";
+          name = "Dishwasher Finish Time";
+          visibility = [
+            {
+              condition = "state";
+              entity = "binary_sensor.dishwasher_running";
+              state = "on";
+            }
+            {
+              condition = "and";
+              conditions = [
+                {
+                  condition = "state";
+                  entity = "binary_sensor.dishwasher_running";
+                  state = "on";
+                }
+                {
+                  condition = "state";
+                  entity = "sensor.dishwasher_finish_at";
+                  state_not = "unknown";
+                }
+              ];
+            }
+          ];
+        }
+        {
+          type = "entity";
+          entity = "sensor.washing_machine_finish_at";
+          display_type = "complete";
+          name = "Washing Machine Finish Time";
+          visibility = singleton {
+            condition = "state";
+            entity = "binary_sensor.washing_machine_running";
+            state = "on";
+          };
+        }
+      ]
+      ++ (map (data: {
+        type = "entity";
+        display_type = "complete";
+        entity = "light.${data.light}";
+        name =
+          concatMapStringsSep " " (string: utils.upperFirstChar string) (splitString "_" data.room)
+          + " Ceiling Lights";
+        visibility = singleton {
+          condition = "state";
+          entity = "light.${data.light}";
+          state = "unavailable";
+        };
+      }) cfg.ceilingLightRooms);
     sections = [
       {
-        title = "Views";
+        title = "";
+        type = "grid";
+        cards = [
+          {
+            entity = "weather.forecast_home";
+            forecast_type = "daily";
+            type = "weather-forecast";
+          }
+          {
+            graph = "line";
+            type = "sensor";
+            entity = "sensor.outdoor_sensor_temperature";
+            detail = 2;
+            name = "Temperature";
+          }
+          {
+            graph = "line";
+            type = "sensor";
+            entity = "sensor.outdoor_sensor_humidity";
+            detail = 2;
+            name = "Humidity";
+          }
+        ];
+      }
+      {
+        title = "";
         type = "grid";
         cards =
           let
@@ -175,7 +431,7 @@ let
           ];
       }
       {
-        title = "Dynamic";
+        title = "";
         type = "grid";
         cards =
           [
@@ -221,200 +477,6 @@ let
                 state_not = "docked";
               };
             }
-            {
-              type = "tile";
-              entity = "sensor.ac_on_count";
-              name = "AC Units Running";
-              color = "purple";
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-              visibility = singleton {
-                condition = "numeric_state";
-                entity = "sensor.ac_on_count";
-                above = 0;
-              };
-              tap_action = {
-                action = "navigate";
-                navigation_path = "/lovelace/hvac";
-              };
-            }
-          ]
-          ++ (map (data: {
-            type = "tile";
-            entity = "light.${data.light}";
-            name =
-              concatMapStringsSep " " (string: utils.upperFirstChar string) (splitString "_" data.room)
-              + " Ceiling Lights";
-            layout_options = {
-              grid_columns = 4;
-              grid_rows = 1;
-            };
-            visibility = singleton {
-              condition = "state";
-              entity = "light.${data.light}";
-              state = "unavailable";
-            };
-          }) cfg.ceilingLightRooms)
-          ++ (optionals frigate.enable (
-            map (camera: {
-              type = "tile";
-              entity = "binary_sensor.${camera}_person_occupancy";
-              name = "${utils.upperFirstChar camera} Person Occupancy";
-              visibility = singleton {
-                condition = "state";
-                entity = "binary_sensor.${camera}_person_occupancy";
-                state = "on";
-              };
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-            }) cameras
-          ))
-          ++ [
-            {
-              type = "tile";
-              entity = "sensor.next_bin_collection";
-              color = "light-green";
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-              visibility = singleton {
-                condition = "numeric_state";
-                entity = "sensor.days_to_bin_collection";
-                below = 2;
-              };
-              tap_action = {
-                action = "navigate";
-                navigation_path = "/calendar";
-              };
-            }
-            {
-              type = "tile";
-              entity = "binary_sensor.powerwall_grid_status";
-              visibility = singleton {
-                condition = "state";
-                entity = "binary_sensor.powerwall_grid_status";
-                state_not = "on";
-              };
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-            }
-            {
-              type = "tile";
-              entity = "sensor.powerwall_battery_percentage";
-              name = "Powerwall Charge";
-              visibility = singleton {
-                condition = "or";
-                conditions = [
-                  {
-                    condition = "numeric_state";
-                    entity = "sensor.powerwall_battery_percentage";
-                    above = 95;
-                  }
-                  {
-                    condition = "numeric_state";
-                    entity = "sensor.powerwall_battery_percentage";
-                    below = 30;
-                  }
-                ];
-              };
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-            }
-            {
-              type = "tile";
-              entity = "binary_sensor.powerwall_grid_charge_status";
-              name = "Currently Exporting Excess Power";
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-              visibility = singleton {
-                condition = "state";
-                entity = "binary_sensor.powerwall_grid_charge_status";
-                state = "on";
-              };
-              color = "purple";
-              hide_state = true;
-            }
-            {
-              type = "tile";
-              entity = "binary_sensor.washing_machine_door";
-              name = "Washing Machine Door";
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-              visibility = singleton {
-                condition = "and";
-                conditions = [
-                  {
-                    condition = "state";
-                    entity = "binary_sensor.washing_machine_door";
-                    state = "off";
-                  }
-                  {
-                    condition = "state";
-                    entity = "sensor.washing_machine_status";
-                    state_not = "running";
-                  }
-                ];
-              };
-              color = "red";
-            }
-            {
-              type = "tile";
-              entity = "sensor.dishwasher_finish_at";
-              name = "Dishwasher Finish Time";
-              visibility = [
-                {
-                  condition = "state";
-                  entity = "binary_sensor.dishwasher_running";
-                  state = "on";
-                }
-                {
-                  condition = "and";
-                  conditions = [
-                    {
-                      condition = "state";
-                      entity = "binary_sensor.dishwasher_running";
-                      state = "on";
-                    }
-                    {
-                      condition = "state";
-                      entity = "sensor.dishwasher_finish_at";
-                      state_not = "unknown";
-                    }
-                  ];
-                }
-              ];
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-            }
-            {
-              type = "tile";
-              entity = "sensor.washing_machine_finish_at";
-              name = "Washing Machine Finish Time";
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 1;
-              };
-              visibility = singleton {
-                condition = "state";
-                entity = "binary_sensor.washing_machine_running";
-                state = "on";
-              };
-            }
           ]
           ++ (optionals frigate.enable (
             concatMap (camera: [
@@ -449,76 +511,25 @@ let
               }
             ]) cameras
           ))
-          ++ [
-            {
-              type = "custom:formulaone-card";
-              card_type = "countdown";
-              f1_font = true;
-              show_raceinfo = true;
-              countdown_type = [
-                "race"
-                "qualifying"
-                "sprint"
-              ];
-              visibility = singleton {
-                condition = "numeric_state";
-                entity = "sensor.days_to_formula_1_event";
-                below = 2;
-              };
-            }
-          ];
-      }
-      {
-        title = "Weather";
-        type = "grid";
-        cards = [
-          {
-            entity = "weather.forecast_home";
-            forecast_type = "daily";
-            type = "weather-forecast";
-          }
-          {
-            graph = "line";
-            type = "sensor";
-            entity = "sensor.outdoor_sensor_temperature";
-            detail = 2;
-            name = "Temperature";
-          }
-          {
-            graph = "line";
-            type = "sensor";
-            entity = "sensor.outdoor_sensor_humidity";
-            detail = 2;
-            name = "Humidity";
-          }
-          {
-            type = "tile";
-            entity = "sensor.outdoor_thermal_comfort_heat_index";
-            name = "Heat Index";
-            layout_options = {
-              grid_columns = 4;
-              grid_rows = 1;
-            };
-          }
-          {
-            type = "tile";
-            entity = "sensor.outdoor_thermal_comfort_frost_risk";
-            color = "red";
-            name = "Frost Risk";
+          ++ singleton {
+            type = "custom:formulaone-card";
+            card_type = "countdown";
+            f1_font = true;
+            show_raceinfo = true;
+            countdown_type = [
+              "race"
+              "qualifying"
+              "sprint"
+            ];
             visibility = singleton {
-              condition = "state";
-              entity = "sensor.outdoor_thermal_comfort_frost_risk";
-              state_not = "no_risk";
+              condition = "numeric_state";
+              entity = "sensor.days_to_formula_1_event";
+              below = 2;
             };
-            layout_options = {
-              grid_columns = 4;
-              grid_rows = 1;
-            };
-          }
-        ];
+          };
       }
     ];
-    max_columns = 3;
+    max_columns = 2;
     cards = [ ];
   };
 
@@ -1102,7 +1113,6 @@ let
     subview = true;
     sections = acSection "master";
   };
-
 in
 mkIf cfg.enableInternal {
   services.home-assistant = {

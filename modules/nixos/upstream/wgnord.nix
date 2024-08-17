@@ -72,16 +72,21 @@ in
 
       serviceConfig = {
         Type = "oneshot";
-        StateDirectory = "wgnord";
+
         ExecStartPre = [
           "${getExe' pkgs.coreutils "ln"} -fs ${template} /var/lib/wgnord/template.conf"
           "${getExe' pkgs.bash "sh"} -c '${getExe cfg.package} login \"$(<${cfg.tokenFile})\"'"
         ];
         ExecStart = "${getExe cfg.package} connect \"${cfg.country}\"";
         ExecStop = "-${getExe cfg.package} disconnect";
+        RemainAfterExit = "yes";
+
+        StateDirectory = "wgnord";
+        StateDirectoryMode = "0700";
+        ConfigurationDirectory = "wireguard";
+        ConfigurationDirectoryMode = "0700";
         Restart = "on-failure";
         RestartSec = 10;
-        RemainAfterExit = "yes";
       };
     };
   };

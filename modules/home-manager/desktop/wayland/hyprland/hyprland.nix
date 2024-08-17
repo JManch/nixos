@@ -298,7 +298,7 @@ mkIf (utils.isHyprland config) {
       # Only reload if gamemode is not active to avoid overriding
       # gamemode-specific hyprland settings
       reloadScript = "${getExe' pkgs.gamemode "gamemoded"} --status | grep 'is active' -q || ${hyprctl} reload";
-      colors = colorMap // {
+      colorOverrides = {
         base00 = mapDarkColor "base00";
         base01 = mapDarkColor "base01";
         base02 = mapDarkColor "base02";

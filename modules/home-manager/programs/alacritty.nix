@@ -1,13 +1,13 @@
 { lib, config, ... }:
 let
+  inherit (lib) mkIf singleton;
   inherit (config.modules) desktop;
-  inherit (config.modules.colorScheme) colorMap;
   cfg = config.modules.programs.alacritty;
   colors = config.colorScheme.palette;
   normalFontSize = 12;
   largeFontSize = 17;
 in
-lib.mkIf cfg.enable {
+mkIf cfg.enable {
   programs.alacritty = {
     enable = true;
 
@@ -71,11 +71,9 @@ lib.mkIf cfg.enable {
   darkman.switchApps.alacritty = {
     paths = [ "alacritty/alacritty.toml" ];
 
-    colors = colorMap // {
-      baseOpacity = {
-        dark = "opacity = 0.7";
-        light = "opacity = 1";
-      };
+    extraReplacements = singleton {
+      dark = "opacity = 0.7";
+      light = "opacity = 1";
     };
   };
 

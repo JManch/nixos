@@ -9,7 +9,7 @@
 let
   inherit (lib) mkIf getExe';
   inherit (config.modules) desktop;
-  inherit (config.modules.colorScheme) light colorMap;
+  inherit (config.modules.colorScheme) light;
   inherit (osConfig'.device) primaryMonitor;
   cfg = desktop.services.dunst;
   colors = config.colorScheme.palette;
@@ -89,7 +89,7 @@ mkIf (cfg.enable && desktopEnabled) {
     paths = [ "dunst/dunstrc" ];
     reloadScript = "${systemctl} restart --user dunst";
 
-    colors = colorMap // {
+    colorOverrides = {
       base00 = {
         dark = "${colors.base00}b3";
         light = "${light.palette.base00}";

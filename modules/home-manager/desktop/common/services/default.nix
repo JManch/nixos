@@ -2,6 +2,7 @@
   lib,
   pkgs,
   inputs,
+  config,
   ...
 }:
 let
@@ -51,24 +52,80 @@ in
       };
 
       switchApps = mkOption {
-        type = types.attrsOf types.attrs;
-        default = { };
-        example = lib.literalExpression ''
-          {
-            waybar = {
-              paths = [ "waybar/config" "waybar/style.css" ];
-              # Optionally provide a custom color format for subsitutions
-              format = c: "#''${c}";
-              # Optionally override colors
-              colors = config.modules.colorScheme.colorsMap // {
-                base00 = {
-                  dark = colors.base04;
-                  light = colors.base03;
+        type = types.attrsOf (
+          types.submodule {
+            options = {
+              paths = mkOption {
+                type = with types; listOf str;
+                default = [ ];
+                example = [
+                  "waybar/config"
+                  "waybar/style.css"
+                ];
+                description = ''
+                  List of config file paths relative to $XDG_CONFIG_HOME that
+                  contain hex colors we want to switch. Note that the config
+                  file must be generated with xdg.configFile and the path
+                  should match the attribute name used in the xdg.configFile
+                  entry.
+                '';
+              };
+
+              format = mkOption {
+                type = with types; functionTo str;
+                default = c: c;
+                example = c: "#${c}";
+                description = ''
+                  Function to apply a custom color format. For example, if the
+                  configuration file expects colors to be prefixed with #.
+                '';
+              };
+
+              reloadScript = mkOption {
+                type = types.lines;
+                default = "";
+                description = "Bash script to execute when switching colorschemes";
+              };
+
+              colorOverrides = mkOption {
+                type = types.attrs;
+                default = { };
+                example = {
+                  base00 = {
+                    dark = config.modules.colorScheme.dark.palette.base00;
+                    light = config.modules.colorScheme.light.palette.base02;
+                  };
                 };
+                description = ''
+                  Attribute set of base colors with dark and light variants that will
+                  override the default base color map.
+                '';
+              };
+
+              extraReplacements = mkOption {
+                type = with types; listOf attrs;
+                default = [ ];
+                example = [
+                  {
+                    dark = "opacity = 0.7";
+                    light = "opacity = 1";
+                  }
+                ];
+                description = ''
+                  List of additional replacements that are not related to base
+                  colors. Cyclic replacements will not work.
+                '';
               };
             };
           }
-        '';
+        );
+        default = { };
+        example = {
+          waybar.paths = [
+            "waybar/config"
+            "waybar/style.css"
+          ];
+        };
         description = ''
           Attribute set of applications that should have color scheme switching
           applied to them.

@@ -53,4 +53,7 @@ mkIf (cfg.enable && isWayland) {
 
     Install.WantedBy = [ "graphical-session.target" ];
   };
+
+  # wlsunset sometimes doesn't work after DPMS, restarting fixes it
+  modules.desktop.programs.locking.postUnlockScript = "systemctl restart --user wlsunset";
 }

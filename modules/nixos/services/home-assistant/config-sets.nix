@@ -332,56 +332,103 @@ in
               ++ optional cfg'.adaptiveLighting.enable {
                 alias = "${formattedRoomName} Lighting Sun Times";
                 mode = "single";
-                trigger = [
-                  {
-                    platform = "homeassistant";
-                    event = "start";
-                  }
-                  {
-                    platform = "state";
-                    entity_id = [ "sensor.${cfg'.roomDeviceId}_next_alarm" ];
-                    from = null;
-                  }
-                  {
-                    platform = "state";
-                    entity_id = [ "input_datetime.${cfg'.roomId}_wake_up_time" ];
-                    from = null;
-                  }
-                  {
-                    platform = "state";
-                    entity_id = [ "input_number.${cfg'.roomId}_sleep_duration" ];
-                    from = null;
-                  }
-                ];
-                action = singleton {
-                  "if" = singleton {
-                    condition = "template";
-                    value_template = "{{ has_value('input_number.${cfg'.roomId}_sleep_duration') and ${
-                      if (cfg'.wakeUpLights.type == "alarm") then
-                        "has_value('sensor.${cfg'.roomDeviceId}_next_alarm')"
-                      else
-                        "has_value('input_datetime.${cfg'.roomId}_wake_up_time')"
-                    } }}";
+                trigger =
+                  [
+                    {
+                      platform = "homeassistant";
+                      event = "start";
+                    }
+                    {
+                      platform = "state";
+                      entity_id = [ "input_number.${cfg'.roomId}_sleep_duration" ];
+                      from = null;
+                    }
+                  ]
+                  ++ (
+                    if (cfg'.wakeUpLights.type == "manual") then
+                      singleton {
+                        platform = "state";
+                        entity_id = [ "input_datetime.${cfg'.roomId}_wake_up_time" ];
+                        from = null;
+                      }
+                    else
+                      [
+                        {
+                          platform = "state";
+                          entity_id = [ "sensor.${cfg'.roomDeviceId}_next_alarm" ];
+                          from = null;
+                        }
+                        {
+                          platform = "state";
+                          entity_id = [ "sensor.${cfg'.roomDeviceId}_next_alarm" ];
+                          to = "unavailable";
+                          for.minutes = 5;
+                        }
+                      ]
+                  );
+                action =
+                  let
+                    unavailableConditions =
+                      addFor:
+                      singleton {
+                        condition = "state";
+                        entity_id = "input_number.${cfg'.roomId}_sleep_duration";
+                        state = "unavailable";
+                      }
+                      ++ singleton (
+                        if (cfg'.wakeUpLights.type == "alarm") then
+                          {
+                            condition = "state";
+                            entity_id = "sensor.${cfg'.roomDeviceId}_next_alarm";
+                            state = "unavailable";
+                            # Alarm has to be unavailable for 5 minutes for it to be considered unavailable
+                            # and for adaptive lighting to be reset to default. This is because when the
+                            # alarm goes off, it always becomes unavailable for a few seconds and if this
+                            # reset the lights it potentially flashbangs you when waking up.
+                            for = mkIf addFor { minutes = 5; };
+                          }
+                        else
+                          {
+                            condition = "state";
+                            entity_id = "input_datetime.${cfg'.roomId}_wake_up_time";
+                            state = "unavailable";
+                          }
+                      );
+                  in
+                  singleton {
+                    choose = [
+                      {
+                        conditions = singleton {
+                          condition = "not";
+                          conditions = unavailableConditions false;
+                        };
+                        sequence = singleton {
+                          action = "adaptive_lighting.change_switch_settings";
+                          data = {
+                            entity_id = "switch.adaptive_lighting_${cfg'.roomId}";
+                            use_defaults = "current";
+                            sunrise_time = "{{ ${wakeUpTimestamp} | timestamp_custom('%H:%M:%S') }}";
+                            # Set sunset 1.5 hours before sleep time so that lights
+                            # will reach minimum brightness at sleep time
+                            sunset_time = "{{ (${wakeUpTimestamp} - (${sleepDuration} + 1.5)*60*60) | timestamp_custom('%H:%M:%S') }}";
+                          };
+                        };
+                      }
+                      {
+                        conditions = singleton {
+                          condition = "or";
+                          conditions = unavailableConditions true;
+                        };
+                        sequence = singleton {
+                          action = "adaptive_lighting.change_switch_settings";
+                          data = {
+                            entity_id = "switch.adaptive_lighting_${cfg'.roomId}";
+                            use_defaults = "configuration";
+                          };
+                        };
+                      }
+                    ];
                   };
-                  "then" = {
-                    action = "adaptive_lighting.change_switch_settings";
-                    data = {
-                      use_defaults = "configuration";
-                      entity_id = "switch.adaptive_lighting_${cfg'.roomId}";
-                      sunrise_time = "{{ ${wakeUpTimestamp} | timestamp_custom('%H:%M:%S') }}";
-                      # Set sunset 1.5 hours before sleep time so that lights
-                      # will reach minimum brightness at sleep time
-                      sunset_time = "{{ (${wakeUpTimestamp} - (${sleepDuration} + 1.5)*60*60) | timestamp_custom('%H:%M:%S') }}";
-                    };
-                  };
-                  "else" = singleton {
-                    action = "adaptive_lighting.change_switch_settings";
-                    data = {
-                      entity_id = "switch.adaptive_lighting_${cfg'.roomId}";
-                      use_defaults = "configuration";
-                    };
-                  };
-                };
               };
 
             input_boolean."${cfg'.roomId}_wake_up_lights" = {
@@ -528,16 +575,20 @@ in
                       from = null;
                     }
                   ]
-                  ++ optional (cfg'.wakeUpLights.type == "manual") {
-                    platform = "state";
-                    entity_id = [ "input_datetime.${cfg'.roomId}_wake_up_time" ];
-                    from = null;
-                  }
-                  ++ optional (cfg'.wakeUpLights.type == "alarm") {
-                    platform = "state";
-                    entity_id = [ "sensor.${cfg'.roomDeviceId}_next_alarm" ];
-                    from = null;
-                  };
+                  ++ singleton (
+                    if (cfg'.wakeUpLights.type == "manual") then
+                      {
+                        platform = "state";
+                        entity_id = [ "input_datetime.${cfg'.roomId}_wake_up_time" ];
+                        from = null;
+                      }
+                    else
+                      {
+                        platform = "state";
+                        entity_id = [ "sensor.${cfg'.roomDeviceId}_next_alarm" ];
+                        from = null;
+                      }
+                  );
                 condition = singleton {
                   condition = "state";
                   entity_id = "switch.adaptive_lighting_${cfg'.roomId}";

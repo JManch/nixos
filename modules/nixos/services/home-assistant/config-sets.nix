@@ -664,67 +664,71 @@ in
                 entity_id = "sensor.${cfg'.roomDeviceId}_sleep_confidence";
                 below = 90;
               };
-              action = singleton {
-                choose = [
-                  {
-                    conditions = singleton {
-                      condition = "and";
-                      conditions = [
-                        {
-                          condition = "numeric_state";
-                          entity_id = "sensor.smoothed_solar_power";
-                          below = 2;
-                        }
-                        {
-                          condition = "state";
-                          entity_id = "light.${cfg'.roomId}_lights";
-                          state = "off";
-                        }
-                      ] ++ cfg'.automatedToggle.presenceConditions;
-                    };
-                    sequence = singleton {
-                      action = "light.turn_on";
-                      target.entity_id = "light.${cfg'.roomId}_lights";
-                    };
-                  }
-                  {
-                    conditions = singleton {
-                      condition = "and";
-                      conditions = [
-                        {
-                          condition = "or";
-                          conditions = [
-                            {
-                              condition = "numeric_state";
-                              entity_id = "sensor.smoothed_solar_power";
-                              above = 2;
-                            }
-                            {
-                              condition = "not";
-                              conditions = singleton {
-                                condition = "trigger";
-                                id = [ "solar" ];
-                              };
-                            }
-                          ];
-                        }
-                        {
-                          condition = "state";
-                          entity_id = "light.${cfg'.roomId}_lights";
-                          state = "on";
-                        }
-                      ] ++ cfg'.automatedToggle.noPresenceConditions;
-                    };
-                    sequence = [
-                      { delay.seconds = 30; }
-                      {
-                        action = "light.turn_off";
+              action =
+                let
+                  solarCondition = below: {
+                    condition = "numeric_state";
+                    entity_id = "sensor.smoothed_solar_power";
+                    below = mkIf below 2;
+                    above = mkIf (!below) 2;
+                  };
+                in
+                singleton {
+                  choose = [
+                    {
+                      conditions = singleton {
+                        condition = "and";
+                        conditions = [
+                          (solarCondition true)
+                          {
+                            condition = "state";
+                            entity_id = "light.${cfg'.roomId}_lights";
+                            state = "off";
+                          }
+                        ] ++ cfg'.automatedToggle.presenceConditions;
+                      };
+                      sequence = singleton {
+                        action = "light.turn_on";
                         target.entity_id = "light.${cfg'.roomId}_lights";
-                      }
-                    ];
-                  }
-                ];
-              };
+                      };
+                    }
+                    {
+                      conditions = singleton {
+                        condition = "and";
+                        conditions = [
+                          {
+                            condition = "or";
+                            conditions = [
+                              (solarCondition false)
+                              {
+                                condition = "not";
+                                conditions = singleton {
+                                  condition = "trigger";
+                                  id = [ "solar" ];
+                                };
+                              }
+                            ];
+                          }
+                          {
+                            condition = "state";
+                            entity_id = "light.${cfg'.roomId}_lights";
+                            state = "on";
+                          }
+                        ] ++ cfg'.automatedToggle.noPresenceConditions;
+                      };
+                      sequence =
+                        [
+                          { delay.seconds = 30; }
+                          (solarCondition false)
+                        ]
+                        ++ cfg'.automatedToggle.noPresenceConditions
+                        ++ singleton {
+                          action = "light.turn_off";
+                          target.entity_id = "light.${cfg'.roomId}_lights";
+                        };
+                    }
+                  ];
+                };
             };
           })
         ]

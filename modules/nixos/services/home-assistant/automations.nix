@@ -283,6 +283,27 @@ let
     };
   }) cfg.ceilingLightRooms;
 
+  mowerErrorNotify = singleton {
+    alias = "Automower Error Notify";
+    mode = "single";
+    trigger = singleton {
+      platform = "state";
+      entity_id = [ "sensor.lewis_error" ];
+      from = null;
+    };
+    condition = singleton {
+      condition = "template";
+      value_template = "{{ has_value('sensor.lewis_error') }}";
+    };
+    action = singleton {
+      action = "notify.adult_notify_devices";
+      data = {
+        title = "Lewis Needs Help!";
+        message = "Error: {{ states('sensor.lewis_error') }}";
+      };
+    };
+  };
+
   hueTapLightSwitch =
     room: deviceId:
     let
@@ -428,6 +449,7 @@ mkIf cfg.enableInternal {
       # ++ (hueLightSwitch "joshua_room" "ad126eeb4153cd333afe86a9553c06ef")
       ++ (hueTapLightSwitch "${people.person2}Room" "670ac1ecf423f069757c7ab30bec3142")
       ++ (hueTapLightSwitch "${people.person3}Room" "0097121e144203512aeacef37a03650c")
+      ++ mowerErrorNotify
       ++ optionals frigate.enable (frigateEntranceNotify ++ frigateCatNotify ++ frigateHighAlertNotify);
 
     input_datetime = {

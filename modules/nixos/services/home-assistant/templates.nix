@@ -1,3 +1,4 @@
+# https://jinja.palletsprojects.com/en/3.1.x/templates/
 { lib, config, ... }:
 let
   inherit (lib)
@@ -82,6 +83,12 @@ mkIf cfg.enableInternal {
             icon = "mdi:home-battery";
             state = "{{ ((states('sensor.powerwall_gateway_battery_remaining') | float(0) / states('sensor.powerwall_gateway_battery_capacity') | float(1)) * 100) | int }}";
             unit_of_measurement = "%";
+          }
+          {
+            name = "Powerwall Site Export Power";
+            icon = "mdi:home-export-outline";
+            state = "{{ [states('sensor.powerwall_site_power') | float(0) * -1, 0] | max }}";
+            unit_of_measurement = "kW";
           }
           {
             name = "Lights On Count";

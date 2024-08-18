@@ -132,7 +132,7 @@ let
           type = "entity";
           display_type = "complete";
           entity = "sensor.ac_on_count";
-          name = "AC Units Running";
+          name = "HVAC Running";
           color = "purple";
           visibility = singleton {
             condition = "numeric_state";
@@ -263,15 +263,15 @@ let
         }
         {
           type = "entity";
-          entity = "binary_sensor.powerwall_grid_charge_status";
-          name = "Exporting Excess Power";
+          entity = "sensor.powerwall_site_export_power";
+          display_type = "complete";
+          name = "Exporting Power";
           visibility = singleton {
             condition = "state";
             entity = "binary_sensor.powerwall_grid_charge_status";
             state = "on";
           };
           color = "purple";
-          state_content = "name";
         }
         {
           type = "entity";
@@ -308,7 +308,7 @@ let
           type = "entity";
           entity = "sensor.dishwasher_finish_at";
           display_type = "complete";
-          name = "Dishwasher Finish Time";
+          name = "Dishwasher Finish";
           visibility = [
             {
               condition = "state";
@@ -336,7 +336,7 @@ let
           type = "entity";
           entity = "sensor.washing_machine_finish_at";
           display_type = "complete";
-          name = "Washing Machine Finish Time";
+          name = "Washing Machine Finish";
           visibility = singleton {
             condition = "state";
             entity = "binary_sensor.washing_machine_running";
@@ -351,6 +351,7 @@ let
         name =
           concatMapStringsSep " " (string: utils.upperFirstChar string) (splitString "_" data.room)
           + " Ceiling Lights";
+        icon = "mdi:lightbulb-alert";
         visibility = singleton {
           condition = "state";
           entity = "light.${data.light}";
@@ -367,20 +368,21 @@ let
             forecast_type = "daily";
             type = "weather-forecast";
           }
-          {
-            graph = "line";
-            type = "sensor";
-            entity = "sensor.outdoor_sensor_temperature";
-            detail = 2;
-            name = "Temperature";
-          }
-          {
-            graph = "line";
-            type = "sensor";
-            entity = "sensor.outdoor_sensor_humidity";
-            detail = 2;
-            name = "Humidity";
-          }
+          # TODO: Move these to garden view
+          # {
+          #   graph = "line";
+          #   type = "sensor";
+          #   entity = "sensor.outdoor_sensor_temperature";
+          #   detail = 2;
+          #   name = "Temperature";
+          # }
+          # {
+          #   graph = "line";
+          #   type = "sensor";
+          #   entity = "sensor.outdoor_sensor_humidity";
+          #   detail = 2;
+          #   name = "Humidity";
+          # }
         ];
       }
       {

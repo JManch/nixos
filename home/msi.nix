@@ -5,6 +5,7 @@
     spotify
     discord
     chromium
+    netflix
   ];
 
   modules = {

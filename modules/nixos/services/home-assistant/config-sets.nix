@@ -330,6 +330,7 @@ in
             automation =
               singleton {
                 alias = "${formattedRoomName} Wake Up Lights";
+                trace.stored_traces = 5;
                 mode = "single";
                 trigger = singleton {
                   platform = "template";
@@ -347,6 +348,7 @@ in
               }
               ++ optional cfg'.adaptiveLighting.enable {
                 alias = "${formattedRoomName} Lighting Sun Times";
+                trace.stored_traces = 5;
                 mode = "single";
                 trigger =
                   [
@@ -498,6 +500,7 @@ in
             automation =
               optional (cfg'.adaptiveLighting.sleepMode.disabledLights != [ ]) {
                 alias = "${formattedRoomName} Sleep Mode Lights Toggle";
+                trace.stored_traces = 5;
                 mode = "single";
                 trigger = [
                   {
@@ -566,6 +569,7 @@ in
               }
               ++ optional (cfg'.adaptiveLighting.sleepMode.automate && cfg'.wakeUpLights.enable) {
                 alias = "${formattedRoomName} Sleep Mode Toggle";
+                trace.stored_traces = 5;
                 mode = "single";
                 trigger =
                   [
@@ -619,7 +623,7 @@ in
                       {
                         conditions = singleton {
                           condition = "template";
-                          value_template = "{{ (${wakeUpTimestamp} != 0) and (${timeToWake} <= (${sleepDuration} + 0.5)*61*60) }}";
+                          value_template = "{{ (${wakeUpTimestamp} != 0) and (${timeToWake} <= ((${sleepDuration} + 0.5)*60*60) + 60) and (${timeToWake} > 61*60) }}";
                         };
                         sequence = singleton {
                           action = "switch.turn_on";
@@ -629,7 +633,7 @@ in
                       {
                         conditions = singleton {
                           condition = "template";
-                          value_template = "{{ (${wakeUpTimestamp} == 0) or (${timeToWake} > (${sleepDuration} + 0.5)*61*60) }}";
+                          value_template = "{{ (${wakeUpTimestamp} == 0) or (${timeToWake} > ((${sleepDuration} + 0.5)*60*60) + 60) or (${timeToWake} <= 61*60) }}";
                         };
                         sequence = singleton {
                           action = "switch.turn_off";
@@ -644,6 +648,7 @@ in
           (mkIf cfg'.automatedToggle.enable {
             automation = singleton {
               alias = "${formattedRoomName} Lights Toggle";
+              trace.stored_traces = 5;
               mode = "single";
               trigger = [
                 {

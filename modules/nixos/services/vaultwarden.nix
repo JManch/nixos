@@ -15,13 +15,12 @@ let
     mkVMOverride
     optional
     utils
-    nameValuePair
     mkMerge
     ;
   inherit (config.modules.system.virtualisation) vmVariant;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (caddy) allowAddresses trustedAddresses;
-  inherit (config.modules.services) caddy;
+  inherit (config.modules.services) caddy fail2ban;
   inherit (config.age.secrets)
     rcloneConfig
     vaultwardenVars
@@ -104,6 +103,8 @@ mkIf cfg.enable {
   assertions = utils.asserts [
     caddy.enable
     "Vaultwarden requires Caddy to be enabled"
+    fail2ban.enable
+    "Vaultwarden requires Fail2ban to be enabled"
   ];
 
   services.vaultwarden = {

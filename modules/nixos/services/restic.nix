@@ -279,7 +279,9 @@ mkMerge [
     services.restic.backups =
       let
         backupDefaults = name: {
-          initialize = true;
+          # We use our own initialization script because upstream uses `restic
+          # cat` without `--no-lock`
+          initialize = false;
           repositoryFile = resticRepositoryFile.path;
           passwordFile = resticPasswordFile.path;
           timerConfig = backupTimerConfig;
@@ -314,6 +316,7 @@ mkMerge [
 
             preStart = mkBefore ''
               ${value.preBackupScript}
+              ${resticExe} cat config --no-cache --no-lock > /dev/null || ${resticExe} init
             '';
 
             postStop = mkAfter ''

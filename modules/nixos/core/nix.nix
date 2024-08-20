@@ -190,6 +190,8 @@ in
     in
     {
       channel.enable = false;
+      daemonIOSchedClass = mkIf (!cfg.builder) "idle";
+      daemonCPUSchedPolicy = mkIf (!cfg.builder) "idle";
 
       # Populates the nix registry with all our flake inputs `nix registry list`
       # Enables referencing flakes with short name in nix commands 

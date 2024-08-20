@@ -62,7 +62,10 @@
   };
 
   modules = {
-    core.homeManager.enable = true;
+    core = {
+      homeManager.enable = true;
+      builder = true;
+    };
 
     hardware = {
       secureBoot.enable = true;

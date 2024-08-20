@@ -36,6 +36,12 @@ in
     homeManager.enable = mkEnableOption "Home Manager";
     autoUpgrade = mkEnableOption "auto upgrade";
 
+    builder = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether this host is a high-performance nix builder";
+    };
+
     username = mkOption {
       type = types.str;
       readOnly = true;

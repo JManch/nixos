@@ -252,7 +252,8 @@ in
       };
 
       # Many configuration changes can be reloaded in the UI rather than having
-      # to fully restart home assistant
+      # to fully restart home assistant. Lovelace config can be reloaded by
+      # pressing "refresh" in the top right of the dashboard.
       reloadTriggers = mkForce [ ];
     };
 

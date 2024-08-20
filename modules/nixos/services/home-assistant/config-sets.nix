@@ -679,28 +679,34 @@ in
                   };
                 in
                 singleton {
-                  choose = [
+                  "if" = singleton {
+                    condition = "and";
+                    conditions = [
+                      {
+                        condition = "state";
+                        entity_id = "light.${cfg'.roomId}_lights";
+                        state = "off";
+                      }
+                      (solarCondition true)
+                    ] ++ cfg'.automatedToggle.presenceConditions;
+                  };
+                  "then" = singleton {
+                    action = "light.turn_on";
+                    target.entity_id = "light.${cfg'.roomId}_lights";
+                  };
+                  "else" = [
+                    # It's important to delay before checking conditions as
+                    # state can change during the delay
+                    { delay.seconds = 30; }
                     {
-                      conditions = singleton {
+                      "if" = singleton {
                         condition = "and";
                         conditions = [
-                          (solarCondition true)
                           {
                             condition = "state";
                             entity_id = "light.${cfg'.roomId}_lights";
-                            state = "off";
+                            state = "on";
                           }
-                        ] ++ cfg'.automatedToggle.presenceConditions;
-                      };
-                      sequence = singleton {
-                        action = "light.turn_on";
-                        target.entity_id = "light.${cfg'.roomId}_lights";
-                      };
-                    }
-                    {
-                      conditions = singleton {
-                        condition = "and";
-                        conditions = [
                           {
                             condition = "or";
                             conditions = [
@@ -714,23 +720,12 @@ in
                               }
                             ];
                           }
-                          {
-                            condition = "state";
-                            entity_id = "light.${cfg'.roomId}_lights";
-                            state = "on";
-                          }
                         ] ++ cfg'.automatedToggle.noPresenceConditions;
                       };
-                      sequence =
-                        [
-                          { delay.seconds = 30; }
-                          (solarCondition false)
-                        ]
-                        ++ cfg'.automatedToggle.noPresenceConditions
-                        ++ singleton {
-                          action = "light.turn_off";
-                          target.entity_id = "light.${cfg'.roomId}_lights";
-                        };
+                      "then" = singleton {
+                        action = "light.turn_off";
+                        target.entity_id = "light.${cfg'.roomId}_lights";
+                      };
                     }
                   ];
                 };

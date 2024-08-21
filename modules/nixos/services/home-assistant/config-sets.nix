@@ -322,6 +322,18 @@ in
         path = "announcements";
         type = "sections";
         max_columns = 2;
+        badges = singleton {
+          name = "Cooldown";
+          display_type = "complete";
+          type = "entity";
+          entity = "timer.announcement_cooldown";
+          color = "red";
+          visibility = singleton {
+            condition = "state";
+            entity = "timer.announcement_cooldown";
+            state = "active";
+          };
+        };
         sections = [
           {
             title = "Controls";
@@ -351,6 +363,7 @@ in
                 type = "tile";
                 entity = "input_boolean.${person}_announcement_enable";
                 name = utils.upperFirstChar person;
+                tap_action.action = "toggle";
               }) peopleList);
           }
           {
@@ -761,7 +774,7 @@ in
             automation = singleton {
               alias = "${formattedRoomName} Lights Toggle";
               trace.stored_traces = 5;
-              mode = "single";
+              mode = "queued";
               trigger = [
                 {
                   platform = "numeric_state";
@@ -809,7 +822,7 @@ in
                   "else" = [
                     # It's important to delay before checking conditions as
                     # state can change during the delay
-                    { delay.minutes = 2; }
+                    { delay.seconds = 30; }
                     {
                       "if" = singleton {
                         condition = "and";
@@ -849,98 +862,128 @@ in
         script.send_announcement = {
           alias = "Send Announcement";
           sequence = singleton {
-            parallel = map (
-              person:
-              let
-                device = devices.${person};
-              in
-              {
-                sequence = [
-                  {
-                    action = "input_text.set_value";
-                    target.entity_id = "input_text.${person}_announcement_response";
-                    data.value = "No response";
-                  }
-                  {
-                    condition = "template";
-                    # Allow self-triggering announcements ourselves for debugging
-                    value_template = "{{ context.user_id == ${userIds."joshua"} or context.user_id != '${userIds.${person}}' }}";
-                  }
-                  {
-                    condition = "state";
-                    entity_id = "input_boolean.${person}_announcement_enable";
-                    state = "on";
-                  }
-                  {
-                    action = "notify.mobile_app_${device.name}";
-                    data = {
-                      # title = "Household Announcement";
-                      title = "{{ states('input_text.announcement_message') }}";
-                      message = "Choose a reply option";
-                      data.actions = [
-                        {
-                          action = "COMING";
-                          title = "I'm coming";
-                        }
-                        {
-                          action = "DELAYED";
-                          title = "I'll be delayed";
-                        }
-                        {
-                          action = "REPLY";
-                          title = "Custom reply";
-                        }
-                      ];
+            parallel =
+              (map (
+                person:
+                let
+                  device = devices.${person};
+                in
+                {
+                  sequence =
+                    [
+                      {
+                        action = "input_text.set_value";
+                        target.entity_id = "input_text.${person}_announcement_response";
+                        data.value = "No response";
+                      }
+                      {
+                        condition = "template";
+                        # Allow self-triggering announcements ourselves for debugging
+                        value_template = "{{ context.user_id == '${userIds."joshua"}' or context.user_id != '${userIds.${person}}' }}";
+                      }
+                      {
+                        condition = "state";
+                        entity_id = "input_boolean.${person}_announcement_enable";
+                        state = "on";
+                      }
+                      {
+                        action = "notify.mobile_app_${device.name}";
+                        data = {
+                          # title = "Household Announcement";
+                          title = "{{ states('input_text.announcement_message') }}";
+                          message = "Choose a reply option";
+                          data = {
+                            # ios only (not sure if this actually works)
+                            url = "homeassistant://call_service/input_text.set_value?entity_id=input_text.${person}_announcement_response&value=I%27m%20coming";
+                            activationMode = "background";
+                            sticky = true; # android only
+                            tag = "announcement"; # android only
+                            actions = [
+                              {
+                                action = "COMING";
+                                title = "I'm coming";
+                              }
+                              {
+                                action = "DELAYED";
+                                title = "I'll be delayed";
+                              }
+                              {
+                                action = "REPLY";
+                                title = "Custom reply";
+                              }
+                            ];
+                          };
+                        };
+                      }
+                      {
+                        action = "input_text.set_value";
+                        target.entity_id = "input_text.${person}_announcement_response";
+                        data.value = "Awaiting response";
+                      }
+                      {
+                        wait_for_trigger = [
+                          {
+                            platform = "event";
+                            event_type = "mobile_app_notification_action";
+                            event_data.action = "COMING";
+                            context.user_id = [ userIds.${person} ];
+                          }
+                          {
+                            platform = "event";
+                            event_type = "mobile_app_notification_action";
+                            event_data.action = "DELAYED";
+                            context.user_id = [ userIds.${person} ];
+                          }
+                          {
+                            platform = "event";
+                            event_type = "mobile_app_notification_action";
+                            event_data.action = "REPLY";
+                            context.user_id = [ userIds.${person} ];
+                          }
+                        ];
+                        timeout.seconds = 60;
+                      }
+                      {
+                        action = "input_text.set_value";
+                        target.entity_id = "input_text.${person}_announcement_response";
+                        data.value = ''
+                          {% if wait.trigger == none %}
+                            No response
+                          {% else %}
+                            {% if wait.trigger.event.data.action == 'COMING' %}
+                              I'm coming
+                            {% elif wait.trigger.event.data.action == 'DELAYED' %}
+                              I'll be delayed
+                            {% else %}
+                              {{ wait.trigger.event.data.reply_text }}
+                            {% endif %}
+                          {% endif %}
+                        '';
+                      }
+                      {
+                        condition = "template";
+                        value_template = "{{ wait.trigger != none }}";
+                      }
+                    ]
+                    ++ optional (!(lib.hasInfix "iphone" device.name)) {
+                      action = "notify.mobile_app_${device.name}";
+                      data = {
+                        message = "clear_notification";
+                        data.tag = "announcement";
+                      };
                     };
-                  }
+                }
+              ) peopleList)
+              ++ singleton {
+                sequence = [
+                  { delay.seconds = 1; }
                   {
-                    action = "input_text.set_value";
-                    target.entity_id = "input_text.${person}_announcement_response";
-                    data.value = "Awaiting response";
-                  }
-                  {
-                    wait_for_trigger = [
-                      {
-                        platform = "event";
-                        event_type = "mobile_app_notification_action";
-                        event_data.action = "COMING";
-                        context.user_id = [ userIds.${person} ];
-                      }
-                      {
-                        platform = "event";
-                        event_type = "mobile_app_notification_action";
-                        event_data.action = "DELAYED";
-                        context.user_id = [ userIds.${person} ];
-                      }
-                      {
-                        platform = "event";
-                        event_type = "mobile_app_notification_action";
-                        event_data.action = "REPLY";
-                        context.user_id = [ userIds.${person} ];
-                      }
-                    ];
-                    timeout.minutes = 1;
-                  }
-                  {
-                    action = "input_text.set_value";
-                    target.entity_id = "input_text.${person}_announcement_response";
-                    data.value = ''
-                      {% if wait.trigger == none %}
-                        No response
-                      {% else %}
-                        {% if wait.trigger.event.data.action == 'COMING' %}
-                          I'm coming
-                        {% elif wait.trigger.event.data.action == 'DELAYED' %}
-                          I'll be delayed
-                        {% else %}
-                          {{ wait.trigger.event.data.reply_text }}
-                        {% endif %}
-                      {% endif %}
-                    '';
+                    action = "timer.start";
+                    target.entity_id = "timer.announcement_cooldown";
+                    data.duration = 60;
                   }
                 ];
-              }
-            ) peopleList;
+              };
           };
         };
 
@@ -948,6 +991,8 @@ in
           name = "Announcement Message";
           initial = "Dinner is ready";
         };
+
+        timer.announcement_cooldown.name = "Announcement Cooldown";
       }
       ++ (map (person: {
         input_text."${person}_announcement_response" = {

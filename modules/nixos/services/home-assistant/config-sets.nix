@@ -18,11 +18,17 @@ let
     attrValues
     mkMerge
     concatMapStringsSep
+    concatMap
     utils
     splitString
     mkEnableOption
     ;
-  inherit (secrets.general) people devices;
+  inherit (secrets.general)
+    people
+    devices
+    userIds
+    peopleList
+    ;
   cfg = config.modules.services.hass;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 in
@@ -306,11 +312,117 @@ in
         )
       );
     };
+
+    homeAnnouncements.lovelaceView = mkOption {
+      type = types.attrs;
+      description = "Lovelace view for home announcements";
+      readOnly = true;
+      default = {
+        title = "Announcements";
+        path = "announcements";
+        type = "sections";
+        max_columns = 2;
+        sections = [
+          {
+            title = "Controls";
+            type = "grid";
+            cards =
+              [
+                {
+                  name = "Send Announcement";
+                  type = "button";
+                  icon = "mdi:bell";
+                  tap_action = {
+                    action = "perform-action";
+                    perform_action = "script.send_announcement";
+                  };
+                  layout_options = {
+                    grid_columns = 2;
+                    grid_rows = 2;
+                  };
+                }
+                {
+                  type = "entity";
+                  name = "Message";
+                  entity = "input_text.announcement_message";
+                }
+              ]
+              ++ (map (person: {
+                type = "tile";
+                entity = "input_boolean.${person}_announcement_enable";
+                name = utils.upperFirstChar person;
+              }) peopleList);
+          }
+          {
+            title = "Responses";
+            type = "grid";
+            cards = concatMap (
+              person:
+              (
+                (map
+                  (variant: {
+                    type = "tile";
+                    entity = "input_text.${person}_announcement_response";
+                    name = utils.upperFirstChar person;
+                    inherit (variant) color;
+                    visibility = singleton {
+                      condition = "state";
+                      entity = "input_text.${person}_announcement_response";
+                      inherit (variant) state;
+                    };
+                  })
+                  [
+                    {
+                      state = "I'm coming";
+                      color = "green";
+                    }
+                    {
+                      state = "Awaiting response";
+                      color = "amber";
+                    }
+                    {
+                      state = "I'll be delayed";
+                      color = "cyan";
+                    }
+                    {
+                      state = "No response";
+                      color = "red";
+                    }
+                  ]
+                )
+                ++ singleton {
+                  type = "tile";
+                  entity = "input_text.${person}_announcement_response";
+                  name = utils.upperFirstChar person;
+                  color = "blue";
+                  visibility = singleton {
+                    condition = "and";
+                    conditions =
+                      map
+                        (state: {
+                          condition = "state";
+                          entity = "input_text.${person}_announcement_response";
+                          state_not = state;
+                        })
+                        [
+                          "I'm coming"
+                          "Awaiting response"
+                          "I'll be delayed"
+                          "No response"
+                        ];
+                  };
+                }
+              )
+            ) peopleList;
+          }
+        ];
+      };
+    };
   };
 
   config = mkIf cfg.enableInternal {
     services.home-assistant.config = mkMerge (
-      map (
+      (map (
         cfg':
         let
           formattedRoomName = concatMapStringsSep " " (s: utils.upperFirstChar s) (
@@ -697,7 +809,7 @@ in
                   "else" = [
                     # It's important to delay before checking conditions as
                     # state can change during the delay
-                    { delay.seconds = 30; }
+                    { delay.minutes = 2; }
                     {
                       "if" = singleton {
                         condition = "and";
@@ -732,7 +844,123 @@ in
             };
           })
         ]
-      ) (attrValues cfg.smartLightingRooms)
+      ) (attrValues cfg.smartLightingRooms))
+      ++ singleton {
+        script.send_announcement = {
+          alias = "Send Announcement";
+          sequence = singleton {
+            parallel = map (
+              person:
+              let
+                device = devices.${person};
+              in
+              {
+                sequence = [
+                  {
+                    action = "input_text.set_value";
+                    target.entity_id = "input_text.${person}_announcement_response";
+                    data.value = "No response";
+                  }
+                  {
+                    condition = "template";
+                    # Allow self-triggering announcements ourselves for debugging
+                    value_template = "{{ context.user_id == ${userIds."joshua"} or context.user_id != '${userIds.${person}}' }}";
+                  }
+                  {
+                    condition = "state";
+                    entity_id = "input_boolean.${person}_announcement_enable";
+                    state = "on";
+                  }
+                  {
+                    action = "notify.mobile_app_${device.name}";
+                    data = {
+                      # title = "Household Announcement";
+                      title = "{{ states('input_text.announcement_message') }}";
+                      message = "Choose a reply option";
+                      data.actions = [
+                        {
+                          action = "COMING";
+                          title = "I'm coming";
+                        }
+                        {
+                          action = "DELAYED";
+                          title = "I'll be delayed";
+                        }
+                        {
+                          action = "REPLY";
+                          title = "Custom reply";
+                        }
+                      ];
+                    };
+                  }
+                  {
+                    action = "input_text.set_value";
+                    target.entity_id = "input_text.${person}_announcement_response";
+                    data.value = "Awaiting response";
+                  }
+                  {
+                    wait_for_trigger = [
+                      {
+                        platform = "event";
+                        event_type = "mobile_app_notification_action";
+                        event_data.action = "COMING";
+                        context.user_id = [ userIds.${person} ];
+                      }
+                      {
+                        platform = "event";
+                        event_type = "mobile_app_notification_action";
+                        event_data.action = "DELAYED";
+                        context.user_id = [ userIds.${person} ];
+                      }
+                      {
+                        platform = "event";
+                        event_type = "mobile_app_notification_action";
+                        event_data.action = "REPLY";
+                        context.user_id = [ userIds.${person} ];
+                      }
+                    ];
+                    timeout.minutes = 1;
+                  }
+                  {
+                    action = "input_text.set_value";
+                    target.entity_id = "input_text.${person}_announcement_response";
+                    data.value = ''
+                      {% if wait.trigger == none %}
+                        No response
+                      {% else %}
+                        {% if wait.trigger.event.data.action == 'COMING' %}
+                          I'm coming
+                        {% elif wait.trigger.event.data.action == 'DELAYED' %}
+                          I'll be delayed
+                        {% else %}
+                          {{ wait.trigger.event.data.reply_text }}
+                        {% endif %}
+                      {% endif %}
+                    '';
+                  }
+                ];
+              }
+            ) peopleList;
+          };
+        };
+
+        input_text.announcement_message = {
+          name = "Announcement Message";
+          initial = "Dinner is ready";
+        };
+      }
+      ++ (map (person: {
+        input_text."${person}_announcement_response" = {
+          name = "${utils.upperFirstChar person} Announcement Response";
+          icon = "mdi:account";
+          initial = "No response";
+        };
+
+        input_boolean."${person}_announcement_enable" = {
+          name = "${utils.upperFirstChar person} Announcement Enable";
+          icon = "mdi:bell";
+        };
+      }) peopleList)
     );
 
     modules.services.hass = {

@@ -184,11 +184,15 @@ in
           #   cnt DESC;
           #
           exclude = {
-            entities = [ "sun.sun" ] ++ (map (camera: "binary_sensor.${camera}_motion") cameras);
+            entities = [
+              "sun.sun"
+              "input_text.announcement_message"
+            ] ++ (map (camera: "binary_sensor.${camera}_motion") cameras);
             entity_globs = [
               "sensor.sun*"
               "switch.adaptive_lighting_*"
               "image.roborock_s6_maxv_*"
+              "input_text.*_announcement_response"
             ];
           };
         };

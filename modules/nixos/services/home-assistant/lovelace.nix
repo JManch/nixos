@@ -1124,6 +1124,7 @@ mkIf cfg.enableInternal {
       views =
         [
           home
+          cfg.homeAnnouncements.lovelaceView
           energy
         ]
         ++ optional frigate.enable cctv

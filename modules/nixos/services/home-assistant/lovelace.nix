@@ -359,32 +359,32 @@ let
         };
       }) cfg.ceilingLightRooms);
     sections = [
-      {
-        title = "";
-        type = "grid";
-        cards = [
-          {
-            entity = "weather.forecast_home";
-            forecast_type = "daily";
-            type = "weather-forecast";
-          }
-          # TODO: Move these to garden view
-          # {
-          #   graph = "line";
-          #   type = "sensor";
-          #   entity = "sensor.outdoor_sensor_temperature";
-          #   detail = 2;
-          #   name = "Temperature";
-          # }
-          # {
-          #   graph = "line";
-          #   type = "sensor";
-          #   entity = "sensor.outdoor_sensor_humidity";
-          #   detail = 2;
-          #   name = "Humidity";
-          # }
-        ];
-      }
+      # {
+      #   title = "";
+      #   type = "grid";
+      #   cards = [
+      # TODO: Move these to garden view
+      # {
+      #   entity = "weather.forecast_home";
+      #   forecast_type = "daily";
+      #   type = "weather-forecast";
+      # }
+      # {
+      #   graph = "line";
+      #   type = "sensor";
+      #   entity = "sensor.outdoor_sensor_temperature";
+      #   detail = 2;
+      #   name = "Temperature";
+      # }
+      # {
+      #   graph = "line";
+      #   type = "sensor";
+      #   entity = "sensor.outdoor_sensor_humidity";
+      #   detail = 2;
+      #   name = "Humidity";
+      # }
+      #   ];
+      # }
       {
         title = "";
         type = "grid";

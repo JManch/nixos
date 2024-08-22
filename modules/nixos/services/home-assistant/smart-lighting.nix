@@ -417,6 +417,11 @@ in
             enable = true;
             sleepMode = {
               automate = true;
+              color = [
+                255
+                0
+                0
+              ];
               disabledLights = [
                 "light.${person}_spot_ceiling_3"
                 "light.${person}_spot_ceiling_4"

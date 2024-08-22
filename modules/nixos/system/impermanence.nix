@@ -89,17 +89,11 @@ in
           "/var/lib/systemd"
           "/var/lib/nixos"
           "/var/db/sudo/lectured"
-          # Unfortunately it isn't possible to persist individual state folders for
-          # services using DynamicUser=yes. This is because systemd assigns
-          # dynamic UIDs to users of this service so it's impossible to set the
-          # required permissions with impermanence. Services place this dynamic
-          # user folder in /var/lib/private/<service>. I will add commented out
-          # persistence definitions in the relevant services so their files are
-          # still documented.
-          {
-            directory = "/var/lib/private";
-            mode = "0700";
-          }
+          # WARN: Systemd services that use DynamicUser without defining a
+          # static User and Group cannot be persisted as it's impossible to
+          # preallocated the correct UID/GID. It should be possible to work
+          # around this by adding User= and Group= to DynamicUser services and
+          # also declaratively creating the User and Group
         ];
 
         files = [

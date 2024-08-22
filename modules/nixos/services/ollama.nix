@@ -8,6 +8,7 @@ let
   inherit (lib)
     mkIf
     mkForce
+    singleton
     optional
     genAttrs
     ;
@@ -18,6 +19,8 @@ mkIf cfg.enable {
 
   services.ollama = {
     enable = true;
+    user = "ollama";
+    group = "ollama";
     listenAddress = "0.0.0.0:11434";
   };
 
@@ -36,11 +39,10 @@ mkIf cfg.enable {
     ];
   });
 
-  persistence.directories = [
-    # NOTE: Can't be persisted because Ollama is a DynamicUser service so the
-    # bind mount cannot match permissions. More info in impermanence.nix.
-    # /var/lib/private is persisted instead.
-
-    # "/var/lib/private/ollama"
-  ];
+  persistence.directories = singleton {
+    directory = "/var/lib/private/ollama";
+    user = "ollama";
+    group = "ollama";
+    mode = "755";
+  };
 }

@@ -20,7 +20,7 @@ let
   inherit (config.modules.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (secrets.lovelace) heating hvac;
-  inherit (secrets.general) people userIds;
+  inherit (secrets.general) people userIds peopleList;
   inherit (config.modules.services.hass) smartLightingRooms;
 
   cfg = config.modules.services.hass;
@@ -344,6 +344,16 @@ let
           };
         }
       ]
+      ++ (map (person: {
+        type = "entity";
+        entity = "person.${person}";
+        display_type = "complete";
+        visibility = singleton {
+          condition = "state";
+          entity = "person.${person}";
+          state = "not_home";
+        };
+      }) peopleList)
       ++ (map (data: {
         type = "entity";
         display_type = "complete";

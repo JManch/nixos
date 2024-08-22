@@ -117,6 +117,7 @@ in
         "forecast_solar"
         "husqvarna_automower"
         "roborock"
+        "unifi"
       ] ++ optional mosquitto.enable "mqtt";
 
       customComponents =

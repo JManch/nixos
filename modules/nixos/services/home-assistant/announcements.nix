@@ -222,6 +222,9 @@ in
                                   sticky = true;
                                   priority = "high";
                                   ttl = 0;
+                                  channel = "Household Announcement";
+                                  importance = "high";
+                                  visibility = "public";
                                 })
 
                                 (mkIf (!isAndroid) {

@@ -193,6 +193,7 @@ in
               "switch.adaptive_lighting_*"
               "image.roborock_s6_maxv_*"
               "input_text.*_announcement_response"
+              "input_boolean.*_announcement_achnowledged"
             ];
           };
         };

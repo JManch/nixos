@@ -19,6 +19,7 @@ let
     mkMerge
     concatMapStringsSep
     concatMap
+    hasInfix
     utils
     splitString
     mkEnableOption
@@ -246,6 +247,7 @@ in
                       (map (l: {
                         type = "tile";
                         entity = "light.${l}";
+                        tap_action.action = "toggle";
                         visibility = singleton {
                           condition = "state";
                           entity = "light.${l}";
@@ -258,6 +260,7 @@ in
                       name = "Adaptive Lighting";
                       type = "tile";
                       entity = "switch.adaptive_lighting_${roomId}";
+                      tap_action.action = "toggle";
                       layout_options = {
                         grid_columns = 4;
                         grid_rows = 1;
@@ -270,6 +273,7 @@ in
                         name = "Wake Up Lights";
                         type = "tile";
                         entity = "input_boolean.${roomId}_wake_up_lights";
+                        tap_action.action = "toggle";
                         layout_options = {
                           grid_columns = 2;
                           grid_rows = 1;
@@ -292,6 +296,7 @@ in
                     name = "Sleep Mode";
                     type = "tile";
                     entity = "switch.adaptive_lighting_sleep_mode_${roomId}";
+                    tap_action.action = "toggle";
                     layout_options = {
                       grid_columns = if (wakeUpLights.enable && wakeUpLights.type == "manual") then 2 else 4;
                       grid_rows = 1;
@@ -322,18 +327,6 @@ in
         path = "announcements";
         type = "sections";
         max_columns = 2;
-        badges = singleton {
-          name = "Cooldown";
-          display_type = "complete";
-          type = "entity";
-          entity = "timer.announcement_cooldown";
-          color = "red";
-          visibility = singleton {
-            condition = "state";
-            entity = "timer.announcement_cooldown";
-            state = "active";
-          };
-        };
         sections = [
           {
             title = "Controls";
@@ -347,6 +340,27 @@ in
                   tap_action = {
                     action = "perform-action";
                     perform_action = "script.send_announcement";
+                  };
+                  visibility = singleton {
+                    condition = "state";
+                    entity = "script.send_announcement";
+                    state = "off";
+                  };
+                  layout_options = {
+                    grid_columns = 2;
+                    grid_rows = 2;
+                  };
+                }
+                {
+                  name = "Sending Announcements...";
+                  type = "button";
+                  icon = "mdi:send-circle";
+                  tap_action.action = "none";
+                  hold_action.action = "none";
+                  visibility = singleton {
+                    condition = "state";
+                    entity = "script.send_announcement";
+                    state = "on";
                   };
                   layout_options = {
                     grid_columns = 2;
@@ -862,128 +876,163 @@ in
         script.send_announcement = {
           alias = "Send Announcement";
           sequence = singleton {
-            parallel =
-              (map (
+            parallel = (
+              map (
                 person:
                 let
                   device = devices.${person};
+                  isAndroid = !(hasInfix "iphone" device.name);
                 in
                 {
-                  sequence =
-                    [
-                      {
-                        action = "input_text.set_value";
-                        target.entity_id = "input_text.${person}_announcement_response";
-                        data.value = "No response";
-                      }
-                      {
-                        condition = "template";
-                        # Allow self-triggering announcements ourselves for debugging
-                        value_template = "{{ context.user_id == '${userIds."joshua"}' or context.user_id != '${userIds.${person}}' }}";
-                      }
-                      {
-                        condition = "state";
-                        entity_id = "input_boolean.${person}_announcement_enable";
-                        state = "on";
-                      }
-                      {
-                        action = "notify.mobile_app_${device.name}";
-                        data = {
-                          # title = "Household Announcement";
-                          title = "{{ states('input_text.announcement_message') }}";
-                          message = "Choose a reply option";
-                          data = {
-                            # ios only (not sure if this actually works)
-                            url = "homeassistant://call_service/input_text.set_value?entity_id=input_text.${person}_announcement_response&value=I%27m%20coming";
-                            activationMode = "background";
-                            sticky = true; # android only
-                            tag = "announcement"; # android only
-                            actions = [
+                  sequence = [
+                    {
+                      action = "input_text.set_value";
+                      target.entity_id = "input_text.${person}_announcement_response";
+                      data.value = "No response";
+                    }
+                    {
+                      action = "input_boolean.turn_off";
+                      target.entity_id = "input_boolean.${person}_announcement_acknowledged";
+                    }
+                    {
+                      condition = "template";
+                      # Allow self-triggering announcements ourselves for debugging
+                      value_template = "{{ context.user_id == '${userIds."joshua"}' or context.user_id != '${userIds.${person}}' }}";
+                    }
+                    {
+                      condition = "state";
+                      entity_id = "input_boolean.${person}_announcement_enable";
+                      state = "on";
+                    }
+                    {
+                      repeat = {
+                        count = 5;
+                        sequence = [
+                          {
+                            condition = "state";
+                            entity_id = "input_boolean.${person}_announcement_acknowledged";
+                            state = "off";
+                          }
+                          {
+                            alias = "Send the announcement notification";
+                            action = "notify.mobile_app_${device.name}";
+                            data = {
+                              # title = "Household Announcement";
+                              title = "{{ states('input_text.announcement_message') }}";
+                              message = if (!isAndroid) then "Tap and hold to reply" else "Select a reply";
+                              data = mkMerge [
+                                {
+                                  context_id = "{{ 'CONTEXT_' ~ context.id }}";
+                                  tag = "household-announcement";
+                                  actions = [
+                                    {
+                                      action = "COMING";
+                                      title = "I'm coming";
+                                    }
+                                    {
+                                      action = "DELAYED";
+                                      title = "I'll be delayed";
+                                    }
+                                    {
+                                      action = "REPLY";
+                                      title = "Custom reply";
+                                    }
+                                  ];
+                                }
+
+                                (mkIf isAndroid {
+                                  sticky = true;
+                                  priority = "high";
+                                  ttl = 0;
+                                })
+
+                                (mkIf (!isAndroid) {
+                                  activationMode = "background";
+                                  authenticationRequired = false;
+                                  push.interruption-level = "critical";
+                                })
+                              ];
+                            };
+                          }
+                          {
+                            action = "input_text.set_value";
+                            target.entity_id = "input_text.${person}_announcement_response";
+                            data.value = "Awaiting response";
+                          }
+                          {
+                            wait_for_trigger = [
                               {
-                                action = "COMING";
-                                title = "I'm coming";
+                                platform = "event";
+                                event_type = "mobile_app_notification_action";
+                                event_data.action = "COMING";
+                                context.user_id = [ userIds.${person} ];
                               }
                               {
-                                action = "DELAYED";
-                                title = "I'll be delayed";
+                                platform = "event";
+                                event_type = "mobile_app_notification_action";
+                                event_data.action = "DELAYED";
+                                context.user_id = [ userIds.${person} ];
                               }
                               {
-                                action = "REPLY";
-                                title = "Custom reply";
+                                platform = "event";
+                                event_type = "mobile_app_notification_action";
+                                event_data.action = "REPLY";
+                                context.user_id = [ userIds.${person} ];
                               }
                             ];
-                          };
-                        };
-                      }
-                      {
-                        action = "input_text.set_value";
-                        target.entity_id = "input_text.${person}_announcement_response";
-                        data.value = "Awaiting response";
-                      }
-                      {
-                        wait_for_trigger = [
-                          {
-                            platform = "event";
-                            event_type = "mobile_app_notification_action";
-                            event_data.action = "COMING";
-                            context.user_id = [ userIds.${person} ];
+                            timeout.seconds = 60;
                           }
                           {
-                            platform = "event";
-                            event_type = "mobile_app_notification_action";
-                            event_data.action = "DELAYED";
-                            context.user_id = [ userIds.${person} ];
-                          }
-                          {
-                            platform = "event";
-                            event_type = "mobile_app_notification_action";
-                            event_data.action = "REPLY";
-                            context.user_id = [ userIds.${person} ];
+                            "if" = singleton {
+                              condition = "template";
+                              value_template = "{{ wait.trigger != none }}";
+                            };
+                            "then" =
+                              [
+                                {
+                                  action = "input_boolean.turn_on";
+                                  target.entity_id = "input_boolean.${person}_announcement_acknowledged";
+                                }
+                                {
+                                  action = "input_text.set_value";
+                                  target.entity_id = "input_text.${person}_announcement_response";
+                                  data.value = ''
+                                    {% if wait.trigger.event.data.action == 'COMING' %}
+                                      I'm coming
+                                    {% elif wait.trigger.event.data.action == 'DELAYED' %}
+                                      I'll be delayed
+                                    {% else %}
+                                      {{ wait.trigger.event.data.reply_text }}
+                                    {% endif %}
+                                  '';
+                                }
+                              ]
+                              ++ optional isAndroid {
+                                alias = "Clear the sticky notification on Android";
+                                action = "notify.mobile_app_${device.name}";
+                                data = {
+                                  message = "clear_notification";
+                                  data.tag = "household-announcement";
+                                };
+                              };
                           }
                         ];
-                        timeout.seconds = 60;
-                      }
-                      {
-                        action = "input_text.set_value";
-                        target.entity_id = "input_text.${person}_announcement_response";
-                        data.value = ''
-                          {% if wait.trigger == none %}
-                            No response
-                          {% else %}
-                            {% if wait.trigger.event.data.action == 'COMING' %}
-                              I'm coming
-                            {% elif wait.trigger.event.data.action == 'DELAYED' %}
-                              I'll be delayed
-                            {% else %}
-                              {{ wait.trigger.event.data.reply_text }}
-                            {% endif %}
-                          {% endif %}
-                        '';
-                      }
-                      {
-                        condition = "template";
-                        value_template = "{{ wait.trigger != none }}";
-                      }
-                    ]
-                    ++ optional (!(lib.hasInfix "iphone" device.name)) {
-                      action = "notify.mobile_app_${device.name}";
-                      data = {
-                        message = "clear_notification";
-                        data.tag = "announcement";
                       };
-                    };
+                    }
+                    {
+                      condition = "state";
+                      entity_id = "input_boolean.${person}_announcement_acknowledged";
+                      state = "off";
+                    }
+                    {
+                      action = "input_text.set_value";
+                      target.entity_id = "input_text.${person}_announcement_response";
+                      data.value = "No response";
+                    }
+                  ];
                 }
-              ) peopleList)
-              ++ singleton {
-                sequence = [
-                  { delay.seconds = 1; }
-                  {
-                    action = "timer.start";
-                    target.entity_id = "timer.announcement_cooldown";
-                    data.duration = 60;
-                  }
-                ];
-              };
+              ) peopleList
+            );
           };
         };
 
@@ -991,8 +1040,6 @@ in
           name = "Announcement Message";
           initial = "Dinner is ready";
         };
-
-        timer.announcement_cooldown.name = "Announcement Cooldown";
       }
       ++ (map (person: {
         input_text."${person}_announcement_response" = {
@@ -1001,9 +1048,14 @@ in
           initial = "No response";
         };
 
-        input_boolean."${person}_announcement_enable" = {
-          name = "${utils.upperFirstChar person} Announcement Enable";
-          icon = "mdi:bell";
+        input_boolean = {
+          "${person}_announcement_enable" = {
+            name = "${utils.upperFirstChar person} Announcement Enable";
+            icon = "mdi:bell";
+          };
+          "${person}_announcement_acknowledged" = {
+            name = "${utils.upperFirstChar person} Announcement Acknowledged";
+          };
         };
       }) peopleList)
     );

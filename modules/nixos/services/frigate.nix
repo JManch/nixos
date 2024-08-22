@@ -140,6 +140,8 @@ mkIf cfg.enable {
           ];
 
           objects.filters.car.mask = [ "1024,576,0,576,0,306,1024,316" ];
+          # WARN: Remove this temporary mask
+          objects.filters.person.mask = [ "933,389,938,534,755,544" ];
         };
       };
 

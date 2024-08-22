@@ -853,6 +853,16 @@ in
         description = "List of interfaces to be used by avahi";
       };
     };
+
+    mealie = {
+      enable = mkEnableOption "Mealie";
+
+      port = mkOption {
+        type = types.port;
+        default = 9000;
+        description = "Port for the Mealie server to listen on";
+      };
+    };
   };
 
   config = {

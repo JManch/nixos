@@ -40,6 +40,7 @@
       mikrotik-backup.enable = true;
       index-checker.enable = true;
       fail2ban.enable = true;
+      mealie.enable = true;
 
       calibre = {
         enable = true;

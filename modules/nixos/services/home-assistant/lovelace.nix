@@ -197,6 +197,45 @@ let
         }
         {
           type = "entity";
+          entity = "sensor.guinea_pig_feeder";
+          icon = "mdi:carrot";
+          name = "Guinea Pig Feeder";
+          display_type = "complete";
+          color = "orange";
+          visibility = singleton {
+            condition = "state";
+            entity = "input_boolean.guinea_pigs_fed";
+            state = "off";
+          };
+        }
+        {
+          type = "entity";
+          entity = "input_boolean.guinea_pigs_fed";
+          name = "Guinea Pigs Not Fed";
+          color = "red";
+          state_content = "name";
+          tap_action.action = "toggle";
+          visibility = singleton {
+            condition = "state";
+            entity = "input_boolean.guinea_pigs_fed";
+            state = "off";
+          };
+        }
+        {
+          type = "entity";
+          entity = "input_boolean.guinea_pigs_fed";
+          name = "Guinea Pigs Fed";
+          color = "green";
+          state_content = "name";
+          tap_action.action = "toggle";
+          visibility = singleton {
+            condition = "state";
+            entity = "input_boolean.guinea_pigs_fed";
+            state = "on";
+          };
+        }
+        {
+          type = "entity";
           entity = "sensor.outdoor_thermal_comfort_heat_index";
           display_type = "complete";
           name = "Heat Index";
@@ -533,11 +572,22 @@ let
               "qualifying"
               "sprint"
             ];
-            visibility = singleton {
-              condition = "numeric_state";
-              entity = "sensor.days_to_formula_1_event";
-              below = 2;
-            };
+            visibility = [
+              {
+                condition = "numeric_state";
+                entity = "sensor.days_to_formula_1_event";
+                below = 2;
+              }
+              {
+                condition = "user";
+                users = [
+                  userIds.joshua
+                  userIds.${people.person1}
+                  userIds.${people.person3}
+                  userIds.${people.person5}
+                ];
+              }
+            ];
           };
       }
     ];
@@ -1135,6 +1185,7 @@ mkIf cfg.enableInternal {
         [
           home
           cfg.homeAnnouncements.lovelaceView
+          cfg.guineaPigs.lovelaceView
           energy
         ]
         ++ optional frigate.enable cctv

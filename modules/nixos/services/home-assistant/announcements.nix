@@ -193,6 +193,19 @@ in
                             state = "off";
                           }
                           {
+                            variables = {
+                              action_coming = "{{ 'COMING_' ~ context.id }}";
+                              action_delayed = "{{ 'DELAYED_' ~ context.id }}";
+                              # WARN: Ideally we would use context.id here but
+                              # that breaks the reply functionality. It can be
+                              # worked around on Android by checking the tag in
+                              # the app notification action but this is not
+                              # possible on ios. I'll just have to hope REPLY
+                              # actions don't happen simultaneously.
+                              action_reply = "REPLY";
+                            };
+                          }
+                          {
                             alias = "Send the announcement notification";
                             action = "notify.mobile_app_${device.name}";
                             data = {
@@ -200,19 +213,18 @@ in
                               message = if (!isAndroid) then "Tap and hold to reply" else "Select a reply";
                               data = mkMerge [
                                 {
-                                  context_id = "{{ 'CONTEXT_' ~ context.id }}";
                                   tag = "household-announcement";
                                   actions = [
                                     {
-                                      action = "COMING";
+                                      action = "{{ action_coming }}";
                                       title = "I'm coming";
                                     }
                                     {
-                                      action = "DELAYED";
+                                      action = "{{ action_delayed }}";
                                       title = "I'll be delayed";
                                     }
                                     {
-                                      action = "REPLY";
+                                      action = "{{ action_reply }}";
                                       title = "Custom reply";
                                     }
                                   ];
@@ -245,19 +257,29 @@ in
                               {
                                 platform = "event";
                                 event_type = "mobile_app_notification_action";
-                                event_data.action = "COMING";
+                                event_data.action = "{{ action_coming }}";
+                                event_data.tag = mkIf isAndroid "household-announcement";
                                 context.user_id = [ userIds.${person} ];
                               }
                               {
                                 platform = "event";
                                 event_type = "mobile_app_notification_action";
-                                event_data.action = "DELAYED";
+                                event_data.action = "{{ action_delayed }}";
+                                event_data.tag = mkIf isAndroid "household-announcement";
                                 context.user_id = [ userIds.${person} ];
                               }
                               {
                                 platform = "event";
                                 event_type = "mobile_app_notification_action";
-                                event_data.action = "REPLY";
+                                event_data.action = "{{ action_reply }}";
+                                # This is only possible here because we're
+                                # using Nix so we have more control over config
+                                # generation. In pure yaml context it isn't
+                                # possible to conditionally add tag depending
+                                # on android vs ios like this. We might as well
+                                # take advantage of it to make replies unique
+                                # on Android.
+                                event_data.tag = mkIf isAndroid "household-announcement";
                                 context.user_id = [ userIds.${person} ];
                               }
                             ];
@@ -278,9 +300,9 @@ in
                                   action = "input_text.set_value";
                                   target.entity_id = "input_text.${person}_announcement_response";
                                   data.value = ''
-                                    {% if wait.trigger.event.data.action == 'COMING' %}
+                                    {% if wait.trigger.event.data.action == action_coming %}
                                       I'm coming
-                                    {% elif wait.trigger.event.data.action == 'DELAYED' %}
+                                    {% elif wait.trigger.event.data.action == action_delayed %}
                                       I'll be delayed
                                     {% else %}
                                       {{ wait.trigger.event.data.reply_text }}

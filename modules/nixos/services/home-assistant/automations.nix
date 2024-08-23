@@ -255,14 +255,18 @@ let
     action =
       let
         mkNotify = person: {
-          action = "notify.mobile_app_${devices.${person}.name}";
+          action = "notify.${person}";
           data = {
             title = "Formula 1 About to Start";
             message = "{{ state_attr('calendar.formula_1', 'message') }} in 15 mins!";
           };
         };
       in
-      [ (mkNotify "joshua") ];
+      [
+        (mkNotify "joshua")
+        (mkNotify people.person3)
+        (mkNotify people.person5)
+      ];
   };
 
   lightsAvailabilityNotify = map (data: {

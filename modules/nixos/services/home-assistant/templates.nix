@@ -1,12 +1,20 @@
 # https://jinja.palletsprojects.com/en/3.1.x/templates/
-{ lib, config, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 let
   inherit (lib)
     mkIf
     utils
+    listToAttrs
     attrNames
     singleton
     ;
+  inherit (secrets.general) peopleList;
+  secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
   cfg = config.modules.services.hass;
   cameras = attrNames config.services.frigate.settings.cameras;
 in
@@ -339,5 +347,15 @@ mkIf cfg.enableInternal {
         }
       ];
     };
+
+    input_boolean = listToAttrs (
+      map (person: {
+        name = "${person}_living_away";
+        value = {
+          name = "${utils.upperFirstChar person} Living Away";
+          icon = "mdi:account";
+        };
+      }) peopleList
+    );
   };
 }

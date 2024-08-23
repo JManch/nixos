@@ -36,7 +36,7 @@ let
         state_entity = "input_boolean.high_alert_surveillance";
         state_filter_states = [ "off" ];
         notify_device = devices.joshua.id;
-        notify_group = "Adult Notify Devices";
+        notify_group = "Adults Except ${utils.upperFirstChar people.person5}";
         base_url = "https://home.${fqDomain}";
         group = "frigate-entrance-notification";
         title = "Security Alert";
@@ -56,7 +56,7 @@ let
       input = {
         camera = "camera.${camera}";
         notify_device = devices.joshua.id;
-        notify_group = "Adult Notify Devices";
+        notify_group = "Adults Except ${utils.upperFirstChar people.person5}";
         sticky = true;
         group = "frigate-cat-notification";
         base_url = "https://home.${fqDomain}";
@@ -80,7 +80,7 @@ let
         state_entity = "input_boolean.high_alert_surveillance";
         state_filter_states = [ "on" ];
         notify_device = devices.joshua.id;
-        notify_group = "Adult Notify Devices";
+        notify_group = "Adults Except ${utils.upperFirstChar people.person5}";
         sticky = true;
         group = "frigate-notification";
         base_url = "https://home.${fqDomain}";
@@ -209,7 +209,7 @@ let
       value_template = "{{ is_state_attr('sensor.bin_collection_types', 'daysTo', 1) }}";
     };
     action = singleton {
-      action = "notify.adult_notify_devices";
+      action = "notify.adults";
       data = {
         title = "Bin Collection Tomorrow";
         message = "{{ states('sensor.bin_collection_types') }}";
@@ -300,7 +300,7 @@ let
       value_template = "{{ has_value('sensor.lewis_error') }}";
     };
     action = singleton {
-      action = "notify.adult_notify_devices";
+      action = "notify.adults";
       data = {
         title = "Lewis Needs Help!";
         message = "Error: {{ states('sensor.lewis_error') }}";

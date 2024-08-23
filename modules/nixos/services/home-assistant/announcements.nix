@@ -232,7 +232,6 @@ in
 
                                 (mkIf isAndroid {
                                   sticky = true;
-                                  priority = "high";
                                   ttl = 0;
                                   channel = "Household Announcement";
                                   importance = "high";
@@ -242,7 +241,6 @@ in
                                 (mkIf (!isAndroid) {
                                   activationMode = "background";
                                   authenticationRequired = false;
-                                  push.interruption-level = "critical";
                                 })
                               ];
                             };

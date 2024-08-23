@@ -7,11 +7,12 @@ mkIf cfg.enable {
   services.mosquitto = {
     enable = true;
     listeners = singleton {
-      address = "127.0.0.1";
       port = cfg.port;
       users = cfg.users;
     };
   };
+
+  networking.firewall.allowedTCPPorts = [ cfg.port ];
 
   persistence.directories = singleton {
     directory = "/var/lib/mosquitto";

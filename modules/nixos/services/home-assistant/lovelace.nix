@@ -74,7 +74,11 @@ let
         {
           name = " ";
           type = "thermostat";
-          entity = "climate.${sensor}_ac_room_temperature";
+          entity =
+            if sensor != "joshua" then
+              "climate.${sensor}_ac_room_temperature"
+            else
+              "climate.joshua_faikin_mqtt_hvac";
           features = singleton { type = "climate-hvac-modes"; };
         }
         {

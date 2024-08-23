@@ -27,7 +27,7 @@ let
     ;
   inherit (config.modules.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.age.secrets) mqttHassPassword;
+  inherit (config.age.secrets) mqttHassPassword mqttFaikinPassword;
   inherit (caddy) trustedAddresses;
   inherit (secrets.general) people;
   cfg = config.modules.services.hass;
@@ -308,10 +308,15 @@ in
         }
       '';
 
+    # TODO: Look into locking down mosquitto ACLs
     modules.services.mosquitto.users = {
       hass = {
         acl = [ "readwrite #" ];
         hashedPasswordFile = mqttHassPassword.path;
+      };
+      faikin = {
+        acl = [ "readwrite #" ];
+        hashedPasswordFile = mqttFaikinPassword.path;
       };
     };
 

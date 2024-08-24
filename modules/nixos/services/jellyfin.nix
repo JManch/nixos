@@ -122,14 +122,9 @@ mkMerge [
       "Jellyfin reverse proxy requires caddy to be enabled"
     ];
 
-    services.caddy.virtualHosts."jellyfin.${fqDomain}".extraConfig =
-      let
-        addressRange = toString wireguard.friends.address + "/" + toString wireguard.friends.subnet;
-        wgAddresses = optional wireguard.friends.enable addressRange;
-      in
-      ''
-        ${allowAddresses (trustedAddresses ++ wgAddresses ++ cfg.extraAllowedAddresses)}
-        reverse_proxy http://${cfg.reverseProxy.address}:8096
-      '';
+    services.caddy.virtualHosts."jellyfin.${fqDomain}".extraConfig = ''
+      ${allowAddresses (trustedAddresses ++ cfg.allowedAddresses)}
+      reverse_proxy http://${cfg.reverseProxy.address}:8096
+    '';
   })
 ]

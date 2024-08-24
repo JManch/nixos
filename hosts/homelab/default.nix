@@ -1,3 +1,7 @@
+{ config, ... }:
+let
+  inherit (config.modules.services) wireguard;
+in
 {
   imports = [
     ./disko.nix
@@ -93,6 +97,7 @@
         autoStart = true;
         proxy = true;
         interfaces = [ "wg-friends" ];
+        allowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
       };
 
       zigbee2mqtt = {
@@ -161,7 +166,10 @@
         autoStart = true;
         reverseProxy.enable = true;
         # Google TV on guest VLAN
-        extraAllowedAddresses = [ "10.30.30.6/32" ];
+        allowedAddresses = with wireguard.friends; [
+          "10.30.30.6/32"
+          "${address}/${toString subnet}"
+        ];
         mediaDirs = {
           shows = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/shows";
           movies = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/movies";

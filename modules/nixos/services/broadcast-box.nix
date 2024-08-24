@@ -15,6 +15,7 @@ let
     ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.services) caddy;
+  inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.modules.services.broadcast-box;
 in
 {
@@ -52,6 +53,7 @@ in
 
     services.caddy.virtualHosts = mkIf cfg.proxy {
       "stream.${fqDomain}".extraConfig = ''
+        ${allowAddresses (trustedAddresses ++ cfg.allowedAddresses)}
         reverse_proxy http://127.0.0.1:${toString cfg.port}
       '';
     };

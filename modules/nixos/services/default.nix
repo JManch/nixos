@@ -159,7 +159,7 @@ in
         description = "Jellyfin service auto start";
       };
 
-      extraAllowedAddresses = mkOption {
+      allowedAddresses = mkOption {
         type = types.listOf types.str;
         default = [ ];
         description = ''
@@ -204,6 +204,15 @@ in
       proxy = mkEnableOption ''
         publically exposing Broadcast Box with a reverse proxy.
       '';
+
+      allowedAddresses = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of address to give access to Broadcast Box in addition to the
+          trusted list.
+        '';
+      };
 
       interfaces = mkOption {
         type = types.listOf types.str;

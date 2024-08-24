@@ -259,6 +259,11 @@ let
           data = {
             title = "Formula 1 About to Start";
             message = "{{ state_attr('calendar.formula_1', 'message') }} in 15 mins!";
+            data = {
+              channel = "Formula 1";
+              importance = "high";
+              ttl = 0;
+            };
           };
         };
       in

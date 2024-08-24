@@ -207,7 +207,7 @@ mkIf cfg.enableInternal {
       }
       (
         let
-          threshold = 0.8;
+          threshold = 1;
           triggers =
             (map
               (enable: {
@@ -347,15 +347,5 @@ mkIf cfg.enableInternal {
         }
       ];
     };
-
-    input_boolean = listToAttrs (
-      map (person: {
-        name = "${person}_living_away";
-        value = {
-          name = "${utils.upperFirstChar person} Living Away";
-          icon = "mdi:account";
-        };
-      }) peopleList
-    );
   };
 }

@@ -308,12 +308,12 @@ in
         }
       '';
 
-    # TODO: Look into locking down mosquitto ACLs
     modules.services.mosquitto.users = {
       hass = {
         acl = [ "readwrite #" ];
         hashedPasswordFile = mqttHassPassword.path;
       };
+
       faikin = {
         acl = [ "readwrite #" ];
         hashedPasswordFile = mqttFaikinPassword.path;

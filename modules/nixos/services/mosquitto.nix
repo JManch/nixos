@@ -1,23 +1,31 @@
-{ lib, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib) mkIf mkMerge singleton;
   cfg = config.modules.services.mosquitto;
 in
-mkIf cfg.enable {
-  services.mosquitto = {
-    enable = true;
-    listeners = singleton {
-      port = cfg.port;
-      users = cfg.users;
+mkMerge [
+  (mkIf cfg.explorer.enable { environment.systemPackages = [ pkgs.mqtt-explorer ]; })
+  (mkIf cfg.enable {
+    services.mosquitto = {
+      enable = true;
+      listeners = singleton {
+        port = cfg.port;
+        users = cfg.users;
+      };
     };
-  };
 
-  networking.firewall.allowedTCPPorts = [ cfg.port ];
+    networking.firewall.allowedTCPPorts = [ cfg.port ];
 
-  persistence.directories = singleton {
-    directory = "/var/lib/mosquitto";
-    user = "mosquitto";
-    group = "mosquitto";
-    mode = "700";
-  };
-}
+    persistence.directories = singleton {
+      directory = "/var/lib/mosquitto";
+      user = "mosquitto";
+      group = "mosquitto";
+      mode = "700";
+    };
+  })
+]

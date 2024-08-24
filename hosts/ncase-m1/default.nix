@@ -115,6 +115,7 @@
       greetd.enable = true;
       lact.enable = true;
       scrutiny.collector.enable = true;
+      mosquitto.explorer.enable = true;
 
       restic = {
         enable = true;

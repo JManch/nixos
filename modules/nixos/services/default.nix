@@ -383,6 +383,7 @@ in
 
     mosquitto = {
       enable = mkEnableOption "Mosquitto MQTT Broker";
+      explorer.enable = mkEnableOption "MQTT Explorer";
 
       users = mkOption {
         type = types.attrs;

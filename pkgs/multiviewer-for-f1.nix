@@ -8,11 +8,11 @@
   ...
 }:
 multiviewer-for-f1.overrideAttrs rec {
-  version = "1.35.4";
+  version = "1.35.5";
 
   src = fetchurl {
-    url = "https://releases.multiviewer.app/download/182296295/multiviewer-for-f1_${version}_amd64.deb";
-    hash = "sha256-aDkuv4Zn2T/jS7rMRz6aR+110mfWgnkUJfx0LLP+Txg=";
+    url = "https://releases.multiviewer.app/download/188172274/multiviewer-for-f1_${version}_amd64.deb";
+    hash = "sha256-FVb+ZkvZTWBWTS+VCSljv7q9tvT9ijrpOpJS4H0vGZw=";
   };
 
   # Add libglvnd to library path for hardware acceleration

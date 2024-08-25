@@ -194,6 +194,10 @@ mkIf cfg.enableInternal {
             at = "00:00:00";
           }
           {
+            platform = "state";
+            entity_id = [ "calendar.formula_1" ];
+          }
+          {
             platform = "homeassistant";
             event = "start";
           }

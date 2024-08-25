@@ -13,7 +13,6 @@ let
     singleton
     mkMerge
     concatMap
-    hasInfix
     utils
     ;
   inherit (secrets.general) devices userIds peopleList;
@@ -30,6 +29,46 @@ in
       path = "announcements";
       type = "sections";
       max_columns = 2;
+      badges = concatMap (
+        person:
+        let
+          inherit (devices.${person}) isAndroid;
+          device = devices.${person}.name;
+        in
+        optional isAndroid {
+          type = "entity";
+          entity = "sensor.${device}_ringer_mode";
+          icon = "mdi:bell-off";
+          color = "red";
+          name = "${utils.upperFirstChar person}'s Phone is Silent";
+          state_content = "name";
+          visibility = singleton {
+            condition = "or";
+            conditions = [
+              {
+                condition = "numeric_state";
+                entity = "sensor.${device}_volume_level_notification";
+                below = 1;
+              }
+              {
+                condition = "state";
+                entity = "sensor.${device}_ringer_mode";
+                state = "silent";
+              }
+              {
+                condition = "state";
+                entity = "sensor.${device}_ringer_mode";
+                state = "vibrate";
+              }
+              {
+                condition = "state";
+                entity = "sensor.${device}_do_not_disturb_sensor";
+                state_not = "off";
+              }
+            ];
+          };
+        }
+      ) peopleList;
       sections = [
         {
           title = "Controls";
@@ -76,12 +115,28 @@ in
                 entity = "input_text.announcement_message";
               }
             ]
-            ++ (map (person: {
-              type = "tile";
-              entity = "input_boolean.${person}_announcement_enable";
-              name = utils.upperFirstChar person;
-              tap_action.action = "toggle";
-            }) peopleList);
+            ++ (concatMap (person: [
+              {
+                type = "tile";
+                entity = "input_boolean.${person}_announcement_enable";
+                name = utils.upperFirstChar person;
+                tap_action.action = "toggle";
+                visibility = singleton {
+                  condition = "state";
+                  entity = "person.${person}";
+                  state = "home";
+                };
+              }
+              {
+                type = "tile";
+                entity = "person.${person}";
+                visibility = singleton {
+                  condition = "state";
+                  entity = "person.${person}";
+                  state = "not_home";
+                };
+              }
+            ]) peopleList);
         }
         {
           title = "Responses";
@@ -159,8 +214,8 @@ in
               (map (
                 person:
                 let
+                  inherit (device) isAndroid;
                   device = devices.${person};
-                  isAndroid = !(hasInfix "iphone" device.name);
                 in
                 {
                   sequence = [
@@ -184,6 +239,11 @@ in
                       state = "on";
                     }
                     {
+                      condition = "state";
+                      entity_id = "person.${person}";
+                      state = "home";
+                    }
+                    {
                       repeat = {
                         count = 5;
                         sequence = [
@@ -196,12 +256,10 @@ in
                             variables = {
                               action_coming = "{{ 'COMING_' ~ context.id }}";
                               action_delayed = "{{ 'DELAYED_' ~ context.id }}";
-                              # WARN: Ideally we would use context.id here but
-                              # that breaks the reply functionality. It can be
-                              # worked around on Android by checking the tag in
-                              # the app notification action but this is not
-                              # possible on ios. I'll just have to hope REPLY
-                              # actions don't happen simultaneously.
+                              # WARN: Ideally we would use context.id here but that breaks the reply
+                              # functionality. It can be worked around on Android by checking the tag in
+                              # the app notification action but this is not possible on ios. I'll just have
+                              # to hope REPLY actions don't happen simultaneously.
                               action_reply = "REPLY";
                             };
                           }
@@ -270,13 +328,10 @@ in
                                 platform = "event";
                                 event_type = "mobile_app_notification_action";
                                 event_data.action = "{{ action_reply }}";
-                                # This is only possible here because we're
-                                # using Nix so we have more control over config
-                                # generation. In pure yaml context it isn't
-                                # possible to conditionally add tag depending
-                                # on android vs ios like this. We might as well
-                                # take advantage of it to make replies unique
-                                # on Android.
+                                # This is only possible here because we're using Nix so we have more control
+                                # over config generation. In pure yaml context it isn't possible to
+                                # conditionally add tag depending on android vs ios like this. We might as well
+                                # take advantage of it to make replies unique on Android.
                                 event_data.tag = mkIf isAndroid "household-announcement";
                                 context.user_id = [ userIds.${person} ];
                               }
@@ -364,6 +419,5 @@ in
         };
       }) peopleList)
     );
-
   };
 }

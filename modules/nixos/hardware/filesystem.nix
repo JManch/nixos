@@ -139,9 +139,13 @@ mkMerge [
                         ''
                           # indent anchor
                               prompt )
-                                # Attempt to load the passphrase from systemd-creds
-                                # then fallback to manual passphrase entry
-                                ${systemd-creds} cat zfs-passphrase | ${zfs} load-key "$ds" \
+                                # Attempt to load the passphrase from systemd-creds then fallback to manual
+                                # passphrase entry
+                                # WARN: We need to decrypt here instead of using
+                                # SetCredentialEncrypted so that import will still work if decryption
+                                # fails. For some reason if SetCredentialEncrypted creds fail to decrypt,
+                                # the entire service fails.
+                                ${systemd-creds} decrypt --name= - - <<< "${cfg.zfs.encryption.passphraseCred}" | ${zfs} load-key "$ds" \
                                   && success=true || success=false
                                 tries=10
                         ''
@@ -155,8 +159,7 @@ mkMerge [
                 after = [ "tpm2.target" ];
                 serviceConfig = {
                   # Generate with:
-                  # systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2 --name=zfs-passphrase -p - -
-                  SetCredentialEncrypted = "zfs-passphrase:${cfg.zfs.encryption.passphraseCred}";
+                  # systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2 --name=zfs-passphrase - -
                   ExecStart = mkForce customImportScript;
                 };
               }

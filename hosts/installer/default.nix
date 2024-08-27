@@ -280,7 +280,7 @@ in
       environment.systemPackages =
         (with pkgs; [
           gitMinimal
-          (zellij.overrideAttrs { postInstall = ""; })
+          (if isArm then zellij.overrideAttrs { postInstall = ""; } else zellij)
           btop
         ])
         ++ optional (!isArm) pkgs.neovim

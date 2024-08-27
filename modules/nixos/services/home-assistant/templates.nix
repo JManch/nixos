@@ -1,20 +1,12 @@
 # https://jinja.palletsprojects.com/en/3.1.x/templates/
-{
-  lib,
-  config,
-  inputs,
-  ...
-}:
+{ lib, config, ... }:
 let
   inherit (lib)
     mkIf
     utils
-    listToAttrs
     attrNames
     singleton
     ;
-  inherit (secrets.general) peopleList;
-  secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
   cfg = config.modules.services.hass;
   cameras = attrNames config.services.frigate.settings.cameras;
 in

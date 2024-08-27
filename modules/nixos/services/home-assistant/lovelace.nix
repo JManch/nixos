@@ -273,6 +273,21 @@ let
         }
         {
           type = "entity";
+          name = "Garage Door";
+          entity = "sensor.garage_door_status";
+          display_type = "complete";
+          visibility = singleton {
+            condition = "state";
+            entity = "sensor.garage_door_status";
+            state_not = "Closed";
+          };
+          tap_action = {
+            action = "perform-action";
+            perform_action = "script.garage_door_toggle";
+          };
+        }
+        {
+          type = "entity";
           entity = "sensor.next_bin_collection";
           color = "light-green";
           visibility = singleton {
@@ -412,32 +427,6 @@ let
         };
       }) cfg.ceilingLightRooms);
     sections = [
-      # {
-      #   title = "";
-      #   type = "grid";
-      #   cards = [
-      # TODO: Move these to garden view
-      # {
-      #   entity = "weather.forecast_home";
-      #   forecast_type = "daily";
-      #   type = "weather-forecast";
-      # }
-      # {
-      #   graph = "line";
-      #   type = "sensor";
-      #   entity = "sensor.outdoor_sensor_temperature";
-      #   detail = 2;
-      #   name = "Temperature";
-      # }
-      # {
-      #   graph = "line";
-      #   type = "sensor";
-      #   entity = "sensor.outdoor_sensor_humidity";
-      #   detail = 2;
-      #   name = "Humidity";
-      # }
-      #   ];
-      # }
       {
         title = "";
         type = "grid";
@@ -475,10 +464,10 @@ let
             (navigationButton "CCTV" "cctv" "mdi:cctv")
             (navigationButton "Heating" "heating" "mdi:heating-coil")
             (navigationButton "HVAC" "hvac" "mdi:hvac")
+            (navigationButton "Outside" "outside" "mdi:tree")
             (navigationButton "Lounge" "lounge" "mdi:sofa")
             (navigationButton "Study" "study" "mdi:chair-rolling")
             (navigationButton "Master" "master-bedroom" "mdi:bed-king")
-            blankButton
             (navigationButton "Joshua" "joshua-room" "mdi:bed")
             (navigationButton "${upperPeople.person3}" "${people.person3}-room" "mdi:bed")
             (navigationButton "${upperPeople.person2}" "${people.person2}-room" "mdi:bed")
@@ -1179,6 +1168,72 @@ let
     subview = true;
     sections = acSection "master";
   };
+
+  outside = {
+    title = "outside";
+    path = "outside";
+    type = "sections";
+    max_columns = 2;
+    subview = true;
+    sections = [
+      {
+        title = "";
+        type = "grid";
+        cards = [
+          {
+            entity = "weather.forecast_home";
+            forecast_type = "hourly";
+            type = "weather-forecast";
+          }
+          {
+            graph = "line";
+            type = "sensor";
+            entity = "sensor.outdoor_sensor_temperature";
+            detail = 2;
+            name = "Temperature";
+          }
+          {
+            graph = "line";
+            type = "sensor";
+            entity = "sensor.outdoor_sensor_humidity";
+            detail = 2;
+            name = "Humidity";
+          }
+        ];
+      }
+      {
+        title = "";
+        type = "grid";
+        cards = [
+          {
+            name = "Garage Door";
+            type = "tile";
+            entity = "sensor.garage_door_status";
+            tap_action = {
+              action = "perform-action";
+              perform_action = "script.garage_door_toggle";
+            };
+            icon_tap_action = {
+              action = "perform-action";
+              perform_action = "script.garage_door_toggle";
+            };
+            layout_options = {
+              grid_columns = 4;
+              grid_rows = 1;
+            };
+          }
+          {
+            type = "history-graph";
+            entities = singleton {
+              name = "Garage";
+              entity = "binary_sensor.garage_door_closed";
+            };
+            hours_to_show = 6;
+          }
+        ];
+      }
+    ];
+  };
 in
 mkIf cfg.enableInternal {
   services.home-assistant = {
@@ -1196,6 +1251,7 @@ mkIf cfg.enableInternal {
         ++ [
           heating
           hvac
+          outside
           lounge
           study
           master

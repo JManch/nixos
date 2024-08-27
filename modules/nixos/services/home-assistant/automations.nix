@@ -441,6 +441,28 @@ let
           ];
       };
     };
+
+  # Fixes https://community.home-assistant.io/t/shelly-1-mqtt-always-unavailable-after-ha-restart/102827/32
+  # The announce command doesn't seem useful as it just returns device info. I
+  # think Shelly may have split the announce functionality into the
+  # status_update command since this thread?
+  shelliesStatusUpdate = singleton {
+    alias = "Shellies Status Update";
+    trigger = singleton {
+      platform = "homeassistant";
+      event = "start";
+    };
+    action = [
+      { delay.seconds = 10; }
+      {
+        action = "mqtt.publish";
+        data = {
+          topic = "shellies/command";
+          payload = "status_update";
+        };
+      }
+    ];
+  };
 in
 mkIf cfg.enableInternal {
   services.home-assistant.config = {
@@ -459,6 +481,7 @@ mkIf cfg.enableInternal {
       ++ (hueTapLightSwitch "${people.person2}Room" "670ac1ecf423f069757c7ab30bec3142")
       ++ (hueTapLightSwitch "${people.person3}Room" "0097121e144203512aeacef37a03650c")
       ++ mowerErrorNotify
+      ++ shelliesStatusUpdate
       ++ optionals frigate.enable (frigateEntranceNotify ++ frigateCatNotify ++ frigateHighAlertNotify);
 
     input_datetime = {

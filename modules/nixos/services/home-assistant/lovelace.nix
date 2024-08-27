@@ -1170,7 +1170,7 @@ let
   };
 
   outside = {
-    title = "outside";
+    title = "Outside";
     path = "outside";
     type = "sections";
     max_columns = 2;
@@ -1206,7 +1206,7 @@ let
         type = "grid";
         cards = [
           {
-            name = "Garage Door";
+            name = "Garage Door Toggle";
             type = "tile";
             entity = "sensor.garage_door_status";
             tap_action = {

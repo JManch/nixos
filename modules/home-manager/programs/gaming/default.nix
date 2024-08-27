@@ -29,6 +29,7 @@ in
     lutris.enable = mkEnableOption "Lutris";
     prism-launcher.enable = mkEnableOption "Prism Launcher";
     mint.enable = mkEnableOption "DRG Mod Loader";
+    ryujinx.enable = mkEnableOption "Ryujinx";
 
     gameClasses = mkOption {
       type = with types; listOf str;

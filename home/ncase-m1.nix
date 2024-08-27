@@ -95,6 +95,7 @@
         lutris.enable = true;
         prism-launcher.enable = true;
         mint.enable = true;
+        ryujinx.enable = true;
       };
     };
 

@@ -130,15 +130,15 @@ in
               hash = "sha256-XwaOQJvosCUXMZYrKX7sMWJIrMx36RhuVYUq163vvNg=";
             };
           })
-          (pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs {
+          pkgs.home-assistant-custom-components.waste_collection_schedule
+          (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs {
             src = pkgs.fetchFromGitHub {
-              owner = "mampfes";
-              repo = "hacs_waste_collection_schedule";
-              rev = "refs/tags/2.0.1";
-              hash = "sha256-nStfENwlPXPEvK13e8kUpPav6ul6XQO/rViHRHlZpKI=";
+              owner = "basnijholt";
+              repo = "adaptive-lighting";
+              rev = "refs/tags/1.23.0";
+              hash = "sha256-Yq8mKk2j2CHyHvwyej0GeFQhuy1MFXwt0o+lDOGwrBU=";
             };
           })
-          pkgs.home-assistant-custom-components.adaptive_lighting
           selfPkgs.heatmiser
           selfPkgs.thermal-comfort
           selfPkgs.daikin-onecta
@@ -195,6 +195,7 @@ in
               "image.roborock_s6_maxv_*"
               "input_text.*_announcement_response"
               "input_boolean.*_announcement_achnowledged"
+              "sensor.*_faikin_liquid"
             ];
           };
         };

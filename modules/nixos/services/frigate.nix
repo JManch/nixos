@@ -59,7 +59,7 @@ mkIf cfg.enable {
       mqtt = mkIf (hass.enable && mosquitto.enable) {
         enabled = true;
         host = "127.0.0.1";
-        port = mosquitto.port;
+        port = 1883;
         user = "{FRIGATE_MQTT_USER}";
         password = "{FRIGATE_MQTT_PASSWORD}";
       };

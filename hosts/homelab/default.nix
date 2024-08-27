@@ -45,6 +45,7 @@ in
       index-checker.enable = true;
       fail2ban.enable = true;
       mealie.enable = true;
+      acme.enable = true;
 
       calibre = {
         enable = true;

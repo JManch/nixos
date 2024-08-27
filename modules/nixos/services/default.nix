@@ -34,6 +34,7 @@ in
     index-checker.enable = mkEnableOption "Google Site Index Checker";
     unifi.enable = mkEnableOption "Unifi Controller";
     fail2ban.enable = mkEnableOption "Fail2ban";
+    acme.enable = mkEnableOption "ACME";
 
     wireguard =
       let
@@ -398,9 +399,17 @@ in
         '';
       };
 
-      port = mkOption {
-        type = types.port;
-        default = 1883;
+      tlsUsers = mkOption {
+        type = types.attrs;
+        default = { };
+        example = lib.literalExpression ''
+          {
+            frigate = {
+              acl = [ "readwrite #" ];
+              hashedPasswordFile = mqttFrigatePassword.path;
+            };
+          }
+        '';
       };
     };
 

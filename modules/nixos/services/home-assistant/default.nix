@@ -308,15 +308,30 @@ in
         }
       '';
 
-    modules.services.mosquitto.users = {
-      hass = {
-        acl = [ "readwrite #" ];
-        hashedPasswordFile = mqttHassPassword.path;
+    modules.services.mosquitto = {
+      users = {
+        hass = {
+          acl = [ "readwrite #" ];
+          hashedPasswordFile = mqttHassPassword.path;
+        };
+
+        # Faikin doesn't support mqtt tls unfortunately. To mitigate this we
+        # restrict acls and run on trusted LAN.
+        # WARN: prefixapp and prefixhost need to be enabled in faikin settings
+        faikin = {
+          acl = [
+            "readwrite Faikin/#"
+            "readwrite homeassistant/climate/#"
+          ];
+          hashedPasswordFile = mqttFaikinPassword.path;
+        };
       };
 
-      faikin = {
-        acl = [ "readwrite #" ];
-        hashedPasswordFile = mqttFaikinPassword.path;
+      tlsUsers = {
+        shelly = {
+          acl = [ "readwrite #" ];
+          hashedPasswordFile = config.age.secrets.mqttShellyPassword.path;
+        };
       };
     };
 

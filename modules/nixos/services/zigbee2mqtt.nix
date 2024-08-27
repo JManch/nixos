@@ -60,7 +60,7 @@ mkIf cfg.enable {
       };
 
       mqtt = {
-        server = "mqtt://127.0.0.1:${toString mosquitto.port}";
+        server = "mqtt://127.0.0.1:1883";
         user = "zigbee2mqtt";
         password = "!${zigbee2mqttYamlSecrets.path} password";
       };

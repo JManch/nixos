@@ -50,7 +50,7 @@ mkIf (cfg.enable && isWayland) {
   };
 
   darkman.switchApps.fuzzel = {
-    paths = [ "fuzzel/fuzzel.ini" ];
+    paths = [ ".config/fuzzel/fuzzel.ini" ];
   };
 
   desktop.hyprland.settings.bindr =

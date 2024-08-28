@@ -86,7 +86,7 @@ mkIf (cfg.enable && desktopEnabled) {
   };
 
   darkman.switchApps.dunst = {
-    paths = [ "dunst/dunstrc" ];
+    paths = [ ".config/dunst/dunstrc" ];
     reloadScript = "${systemctl} restart --user dunst";
 
     colorOverrides = {

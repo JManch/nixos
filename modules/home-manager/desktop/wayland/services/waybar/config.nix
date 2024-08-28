@@ -271,8 +271,8 @@ mkIf (cfg.enable && isWayland) {
 
   darkman.switchApps.waybar = {
     paths = [
-      "waybar/config"
-      "waybar/style.css"
+      ".config/waybar/config"
+      ".config/waybar/style.css"
     ];
     reloadScript = "${systemctl} restart --user waybar";
   };

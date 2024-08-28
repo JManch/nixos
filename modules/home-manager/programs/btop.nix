@@ -74,7 +74,7 @@ mkIf cfg.enable {
   '';
 
   darkman.switchApps.btop = {
-    paths = [ themePath ];
+    paths = [ ".config/${themePath}" ];
   };
 
   xdg.desktopEntries.btop =

@@ -69,7 +69,7 @@ mkIf cfg.enable {
   };
 
   darkman.switchApps.alacritty = {
-    paths = [ "alacritty/alacritty.toml" ];
+    paths = [ ".config/alacritty/alacritty.toml" ];
 
     extraReplacements = singleton {
       dark = "opacity = 0.7";

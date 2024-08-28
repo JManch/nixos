@@ -81,6 +81,6 @@ mkIf (cfg.enable && isWayland) {
   };
 
   darkman.switchApps.swaylock = {
-    paths = [ "swaylock/config" ];
+    paths = [ ".config/swaylock/config" ];
   };
 }

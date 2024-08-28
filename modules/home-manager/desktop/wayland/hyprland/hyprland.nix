@@ -294,7 +294,7 @@ mkIf (utils.isHyprland config) {
       mapDarkColor = base: colorMap.${base} // { light = dark.palette.${base}; };
     in
     {
-      paths = [ "hypr/hyprland.conf" ];
+      paths = [ ".config/hypr/hyprland.conf" ];
       # Only reload if gamemode is not active to avoid overriding
       # gamemode-specific hyprland settings
       reloadScript = "${getExe' pkgs.gamemode "gamemoded"} --status | grep 'is active' -q || ${hyprctl} reload";

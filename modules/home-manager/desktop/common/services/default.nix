@@ -63,11 +63,8 @@ in
                   "waybar/style.css"
                 ];
                 description = ''
-                  List of config file paths relative to $XDG_CONFIG_HOME that
-                  contain hex colors we want to switch. Note that the config
-                  file must be generated with xdg.configFile and the path
-                  should match the attribute name used in the xdg.configFile
-                  entry.
+                  List of paths relative to $HOME that point to files managed
+                  by home-manager that contain hex colors we want to switch
                 '';
               };
 

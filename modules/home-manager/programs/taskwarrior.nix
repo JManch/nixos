@@ -6,14 +6,15 @@
   ...
 }:
 let
+  inherit (lib) mkIf singleton;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.modules.programs.taskwarrior;
 in
-lib.mkIf cfg.enable {
+mkIf cfg.enable {
   programs.taskwarrior = {
     enable = true;
     package = pkgs.taskwarrior3;
-    colorTheme = "light-256";
+    colorTheme = "dark-256";
     extraConfig = ''
       include $XDG_RUNTIME_DIR/agenix/taskwarriorSyncEncryption
       sync.server.url=https://tasks.${fqDomain}
@@ -25,6 +26,14 @@ lib.mkIf cfg.enable {
   };
 
   home.packages = [ pkgs.taskwarrior-tui ];
+
+  darkman.switchApps.taskwarrior = {
+    paths = [ ".config/task/home-manager-taskrc" ];
+    extraReplacements = singleton {
+      dark = "dark-256";
+      light = "light-256";
+    };
+  };
 
   persistence.directories = [
     ".local/share/task"

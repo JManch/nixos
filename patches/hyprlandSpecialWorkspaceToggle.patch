@@ -10,7 +10,7 @@ index ead83fa8..163a39e2 100644
 -    auto       specialOpenOnMonitor            = PMONITOR->activeSpecialWorkspaceID();
 +    auto       PMONITOR                        = g_pCompositor->m_pLastMonitor.get();
  
-     for (auto& m : g_pCompositor->m_vMonitors) {
+     for (auto const& m : g_pCompositor->m_vMonitors) {
          if (m->activeSpecialWorkspaceID() == workspaceID) {
              requestedWorkspaceIsAlreadyOpen = true;
 +            PMONITOR = m.get();

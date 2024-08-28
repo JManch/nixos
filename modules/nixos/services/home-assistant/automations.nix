@@ -295,20 +295,37 @@ let
   mowerErrorNotify = singleton {
     alias = "Automower Error Notify";
     mode = "single";
-    trigger = singleton {
-      platform = "state";
-      entity_id = [ "sensor.lewis_error" ];
-      from = null;
-    };
-    condition = singleton {
-      condition = "template";
-      value_template = "{{ has_value('sensor.lewis_error') }}";
-    };
+    trigger = [
+      {
+        platform = "state";
+        entity_id = [ "sensor.lewis_error" ];
+        from = null;
+      }
+    ];
+    condition = [
+      {
+        condition = "template";
+        value_template = "{{ has_value('sensor.lewis_error') }}";
+      }
+      {
+        condition = "not";
+        conditions = singleton {
+          condition = "state";
+          entity_id = "sensor.lewis_error";
+          state = "no_error";
+        };
+      }
+    ];
     action = singleton {
       action = "notify.adults";
       data = {
         title = "Lewis Needs Help!";
-        message = "Error: {{ states('sensor.lewis_error') }}";
+        message = "Error: {{ state_attr('sensor.lewis_error', 'friendly_name') }}";
+        data = {
+          channel = "Automower";
+          ttl = 0;
+          importance = "high";
+        };
       };
     };
   };

@@ -46,6 +46,7 @@ in
       fail2ban.enable = true;
       mealie.enable = true;
       acme.enable = true;
+      taskchampion-server.enable = true;
 
       calibre = {
         enable = true;

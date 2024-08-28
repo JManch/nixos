@@ -882,6 +882,16 @@ in
         description = "Port for the Mealie server to listen on";
       };
     };
+
+    taskchampion-server = {
+      enable = mkEnableOption "Taskchampion Sync Server";
+
+      port = mkOption {
+        type = types.port;
+        default = 10222;
+        description = "Port for the Taskchampion server to listen on";
+      };
+    };
   };
 
   config = {

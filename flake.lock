@@ -1214,11 +1214,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1724152091,
-        "narHash": "sha256-pvMS0KE5+JKjegyc77bpJCvbsfNsaRRGuUgU7r03RO0=",
+        "lastModified": 1724836453,
+        "narHash": "sha256-cc7kQKBHiUgosX/yv3ZBtWBXv7LllJ7J+bXWbSRukmY=",
         "owner": "JManch",
         "repo": "nixpkgs",
-        "rev": "f0a9eefdb8952836ae5d46f98833971440a73825",
+        "rev": "4562dc099e6b2c43929c33dcded1f10489c40e96",
         "type": "github"
       },
       "original": {

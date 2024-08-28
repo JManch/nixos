@@ -1,9 +1,12 @@
+{ inputs, ... }:
+let
+  inherit (inputs.nix-resources.secrets) fqDomain;
+in
 {
   imports = [ ./hardware-configuration.nix ];
 
   device = {
     type = "desktop";
-    # TODO: Double check this
     ipAddress = "192.168.88.220";
     memory = 1024;
 
@@ -21,16 +24,20 @@
       type = "sdImage";
     };
 
+    services = {
+      restic.enable = true;
+      restic.backupSchedule = "*-*-* 03:00:00";
+      zigbee2mqtt = {
+        enable = true;
+        mqtt.server = "mqtt://mqtt.${fqDomain}:8883";
+        deviceNode = "/dev/ttyACM0";
+      };
+    };
+
     system = {
-      audio.enable = true;
       ssh.server.enable = true;
       # Cross compilation build fails
       ssh.agent.enable = false;
-
-      desktop = {
-        enable = true;
-        desktopEnvironment = "xfce";
-      };
 
       networking = {
         primaryInterface = "enu1u1u1";

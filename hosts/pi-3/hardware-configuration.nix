@@ -1,3 +1,4 @@
+{ lib, ... }:
 {
   networking.hostId = "bc80a660";
 
@@ -15,6 +16,9 @@
     "console=ttyS0,115200n8"
     "console=tty0"
   ];
+
+  # zfs has a dependency on samba which is broken under cross compilation
+  boot.supportedFilesystems.zfs = lib.mkForce false;
 
   system.stateVersion = "24.05";
 }

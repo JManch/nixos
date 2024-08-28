@@ -46,16 +46,23 @@ mkMerge [
       initrd.systemd.enable = true;
       tmp.useTmpfs = cfg.tmpfsTmp;
 
-      loader = {
-        efi.canTouchEfiVariables = true;
-        timeout = mkIf cfg.extendedLoaderTimeout 30;
-        systemd-boot = {
-          enable = true;
-          editor = false;
-          consoleMode = "auto";
-          configurationLimit = 20;
-        };
-      };
+      loader =
+        if (cfg.type == "sdImage") then
+          {
+            generic-extlinux-compatible.enable = true;
+            grub.enable = false;
+          }
+        else
+          {
+            efi.canTouchEfiVariables = true;
+            timeout = mkIf cfg.extendedLoaderTimeout 30;
+            systemd-boot = {
+              enable = true;
+              editor = false;
+              consoleMode = "auto";
+              configurationLimit = 10;
+            };
+          };
     };
 
     programs.zsh.shellAliases = {

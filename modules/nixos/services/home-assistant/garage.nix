@@ -116,6 +116,11 @@ mkIf cfg.enableInternal {
           event_type = "mobile_app_notification_action";
           event_data.action = "CLOSE_GARAGE_DOOR";
         };
+        condition = singleton {
+          condition = "state";
+          entity_id = "binary_sensor.garage_door_closed";
+          state = "off";
+        };
         action = singleton { action = "script.garage_door_toggle"; };
       }
       {
@@ -147,6 +152,7 @@ mkIf cfg.enableInternal {
               importance = "high";
               channel = "Garage Door";
               tag = "garage-door-open";
+              ttl = 0;
               notification_icon = "mdi:garage-alert-variant";
               actions = singleton {
                 action = "CLOSE_GARAGE_DOOR";

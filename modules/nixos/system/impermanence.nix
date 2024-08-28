@@ -107,6 +107,7 @@ in
 
     (mkIf (!cfg.enable) {
       persistence = {
+        enable = false;
         directories = mkForce [ ];
         files = mkForce [ ];
         users.${username} = mkForce { };

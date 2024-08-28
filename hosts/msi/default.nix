@@ -6,7 +6,7 @@
 
   device = {
     type = "desktop";
-    ipAddress = null;
+    ipAddress = "192.168.88.244";
     memory = 1024 * 16;
 
     cpu = {

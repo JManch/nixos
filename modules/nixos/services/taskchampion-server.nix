@@ -24,6 +24,7 @@ mkIf cfg.enable {
 
   systemd.services.taskchampion-sync-server.serviceConfig = utils.hardeningBaseline config {
     DynamicUser = false;
+    StateDirectory = "taskchampion-sync-server";
   };
 
   services.caddy.virtualHosts."tasks.${fqDomain}".extraConfig = ''

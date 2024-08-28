@@ -42,6 +42,10 @@ let
       runtimeInputs = [ pkgs.nixos-rebuild ] ++ optional (cmd == "diff") pkgs.nvd;
       # Always rebuild in ~ because I once had a bad experience where I
       # accidentally built in /nix/store and caused irrepairable corruption
+
+      # Use --fast on all switch modes apart from boot as I usually do a
+      # rebuild-boot after a large nixpkgs change which is the only time when
+      # --fast would be bad to use
       text = # bash
         ''
           flake="/home/${adminUsername}/.config/nixos"
@@ -53,12 +57,8 @@ let
           pushd ~ >/dev/null 2>&1
 
           nixos-rebuild ${if (cmd == "diff") then "build" else cmd} \
-            --use-remote-sudo --flake "$flake#${hostname}" "$@"
-          ${optionalString (cmd == "diff") # bash
-            ''
-              nvd diff /run/current-system result
-            ''
-          }
+            --use-remote-sudo --flake "$flake#${hostname}" ${optionalString (cmd != "boot") "--fast"} "$@"
+          ${optionalString (cmd == "diff") "nvd diff /run/current-system result"}
         '';
     }
   ) rebuildCmds;
@@ -103,7 +103,7 @@ let
           mkdir -p "$remote_builds"
           trap "popd >/dev/null 2>&1 || true" EXIT
           pushd "$remote_builds" >/dev/null 2>&1
-          nixos-rebuild build --flake "$flake#$hostname" "''${@:2}"
+          nixos-rebuild build --flake "$flake#$hostname" ${optionalString (cmd != "boot") "--fast"} "''${@:2}"
         '';
     in
     pkgs.writeShellApplication {
@@ -132,7 +132,8 @@ let
           else
             optionalString (cmd != "build") # bash
               ''
-                nixos-rebuild ${cmd} --use-remote-sudo --flake "$flake#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
+                nixos-rebuild ${cmd} ${optionalString (cmd != "boot") "--fast"} \
+                  --use-remote-sudo --flake "$flake#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
               ''
         );
     }

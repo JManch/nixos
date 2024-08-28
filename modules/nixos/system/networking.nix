@@ -23,6 +23,7 @@ let
     allUnique
     ;
   inherit (config.modules.core) homeManager;
+  inherit (config.modules.system) desktop;
   cfg = config.modules.system.networking;
   homeFirewall = config.home-manager.users.${username}.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
@@ -141,7 +142,7 @@ in
 
   services.resolved.enable = cfg.resolved.enable;
 
-  userPackages = optional cfg.wireless.enable pkgs.wpa_supplicant_gui;
+  userPackages = optional (cfg.wireless.enable && desktop.enable) pkgs.wpa_supplicant_gui;
   systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";
 
   systemd.services."disable-wifi-on-boot" = mkIf (cfg.wireless.enable && cfg.wireless.disableOnBoot) {

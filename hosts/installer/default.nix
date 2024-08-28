@@ -189,6 +189,11 @@ let
       install_nixos() {
         if [ "$fs_type" = "sdImage" ]; then
           echo "### Running nixos-rebuild boot ###"
+
+          if [ -n "$build_host" ]; then
+            build_host="--build-host root@$build_host"
+          fi
+
           # No need to run nixos-install on sdImage hosts as the install
           # environment is our filesystem
           nixos-rebuild boot \

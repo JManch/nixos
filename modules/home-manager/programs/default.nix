@@ -1,6 +1,6 @@
 { lib, ... }:
 let
-  inherit (lib) mkEnableOption;
+  inherit (lib) mkEnableOption mkOption types;
 in
 {
   imports = lib.utils.scanPaths ./.;
@@ -46,6 +46,23 @@ in
       };
       hideToolbar = mkEnableOption "automatic toolbar hiding";
       runInRam = mkEnableOption "running Firefox in RAM";
+    };
+
+    taskwarrior = {
+      enable = mkEnableOption "Taskwarrior";
+
+      primaryClient = mkEnableOption ''
+        Whether this is the primary Taskwarrior client for this user
+      '';
+
+      userUuid = mkOption {
+        type = types.str;
+        default = "565b3910-9d0b-4c2c-9bfc-b3195aac9d8f";
+        description = ''
+          Randomly generated UUID that identifies a user on the Taskchampion
+          sync server
+        '';
+      };
     };
   };
 }

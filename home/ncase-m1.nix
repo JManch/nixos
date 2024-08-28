@@ -88,6 +88,11 @@
         runInRam = true;
       };
 
+      taskwarrior = {
+        enable = true;
+        primaryClient = true;
+      };
+
       gaming = {
         steam.enable = true;
         mangohud.enable = true;

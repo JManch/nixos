@@ -444,10 +444,42 @@ in
     zigbee2mqtt = {
       enable = mkEnableOption "Zigbee2MQTT";
 
+      mqtt = {
+        user = mkEnableOption "the Zigbee2mqtt Mosquitto user";
+
+        server = mkOption {
+          type = types.str;
+          default = "mqtt://127.0.0.1:1883";
+          description = "MQTT server address";
+        };
+      };
+
+      proxy = {
+        enable = mkEnableOption "proxying Zigbee2mqtt";
+
+        address = mkOption {
+          type = types.str;
+          default = "127.0.0.1";
+          description = "Frontend proxy address";
+        };
+
+        port = mkOption {
+          type = types.port;
+          default = cfg.zigbee2mqtt.port;
+          description = "Frontend proxy port";
+        };
+      };
+
       port = mkOption {
         type = types.port;
         default = 8084;
         description = "Port of the frontend web interface";
+      };
+
+      address = mkOption {
+        type = types.str;
+        default = "127.0.0.1";
+        description = "Address for the frontend web interface to listen on";
       };
 
       deviceNode = mkOption {

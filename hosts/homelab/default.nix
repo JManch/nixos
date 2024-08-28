@@ -103,7 +103,13 @@ in
       };
 
       zigbee2mqtt = {
+        # enable = false;
+        # proxy.enable = true;
+        # proxy.address = "pi-3.lan";
+        # mqtt.user = true;
         enable = true;
+        proxy.enable = true;
+        mqtt.user = true;
         deviceNode = "/dev/ttyACM0";
       };
 

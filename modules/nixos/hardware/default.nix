@@ -74,7 +74,7 @@ in
         in
         {
           enable = mkEnableOption "swap" // {
-            default = cfg.fileSystem.type != "zfs" && memory <= 4 * 1024;
+            default = cfg.fileSystem.type != "zfs" && cfg.fileSystem.type != "sdImage" && memory <= 4 * 1024;
           };
 
           size = mkOption {

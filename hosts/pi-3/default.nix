@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ pkgs, inputs, ... }:
 let
   inherit (inputs.nix-resources.secrets) fqDomain;
 in
@@ -49,4 +49,6 @@ in
       };
     };
   };
+
+  environment.systemPackages = [ pkgs.btop ];
 }

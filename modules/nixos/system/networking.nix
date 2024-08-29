@@ -133,8 +133,20 @@ in
       allowAuxiliaryImperativeNetworks = true;
 
       networks = {
+        # Use psk for WPA3 and pskRaw for WPA2. More info in secret file.
+        # Priorities seem to get assigned for 2.4GHz and 5GHz so increment by 2
+        # between each network
+
+        # Inspect the generated file at /run/wpa_supplicant/wpa_supplicant.conf
+        # Manually reload config with `wpa_cli -i <wireless_interface> reconfigure`
+        Mikrotik = {
+          psk = "@MIKROTIK@";
+          priority = 3;
+        };
+
         "Pixel 5" = {
           pskRaw = "@PIXEL_5@";
+          priority = 1;
         };
       };
     };

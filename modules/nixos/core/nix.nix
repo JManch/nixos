@@ -11,7 +11,6 @@
 let
   inherit (lib)
     mkIf
-    utils
     mapAttrs
     filterAttrs
     isType
@@ -20,7 +19,6 @@ let
     optionalString
     mkForce
     concatStringsSep
-    getExe
     ;
   inherit (config.modules.system) impermanence;
   cfg = config.modules.core;
@@ -139,109 +137,9 @@ let
         );
     }
   ) rebuildCmds;
-
-  setupSdImage = pkgs.writeShellApplication {
-    name = "setup-sd-image";
-    runtimeInputs = with pkgs; [
-      parted
-      age
-    ];
-    text = # bash
-      ''
-        if [ "$(id -u)" != "0" ]; then
-           echo "This script must be run as root" 1>&2
-           exit 1
-        fi
-
-        if [ "$#" -ne 2 ]; then
-          echo "Usage: setup-sd-image <hostname> <result_path>"
-          exit 1
-        fi
-        ${utils.exitTrapBuilder}
-
-        hostname="$1"
-        result="$2"
-
-        flake="/home/${adminUsername}/.config/nixos"
-        if [ ! -d $flake ]; then
-          echo "Flake does not exist locally so using remote from github"
-          flake="github:JManch/nixos"
-        fi
-
-        host_config="$flake#nixosConfigurations.$hostname.config"
-        fs_type=$(nix eval --raw "$host_config.modules.hardware.fileSystem.type")
-        username=$(nix eval --raw "$host_config.modules.core.username")
-        admin_username=$(nix eval --raw "$host_config.modules.core.adminUsername")
-
-        if [ "$fs_type" != "sd-image" ]; then
-          echo "Host $hostname does not have a sd image filesystem" 1>&2
-          exit 1
-        fi
-
-        tmpdir=$(mktemp -d)
-        clean_up() {
-          umount /mnt/nixos-sd-image >/dev/null 2>&1 || true
-          rm -rf "$tmpdir"
-        }
-        add_exit_trap clean_up
-
-        if ! ls "$result"/sd-image/*.img >/dev/null 2>&1; then
-          echo "Result path does not contain an sd image" 1>&2
-          exit 1
-        fi
-
-        echo "### Mounting sd image ###"
-        cp "$result"/sd-image/*.img "$tmpdir"
-        start_sector=$(parted -s "$tmpdir"/*.img unit s print 2>/dev/null | grep ext4 | awk '{print $2}' | sed 's/s//')
-        offset=$((start_sector * 512))
-
-        rootDir="/mnt/nixos-sd-image"
-        mkdir -p $rootDir
-        mount -o loop,offset="$offset" -t ext4 "$tmpdir"/*.img "$rootDir"
-
-        echo "### Decrypting ssh-bootstrap-kit ###"
-        temp_keys=$(mktemp -d)
-        clean_up_keys() {
-          rm -rf "$temp_keys"
-        }
-        add_exit_trap clean_up_keys
-        kit_path="${../../../hosts/ssh-bootstrap-kit}"
-        age -d "$kit_path" | tar -xf - -C "$temp_keys"
-
-        echo "### Installing keys ###"
-        install -d -m755 "$rootDir/etc/ssh" "$rootDir/home"
-        install -d -m700 "$rootDir/home/$username" "$rootDir/home/$admin_username"
-        install -d -m700 "$rootDir/home/$username/.ssh" "$rootDir/home/$admin_username/.ssh"
-
-        # Host keys
-        mv "$temp_keys/$hostname"/* "$rootDir/etc/ssh"
-
-        # User keys
-        if [ -d "$temp_keys/$username" ]; then
-          mv "$temp_keys/$username"/* "$rootDir/home/$username/.ssh"
-        fi
-
-        # Admin user keys
-        if [[ -d "$temp_keys/$admin_username" && -n "$(ls -A "$temp_keys/$admin_username")" ]]; then
-          mv "$temp_keys/$admin_username"/* "$rootDir/home/$admin_username/.ssh"
-        fi
-
-        rm -rf "$temp_keys"
-        # user:users
-        chown -R 1000:100 "$rootDir/home/$username"
-
-        if [ "$username" != "$admin_username" ]; then
-          # admin_user:wheel
-          chown -R 1:1 "$rootDir/home/$admin_username"
-        fi
-
-        umount "$rootDir"
-        mv "$tmpdir"/*.img .
-      '';
-  };
 in
 {
-  adminPackages = rebuildScripts ++ remoteRebuildScripts ++ [ setupSdImage ];
+  adminPackages = rebuildScripts ++ remoteRebuildScripts;
   persistenceAdminHome.directories = [ ".remote-builds" ];
 
   # Nice explanation of overlays: https://archive.is/f8goR
@@ -386,26 +284,6 @@ in
             return 1
           fi
           nixos-rebuild repl --flake "${configDir}#$1"
-        }
-
-        build-installer() {
-          if [ -z "$1" ]; then
-            echo "Usage: build-installer <name>"
-            return 1
-          fi
-
-          flake="/home/${adminUsername}/.config/nixos"
-          if [ ! -d $flake ]; then
-            echo "Flake does not exist locally so using remote from github"
-            flake="github:JManch/nixos"
-          fi
-
-          host_config="$flake#nixosConfigurations.$1.config"
-          fs_type=$(nix eval --raw "$host_config.modules.hardware.fileSystem.type")
-          result=$(nix build "$flake#installer-$1")
-          if [ "$fs_type" = "sd-image"]; then
-            sudo ${getExe setupSdImage} "$1" "$result"
-          fi
         }
       '';
 

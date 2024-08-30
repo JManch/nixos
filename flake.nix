@@ -60,32 +60,26 @@
         };
       };
 
-      mkInstaller =
-        name: system: base:
-        let
-          isIso = hasPrefix "cd-dvd" base;
-        in
-        {
-          inherit name;
-          value =
-            (nixosSystem {
-              specialArgs = {
-                inherit
-                  lib
-                  self
-                  base
-                  isIso
-                  ;
-              };
-              modules = [
-                {
-                  nixpkgs.hostPlatform = system;
-                  nixpkgs.buildPlatform = "x86_64-linux";
-                }
-                ./hosts/installer
-              ];
-            }).config.system.build.${if isIso then "isoImage" else "sdImage"};
-        };
+      mkInstaller = name: system: base: {
+        inherit name;
+        value =
+          (nixosSystem {
+            specialArgs = {
+              inherit
+                lib
+                self
+                base
+                ;
+            };
+            modules = [
+              {
+                nixpkgs.hostPlatform = system;
+                nixpkgs.buildPlatform = "x86_64-linux";
+              }
+              ./hosts/installer
+            ];
+          }).config.system.build.isoImage;
+      };
     in
     {
       formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);

@@ -3,7 +3,6 @@
   pkgs,
   self,
   base,
-  isIso,
   modulesPath,
   ...
 }:
@@ -11,17 +10,10 @@ let
   inherit (lib)
     utils
     concatStringsSep
-    mkIf
-    hasPrefix
-    optional
-    mkForce
-    mkMerge
-    singleton
-    listToAttrs
     ;
-  isArm = hasPrefix "aarch64" pkgs.hostPlatform.system;
   installScript = pkgs.writeShellApplication {
     name = "install-local";
+
     runtimeInputs = with pkgs; [
       age
       disko
@@ -33,11 +25,9 @@ let
           "-s"
           "-w"
         ];
-        # Do not install man pages or shell completition because it causes
-        # build to fail or aarch64 and isn't needed here
-        postInstall = "";
       })
     ];
+
     text = ''
       if [ "$(id -u)" != "0" ]; then
          echo "This script must be run as root" 1>&2
@@ -51,7 +41,7 @@ let
       ${utils.exitTrapBuilder}
 
       hostname=$1
-      hosts=(${concatStringsSep " " (builtins.attrNames (utils.hosts self))})
+      hosts=(${concatStringsSep " " (builtins.attrNames self.nixosConfigurations)})
       match=0
       for host in "''${hosts[@]}"; do
         if [[ $host = "$hostname" ]]; then
@@ -100,14 +90,13 @@ let
 
       echo "### Fetching host information ###"
       host_config="$flake#nixosConfigurations.$hostname.config"
-      fs_type=$(nix eval --raw "$host_config.modules.hardware.fileSystem.type")
       username=$(nix eval --raw "$host_config.modules.core.username")
       admin_username=$(nix eval --raw "$host_config.modules.core.adminUsername")
       impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
       secure_boot=$(nix eval "$host_config.modules.hardware.secureBoot.enable")
       has_disko=$(nix eval --impure --expr "(builtins.getFlake \"$flake\").nixosConfigurations.$hostname.config.disko.devices.disk or {} != {}")
 
-      if [[ "$has_disko" = "false" && "$fs_type" != "sdImage" ]]; then
+      if [[ "$has_disko" = "false" ]]; then
           echo "The host does not have a disko config"
           echo "You'll need to manually formatted and partitioned the disk then mounted it to /mnt";
           read -p "Have you done this? (y/N): " -n 1 -r
@@ -118,9 +107,7 @@ let
           fi
       fi
 
-      if [ "$fs_type" = "sdImage" ]; then
-        rootDir="/"
-      elif [ "$impermanence" = "true" ]; then
+      if [ "$impermanence" = "true" ]; then
         rootDir="/mnt/persist"
       else
         rootDir="/mnt"
@@ -187,79 +174,63 @@ let
       }
 
       install_nixos() {
-        if [ "$fs_type" = "sdImage" ]; then
-          echo "### Running nixos-rebuild boot ###"
-
-          if [ -n "$build_host" ]; then
-            build_host="--build-host root@$build_host"
-          fi
-
-          # No need to run nixos-install on sdImage hosts as the install
-          # environment is our filesystem
-          nixos-rebuild boot \
-            --flake "$flake#$hostname" \
+        if [ -n "$build_host" ]; then
+          echo "### Generating system derivation ###"
+          drv=$(nix eval \
+            --raw \
             --override-input firstBoot "github:JManch/true" \
             --override-input vmInstall "github:JManch/$vmInstall" \
-            "$build_host"
+            "$host_config.system.build.toplevel.drvPath")
+
+          ssh_ctrl=$(mktemp -d)
+          cleanup_ssh_ctrl() {
+            for ctrl in "$ssh_ctrl"/ssh-*; do
+              ssh -o ControlPath="$ctrl" -O exit dummyhost 2>/dev/null || true
+            done
+            rm -rf "$ssh_ctrl"
+          }
+          ssh_opts="-o ControlMaster=auto -o ControlPath=$ssh_ctrl/ssh-%n -o ControlPersist=60"
+
+          echo "### Copying system derivation to remote host ###"
+          NIX_SSHOPTS="$ssh_opts" nix copy \
+            --to "ssh://$build_host" \
+            --derivation "$drv"
+
+          echo "### Realising system derivation on remote host ###"
+          ssh_opts="-o ControlMaster=auto -o ControlPath=$ssh_ctrl/ssh-%n -o ControlPersist=60"
+          nixos_system=$(eval ssh "$ssh_opts" "$build_host" nix-store --realise "$drv")
+
+          echo "### Copying system closure from remote host ###"
+          NIX_SSHOPTS="$ssh_opts" nix copy \
+            --from "ssh://$build_host" \
+            --to "/mnt" \
+            --no-check-sigs \
+            "$nixos_system"
         else
-          if [ -n "$build_host" ]; then
-            echo "### Generating system derivation ###"
-            drv=$(nix eval \
-              --raw \
+          echo "### Building system ###"
+          # nix build uses a tmpdir for build files. We need to make sure
+          # this is located in persistent storage on the mounted filesystem.
+          nix_build_tmp="$(mktemp -d -p "$rootDir")"
+          # shellcheck disable=SC2016
+          add_exit_trap 'rm -rf $nix_build_tmp'
+          nixos_system=$(
+            TMPDIR="$nix_build_tmp" nix build \
+              --store "/mnt" \
+              --no-link \
+              --print-out-paths \
+              --extra-experimental-features "nix-command flakes" \
               --override-input firstBoot "github:JManch/true" \
               --override-input vmInstall "github:JManch/$vmInstall" \
-              "$host_config.system.build.toplevel.drvPath")
-
-            ssh_ctrl=$(mktemp -d)
-            cleanup_ssh_ctrl() {
-              for ctrl in "$ssh_ctrl"/ssh-*; do
-                ssh -o ControlPath="$ctrl" -O exit dummyhost 2>/dev/null || true
-              done
-              rm -rf "$ssh_ctrl"
-            }
-            ssh_opts="-o ControlMaster=auto -o ControlPath=$ssh_ctrl/ssh-%n -o ControlPersist=60"
-
-            echo "### Copying system derivation to remote host ###"
-            NIX_SSHOPTS="$ssh_opts" nix copy \
-              --to "ssh://$build_host" \
-              --derivation "$drv"
-
-            echo "### Realising system derivation on remote host ###"
-            ssh_opts="-o ControlMaster=auto -o ControlPath=$ssh_ctrl/ssh-%n -o ControlPersist=60"
-            nixos_system=$(eval ssh "$ssh_opts" "$build_host" nix-store --realise "$drv")
-
-            echo "### Copying system closure from remote host ###"
-            NIX_SSHOPTS="$ssh_opts" nix copy \
-              --from "ssh://$build_host" \
-              --to "/mnt" \
-              --no-check-sigs \
-              "$nixos_system"
-          else
-            echo "### Building system ###"
-            # nix build uses a tmpdir for build files. We need to make sure
-            # this is located in persistent storage on the mounted filesystem.
-            nix_build_tmp="$(mktemp -d -p "$rootDir")"
-            # shellcheck disable=SC2016
-            add_exit_trap 'rm -rf $nix_build_tmp'
-            nixos_system=$(
-              TMPDIR="$nix_build_tmp" nix build \
-                --store "/mnt" \
-                --no-link \
-                --print-out-paths \
-                --extra-experimental-features "nix-command flakes" \
-                --override-input firstBoot "github:JManch/true" \
-                --override-input vmInstall "github:JManch/$vmInstall" \
-                "$flake#nixosConfigurations.\"$hostname\".config.system.build.toplevel"
-            )
-          fi
-
-          echo "### Installing system ###"
-          nixos-install \
-            --root "/mnt" \
-            --no-root-passwd \
-            --no-channel-copy \
-            --system "$nixos_system"
+              "$flake#nixosConfigurations.\"$hostname\".config.system.build.toplevel"
+          )
         fi
+
+        echo "### Installing system ###"
+        nixos-install \
+          --root "/mnt" \
+          --no-root-passwd \
+          --no-channel-copy \
+          --system "$nixos_system"
       }
       run_disko
       install_keys
@@ -270,58 +241,48 @@ in
 {
   imports = [ "${modulesPath}/installer/${base}" ];
 
-  config = mkMerge [
-    (listToAttrs (singleton {
-      name = if isIso then "isoImage" else "sdImage";
-      value = {
-        compressImage = false;
-      };
-    }))
+  config = {
+    isoImage.compressImage = false;
 
-    {
-      # zfs has a dependency on samba which is broken under cross compilation
-      boot.supportedFilesystems.zfs = mkIf isArm (mkForce false);
+    environment.systemPackages =
+      (with pkgs; [
+        gitMinimal
+        zellij
+        btop
+        neovim
+      ])
+      ++ [ installScript ];
 
-      environment.systemPackages =
-        (with pkgs; [
-          gitMinimal
-          (if isArm then zellij.overrideAttrs { postInstall = ""; } else zellij)
-          btop
-        ])
-        ++ optional (!isArm) pkgs.neovim
-        ++ [ installScript ];
+    nix.settings = {
+      experimental-features = "nix-command flakes";
+      auto-optimise-store = true;
+      # Causes a lot of spam in the install script otherwise
+      warn-dirty = false;
+    };
 
-      nix.settings = {
-        experimental-features = "nix-command flakes";
-        auto-optimise-store = true;
-        # Causes a lot of spam in the install script otherwise
-        warn-dirty = false;
-      };
+    zramSwap.enable = true;
 
-      zramSwap.enable = true;
+    services.openssh = {
+      enable = true;
+      settings.PasswordAuthentication = false;
+      settings.KbdInteractiveAuthentication = false;
 
-      services.openssh = {
-        enable = true;
-        settings.PasswordAuthentication = false;
-        settings.KbdInteractiveAuthentication = false;
+      knownHosts =
+        (lib.mapAttrs (host: _: {
+          publicKeyFile = ../${host}/ssh_host_ed25519_key.pub;
+          extraHostNames = [ "${host}.lan" ];
+        }) self.nixosConfigurations)
+        // {
+          "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+        };
+    };
 
-        knownHosts =
-          (lib.mapAttrs (host: _: {
-            publicKeyFile = ../${host}/ssh_host_ed25519_key.pub;
-            extraHostNames = [ "${host}.lan" ];
-          }) (utils.hosts self))
-          // {
-            "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
-          };
-      };
+    users.users.root = {
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
+      ];
+    };
 
-      users.users.root = {
-        openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
-        ];
-      };
-
-      system.stateVersion = "24.05";
-    }
-  ];
+    system.stateVersion = "24.05";
+  };
 }

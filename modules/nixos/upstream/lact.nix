@@ -39,9 +39,7 @@ in
         After = [ "multi-user.service" ];
       };
 
-      serviceConfig = {
-        ExecStart = "${getExe cfg.package} daemon";
-      };
+      serviceConfig.ExecStart = "${getExe cfg.package} daemon";
 
       wantedBy = [ "multi-user.target" ];
     };

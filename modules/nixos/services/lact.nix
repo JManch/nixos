@@ -12,14 +12,15 @@ let
     utils
     getExe'
     getExe
+    replaceStrings
     concatMapStrings
     ;
   inherit (config.device) gpu;
   cfg = config.modules.services.lact;
 
-  # I haven't worked out why yet but sometimes my GPU's PCIE address changes,
-  # causing the LACT config to not load. It only seems to switch between these
-  # two IDs though so I can workaround it by adding the same config for each
+  # I haven't worked out why yet but sometimes my GPU's PCIE address changes
+  # and causes the LACT config to not load. It only seems to switch between
+  # these two IDs so I can workaround it by applying the same config for each
   # ID.
   gpuIds = [
     "1002:744C-1EAE:7905-0000:08:00.0"
@@ -96,14 +97,14 @@ mkIf cfg.enable {
         ${concatMapStrings (gpuId: ''
           # anchor for correct indendation
             ${gpuId}:
-              ${lib.replaceStrings [ "\n" ] [ "\n    " ] gpuConfig}
+              ${replaceStrings [ "\n" ] [ "\n    " ] gpuConfig}
         '') gpuIds}
       '';
   };
 
   # Pass --high-perf when using gamemoderun for higher power cap of 257. In
-  # unigine superposition 4k optimised gives an 8% FPS instead (132fps ->
-  # 122fps). Max core clock speeds go 2000MHz -> 2200Mhz. Thermals are a fair
+  # unigine superposition 4k optimised gives an 8% FPS increase (122fps ->
+  # 132fps). Max core clock speeds go 2000MHz -> 2200Mhz. Thermals are a fair
   # bit worse though, ~200rpm fan increase.
   modules.programs.gaming.gamemode =
     let

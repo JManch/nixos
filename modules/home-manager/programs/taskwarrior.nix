@@ -16,6 +16,7 @@ mkIf cfg.enable {
     package = pkgs.taskwarrior3;
     colorTheme = "dark-256";
     extraConfig = ''
+      news.version=3.1.0
       include $XDG_RUNTIME_DIR/agenix/taskwarriorSyncEncryption
       sync.server.url=https://tasks.${fqDomain}
       sync.server.client_id=${cfg.userUuid}

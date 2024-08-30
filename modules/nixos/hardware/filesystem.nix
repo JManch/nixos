@@ -25,6 +25,7 @@ let
     replaceStrings
     ;
   inherit (config.modules.system) impermanence;
+  inherit (config.modules.hardware) raspberryPi;
   cfg = config.modules.hardware.fileSystem;
 in
 mkMerge [
@@ -46,38 +47,22 @@ mkMerge [
       initrd.systemd.enable = true;
       tmp.useTmpfs = cfg.tmpfsTmp;
 
-      loader =
-        if (cfg.type == "sdImage") then
-          {
-            generic-extlinux-compatible.enable = true;
-            grub.enable = false;
-          }
-        else
-          {
-            efi.canTouchEfiVariables = true;
-            timeout = mkIf cfg.extendedLoaderTimeout 30;
-            systemd-boot = {
-              enable = true;
-              editor = false;
-              consoleMode = "auto";
-              configurationLimit = 10;
-            };
-          };
+      loader = mkIf (!raspberryPi.enable) {
+        efi.canTouchEfiVariables = true;
+        timeout = mkIf cfg.extendedLoaderTimeout 30;
+        systemd-boot = {
+          enable = true;
+          editor = false;
+          consoleMode = "auto";
+          configurationLimit = 10;
+        };
+      };
     };
 
     programs.zsh.shellAliases = {
       boot-bios = "systemctl reboot --firmware-setup";
     };
   }
-
-  (mkIf (cfg.type == "sdImage") {
-    # Filesystem created by the sd-image-aarch64.nix installer
-    # https://github.com/NixOS/nixpkgs/blob/7bc3f9074f4aa45b003fddf53cb44e2e9d7f9979/nixos/modules/installer/sd-card/sd-image.nix#L19C3-L19C14
-    fileSystems."/" = {
-      device = "/dev/disk/by-label/NIXOS_SD";
-      fsType = "ext4";
-    };
-  })
 
   (mkIf (cfg.type == "zfs") {
     # We use legacy ZFS mountpoints and use systemd to mount them rather than

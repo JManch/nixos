@@ -19,10 +19,7 @@ in
 
   modules = {
     core.homeManager.enable = false;
-
-    hardware.fileSystem = {
-      type = "sdImage";
-    };
+    hardware.fileSystem.type = "sd-image";
 
     services = {
       restic.enable = true;

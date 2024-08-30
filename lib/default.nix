@@ -5,6 +5,7 @@ let
     filterAttrs
     imap0
     hasAttr
+    elem
     head
     findFirst
     optionalString
@@ -149,6 +150,18 @@ in
           filterAttrs (
             path: _type:
             (_type == "directory") || ((path != "default.nix") && (lib.strings.hasSuffix ".nix" path))
+          ) (builtins.readDir path)
+        )
+      );
+
+    scanPathsExcept =
+      path: except:
+      map (f: (path + "/${f}")) (
+        attrNames (
+          filterAttrs (
+            path: _type:
+            (_type == "directory")
+            || ((!elem path except) && (path != "default.nix") && (lib.strings.hasSuffix ".nix" path))
           ) (builtins.readDir path)
         )
       );

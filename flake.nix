@@ -13,8 +13,11 @@
       inherit (lib)
         nixosSystem
         genAttrs
+        filterAttrs
+        nameValuePair
         hasPrefix
         listToAttrs
+        optionals
         ;
 
       lib = nixpkgs.lib.extend (final: prev: (import ./lib final) // home-manager.lib);
@@ -49,14 +52,21 @@
               config.allowUnfree = true;
             };
           };
-          modules = [
-            {
-              nixpkgs.hostPlatform = system;
-              nixpkgs.buildPlatform = "x86_64-linux";
-            }
-            ./hosts/${hostname}
-            ./modules/nixos
-          ];
+          modules =
+            [
+              {
+                nixpkgs.hostPlatform = system;
+                nixpkgs.buildPlatform = "x86_64-linux";
+              }
+              ./hosts/${hostname}
+              ./modules/nixos
+            ]
+            ++ optionals (hasPrefix "pi" hostname) [
+              # Raspberry-pi-nix does not have an enable option so we have to
+              # conditionally import like this
+              inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+              ./modules/nixos/hardware/raspberry-pi.nix
+            ];
         };
       };
 
@@ -83,15 +93,18 @@
     in
     {
       formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
+      templates = import ./templates;
+
       packages = forEachSystem (
         pkgs:
         import ./pkgs { inherit pkgs; }
         // listToAttrs [
           (mkInstaller "installer-x86_64" "x86_64-linux" "cd-dvd/installation-cd-minimal.nix")
-          (mkInstaller "installer-pi" "aarch64-linux" "sd-card/sd-image-aarch64.nix")
         ]
+        // lib.mapAttrs' (
+          name: value: nameValuePair "installer-${name}" value.config.system.build.sdImage
+        ) (filterAttrs (n: _: hasPrefix "pi" n) self.nixosConfigurations)
       );
-      templates = import ./templates;
 
       nixosConfigurations = listToAttrs [
         (mkHost "ncase-m1" "joshua" "x86_64-linux")
@@ -192,5 +205,13 @@
 
     firefox-nightly.url = "github:nix-community/flake-firefox-nightly";
     firefox-nightly.inputs.nixpkgs.follows = "nixpkgs";
+
+    rpi-firmware-nonfree-src.url = "github:RPi-Distro/firmware-nonfree/bookworm";
+    rpi-firmware-nonfree-src.flake = false;
+
+    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
+    raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
+    # Use latest wireless firmware for WPA3
+    raspberry-pi-nix.inputs.rpi-firmware-nonfree-src.follows = "rpi-firmware-nonfree-src";
   };
 }

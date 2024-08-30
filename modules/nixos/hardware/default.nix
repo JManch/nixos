@@ -1,4 +1,9 @@
-{ lib, config, ... }:
+{
+  lib,
+  config,
+  hostname,
+  ...
+}:
 let
   inherit (lib)
     utils
@@ -8,16 +13,42 @@ let
     mkDefault
     mapAttrsToList
     hasAttr
+    hasPrefix
+    literalExpression
     ;
   cfg = config.modules.hardware;
 in
 {
-  imports = utils.scanPaths ./.;
+  imports = utils.scanPathsExcept ./. [ "raspberry-pi.nix" ];
 
   options.modules.hardware = {
     vr.enable = mkEnableOption "virtual reality";
     secureBoot.enable = mkEnableOption "secure boot";
     fanatec.enable = mkEnableOption "support for Fanatec hardware";
+
+    raspberryPi = {
+      enable = mkOption {
+        type = types.bool;
+        readOnly = true;
+        default = hasPrefix "pi" hostname;
+        description = "Whether this host is a raspberry pi";
+      };
+
+      uboot = {
+        enable = mkEnableOption "uboot bootloader (disable on newer pis)" // {
+          default = null;
+        };
+
+        package = mkOption {
+          type = types.package;
+          example = literalExpression "pkgs.ubootRaspberryPi3_64bit";
+          description = ''
+            The uboot package to use. The overlay raspberry-pi-nix uses breaks
+            things so we replace it.
+          '';
+        };
+      };
+    };
 
     fileSystem = {
       tmpfsTmp = mkEnableOption "tmp on tmpfs";
@@ -29,14 +60,11 @@ in
       type = mkOption {
         type = types.enum [
           "zfs"
-          "sdImage"
+          "ext4"
+          "sd-image"
         ];
         default = null;
-        description = ''
-          The type of filesystem on this host. Should be `sdImage` if the host
-          is installed using the sd-image.nix installer. In this case, the
-          system uses a ext4 root filesystem labelled NIXOS_SD.
-        '';
+        description = "The type of filesystem on this host";
       };
 
       zfs = {
@@ -74,7 +102,7 @@ in
         in
         {
           enable = mkEnableOption "swap" // {
-            default = cfg.fileSystem.type != "zfs" && cfg.fileSystem.type != "sdImage" && memory <= 4 * 1024;
+            default = cfg.fileSystem.type != "zfs" && cfg.fileSystem.type != "sd-image" && memory <= 4 * 1024;
           };
 
           size = mkOption {

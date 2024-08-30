@@ -44,7 +44,7 @@ let
     //
       # Add all hosts that have a static local address
       mapAttrs' (host: v: nameValuePair v.config.device.ipAddress host) (
-        filterAttrs (host: v: v.config.device.ipAddress != null) (utils.hosts self)
+        filterAttrs (host: v: v.config.device.ipAddress != null) self.nixosConfigurations
       );
 in
 mkIf cfg.enable {

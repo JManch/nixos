@@ -43,7 +43,7 @@ let
             attrNames (
               filterAttrs (
                 _: value: !(with value.config.modules.hardware.fileSystem; type == "zfs" && zfs.encryption.enable)
-              ) (utils.hosts self)
+              ) self.nixosConfigurations
             )
           )
         })

@@ -15,7 +15,6 @@ let
     mod
     elemAt
     concatMap
-    hasPrefix
     stringToCharacters
     singleton
     ;
@@ -34,8 +33,6 @@ in
       pkg.overrideAttrs (oldAttrs: {
         patches = (oldAttrs.patches or [ ]) ++ patches;
       });
-
-    hosts = self: filterAttrs (host: _: !hasPrefix "installer" host) self.nixosConfigurations;
 
     upperFirstChar =
       string:

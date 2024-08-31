@@ -51,7 +51,7 @@ let
 
         driver_numbers = {
             "Max Verstappen": 1,
-            "Logan Sargeant": 2,
+            "Franco Colapinto": 43,
             "Daniel Ricciardo": 3,
             "Lando Norris": 4,
             "Pierre Gasly": 10,

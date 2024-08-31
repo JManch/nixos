@@ -17,4 +17,5 @@ in
   hyprpy = pkgs.python3Packages.callPackage ./hyprpy.nix { };
   wg-nord = callPackage ./wg-nord.nix { };
   formulaone-card = callPackage ./formulaone-card.nix { };
+  winbox = callPackage ./winbox.nix { };
 }

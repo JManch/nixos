@@ -1,6 +1,7 @@
 {
   lib,
   pkgs,
+  self,
   pkgs',
   config,
   inputs,
@@ -21,6 +22,7 @@ let
     replaceStrings
     concatStrings
     concatStringsSep
+    concatMapStrings
     concatMapStringsSep
     nameValuePair
     optionalAttrs
@@ -36,11 +38,11 @@ let
     singleton
     ;
   inherit (config.modules.services) caddy;
-  inherit (config.modules.system) impermanence;
   inherit (config.modules.core) homeManager;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.modules.system.virtualisation) vmVariant;
   inherit (caddy) allowAddresses trustedAddresses;
+  inherit (cfg) backups;
   inherit (config.age.secrets)
     resticPasswordFile
     resticHtPasswordsFile
@@ -54,22 +56,6 @@ let
   isServer = (config.device.type == "server");
   resticExe = getExe pkgs.restic;
   homeBackups = optionalAttrs homeManager.enable config.home-manager.users.${username}.backups;
-
-  # WARN: On impermanence hosts paths are prefixed with /persist. We don't
-  # modify exclude or include paths to allow non-absolute patterns. Be careful
-  # with those.
-  backups = mapAttrs (
-    name: value:
-    value
-    // {
-      paths = map (path: "${optionalString impermanence.enable "/persist"}${path}") value.paths;
-      restore = value.restore // {
-        pathOwnership = mapAttrs' (
-          path: value: nameValuePair "${optionalString impermanence.enable "/persist"}${path}" value
-        ) value.restore.pathOwnership;
-      };
-    }
-  ) (cfg.backups // homeBackups);
 
   backupTimerConfig = {
     OnCalendar = cfg.backupSchedule;
@@ -138,12 +124,23 @@ let
         if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
         echo
 
-        ${concatStrings (
-          mapAttrsToList (
-            name: value: # bash
-            ''
-              read -p "Restore backup ${name}? (y/N): " -n 1 -r
-              if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+        read -p "Enter the host to restore from (leave empty for current): " -r hostname
+        if [ -z "$hostname" ]; then hostname="${hostname}"; fi
+
+        foreign_host=false
+        if [ "$hostname" != "${hostname}" ]; then
+          foreign_host=true
+        fi
+
+        ${concatMapStrings (
+          hostname:
+          concatStrings (
+            mapAttrsToList (
+              name: value: # bash
+              ''
+                if [ "$hostname" = "${hostname}" ]; then
+                read -p "Restore backup ${name}? (y/N): " -n 1 -r
+                if [[ "$REPLY" =~ ^[Yy]$ ]]; then
                   echo
                   sudo sh -c "$load_vars restic snapshots --tag ${name} --host ${hostname} --no-lock"
                   read -p "Enter the snapshot ID to restore (leave empty for latest): " -r snapshot
@@ -151,8 +148,12 @@ let
 
                   target="/"
                   custom_target=false
-                  read -p "Would you like to restore to a custom path instead of the original? Restore scripts will NOT run. (y/N): " -n 1 -r
-                  if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+                  if [ "$foreign_host" = false ]; then
+                    read -p "Would you like to restore to a custom path instead of the original? Restore scripts will NOT run. (y/N): " -n 1 -r
+                  else
+                    echo -n "WARN: Since you are restoring a foreign host you must specify a restore path and restore scripts will NOT run"
+                  fi
+                  if [[ "$foreign_host" = true || "$REPLY" =~ ^[Yy]$ ]]; then
                     echo
                     read -p "Enter an absolute path to a restore directory: " -r target
                     if [[ -z "$target" || -e "$target" ]]; then
@@ -175,11 +176,30 @@ let
                     # Update ownership because UID/GID mappings are not guaranteed to match between hosts
                     # Modules with statically mapped IDs don't need this https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix
                     ${
-                      concatStringsSep ";" (
+                      concatStrings (
                         mapAttrsToList (
                           path: ownership:
-                          (optionalString (ownership.user != null) "sudo chown -R ${ownership.user} ${path}")
-                          + (optionalString (ownership.group != null) ";sudo chgrp -R ${ownership.group} ${path}")
+                          let
+                            inherit (ownership) user group;
+                          in
+                          (optionalString (user != null) # bash
+                            ''
+                              if id -u "${user}" >/dev/null 2>&1; then
+                                sudo chown -R ${user} ${path}
+                              else
+                                echo "Warning: User ownership restore failed. User '${user}' does not exist on the system." >&2
+                              fi
+                            ''
+                          )
+                          + (optionalString (group != null) # bash
+                            ''
+                              if getent group "${group}" >/dev/null 2>&1; then
+                                sudo chgrp -R ${group} ${path}
+                              else
+                                echo "Warning: Group ownership restore failed. Group '${group}' does not exist on the system." >&2
+                              fi
+                            ''
+                          )
                         ) value.restore.pathOwnership
                       )
                     }
@@ -206,9 +226,11 @@ let
                     echo "Running post-restore script..."
                     ${value.restore.postRestoreScript}
                   fi
-              fi
-            '') backups
-        )}
+                fi
+                fi
+              '') self.nixosConfigurations.${hostname}.config.modules.services.restic.backups
+          )
+        ) (attrNames self.nixosConfigurations)}
       '';
   };
 in

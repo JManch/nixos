@@ -717,6 +717,37 @@ in
           }
         );
         default = { };
+        apply =
+          # Modify the backup paths and ownership paths to include persistence
+          # path if impermanence is enabled and merge with home manager backups
+
+          # WARN: Exclude and include paths are not prefixed with persistence
+          # to allow non-absolute patterns, be careful with those
+          backups:
+          let
+            inherit (lib)
+              optionalAttrs
+              mapAttrs'
+              mapAttrs
+              nameValuePair
+              optionalString
+              ;
+            inherit (config.modules.core) homeManager;
+            inherit (config.modules.system) impermanence;
+            homeBackups = optionalAttrs homeManager.enable config.home-manager.users.${username}.backups;
+          in
+          mapAttrs (
+            name: value:
+            value
+            // {
+              paths = map (path: "${optionalString impermanence.enable "/persist"}${path}") value.paths;
+              restore = value.restore // {
+                pathOwnership = mapAttrs' (
+                  path: value: nameValuePair "${optionalString impermanence.enable "/persist"}${path}" value
+                ) value.restore.pathOwnership;
+              };
+            }
+          ) (backups // homeBackups);
         description = ''
           Attribute set of Restic backups matching the upstream module backups
           options.

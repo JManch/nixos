@@ -1,4 +1,8 @@
-{ pkgs, inputs, ... }:
+{
+  pkgs,
+  inputs,
+  ...
+}:
 let
   inherit (inputs.nix-resources.secrets) fqDomain;
 in
@@ -7,7 +11,7 @@ in
 
   device = {
     type = "desktop";
-    ipAddress = "192.168.88.220";
+    ipAddress = "10.20.20.28";
     memory = 1024;
 
     cpu = {
@@ -26,7 +30,8 @@ in
       restic.backupSchedule = "*-*-* 03:00:00";
       zigbee2mqtt = {
         enable = true;
-        mqtt.server = "mqtt://mqtt.${fqDomain}:8883";
+        address = "0.0.0.0";
+        mqtt.server = "mqtts://mqtt.${fqDomain}:8883";
         deviceNode = "/dev/ttyACM0";
       };
     };
@@ -39,6 +44,16 @@ in
       networking = {
         wiredInterface = "enu1u1u1";
         useNetworkd = true;
+        resolved.enable = true;
+
+        firewall = {
+          enable = true;
+          defaultInterfaces = [
+            "enu1u1u1"
+            "wlan0"
+          ];
+        };
+
         wireless = {
           enable = true;
           interface = "wlan0";
@@ -46,6 +61,11 @@ in
       };
     };
   };
+
+  # Drop all traffic to port 8084 not originating from 192.168.89.2
+  networking.firewall.extraCommands = ''
+    iptables -I nixos-fw -p tcp --dport 8084 ! -s 192.168.89.2 -j nixos-fw-refuse
+  '';
 
   environment.systemPackages = [ pkgs.btop ];
 }

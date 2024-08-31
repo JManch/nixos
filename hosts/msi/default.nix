@@ -56,7 +56,7 @@
     system = {
       audio.enable = true;
       ssh.server.enable = true;
-      networking.primaryInterface = "enp3s0";
+      networking.wiredInterface = "enp3s0";
 
       windows.bootEntry = {
         enable = true;

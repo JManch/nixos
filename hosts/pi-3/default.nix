@@ -37,7 +37,7 @@ in
       ssh.agent.enable = false;
 
       networking = {
-        primaryInterface = "enu1u1u1";
+        wiredInterface = "enu1u1u1";
         useNetworkd = true;
         wireless = {
           enable = true;

@@ -113,12 +113,12 @@ in
       tcpOptimisations = mkEnableOption "TCP optimisations";
       resolved.enable = mkEnableOption "Resolved";
 
-      primaryInterface = mkOption {
+      wiredInterface = mkOption {
         type = types.str;
         example = "enp5s0";
         description = ''
-          Primary wired network interface of the device. Be careful to use the
-          main interface name displayed in `ip a`, NOT the altname.
+          Wired network interface of the device. Be careful to use the main
+          interface name displayed in `ip a`, NOT the altname.
         '';
       };
 
@@ -156,9 +156,10 @@ in
         enable = mkEnableOption "Firewall" // {
           default = true;
         };
+
         defaultInterfaces = mkOption {
           type = types.listOf types.str;
-          default = [ cfg.networking.primaryInterface ];
+          default = [ cfg.networking.wiredInterface ];
           example = [
             "eno1"
             "wlp6s0"

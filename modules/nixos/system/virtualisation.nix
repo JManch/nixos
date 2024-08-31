@@ -170,7 +170,7 @@ in
             virtualisation.vmVariant = true;
 
             networking = {
-              primaryInterface = mkVMOverride "eth0";
+              wiredInterface = mkVMOverride "eth0";
               staticIPAddress = mkVMOverride null;
               defaultGateway = mkVMOverride null;
               tcpOptimisations = mkVMOverride false;

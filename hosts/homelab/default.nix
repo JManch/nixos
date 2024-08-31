@@ -103,14 +103,11 @@ in
       };
 
       zigbee2mqtt = {
-        # enable = false;
-        # proxy.enable = true;
-        # proxy.address = "pi-3.lan";
-        # mqtt.user = true;
-        enable = true;
+        enable = false;
         proxy.enable = true;
+        proxy.address = "10.20.20.28";
         mqtt.user = true;
-        deviceNode = "/dev/ttyACM0";
+        mqtt.tls = true;
       };
 
       wireguard.friends = {
@@ -199,7 +196,7 @@ in
       desktop.enable = false;
 
       networking = {
-        primaryInterface = "enp1s0";
+        wiredInterface = "enp1s0";
         staticIPAddress = "192.168.89.2/24";
         defaultGateway = "192.168.89.1";
         firewall.enable = true;

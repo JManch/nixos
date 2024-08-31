@@ -4,10 +4,7 @@ let
     mkIf
     utils
     genAttrs
-    elem
-    remove
     ;
-  inherit (config.modules.system.networking) primaryInterface;
   cfg = config.modules.services.avahi;
 in
 mkIf cfg.enable {
@@ -18,7 +15,7 @@ mkIf cfg.enable {
 
   services.avahi = {
     enable = true;
-    openFirewall = elem primaryInterface cfg.interfaces;
+    openFirewall = false;
     allowInterfaces = cfg.interfaces;
     reflector = true;
     ipv4 = true;
@@ -26,7 +23,7 @@ mkIf cfg.enable {
     domainName = "local";
   };
 
-  networking.firewall.interfaces = genAttrs (remove primaryInterface cfg.interfaces) (_: {
+  networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
     allowedUDPPorts = [ 5353 ];
   });
 }

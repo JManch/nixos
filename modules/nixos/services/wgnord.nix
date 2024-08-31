@@ -12,7 +12,7 @@ let
     concatMapStringsSep
     optionalString
     ;
-  inherit (config.modules.system.networking) primaryInterface defaultGateway resolved;
+  inherit (config.modules.system.networking) wiredInterface defaultGateway resolved;
   cfg = config.modules.services.wgnord;
   ip = getExe' pkgs.iproute "ip";
 in
@@ -38,12 +38,12 @@ mkIf cfg.enable {
       ${optionalString cfg.setDNS "DNS = 103.86.96.100 103.86.99.100"}
       PreUp = ${
         concatMapStringsSep ";" (
-          route: "${ip} route add ${route} via ${defaultGateway} dev ${primaryInterface}"
+          route: "${ip} route add ${route} via ${defaultGateway} dev ${wiredInterface}"
         ) cfg.excludeSubnets
       }
       PostDown = ${
         concatMapStringsSep ";" (
-          route: "${ip} route del ${route} via ${defaultGateway} dev ${primaryInterface}"
+          route: "${ip} route del ${route} via ${defaultGateway} dev ${wiredInterface}"
         ) cfg.excludeSubnets
       }
 

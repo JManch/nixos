@@ -31,8 +31,8 @@ let
 in
 {
   assertions = utils.asserts [
-    (cfg.primaryInterface != null)
-    "Primary networking interface must be set"
+    (cfg.wiredInterface != null)
+    "Wired networking interface must be set"
     ((cfg.staticIPAddress != null) -> (cfg.defaultGateway != null))
     "Default gateway must be set when using a static IPV4 address"
     (allUnique cfg.publicPorts)
@@ -54,7 +54,7 @@ in
       {
         # TODO: Might want to bond wired and wireless networks
         "10-wired" = {
-          matchConfig.Name = cfg.primaryInterface;
+          matchConfig.Name = cfg.wiredInterface;
 
           networkConfig = {
             DHCP = cfg.staticIPAddress == null;
@@ -157,7 +157,7 @@ in
   userPackages = optional (cfg.wireless.enable && desktop.enable) pkgs.wpa_supplicant_gui;
   systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";
 
-  systemd.services."disable-wifi-on-boot" = mkIf (cfg.wireless.enable && cfg.wireless.disableOnBoot) {
+  systemd.services.disable-wifi-on-boot = mkIf (cfg.wireless.enable && cfg.wireless.disableOnBoot) {
     restartIfChanged = false;
 
     unitConfig = {
@@ -181,8 +181,8 @@ in
     {
       "wifi-up" = "sudo ${rfkill} unblock wifi";
       "wifi-down" = "sudo ${rfkill} block wifi";
-      "ethernet-up" = "sudo ${ip} link set ${cfg.primaryInterface} up";
-      "ethernet-down" = "sudo ${ip} link set ${cfg.primaryInterface} down";
+      "ethernet-up" = "sudo ${ip} link set ${cfg.wiredInterface} up";
+      "ethernet-down" = "sudo ${ip} link set ${cfg.wiredInterface} down";
     };
 
   boot = {

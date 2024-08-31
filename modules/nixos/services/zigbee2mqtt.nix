@@ -124,9 +124,20 @@ mkMerge [
       "Zigbee2mqtt MQTT user requires Mosquitto to be enabled"
     ];
 
-    modules.services.mosquitto.users.zigbee2mqtt = {
-      acl = [ "readwrite #" ];
-      hashedPasswordFile = mqttZigbee2mqttPassword.path;
+    modules.services.mosquitto = {
+      users = mkIf (!cfg.mqtt.tls) {
+        zigbee2mqtt = {
+          acl = [ "readwrite #" ];
+          hashedPasswordFile = mqttZigbee2mqttPassword.path;
+        };
+      };
+
+      tlsUsers = mkIf cfg.mqtt.tls {
+        zigbee2mqtt = {
+          acl = [ "readwrite #" ];
+          hashedPasswordFile = mqttZigbee2mqttPassword.path;
+        };
+      };
     };
   })
 ]

@@ -445,7 +445,8 @@ in
       enable = mkEnableOption "Zigbee2MQTT";
 
       mqtt = {
-        user = mkEnableOption "the Zigbee2mqtt Mosquitto user";
+        user = mkEnableOption "Zigbee2mqtt Mosquitto user";
+        tls = mkEnableOption "TLS Mosquitto user";
 
         server = mkOption {
           type = types.str;

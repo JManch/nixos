@@ -75,7 +75,7 @@ mkMerge [
 
     systemd.services.zigbee2mqtt = {
       startLimitBurst = 3;
-      startLimitIntervalSec = 60;
+      startLimitIntervalSec = 300;
       serviceConfig = {
         # Presumably due to instability in the ember driver the service sometimes
         # thinks the dongle has disconnected and stops gracefully

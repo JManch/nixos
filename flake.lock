@@ -1205,6 +1205,26 @@
         "type": "github"
       }
     },
+    "nix-index-database": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1724576102,
+        "narHash": "sha256-uM7n5nNL6fmA0bwMJBNll11f4cMWOFa2Ni6F5KeIldM=",
+        "owner": "nix-community",
+        "repo": "nix-index-database",
+        "rev": "e333d62b70b179da1dd78d94315e8a390f2d12e5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nix-index-database",
+        "type": "github"
+      }
+    },
     "nix-matlab": {
       "inputs": {
         "flake-compat": "flake-compat_4",
@@ -1371,6 +1391,7 @@
         "neovim-config": "neovim-config",
         "nix-colors": "nix-colors",
         "nix-gaming": "nix-gaming",
+        "nix-index-database": "nix-index-database",
         "nix-matlab": "nix-matlab",
         "nix-resources": "nix-resources",
         "nixpkgs": "nixpkgs",

@@ -206,6 +206,9 @@
     firefox-nightly.url = "github:nix-community/flake-firefox-nightly";
     firefox-nightly.inputs.nixpkgs.follows = "nixpkgs";
 
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+
     rpi-firmware-nonfree-src.url = "github:RPi-Distro/firmware-nonfree/bookworm";
     rpi-firmware-nonfree-src.flake = false;
 

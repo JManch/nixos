@@ -139,6 +139,8 @@ let
   ) rebuildCmds;
 in
 {
+  imports = [ inputs.nix-index-database.nixosModules.nix-index ];
+
   adminPackages = rebuildScripts ++ remoteRebuildScripts;
   persistenceAdminHome.directories = [ ".remote-builds" ];
 

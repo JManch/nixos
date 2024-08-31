@@ -277,6 +277,9 @@ in
     "d /persist/var/nix-tmp 0755 root root"
   ];
 
+  # Nix-index doesn't work with cross compilation
+  programs.nix-index.enable = with pkgs; stdenv.hostPlatform == stdenv.buildPlatform;
+
   programs.zsh = {
     interactiveShellInit = # bash
       ''

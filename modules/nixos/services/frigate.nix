@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs',
   config,
   inputs,
   hostname,
@@ -51,9 +52,12 @@ mkIf cfg.enable {
 
   services.frigate = {
     enable = true;
+    package = pkgs'.frigate;
     hostname = "frigate.internal.com";
 
     settings = {
+      auth.enabled = false;
+      tls.enabled = false;
       ffmpeg.hwaccel_args = "preset-vaapi";
 
       mqtt = mkIf (hass.enable && mosquitto.enable) {
@@ -110,10 +114,12 @@ mkIf cfg.enable {
             "0,576,173,576,63,306,199,262,416,149,418,43,549,34,548,117,690,136,775,98,903,132,643,264,679,320,619,378,356,576,1024,576,1024,0,0,0"
           ];
 
-          zones.entrance = {
-            coordinates = "548,102,575,129,414,138,415,110";
+          zones = {
+            entrance.coordinates = "548,102,575,129,414,138,415,110";
+            driveway-zone.coordinates = "0.195,0.386,0.22,0.574,0.321,0.908,0.633,0.606,0.625,0.464,0.871,0.227,0.757,0.171,0.539,0.209,0.405,0.225";
           };
 
+          review.alerts.required_zones = [ "driveway-zone" ];
           objects.filters.car.mask = [ "648,0,648,46,419,51,411,120,647,249,1024,576,0,576,0,0" ];
         };
 
@@ -139,7 +145,11 @@ mkIf cfg.enable {
             "1024,0,1024,445,994,411,981,309,951,262,860,252,752,249,749,305,811,313,810,408,661,496,537,492,282,456,0,453,0,0"
           ];
 
+          zones.entrance.coordinates = "0.934,0.48,0.798,0.476,0.789,0.822,0.938,0.827";
+          review.alerts.required_zones = [ "entrance" ];
+
           objects.filters.car.mask = [ "1024,576,0,576,0,306,1024,316" ];
+
           # WARN: Remove this temporary mask
           objects.filters.person.mask = [ "926,342,1024,576,707,576" ];
         };

@@ -32,24 +32,17 @@ in
       settings = {
         HTTP_ADDRESS = "${optionalString cfg.proxy "127.0.0.1"}:${toString cfg.port}";
         UDP_MUX_PORT = cfg.udpMuxPort;
-        # This breaks local streaming without hairpin NAT so hairpin NAT is needed
-        # for streaming from local network when proxying
-        INCLUDE_PUBLIC_IP_IN_NAT_1_TO_1_IP = cfg.proxy;
-        DISABLE_STATUS = true;
       };
     };
 
     systemd.services.broadcast-box.wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
 
-    networking.firewall.interfaces = mkIf (!cfg.proxy) (
-      genAttrs cfg.interfaces (_: {
-        allowedTCPPorts = [ cfg.port ];
-        allowedUDPPorts = [ cfg.udpMuxPort ];
-      })
-    );
+    networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
+      allowedTCPPorts = optional (!cfg.proxy) cfg.port;
+      allowedUDPPorts = [ cfg.udpMuxPort ];
+    });
 
-    modules.system.networking.publicPorts = [ cfg.udpMuxPort ];
-    networking.firewall.allowedUDPPorts = mkIf cfg.proxy [ cfg.udpMuxPort ];
+    networking.firewall.allowedUDPPorts = [ cfg.udpMuxPort ];
 
     services.caddy.virtualHosts = mkIf cfg.proxy {
       "stream.${fqDomain}".extraConfig = ''

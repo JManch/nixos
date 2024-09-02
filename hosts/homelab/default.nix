@@ -102,6 +102,11 @@ in
         allowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
       };
 
+      factorio-server = {
+        enable = true;
+        interfaces = [ "wg-friends" ];
+      };
+
       zigbee2mqtt = {
         enable = true;
         proxy.enable = true;

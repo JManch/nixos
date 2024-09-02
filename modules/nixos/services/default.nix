@@ -961,6 +961,25 @@ in
         description = "Port for the Taskchampion server to listen on";
       };
     };
+
+    factorio-server = {
+      enable = mkEnableOption "Factorio Server";
+
+      port = mkOption {
+        type = types.port;
+        default = 34197;
+        description = "Port for the Factorio server to listen on";
+      };
+
+      interfaces = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of additional interfaces for the Factorio server to be exposed
+          on
+        '';
+      };
+    };
   };
 
   config = {

@@ -103,11 +103,12 @@ in
       };
 
       zigbee2mqtt = {
-        enable = false;
+        enable = true;
         proxy.enable = true;
-        proxy.address = "10.20.20.28";
+        proxy.address = "127.0.0.1";
         mqtt.user = true;
-        mqtt.tls = true;
+        mqtt.tls = false;
+        deviceNode = "/dev/ttyACM0";
       };
 
       wireguard.friends = {

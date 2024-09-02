@@ -163,17 +163,6 @@ let
         }
         {
           type = "entity";
-          entity = "sensor.lewis_mode";
-          icon = "mdi:robot-mower";
-          color = "green";
-          visibility = singleton {
-            condition = "state";
-            entity = "sensor.lewis_mode";
-            state_not = "home";
-          };
-        }
-        {
-          type = "entity";
           entity = "sensor.lewis_error";
           icon = "mdi:robot-mower";
           color = "red";
@@ -223,19 +212,6 @@ let
             condition = "state";
             entity = "input_boolean.guinea_pigs_fed";
             state = "off";
-          };
-        }
-        {
-          type = "entity";
-          entity = "input_boolean.guinea_pigs_fed";
-          name = "Guinea Pigs Fed";
-          color = "green";
-          state_content = "name";
-          tap_action.action = "toggle";
-          visibility = singleton {
-            condition = "state";
-            entity = "input_boolean.guinea_pigs_fed";
-            state = "on";
           };
         }
         {
@@ -1177,7 +1153,7 @@ let
     subview = true;
     sections = [
       {
-        title = "";
+        title = "Weather";
         type = "grid";
         cards = [
           {
@@ -1202,7 +1178,7 @@ let
         ];
       }
       {
-        title = "";
+        title = "Garage";
         type = "grid";
         cards = [
           {
@@ -1231,6 +1207,46 @@ let
             hours_to_show = 6;
           }
         ];
+      }
+      {
+        title = "Automower";
+        type = "grid";
+        cards = [
+          {
+            type = "tile";
+            entity = "lawn_mower.lewis";
+            features = singleton {
+              type = "lawn-mower-commands";
+              commands = [
+                "start_pause"
+                "dock"
+              ];
+            };
+            layout_options = {
+              grid_columns = 4;
+              grid_rows = 2;
+            };
+          }
+          {
+            type = "tile";
+            name = "Scheduled Mowing";
+            entity = "switch.lewis_enable_schedule";
+          }
+          {
+            type = "tile";
+            name = "Next Start Time";
+            entity = "sensor.lewis_next_start";
+          }
+        ];
+      }
+      {
+        title = "Bin Collections";
+        type = "grid";
+        cards = singleton {
+          type = "calendar";
+          initial_view = "listWeek";
+          entities = [ "calendar.bin_collection_schedule" ];
+        };
       }
     ];
   };

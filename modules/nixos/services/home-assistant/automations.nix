@@ -320,7 +320,7 @@ let
       action = "notify.adults";
       data = {
         title = "Lewis Needs Help!";
-        message = "Error: {{ state_attr('sensor.lewis_error', 'friendly_name') }}";
+        message = "{{ state_attr('sensor.lewis_error', 'friendly_name') }}";
         data = {
           channel = "Automower";
           ttl = 0;

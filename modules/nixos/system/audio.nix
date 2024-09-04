@@ -11,6 +11,7 @@ let
     getExe
     getExe'
     mkForce
+    singleton
     ;
   cfg = config.modules.system.audio;
 
@@ -28,11 +29,6 @@ let
     '';
 in
 {
-  imports = [
-    # Waiting on https://github.com/fufexan/nix-gaming/issues/161
-    # inputs.nix-gaming.nixosModules.pipewireLowLatency
-  ];
-
   config = mkMerge [
     (mkIf cfg.enable {
       userPackages = [ pkgs.pavucontrol ];
@@ -48,7 +44,6 @@ in
         jack.enable = true;
         pulse.enable = true;
         wireplumber.enable = true;
-        # lowLatency.enable = gaming.enable;
       };
 
       # Do not start pipewire user sockets for non-system users. This prevents

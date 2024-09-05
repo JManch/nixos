@@ -22,12 +22,13 @@ let
     sort
     concatLines
     ;
-  inherit (config.modules.desktop.services) hypridle;
+  inherit (config.modules) desktop;
+  inherit (desktop.services) hypridle;
   inherit (osConfig'.device) gpu;
-  cfg = desktopCfg.services.waybar;
-  desktopCfg = config.modules.desktop;
+  cfg = desktop.services.waybar;
   isHyprland = utils.isHyprland config;
   colors = config.colorScheme.palette;
+  gapSize = toString desktop.style.gapSize;
 
   audio = osConfig'.modules.system.audio;
   wgnord = osConfig'.modules.services.wgnord;
@@ -89,7 +90,7 @@ mkIf (cfg.enable && isWayland) {
       bar = {
         layer = "top";
         height = 41;
-        margin = "0";
+        margin = "${gapSize} ${gapSize} 0 ${gapSize}";
         spacing = 17;
 
         "hyprland/workspaces" = mkIf isHyprland {

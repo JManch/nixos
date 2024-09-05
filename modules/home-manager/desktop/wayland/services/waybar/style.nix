@@ -16,7 +16,6 @@ mkIf (cfg.enable && isWayland) {
       inherit (desktopCfg.style)
         cornerRadius
         borderWidth
-        gapSize
         font
         ;
       halfCornerRadius = toString (cornerRadius / 2);
@@ -52,7 +51,7 @@ mkIf (cfg.enable && isWayland) {
       window#waybar {
           background: @background;
           color: @text-light;
-          border-radius: 0px;
+          border-radius: ${toString cornerRadius}px;
           border: ${borderWidthStr}px solid @background;
       }
 
@@ -61,7 +60,7 @@ mkIf (cfg.enable && isWayland) {
       }
 
       #workspaces {
-          margin: 5px 0px 5px ${toString gapSize}px;
+          margin: 5px 0px 5px 5px;
           padding: 0px;
           border-radius: ${halfCornerRadius}px;
           background: @blue;
@@ -111,7 +110,7 @@ mkIf (cfg.enable && isWayland) {
       }
 
       #network.hostname {
-          margin: 5px ${toString gapSize}px 5px 0px;
+          margin: 5px 5px 5px 0px;
           padding: 0px 7px;
           border-radius: ${halfCornerRadius}px;
           background: @blue;

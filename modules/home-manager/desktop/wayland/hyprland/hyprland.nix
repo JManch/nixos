@@ -222,7 +222,7 @@ mkIf (utils.isHyprland config) {
           "fadeDim, 1, 4, fluent_decel"
           "border, 1, 2.7, easeOutCirc"
           "borderangle, 1, 30, fluent_decel, once"
-          "workspaces, 1, 3, easeOutCubic, slidevert"
+          "workspaces, 1, 3, easeOutCubic, slide"
         ];
       };
 

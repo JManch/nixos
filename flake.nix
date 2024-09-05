@@ -208,5 +208,8 @@
     raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
     # Use latest wireless firmware for WPA3
     raspberry-pi-nix.inputs.rpi-firmware-nonfree-src.follows = "rpi-firmware-nonfree-src";
+
+    ags.url = "github:Aylur/ags";
+    ags.inputs.nixpkgs.follows = "nixpkgs";
   };
 }

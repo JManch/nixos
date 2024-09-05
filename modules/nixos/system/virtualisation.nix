@@ -106,8 +106,6 @@ let
   };
 in
 {
-  imports = [ inputs.microvm.nixosModules.host ];
-
   config = mkMerge [
     {
       # The vmInstall input flake indicates whether or not we are installing
@@ -241,8 +239,6 @@ in
         programs.zsh.shellAliases.p = "sudo systemctl poweroff";
       };
 
-      microvm.host.enable = cfg.microvm.enable;
-
       hm = mkIf homeManager.enable {
         desktop.hyprland.settings.windowrulev2 = [
           "workspace name:VM silent, class:^(\\.?qemu.*|wlroots|virt-manager)$"
@@ -303,7 +299,5 @@ in
 
       persistence.directories = [ "/var/lib/containers" ];
     })
-
-    (mkIf cfg.microvm.enable { persistence.directories = [ "/var/lib/microvms" ]; })
   ];
 }

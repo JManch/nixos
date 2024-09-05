@@ -189,8 +189,6 @@
     broadcast-box.url = "github:JManch/broadcast-box";
     broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
 
-    microvm.url = "github:astro/microvm.nix";
-    microvm.inputs.nixpkgs.follows = "nixpkgs";
 
 
     nix-index-database.url = "github:nix-community/nix-index-database";

@@ -109,17 +109,23 @@ mkIf cfg.enableInternal {
 
     automation = [
       {
-        # For some reason the shelly goes into an unavailable state after
-        # reloading yaml config. Sending status_update fixes it.
+        # For some reason the shelly goes into an unavailable or unknown state
+        # after reloading yaml config. Sending status_update fixes it.
         alias = "Garage Shelly Update";
         mode = "single";
-        trigger = singleton {
-          platform = "state";
-          entity_id = [ "binary_sensor.garage_door_closed" ];
-          from = null;
-          to = "unavailable";
-          for.minutes = 1;
-        };
+        trigger =
+          map
+            (state: {
+              platform = "state";
+              entity_id = [ "binary_sensor.garage_door_closed" ];
+              from = null;
+              to = state;
+              for.minutes = 1;
+            })
+            [
+              "unavailable"
+              "unknown"
+            ];
         action = singleton {
           action = "mqtt.publish";
           data = {

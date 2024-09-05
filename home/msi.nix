@@ -33,9 +33,6 @@
     };
   };
 
-  # Use nightly until 130 releases for https://bugzilla.mozilla.org/show_bug.cgi?id=1898476
-  programs.firefox.package = (lib.utils.flakePkgs args "firefox-nightly").firefox-nightly-bin;
-
   backups.documents.paths = [ "Documents" ];
 
   home.stateVersion = "24.05";

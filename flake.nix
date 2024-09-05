@@ -133,9 +133,6 @@
     neovim-config.url = "github:JManch/nvim";
     neovim-config.flake = false;
 
-    anyrun.url = "github:Kirottu/anyrun";
-    anyrun.inputs.nixpkgs.follows = "nixpkgs";
-
     grimblast.url = "github:JManch/grimblast";
     grimblast.inputs.nixpkgs.follows = "nixpkgs";
 

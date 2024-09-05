@@ -32,7 +32,6 @@
       programs = {
         swaylock.enable = false;
         hyprlock.enable = true;
-        anyrun.enable = false;
         fuzzel.enable = true;
         swww.enable = true;
       };

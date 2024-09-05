@@ -20,7 +20,6 @@ in
   imports = lib.utils.scanPaths ./.;
 
   options.modules.desktop.programs = {
-    anyrun.enable = mkEnableOption "Anyrun";
     fuzzel.enable = mkEnableOption "Fuzzel";
     swww.enable = mkEnableOption "Swww";
     swaylock.enable = mkEnableOption "Swaylock";

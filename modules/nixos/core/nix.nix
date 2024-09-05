@@ -7,10 +7,11 @@
   hostname,
   adminUsername,
   ...
-}:
+}@args:
 let
   inherit (lib)
     mkIf
+    utils
     mapAttrs
     filterAttrs
     isType
@@ -139,8 +140,6 @@ let
   ) rebuildCmds;
 in
 {
-  imports = [ inputs.nix-index-database.nixosModules.nix-index ];
-
   adminPackages = rebuildScripts ++ remoteRebuildScripts;
   persistenceAdminHome.directories = [ ".remote-builds" ];
 
@@ -277,8 +276,12 @@ in
     "d /persist/var/nix-tmp 0755 root root"
   ];
 
-  # Nix-index doesn't work with cross compilation
-  programs.nix-index.enable = with pkgs; stdenv.hostPlatform == stdenv.buildPlatform;
+  programs.command-not-found.enable = false;
+  programs.nix-index = {
+    # Nix-index doesn't work with cross compilation
+    enable = with pkgs; stdenv.hostPlatform == stdenv.buildPlatform;
+    package = (utils.flakePkgs args "nix-index-database").nix-index-with-db;
+  };
 
   programs.zsh = {
     interactiveShellInit = # bash

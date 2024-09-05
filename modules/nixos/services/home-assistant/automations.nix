@@ -325,6 +325,7 @@ let
           channel = "Automower";
           ttl = 0;
           importance = "high";
+          priority = "high";
         };
       };
     };

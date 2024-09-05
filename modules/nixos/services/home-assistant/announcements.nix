@@ -293,6 +293,7 @@ in
                                   ttl = 0;
                                   channel = "Household Announcement";
                                   importance = "high";
+                                  priority = "high";
                                   visibility = "public";
                                 })
 

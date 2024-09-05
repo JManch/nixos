@@ -169,10 +169,11 @@ mkIf cfg.enableInternal {
             title = "Garage Door Open";
             message = "Tap and hold to close it";
             data = {
+              ttl = 0;
               importance = "high";
+              priority = "high";
               channel = "Garage Door";
               tag = "garage-door-open";
-              ttl = 0;
               notification_icon = "mdi:garage-alert-variant";
               actions = singleton {
                 action = "CLOSE_GARAGE_DOOR";

@@ -130,6 +130,7 @@ let
     title = "Home";
     path = "home";
     type = "sections";
+    max_columns = 1;
     badges =
       [
         {
@@ -422,18 +423,6 @@ let
                 grid_rows = 2;
               };
             };
-
-            blankButton = {
-              name = "";
-              icon = "";
-              type = "button";
-              tap_action.action = "none";
-              hold_action.action = "none";
-              layout_options = {
-                grid_columns = 1;
-                grid_rows = 2;
-              };
-            };
           in
           [
             (navigationButton "Energy" "energy" "mdi:home-lightning-bolt-outline")
@@ -560,14 +549,14 @@ let
           };
       }
     ];
-    max_columns = 2;
-    cards = [ ];
   };
 
   energy = {
     title = "Energy";
     path = "energy";
     type = "sections";
+    max_columns = 3;
+    subview = true;
     sections = [
       {
         type = "grid";
@@ -783,9 +772,6 @@ let
         ];
       }
     ];
-    max_columns = 3;
-    cards = [ ];
-    subview = true;
   };
 
   cctv = {
@@ -793,6 +779,7 @@ let
     path = "cctv";
     type = "sections";
     max_columns = 2;
+    subview = true;
     sections = [
       {
         title = "Live Views";
@@ -868,8 +855,6 @@ let
         };
       }
     ];
-    cards = [ ];
-    subview = true;
   };
 
   lounge = {

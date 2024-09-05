@@ -1,6 +1,5 @@
 {
   lib,
-  pkgs',
   config,
   inputs,
   hostname,
@@ -52,7 +51,6 @@ mkIf cfg.enable {
 
   services.frigate = {
     enable = true;
-    package = pkgs'.frigate;
     hostname = "frigate.internal.com";
 
     settings = {

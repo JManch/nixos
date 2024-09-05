@@ -26,12 +26,7 @@ in
       "restic"
       "backups"
     ])
-    # TODO: Remove once nixos-unstable updates
-    "${inputs.nixpkgs-small}/nixos/modules/services/video/frigate.nix"
   ];
-
-  # TODO: Remove once nixos-unstable updates
-  disabledModules = [ "services/video/frigate.nix" ];
 
   options.modules.services = {
     udisks.enable = mkEnableOption "udisks";

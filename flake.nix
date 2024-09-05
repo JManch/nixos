@@ -114,27 +114,15 @@
       ];
     };
 
+  # To use a local flake as an input set url to "git+file://<PATH>"
   inputs = {
-    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Critical inputs that provide imported NixOS modules. Ideally should
+    # review changes after updating.
+
     nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-personal";
-    # nixpkgs.url = "git+file:///home/joshua/files/repos/nixpkgs";
     nixpkgs-small.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+
     impermanence.url = "github:nix-community/impermanence";
-    firstBoot.url = "github:JManch/false";
-    vmInstall.url = "github:JManch/false";
-
-    nix-colors.url = "github:misterio77/nix-colors";
-    nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
-
-    # nix-resources.url = "git+file:///home/joshua/files/personal-repos/nix-resources";
-    nix-resources.url = "git+ssh://git@github.com/JManch/nix-resources";
-    nix-resources.inputs.nixpkgs.follows = "nixpkgs";
-
-    neovim-config.url = "github:JManch/nvim";
-    neovim-config.flake = false;
-
-    grimblast.url = "github:JManch/grimblast";
-    grimblast.inputs.nixpkgs.follows = "nixpkgs";
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -145,6 +133,33 @@
 
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
+
+    nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
+    nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
+
+    lanzaboote.url = "github:nix-community/lanzaboote";
+    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
+    lanzaboote.inputs.pre-commit-hooks-nix.follows = "";
+
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
+
+    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
+    raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
+    raspberry-pi-nix.inputs.rpi-firmware-nonfree-src.follows = "rpi-firmware-nonfree-src";
+
+    rpi-firmware-nonfree-src.url = "github:RPi-Distro/firmware-nonfree/bookworm";
+    rpi-firmware-nonfree-src.flake = false;
+
+    # Inputs that provide imported home-manager modules
+
+    nix-colors.url = "github:misterio77/nix-colors";
+    nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
+
+    ags.url = "github:Aylur/ags";
+    ags.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Inputs that provide packages
 
     hyprland-plugins.url = "github:hyprwm/hyprland-plugins";
     hyprland-plugins.inputs.hyprland.follows = "hyprland";
@@ -158,51 +173,30 @@
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";
 
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
-
-    nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
-    nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
-
-    lanzaboote.url = "github:nix-community/lanzaboote";
-    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
-    lanzaboote.inputs.pre-commit-hooks-nix.follows = "";
-    lanzaboote.inputs.rust-overlay.follows = "rust-overlay";
-
-    disko.url = "github:nix-community/disko";
-    disko.inputs.nixpkgs.follows = "nixpkgs";
-
-    rust-overlay.url = "github:oxalica/rust-overlay";
-    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-
     mint.url = "github:trumank/mint";
     mint.inputs.nixpkgs.follows = "nixpkgs";
-    mint.inputs.rust-overlay.follows = "rust-overlay";
-
-    cargo2nix.url = "github:cargo2nix/cargo2nix";
-    cargo2nix.inputs.nixpkgs.follows = "nixpkgs";
 
     yaml2nix.url = "github:euank/yaml2nix";
     yaml2nix.inputs.nixpkgs.follows = "nixpkgs";
-    yaml2nix.inputs.cargo2nix.follows = "cargo2nix";
-
-    broadcast-box.url = "github:JManch/broadcast-box";
-    broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
-
-
 
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
-    rpi-firmware-nonfree-src.url = "github:RPi-Distro/firmware-nonfree/bookworm";
-    rpi-firmware-nonfree-src.flake = false;
+    # Personal inputs
 
-    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
-    raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
-    # Use latest wireless firmware for WPA3
-    raspberry-pi-nix.inputs.rpi-firmware-nonfree-src.follows = "rpi-firmware-nonfree-src";
+    firstBoot.url = "github:JManch/false";
+    vmInstall.url = "github:JManch/false";
 
-    ags.url = "github:Aylur/ags";
-    ags.inputs.nixpkgs.follows = "nixpkgs";
+    nix-resources.url = "git+ssh://git@github.com/JManch/nix-resources";
+    nix-resources.inputs.nixpkgs.follows = "nixpkgs";
+
+    neovim-config.url = "github:JManch/nvim";
+    neovim-config.flake = false;
+
+    grimblast.url = "github:JManch/grimblast";
+    grimblast.inputs.nixpkgs.follows = "nixpkgs";
+
+    broadcast-box.url = "github:JManch/broadcast-box";
+    broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
   };
 }

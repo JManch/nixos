@@ -102,7 +102,7 @@ mkIf cfg.enable {
     {
       exec-once = [ (getExe twitchWorkspaceScript) ];
       workspace = [
-        "name:TWITCH,monitor:${secondMonitor.name}, gapsin:0, gapsout:0, rounding:false, border:false}"
+        "name:TWITCH,monitor:${secondMonitor.name}, gapsin:0, gapsout:0, rounding:false, border:false"
       ];
       bind = [ "${desktopCfg.hyprland.modKey}, T, workspace, name:TWITCH" ];
       windowrulev2 = [

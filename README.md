@@ -21,7 +21,7 @@ All system and Home Manager modules are stored under the `modules` directory.
 Options are used heavily to enable, disable, or modify modules on each host.
 Each host has two entry points for module configuration:
 `hosts/<hostname>/default.nix` for system configuration and
-`home/<hostname>.nix` for Home Manager configuration.
+`homes/<hostname>.nix` for Home Manager configuration.
 
 Modules are split into categories using directories. Each directory contains a
 `default.nix` file which defines all options for modules in that category. The

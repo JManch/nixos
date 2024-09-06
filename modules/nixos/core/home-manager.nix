@@ -36,7 +36,7 @@ in
       useUserPackages = true;
 
       users = mkMerge [
-        { ${username} = import ../../../home/${hostname}.nix; }
+        { ${username} = import ../../../homes/${hostname}.nix; }
         (mkIf (username != adminUsername) {
           ${adminUsername} = {
             modules = {

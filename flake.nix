@@ -5,108 +5,21 @@
     {
       self,
       nixpkgs,
-      nixpkgs-small,
       home-manager,
       ...
-    }@inputs:
+    }:
     let
-      inherit (lib)
-        nixosSystem
-        genAttrs
-        filterAttrs
-        nameValuePair
-        hasPrefix
-        listToAttrs
-        optionals
-        ;
-
-      lib = nixpkgs.lib.extend (final: prev: (import ./lib final) // home-manager.lib);
-
+      ns = "JManch";
       systems = [ "x86_64-linux" ];
-      forEachSystem =
-        f:
-        genAttrs systems (
-          system:
-          f (
-            import nixpkgs {
-              inherit system;
-              config.allowUnfree = true;
-            }
-          )
-        );
-
-      mkHost = hostname: username: system: {
-        name = hostname;
-        value = nixosSystem {
-          specialArgs = {
-            inherit
-              self
-              inputs
-              hostname
-              username
-              lib
-              ;
-            selfPkgs = self.packages.${system};
-            pkgs' = import nixpkgs-small {
-              inherit system;
-              config.allowUnfree = true;
-            };
-          };
-          modules =
-            [
-              {
-                nixpkgs.hostPlatform = system;
-                nixpkgs.buildPlatform = "x86_64-linux";
-              }
-              ./hosts/${hostname}
-              ./modules/nixos
-            ]
-            ++ optionals (hasPrefix "pi" hostname) [
-              # Raspberry-pi-nix does not have an enable option so we have to
-              # conditionally import like this
-              inputs.raspberry-pi-nix.nixosModules.raspberry-pi
-              ./modules/nixos/hardware/raspberry-pi.nix
-            ];
-        };
-      };
-
-      mkInstaller = name: system: base: {
-        inherit name;
-        value =
-          (nixosSystem {
-            specialArgs = {
-              inherit
-                lib
-                self
-                base
-                ;
-            };
-            modules = [
-              {
-                nixpkgs.hostPlatform = system;
-                nixpkgs.buildPlatform = "x86_64-linux";
-              }
-              ./hosts/installer
-            ];
-          }).config.system.build.isoImage;
-      };
+      lib = nixpkgs.lib.extend (final: _: (import ./lib final ns) // home-manager.lib);
+      mkHost = lib.utils.mkHost self;
+      forEachSystem = lib.utils.forEachSystem self systems;
     in
     {
-      formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
       templates = import ./templates;
+      packages = forEachSystem (pkgs: import ./pkgs lib pkgs self);
 
-      packages = forEachSystem (
-        pkgs:
-        import ./pkgs { inherit pkgs; }
-        // listToAttrs [
-          (mkInstaller "installer-x86_64" "x86_64-linux" "cd-dvd/installation-cd-minimal.nix")
-        ]
-        // lib.mapAttrs' (
-          name: value: nameValuePair "installer-${name}" value.config.system.build.sdImage
-        ) (filterAttrs (n: _: hasPrefix "pi" n) self.nixosConfigurations)
-      );
-
-      nixosConfigurations = listToAttrs [
+      nixosConfigurations = lib.listToAttrs [
         (mkHost "ncase-m1" "joshua" "x86_64-linux")
         (mkHost "homelab" "joshua" "x86_64-linux")
         (mkHost "msi" "lauren" "x86_64-linux")

@@ -1,4 +1,4 @@
-{ pkgs }:
+lib: pkgs: self:
 let
   inherit (pkgs) callPackage;
 in
@@ -19,3 +19,4 @@ in
   formulaone-card = callPackage ./formulaone-card.nix { };
   winbox = callPackage ./winbox.nix { };
 }
+// import ./installers.nix lib self

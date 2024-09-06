@@ -1,4 +1,4 @@
-lib:
+lib: ns:
 let
   inherit (lib)
     attrNames
@@ -6,6 +6,7 @@ let
     imap0
     hasAttr
     elem
+    genAttrs
     head
     findFirst
     optionalString
@@ -17,16 +18,67 @@ let
     concatMap
     stringToCharacters
     singleton
+    nixosSystem
+    optionals
+    hasPrefix
     ;
 in
 {
   utils = {
+    mkHost = self: hostname: username: system: {
+      name = hostname;
+      value = nixosSystem {
+        specialArgs = {
+          inherit
+            self
+            hostname
+            username
+            lib
+            ns
+            ;
+          inherit (self) inputs;
+          selfPkgs = self.packages.${system};
+          pkgs' = import self.inputs.nixpkgs-small {
+            inherit system;
+            config.allowUnfree = true;
+          };
+        };
+        modules =
+          [
+            {
+              nixpkgs.hostPlatform = system;
+              nixpkgs.buildPlatform = "x86_64-linux";
+            }
+            ../hosts/${hostname}
+            ../modules/nixos
+          ]
+          ++ optionals (hasPrefix "pi" hostname) [
+            # Raspberry-pi-nix does not have an enable option so we have to
+            # conditionally import like this
+            self.inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+            ../modules/nixos/hardware/raspberry-pi.nix
+          ];
+      };
+    };
+
+    forEachSystem =
+      self: systems: f:
+      genAttrs systems (
+        system:
+        f (
+          import self.inputs.nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          }
+        )
+      );
+
     # We use an unorthodox pkgs reference here because pkgs will not be in the
     # first layer of arguments if it is not explicitly added to the module
     # parameters. This is annoying because the LSP complains about pkgs being an
     # unused argument when it actually is used. This method avoids that.
     flakePkgs =
-      args: flake: args.inputs.${flake}.packages.${args.options._module.args.value.pkgs.system};
+      args: flake: args.inputs.${flake}.packages.${args.options._module.args.value.pkgs.stdenv.system};
 
     addPatches =
       pkg: patches:

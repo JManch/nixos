@@ -198,7 +198,7 @@ in
       # Enables referencing flakes with short name in nix commands 
       # e.g. 'nix shell n#dnsutils' or 'nix shell hyprland#wlroots-hyprland'
       registry = (mapAttrs (_: flake: { inherit flake; }) flakeInputs) // {
-        self.flake = inputs.self;
+        self.flake = self;
         n.flake = inputs.nixpkgs;
       };
 

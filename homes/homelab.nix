@@ -1,5 +1,6 @@
+{ ns, ... }:
 {
-  modules = {
+  ${ns} = {
     shell = {
       enable = true;
       promptColor = "blue";

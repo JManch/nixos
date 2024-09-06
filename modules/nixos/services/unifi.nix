@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -7,14 +8,14 @@
   ...
 }:
 let
-  inherit (lib) mkIf utils singleton;
+  inherit (lib) mkIf singleton;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) caddy;
+  inherit (config.${ns}.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
-  cfg = config.modules.services.unifi;
+  cfg = config.${ns}.services.unifi;
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = lib.${ns}.asserts [
     (hostname == "homelab")
     "Unifi is only intended to work on host 'homelab'"
     caddy.enable

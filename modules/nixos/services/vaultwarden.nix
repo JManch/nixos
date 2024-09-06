@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   pkgs',
@@ -14,13 +15,12 @@ let
     mkForce
     mkVMOverride
     optional
-    utils
     mkMerge
     ;
-  inherit (config.modules.system.virtualisation) vmVariant;
+  inherit (config.${ns}.system.virtualisation) vmVariant;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (caddy) allowAddresses trustedAddresses;
-  inherit (config.modules.services) caddy fail2ban;
+  inherit (config.${ns}.services) caddy fail2ban;
   inherit (config.age.secrets)
     rcloneConfig
     vaultwardenVars
@@ -28,7 +28,7 @@ let
     vaultwardenPublicBackupKey
     healthCheckVaultwarden
     ;
-  cfg = config.modules.services.vaultwarden;
+  cfg = config.${ns}.services.vaultwarden;
 
   restoreScript = pkgs.writeShellApplication {
     name = "vaultwarden-restore-backup";
@@ -100,7 +100,7 @@ let
   };
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = lib.${ns}.asserts [
     caddy.enable
     "Vaultwarden requires Caddy to be enabled"
     fail2ban.enable

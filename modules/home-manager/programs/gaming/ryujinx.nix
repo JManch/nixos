@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.modules.programs.gaming.ryujinx;
+  cfg = config.${ns}.programs.gaming.ryujinx;
 in
 lib.mkIf cfg.enable {
   home.packages = [ pkgs.ryujinx ];

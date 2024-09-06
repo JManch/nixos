@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -10,17 +11,17 @@ let
   inherit (lib)
     mkIf
     mkMerge
-    utils
     toUpper
     mkForce
     getExe'
     mkVMOverride
     ;
+  inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) caddy;
+  inherit (config.${ns}.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.age.secrets) scrutinyVars;
-  cfg = config.modules.services.scrutiny;
+  cfg = config.${ns}.services.scrutiny;
   influx = getExe' pkgs.influxdb2 "influx";
 in
 mkMerge [
@@ -53,7 +54,7 @@ mkMerge [
   })
 
   (mkIf cfg.server.enable {
-    assertions = utils.asserts [
+    assertions = asserts [
       caddy.enable
       "Scrutiny server requires Caddy to be enabled"
     ];
@@ -83,7 +84,7 @@ mkMerge [
 
     users.groups.scrutiny = { };
 
-    systemd.services.scrutiny.serviceConfig = utils.hardeningBaseline config {
+    systemd.services.scrutiny.serviceConfig = hardeningBaseline config {
       User = "scrutiny";
       Group = "scrutiny";
       DynamicUser = mkForce false;

@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.modules.programs.images;
+  cfg = config.${ns}.programs.images;
 in
 lib.mkIf cfg.enable {
   home.packages = with pkgs; [

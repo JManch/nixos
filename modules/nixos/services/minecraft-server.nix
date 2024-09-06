@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -24,9 +25,9 @@ let
     ;
   inherit (config.services.minecraft-server) dataDir;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) caddy wireguard;
+  inherit (config.${ns}.services) caddy wireguard;
   inherit (caddy) allowAddresses trustedAddresses;
-  cfg = config.modules.services.minecraft-server;
+  cfg = config.${ns}.services.minecraft-server;
   serverPackage = pkgs.papermcServers.papermc-1_20_4;
   pluginEnabled = p: elem p cfg.plugins;
 
@@ -80,136 +81,138 @@ mkIf cfg.enable {
     };
   };
 
-  modules.services.minecraft-server.mshConfig = {
-    Server = {
-      Folder = "${dataDir}";
-      FileName = "minecraft-server";
-    };
-    Commands = {
-      StartServer = concatStringsSep " " [
-        "${getExe serverPackage}"
-        "-Xmx${toString cfg.memory}M"
-        "-Xms${toString cfg.memory}M"
-        "-XX:+AlwaysPreTouch"
-        "-XX:+DisableExplicitGC"
-        "-XX:+ParallelRefProcEnabled"
-        "-XX:+PerfDisableSharedMem"
-        "-XX:+UnlockExperimentalVMOptions"
-        "-XX:+UseG1GC"
-        "-XX:G1HeapRegionSize=8M"
-        "-XX:G1HeapWastePercent=5"
-        "-XX:G1MaxNewSizePercent=40"
-        "-XX:G1MixedGCCountTarget=4"
-        "-XX:G1MixedGCLiveThresholdPercent=90"
-        "-XX:G1NewSizePercent=30"
-        "-XX:G1RSetUpdatingPauseTimePercent=5"
-        "-XX:G1ReservePercent=20"
-        "-XX:InitiatingHeapOccupancyPercent=15"
-        "-XX:MaxGCPauseMillis=200"
-        "-XX:MaxTenuringThreshold=1"
-        "-XX:SurvivorRatio=32"
-        "-Dusing.aikars.flags=https://mcflags.emc.gs"
-        "-Daikars.new.flags=true"
-      ];
-      StopServer = "stop";
-      StopServerAllowKill = 30;
-    };
-    Msh = {
-      Debug = 2;
-      MshPort = cfg.port;
-      MshPortQuery = cfg.port;
-      EnableQuery = true;
-      TimeBeforeStoppingEmptyServer = 3600;
-      SuspendAllow = false;
-      SuspendRefresh = -1;
-      InfoHibernation = "                   §fserver status:\n                   §b§lHIBERNATING";
-      InfoStarting = "                   §fserver status:\n                    §6§lWARMING UP";
-      NotifyUpdate = false;
-      NotifyMessage = true;
-    };
-  };
-
-  modules.services.minecraft-server.files = mkMerge [
-    {
-      "spigot.yml".value = # yaml
-        ''
-          world-settings:
-            default:
-              entity-tracking-range:
-                players: 128
-                animals: 64
-                monsters: 64
-              merge-radius:
-                exp: 0
-                item: 0
-        '';
-    }
-
-    (mkIf (pluginEnabled "aura-skills") {
-      "plugins/AuraSkills/config.yml".value = # yaml
-        ''
-          on_death:
-            reset_xp: true
-        '';
-    })
-
-    (mkIf (pluginEnabled "vivecraft") {
-      "plugins/Vivecraft-Spigot-Extensions/config.yml".value = # yaml
-        ''
-          bow:
-            standingmultiplier: 1
-            seatedheadshotmultiplier: 2
-          welcomemsg:
-            enabled: true
-            welcomeVanilla: '&player has joined with non-VR!'
-          crawling:
-            enabled: true
-          teleport:
-            enable: false
-        '';
-    })
-
-    (mkIf (pluginEnabled "squaremap") {
-      "plugins/squaremap/config.yml".value = # yaml
-        ''
-          settings:
-            web-address: https://squaremap.${fqDomain}
-            internal-webserver:
-              bind: 127.0.0.1
-              port: 25566
-        '';
-    })
-
-    # Some plugins need config to be applied in context of the default config.
-    # To avoid copying the entire default config file into our nix config we
-    # generate a diff and apply it to the reference config file sourced
-    # upstream.
-    (mkIf (pluginEnabled "levelled-mobs") {
-      "plugins/LevelledMobs/rules.yml" = {
-        reference = "${availablePlugins.levelled-mobs}/config/rules.yml";
-        diff = ''
-          --- rules.yml	2024-05-12 11:34:55.911349601 +0100
-          +++ rules-custom.yml	2024-05-12 11:36:51.519976466 +0100
-          @@ -426,11 +426,14 @@
-           custom-rules:
-             - enabled: true
-               name: 'No Stat Change for Specific Entities'
-          -    use-preset: vanilla_challenge, nametag_no_level
-          +    use-preset: vanilla_challenge
-               conditions:
-                 entities:
-                   allowed-groups: [ 'all_passive_mobs' ]
-                   allowed-list: [ 'BABY_', 'WANDERING_TRADER', 'VILLAGER', 'ZOMBIE_VILLAGER', 'BAT' ]
-          +    apply-settings:
-          +      nametag: disabled
-          +      nametag-visibility-method: DISABLED
-
-             - enabled: true
-               name: 'Custom Nether Levelling'
-        '';
+  ${ns}.services.minecraft-server = {
+    mshConfig = {
+      Server = {
+        Folder = "${dataDir}";
+        FileName = "minecraft-server";
       };
-    })
-  ];
+      Commands = {
+        StartServer = concatStringsSep " " [
+          "${getExe serverPackage}"
+          "-Xmx${toString cfg.memory}M"
+          "-Xms${toString cfg.memory}M"
+          "-XX:+AlwaysPreTouch"
+          "-XX:+DisableExplicitGC"
+          "-XX:+ParallelRefProcEnabled"
+          "-XX:+PerfDisableSharedMem"
+          "-XX:+UnlockExperimentalVMOptions"
+          "-XX:+UseG1GC"
+          "-XX:G1HeapRegionSize=8M"
+          "-XX:G1HeapWastePercent=5"
+          "-XX:G1MaxNewSizePercent=40"
+          "-XX:G1MixedGCCountTarget=4"
+          "-XX:G1MixedGCLiveThresholdPercent=90"
+          "-XX:G1NewSizePercent=30"
+          "-XX:G1RSetUpdatingPauseTimePercent=5"
+          "-XX:G1ReservePercent=20"
+          "-XX:InitiatingHeapOccupancyPercent=15"
+          "-XX:MaxGCPauseMillis=200"
+          "-XX:MaxTenuringThreshold=1"
+          "-XX:SurvivorRatio=32"
+          "-Dusing.aikars.flags=https://mcflags.emc.gs"
+          "-Daikars.new.flags=true"
+        ];
+        StopServer = "stop";
+        StopServerAllowKill = 30;
+      };
+      Msh = {
+        Debug = 2;
+        MshPort = cfg.port;
+        MshPortQuery = cfg.port;
+        EnableQuery = true;
+        TimeBeforeStoppingEmptyServer = 3600;
+        SuspendAllow = false;
+        SuspendRefresh = -1;
+        InfoHibernation = "                   §fserver status:\n                   §b§lHIBERNATING";
+        InfoStarting = "                   §fserver status:\n                    §6§lWARMING UP";
+        NotifyUpdate = false;
+        NotifyMessage = true;
+      };
+    };
+
+    files = mkMerge [
+      {
+        "spigot.yml".value = # yaml
+          ''
+            world-settings:
+              default:
+                entity-tracking-range:
+                  players: 128
+                  animals: 64
+                  monsters: 64
+                merge-radius:
+                  exp: 0
+                  item: 0
+          '';
+      }
+
+      (mkIf (pluginEnabled "aura-skills") {
+        "plugins/AuraSkills/config.yml".value = # yaml
+          ''
+            on_death:
+              reset_xp: true
+          '';
+      })
+
+      (mkIf (pluginEnabled "vivecraft") {
+        "plugins/Vivecraft-Spigot-Extensions/config.yml".value = # yaml
+          ''
+            bow:
+              standingmultiplier: 1
+              seatedheadshotmultiplier: 2
+            welcomemsg:
+              enabled: true
+              welcomeVanilla: '&player has joined with non-VR!'
+            crawling:
+              enabled: true
+            teleport:
+              enable: false
+          '';
+      })
+
+      (mkIf (pluginEnabled "squaremap") {
+        "plugins/squaremap/config.yml".value = # yaml
+          ''
+            settings:
+              web-address: https://squaremap.${fqDomain}
+              internal-webserver:
+                bind: 127.0.0.1
+                port: 25566
+          '';
+      })
+
+      # Some plugins need config to be applied in context of the default config.
+      # To avoid copying the entire default config file into our nix config we
+      # generate a diff and apply it to the reference config file sourced
+      # upstream.
+      (mkIf (pluginEnabled "levelled-mobs") {
+        "plugins/LevelledMobs/rules.yml" = {
+          reference = "${availablePlugins.levelled-mobs}/config/rules.yml";
+          diff = ''
+            --- rules.yml	2024-05-12 11:34:55.911349601 +0100
+            +++ rules-custom.yml	2024-05-12 11:36:51.519976466 +0100
+            @@ -426,11 +426,14 @@
+             custom-rules:
+               - enabled: true
+                 name: 'No Stat Change for Specific Entities'
+            -    use-preset: vanilla_challenge, nametag_no_level
+            +    use-preset: vanilla_challenge
+                 conditions:
+                   entities:
+                     allowed-groups: [ 'all_passive_mobs' ]
+                     allowed-list: [ 'BABY_', 'WANDERING_TRADER', 'VILLAGER', 'ZOMBIE_VILLAGER', 'BAT' ]
+            +    apply-settings:
+            +      nametag: disabled
+            +      nametag-visibility-method: DISABLED
+
+               - enabled: true
+                 name: 'Custom Nether Levelling'
+          '';
+        };
+      })
+    ];
+  };
 
   systemd.services.minecraft-server = {
     path = [ pkgs.jre ]; # Msh needs java in path

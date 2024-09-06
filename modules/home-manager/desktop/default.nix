@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +9,6 @@
 let
   inherit (lib)
     mkIf
-    utils
     mkOption
     mkPackageOption
     length
@@ -17,7 +17,14 @@ let
     literalExpression
     mkEnableOption
     ;
-  cfg = config.modules.desktop;
+  inherit (lib.${ns})
+    scanPaths
+    asserts
+    flakePkgs
+    waylandWindowManagers
+    waylandDesktopEnvironments
+    ;
+  cfg = config.${ns}.desktop;
 
   terminalSubmodule = {
     options = {
@@ -37,13 +44,13 @@ let
   };
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = scanPaths ./.;
 
-  options.modules.desktop = {
+  options.${ns}.desktop = {
     enable = mkEnableOption "home-manager desktop modules";
 
     xdg.lowercaseUserDirs = mkEnableOption "lowercase user dirs" // {
-      default = (osConfig'.modules.system.desktop.desktopEnvironment or false) == null;
+      default = (osConfig'.${ns}.system.desktop.desktopEnvironment or false) == null;
     };
 
     windowManager = mkOption {
@@ -64,14 +71,14 @@ in
       default =
         cfg.enable
         && (
-          (elem cfg.windowManager utils.waylandWindowManagers)
-          || (elem osConfig'.modules.system.desktop.desktopEnvironment utils.waylandDesktopEnvironments)
+          (elem cfg.windowManager waylandWindowManagers)
+          || (elem osConfig'.${ns}.system.desktop.desktopEnvironment waylandDesktopEnvironments)
         );
     };
 
     style = {
       customTheme = mkEnableOption "custom GTK theme derived from base16 colorscheme" // {
-        default = osConfig'.modules.system.desktop.desktopEnvironment == null;
+        default = osConfig'.${ns}.system.desktop.desktopEnvironment == null;
       };
 
       font = {
@@ -84,7 +91,7 @@ in
 
         package = mkOption {
           type = types.package;
-          default = (utils.flakePkgs args "nix-resources").berkeley-mono-nerdfont;
+          default = (flakePkgs args "nix-resources").berkeley-mono-nerdfont;
           description = "Font package";
           example = literalExpression "pkgs.fira-code";
         };
@@ -92,7 +99,7 @@ in
 
       cursor = {
         enable = mkEnableOption "custom cursor theme" // {
-          default = osConfig'.modules.system.desktop.desktopEnvironment == null;
+          default = osConfig'.${ns}.system.desktop.desktopEnvironment == null;
         };
 
         package = mkPackageOption pkgs "bibata-cursors" { };
@@ -132,24 +139,22 @@ in
 
   config =
     let
-      cfg = config.modules.desktop;
-      osDesktop = osConfig'.modules.system.desktop;
+      cfg = config.${ns}.desktop;
+      osDesktop = osConfig'.${ns}.system.desktop;
     in
     {
-      assertions = mkIf cfg.enable (
-        utils.asserts [
-          (osConfig' != null)
-          "Desktop modules are not supported on standalone home-manager deployments"
-          osDesktop.enable
-          "You cannot enable home-manager desktop if NixOS desktop is not enabled"
-          (cfg.windowManager != null -> osDesktop.desktopEnvironment == null)
-          "You cannot use a desktop environment with a window manager"
-          (cfg.windowManager != null -> length osConfig'.device.monitors != 0)
-          "Device monitors must be configured to use a window manager"
-          (cfg.terminal != null)
-          "Desktop default terminal must be set"
-        ]
-      );
+      assertions = mkIf cfg.enable (asserts [
+        (osConfig' != null)
+        "Desktop modules are not supported on standalone home-manager deployments"
+        osDesktop.enable
+        "You cannot enable home-manager desktop if NixOS desktop is not enabled"
+        (cfg.windowManager != null -> osDesktop.desktopEnvironment == null)
+        "You cannot use a desktop environment with a window manager"
+        (cfg.windowManager != null -> length osConfig'.${ns}.device.monitors != 0)
+        "Device monitors must be configured to use a window manager"
+        (cfg.terminal != null)
+        "Desktop default terminal must be set"
+      ]);
 
       _module.args = {
         inherit (cfg) isWayland;

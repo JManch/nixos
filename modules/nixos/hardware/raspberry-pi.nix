@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   ...
@@ -8,7 +9,7 @@ let
     mkIf
     mkAfter
     ;
-  cfg = config.modules.hardware.raspberryPi;
+  cfg = config.${ns}.hardware.raspberryPi;
 in
 mkIf cfg.enable {
   # I'm not sure why raspberry-pi-nix overlays this. Their overlay breaks cross

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,9 +7,9 @@
 }:
 let
   inherit (lib) mkIf;
-  inherit (config.modules.system.desktop) isWayland suspend;
+  inherit (config.${ns}.system.desktop) isWayland suspend;
 in
-mkIf (config.device.gpu.type == "nvidia") {
+mkIf (config.${ns}.device.gpu.type == "nvidia") {
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
@@ -17,7 +18,7 @@ mkIf (config.device.gpu.type == "nvidia") {
     ];
   };
 
-  services.xserver.videoDrivers = mkIf config.modules.system.desktop.enable [ "nvidia" ];
+  services.xserver.videoDrivers = mkIf config.${ns}.system.desktop.enable [ "nvidia" ];
 
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.stable;

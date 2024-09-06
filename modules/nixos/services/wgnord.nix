@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -7,17 +8,16 @@
 let
   inherit (lib)
     mkIf
-    utils
     getExe'
     concatMapStringsSep
     optionalString
     ;
-  inherit (config.modules.system.networking) wiredInterface defaultGateway resolved;
-  cfg = config.modules.services.wgnord;
+  inherit (config.${ns}.system.networking) wiredInterface defaultGateway resolved;
+  cfg = config.${ns}.services.wgnord;
   ip = getExe' pkgs.iproute "ip";
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = lib.${ns}.asserts [
     (defaultGateway != null)
     "Default gateway must be set to use wgnord"
     (cfg.splitTunnel -> (cfg.excludeSubnets == [ ]))

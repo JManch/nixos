@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -11,8 +12,8 @@ let
     mkForce
     mkDefault
     ;
-  inherit (config.modules.core) homeManager;
-  cfg = config.modules.system.desktop;
+  inherit (config.${ns}.core) homeManager;
+  cfg = config.${ns}.system.desktop;
   extensions = with pkgs.gnomeExtensions; [
     appindicator
     night-theme-switcher
@@ -28,7 +29,7 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
   };
 
   # Gnome uses network manager
-  modules.system.networking.useNetworkd = mkForce false;
+  ${ns}.system.networking.useNetworkd = mkForce false;
 
   environment.gnome.excludePackages = with pkgs; [
     gnome-tour
@@ -45,7 +46,7 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
     ]);
 
   hm = mkIf homeManager.enable {
-    modules.desktop.terminal = {
+    ${ns}.desktop.terminal = {
       exePath = mkDefault (getExe pkgs.gnome-console);
       class = mkDefault "org.gnome.Consolez";
     };

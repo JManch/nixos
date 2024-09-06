@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   inputs,
@@ -15,16 +16,15 @@ let
     attrValues
     mkMerge
     concatMapStringsSep
-    utils
     splitString
     mkEnableOption
     ;
   inherit (secrets.general) people devices;
-  cfg = config.modules.services.hass;
+  cfg = config.${ns}.services.hass;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 in
 {
-  options.modules.services.hass.smartLightingRooms = mkOption {
+  options.${ns}.services.hass.smartLightingRooms = mkOption {
     description = ''
       List of rooms to configure modular smart lighting functionality for.
       Also generates  lovelace cards that can be added to the dashboard.
@@ -308,7 +308,7 @@ in
   };
 
   config = mkIf cfg.enableInternal {
-    modules.services.hass.smartLightingRooms = {
+    ${ns}.services.hass.smartLightingRooms = {
       joshuaRoom = {
         roomId = "joshua_room";
         roomDeviceId = "joshua_pixel_5";
@@ -436,7 +436,7 @@ in
       map (
         cfg':
         let
-          formattedRoomName = concatMapStringsSep " " (s: utils.upperFirstChar s) (
+          formattedRoomName = concatMapStringsSep " " (s: lib.${ns}.upperFirstChar s) (
             splitString "_" cfg'.roomId
           );
 

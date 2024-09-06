@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,7 +7,7 @@
   ...
 }:
 let
-  cfg = config.modules.programs.winbox;
+  cfg = config.${ns}.programs.winbox;
 in
 lib.mkIf cfg.enable {
   # New v4 native linux version
@@ -16,7 +17,7 @@ lib.mkIf cfg.enable {
   # directory tends to fix it
   programs.winbox = {
     enable = true;
-    package = pkgs.winbox.override { wine = config.modules.programs.wine.package; };
+    package = pkgs.winbox.override { wine = config.${ns}.programs.wine.package; };
     openFirewall = true;
   };
 

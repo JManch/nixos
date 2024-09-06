@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.modules.programs.unity;
+  cfg = config.${ns}.programs.unity;
 in
 lib.mkIf cfg.enable {
   # Unity is unusable, at least on Hyprland. Constant crashing. I suspect it's

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   inputs,
@@ -8,12 +9,12 @@
 }:
 let
   inherit (lib) mkIf singleton;
-  inherit (config.modules) desktop;
-  cfg = config.modules.desktop.programs.hyprlock;
+  inherit (config.${ns}) desktop;
+  cfg = config.${ns}.desktop.programs.hyprlock;
   colors = config.colorScheme.palette;
 in
 mkIf (cfg.enable && isWayland) {
-  modules.desktop.programs.locking.package = config.programs.hyprlock.package;
+  ${ns}.desktop.programs.locking.package = config.programs.hyprlock.package;
 
   programs.hyprlock = {
     enable = true;

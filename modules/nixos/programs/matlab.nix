@@ -1,11 +1,15 @@
-{ lib, config, ... }@args:
+{
+  ns,
+  lib,
+  config,
+  ...
+}@args:
 let
-  inherit (lib) mkIf utils;
-  cfg = config.modules.programs.matlab;
+  cfg = config.${ns}.programs.matlab;
 in
-mkIf cfg.enable {
+lib.mkIf cfg.enable {
   # Install instructions: https://gitlab.com/doronbehar/nix-matlab
-  userPackages = [ (utils.flakePkgs args "nix-matlab").matlab ];
+  userPackages = [ (lib.${ns}.flakePkgs args "nix-matlab").matlab ];
 
   persistenceHome.directories = [ ".config/matlab" ];
 }

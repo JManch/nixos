@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   inputs,
@@ -7,7 +8,6 @@
 let
   inherit (lib)
     mkIf
-    utils
     optional
     optionals
     singleton
@@ -17,16 +17,17 @@ let
     splitString
     concatMapStringsSep
     ;
-  inherit (config.modules.services) frigate;
+  inherit (lib.${ns}) upperFirstChar;
+  inherit (config.${ns}.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (secrets.lovelace) heating hvac;
   inherit (secrets.general) people userIds peopleList;
-  inherit (config.modules.services.hass) smartLightingRooms;
+  inherit (config.${ns}.services.hass) smartLightingRooms;
 
-  cfg = config.modules.services.hass;
+  cfg = config.${ns}.services.hass;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
   cameras = attrNames config.services.frigate.settings.cameras;
-  upperPeople = mapAttrs (_: p: utils.upperFirstChar p) people;
+  upperPeople = mapAttrs (_: p: upperFirstChar p) people;
 
   floorPlanLight = light: left: top: {
     entity = "light.${light}";
@@ -394,7 +395,7 @@ let
         display_type = "complete";
         entity = "light.${data.light}";
         name =
-          concatMapStringsSep " " (string: utils.upperFirstChar string) (splitString "_" data.room)
+          concatMapStringsSep " " (string: upperFirstChar string) (splitString "_" data.room)
           + " Ceiling Lights";
         icon = "mdi:lightbulb-alert";
         visibility = singleton {

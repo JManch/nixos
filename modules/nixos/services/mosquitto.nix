@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,18 +9,17 @@
 let
   inherit (lib)
     mkIf
-    utils
     mkMerge
     singleton
     ;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  cfg = config.modules.services.mosquitto;
+  cfg = config.${ns}.services.mosquitto;
 in
 mkMerge [
   (mkIf cfg.explorer.enable { environment.systemPackages = [ pkgs.mqtt-explorer ]; })
   (mkIf cfg.enable {
-    assertions = utils.asserts [
-      config.modules.services.acme.enable
+    assertions = lib.${ns}.asserts [
+      config.${ns}.services.acme.enable
       "Mosquitto requires ACME to be enabled"
     ];
 

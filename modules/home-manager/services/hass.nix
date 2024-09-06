@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -14,7 +15,7 @@ let
     optionalString
     toLower
     ;
-  inherit (osConfig'.device) hassIntegration;
+  inherit (osConfig'.${ns}.device) hassIntegration;
   inherit (config.age.secrets) hassToken;
 
   curlCommand =
@@ -36,8 +37,16 @@ let
       endpoint = "webhook/${toLower hostname}-active";
     });
 in
-mkIf (osConfig'.device.hassIntegration.enable or false) {
-  modules.services.hass.curlCommand = curlCommand;
+mkIf (osConfig'.${ns}.device.hassIntegration.enable or false) {
+  ${ns} = {
+    services.hass.curlCommand = curlCommand;
+
+    # Update the active state when locking
+    desktop.programs.locking = {
+      postLockScript = "systemctl stop --user hass-active-heartbeat";
+      postUnlockScript = "systemctl start --user hass-active-heartbeat";
+    };
+  };
 
   systemd.user.services.hass-active-heartbeat = {
     Unit = {
@@ -56,11 +65,5 @@ mkIf (osConfig'.device.hassIntegration.enable or false) {
     };
 
     Install.WantedBy = [ "graphical-session.target" ];
-  };
-
-  # Update the active state when locking
-  modules.desktop.programs.locking = {
-    postLockScript = "systemctl stop --user hass-active-heartbeat";
-    postUnlockScript = "systemctl start --user hass-active-heartbeat";
   };
 }

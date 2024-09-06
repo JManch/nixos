@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -7,13 +8,13 @@
   ...
 }:
 let
-  inherit (lib) mkIf toUpper utils;
+  inherit (lib) mkIf toUpper;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.system) virtualisation;
-  cfg = config.modules.services.wallabag;
+  inherit (config.${ns}.system) virtualisation;
+  cfg = config.${ns}.services.wallabag;
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = lib.${ns}.asserts [
     virtualisation.containerisation.enable
     "Wallabag requires containerised virtualisation to be enabled"
     false

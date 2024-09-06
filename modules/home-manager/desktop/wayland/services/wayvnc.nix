@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,7 +7,7 @@
 }:
 let
   inherit (lib) mkIf getExe';
-  cfg = config.modules.desktop.services.wayvnc;
+  cfg = config.${ns}.desktop.services.wayvnc;
 in
 # TODO: WIP
 mkIf false {

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,16 +9,19 @@
 }:
 let
   inherit (lib) mkIf getExe getExe';
-  cfg = config.modules.desktop.programs.swww;
+  cfg = config.${ns}.desktop.programs.swww;
   transition =
     let
-      inherit (osConfig'.device) primaryMonitor;
+      inherit (osConfig'.${ns}.device) primaryMonitor;
       refreshRate = toString (builtins.floor primaryMonitor.refreshRate);
     in
     "--transition-bezier .43,1.19,1,.4 --transition-type center --transition-duration 1 --transition-fps ${refreshRate}";
 in
 mkIf (cfg.enable && isWayland) {
-  modules.desktop.services.wallpaper.setWallpaperCmd = "${getExe pkgs.swww} img ${transition}";
+  ${ns}.desktop.services.wallpaper = {
+    setWallpaperCmd = "${getExe pkgs.swww} img ${transition}";
+    dependencyUnit = "swww.service";
+  };
 
   systemd.user.services.swww = {
     Unit = {
@@ -33,6 +37,4 @@ mkIf (cfg.enable && isWayland) {
 
     Install.WantedBy = [ "graphical-session.target" ];
   };
-
-  modules.desktop.services.wallpaper.dependencyUnit = "swww.service";
 }

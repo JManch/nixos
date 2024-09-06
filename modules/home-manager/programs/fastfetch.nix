@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.modules.programs.fastfetch;
+  cfg = config.${ns}.programs.fastfetch;
 in
 lib.mkIf cfg.enable {
   home.packages = [ pkgs.fastfetch ];

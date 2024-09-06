@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -10,15 +11,14 @@
 let
   inherit (lib)
     mkIf
-    utils
     mkMerge
     mkVMOverride
     mod
     ;
-  inherit (config.home-manager.users.${username}.modules.desktop) terminal;
-  inherit (config.device) monitors cpu memory;
-  inherit (config.modules.core) homeManager;
-  cfg = config.modules.system.virtualisation;
+  inherit (config.home-manager.users.${username}.${ns}.desktop) terminal;
+  inherit (config.${ns}.device) monitors cpu memory;
+  inherit (config.${ns}.core) homeManager;
+  cfg = config.${ns}.system.virtualisation;
 
   runVMScript = pkgs.writeShellApplication {
     name = "run-vm";
@@ -52,7 +52,7 @@ let
           flake="github:JManch/nixos"
         fi
 
-        ${utils.exitTrapBuilder}
+        ${lib.${ns}.exitTrapBuilder}
 
         # Build the VM
         runscript="/home/${adminUsername}/result/bin/run-$hostname-vm"
@@ -61,7 +61,7 @@ let
         nixos-rebuild build-vm --flake "$flake#$hostname"
 
         # Check if the VM uses impermanence
-        impermanence=$(nix eval "$flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.modules.system.impermanence.enable")
+        impermanence=$(nix eval "$flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.${ns}.system.impermanence.enable")
 
         # Print ports mapped to the VM
         printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
@@ -91,7 +91,7 @@ let
         # terminal windows
         if grep -q -- "-nographic" "$runscript"; then
           ${
-            if config.modules.system.desktop.enable && homeManager.enable then # bash
+            if config.${ns}.system.desktop.enable && homeManager.enable then # bash
               ''
                 ${terminal.exePath} -e "zsh" "-i" "-c" "ssh-vm; zsh -i" &
                 ${terminal.exePath} --class qemu -e "$runscript"
@@ -194,7 +194,7 @@ in
 
         virtualisation =
           let
-            inherit (config.modules.system) desktop;
+            inherit (config.${ns}.system) desktop;
           in
           {
             graphics = desktop.enable;
@@ -214,7 +214,7 @@ in
               let
                 # It's important to use firewall rules from the vmVariant here
                 inherit (config.virtualisation.vmVariant.networking.firewall) allowedTCPPorts allowedUDPPorts;
-                inherit (config.virtualisation.vmVariant.modules.system.virtualisation)
+                inherit (config.virtualisation.vmVariant.${ns}.system.virtualisation)
                   mappedTCPPorts
                   mappedUDPPorts
                   ;

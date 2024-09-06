@@ -1,6 +1,11 @@
-{ lib, config, ... }:
 {
-  modules = {
+  ns,
+  lib,
+  config,
+  ...
+}:
+{
+  ${ns} = {
     core = {
       configManager = true;
       backupFiles = true;

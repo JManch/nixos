@@ -1,18 +1,20 @@
 {
+  ns,
   lib,
   config,
   inputs,
   ...
 }:
 let
-  inherit (lib) mkIf utils singleton;
-  inherit (config.modules.services) caddy;
+  inherit (lib) mkIf singleton;
+  inherit (lib.${ns}) asserts hardeningBaseline;
+  inherit (config.${ns}.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  cfg = config.modules.services.taskchampion-server;
+  cfg = config.${ns}.services.taskchampion-server;
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = asserts [
     caddy.enable
     "Taskchampion server requires Caddy to be enabled"
   ];
@@ -22,7 +24,7 @@ mkIf cfg.enable {
     port = cfg.port;
   };
 
-  systemd.services.taskchampion-sync-server.serviceConfig = utils.hardeningBaseline config {
+  systemd.services.taskchampion-sync-server.serviceConfig = hardeningBaseline config {
     DynamicUser = false;
     StateDirectory = "taskchampion-sync-server";
   };

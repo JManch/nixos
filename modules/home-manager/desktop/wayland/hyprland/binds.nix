@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +9,6 @@
 }@args:
 let
   inherit (lib)
-    utils
     mkIf
     optionals
     optional
@@ -18,17 +18,18 @@ let
     concatMap
     concatMapStringsSep
     ;
-  inherit (osConfig'.modules.system) audio;
-  inherit (osConfig'.device) monitors;
+  inherit (lib.${ns}) isHyprland flakePkgs getMonitorHyprlandCfgStr;
+  inherit (osConfig'.${ns}.system) audio;
+  inherit (osConfig'.${ns}.device) monitors;
   cfg = desktopCfg.hyprland;
-  desktopCfg = config.modules.desktop;
+  desktopCfg = config.${ns}.desktop;
 
   jaq = getExe pkgs.jaq;
   bc = getExe' pkgs.bc "bc";
   notifySend = getExe pkgs.libnotify;
   hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 
-  getMonitorByNumber = number: utils.getMonitorByNumber osConfig' number;
+  getMonitorByNumber = number: lib.${ns}.getMonitorByNumber osConfig' number;
 
   disableShadersCommand = command: "${cfg.disableShaders}; ${command}; ${cfg.enableShaders}";
 
@@ -159,9 +160,9 @@ let
           ${notifySend} --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
       '';
 in
-mkIf (utils.isHyprland config) {
+mkIf (isHyprland config) {
   # Force secondaryModKey VM variant because binds are repeated on host
-  modules.desktop.hyprland.modKey = mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);
+  ${ns}.desktop.hyprland.modKey = mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);
 
   wayland.windowManager.hyprland =
     let
@@ -169,7 +170,7 @@ mkIf (utils.isHyprland config) {
       modShift = "${cfg.modKey}SHIFT";
       modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
 
-      grimblast = getExe (utils.flakePkgs args "grimblast").grimblast;
+      grimblast = getExe (flakePkgs args "grimblast").grimblast;
       wpctl = getExe' pkgs.wireplumber "wpctl";
     in
     {
@@ -187,7 +188,7 @@ mkIf (utils.isHyprland config) {
           "${mod}, A, exec, ${toggleSwallowing}"
           "${modShift}, T, exec, ${scaleTabletToWindow}"
           "${modShiftCtrl}, T, exec, ${toggleGaps}"
-          "${mod}, Space, exec, ${config.modules.desktop.programs.locking.lockScript}"
+          "${mod}, Space, exec, ${config.${ns}.desktop.programs.locking.lockScript}"
           "${modShiftCtrl}, V, exec, ${syncClipboard}"
 
           # Movement
@@ -308,7 +309,7 @@ mkIf (utils.isHyprland config) {
         declare -A monitor_name_to_cfg
         ${
           concatMapStringsSep "\n  " (
-            m: "monitor_name_to_cfg[${m.name}]='${utils.getMonitorHyprlandCfgStr m}'"
+            m: "monitor_name_to_cfg[${m.name}]='${getMonitorHyprlandCfgStr m}'"
           ) monitors
         }
 

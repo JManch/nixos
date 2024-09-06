@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,7 +7,7 @@
   ...
 }:
 let
-  cfg = config.modules.programs.wireshark;
+  cfg = config.${ns}.programs.wireshark;
 in
 lib.mkIf cfg.enable {
   programs.wireshark = {

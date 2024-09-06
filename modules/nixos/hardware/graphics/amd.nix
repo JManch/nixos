@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -17,7 +18,7 @@ let
       '';
   });
 in
-mkIf (config.device.gpu.type == "amd") {
+mkIf (config.${ns}.device.gpu.type == "amd") {
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
   userPackages = [ amdgpu_top ];
   services.xserver.videoDrivers = [ "modesetting" ];

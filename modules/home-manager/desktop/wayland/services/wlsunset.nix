@@ -7,6 +7,7 @@
 # stutter during gamma adjustments if audio is coming from monitors. This
 # includes using the headphone jack on a monitor.
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -15,7 +16,7 @@
 }:
 let
   inherit (lib) mkIf getExe;
-  cfg = config.modules.desktop.services.wlsunset;
+  cfg = config.${ns}.desktop.services.wlsunset;
   latitude = "50.8";
   longitude = "-0.1";
 in
@@ -55,5 +56,5 @@ mkIf (cfg.enable && isWayland) {
   };
 
   # wlsunset sometimes doesn't work after DPMS, restarting fixes it
-  modules.desktop.programs.locking.postUnlockScript = "systemctl restart --user wlsunset";
+  ${ns}.desktop.programs.locking.postUnlockScript = "systemctl restart --user wlsunset";
 }

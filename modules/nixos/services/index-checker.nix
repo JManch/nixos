@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   pkgs',
@@ -7,7 +8,7 @@
 }:
 let
   inherit (lib) mkIf getExe;
-  cfg = config.modules.services.index-checker;
+  cfg = config.${ns}.services.index-checker;
   shoutrrr = getExe pkgs'.shoutrrr;
 
   pythonScript =

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,8 +7,8 @@
   ...
 }:
 let
-  inherit (lib) mkIf utils;
-  cfg = config.modules.programs.multiviewerF1;
+  inherit (lib) mkIf;
+  cfg = config.${ns}.programs.multiviewerF1;
 
   # This script acts as a replacement for Multiviewer's layout saving/loading
   # system which doesn't work with a tiling window manager. The idea is that
@@ -291,7 +292,7 @@ mkIf cfg.enable {
 
   desktop.hyprland.settings =
     let
-      inherit (config.modules.desktop.hyprland) modKey;
+      inherit (config.${ns}.desktop.hyprland) modKey;
     in
     {
       workspace = [ "name:F1, gapsin:0, gapsout:0, decorate:false, rounding:false, border:false" ];
@@ -312,7 +313,7 @@ mkIf cfg.enable {
       ];
     };
 
-  systemd.user.services.hyprland-multiviewer-tiler = mkIf (utils.isHyprland config) {
+  systemd.user.services.hyprland-multiviewer-tiler = mkIf (lib.${ns}.isHyprland config) {
     Unit = {
       Description = "Hyprland Multiviewer F1 Tiler";
     };

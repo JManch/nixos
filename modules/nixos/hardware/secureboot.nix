@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -7,8 +8,8 @@
 }:
 let
   inherit (lib) mkIf mkForce optionalString;
-  inherit (config.modules.system) impermanence;
-  cfg = config.modules.hardware.secureBoot;
+  inherit (config.${ns}.system) impermanence;
+  cfg = config.${ns}.hardware.secureBoot;
 in
 {
   # Requires manual initial setup

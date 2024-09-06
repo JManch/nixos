@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   config,
   username,
   ...
 }:
 let
-  cfg = config.modules.programs.adb;
+  cfg = config.${ns}.programs.adb;
 in
 lib.mkIf cfg.enable {
   programs.adb.enable = true;

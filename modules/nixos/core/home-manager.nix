@@ -1,19 +1,17 @@
 {
+  ns,
   lib,
-  self,
-  pkgs',
   inputs,
   config,
-  selfPkgs,
   username,
   hostname,
   adminUsername,
   ...
-}:
+}@args:
 let
   inherit (lib) mkIf mkMerge;
-  inherit (config.modules.system.virtualisation) vmVariant;
-  cfg = config.modules.core.homeManager;
+  inherit (config.${ns}.system.virtualisation) vmVariant;
+  cfg = config.${ns}.core.homeManager;
 in
 {
   imports = [
@@ -39,7 +37,7 @@ in
         { ${username} = import ../../../homes/${hostname}.nix; }
         (mkIf (username != adminUsername) {
           ${adminUsername} = {
-            modules = {
+            ${ns} = {
               core.standalone = true;
               shell.enable = true;
               shell.promptColor = "purple";
@@ -54,13 +52,12 @@ in
       sharedModules = [ ../../home-manager ];
 
       extraSpecialArgs = {
-        inherit
-          inputs
+        inherit inputs hostname vmVariant;
+        inherit (args)
           self
           pkgs'
           selfPkgs
-          hostname
-          vmVariant
+          ns
           ;
       };
     };

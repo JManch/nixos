@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   self,
@@ -11,7 +12,6 @@
 let
   inherit (lib)
     mkIf
-    utils
     mapAttrs
     filterAttrs
     isType
@@ -21,8 +21,8 @@ let
     mkForce
     concatStringsSep
     ;
-  inherit (config.modules.system) impermanence;
-  cfg = config.modules.core;
+  inherit (config.${ns}.system) impermanence;
+  cfg = config.${ns}.core;
   configDir = "/home/${adminUsername}/.config/nixos";
 
   rebuildCmds = [
@@ -280,7 +280,7 @@ in
   programs.nix-index = {
     # Nix-index doesn't work with cross compilation
     enable = with pkgs; stdenv.hostPlatform == stdenv.buildPlatform;
-    package = (utils.flakePkgs args "nix-index-database").nix-index-with-db;
+    package = (lib.${ns}.flakePkgs args "nix-index-database").nix-index-with-db;
   };
 
   programs.zsh = {

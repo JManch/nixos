@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,11 +9,11 @@
 }:
 let
   inherit (lib) mkIf getExe';
-  inherit (config.modules) colorScheme;
-  inherit (config.modules.desktop.services) darkman;
-  inherit (config.modules.desktop.style) cursor;
+  inherit (config.${ns}) colorScheme;
+  inherit (config.${ns}.desktop.services) darkman;
+  inherit (config.${ns}.desktop.style) cursor;
   inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) gtkThemeFromScheme;
-  cfg = config.modules.desktop;
+  cfg = config.${ns}.desktop;
   darkTheme = gtkThemeFromScheme { scheme = colorScheme.dark; };
   lightTheme = gtkThemeFromScheme { scheme = colorScheme.light; };
 in

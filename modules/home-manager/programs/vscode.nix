@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,9 +7,9 @@
 }:
 let
   inherit (lib) mkIf;
-  inherit (config.modules) desktop;
+  inherit (config.${ns}) desktop;
   inherit (desktop) isWayland;
-  cfg = config.modules.programs.vscode;
+  cfg = config.${ns}.programs.vscode;
 in
 mkIf cfg.enable {
   # NOTE: To fix credential saving (signing in with gihub) need to add

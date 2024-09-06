@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,14 +9,13 @@
 let
   inherit (lib)
     mkIf
-    utils
     getExe'
     mapAttrs'
     nameValuePair
     ;
   inherit (config.xdg) dataHome;
-  osSteam = osConfig'.modules.programs.gaming.steam or null;
-  cfg = config.modules.programs.gaming.steam;
+  osSteam = osConfig'.${ns}.programs.gaming.steam or null;
+  cfg = config.${ns}.programs.gaming.steam;
 
   steamAppIDs = {
     "BeamNG.drive" = 284160;
@@ -27,7 +27,7 @@ let
 
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = lib.${ns}.asserts [
     (osSteam.enable or true)
     "The Steam home-manager module requires the system module to be enabled"
   ];
@@ -72,7 +72,7 @@ mkIf cfg.enable {
   # - Close the protontricks-launch instance of content manager and launch assetto corsa from Steam
   # - When installing custom shaders patch install one of the latest versions (old stable versions don't work)
 
-  modules.programs.gaming = {
+  ${ns}.programs.gaming = {
     gameClasses = [
       "steam_app.*"
       "cs2"
@@ -101,12 +101,12 @@ mkIf cfg.enable {
 
   xdg.desktopEntries.beam-mp =
     let
-      terminal = config.modules.desktop.terminal.exePath;
+      terminal = config.${ns}.desktop.terminal.exePath;
       protontrick-launch = getExe' pkgs.protontricks "protontricks-launch";
       launcherDir = "${dataHome}/Steam/steamapps/compatdata/284160/pfx/dosdevices/c:/users/steamuser/AppData/Roaming/BeamMP-Launcher";
       appID = toString steamAppIDs."BeamNG.drive";
     in
-    mkIf config.modules.desktop.enable {
+    mkIf config.${ns}.desktop.enable {
       name = "BeamMP";
       exec = "${terminal} --title BeamMP -e ${protontrick-launch} --appid ${appID} ${launcherDir}/BeamMP-Launcher.exe";
       terminal = false;

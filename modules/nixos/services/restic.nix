@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   self,
@@ -13,7 +14,6 @@ let
   inherit (lib)
     mkIf
     mkMerge
-    utils
     all
     elem
     mapAttrs
@@ -37,10 +37,11 @@ let
     optionalString
     singleton
     ;
-  inherit (config.modules.services) caddy;
-  inherit (config.modules.core) homeManager;
+  inherit (lib.${ns}) asserts upperFirstChar;
+  inherit (config.${ns}.services) caddy;
+  inherit (config.${ns}.core) homeManager;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.system.virtualisation) vmVariant;
+  inherit (config.${ns}.system.virtualisation) vmVariant;
   inherit (caddy) allowAddresses trustedAddresses;
   inherit (cfg) backups;
   inherit (config.age.secrets)
@@ -52,8 +53,8 @@ let
     resticNotifVars
     healthCheckResticRemoteCopy
     ;
-  cfg = config.modules.services.restic;
-  isServer = (config.device.type == "server");
+  cfg = config.${ns}.services.restic;
+  isServer = (config.${ns}.device.type == "server");
   resticExe = getExe pkgs.restic;
   homeBackups = optionalAttrs homeManager.enable config.home-manager.users.${username}.backups;
 
@@ -228,7 +229,7 @@ let
                   fi
                 fi
                 fi
-              '') self.nixosConfigurations.${hostname}.config.modules.services.restic.backups
+              '') self.nixosConfigurations.${hostname}.config.${ns}.services.restic.backups
           )
         ) (attrNames self.nixosConfigurations)}
       '';
@@ -278,7 +279,7 @@ mkMerge [
   })
 
   (mkIf (cfg.enable && !vmVariant) {
-    assertions = utils.asserts [
+    assertions = asserts [
       (all (v: v == true) (
         mapAttrsToList (
           _: backup:
@@ -355,7 +356,7 @@ mkMerge [
           name: value:
           let
             failureServiceName = "restic-backups-${name}-failure-notif";
-            capitalisedNamed = utils.upperFirstChar name;
+            capitalisedNamed = upperFirstChar name;
             service =
               failureNotifService failureServiceName "Restic Backup ${capitalisedNamed} Failed"
                 "${capitalisedNamed} backup";
@@ -415,7 +416,7 @@ mkMerge [
   })
 
   (mkIf (cfg.server.enable && !vmVariant) {
-    assertions = utils.asserts [
+    assertions = asserts [
       caddy.enable
       "Restic server requires Caddy to be enabled"
       isServer

@@ -1,15 +1,16 @@
 {
+  ns,
   lib,
   config,
   inputs,
   ...
 }:
 let
-  inherit (lib) mkIf singleton utils;
+  inherit (lib) mkIf singleton;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) caddy;
+  inherit (config.${ns}.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
-  cfg = config.modules.services.mealie;
+  cfg = config.${ns}.services.mealie;
 in
 mkIf cfg.enable {
   services.mealie = {
@@ -28,7 +29,7 @@ mkIf cfg.enable {
   };
   users.groups.mealie = { };
 
-  systemd.services.mealie.serviceConfig = utils.hardeningBaseline config {
+  systemd.services.mealie.serviceConfig = lib.${ns}.hardeningBaseline config {
     User = "mealie";
     Group = "mealie";
   };

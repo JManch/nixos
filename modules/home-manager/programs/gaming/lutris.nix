@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.modules.programs.gaming.lutris;
+  cfg = config.${ns}.programs.gaming.lutris;
 
   lutris = pkgs.lutris.override {
     extraPkgs =
@@ -18,7 +19,7 @@ in
 lib.mkIf cfg.enable {
   home.packages = [ lutris ];
 
-  modules.programs.gaming.gameClasses = [
+  ${ns}.programs.gaming.gameClasses = [
     "bfv.exe"
     "xdefiant.exe"
   ];

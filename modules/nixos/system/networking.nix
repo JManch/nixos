@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -11,7 +12,6 @@ let
   inherit (lib)
     mkMerge
     mkIf
-    utils
     listToAttrs
     toInt
     optional
@@ -22,15 +22,15 @@ let
     getExe'
     allUnique
     ;
-  inherit (config.modules.core) homeManager;
-  inherit (config.modules.system) desktop;
-  cfg = config.modules.system.networking;
+  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.system) desktop;
+  cfg = config.${ns}.system.networking;
   homeFirewall = config.home-manager.users.${username}.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
   vlanIds = attrNames cfg.vlans;
 in
 {
-  assertions = utils.asserts [
+  assertions = lib.${ns}.asserts [
     (cfg.wiredInterface != null)
     "Wired networking interface must be set"
     ((cfg.staticIPAddress != null) -> (cfg.defaultGateway != null))
@@ -129,7 +129,7 @@ in
       enable = true;
       userControlled.enable = true;
       environmentFile = config.age.secrets.wirelessNetworks.path;
-      scanOnLowSignal = config.device.type == "laptop";
+      scanOnLowSignal = config.${ns}.device.type == "laptop";
       allowAuxiliaryImperativeNetworks = true;
 
       networks = {

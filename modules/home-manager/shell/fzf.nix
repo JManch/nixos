@@ -1,7 +1,8 @@
 {
+  ns,
   lib,
-  config,
   pkgs,
+  config,
   ...
 }:
 let
@@ -9,7 +10,7 @@ let
   fd = getExe pkgs.fd;
   bat = getExe pkgs.bat;
 in
-mkIf config.modules.shell.enable {
+mkIf config.${ns}.shell.enable {
   programs.fzf = {
     enable = true;
     defaultCommand = "${fd} -H --type f";

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   inputs,
@@ -9,18 +10,17 @@
 let
   inherit (lib)
     mkIf
-    utils
     optional
     getExe
     getExe'
     escapeShellArg
     singleton
     ;
-  inherit (config.modules.desktop.programs) locking;
-  cfg = config.modules.desktop.services.hypridle;
+  inherit (config.${ns}.desktop.programs) locking;
+  cfg = config.${ns}.desktop.services.hypridle;
 in
 mkIf (cfg.enable && isWayland) {
-  assertions = utils.asserts [
+  assertions = lib.${ns}.asserts [
     (locking.package != null)
     "Hypridle requires a locker to be enabled"
   ];
@@ -46,12 +46,12 @@ mkIf (cfg.enable && isWayland) {
     };
   };
 
-  modules.desktop.programs.locking.postLockScript =
+  ${ns}.desktop.programs.locking.postLockScript =
     let
       hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
       jaq = getExe pkgs.jaq;
     in
-    mkIf (utils.isHyprland config)
+    mkIf (lib.${ns}.isHyprland config)
       # bash
       ''
         # Turn off the display after locking. I've found that doing this in the
@@ -71,7 +71,7 @@ mkIf (cfg.enable && isWayland) {
 
   wayland.windowManager.hyprland.settings.bind =
     let
-      inherit (config.modules.desktop.hyprland) modKey;
+      inherit (config.${ns}.desktop.hyprland) modKey;
       systemctl = getExe' pkgs.systemd "systemctl";
       notifySend = getExe pkgs.libnotify;
       toggleHypridle = pkgs.writeShellScript "hypridle-toggle" ''

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -12,7 +13,7 @@ let
     optional
     genAttrs
     ;
-  cfg = config.modules.services.ollama;
+  cfg = config.${ns}.services.ollama;
 in
 mkIf cfg.enable {
   userPackages = [ pkgs.oterm ];

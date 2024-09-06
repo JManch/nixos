@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -7,7 +8,7 @@
 }:
 let
   inherit (lib) mkIf getExe;
-  cfg = config.modules.programs.btop;
+  cfg = config.${ns}.programs.btop;
   colors = config.colorScheme.palette;
   themePath = "btop/themes/custom.theme";
 in
@@ -17,7 +18,7 @@ mkIf cfg.enable {
     package = mkIf (osConfig' != null) (
       pkgs.btop.override (
         let
-          inherit (osConfig'.device) gpu;
+          inherit (osConfig'.${ns}.device) gpu;
         in
         {
           cudaSupport = gpu.type == "nvidia";
@@ -80,9 +81,9 @@ mkIf cfg.enable {
   xdg.desktopEntries.btop =
     let
       btop = getExe config.programs.btop.package;
-      terminal = config.modules.desktop.terminal.exePath;
+      terminal = config.${ns}.desktop.terminal.exePath;
     in
-    mkIf config.modules.desktop.enable {
+    mkIf config.${ns}.desktop.enable {
       name = "btop";
       genericName = "Resource Monitor";
       icon = "application-x-generic";

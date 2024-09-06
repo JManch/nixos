@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -10,7 +11,6 @@ let
   inherit (lib)
     mkIf
     mkMerge
-    utils
     mapAttrs
     getExe
     mkVMOverride
@@ -21,9 +21,10 @@ let
     genAttrs
     singleton
     ;
+  inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.system.virtualisation) vmVariant;
-  cfg = config.modules.services.caddy;
+  inherit (config.${ns}.system.virtualisation) vmVariant;
+  cfg = config.${ns}.services.caddy;
 
   generateCerts =
     let
@@ -82,7 +83,7 @@ in
 mkMerge [
   { adminPackages = [ generateCerts ]; }
   (mkIf cfg.enable {
-    assertions = utils.asserts [
+    assertions = asserts [
       (cfg.trustedAddresses != [ ])
       "Caddy requires trusted addresses to be set"
     ];
@@ -114,7 +115,7 @@ mkMerge [
       80
     ];
     networking.firewall.allowedUDPPorts = [ 443 ];
-    modules.system.networking.publicPorts = [
+    ${ns}.system.networking.publicPorts = [
       443
       80
     ];
@@ -128,7 +129,7 @@ mkMerge [
     });
 
     # Extra hardening
-    systemd.services.caddy.serviceConfig = utils.hardeningBaseline config {
+    systemd.services.caddy.serviceConfig = hardeningBaseline config {
       DynamicUser = false;
       PrivateUsers = false;
       SystemCallFilter = [
@@ -183,7 +184,7 @@ mkMerge [
           User = "caddy";
           Group = "caddy";
           StateDirectory = [ "goaccess" ];
-        } // utils.hardeningBaseline config { DynamicUser = false; };
+        } // hardeningBaseline config { DynamicUser = false; };
 
         wantedBy = [ "multi-user.target" ];
       };
@@ -217,7 +218,7 @@ mkMerge [
       };
 
     virtualisation.vmVariant = {
-      modules.services.caddy.trustedAddresses = [ "10.0.2.2/32" ];
+      ${ns}.services.caddy.trustedAddresses = [ "10.0.2.2/32" ];
 
       services.caddy = {
         # Confusingly auto_https off doesn't actually server all hosts of http

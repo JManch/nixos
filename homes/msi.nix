@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }@args:
+{ ns, pkgs, ... }:
 {
   home.packages = with pkgs; [
     libreoffice
@@ -8,7 +8,7 @@
     netflix
   ];
 
-  modules = {
+  ${ns} = {
     desktop = {
       enable = true;
       style.cursor = {

@@ -1,7 +1,12 @@
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf getExe;
-  cfg = config.modules.programs.git;
+  cfg = config.${ns}.programs.git;
 in
 mkIf cfg.enable {
   programs.git = {

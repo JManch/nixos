@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,14 +9,13 @@ let
   inherit (lib)
     mkIf
     getExe'
-    utils
     singleton
     ;
-  cfg = config.modules.services.greetd;
+  cfg = config.${ns}.services.greetd;
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
-    config.modules.system.desktop.enable
+  assertions = lib.${ns}.asserts [
+    config.${ns}.system.desktop.enable
     "Greetd requires desktop to be enabled"
     (cfg.sessionDirs != [ ])
     "Greetd session dirs must be set"

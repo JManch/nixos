@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   pkgs,
   desktopEnabled,
   ...
 }:
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
   config = lib.mkIf desktopEnabled { home.packages = [ pkgs.nautilus ]; };
 }

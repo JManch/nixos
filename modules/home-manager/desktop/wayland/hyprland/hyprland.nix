@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -9,7 +10,6 @@
 let
   inherit (lib)
     mkIf
-    utils
     mkVMOverride
     getExe
     getExe'
@@ -19,29 +19,36 @@ let
     optionalString
     optionals
     ;
-  inherit (osConfig'.device) monitors primaryMonitor;
+  inherit (lib.${ns})
+    flakePkgs
+    addPatches
+    isHyprland
+    asserts
+    getMonitorHyprlandCfgStr
+    ;
+  inherit (osConfig'.${ns}.device) monitors primaryMonitor;
   inherit (desktopCfg.style) gapSize borderWidth;
 
   cfg = desktopCfg.hyprland;
-  desktopCfg = config.modules.desktop;
+  desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
 
-  hyprlandPkgs = utils.flakePkgs args "hyprland";
+  hyprlandPkgs = flakePkgs args "hyprland";
 
   # Patch makes the togglespecialworkspace dispatcher always toggle instead
   # of moving the open special workspace to the active monitor
-  hyprland = utils.addPatches hyprlandPkgs.hyprland [
+  hyprland = addPatches hyprlandPkgs.hyprland [
     ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch
     ../../../../../patches/hyprlandDispatcherError.patch
   ];
 in
-mkIf (utils.isHyprland config) {
-  assertions = utils.asserts [
+mkIf (isHyprland config) {
+  assertions = asserts [
     (!(osConfig'.xdg.portal.enable or false))
     "The os xdg portal must be disabled when using Hyprland as it is configured using home-manager"
   ];
 
-  modules.desktop = {
+  ${ns}.desktop = {
     # Optimise for performance in VM variant
     # TODO: Add a hook to disable hardware cursor when launching a QEMU VM
     # otherwise the cursor is upside down
@@ -54,7 +61,7 @@ mkIf (utils.isHyprland config) {
     });
   };
 
-  home.packages = [ (utils.flakePkgs args "grimblast").grimblast ];
+  home.packages = [ (flakePkgs args "grimblast").grimblast ];
 
   # Install Hyprcursor package
   home.file = mkIf (cfg.hyprcursor.package != null) {
@@ -105,7 +112,7 @@ mkIf (utils.isHyprland config) {
     enable = true;
     package = hyprland;
 
-    # plugins = with utils.flakePkgs args "hyprland-plugins"; [ hyprexpo ];
+    # plugins = with flakePkgs args "hyprland-plugins"; [ hyprexpo ];
 
     systemd = {
       enable = true;
@@ -132,9 +139,9 @@ mkIf (utils.isHyprland config) {
         ]
         ++ optionals (cfg.hyprcursor.package != null) [
           "HYPRCURSOR_THEME,${cfg.hyprcursor.name}"
-          "HYPRCURSOR_SIZE,${toString config.modules.desktop.style.cursor.size}"
+          "HYPRCURSOR_SIZE,${toString config.${ns}.desktop.style.cursor.size}"
         ]
-        ++ optionals (osConfig'.device.gpu.type == "nvidia") [
+        ++ optionals (osConfig'.${ns}.device.gpu.type == "nvidia") [
           "LIBVA_DRIVER_NAME,nvidia"
           "GBM_BACKEND,nvidia-drm"
           "__GLX_VENDOR_LIBRARY_NAME,nvidia"
@@ -143,7 +150,7 @@ mkIf (utils.isHyprland config) {
         ];
 
       monitor =
-        (map (m: if !m.enabled then "${m.name},disable" else utils.getMonitorHyprlandCfgStr m) monitors)
+        (map (m: if !m.enabled then "${m.name},disable" else getMonitorHyprlandCfgStr m) monitors)
         ++ [
           ",preferred,auto,1" # automatic monitor detection
         ];
@@ -289,7 +296,7 @@ mkIf (utils.isHyprland config) {
 
   darkman.switchApps.hyprland =
     let
-      inherit (config.modules.colorScheme) colorMap dark;
+      inherit (config.${ns}.colorScheme) colorMap dark;
       hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
       mapDarkColor = base: colorMap.${base} // { light = dark.palette.${base}; };
     in

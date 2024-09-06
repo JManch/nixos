@@ -1,8 +1,13 @@
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf;
-  cfg = config.modules.programs.gaming.gamescope;
-  gamingCfg = config.modules.programs.gaming;
+  cfg = config.${ns}.programs.gaming.gamescope;
+  gamingCfg = config.${ns}.programs.gaming;
 in
 mkIf cfg.enable {
   programs.steam = mkIf gamingCfg.steam.enable { gamescopeSession.enable = true; };

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   osConfig',
@@ -6,9 +7,9 @@
 }:
 let
   inherit (lib) mkIf getExe;
-  cfg = config.modules.programs.cava;
+  cfg = config.${ns}.programs.cava;
 in
-mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true)) {
+mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
   programs.cava = {
     enable = true;
 
@@ -55,9 +56,9 @@ mkIf (cfg.enable && (osConfig'.modules.system.audio.enable or true)) {
   xdg.desktopEntries.cava =
     let
       cava = getExe config.programs.cava.package;
-      terminal = config.modules.desktop.terminal.exePath;
+      terminal = config.${ns}.desktop.terminal.exePath;
     in
-    mkIf config.modules.desktop.enable {
+    mkIf config.${ns}.desktop.enable {
       name = "Cava";
       genericName = "Audio Visualizer";
       exec = "${terminal} --title Cava -e ${cava}";

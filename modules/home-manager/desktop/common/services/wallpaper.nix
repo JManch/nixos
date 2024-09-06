@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -12,13 +13,12 @@ let
     boolToString
     optional
     getExe
-    utils
     ;
-  inherit (config.modules.desktop.services) darkman;
-  cfg = config.modules.desktop.services.wallpaper;
+  inherit (config.${ns}.desktop.services) darkman;
+  cfg = config.${ns}.desktop.services.wallpaper;
   wallpaperCache = "${config.xdg.cacheHome}/wallpaper";
   wallpapers =
-    type: "${(utils.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers"}/wallpapers";
+    type: "${(lib.${ns}.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers"}/wallpapers";
 
   setWallpaper = pkgs.writeShellApplication {
     name = "set-wallpaper";

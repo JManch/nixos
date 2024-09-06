@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   inputs,
@@ -96,7 +97,7 @@ let
   };
 in
 {
-  options.device = {
+  options.${ns}.device = {
     type = mkOption {
       type = types.enum [
         "laptop"
@@ -175,7 +176,7 @@ in
       default =
         findFirst (m: m.number == 1)
           (throw "Attempted to access primary monitors but monitors have not been configured")
-          config.device.monitors;
+          config.${ns}.device.monitors;
     };
 
     ipAddress = mkOption {
@@ -203,7 +204,6 @@ in
   config =
     let
       inherit (lib)
-        utils
         sort
         zipListsWith
         init
@@ -211,10 +211,10 @@ in
         head
         all
         ;
-      inherit (config.device) monitors;
+      inherit (config.${ns}.device) monitors;
     in
     {
-      assertions = utils.asserts [
+      assertions = lib.${ns}.asserts [
         (
           let
             sorted = sort (a: b: a < b) (map (m: m.number) monitors);

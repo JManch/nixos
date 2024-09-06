@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   selfPkgs,
@@ -12,7 +13,7 @@ let
     optional
     singleton
     ;
-  cfg = config.modules.services.beammp-server;
+  cfg = config.${ns}.services.beammp-server;
 in
 mkIf cfg.enable {
   services.beammp-server = {

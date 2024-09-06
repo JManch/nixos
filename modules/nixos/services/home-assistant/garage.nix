@@ -1,7 +1,12 @@
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf singleton;
-  cfg = config.modules.services.hass;
+  cfg = config.${ns}.services.hass;
 
   # The shelly should be configured with input mode "Switch", output type
   # "Detached" and a timer that turns off the input switch after 3 seconds. The

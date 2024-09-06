@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -7,7 +8,7 @@
 }:
 let
   inherit (lib) mkIf optional;
-  cfg = config.modules.programs.mpv;
+  cfg = config.${ns}.programs.mpv;
 in
 mkIf cfg.enable {
   home.packages = [ pkgs.yt-dlp ] ++ optional cfg.jellyfinShim.enable pkgs.jellyfin-mpv-shim;
@@ -57,7 +58,7 @@ mkIf cfg.enable {
       osc = "no"; # we use modernx osc
 
       # Subs
-      sub-font = config.modules.desktop.style.font.family;
+      sub-font = config.${ns}.desktop.style.font.family;
       sub-font-size = 20;
       sub-border-size = 1.5;
       sub-pos = 95;

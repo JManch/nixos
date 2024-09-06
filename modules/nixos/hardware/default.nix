@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   hostname,
@@ -6,7 +7,6 @@
 }:
 let
   inherit (lib)
-    utils
     mkOption
     mkEnableOption
     types
@@ -16,12 +16,12 @@ let
     hasPrefix
     literalExpression
     ;
-  cfg = config.modules.hardware;
+  cfg = config.${ns}.hardware;
 in
 {
-  imports = utils.scanPathsExcept ./. [ "raspberry-pi.nix" ];
+  imports = lib.${ns}.scanPathsExcept ./. [ "raspberry-pi.nix" ];
 
-  options.modules.hardware = {
+  options.${ns}.hardware = {
     vr.enable = mkEnableOption "virtual reality";
     secureBoot.enable = mkEnableOption "secure boot";
     fanatec.enable = mkEnableOption "support for Fanatec hardware";
@@ -98,7 +98,7 @@ in
 
       swap =
         let
-          inherit (config.device) memory;
+          inherit (config.${ns}.device) memory;
         in
         {
           enable = mkEnableOption "swap" // {

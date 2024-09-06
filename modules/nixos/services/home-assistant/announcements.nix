@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   inputs,
@@ -13,14 +14,14 @@ let
     singleton
     mkMerge
     concatMap
-    utils
     ;
+  inherit (lib.${ns}) upperFirstChar;
   inherit (secrets.general) devices userIds peopleList;
-  cfg = config.modules.services.hass;
+  cfg = config.${ns}.services.hass;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 in
 {
-  options.modules.services.hass.homeAnnouncements.lovelaceView = mkOption {
+  options.${ns}.services.hass.homeAnnouncements.lovelaceView = mkOption {
     type = types.attrs;
     description = "Lovelace view for home announcements";
     readOnly = true;
@@ -40,7 +41,7 @@ in
           entity = "sensor.${device}_ringer_mode";
           icon = "mdi:bell-off";
           color = "red";
-          name = "${utils.upperFirstChar person}'s Phone is Silent";
+          name = "${upperFirstChar person}'s Phone is Silent";
           state_content = "name";
           visibility = singleton {
             condition = "or";
@@ -119,7 +120,7 @@ in
               {
                 type = "tile";
                 entity = "input_boolean.${person}_announcement_enable";
-                name = utils.upperFirstChar person;
+                name = upperFirstChar person;
                 tap_action.action = "toggle";
                 visibility = singleton {
                   condition = "state";
@@ -148,7 +149,7 @@ in
                 (variant: {
                   type = "tile";
                   entity = "input_text.${person}_announcement_response";
-                  name = utils.upperFirstChar person;
+                  name = upperFirstChar person;
                   inherit (variant) color;
                   visibility = singleton {
                     condition = "state";
@@ -178,7 +179,7 @@ in
               ++ singleton {
                 type = "tile";
                 entity = "input_text.${person}_announcement_response";
-                name = utils.upperFirstChar person;
+                name = upperFirstChar person;
                 color = "blue";
                 visibility = singleton {
                   condition = "and";
@@ -404,18 +405,18 @@ in
       }
       ++ (map (person: {
         input_text."${person}_announcement_response" = {
-          name = "${utils.upperFirstChar person} Announcement Response";
+          name = "${upperFirstChar person} Announcement Response";
           icon = "mdi:account";
           initial = "No response";
         };
 
         input_boolean = {
           "${person}_announcement_enable" = {
-            name = "${utils.upperFirstChar person} Announcement Enable";
+            name = "${upperFirstChar person} Announcement Enable";
             icon = "mdi:bell";
           };
           "${person}_announcement_acknowledged" = {
-            name = "${utils.upperFirstChar person} Announcement Acknowledged";
+            name = "${upperFirstChar person} Announcement Acknowledged";
           };
         };
       }) peopleList)

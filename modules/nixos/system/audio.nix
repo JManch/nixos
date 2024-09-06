@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -11,9 +12,8 @@ let
     getExe
     getExe'
     mkForce
-    singleton
     ;
-  cfg = config.modules.system.audio;
+  cfg = config.${ns}.system.audio;
 
   toggleMic =
     let
@@ -33,7 +33,7 @@ in
     (mkIf cfg.enable {
       userPackages = [ pkgs.pavucontrol ];
       hardware.pulseaudio.enable = mkForce false;
-      modules.system.audio.scripts.toggleMic = toggleMic.outPath;
+      ${ns}.system.audio.scripts.toggleMic = toggleMic.outPath;
 
       # Make pipewire realtime-capable
       security.rtkit.enable = true;

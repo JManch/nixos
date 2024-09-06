@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,13 +7,12 @@
 }:
 let
   inherit (lib)
-    utils
     mkIf
     getExe
     singleton
     ;
   inherit (config.age.secrets) mikrotikBackupKey;
-  cfg = config.modules.services.mikrotik-backup;
+  cfg = config.${ns}.services.mikrotik-backup;
   backupDir = "/var/backup/mikrotik";
   backupScript = pkgs.writeShellApplication {
     name = "mikrotik-backup-script";
@@ -47,8 +47,8 @@ let
   };
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
-    config.modules.services.restic.enable
+  assertions = lib.${ns}.asserts [
+    config.${ns}.services.restic.enable
     "Mikrotik backup requires Restic backups to be enabled"
   ];
 

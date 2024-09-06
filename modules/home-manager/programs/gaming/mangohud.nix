@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,10 +7,10 @@
   ...
 }:
 let
-  inherit (lib) mkIf utils;
-  inherit (config.modules.desktop.style) cornerRadius;
-  cfg = config.modules.programs.gaming.mangohud;
-  device = osConfig'.device or null;
+  inherit (lib) mkIf;
+  inherit (config.${ns}.desktop.style) cornerRadius;
+  cfg = config.${ns}.programs.gaming.mangohud;
+  device = osConfig'.${ns}.device or null;
   colors = config.colorScheme.palette;
 in
 mkIf cfg.enable {
@@ -19,7 +20,7 @@ mkIf cfg.enable {
   # the first toggle, after which it hides and never shows again.
   programs.mangohud = {
     enable = true;
-    package = utils.addPatches pkgs.mangohud [ ../../../../patches/mangoHud.diff ];
+    package = lib.${ns}.addPatches pkgs.mangohud [ ../../../../patches/mangoHud.diff ];
 
     settings = {
       # Performance

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs',
   config,
@@ -9,17 +10,17 @@ let
   inherit (lib)
     mkIf
     mkMerge
-    utils
     optional
     singleton
     mkForce
     ;
+  inherit (lib.${ns}) asserts;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) caddy mosquitto;
+  inherit (config.${ns}.services) caddy mosquitto;
   inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.age.secrets) zigbee2mqttYamlSecrets mqttZigbee2mqttPassword;
   inherit (config.services.zigbee2mqtt) dataDir;
-  cfg = config.modules.services.zigbee2mqtt;
+  cfg = config.${ns}.services.zigbee2mqtt;
 in
 mkMerge [
   (mkIf cfg.enable {
@@ -104,7 +105,7 @@ mkMerge [
   })
 
   (mkIf cfg.proxy.enable {
-    assertions = utils.asserts [
+    assertions = asserts [
       caddy.enable
       "Zigbee2mqtt proxy requires Caddy to be enabled"
     ];
@@ -119,12 +120,12 @@ mkMerge [
   })
 
   (mkIf cfg.mqtt.user {
-    assertions = utils.asserts [
+    assertions = asserts [
       (cfg.enable -> mosquitto.enable)
       "Zigbee2mqtt MQTT user requires Mosquitto to be enabled"
     ];
 
-    modules.services.mosquitto = {
+    ${ns}.services.mosquitto = {
       users = mkIf (!cfg.mqtt.tls) {
         zigbee2mqtt = {
           acl = [ "readwrite #" ];

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   vmVariant,
@@ -7,7 +8,7 @@
 let
   inherit (lib) mkIf optional;
   inherit (config.home) username;
-  cfg = config.modules.services.syncthing;
+  cfg = config.${ns}.services.syncthing;
 in
 mkIf (cfg.enable && !vmVariant) {
   services.syncthing = {

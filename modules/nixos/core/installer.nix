@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   self,
@@ -7,12 +8,12 @@
 }:
 let
   inherit (lib)
-    utils
     concatStringsSep
     attrNames
     filterAttrs
     getExe
     ;
+  inherit (lib.${ns}) addPatches exitTrapBuilder;
 
   remoteInstallScript = pkgs.writeShellApplication {
     name = "install-remote";
@@ -27,7 +28,7 @@ let
       # The patch also preserves original file ownership of files transfered
       # with --extra-files. This is needed for deploying secrets to the home
       # directory with correct permissions.
-      (utils.addPatches pkgs.nixos-anywhere [ ../../../patches/nixosAnywhere.patch ])
+      (addPatches pkgs.nixos-anywhere [ ../../../patches/nixosAnywhere.patch ])
       pkgs.gnutar
     ];
     text = # bash
@@ -43,7 +44,7 @@ let
           concatStringsSep " " (
             attrNames (
               filterAttrs (
-                _: value: !(with value.config.modules.hardware.fileSystem; type == "zfs" && zfs.encryption.enable)
+                _: value: !(with value.config.${ns}.hardware.fileSystem; type == "zfs" && zfs.encryption.enable)
               ) self.nixosConfigurations
             )
           )
@@ -71,8 +72,8 @@ let
         fi
 
         host_config="$flake#nixosConfigurations.$hostname.config"
-        username=$(nix eval --raw "$host_config.modules.core.username")
-        impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
+        username=$(nix eval --raw "$host_config.${ns}.core.username")
+        impermanence=$(nix eval "$host_config.${ns}.system.impermanence.enable")
 
         temp_keys=$(mktemp -d)
         temp=$(mktemp -d)
@@ -139,7 +140,7 @@ let
           echo "Usage: setup-sd-image <hostname> <result_path>"
           exit 1
         fi
-        ${utils.exitTrapBuilder}
+        ${exitTrapBuilder}
 
         hostname="$1"
         result="$2"
@@ -151,8 +152,8 @@ let
         fi
 
         host_config="$flake#nixosConfigurations.$hostname.config"
-        fs_type=$(nix eval --raw "$host_config.modules.hardware.fileSystem.type")
-        username=$(nix eval --raw "$host_config.modules.core.username")
+        fs_type=$(nix eval --raw "$host_config.${ns}.hardware.fileSystem.type")
+        username=$(nix eval --raw "$host_config.${ns}.core.username")
 
         if [ "$fs_type" != "sd-image" ]; then
           echo "Host $hostname does not have a sd image filesystem" 1>&2
@@ -243,7 +244,7 @@ in
         fi
 
         host_config="$flake#nixosConfigurations.$1.config"
-        fs_type=$(nix eval --raw "$host_config.modules.hardware.fileSystem.type")
+        fs_type=$(nix eval --raw "$host_config.${ns}.hardware.fileSystem.type")
         result=$(nix build "$flake#installer-$1" --print-out-paths)
         if [ "$fs_type" = "sd-image" ]; then
           sudo ${getExe setupSdImage} "$1" "$result"

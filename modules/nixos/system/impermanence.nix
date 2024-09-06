@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -12,14 +13,13 @@ let
     mkIf
     mkForce
     mkMerge
-    utils
     mkAliasOptionModule
     concatStringsSep
     hasAttr
     ;
-  inherit (config.modules.core) homeManager;
-  inherit (config.modules.system.virtualisation) vmVariant;
-  cfg = config.modules.system.impermanence;
+  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.system.virtualisation) vmVariant;
+  cfg = config.${ns}.system.impermanence;
   homePersistence = config.home-manager.users.${username}.persistence;
 in
 {
@@ -51,7 +51,7 @@ in
 
   config = mkMerge [
     (mkIf cfg.enable {
-      assertions = utils.asserts [
+      assertions = lib.${ns}.asserts [
         (vmVariant || (hasAttr "/persist" config.fileSystems))
         "A /persist file system must be defined for impermanence"
       ];

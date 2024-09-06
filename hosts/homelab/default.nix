@@ -1,6 +1,6 @@
-{ config, ... }:
+{ ns, config, ... }:
 let
-  inherit (config.modules.services) wireguard;
+  inherit (config.${ns}.services) wireguard;
 in
 {
   imports = [
@@ -8,17 +8,17 @@ in
     ./hardware-configuration.nix
   ];
 
-  device = {
-    type = "server";
-    cpu.type = "amd";
-    cpu.cores = 4;
-    memory = 1024 * 8;
-    gpu.type = null;
-    ipAddress = "192.168.89.2";
-  };
-
-  modules = {
+  ${ns} = {
     core.homeManager.enable = true;
+
+    device = {
+      type = "server";
+      cpu.type = "amd";
+      cpu.cores = 4;
+      memory = 1024 * 8;
+      gpu.type = null;
+      ipAddress = "192.168.89.2";
+    };
 
     hardware = {
       graphics.hardwareAcceleration = true;

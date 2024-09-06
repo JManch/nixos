@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +9,7 @@
 let
   inherit (lib) mkIf singleton;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  cfg = config.modules.programs.taskwarrior;
+  cfg = config.${ns}.programs.taskwarrior;
 in
 mkIf cfg.enable {
   programs.taskwarrior = {

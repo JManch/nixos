@@ -1,7 +1,12 @@
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf singleton;
-  cfg = config.modules.services.acme;
+  cfg = config.${ns}.services.acme;
 in
 mkIf cfg.enable {
   security.acme = {

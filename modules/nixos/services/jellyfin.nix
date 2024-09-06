@@ -5,6 +5,7 @@
 # multiple clients watching this can easily throttle the web server and make
 # Jellyfin unusable.
 {
+  ns,
   lib,
   config,
   inputs,
@@ -13,7 +14,6 @@
 let
   inherit (lib)
     mkIf
-    utils
     mkMerge
     optional
     mkForce
@@ -22,18 +22,18 @@ let
     genAttrs
     attrNames
     ;
-  inherit (config.modules.system.networking) publicPorts;
-  inherit (config.modules.services) caddy wireguard;
+  inherit (config.${ns}.system.networking) publicPorts;
+  inherit (config.${ns}.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.services) jellyfin;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  cfg = config.modules.services.jellyfin;
+  cfg = config.${ns}.services.jellyfin;
   uid = 1500;
   gid = 1500;
 in
 mkMerge [
   {
-    modules.system.reservedIDs.jellyfin = {
+    ${ns}.system.reservedIDs.jellyfin = {
       inherit uid gid;
     };
   }
@@ -117,7 +117,7 @@ mkMerge [
   })
 
   (mkIf cfg.reverseProxy.enable {
-    assertions = utils.asserts [
+    assertions = lib.${ns}.asserts [
       caddy.enable
       "Jellyfin reverse proxy requires caddy to be enabled"
     ];

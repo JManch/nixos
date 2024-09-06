@@ -1,14 +1,12 @@
 {
+  ns,
   lib,
   pkgs,
   isWayland,
   ...
 }:
-let
-  inherit (lib) mkIf utils;
-in
 {
-  imports = utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
-  config = mkIf isWayland { home.packages = [ pkgs.wl-clipboard ]; };
+  config = lib.mkIf isWayland { home.packages = [ pkgs.wl-clipboard ]; };
 }

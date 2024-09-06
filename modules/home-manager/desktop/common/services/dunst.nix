@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,9 +9,9 @@
 }:
 let
   inherit (lib) mkIf getExe';
-  inherit (config.modules) desktop;
-  inherit (config.modules.colorScheme) light;
-  inherit (osConfig'.device) primaryMonitor;
+  inherit (config.${ns}) desktop;
+  inherit (config.${ns}.colorScheme) light;
+  inherit (osConfig'.${ns}.device) primaryMonitor;
   cfg = desktop.services.dunst;
   colors = config.colorScheme.palette;
   systemctl = getExe' pkgs.systemd "systemctl";

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   inputs,
@@ -10,20 +11,20 @@ let
     mkIf
     mkVMOverride
     optionalString
-    utils
     optional
     singleton
     ;
-  inherit (config.device) ipAddress;
-  inherit (config.modules.system.networking) publicPorts;
-  inherit (config.modules.services) hass mosquitto caddy;
+  inherit (lib.${ns}) asserts hardeningBaseline;
+  inherit (config.${ns}.device) ipAddress;
+  inherit (config.${ns}.system.networking) publicPorts;
+  inherit (config.${ns}.services) hass mosquitto caddy;
   inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.age.secrets) cctvVars mqttFrigatePassword;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  cfg = config.modules.services.frigate;
+  cfg = config.${ns}.services.frigate;
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = asserts [
     (hostname == "homelab")
     "Frigate is only intended to work on host 'homelab'"
     caddy.enable
@@ -34,13 +35,27 @@ mkIf cfg.enable {
     "The Frigate service requires hardware acceleration"
   ];
 
-  modules.services.frigate.rtspAddress =
-    {
-      channel,
-      subtype,
-      go2rtc ? false,
-    }:
-    "rtsp://${optionalString go2rtc "$"}{FRIGATE_RTSP_USER}:${optionalString go2rtc "$"}{FRIGATE_RTSP_PASSWORD}@${cfg.nvrAddress}:554/cam/realmonitor?channel=${toString channel}&subtype=${toString subtype}";
+  ${ns} = {
+    # Always consider a public port because of router forwarding rule
+    system.networking.publicPorts = [ cfg.webrtc.port ];
+
+    services = {
+      frigate.rtspAddress =
+        {
+          channel,
+          subtype,
+          go2rtc ? false,
+        }:
+        "rtsp://${optionalString go2rtc "$"}{FRIGATE_RTSP_USER}:${optionalString go2rtc "$"}{FRIGATE_RTSP_PASSWORD}@${cfg.nvrAddress}:554/cam/realmonitor?channel=${toString channel}&subtype=${toString subtype}";
+
+      mosquitto.users = mkIf (hass.enable && mosquitto.enable) {
+        frigate = {
+          acl = [ "readwrite #" ];
+          hashedPasswordFile = mqttFrigatePassword.path;
+        };
+      };
+    };
+  };
 
   users.groups.cctv.members = [
     "frigate"
@@ -182,7 +197,7 @@ mkIf cfg.enable {
     };
   };
 
-  systemd.services.frigate.serviceConfig = utils.hardeningBaseline config {
+  systemd.services.frigate.serviceConfig = hardeningBaseline config {
     # WARN: The upstream module tries to set a read only bind path with BindPaths
     # which is invalid, I'm not sure if it affects functionality?
     DynamicUser = false;
@@ -202,13 +217,6 @@ mkIf cfg.enable {
   # Nginx upstream module has good systemd hardening
   systemd.services.nginx.serviceConfig = {
     SocketBindDeny = publicPorts;
-  };
-
-  modules.services.mosquitto.users = mkIf (hass.enable && mosquitto.enable) {
-    frigate = {
-      acl = [ "readwrite #" ];
-      hashedPasswordFile = mqttFrigatePassword.path;
-    };
   };
 
   # We just use go2rtc to provide a low latency WebRTC stream. It is lazy so
@@ -265,7 +273,7 @@ mkIf cfg.enable {
     };
   };
 
-  systemd.services.go2rtc.serviceConfig = utils.hardeningBaseline config {
+  systemd.services.go2rtc.serviceConfig = hardeningBaseline config {
     EnvironmentFile = cctvVars.path;
     RestrictAddressFamilies = [
       "AF_UNIX"
@@ -287,8 +295,6 @@ mkIf cfg.enable {
     RestartSec = 10;
   };
 
-  # Always consider a public port because of router forwarding rule
-  modules.system.networking.publicPorts = [ cfg.webrtc.port ];
   networking.firewall = mkIf cfg.webrtc.enable {
     allowedTCPPorts = cfg.webrtc.port;
     allowedUDPPorts = cfg.webrtc.port;

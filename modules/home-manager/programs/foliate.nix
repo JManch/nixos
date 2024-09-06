@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.modules.programs.foliate;
+  cfg = config.${ns}.programs.foliate;
 in
 lib.mkIf cfg.enable {
   home.packages = [ pkgs.foliate ];

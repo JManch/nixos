@@ -1,12 +1,13 @@
 {
+  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  inherit (config.modules.system) desktop;
-  cfg = config.modules.programs.wine;
+  inherit (config.${ns}.system) desktop;
+  cfg = config.${ns}.programs.wine;
 in
 lib.mkIf (cfg.enable && desktop.enable) {
   userPackages = [

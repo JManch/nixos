@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   username,
@@ -7,7 +8,7 @@
 let
   inherit (lib) mkIf;
   inherit (homeConfig.programs) swaylock hyprlock;
-  inherit (config.modules.core) homeManager;
+  inherit (config.${ns}.core) homeManager;
   homeConfig = config.home-manager.users.${username};
 in
 {

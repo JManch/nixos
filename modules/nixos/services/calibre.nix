@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -11,15 +12,15 @@ let
     mkBefore
     mkVMOverride
     getExe'
-    utils
     ;
+  inherit (lib.${ns}) asserts addPatches hardeningBaseline;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) caddy;
+  inherit (config.${ns}.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
-  cfg = config.modules.services.calibre;
+  cfg = config.${ns}.services.calibre;
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = asserts [
     caddy.enable
     "Calibre requires Caddy to be enabled"
   ];
@@ -30,7 +31,7 @@ mkIf cfg.enable {
     # https://github.com/janeczku/calibre-web/issues/452
     # Also fixes unwanted gamma adjusted of cover images
     # https://github.com/janeczku/calibre-web/issues/2564
-    package = utils.addPatches pkgs.calibre-web [ ../../../patches/calibre-web.patch ];
+    package = addPatches pkgs.calibre-web [ ../../../patches/calibre-web.patch ];
     listen.ip = "127.0.0.1";
     listen.port = cfg.port;
     options = {
@@ -39,7 +40,7 @@ mkIf cfg.enable {
     };
   };
 
-  systemd.services.calibre-web.serviceConfig = utils.hardeningBaseline config {
+  systemd.services.calibre-web.serviceConfig = hardeningBaseline config {
     DynamicUser = false;
     RestrictAddressFamilies = [
       "AF_UNIX"

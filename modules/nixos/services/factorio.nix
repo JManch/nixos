@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,7 +7,7 @@
 }:
 let
   inherit (lib) mkIf genAttrs singleton;
-  cfg = config.modules.services.factorio-server;
+  cfg = config.${ns}.services.factorio-server;
 in
 mkIf cfg.enable {
   services.factorio = {

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   pkgs',
@@ -6,7 +7,7 @@
   ...
 }:
 let
-  cfg = config.modules.programs.discord;
+  cfg = config.${ns}.programs.discord;
 in
 lib.mkIf cfg.enable {
   home.packages = [

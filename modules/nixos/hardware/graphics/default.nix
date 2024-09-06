@@ -1,11 +1,16 @@
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
-  inherit (lib) utils mkEnableOption mkDefault;
+  inherit (lib) mkEnableOption mkDefault;
 in
 {
-  imports = utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
-  options.modules.hardware.graphics = {
+  options.${ns}.hardware.graphics = {
     hardwareAcceleration = mkEnableOption ''
       Enable hardware acceleration. Useful for headless systems that need to
       perform hardware accelerated rendering.
@@ -14,7 +19,7 @@ in
 
   config =
     let
-      cfg = config.modules.hardware.graphics;
+      cfg = config.${ns}.hardware.graphics;
     in
     {
       hardware.graphics.enable = mkDefault cfg.hardwareAcceleration;

@@ -1,8 +1,13 @@
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf singleton;
-  inherit (config.modules) desktop;
-  cfg = config.modules.programs.alacritty;
+  inherit (config.${ns}) desktop;
+  cfg = config.${ns}.programs.alacritty;
   colors = config.colorScheme.palette;
   normalFontSize = 12;
   largeFontSize = 17;

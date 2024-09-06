@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -9,7 +10,6 @@ let
   inherit (lib)
     mkIf
     all
-    utils
     elem
     getExe
     getExe'
@@ -25,9 +25,9 @@ let
     removePrefix
     substring
     ;
-  inherit (config.modules.services) dns-server-stack;
+  inherit (config.${ns}.services) dns-server-stack;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  interfaces = filterAttrs (_: cfg: cfg.enable) config.modules.services.wireguard;
+  interfaces = filterAttrs (_: cfg: cfg.enable) config.${ns}.services.wireguard;
 
   # Friends VPN public keys
   # NCASE-M1 PFt9p3zx8nAYjU9pbNVRGS4QIvU/Tb18DdVowbcLuFc=
@@ -160,7 +160,7 @@ let
     };
 in
 {
-  assertions = utils.asserts (
+  assertions = lib.${ns}.asserts (
     (concatMap (
       interface:
       let

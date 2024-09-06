@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.modules.programs.qbittorrent;
+  cfg = config.${ns}.programs.qbittorrent;
 in
 lib.mkIf cfg.enable {
   home.packages = [ pkgs.qbittorrent ];

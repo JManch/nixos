@@ -1,11 +1,16 @@
-{ lib, pkgs, ... }:
+{
+  ns,
+  lib,
+  pkgs,
+  ...
+}:
 let
   inherit (lib) mkEnableOption mkOption types;
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
-  options.modules.programs = {
+  options.${ns}.programs = {
     winbox.enable = mkEnableOption "Winbox";
     matlab.enable = mkEnableOption "Matlab";
     wireshark.enable = mkEnableOption "Wireshark";

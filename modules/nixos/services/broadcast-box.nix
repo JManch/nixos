@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   inputs,
@@ -7,22 +8,21 @@
 let
   inherit (lib)
     mkIf
-    utils
     mkForce
     optional
     genAttrs
     optionalString
     ;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) caddy;
+  inherit (config.${ns}.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
-  cfg = config.modules.services.broadcast-box;
+  cfg = config.${ns}.services.broadcast-box;
 in
 {
   imports = [ inputs.broadcast-box.nixosModules.default ];
 
   config = mkIf cfg.enable {
-    assertions = utils.asserts [
+    assertions = lib.${ns}.asserts [
       (cfg.proxy -> caddy.enable)
       "Broadcast box proxy mode requires caddy to be enabled"
     ];

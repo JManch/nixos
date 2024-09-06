@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,8 +7,8 @@
 }:
 let
   inherit (lib) mkIf optionals optional;
-  cfg = config.modules.programs.gaming.steam;
-  gamingCfg = config.modules.programs.gaming;
+  cfg = config.${ns}.programs.gaming.steam;
+  gamingCfg = config.${ns}.programs.gaming;
 in
 mkIf cfg.enable {
   # -- Common steam launch commands --

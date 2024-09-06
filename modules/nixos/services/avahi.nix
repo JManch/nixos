@@ -1,14 +1,18 @@
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib)
     mkIf
-    utils
     genAttrs
     ;
-  cfg = config.modules.services.avahi;
+  cfg = config.${ns}.services.avahi;
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = lib.${ns}.asserts [
     (cfg.interfaces != [ ])
     "Avahi interface list cannot be empty"
   ];

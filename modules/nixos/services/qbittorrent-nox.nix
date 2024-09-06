@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -9,18 +10,18 @@
 let
   inherit (lib)
     mkIf
-    utils
     getExe'
     singleton
     ;
-  inherit (config.modules.services) wgnord caddy nfs;
+  inherit (lib.${ns}) asserts hardeningBaseline;
+  inherit (config.${ns}.services) wgnord caddy nfs;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (caddy) allowAddresses trustedAddresses;
-  cfg = config.modules.services.qbittorrent-nox;
+  cfg = config.${ns}.services.qbittorrent-nox;
   qbittorrent-nox = pkgs.qbittorrent.override { guiSupport = false; };
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = asserts [
     wgnord.enable
     "qBittorrent nox requires wgnord to be enabled"
     caddy.enable
@@ -49,7 +50,7 @@ mkIf cfg.enable {
       QBT_WEBUI_PORT = toString cfg.port;
     };
 
-    serviceConfig = utils.hardeningBaseline config {
+    serviceConfig = hardeningBaseline config {
       DynamicUser = false;
       User = "qbittorrent-nox";
       Group = "qbittorrent-nox";
@@ -78,9 +79,9 @@ mkIf cfg.enable {
     options = [ "bind" ];
   };
 
-  modules.services.nfs.server.fileSystems =
+  ${ns}.services.nfs.server.fileSystems =
     let
-      inherit (config.modules.system.reservedIDs.jellyfin) uid gid;
+      inherit (config.${ns}.system.reservedIDs.jellyfin) uid gid;
     in
     [
       {

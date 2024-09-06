@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,8 +9,8 @@
 }:
 let
   inherit (lib) mkIf optionalString optional;
-  inherit (config.modules.desktop.services) darkman;
-  cfg = config.modules.programs.neovim;
+  inherit (config.${ns}.desktop.services) darkman;
+  cfg = config.${ns}.programs.neovim;
 in
 mkIf cfg.enable {
   home.packages = optional cfg.neovide.enable pkgs.neovide;
@@ -67,7 +68,7 @@ mkIf cfg.enable {
     NIX_NEOVIM_DARKMAN = if darkman.enable then 1 else 0;
   };
 
-  xdg.mimeApps = mkIf (osConfig'.modules.system.desktop.enable or false) {
+  xdg.mimeApps = mkIf (osConfig'.${ns}.system.desktop.enable or false) {
     defaultApplications = {
       "text/plain" = [ "nvim.desktop" ];
     };
@@ -75,7 +76,7 @@ mkIf cfg.enable {
 
   programs.zsh.initExtra =
     let
-      inherit (config.modules.programs) alacritty;
+      inherit (config.${ns}.programs) alacritty;
     in
     optionalString alacritty.enable # bash
       ''

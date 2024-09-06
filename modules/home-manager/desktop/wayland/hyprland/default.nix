@@ -1,7 +1,11 @@
-{ lib, config, ... }@args:
+{
+  ns,
+  lib,
+  config,
+  ...
+}@args:
 let
   inherit (lib)
-    utils
     mkAliasOptionModule
     mkEnableOption
     mkOption
@@ -9,11 +13,12 @@ let
     getExe'
     escapeShellArg
     ;
-  cfg = config.modules.desktop.hyprland;
+  inherit (lib.${ns}) scanPaths flakePkgs;
+  cfg = config.${ns}.desktop.hyprland;
   hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 in
 {
-  imports = lib.utils.scanPaths ./. ++ [
+  imports = scanPaths ./. ++ [
     (mkAliasOptionModule
       [
         "desktop"
@@ -44,7 +49,7 @@ in
     )
   ];
 
-  options.modules.desktop.hyprland = {
+  options.${ns}.desktop.hyprland = {
     logging = mkEnableOption "logging";
     tearing = mkEnableOption "enable tearing";
     directScanout = mkEnableOption ''
@@ -61,7 +66,7 @@ in
 
       package = mkOption {
         type = types.nullOr types.package;
-        default = (utils.flakePkgs args "nix-resources").bibata-hyprcursors;
+        default = (flakePkgs args "nix-resources").bibata-hyprcursors;
         description = ''
           A Hyprcursor compatible cursor package. Set to null to disable Hyprcursor.
         '';

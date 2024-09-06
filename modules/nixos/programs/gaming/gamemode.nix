@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -7,24 +8,23 @@
 }:
 let
   inherit (lib) mkIf getExe;
-  cfg = config.modules.programs.gaming.gamemode;
+  cfg = config.${ns}.programs.gaming.gamemode;
 
   startStopScript =
     let
       inherit (lib)
         optionalString
-        utils
         boolToString
         substring
         stringLength
         toUpper
         optional
         ;
-      inherit (homeConfig.modules.desktop) hyprland;
-      inherit (config.modules.system) desktop;
-      inherit (config.device) primaryMonitor;
+      inherit (homeConfig.${ns}.desktop) hyprland;
+      inherit (config.${ns}.system) desktop;
+      inherit (config.${ns}.device) primaryMonitor;
       homeConfig = config.home-manager.users.${username};
-      isHyprland = utils.isHyprland config;
+      isHyprland = lib.${ns}.isHyprland config;
 
       # Remap the killactive key to use the shift modifier
       killActiveRebind = isEnd: ''
@@ -62,7 +62,7 @@ let
             hyprctl --instance 0 --batch "\
               ${optionalString hyprland.blur "keyword decoration:blur:enabled ${blur mode};\\"}
               keyword monitor ${
-                utils.getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = refreshRate mode; })
+                lib.${ns}.getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = refreshRate mode; })
               }; \
               ${killActiveRebind (mode == "end")}"
           ''

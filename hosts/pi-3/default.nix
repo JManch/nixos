@@ -1,4 +1,5 @@
 {
+  ns,
   pkgs,
   inputs,
   ...
@@ -9,21 +10,21 @@ in
 {
   imports = [ ./hardware-configuration.nix ];
 
-  device = {
-    type = "desktop";
-    ipAddress = "10.20.20.28";
-    memory = 1024;
-
-    cpu = {
-      name = "Cortex-A53";
-      type = "arm";
-      cores = "4";
-    };
-  };
-
-  modules = {
+  ${ns} = {
     core.homeManager.enable = false;
     hardware.fileSystem.type = "sd-image";
+
+    device = {
+      type = "desktop";
+      ipAddress = "10.20.20.28";
+      memory = 1024;
+
+      cpu = {
+        name = "Cortex-A53";
+        type = "arm";
+        cores = "4";
+      };
+    };
 
     services = {
       restic.enable = true;

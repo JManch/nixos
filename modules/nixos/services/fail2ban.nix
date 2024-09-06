@@ -1,7 +1,12 @@
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib) mkIf mkForce;
-  cfg = config.modules.services.fail2ban;
+  cfg = config.${ns}.services.fail2ban;
 in
 mkIf cfg.enable {
   services.fail2ban = {

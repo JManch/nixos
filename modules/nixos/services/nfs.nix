@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -19,7 +20,7 @@ let
     attrNames
     filterAttrs
     ;
-  cfg = config.modules.services.nfs;
+  cfg = config.${ns}.services.nfs;
 in
 mkMerge [
   (mkIf (cfg.server.enable || cfg.client.enable) {

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   self,
@@ -13,13 +14,12 @@ let
     mkIf
     mapAttrs
     mkVMOverride
-    utils
     optional
     getExe'
     singleton
     ;
-  inherit (config.modules.system) virtualisation;
-  cfg = config.modules.system.ssh;
+  inherit (config.${ns}.system) virtualisation;
+  cfg = config.${ns}.system.ssh;
 in
 {
   services.openssh = mkIf cfg.server.enable {

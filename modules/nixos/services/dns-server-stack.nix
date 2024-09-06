@@ -5,6 +5,7 @@
 # local network. We use the Ctrld dns forwarding proxy because it provides
 # extra statistics to the web UI for monitoring and enables DoH/3.
 {
+  ns,
   lib,
   pkgs,
   self,
@@ -23,17 +24,17 @@ let
     mapAttrsToList
     nameValuePair
     filterAttrs
-    utils
     getExe
     getExe'
     genAttrs
     singleton
     ;
+  inherit (lib.${ns}) addPatches asserts hardeningBaseline;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  cfg = config.modules.services.dns-server-stack;
+  cfg = config.${ns}.services.dns-server-stack;
 
   # Patch Ctrld to enable loading endpoints from environment variables
-  ctrld = utils.addPatches selfPkgs.ctrld [ ../../../patches/ctrldSecretEndpoint.patch ];
+  ctrld = addPatches selfPkgs.ctrld [ ../../../patches/ctrldSecretEndpoint.patch ];
 
   # Declares hostnames for all devices on my local network
   homeHosts =
@@ -43,22 +44,19 @@ let
     }
     //
       # Add all hosts that have a static local address
-      mapAttrs' (host: v: nameValuePair v.config.device.ipAddress host) (
-        filterAttrs (host: v: v.config.device.ipAddress != null) self.nixosConfigurations
+      mapAttrs' (host: v: nameValuePair v.config.${ns}.device.ipAddress host) (
+        filterAttrs (host: v: v.config.${ns}.device.ipAddress != null) self.nixosConfigurations
       );
 in
 mkIf cfg.enable {
-  assertions = utils.asserts [
-    (config.device.type == "server")
+  assertions = asserts [
+    (config.${ns}.device.type == "server")
     "DNS server stack can only be used on server devices"
-    (config.device.ipAddress != null)
+    (config.${ns}.device.ipAddress != null)
     "The DNS server stack requires the device to have a static IP address set"
     (cfg.routerAddress != "")
     "The DNS server stack requires the device to have a router IP address set"
   ];
-
-  # Disable systemd-resolved to simplify DNS stack
-  modules.system.networking.resolved.enable = mkForce false;
 
   services.ctrld = {
     enable = true;
@@ -118,7 +116,7 @@ mkIf cfg.enable {
     };
   };
 
-  systemd.services.ctrld.serviceConfig = utils.hardeningBaseline config {
+  systemd.services.ctrld.serviceConfig = hardeningBaseline config {
     EnvironmentFile = config.age.secrets.ctrldEndpoint.path;
   };
 
@@ -132,53 +130,80 @@ mkIf cfg.enable {
   };
   users.groups.dnsmasq = { };
 
-  modules.services.dns-server-stack.dnsmasqConfig = {
-    port = cfg.listenPort;
-    log-queries = cfg.debug;
+  ${ns} = {
+    # Disable systemd-resolved to simplify DNS stack
+    system.networking.resolved.enable = mkForce false;
 
-    # Do not read from hosts because it contains an entry that points
-    # ${hostname}.lan to ::1 and 127.0.0.2. Don't want this in responses so
-    # instead we define hosts using the dnsmasq host-record option and keep
-    # /etc/hosts for ctrld.
-    no-hosts = true;
+    services.dns-server-stack = {
+      dnsmasqConfig = {
+        port = cfg.listenPort;
+        log-queries = cfg.debug;
 
-    # Never forward dns queries without a domain to upstream nameservers
-    domain-needed = true;
+        # Do not read from hosts because it contains an entry that points
+        # ${hostname}.lan to ::1 and 127.0.0.2. Don't want this in responses so
+        # instead we define hosts using the dnsmasq host-record option and keep
+        # /etc/hosts for ctrld.
+        no-hosts = true;
 
-    # Do not send reverse lookups for private ip ranges upstream
-    bogus-priv = true;
+        # Never forward dns queries without a domain to upstream nameservers
+        domain-needed = true;
 
-    # Reject addresses from upstream nameservers that are in private ranges
-    stop-dns-rebind = true;
+        # Do not send reverse lookups for private ip ranges upstream
+        bogus-priv = true;
 
-    # Allow localhost reply from blackhole nameservers
-    rebind-localhost-ok = true;
+        # Reject addresses from upstream nameservers that are in private ranges
+        stop-dns-rebind = true;
 
-    # Do not read or poll resolv.conf, we manually configure servers
-    no-resolv = true;
-    no-poll = true;
+        # Allow localhost reply from blackhole nameservers
+        rebind-localhost-ok = true;
 
-    # Send the entire source ip to the Ctrld DNS server. Otherwise Ctrld DNS
-    # server sees all source requests coming from localhost. Note that this
-    # disables dnsmasq caching so we instead cache with Ctrld.
-    add-subnet = "32,128";
-    filter-AAAA = !cfg.enableIPv6;
+        # Do not read or poll resolv.conf, we manually configure servers
+        no-resolv = true;
+        no-poll = true;
 
-    # Send all queries to the Ctrld DNS server
-    server = [ "127.0.0.1#${toString cfg.ctrldListenPort}" ];
+        # Send the entire source ip to the Ctrld DNS server. Otherwise Ctrld DNS
+        # server sees all source requests coming from localhost. Note that this
+        # disables dnsmasq caching so we instead cache with Ctrld.
+        add-subnet = "32,128";
+        filter-AAAA = !cfg.enableIPv6;
 
-    address = [
-      # Point reverse proxy traffic to the device to avoid need for hairpin
-      # NAT
-      "/${fqDomain}/${config.device.ipAddress}"
-      # Return NXDOMAIN for AAAA requests. Otherwise AAAA requests resolve to
-      # the public DDNS CNAME response which resolves to public IP.
-      "/${fqDomain}/"
-    ];
+        # Send all queries to the Ctrld DNS server
+        server = [ "127.0.0.1#${toString cfg.ctrldListenPort}" ];
 
-    # Host records create PTR entries as well. Using addn-hosts created
-    # duplicate entries for some reason so using this instead.
-    host-record = mapAttrsToList (address: hostname: "${hostname}.lan,${address}") homeHosts;
+        address = [
+          # Point reverse proxy traffic to the device to avoid need for hairpin
+          # NAT
+          "/${fqDomain}/${config.${ns}.device.ipAddress}"
+          # Return NXDOMAIN for AAAA requests. Otherwise AAAA requests resolve to
+          # the public DDNS CNAME response which resolves to public IP.
+          "/${fqDomain}/"
+        ];
+
+        # Host records create PTR entries as well. Using addn-hosts created
+        # duplicate entries for some reason so using this instead.
+        host-record = mapAttrsToList (address: hostname: "${hostname}.lan,${address}") homeHosts;
+      };
+
+      # Settings generation copied from nixpkgs under MIT license
+      # https://github.com/NixOS/nixpkgs/blob/4cba8b53da471aea2ab2b0c1f30a81e7c451f4b6/COPYING
+      generateDnsmasqConfig =
+        let
+          formatKeyValue =
+            name: value:
+            if value == true then
+              name
+            else if value == false then
+              "# setting `${name}` explicitly set to false"
+            else
+              lib.generators.mkKeyValueDefault { } "=" name value;
+
+          settingsFormat = pkgs.formats.keyValue {
+            mkKeyValue = formatKeyValue;
+            listsAsDuplicateKeys = true;
+          };
+        in
+        name: settings: settingsFormat.generate name settings;
+    };
   };
 
   # Open DNS ports in firewall
@@ -195,26 +220,6 @@ mkIf cfg.enable {
   networking.nameservers = mkForce [ "127.0.0.1" ];
   networking.resolvconf.useLocalResolver = true;
 
-  # Settings generation copied from nixpkgs under MIT license
-  # https://github.com/NixOS/nixpkgs/blob/4cba8b53da471aea2ab2b0c1f30a81e7c451f4b6/COPYING
-  modules.services.dns-server-stack.generateDnsmasqConfig =
-    let
-      formatKeyValue =
-        name: value:
-        if value == true then
-          name
-        else if value == false then
-          "# setting `${name}` explicitly set to false"
-        else
-          lib.generators.mkKeyValueDefault { } "=" name value;
-
-      settingsFormat = pkgs.formats.keyValue {
-        mkKeyValue = formatKeyValue;
-        listsAsDuplicateKeys = true;
-      };
-    in
-    name: settings: settingsFormat.generate name settings;
-
   systemd.services.dnsmasq =
     let
       configFile = cfg.generateDnsmasqConfig "dnsmasq.conf" cfg.dnsmasqConfig;
@@ -227,7 +232,7 @@ mkIf cfg.enable {
         After = [ "network.target" ];
       };
 
-      serviceConfig = utils.hardeningBaseline config {
+      serviceConfig = hardeningBaseline config {
         ExecStartPre = "${dnsmasq} -C ${configFile} --test";
         ExecStart = "${dnsmasq} -k --user=dnsmasq -C ${configFile}";
         ExecReload = "${kill} -HUP $MAINPID";

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   osConfig,
@@ -8,20 +9,19 @@
 let
   inherit (lib)
     mkIf
-    utils
     optionalString
     types
     mkEnableOption
     optional
     mkOption
     ;
-  impermanence = osConfig'.modules.system.impermanence or null;
-  cfg = config.modules.core;
+  impermanence = osConfig'.${ns}.system.impermanence or null;
+  cfg = config.${ns}.core;
 in
 {
-  imports = utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
-  options.modules.core = {
+  options.${ns}.core = {
     configManager = mkEnableOption "this host as a NixOS config manager";
     backupFiles = mkEnableOption "backing up of ~/files";
 

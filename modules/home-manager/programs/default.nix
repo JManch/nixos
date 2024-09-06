@@ -1,11 +1,11 @@
-{ lib, ... }:
+{ ns, lib, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
-  options.modules.programs = {
+  options.${ns}.programs = {
     alacritty.enable = mkEnableOption "Alacritty";
     btop.enable = mkEnableOption "btop";
     cava.enable = mkEnableOption "cava";

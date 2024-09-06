@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +9,7 @@
 let
   inherit (lib) mkIf getExe getExe';
   cfg = desktopCfg.programs.fuzzel;
-  desktopCfg = config.modules.desktop;
+  desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
 in
 mkIf (cfg.enable && isWayland) {

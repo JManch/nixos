@@ -1,6 +1,11 @@
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
-  cfg = config.modules.shell;
+  cfg = config.${ns}.shell;
 in
 lib.mkIf cfg.enable {
   programs.starship = {

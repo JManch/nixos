@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -17,7 +18,6 @@ let
     optional
     optionalString
     optionalAttrs
-    utils
     getExe'
     mkVMOverride
     concatStringsSep
@@ -25,19 +25,25 @@ let
     singleton
     attrNames
     ;
-  inherit (config.modules.services) frigate mosquitto caddy;
+  inherit (lib.${ns})
+    scanPaths
+    asserts
+    upperFirstChar
+    hardeningBaseline
+    ;
+  inherit (config.${ns}.services) frigate mosquitto caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets) mqttHassPassword mqttFaikinPassword;
   inherit (caddy) trustedAddresses;
   inherit (secrets.general) people;
-  cfg = config.modules.services.hass;
+  cfg = config.${ns}.services.hass;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
   cameras = attrNames config.services.frigate.settings.cameras;
 in
 {
-  imports = (utils.scanPaths ./.) ++ [ inputs.nix-resources.nixosModules.home-assistant ];
+  imports = (scanPaths ./.) ++ [ inputs.nix-resources.nixosModules.home-assistant ];
 
-  options.modules.services.hass = {
+  options.${ns}.services.hass = {
     enable = mkEnableOption "Home Assistant";
 
     enableInternal = mkOption {
@@ -78,14 +84,43 @@ in
   };
 
   config = mkIf cfg.enable {
-    assertions = utils.asserts [
+    assertions = asserts [
       (hostname == "homelab")
       "Home Assistant is only intended to work on host 'homelab'"
       caddy.enable
       "Home Assistant requires Caddy to be enabled"
     ];
 
-    modules.services.hass.enableInternal = true;
+    ${ns}.services = {
+      hass.enableInternal = true;
+
+      mosquitto = {
+        users = {
+          hass = {
+            acl = [ "readwrite #" ];
+            hashedPasswordFile = mqttHassPassword.path;
+          };
+
+          # Faikin doesn't support mqtt tls unfortunately. To mitigate this we
+          # restrict acls and run on trusted LAN.
+          # WARN: prefixapp and prefixhost need to be enabled in faikin settings
+          faikin = {
+            acl = [
+              "readwrite Faikin/#"
+              "readwrite homeassistant/climate/#"
+            ];
+            hashedPasswordFile = mqttFaikinPassword.path;
+          };
+        };
+
+        tlsUsers = {
+          shelly = {
+            acl = [ "readwrite #" ];
+            hashedPasswordFile = config.age.secrets.mqttShellyPassword.path;
+          };
+        };
+      };
+    };
 
     services.home-assistant = {
       enable = true;
@@ -225,7 +260,7 @@ in
           {
             platform = "local_file";
             file_path = "/var/lib/hass/media/${people.person3}_room_floorplan.png";
-            name = "${utils.upperFirstChar people.person3} Room Floorplan";
+            name = "${upperFirstChar people.person3} Room Floorplan";
           }
         ];
 
@@ -309,33 +344,6 @@ in
         }
       '';
 
-    modules.services.mosquitto = {
-      users = {
-        hass = {
-          acl = [ "readwrite #" ];
-          hashedPasswordFile = mqttHassPassword.path;
-        };
-
-        # Faikin doesn't support mqtt tls unfortunately. To mitigate this we
-        # restrict acls and run on trusted LAN.
-        # WARN: prefixapp and prefixhost need to be enabled in faikin settings
-        faikin = {
-          acl = [
-            "readwrite Faikin/#"
-            "readwrite homeassistant/climate/#"
-          ];
-          hashedPasswordFile = mqttFaikinPassword.path;
-        };
-      };
-
-      tlsUsers = {
-        shelly = {
-          acl = [ "readwrite #" ];
-          hashedPasswordFile = config.age.secrets.mqttShellyPassword.path;
-        };
-      };
-    };
-
     services.postgresql = {
       enable = true;
       ensureDatabases = [ "hass" ];
@@ -351,7 +359,7 @@ in
       settings.log_checkpoints = false;
     };
 
-    systemd.services.postgresql.serviceConfig = utils.hardeningBaseline config {
+    systemd.services.postgresql.serviceConfig = hardeningBaseline config {
       DynamicUser = false;
       PrivateUsers = false;
     };

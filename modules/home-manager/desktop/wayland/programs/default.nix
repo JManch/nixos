@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -14,12 +15,12 @@ let
     optionalString
     escapeShellArg
     ;
-  cfg = config.modules.desktop.programs;
+  cfg = config.${ns}.desktop.programs;
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
-  options.modules.desktop.programs = {
+  options.${ns}.desktop.programs = {
     fuzzel.enable = mkEnableOption "Fuzzel";
     swww.enable = mkEnableOption "Swww";
     swaylock.enable = mkEnableOption "Swaylock";
@@ -55,7 +56,7 @@ in
         readOnly = true;
         default =
           let
-            osAudio = osConfig'.modules.system.audio;
+            osAudio = osConfig'.${ns}.system.audio;
             preLock = ''
               ${optionalString osAudio.enable ''
                 wpctl set-mute @DEFAULT_AUDIO_SINK@ 1

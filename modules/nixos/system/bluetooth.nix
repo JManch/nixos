@@ -1,6 +1,11 @@
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
-  cfg = config.modules.system.bluetooth;
+  cfg = config.${ns}.system.bluetooth;
 in
 lib.mkIf cfg.enable {
   hardware.bluetooth.enable = true;

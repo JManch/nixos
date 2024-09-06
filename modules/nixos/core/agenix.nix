@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -7,7 +8,7 @@
 }:
 let
   inherit (inputs) agenix nix-resources;
-  inherit (config.modules.system) impermanence;
+  inherit (config.${ns}.system) impermanence;
   scriptInputs =
     (with pkgs; [
       age

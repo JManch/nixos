@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -9,7 +10,6 @@
 }:
 let
   inherit (lib)
-    utils
     mkIf
     optional
     getExe'
@@ -22,17 +22,17 @@ let
     sort
     concatLines
     ;
-  inherit (config.modules) desktop;
+  inherit (config.${ns}) desktop;
   inherit (desktop.services) hypridle;
-  inherit (osConfig'.device) gpu;
+  inherit (osConfig'.${ns}.device) gpu;
   cfg = desktop.services.waybar;
-  isHyprland = utils.isHyprland config;
+  isHyprland = lib.${ns}.isHyprland config;
   colors = config.colorScheme.palette;
   gapSize = toString desktop.style.gapSize;
 
-  audio = osConfig'.modules.system.audio;
-  wgnord = osConfig'.modules.services.wgnord;
-  gamemode = osConfig'.modules.programs.gaming.gamemode;
+  audio = osConfig'.${ns}.system.audio;
+  wgnord = osConfig'.${ns}.services.wgnord;
+  gamemode = osConfig'.${ns}.programs.gaming.gamemode;
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
   systemctl = getExe' pkgs.systemd "systemctl";
 in
@@ -50,7 +50,7 @@ mkIf (cfg.enable && isWayland) {
     # sending the SIGRTMIN+<output_number> signal. It disables the custom
     # module signal functionality that I don't use.
     package =
-      (utils.addPatches
+      (lib.${ns}.addPatches
         (pkgs.waybar.overrideAttrs {
           src = pkgs.fetchFromGitHub {
             owner = "Alexays";
@@ -280,10 +280,10 @@ mkIf (cfg.enable && isWayland) {
 
   desktop.hyprland.settings.bind =
     let
-      inherit (config.modules.desktop.hyprland) modKey;
+      inherit (config.${ns}.desktop.hyprland) modKey;
       hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
       jaq = getExe pkgs.jaq;
-      monitors = filter (m: m.mirror == null) osConfig'.device.monitors;
+      monitors = filter (m: m.mirror == null) osConfig'.${ns}.device.monitors;
       # Waybar bars are ordered based on x pos so we need to sort
       sortedMonitors = sort (a: b: a.position.x < b.position.x) monitors;
 

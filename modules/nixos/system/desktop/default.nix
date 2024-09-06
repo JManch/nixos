@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -9,20 +10,20 @@
 let
   inherit (lib)
     mkIf
-    utils
     types
     mkEnableOption
     mkOption
     elem
     ;
-  inherit (config.modules.core) homeManager;
-  inherit (config.modules.system.desktop) isWayland;
-  cfg = config.modules.system.desktop;
+  inherit (lib.${ns}) scanPaths waylandWindowManagers waylandDesktopEnvironments;
+  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.system.desktop) isWayland;
+  cfg = config.${ns}.system.desktop;
 in
 {
-  imports = (utils.scanPaths ./.) ++ [ inputs.hyprland.nixosModules.default ];
+  imports = (scanPaths ./.) ++ [ inputs.hyprland.nixosModules.default ];
 
-  options.modules.system.desktop = {
+  options.${ns}.system.desktop = {
     enable = mkEnableOption "desktop functionality";
 
     suspend.enable = mkOption {
@@ -54,14 +55,12 @@ in
       readOnly = true;
       default =
         (
-          if config.modules.core.homeManager.enable then
-            (elem config.home-manager.users.${username}.modules.desktop.windowManager
-              utils.waylandWindowManagers
-            )
+          if config.${ns}.core.homeManager.enable then
+            (elem config.home-manager.users.${username}.${ns}.desktop.windowManager waylandWindowManagers)
           else
             false
         )
-        || (elem cfg.desktopEnvironment utils.waylandDesktopEnvironments);
+        || (elem cfg.desktopEnvironment waylandDesktopEnvironments);
     };
   };
 

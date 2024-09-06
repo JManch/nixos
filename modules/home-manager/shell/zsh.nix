@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,7 +7,7 @@
 }:
 let
   inherit (lib) mkIf getExe' singleton;
-  cfg = config.modules.shell;
+  cfg = config.${ns}.shell;
 in
 mkIf cfg.enable {
   programs.zsh = {

@@ -12,12 +12,12 @@
       ns = "JManch";
       systems = [ "x86_64-linux" ];
       lib = nixpkgs.lib.extend (final: _: (import ./lib final ns) // home-manager.lib);
-      mkHost = lib.utils.mkHost self;
-      forEachSystem = lib.utils.forEachSystem self systems;
+      mkHost = lib.${ns}.mkHost self;
+      forEachSystem = lib.${ns}.forEachSystem self systems;
     in
     {
       templates = import ./templates;
-      packages = forEachSystem (pkgs: import ./pkgs lib pkgs self);
+      packages = forEachSystem (pkgs: import ./pkgs ns lib pkgs self);
 
       nixosConfigurations = lib.listToAttrs [
         (mkHost "ncase-m1" "joshua" "x86_64-linux")

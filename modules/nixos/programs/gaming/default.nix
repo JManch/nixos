@@ -1,11 +1,11 @@
-{ lib, ... }:
+{ ns, lib, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
-  options.modules.programs.gaming = {
+  options.${ns}.programs.gaming = {
     enable = mkEnableOption "gaming optimisations";
     steam.enable = mkEnableOption "Steam";
     gamescope.enable = mkEnableOption "Gamescope";

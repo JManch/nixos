@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,17 +9,16 @@
 let
   inherit (lib)
     mkIf
-    utils
     concatMap
     concatLines
     any
     getExe
     getExe'
     ;
-  inherit (osConfig'.device) monitors;
+  inherit (osConfig'.${ns}.device) monitors;
   cfg = desktopCfg.hyprland;
-  desktopCfg = config.modules.desktop;
-  isGammaCustom = any (m: m.gamma != 1.0) osConfig'.device.monitors;
+  desktopCfg = config.${ns}.desktop;
+  isGammaCustom = any (m: m.gamma != 1.0) osConfig'.${ns}.device.monitors;
 
   monitorGammaConditionals =
     (concatMap (
@@ -70,7 +70,7 @@ let
       blankShader;
 
 in
-mkIf (utils.isHyprland config) {
+mkIf (lib.${ns}.isHyprland config) {
   xdg.configFile."hypr/shaders/monitorGamma.frag".text = gammaShader;
   xdg.configFile."hypr/shaders/blank.frag".text = blankShader;
 

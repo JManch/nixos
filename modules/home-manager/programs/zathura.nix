@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.modules.programs.zathura;
+  cfg = config.${ns}.programs.zathura;
   colors = config.colorScheme.palette;
 in
 lib.mkIf cfg.enable {
@@ -40,7 +41,7 @@ lib.mkIf cfg.enable {
       recolor-reverse-video = "true";
       recolor-keephue = "true";
 
-      font = "${config.modules.desktop.style.font.family} 10";
+      font = "${config.${ns}.desktop.style.font.family} 10";
       adjust-open = "best-fit";
       pages-per-row = 1;
       scroll-page-aware = true;

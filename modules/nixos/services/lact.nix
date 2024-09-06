@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   pkgs',
@@ -9,14 +10,13 @@
 let
   inherit (lib)
     mkIf
-    utils
     getExe'
     getExe
     replaceStrings
     concatMapStrings
     ;
-  inherit (config.device) gpu;
-  cfg = config.modules.services.lact;
+  inherit (config.${ns}.device) gpu;
+  cfg = config.${ns}.services.lact;
 
   # I haven't worked out why yet but sometimes my GPU's PCIE address changes
   # and causes the LACT config to not load. It only seems to switch between
@@ -29,7 +29,7 @@ let
 in
 # This module is specifically for 7900XT on NCASE-M1 host
 mkIf cfg.enable {
-  assertions = utils.asserts [
+  assertions = lib.${ns}.asserts [
     (hostname == "ncase-m1")
     "Lact is only intended to work on host 'ncase-m1'"
     (gpu.type == "amd")
@@ -106,7 +106,7 @@ mkIf cfg.enable {
   # unigine superposition 4k optimised gives an 8% FPS increase (122fps ->
   # 132fps). Max core clock speeds go 2000MHz -> 2200Mhz. Thermals are a fair
   # bit worse though, ~200rpm fan increase.
-  modules.programs.gaming.gamemode =
+  ${ns}.programs.gaming.gamemode =
     let
       ncat = getExe' pkgs.nmap "ncat";
       jaq = getExe pkgs.jaq;

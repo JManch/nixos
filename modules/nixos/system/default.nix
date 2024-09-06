@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   username,
@@ -7,7 +8,6 @@
 }:
 let
   inherit (lib)
-    utils
     mkEnableOption
     mkOption
     types
@@ -15,12 +15,13 @@ let
     all
     allUnique
     ;
-  cfg = config.modules.system;
+  inherit (lib.${ns}) scanPaths asserts;
+  cfg = config.${ns}.system;
 in
 {
-  imports = utils.scanPaths ./.;
+  imports = scanPaths ./.;
 
-  options.modules.system = {
+  options.${ns}.system = {
     bluetooth.enable = mkEnableOption "bluetooth";
 
     ssh = {
@@ -223,7 +224,7 @@ in
         gids = mapAttrsToList (name: value: value.gid) cfg.reservedIDs;
         uids = mapAttrsToList (name: value: value.uid) cfg.reservedIDs;
       in
-      utils.asserts [
+      asserts [
         (allUnique uids)
         "Reserved UIDs must be unique"
         (allUnique gids)

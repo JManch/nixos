@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,8 +7,8 @@
 }:
 let
   inherit (lib) mkIf mkMerge optional;
-  inherit (config.modules.hardware) secureBoot;
-  cfg = config.modules.system.windows;
+  inherit (config.${ns}.hardware) secureBoot;
+  cfg = config.${ns}.system.windows;
 in
 mkMerge [
   (mkIf cfg.enable {

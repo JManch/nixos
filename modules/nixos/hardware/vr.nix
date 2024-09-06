@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   inputs,
@@ -6,9 +7,9 @@
   ...
 }:
 let
-  inherit (lib) mkIf utils;
-  inherit (config.modules.core) homeManager;
-  cfg = config.modules.hardware.vr;
+  inherit (lib) mkIf;
+  inherit (config.${ns}.core) homeManager;
+  cfg = config.${ns}.hardware.vr;
 in
 {
   imports = [
@@ -46,7 +47,7 @@ in
   # effort into optimising it.
 
   config = mkIf cfg.enable {
-    assertions = utils.asserts [
+    assertions = lib.${ns}.asserts [
       homeManager.enable
       "VR requires home manager to be enabled"
     ];

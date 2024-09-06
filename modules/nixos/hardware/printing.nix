@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -9,14 +10,13 @@ let
   inherit (lib)
     mkIf
     mkMerge
-    utils
     mkForce
     singleton
     ;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) caddy;
+  inherit (config.${ns}.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
-  cfg = config.modules.hardware.printing;
+  cfg = config.${ns}.hardware.printing;
 
   dcp9015cdwlpr = pkgs.dcp9020cdwlpr.overrideAttrs (oldAttrs: rec {
     pname = "dcp9015cdw-lpr";
@@ -56,10 +56,10 @@ mkMerge [
   })
 
   (mkIf cfg.server.enable {
-    assertions = utils.asserts [
+    assertions = lib.${ns}.asserts [
       caddy.enable
       "Printing server requires Caddy to be enabled"
-      (config.device.type == "server")
+      (config.${ns}.device.type == "server")
       "Printing server can only be run on servers on secure local networks"
     ];
 

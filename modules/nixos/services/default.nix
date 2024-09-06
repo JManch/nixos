@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -16,19 +17,19 @@ let
     attrNames
     mkDefault
     ;
-  cfg = config.modules.services;
+  cfg = config.${ns}.services;
 in
 {
-  imports = lib.utils.scanPaths ./. ++ [
+  imports = lib.${ns}.scanPaths ./. ++ [
     (mkAliasOptionModule [ "backups" ] [
-      "modules"
+      ns
       "services"
       "restic"
       "backups"
     ])
   ];
 
-  options.modules.services = {
+  options.${ns}.services = {
     udisks.enable = mkEnableOption "udisks";
     lact.enable = mkEnableOption "Lact";
     index-checker.enable = mkEnableOption "Google Site Index Checker";
@@ -733,8 +734,8 @@ in
               nameValuePair
               optionalString
               ;
-            inherit (config.modules.core) homeManager;
-            inherit (config.modules.system) impermanence;
+            inherit (config.${ns}.core) homeManager;
+            inherit (config.${ns}.system) impermanence;
             homeBackups = optionalAttrs homeManager.enable config.home-manager.users.${username}.backups;
           in
           mapAttrs (
@@ -983,6 +984,6 @@ in
     # Allows user services like home-manager syncthing to start on boot and
     # keep running rather than stopping and starting with each ssh session on
     # servers
-    users.users.${username}.linger = config.device.type == "server";
+    users.users.${username}.linger = config.${ns}.device.type == "server";
   };
 }

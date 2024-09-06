@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -10,13 +11,12 @@ let
     mkIf
     optional
     getExe
-    utils
     ;
-  inherit (config.modules.programs) mpv;
+  inherit (config.${ns}.programs) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
   inherit (config.home) homeDirectory;
-  cfg = config.modules.programs.chatterino;
-  desktopCfg = config.modules.desktop;
+  cfg = config.${ns}.programs.chatterino;
+  desktopCfg = config.${ns}.desktop;
 
   # This is the only way to load the twitch auth secret from agenix
   streamlink = pkgs.streamlink.overrideAttrs (oldAttrs: {
@@ -97,7 +97,7 @@ mkIf cfg.enable {
 
   desktop.hyprland.settings =
     let
-      secondMonitor = utils.getMonitorByNumber osConfig' 2;
+      secondMonitor = lib.${ns}.getMonitorByNumber osConfig' 2;
     in
     {
       exec-once = [ (getExe twitchWorkspaceScript) ];

@@ -1,11 +1,11 @@
-{ lib, ... }:
+{ ns, lib, ... }:
 let
   inherit (lib) mkOption types mkEnableOption;
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
-  options.modules.services = {
+  options.${ns}.services = {
     easyeffects.enable = mkEnableOption "Easyeffects";
 
     syncthing = {

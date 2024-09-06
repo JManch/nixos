@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,8 +7,8 @@
 }:
 let
   inherit (lib) mkIf;
-  inherit (config.modules.desktop) isWayland;
-  cfg = config.modules.programs.anki;
+  inherit (config.${ns}.desktop) isWayland;
+  cfg = config.${ns}.programs.anki;
 in
 mkIf cfg.enable {
   home = {

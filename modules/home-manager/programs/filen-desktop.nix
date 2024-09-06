@@ -1,11 +1,12 @@
 {
+  ns,
   lib,
   config,
   selfPkgs,
   ...
 }:
 let
-  cfg = config.modules.programs.filenDesktop;
+  cfg = config.${ns}.programs.filenDesktop;
 in
 lib.mkIf cfg.enable {
   home.packages = [ selfPkgs.filen-desktop ];

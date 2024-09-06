@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +9,7 @@
 }:
 let
   inherit (lib) mkIf optionalAttrs;
-  cfg = config.modules.desktop.xdg;
+  cfg = config.${ns}.desktop.xdg;
   home = config.home.homeDirectory;
 in
 mkIf desktopEnabled {
@@ -39,5 +40,5 @@ mkIf desktopEnabled {
       extraConfig.XDG_SCREENSHOTS_DIR = "${home}/pictures/screenshots";
     };
 
-  xdg.mimeApps.enable = osConfig'.modules.system.desktop.desktopEnvironment == null;
+  xdg.mimeApps.enable = osConfig'.${ns}.system.desktop.desktopEnvironment == null;
 }

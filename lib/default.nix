@@ -21,10 +21,11 @@ let
     nixosSystem
     optionals
     hasPrefix
+    hasSuffix
     ;
 in
 {
-  utils = {
+  ${ns} = {
     mkHost = self: hostname: username: system: {
       name = hostname;
       value = nixosSystem {
@@ -115,7 +116,10 @@ in
 
     getMonitorByNumber =
       osConfig: number:
-      findFirst (m: m.number == number) (head osConfig.device.monitors) osConfig.device.monitors;
+      let
+        inherit (osConfig.${ns}.device) monitors;
+      in
+      findFirst (m: m.number == number) (head monitors) monitors;
 
     getMonitorHyprlandCfgStr =
       m:
@@ -140,8 +144,8 @@ in
 
     wgInterfaceEnabled =
       interface: osConfig:
-      (hasAttr interface (osConfig.modules.services.wireguard or { }))
-      && (osConfig.modules.services.wireguard.${interface}.enable);
+      (hasAttr interface (osConfig.${ns}.services.wireguard or { }))
+      && (osConfig.${ns}.services.wireguard.${interface}.enable);
 
     waylandWindowManagers = [ "hyprland" ];
 
@@ -185,7 +189,7 @@ in
         CapabilityBoundingSet = "";
         AmbientCapabilities = "";
         DeviceAllow = "";
-        SocketBindDeny = config.modules.system.networking.publicPorts;
+        SocketBindDeny = config.${ns}.system.networking.publicPorts;
         MemoryDenyWriteExecute = true;
         UMask = "0077";
       }
@@ -197,8 +201,7 @@ in
       map (f: (path + "/${f}")) (
         attrNames (
           filterAttrs (
-            path: _type:
-            (_type == "directory") || ((path != "default.nix") && (lib.strings.hasSuffix ".nix" path))
+            path: _type: (_type == "directory") || ((path != "default.nix") && (hasSuffix ".nix" path))
           ) (builtins.readDir path)
         )
       );
@@ -210,7 +213,7 @@ in
           filterAttrs (
             path: _type:
             (_type == "directory")
-            || ((!elem path except) && (path != "default.nix") && (lib.strings.hasSuffix ".nix" path))
+            || ((!elem path except) && (path != "default.nix") && (hasSuffix ".nix" path))
           ) (builtins.readDir path)
         )
       );
@@ -219,7 +222,7 @@ in
       config:
       let
         modules =
-          config.home-manager.users.${config.modules.core.username or ""}.modules or config.modules or null;
+          config.home-manager.users.${config.${ns}.core.username or ""}.${ns} or config.${ns} or null;
       in
       (modules.desktop.enable or false) && modules.desktop.windowManager == "hyprland";
   };

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +9,6 @@
 let
   inherit (lib)
     mkIf
-    utils
     mkVMOverride
     nameValuePair
     filter
@@ -24,16 +24,16 @@ let
     optionalString
     replaceStrings
     ;
-  inherit (config.modules.system) impermanence;
-  inherit (config.modules.hardware) raspberryPi;
-  cfg = config.modules.hardware.fileSystem;
+  inherit (config.${ns}.system) impermanence;
+  inherit (config.${ns}.hardware) raspberryPi;
+  cfg = config.${ns}.hardware.fileSystem;
 in
 mkMerge [
   {
-    assertions = utils.asserts [
+    assertions = lib.${ns}.asserts [
       (cfg.type != null)
       "Filesystem type must be set"
-      (cfg.tmpfsTmp -> !config.modules.system.impermanence.enable)
+      (cfg.tmpfsTmp -> !config.${ns}.system.impermanence.enable)
       "Tmp on tmpfs should not be necessary if impermanence is enabled"
     ];
 

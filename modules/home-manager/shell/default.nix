@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -6,14 +7,14 @@
 }@args:
 let
   inherit (lib)
-    utils
     mkEnableOption
     mkOption
     types
     mkIf
     optionals
     ;
-  cfg = config.modules.shell;
+  inherit (lib.${ns}) scanPaths flakePkgs;
+  cfg = config.${ns}.shell;
 
   tomato-c = pkgs.tomato-c.overrideAttrs (_: {
     version = "2024-06-11";
@@ -37,9 +38,9 @@ let
   });
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = scanPaths ./.;
 
-  options.modules.shell = {
+  options.${ns}.shell = {
     enable = mkEnableOption "custom shell environment";
     sillyTools = mkEnableOption "installation of silly shell tools";
 
@@ -66,7 +67,7 @@ in
         file
       ])
       ++ [
-        (utils.flakePkgs args "yaml2nix").default
+        (flakePkgs args "yaml2nix").default
         tomato-c
       ]
       ++ optionals cfg.sillyTools (

@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   isWayland,
@@ -7,7 +8,7 @@
 let
   inherit (lib) mkIf;
   cfg = desktopCfg.services.waybar;
-  desktopCfg = config.modules.desktop;
+  desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
 in
 mkIf (cfg.enable && isWayland) {

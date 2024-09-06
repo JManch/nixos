@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   inputs,
@@ -8,7 +9,6 @@ let
   inherit (lib)
     mkIf
     imap
-    utils
     optional
     optionals
     attrNames
@@ -16,15 +16,16 @@ let
     splitString
     concatMapStringsSep
     ;
+  inherit (lib.${ns}) upperFirstChar;
   inherit (secrets.general) devices people;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.modules.services) frigate;
-  cfg = config.modules.services.hass;
+  inherit (config.${ns}.services) frigate;
+  cfg = config.${ns}.services.hass;
   cameras = attrNames config.services.frigate.settings.cameras;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 
   formattedRoomName =
-    room: (concatMapStringsSep " " (string: utils.upperFirstChar string) (splitString "_" room));
+    room: (concatMapStringsSep " " (string: upperFirstChar string) (splitString "_" room));
 
   frigateEntranceNotify = singleton {
     alias = "Entrance Person Notify";
@@ -36,7 +37,7 @@ let
         state_entity = "input_boolean.high_alert_surveillance";
         state_filter_states = [ "off" ];
         notify_device = devices.joshua.id;
-        notify_group = "Adults Except ${utils.upperFirstChar people.person5}";
+        notify_group = "Adults Except ${upperFirstChar people.person5}";
         base_url = "https://home.${fqDomain}";
         group = "frigate-entrance-notification";
         title = "Security Alert";
@@ -50,13 +51,13 @@ let
   };
 
   frigateCatNotify = map (camera: {
-    alias = "${utils.upperFirstChar camera} Cat Notify";
+    alias = "${upperFirstChar camera} Cat Notify";
     use_blueprint = {
       path = "SgtBatten/frigate_notifications.yaml";
       input = {
         camera = "camera.${camera}";
         notify_device = devices.joshua.id;
-        notify_group = "Adults Except ${utils.upperFirstChar people.person5}";
+        notify_group = "Adults Except ${upperFirstChar people.person5}";
         sticky = true;
         group = "frigate-cat-notification";
         base_url = "https://home.${fqDomain}";
@@ -71,7 +72,7 @@ let
   }) cameras;
 
   frigateHighAlertNotify = map (camera: {
-    alias = "High Alert ${utils.upperFirstChar camera} Notify";
+    alias = "High Alert ${upperFirstChar camera} Notify";
     use_blueprint = {
       path = "SgtBatten/frigate_notifications.yaml";
       input = {
@@ -80,7 +81,7 @@ let
         state_entity = "input_boolean.high_alert_surveillance";
         state_filter_states = [ "on" ];
         notify_device = devices.joshua.id;
-        notify_group = "Adults Except ${utils.upperFirstChar people.person5}";
+        notify_group = "Adults Except ${upperFirstChar people.person5}";
         sticky = true;
         group = "frigate-notification";
         base_url = "https://home.${fqDomain}";
@@ -334,7 +335,7 @@ let
   hueTapLightSwitch =
     room: deviceId:
     let
-      smartLightingCfg = config.modules.services.hass.smartLightingRooms.${room};
+      smartLightingCfg = config.${ns}.services.hass.smartLightingRooms.${room};
       roomId = smartLightingCfg.roomId or room;
       hasAdaptiveLighting = smartLightingCfg.adaptiveLighting.enable or false;
     in

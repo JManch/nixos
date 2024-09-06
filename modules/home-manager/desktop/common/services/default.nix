@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   inputs,
@@ -14,16 +15,16 @@ let
     ;
 in
 {
-  imports = lib.utils.scanPaths ./. ++ [
+  imports = lib.${ns}.scanPaths ./. ++ [
     (mkAliasOptionModule [ "darkman" ] [
-      "modules"
+      ns
       "desktop"
       "services"
       "darkman"
     ])
   ];
 
-  options.modules.desktop.services = {
+  options.${ns}.desktop.services = {
     darkman = {
       enable = mkEnableOption "Darkman";
 
@@ -89,8 +90,8 @@ in
                 default = { };
                 example = {
                   base00 = {
-                    dark = config.modules.colorScheme.dark.palette.base00;
-                    light = config.modules.colorScheme.light.palette.base02;
+                    dark = config.${ns}.colorScheme.dark.palette.base00;
+                    light = config.${ns}.colorScheme.light.palette.base02;
                   };
                 };
                 description = ''

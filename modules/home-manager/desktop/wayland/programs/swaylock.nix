@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -7,25 +8,25 @@
   ...
 }:
 let
-  inherit (lib) mkIf utils getExe';
-  inherit (osConfig'.device) primaryMonitor;
+  inherit (lib) mkIf getExe';
+  inherit (osConfig'.${ns}.device) primaryMonitor;
   cfg = desktopCfg.programs.swaylock;
-  desktopCfg = config.modules.desktop;
+  desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
-  isHyprland = utils.isHyprland config;
+  isHyprland = lib.${ns}.isHyprland config;
 in
 mkIf (cfg.enable && isWayland) {
-  modules.desktop.programs.locking = {
+  ${ns}.desktop.programs.locking = {
     package = config.programs.swaylock.package;
 
     # Temporarily disable hyprland shader so that screenshot doesn't get shader
     # applied twice
     preLockScript = mkIf isHyprland ''
-      ${config.modules.desktop.hyprland.disableShaders}
+      ${config.${ns}.desktop.hyprland.disableShaders}
     '';
 
     postLockScript = mkIf isHyprland ''
-      (${getExe' pkgs.coreutils "sleep"} 0.1; ${config.modules.desktop.hyprland.enableShaders}) &
+      (${getExe' pkgs.coreutils "sleep"} 0.1; ${config.${ns}.desktop.hyprland.enableShaders}) &
     '';
   };
 

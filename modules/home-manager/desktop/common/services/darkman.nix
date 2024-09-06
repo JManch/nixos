@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -11,7 +12,6 @@ let
   inherit (lib)
     mkIf
     mkForce
-    utils
     mapAttrs
     mapAttrs'
     getExe
@@ -25,20 +25,18 @@ let
     optionalAttrs
     listToAttrs
     ;
-  inherit (config.modules) desktop;
-  inherit (osConfig'.device) hassIntegration;
-  inherit (config.modules.services.hass) curlCommand;
+  inherit (config.${ns}) desktop;
+  inherit (osConfig'.${ns}.device) hassIntegration;
+  inherit (config.${ns}.services.hass) curlCommand;
   inherit (config.xdg) dataHome;
   cfg = desktop.services.darkman;
   darkmanPackage = config.services.darkman.package;
 in
 mkIf (cfg.enable && desktopEnabled) {
-  assertions = utils.asserts [
+  assertions = lib.${ns}.asserts [
     ((cfg.switchMethod == "hass") -> hassIntegration.enable)
     "Darkman 'hass' switch mode requires the device to have hass integration enabled"
   ];
-
-  modules.desktop.services.darkman.switchMethod = mkIf vmVariant (mkVMOverride "coordinates");
 
   services.darkman = {
     enable = true;
@@ -167,7 +165,7 @@ mkIf (cfg.enable && desktopEnabled) {
   home.activation =
     let
       inherit (lib.hm.dag) entryAfter;
-      inherit (config.modules.colorScheme) colorMap;
+      inherit (config.${ns}.colorScheme) colorMap;
     in
     mapAttrs' (
       switchApp: switchConfig:
@@ -235,10 +233,14 @@ mkIf (cfg.enable && desktopEnabled) {
 
   # Create a switch script for this app that swaps our out of store
   # symlink config file with the new theme and executes the reload script
-  modules.desktop.services.darkman.switchScripts = mapAttrs (_: switchConfig: theme: ''
-    ${concatMapStringsSep "\n" (path: ''
-      cp "${dataHome}/darkman/variants/${path}.${theme}" "${dataHome}/darkman/variants/${path}"
-    '') switchConfig.paths}
-    ${switchConfig.reloadScript}
-  '') cfg.switchApps;
+  ${ns}.desktop.services.darkman = {
+    switchScripts = mapAttrs (_: switchConfig: theme: ''
+      ${concatMapStringsSep "\n" (path: ''
+        cp "${dataHome}/darkman/variants/${path}.${theme}" "${dataHome}/darkman/variants/${path}"
+      '') switchConfig.paths}
+      ${switchConfig.reloadScript}
+    '') cfg.switchApps;
+
+    switchMethod = mkIf vmVariant (mkVMOverride "coordinates");
+  };
 }

@@ -3,6 +3,7 @@
 # libedgetpu following the instructions here:
 # https://github.com/NixOS/nixpkgs/issues/188719#issuecomment-2094575860
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -16,7 +17,7 @@ let
     optional
     singleton
     ;
-  cfg = config.modules.hardware.coral;
+  cfg = config.${ns}.hardware.coral;
   libedgetpu = config.boot.kernelPackages.callPackage "${inputs.nix-resources}/pkgs/libedgetpu" { };
   gasket = config.boot.kernelPackages.gasket.overrideAttrs {
     src = pkgs.fetchFromGitHub {

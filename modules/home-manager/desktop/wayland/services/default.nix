@@ -1,11 +1,11 @@
-{ lib, ... }:
+{ ns, lib, ... }:
 let
   inherit (lib) mkEnableOption mkOption types;
 in
 {
-  imports = lib.utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
-  options.modules.desktop.services = {
+  options.${ns}.desktop.services = {
     waybar.enable = mkEnableOption "Waybar";
     wayvnc.enable = mkEnableOption "WayVNC";
 

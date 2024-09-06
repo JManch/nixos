@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   config,
   osConfig',
@@ -7,7 +8,6 @@
 let
   inherit (lib)
     mkIf
-    utils
     mkEnableOption
     mkOption
     types
@@ -15,14 +15,14 @@ let
     concatStrings
     optional
     ;
-  inherit (config.modules.desktop) hyprland;
-  cfg = config.modules.programs.gaming;
-  osGaming = osConfig'.modules.programs.gaming or null;
+  inherit (config.${ns}.desktop) hyprland;
+  cfg = config.${ns}.programs.gaming;
+  osGaming = osConfig'.${ns}.programs.gaming or null;
 in
 {
-  imports = utils.scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
-  options.modules.programs.gaming = {
+  options.${ns}.programs.gaming = {
     steam.enable = mkEnableOption "Steam configuration";
     mangohud.enable = mkEnableOption "MangoHud";
     r2modman.enable = mkEnableOption "r2modman";
@@ -44,7 +44,7 @@ in
     gameRegex = mkOption {
       type = types.str;
       readOnly = true;
-      apply = _: "^(${concatStringsSep "|" config.modules.programs.gaming.gameClasses})$";
+      apply = _: "^(${concatStringsSep "|" config.${ns}.programs.gaming.gameClasses})$";
     };
 
     tearingExcludedClasses = mkOption {
@@ -60,7 +60,7 @@ in
       readOnly = true;
       apply =
         let
-          inherit (config.modules.programs.gaming) tearingExcludedClasses gameClasses;
+          inherit (config.${ns}.programs.gaming) tearingExcludedClasses gameClasses;
           tearingRegex = concatStringsSep "|" gameClasses;
           tearingExcludedRegex = concatStrings (map (class: "(?!${class}$)") tearingExcludedClasses);
         in
@@ -73,7 +73,7 @@ in
   };
 
   config = mkIf (osGaming.enable or false) {
-    modules.programs.gaming.gameClasses = optional osGaming.gamescope.enable "\\.?gamescope.*";
+    ${ns}.programs.gaming.gameClasses = optional osGaming.gamescope.enable "\\.?gamescope.*";
 
     desktop.hyprland.settings.windowrulev2 = [
       "workspace name:GAME, class:${cfg.gameRegex}"

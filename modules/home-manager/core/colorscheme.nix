@@ -34,6 +34,7 @@
 # base0E: "#A37ACC"
 # base0F: "#E6BA7E"
 {
+  ns,
   lib,
   config,
   inputs,
@@ -46,12 +47,12 @@ let
     genAttrs
     attrNames
     ;
-  inherit (config.modules.colorScheme) light dark;
+  inherit (config.${ns}.colorScheme) light dark;
 in
 {
   imports = [ inputs.nix-colors.homeManagerModules.default ];
 
-  options.modules.colorScheme = {
+  options.${ns}.colorScheme = {
     dark = mkOption {
       type = types.attrs;
       default = inputs.nix-colors.colorSchemes.ayu-mirage;
@@ -101,6 +102,6 @@ in
   };
 
   config = {
-    colorScheme = config.modules.colorScheme.dark;
+    colorScheme = config.${ns}.colorScheme.dark;
   };
 }

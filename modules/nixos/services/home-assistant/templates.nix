@@ -1,13 +1,17 @@
 # https://jinja.palletsprojects.com/en/3.1.x/templates/
-{ lib, config, ... }:
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib)
     mkIf
-    utils
     attrNames
     singleton
     ;
-  cfg = config.modules.services.hass;
+  cfg = config.${ns}.services.hass;
   cameras = attrNames config.services.frigate.settings.cameras;
 in
 mkIf cfg.enableInternal {
@@ -46,7 +50,7 @@ mkIf cfg.enableInternal {
             }
           ]
           ++ map (camera: {
-            name = "${utils.upperFirstChar camera} Person Recently Updated";
+            name = "${lib.${ns}.upperFirstChar camera} Person Recently Updated";
             icon = "mdi:walk";
             state = "{{ (now().timestamp() - as_timestamp(states('image.${camera}_person'), default = 0)) < 5*60 }}";
             device_class = "update";

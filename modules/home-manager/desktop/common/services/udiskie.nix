@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   osConfig',
@@ -7,11 +8,11 @@
   ...
 }:
 let
-  udisks = osConfig'.modules.services.udisks;
+  udisks = osConfig'.${ns}.services.udisks;
 in
 lib.mkIf (desktopEnabled && udisks.enable && !vmVariant) {
-  assertions = lib.utils.asserts [
-    (osConfig'.modules.system.desktop.desktopEnvironment == null)
+  assertions = lib.${ns}.asserts [
+    (osConfig'.${ns}.system.desktop.desktopEnvironment == null)
     "udiskie should not need to be enabled with a desktop environment"
   ];
 

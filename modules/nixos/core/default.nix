@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +9,6 @@
 }:
 let
   inherit (lib)
-    utils
     mkOption
     mkEnableOption
     types
@@ -16,7 +16,7 @@ let
     ;
 in
 {
-  imports = utils.scanPaths ./. ++ [
+  imports = lib.${ns}.scanPaths ./. ++ [
     (mkAliasOptionModule [ "userPackages" ] [
       "users"
       "users"
@@ -32,7 +32,7 @@ in
     ])
   ];
 
-  options.modules.core = {
+  options.${ns}.core = {
     homeManager.enable = mkEnableOption "Home Manager";
     autoUpgrade = mkEnableOption "auto upgrade";
 
@@ -63,6 +63,13 @@ in
         Whether the host's primary user is part of the wheel group
       '';
     };
+
+    namespace = mkOption {
+      type = types.str;
+      internal = true;
+      readOnly = true;
+      default = ns;
+    };
   };
 
   config = {
@@ -71,7 +78,7 @@ in
     environment.systemPackages = [ pkgs.gitMinimal ];
 
     _module.args = {
-      inherit (config.modules.core) adminUsername;
+      inherit (config.${ns}.core) adminUsername;
     };
 
     security.sudo.extraConfig = "Defaults lecture=never";

@@ -1,5 +1,10 @@
-{ lib, config, ... }:
-lib.mkIf config.modules.shell.enable {
+{
+  ns,
+  lib,
+  config,
+  ...
+}:
+lib.mkIf config.${ns}.shell.enable {
   programs.zellij = {
     enable = true;
     # TODO: Configure this

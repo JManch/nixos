@@ -1,4 +1,5 @@
 {
+  ns,
   lib,
   pkgs,
   self,
@@ -7,10 +8,7 @@
   ...
 }:
 let
-  inherit (lib)
-    utils
-    concatStringsSep
-    ;
+  inherit (lib) concatStringsSep;
   installScript = pkgs.writeShellApplication {
     name = "install-local";
 
@@ -38,7 +36,7 @@ let
         echo "Usage: install-local <hostname>"
         exit 1
       fi
-      ${utils.exitTrapBuilder}
+      ${lib.${ns}.exitTrapBuilder}
 
       hostname=$1
       hosts=(${concatStringsSep " " (builtins.attrNames self.nixosConfigurations)})
@@ -90,10 +88,10 @@ let
 
       echo "### Fetching host information ###"
       host_config="$flake#nixosConfigurations.$hostname.config"
-      username=$(nix eval --raw "$host_config.modules.core.username")
-      admin_username=$(nix eval --raw "$host_config.modules.core.adminUsername")
-      impermanence=$(nix eval "$host_config.modules.system.impermanence.enable")
-      secure_boot=$(nix eval "$host_config.modules.hardware.secureBoot.enable")
+      username=$(nix eval --raw "$host_config.${ns}.core.username")
+      admin_username=$(nix eval --raw "$host_config.${ns}.core.adminUsername")
+      impermanence=$(nix eval "$host_config.${ns}.system.impermanence.enable")
+      secure_boot=$(nix eval "$host_config.${ns}.hardware.secureBoot.enable")
       has_disko=$(nix eval --impure --expr "(builtins.getFlake \"$flake\").nixosConfigurations.$hostname.config.disko.devices.disk or {} != {}")
 
       if [[ "$has_disko" = "false" ]]; then

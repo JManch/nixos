@@ -137,24 +137,24 @@ in
       # We configure the vmVariant regardless of whether or not the host has
       # virtualisation enabled because it should be possible to create a VM of any host
       virtualisation.vmVariant = {
-        device = {
-          monitors = mkIf (monitors != [ ]) (mkVMOverride [
-            {
-              name = "Virtual-1";
-              number = 1;
-              refreshRate = 60.0;
-              width = 2048;
-              height = 1152;
-              position.x = 0;
-              position.y = 0;
-              workspaces = builtins.genList (i: i + 1) 9;
-            }
-          ]);
-          gpu.type = mkVMOverride null;
-          hassIntegration.enable = mkVMOverride false;
-        };
+        ${ns} = {
+          device = {
+            monitors = mkIf (monitors != [ ]) (mkVMOverride [
+              {
+                name = "Virtual-1";
+                number = 1;
+                refreshRate = 60.0;
+                width = 2048;
+                height = 1152;
+                position.x = 0;
+                position.y = 0;
+                workspaces = builtins.genList (i: i + 1) 9;
+              }
+            ]);
+            gpu.type = mkVMOverride null;
+            hassIntegration.enable = mkVMOverride false;
+          };
 
-        modules = {
           hardware = {
             coral.enable = mkVMOverride false;
             printing.client.enable = mkVMOverride false;

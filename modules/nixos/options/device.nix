@@ -49,9 +49,9 @@ let
 
       gamingRefreshRate = mkOption {
         type = types.float;
-        default = (config.device.primaryMonitor config).refreshRate;
+        default = config.${ns}.device.primaryMonitor.refreshRate;
         description = ''
-          Higher refresh to use during gaming and any other scenario where
+          Higher refresh rate to use during gaming and any other scenario where
           smoothness is preferred. Only affects the primary monitor.
         '';
       };

@@ -236,7 +236,7 @@ in
     enable = true;
     flake = "github:JManch/nixos";
     operation = "boot";
-    dates = "daily";
+    dates = "weekly";
     randomizedDelaySec = "2hours";
   };
 

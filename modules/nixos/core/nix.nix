@@ -293,6 +293,10 @@ in
           fi
           nixos-rebuild repl --flake "${configDir}#$1"
         }
+
+        build-package() {
+          NIXPKGS_ALLOW_UNFREE=1 nix build --impure --expr "with import <nixpkgs> {}; pkgs.callPackage $1 {}"
+        }
       '';
 
     shellAliases = {

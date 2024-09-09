@@ -316,12 +316,20 @@ let
           state = "no_error";
         };
       }
+      {
+        condition = "not";
+        conditions = singleton {
+          condition = "state";
+          entity_id = "sensor.lewis_error";
+          state = "sms_could_not_be_sent";
+        };
+      }
     ];
     action = singleton {
       action = "notify.adults";
       data = {
         title = "Lewis Needs Help!";
-        message = "{{ state_attr('sensor.lewis_error', 'friendly_name') }}";
+        message = "{{ state_translated('sensor.lewis_error') }}";
         data = {
           channel = "Automower";
           ttl = 0;

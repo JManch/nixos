@@ -237,9 +237,7 @@ mkIf (isHyprland config) {
         disable_autoreload = true;
         disable_hyprland_logo = true;
         focus_on_activate = false;
-        # For some reason having this enabled causes DPMS to randomly turn on
-        # even without mouse movement
-        mouse_move_enables_dpms = false;
+        mouse_move_enables_dpms = true;
         key_press_enables_dpms = true;
         background_color = "0xff${colors.base00}";
         new_window_takes_over_fullscreen = 2;

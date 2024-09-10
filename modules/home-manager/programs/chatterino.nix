@@ -85,11 +85,40 @@ in
 mkIf cfg.enable {
   home.packages = [ pkgs.chatterino2 ] ++ optional mpv.enable streamlink;
 
+  programs.mpv.profiles.streamlink = {
+    # No point doing fancy scaling on streams
+    profile = "fast";
+
+    # Stripped down copy of the low-latency profile that allows playing the
+    # stream at custom speeds without lag/audio sync issues
+    vd-lavc-threads = 1;
+    cache-pause = false;
+    demuxer-lavf-o-add = "fflags=+nobuffer";
+    demuxer-lavf-analyzeduration = 0.1;
+    interpolation = false;
+    stream-buffer-size = "4k";
+
+    # Needed for our jump to live keybind
+    force-seekable = true;
+
+    # Do not load the modernx osc
+    load-scripts = false;
+    osc = true;
+
+    # RAM cache to enable rewinding streams
+    cache = true;
+    demuxer-max-back-bytes = "1024MiB";
+
+    save-position-on-quit = false;
+    loop-playlist = "inf";
+    loop-file = "inf";
+  };
+
   # WARNING: Enabling the MPV audio compression adds 4 seconds of latency
   xdg.configFile = mkIf mpv.enable {
     "streamlink/config".text = ''
       player=${getExe pkgs.mpv-unwrapped}
-      player-args=--save-position-on-quit=no --load-scripts=no --osc --loop-playlist=inf --loop-file=inf --cache=yes --demuxer-max-back-bytes=268435456
+      player-args=--profile=streamlink
       twitch-low-latency
       twitch-disable-ads
     '';

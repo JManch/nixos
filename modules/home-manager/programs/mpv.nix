@@ -43,11 +43,9 @@ mkIf cfg.enable {
 
     config = {
       # Quality
-      profile = "gpu-hq";
+      profile = "high-quality";
       hwdec = "auto-safe";
       vo = "gpu-next";
-      scale = "ewa_lanczossharp";
-      scale-blur = "0.981251";
       video-sync = "display-resample";
       interpolation = true;
       tscale = "oversample";
@@ -80,8 +78,8 @@ mkIf cfg.enable {
       "Ctrl+WHEEL_DOWN" = "add speed -0.1";
       "MBTN_MID" = "cycle mute";
       F1 = "af toggle acompressor=ratio=4; af toggle loudnorm";
-      "Shift+RIGHT" = "seek 0.1 exact"; # for catching-up livestreams
       E = "add panscan -0.1"; # because jellyfin shim overrides w
+      l = "no-osd seek 100 absolute-percent"; # jump to live
     };
   };
 

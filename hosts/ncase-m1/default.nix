@@ -146,7 +146,7 @@
 
       satisfactory-server = {
         enable = true;
-        autoStart = true;
+        autoStart = false;
         interfaces = [ "wg-friends" ];
       };
     };

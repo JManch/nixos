@@ -166,11 +166,11 @@ in
         ProtectControlGroups = true;
         ProtectClock = true;
         ProtectProc = "invisible";
+        ProcSubset = "pid";
         ProtectHostname = true;
         ProtectKernelLogs = true;
         ProtectKernelModules = true;
         ProtectKernelTunables = true;
-        ProcSubset = "pid";
         RemoveIPC = true;
         RestrictAddressFamilies = [
           "AF_UNIX"

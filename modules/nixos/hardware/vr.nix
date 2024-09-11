@@ -2,21 +2,16 @@
   ns,
   lib,
   pkgs,
-  inputs,
   config,
   ...
-}:
+}@args:
 let
-  inherit (lib) mkIf;
+  inherit (lib.${ns}) asserts flakePkgs;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.hardware.vr;
+  xrPkgs = flakePkgs args "nixpkgs-xr";
 in
 {
-  imports = [
-    # Provides overlays for latest versions of monado, opencomposite, index_camera_passthrough
-    inputs.nixpkgs-xr.nixosModules.nixpkgs-xr
-  ];
-
   # Notes on VR with Valve Index:
   # SteamVR on Linux is notoriously broken. From some quick testing I found
   # that SteamVR had good controller tracking but the rendering had
@@ -46,19 +41,24 @@ in
   # Performance is noticeably worse than Windows but I haven't put a lot of
   # effort into optimising it.
 
-  config = mkIf cfg.enable {
-    assertions = lib.${ns}.asserts [
+  config = lib.mkIf cfg.enable {
+    assertions = asserts [
       homeManager.enable
       "VR requires home manager to be enabled"
     ];
 
-    userPackages = with pkgs; [
-      opencomposite-helper
-      index_camera_passthrough
+    nixpkgs.overlays = [
+      (_: _: { opencomposite = xrPkgs.opencomposite; })
+    ];
+
+    userPackages = [
+      pkgs.opencomposite-helper
+      xrPkgs.index_camera_passthrough
     ];
 
     services.monado = {
       enable = true;
+      package = xrPkgs.monado;
       defaultRuntime = true;
     };
 

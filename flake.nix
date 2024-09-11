@@ -29,8 +29,8 @@
 
   # To use a local flake as an input set url to "git+file://<PATH>"
   inputs = {
-    # Critical inputs that provide imported NixOS modules. Ideally should
-    # review changes after updating.
+    # Critical inputs that provide imported NixOS modules or overlays. Ideally
+    # should review changes after updating.
 
     nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-personal";
     nixpkgs-small.url = "github:NixOS/nixpkgs/nixos-unstable-small";
@@ -46,9 +46,6 @@
 
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
-
-    nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
-    nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
 
     lanzaboote.url = "github:nix-community/lanzaboote";
     lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
@@ -82,6 +79,9 @@
 
     hyprlock.url = "github:hyprwm/hyprlock";
     hyprlock.inputs.nixpkgs.follows = "nixpkgs";
+
+    nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
+    nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";

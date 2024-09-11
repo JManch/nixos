@@ -123,6 +123,7 @@
 
       wireguard.friends = {
         enable = true;
+        autoStart = true;
         routerPeer = true;
         routerAllowedIPs = [ "10.0.0.0/24" ];
         address = "10.0.0.2";
@@ -140,6 +141,12 @@
 
       ollama = {
         enable = false;
+        interfaces = [ "wg-friends" ];
+      };
+
+      satisfactory-server = {
+        enable = true;
+        autoStart = true;
         interfaces = [ "wg-friends" ];
       };
     };

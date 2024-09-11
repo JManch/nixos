@@ -976,6 +976,27 @@ in
         '';
       };
     };
+
+    satisfactory-server = {
+      enable = mkEnableOption "Satisfactory Dedicated Server";
+      openFirewall = mkEnableOption "opening the firewall on default interfaces";
+      autoStart = mkEnableOption "automatic server start";
+
+      port = mkOption {
+        type = types.port;
+        default = 7777;
+        description = "Port for the Satisfactory server to listen on";
+      };
+
+      interfaces = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of additional interfaces for the Satisfactory server to be
+          exposed on
+        '';
+      };
+    };
   };
 
   config = {

@@ -16,7 +16,8 @@ lib.mkIf cfg.enable {
       patches = (old.patches or [ ]) ++ [
         (pkgs.fetchpatch {
           name = "webrtc-pacing-handler";
-          url = "https://patch-diff.githubusercontent.com/raw/obsproject/obs-studio/pull/10966.patch";
+          # https://github.com/obsproject/obs-studio/pull/10966
+          url = "https://github.com/obsproject/obs-studio/commit/2aae0f4d6849a7c23f44760f548e13f3a307426b.patch";
           hash = "sha256-VKNA0N4JHat/tLSRk3CLY+NcHsIoIvRHYfHo572KSGk=";
         })
       ];
@@ -28,8 +29,8 @@ lib.mkIf cfg.enable {
         src = pkgs.fetchFromGitHub {
           owner = "dimtpap";
           repo = "obs-pipewire-audio-capture";
-          rev = "38176824e5f95f5e2542130f6d7c027ea64536c4";
-          sha256 = "sha256-z1eHz5uxfwfauO0zB/mMxzRmte5UYKGwsi3CkQu5Vhc=";
+          rev = "7bb128951a607aa92ce4e4535df628feb19e9d88";
+          sha256 = "sha256-Lp5YO/Rkwa8IRN3Nc9X8oyTu8FtiH83rnGPzWZhypVA=";
         };
         cmakeFlags = [ ];
       })

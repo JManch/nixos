@@ -30,46 +30,6 @@ in
       path = "announcements";
       type = "sections";
       max_columns = 2;
-      badges = concatMap (
-        person:
-        let
-          inherit (devices.${person}) isAndroid;
-          device = devices.${person}.name;
-        in
-        optional isAndroid {
-          type = "entity";
-          entity = "sensor.${device}_ringer_mode";
-          icon = "mdi:bell-off";
-          color = "red";
-          name = "${upperFirstChar person}'s Phone is Silent";
-          state_content = "name";
-          visibility = singleton {
-            condition = "or";
-            conditions = [
-              {
-                condition = "numeric_state";
-                entity = "sensor.${device}_volume_level_notification";
-                below = 1;
-              }
-              {
-                condition = "state";
-                entity = "sensor.${device}_ringer_mode";
-                state = "silent";
-              }
-              {
-                condition = "state";
-                entity = "sensor.${device}_ringer_mode";
-                state = "vibrate";
-              }
-              {
-                condition = "state";
-                entity = "sensor.${device}_do_not_disturb_sensor";
-                state_not = "off";
-              }
-            ];
-          };
-        }
-      ) peopleList;
       sections = [
         {
           title = "Controls";

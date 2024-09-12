@@ -19,6 +19,7 @@ let
     mapAttrsToList
     optionalString
     mkForce
+    singleton
     concatStringsSep
     ;
   inherit (config.${ns}.system) impermanence;
@@ -138,9 +139,65 @@ let
         );
     }
   ) rebuildCmds;
+
+  flakeUpdate = singleton (
+    pkgs.writers.writePython3Bin "flake-update" { } ''
+      import os
+      import json
+      import subprocess
+
+      os.chdir("/home/${adminUsername}/.config/nixos")
+      critical_inputs = [
+        "impermanence",
+        "home-manager",
+        "agenix",
+        "lanzaboote",
+        "disko",
+        "raspberry-pi-nix",
+        "rpi-firmware-nonfree-src",
+      ]
+      with open("flake.lock", "r") as file:
+          old_lock = json.load(file)["nodes"]
+      critical_inputs = [i for i in critical_inputs if i in old_lock]
+
+      try:
+          subprocess.run(["nix", "flake", "update"], check=True)
+      except subprocess.CalledProcessError as e:
+          exit(e.returncode)
+
+      with open("flake.lock", "r") as file:
+          new_lock = json.load(file)["nodes"]
+
+      first_diff = True
+      for input in critical_inputs:
+          if input in new_lock:
+              old_rev = old_lock[input]["locked"]["rev"]
+              new_rev = new_lock[input]["locked"]["rev"]
+              if new_rev != old_rev:
+                  if first_diff:
+                      print((
+                          "\033[1;31m\nCritical inputs have updated. "
+                          "Check changes using the URLs below:\n\033[0m"
+                      ))
+                      first_diff = False
+
+                  print(f"\033[1m• Updated critical input '{input}':\033[0m")
+                  source = new_lock[input]["original"]
+                  if source["type"] == "github" or source["type"] == "gitlab":
+                      print((
+                          f"    'https://{source["type"]}.com/{source["owner"]}"
+                          f"/{source["repo"]}/compare/{old_rev}...{new_rev}'"
+                      ))
+                  else:
+                      print((
+                          f"\033[1;31m   Cannot get diff url, source type"
+                          f" {source["type"]} is unsupported\033[0m"
+                      ))
+    ''
+  );
 in
 {
-  adminPackages = rebuildScripts ++ remoteRebuildScripts;
+  adminPackages = rebuildScripts ++ remoteRebuildScripts ++ flakeUpdate;
   persistenceAdminHome.directories = [ ".remote-builds" ];
 
   # Nice explanation of overlays: https://archive.is/f8goR

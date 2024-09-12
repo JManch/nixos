@@ -3,7 +3,6 @@
   lib,
   pkgs,
   config,
-  inputs,
   username,
   ...
 }:
@@ -21,7 +20,7 @@ let
   cfg = config.${ns}.system.desktop;
 in
 {
-  imports = (scanPaths ./.) ++ [ inputs.hyprland.nixosModules.default ];
+  imports = scanPaths ./.;
 
   options.${ns}.system.desktop = {
     enable = mkEnableOption "desktop functionality";

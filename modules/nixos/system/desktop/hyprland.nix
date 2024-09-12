@@ -7,11 +7,18 @@
 }:
 let
   inherit (lib) mkIf mkForce;
+  inherit (lib.${ns}) asserts isHyprland;
+  inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
   homeConfig = config.home-manager.users.${username};
   hyprlandPackage = homeConfig.wayland.windowManager.hyprland.package;
 in
-mkIf (cfg.enable && lib.${ns}.isHyprland config) {
+mkIf (cfg.enable && isHyprland config) {
+  assertions = asserts [
+    homeManager.enable
+    "Hyprland requires Home Manager to be enabled"
+  ];
+
   # The purpose of enabling hyprland here (in addition to enabling it in
   # home-manager) is to create the hyprland.desktop session file which
   # enables login GUI managers to launch hyprland. However we use greetd

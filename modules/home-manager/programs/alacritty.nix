@@ -17,6 +17,9 @@ mkIf cfg.enable {
     enable = true;
 
     settings = {
+      mouse.hide_when_typing = true;
+      scrolling.history = 10000;
+
       window = {
         padding = {
           x = 5;
@@ -26,10 +29,6 @@ mkIf cfg.enable {
         decorations = "none";
         opacity = 0.7;
         dynamic_title = true;
-      };
-
-      scrolling = {
-        history = 10000;
       };
 
       font = {
@@ -57,10 +56,6 @@ mkIf cfg.enable {
           cyan = "#${colors.base0C}";
           white = "#${colors.base07}";
         };
-      };
-
-      mouse = {
-        hide_when_typing = false;
       };
 
       cursor = {

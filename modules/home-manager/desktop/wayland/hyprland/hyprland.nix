@@ -202,9 +202,9 @@ mkIf (isHyprland config) {
       };
 
       cursor = {
-        inactive_timeout = 3;
+        inactive_timeout = 0;
         enable_hyprcursor = cfg.hyprcursor.package != null;
-        hide_on_key_press = true;
+        hide_on_key_press = false;
       };
 
       animations = {

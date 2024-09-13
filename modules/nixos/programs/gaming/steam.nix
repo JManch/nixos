@@ -17,28 +17,33 @@ mkIf cfg.enable {
   # Gamescope : gamescope -W 2560 -H 1440 -f -r 165 --mangoapp -- gamemoderun %command%
   userPackages = with pkgs; [
     steam-run
-    # Temporarily use appinfo_v29 branch to fix https://github.com/Matoking/protontricks/issues/304
-    (
-      (protontricks.overrideAttrs {
-        src = pkgs.fetchFromGitHub {
-          owner = "Matoking";
-          repo = "protontricks";
-          rev = "f7b1fa33b0438dbd72f7222703f8442e40edc510";
-          hash = "sha256-t794WEMJx/JNX3gTMHfgquFWB7yXkleW07+QURm1NPM=";
-        };
-      }).override
-      {
-        vdf = pkgs.python312Packages.vdf.overrideAttrs (old: {
-          patches = (old.patches or [ ]) ++ [
-            (pkgs.fetchpatch {
-              name = "new-vdf-support";
-              url = "https://github.com/Matoking/vdf/commit/981cad270c2558aeb8eccaf42cfcf9fabbbed199.patch";
-              hash = "sha256-0mt5nwnZtqBzctXD4Ygi0bVSm20BDJRuvUq6xg5jMfQ=";
-            })
-          ];
-        });
-      }
-    )
+    protontricks
+  ];
+
+  # Temporarily use appinfo_v29 branch to fix
+  # https://github.com/Matoking/protontricks/issues/304
+  nixpkgs.overlays = [
+    (final: prev: {
+      protontricks =
+        (prev.protontricks.overrideAttrs {
+          src = final.fetchFromGitHub {
+            owner = "Matoking";
+            repo = "protontricks";
+            rev = "f7b1fa33b0438dbd72f7222703f8442e40edc510";
+            hash = "sha256-t794WEMJx/JNX3gTMHfgquFWB7yXkleW07+QURm1NPM=";
+          };
+        }).override
+          {
+            vdf = final.python312Packages.vdf.overrideAttrs {
+              src = final.fetchFromGitHub {
+                owner = "Matoking";
+                repo = "vdf";
+                rev = "981cad270c2558aeb8eccaf42cfcf9fabbbed199";
+                hash = "sha256-OPonFrYrEFYtx0T2hvSYXl/idsm0iDPwqlnm1KbTPIo=";
+              };
+            };
+          };
+    })
   ];
 
   programs.steam = {

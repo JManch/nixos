@@ -12,7 +12,7 @@ let
   # "Detached" and a timer that turns off the input switch after 3 seconds. The
   # door responds to rising edge inputs.
   shellyId = "shellyplus1-e465b8b961a4";
-  doorSeconds = 18;
+  doorSeconds = 20;
 in
 mkIf cfg.enableInternal {
   services.home-assistant.config = {
@@ -61,7 +61,14 @@ mkIf cfg.enableInternal {
           entity_id = [ "script.garage_door_toggle" ];
           from = "off";
           to = "on";
-          id = "script";
+          id = "script_start";
+        }
+        {
+          platform = "state";
+          entity_id = [ "script.garage_door_toggle" ];
+          from = "on";
+          to = "off";
+          id = "script_stop";
         }
         {
           platform = "state";
@@ -80,9 +87,15 @@ mkIf cfg.enableInternal {
         name = "Garage Door Status";
         icon = "mdi:garage";
         state = ''
-          {% if trigger.id == 'script' %}
+          {% if trigger.id == 'script_start' %}
             {% if is_state('binary_sensor.garage_door_closed', 'on') %}
               Closing
+            {% else %}
+              {{ states('sensor.garage_door_status') }}
+            {% endif %}
+          {% elif trigger.id == 'script_stop' %}
+            {% if states('sensor.garage_door_status') == 'Closing' %}
+              Jammed
             {% else %}
               {{ states('sensor.garage_door_status') }}
             {% endif %}
@@ -136,6 +149,31 @@ mkIf cfg.enableInternal {
           data = {
             topic = "${shellyId}/command";
             payload = "status_update";
+          };
+        };
+      }
+      {
+        alias = "Garage Door Jammed Notify";
+        mode = "single";
+        trigger = singleton {
+          platform = "state";
+          entity_id = [ "sensor.garage_door_status" ];
+          from = null;
+          to = "Jammed";
+        };
+        action = singleton {
+          action = "notify.adults";
+          data = {
+            title = "Garage Door Jammed";
+            message = "Something is preventing the garage door from closing";
+            data = {
+              ttl = 0;
+              importance = "high";
+              priority = "high";
+              channel = "Garage Door";
+              tag = "garage-door-jammed";
+              notification_icon = "mdi:garage-alert-variant";
+            };
           };
         };
       }

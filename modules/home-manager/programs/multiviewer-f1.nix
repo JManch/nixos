@@ -290,6 +290,8 @@ in
 mkIf cfg.enable {
   home.packages = [ selfPkgs.multiviewer-for-f1 ];
 
+  ${ns}.desktop.services.waybar.autoHideWorkspaces = [ "F1" ];
+
   desktop.hyprland.settings =
     let
       inherit (config.${ns}.desktop.hyprland) modKey;

@@ -16,15 +16,15 @@ let
     toUpper
     mkForce
     getExe
-    filter
-    escapeShellArg
-    imap1
-    sort
     concatLines
+    sort
+    escapeShellArg
+    concatMapStringsSep
     ;
+  inherit (lib.${ns}) addPatches getMonitorByName;
   inherit (config.${ns}) desktop;
   inherit (desktop.services) hypridle;
-  inherit (osConfig'.${ns}.device) gpu;
+  inherit (osConfig'.${ns}.device) gpu monitors;
   cfg = desktop.services.waybar;
   isHyprland = lib.${ns}.isHyprland config;
   colors = config.colorScheme.palette;
@@ -46,11 +46,13 @@ mkIf (cfg.enable && isWayland) {
     # because we run Waybar with systemd. Also breaks theme switching because
     # it reloads regardless of the Hyprland disable autoreload setting.
 
-    # The output bar patch allows for toggling the bar on specific outputs by
-    # sending the SIGRTMIN+<output_number> signal. It disables the custom
-    # module signal functionality that I don't use.
+    # The output bar patch allows for hiding, showing, or toggling the bar on
+    # specific outputs by sending an encoded signal. The signal is 5 bits where
+    # the first two bits are the action and the remaining 3 bits are the output
+    # number. Actions are hide(0), show(1), toggle(2). This patch disables the
+    # custom module signal functionality that I don't use.
     package =
-      (lib.${ns}.addPatches
+      (addPatches
         (pkgs.waybar.overrideAttrs {
           src = pkgs.fetchFromGitHub {
             owner = "Alexays";
@@ -61,7 +63,56 @@ mkIf (cfg.enable && isWayland) {
         })
         [
           ../../../../../../patches/waybarDisableReload.patch
-          ../../../../../../patches/waybarOutputBarToggle.patch
+          (
+            let
+              sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
+                sort (a: b: a.number < b.number) monitors
+              );
+            in
+            pkgs.writeText "waybar-bar-toggle.patch" # cpp
+              ''
+                diff --git a/src/bar.cpp b/src/bar.cpp
+                index 872632ac..ba578b1e 100644
+                --- a/src/bar.cpp
+                +++ b/src/bar.cpp
+                @@ -405,6 +405,7 @@ void waybar::Bar::onMap(GdkEventAny*) {
+                 }
+                 
+                 void waybar::Bar::setVisible(bool value) {
+                +  if (value == visible) return;
+                   visible = value;
+                   if (auto mode = config.get("mode", {}); mode.isString()) {
+                     setMode(visible ? config["mode"].asString() : MODE_INVISIBLE);
+                diff --git a/src/main.cpp b/src/main.cpp
+                index ff446ffc..131c8fb7 100644
+                --- a/src/main.cpp
+                +++ b/src/main.cpp
+                @@ -93,8 +93,22 @@ int main(int argc, char* argv[]) {
+                 
+                     for (int sig = SIGRTMIN + 1; sig <= SIGRTMAX; ++sig) {
+                       std::signal(sig, [](int sig) {
+                +        std::vector<std::string> monitors = {${sortedMonitors}};
+                +        int action = (sig - SIGRTMIN) >> 3;
+                +        int monitorNum = (sig - SIGRTMIN) & ((1 << 3) - 1);
+                +        if (monitorNum >= monitors.size() || monitorNum < 1) {
+                +          spdlog::error("Monitor with number {} does not exist", monitorNum);
+                +          return;
+                +        }
+                +        auto& monitorName = monitors[monitorNum - 1];
+                         for (auto& bar : waybar::Client::inst()->bars) {
+                -          bar->handleSignal(sig);
+                +          if (bar->output->name == monitorName) {
+                +            if (action == 2)
+                +              bar->toggle();
+                +            else
+                +              bar->setVisible(action);
+                +            break;
+                +          }
+                         }
+                       });
+                     }
+              ''
+          )
         ]
       ).override
         {
@@ -278,30 +329,81 @@ mkIf (cfg.enable && isWayland) {
     reloadScript = "${systemctl} restart --user waybar";
   };
 
-  desktop.hyprland.settings.bind =
+  desktop.hyprland.settings =
     let
       inherit (config.${ns}.desktop.hyprland) modKey;
       hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
       jaq = getExe pkgs.jaq;
-      monitors = filter (m: m.mirror == null) osConfig'.${ns}.device.monitors;
-      # Waybar bars are ordered based on x pos so we need to sort
-      sortedMonitors = sort (a: b: a.position.x < b.position.x) monitors;
+
+      monitorNameToNumMap = # bash
+        ''
+          declare -A monitor_name_to_num
+          ${concatLines (
+            map (
+              m:
+              "monitor_name_to_num[${m.name}]='${
+                if m.mirror == null then
+                  toString m.number
+                else
+                  toString (getMonitorByName osConfig' m.mirror).number
+              }'"
+            ) monitors
+          )}
+        '';
 
       toggleActiveMonitorBar = pkgs.writeShellScript "hypr-toggle-active-monitor-waybar" ''
         focused_monitor=$(${escapeShellArg hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
         # Get ID of the monitor based on x pos sort
-        declare -A monitor_name_to_id
-        ${concatLines (imap1 (i: m: "monitor_name_to_id[${m.name}]='${toString i}'") sortedMonitors)}
-        monitor_id=''${monitor_name_to_id[$focused_monitor]}
-        ${systemctl} kill --user --signal="SIGRTMIN+$monitor_id" waybar
+        ${monitorNameToNumMap}
+        monitor_num=''${monitor_name_to_num[$focused_monitor]}
+        ${systemctl} kill --user --signal="SIGRTMIN+$(((2 << 3) | monitor_num))" waybar
       '';
+
+      workspaceAutoToggle = pkgs.writeShellApplication {
+        name = "hypr-waybar-workspace-auto-toggle";
+        runtimeInputs = with pkgs; [
+          coreutils
+          socat
+          systemd
+        ];
+        text = # bash
+          ''
+            open_workspace() {
+              workspace_name="''${1#*>>}"
+              focused_monitor=$(${escapeShellArg hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
+              ${monitorNameToNumMap}
+              monitor_num=''${monitor_name_to_num[$focused_monitor]}
+
+              if [[ ${
+                concatMapStringsSep "||" (
+                  workspace: "\"$workspace_name\" == \"${workspace}\""
+                ) cfg.autoHideWorkspaces
+              } ]]; then
+                  systemctl kill --user --signal="SIGRTMIN+$(((0 << 3) | monitor_num ))" waybar
+              else
+                  systemctl kill --user --signal="SIGRTMIN+$(((1 << 3) | monitor_num ))" waybar
+              fi
+            }
+
+            handle() {
+              case $1 in
+                workspace\>*) open_workspace "$1" ;;
+              esac
+            }
+
+            socat -U - UNIX-CONNECT:"/$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" | while read -r line; do handle "$line"; done
+          '';
+      };
     in
-    [
-      # Toggle active monitor bar
-      "${modKey}, B, exec, ${toggleActiveMonitorBar}"
-      # Toggle all bars
-      "${modKey}SHIFT, B, exec, ${systemctl} kill --user --signal=SIGUSR1 waybar"
-      # Restart waybar
-      "${modKey}SHIFTCONTROL, B, exec, ${systemctl} restart --user waybar"
-    ];
+    {
+      exec-once = mkIf (cfg.autoHideWorkspaces != [ ]) [ (getExe workspaceAutoToggle) ];
+      bind = [
+        # Toggle active monitor bar
+        "${modKey}, B, exec, ${toggleActiveMonitorBar}"
+        # Toggle all bars
+        "${modKey}SHIFT, B, exec, ${systemctl} kill --user --signal=SIGUSR1 waybar"
+        # Restart waybar
+        "${modKey}SHIFTCONTROL, B, exec, ${systemctl} restart --user waybar"
+      ];
+    };
 }

@@ -6,8 +6,19 @@ in
   imports = lib.${ns}.scanPaths ./.;
 
   options.${ns}.desktop.services = {
-    waybar.enable = mkEnableOption "Waybar";
     wayvnc.enable = mkEnableOption "WayVNC";
+
+    waybar = {
+      enable = mkEnableOption "Waybar";
+      autoHideWorkspaces = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of workspace names that, when activated, cause the bar to
+          automatically hide. Only works on Hyprland.
+        '';
+      };
+    };
 
     wlsunset = {
       enable = mkEnableOption "wlsunset";

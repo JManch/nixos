@@ -124,6 +124,8 @@ mkIf cfg.enable {
     '';
   };
 
+  ${ns}.desktop.services.waybar.autoHideWorkspaces = [ "TWITCH" ];
+
   desktop.hyprland.settings =
     let
       secondMonitor = lib.${ns}.getMonitorByNumber osConfig' 2;

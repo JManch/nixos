@@ -121,6 +121,13 @@ in
       in
       findFirst (m: m.number == number) (head monitors) monitors;
 
+    getMonitorByName =
+      osConfig: name:
+      let
+        inherit (osConfig.${ns}.device) monitors;
+      in
+      findFirst (m: m.name == name) (head monitors) monitors;
+
     getMonitorHyprlandCfgStr =
       m:
       "${m.name},${toString m.width}x${toString m.height}@${toString m.refreshRate},${toString m.position.x}x${toString m.position.y},1,transform,${toString m.transform}${

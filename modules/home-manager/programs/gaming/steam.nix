@@ -75,7 +75,7 @@ mkIf cfg.enable {
   ${ns}.programs.gaming = {
     gameClasses = [
       "steam_app.*"
-      "cs2"
+      "SDL Application"
       "factorio"
     ];
 

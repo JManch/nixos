@@ -15,6 +15,7 @@ let
   inherit (config.${ns}.programs) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
   inherit (config.home) homeDirectory;
+  inherit (config.${ns}.desktop.hyprland) namedWorkspaceIDs;
   cfg = config.${ns}.programs.chatterino;
   desktopCfg = config.${ns}.desktop;
   secondMonitor = lib.${ns}.getMonitorByNumber osConfig' 2;
@@ -31,8 +32,7 @@ let
 
   twitchWorkspaceScript =
     let
-      chatterinoRatio = 0.175;
-      chatterinoWidth = builtins.floor (secondMonitor.width * chatterinoRatio);
+      chatterinoPercentage = 17.5;
     in
     pkgs.writeShellApplication {
       name = "hypr-twitch-workspace";
@@ -55,26 +55,24 @@ let
             window_address="''${args[0]#*>>}"
             workspace_name="''${args[1]}"
             window_class="''${args[2]}"
-            if [[ "$workspace_name" =~ ^(name:|)TWITCH$ ]]; then
-              # FIX: Using exact pixel values in the movewindowpixel dispatcher
-              # is not ideal as it's making assumptions about the monitor
-              # layout. Ideally we would use % with a decimal but Hyprland does
-              # not support it.
+            # Windows sent to the twitch workspace with windowrules with have
+            # the workspace ID as their workspace name
+            if [[ "$workspace_name" =~ ^(name:|)TWITCH$ || "$workspace_name" = "${namedWorkspaceIDs.TWITCH}" ]]; then
               if [ "$window_class" = "com.chatterino." ]; then
                 hyprctl --batch "\
                   dispatch setfloating address:0x$window_address; \
                   dispatch movewindowpixel exact ${
-                    toString (secondMonitor.width - chatterinoWidth)
-                  } 0%,address:0x$window_address; \
-                  dispatch resizewindowpixel exact ${toString chatterinoWidth} 100%,address:0x$window_address; \
+                    toString (100 - chatterinoPercentage)
+                  }% 0%,address:0x$window_address; \
+                  dispatch resizewindowpixel exact ${toString chatterinoPercentage}% 100%,address:0x$window_address; \
                 "
               elif [[ "$window_class" == "mpv" || "$window_class" == "firefox" ]]; then
                 hyprctl --batch "\
                   dispatch setfloating address:0x$window_address; \
                   dispatch movewindowpixel exact 0% 0%,address:0x$window_address; \
                   dispatch resizewindowpixel exact ${
-                    toString (secondMonitor.width - chatterinoWidth)
-                  } 100%,address:0x$window_address; \
+                    toString (100 - chatterinoPercentage)
+                  }% 100%,address:0x$window_address; \
                 "
               fi
             fi
@@ -147,19 +145,15 @@ mkIf cfg.enable {
     hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false";
   };
 
-  desktop.hyprland.settings =
-    let
-      inherit (config.${ns}.desktop.hyprland) namedWorkspaceIDs;
-    in
-    {
-      exec-once = [ (getExe twitchWorkspaceScript) ];
-      bind = [ "${desktopCfg.hyprland.modKey}, T, workspace, ${namedWorkspaceIDs.TWITCH}" ];
-      windowrulev2 = [
-        # Not using "name:" here does work however it causes my current workspace
-        # to unexpectedly switch so it's needed
-        "workspace ${namedWorkspaceIDs.TWITCH}, class:mpv, title:^(twitch\.tv.*)$"
-      ];
-    };
+  desktop.hyprland.settings = {
+    exec-once = [ (getExe twitchWorkspaceScript) ];
+    bind = [ "${desktopCfg.hyprland.modKey}, T, workspace, ${namedWorkspaceIDs.TWITCH}" ];
+    windowrulev2 = [
+      # Not using "name:" here does work however it causes my current workspace
+      # to unexpectedly switch so it's needed
+      "workspace ${namedWorkspaceIDs.TWITCH}, class:mpv, title:^(twitch\.tv.*)$"
+    ];
+  };
 
   persistence.directories = [ ".local/share/chatterino/Settings" ];
 }

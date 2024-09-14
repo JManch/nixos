@@ -41,6 +41,7 @@ let
   hyprland = addPatches hyprlandPkgs.hyprland [
     ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch
     ../../../../../patches/hyprlandDispatcherError.patch
+    ../../../../../patches/hyprlandResizeParamsFloats.diff
   ];
 in
 mkIf (isHyprland config) {

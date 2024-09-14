@@ -200,12 +200,12 @@ mkIf (isHyprland config) {
           "${modShiftCtrl}, L, movewindow, r"
           "${modShiftCtrl}, K, movewindow, u"
           "${modShiftCtrl}, J, movewindow, d"
-          "${mod}, mouse:276, workspace, r-1"
-          "${mod}, mouse:275, workspace, r+1"
+          "${mod}, mouse:276, workspace, m-1"
+          "${mod}, mouse:275, workspace, m+1"
           "${modShift}, Left, movetoworkspace, r-1"
           "${modShift}, Right, movetoworkspace, r+1"
-          "${modShift}, J, workspace, r-1"
-          "${modShift}, K, workspace, r+1"
+          "${modShift}, J, workspace, m-1"
+          "${modShift}, K, workspace, m+1"
 
           # Monitors
           "${modShift}, Comma, movecurrentworkspacetomonitor, ${(getMonitorByNumber 2).name}"

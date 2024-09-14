@@ -170,7 +170,7 @@ mkIf (cfg.enable && desktopEnabled) {
     mapAttrs' (
       switchApp: switchConfig:
       nameValuePair "generate-${switchApp}-light-variants" (
-        entryAfter [ "linkGeneration" ] (
+        entryAfter [ "writeBoundary" ] (
           concatMapStringsSep "\n" (
             path:
             let
@@ -219,11 +219,11 @@ mkIf (cfg.enable && desktopEnabled) {
               # rebuilds.
               theme=$(${getExe darkmanPackage} get 2>/dev/null || echo "")
               if [ "$theme" = "light" ]; then
-                run --quiet cp "${dataHome}/darkman/variants/${path}.light" "${dataHome}/darkman/variants/${path}"
+                run cp "${dataHome}/darkman/variants/${path}.light" "${dataHome}/darkman/variants/${path}"
               else
                 # Use dark config as a placeholder in case darkman fails or is
                 # too late to start
-                run --quiet install -m644 "${dataHome}/darkman/variants/${path}.dark" "${dataHome}/darkman/variants/${path}"
+                run install -m644 "${dataHome}/darkman/variants/${path}.dark" "${dataHome}/darkman/variants/${path}"
               fi
             ''
           ) switchConfig.paths

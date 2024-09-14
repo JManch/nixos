@@ -108,7 +108,7 @@ mkIf cfg.enable {
     in
     mkIf config.${ns}.desktop.enable {
       name = "BeamMP";
-      exec = "${terminal} --title BeamMP -e ${protontrick-launch} --appid ${appID} ${launcherDir}/BeamMP-Launcher.exe";
+      exec = "${terminal} --title BeamMP -e ${protontrick-launch} --cwd-app --appid ${appID} ${launcherDir}/BeamMP-Launcher.exe";
       terminal = false;
       type = "Application";
       icon = "application-x-generic";

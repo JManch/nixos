@@ -7,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf getExe;
   cfg = config.${ns}.programs.multiviewerF1;
 
   # This script acts as a replacement for Multiviewer's layout saving/loading
@@ -60,7 +60,7 @@ let
             "Fernando Alonso": 14,
             "Charles Leclerc": 16,
             "Lance Stroll": 18,
-            "Oliver Bearman": 20,
+            "Oliver Bearman": 50,
             "Yuki Tsunoda": 22,
             "Alex Albon": 23,
             "Guanyu Zhou": 24,
@@ -197,9 +197,11 @@ let
             def update_driver_positions(positions):
                 driver_cams = DriverCam.get_driver_cams()
                 for driver_cam in driver_cams:
-                    driver_cam.position = positions[
-                        str(driver_numbers[driver_cam.driver_name])
-                    ]["Line"]
+                    driver_num = str(driver_numbers[driver_cam.driver_name])
+                    if driver_num not in positions:
+                        print(f"{driver_num} is not a valid driver number")
+                        exit(1)
+                    driver_cam.position = positions[driver_num]["Line"]
 
                 s_driver_cams = sorted(driver_cams, key=lambda d: d.position)
                 for i, driver_cam in enumerate(s_driver_cams, start=1):
@@ -323,6 +325,11 @@ mkIf cfg.enable {
     Service = {
       Environment = [ "PYTHONUNBUFFERED=1" ];
       ExecStart = hyprlandMultiviewerTiler;
+      ExecStopPost = pkgs.writeShellScript "hyprland-multiviewer-tiling-exec-stop-post" ''
+        if [ "$SERVICE_RESULT" != "success" ]; then
+          ${getExe pkgs.libnotify} --urgency=critical -t 5000 "Multiviewer F1 Tiler" "Exited unexpectedly"
+        fi
+      '';
     };
   };
 

@@ -60,7 +60,7 @@ let
             "Fernando Alonso": 14,
             "Charles Leclerc": 16,
             "Lance Stroll": 18,
-            "Kevin Magnussen": 20,
+            "Oliver Bearman": 20,
             "Yuki Tsunoda": 22,
             "Alex Albon": 23,
             "Guanyu Zhou": 24,

@@ -8,6 +8,7 @@
 }:
 let
   inherit (lib) mkIf getExe;
+  inherit (config.${ns}.desktop.hyprland) modKey namedWorkspaceIDs;
   cfg = config.${ns}.programs.multiviewerF1;
 
   # This script acts as a replacement for Multiviewer's layout saving/loading
@@ -154,7 +155,7 @@ let
                     width = self.brTile.posX - self.tlTile.posX + self.brTile.width
 
                 instance.dispatch(
-                    ["movetoworkspacesilent", f"name:F1,address:{self.window.address}"]
+                    ["movetoworkspacesilent", f"${namedWorkspaceIDs.F1},address:{self.window.address}"]
                 )
                 instance.dispatch(
                     [
@@ -292,30 +293,27 @@ in
 mkIf cfg.enable {
   home.packages = [ selfPkgs.multiviewer-for-f1 ];
 
-  ${ns}.desktop.services.waybar.autoHideWorkspaces = [ "F1" ];
+  ${ns}.desktop = {
+    services.waybar.autoHideWorkspaces = [ "F1" ];
+    hyprland.namedWorkspaces.F1 = "decorate:false, rounding:false, border:false";
+  };
 
-  desktop.hyprland.settings =
-    let
-      inherit (config.${ns}.desktop.hyprland) modKey;
-    in
-    {
-      workspace = [ "name:F1, gapsin:0, gapsout:0, decorate:false, rounding:false, border:false" ];
+  desktop.hyprland.settings = {
+    bind = [
+      "${modKey}, F, workspace, ${namedWorkspaceIDs.F1}"
+      "${modKey}SHIFT, F, movetoworkspace, ${namedWorkspaceIDs.F1}"
+      "${modKey}SHIFTCONTROL, F, exec, systemctl restart --user hyprland-multiviewer-tiler"
+    ];
 
-      bind = [
-        "${modKey}, F, workspace, name:F1"
-        "${modKey}SHIFT, F, movetoworkspace, name:F1"
-        "${modKey}SHIFTCONTROL, F, exec, systemctl restart --user hyprland-multiviewer-tiler"
-      ];
+    windowrulev2 = [
+      "float, class:^(MultiViewer for F1)$"
+      "workspace ${namedWorkspaceIDs.F1}, class:^(MultiViewer for F1)$"
 
-      windowrulev2 = [
-        "float, class:^(MultiViewer for F1)$"
-        "workspace name:F1, class:^(MultiViewer for F1)$"
-
-        "xray 0, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
-        "noblur, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
-        "noborder, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
-      ];
-    };
+      "xray 0, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+      "noblur, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+      "noborder, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+    ];
+  };
 
   systemd.user.services.hyprland-multiviewer-tiler = mkIf (lib.${ns}.isHyprland config) {
     Unit = {

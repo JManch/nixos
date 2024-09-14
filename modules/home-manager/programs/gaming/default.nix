@@ -16,6 +16,7 @@ let
     optional
     ;
   inherit (config.${ns}.desktop) hyprland;
+  inherit (osConfig'.${ns}.device) primaryMonitor;
   cfg = config.${ns}.programs.gaming;
   osGaming = osConfig'.${ns}.programs.gaming or null;
 in
@@ -73,10 +74,24 @@ in
   };
 
   config = mkIf (osGaming.enable or false) {
-    ${ns}.programs.gaming.gameClasses = optional osGaming.gamescope.enable "\\.?gamescope.*";
+    ${ns} = {
+      programs.gaming.gameClasses = optional osGaming.gamescope.enable "\\.?gamescope.*";
+      desktop.hyprland.namedWorkspaces.GAME = "monitor:${primaryMonitor.name}";
+    };
 
-    desktop.hyprland.settings.windowrulev2 = [
-      "workspace name:GAME, class:${cfg.gameRegex}"
-    ] ++ optional hyprland.tearing "immediate, class:${cfg.tearingRegex}";
+    desktop.hyprland.settings =
+      let
+        inherit (hyprland) modKey namedWorkspaceIDs;
+      in
+      {
+        windowrulev2 = [
+          "workspace ${namedWorkspaceIDs.GAME}, class:${cfg.gameRegex}"
+        ] ++ optional hyprland.tearing "immediate, class:${cfg.tearingRegex}";
+
+        bind = [
+          "${modKey}, G, workspace, ${namedWorkspaceIDs.GAME}"
+          "${modKey}SHIFT, G, movetoworkspace, ${namedWorkspaceIDs.GAME}"
+        ];
+      };
   };
 }

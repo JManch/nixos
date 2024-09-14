@@ -142,20 +142,24 @@ mkIf cfg.enable {
     '';
   };
 
-  ${ns}.desktop.services.waybar.autoHideWorkspaces = [ "TWITCH" ];
-
-  desktop.hyprland.settings = {
-    exec-once = [ (getExe twitchWorkspaceScript) ];
-    workspace = [
-      "name:TWITCH,monitor:${secondMonitor.name}, rounding:false, border:false"
-    ];
-    bind = [ "${desktopCfg.hyprland.modKey}, T, workspace, name:TWITCH" ];
-    windowrulev2 = [
-      # Not using "name:" here does work however it causes my current workspace
-      # to unexpectedly switch so it's needed
-      "workspace name:TWITCH, class:mpv, title:^(twitch\.tv.*)$"
-    ];
+  ${ns}.desktop = {
+    services.waybar.autoHideWorkspaces = [ "TWITCH" ];
+    hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false";
   };
+
+  desktop.hyprland.settings =
+    let
+      inherit (config.${ns}.desktop.hyprland) namedWorkspaceIDs;
+    in
+    {
+      exec-once = [ (getExe twitchWorkspaceScript) ];
+      bind = [ "${desktopCfg.hyprland.modKey}, T, workspace, ${namedWorkspaceIDs.TWITCH}" ];
+      windowrulev2 = [
+        # Not using "name:" here does work however it causes my current workspace
+        # to unexpectedly switch so it's needed
+        "workspace ${namedWorkspaceIDs.TWITCH}, class:mpv, title:^(twitch\.tv.*)$"
+      ];
+    };
 
   persistence.directories = [ ".local/share/chatterino/Settings" ];
 }

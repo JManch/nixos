@@ -15,8 +15,13 @@ let
     mkVMOverride
     mod
     ;
-  inherit (config.home-manager.users.${username}.${ns}.desktop) terminal;
-  inherit (config.${ns}.device) monitors cpu memory;
+  inherit (config.home-manager.users.${username}.${ns}.desktop) terminal hyprland;
+  inherit (config.${ns}.device)
+    monitors
+    cpu
+    memory
+    primaryMonitor
+    ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.virtualisation;
 
@@ -240,13 +245,26 @@ in
       };
 
       hm = mkIf homeManager.enable {
-        desktop.hyprland.settings.windowrulev2 = [
-          "workspace name:VM silent, class:^(\\.?qemu.*|wlroots|virt-manager)$"
-          "float, class:^(\\.?qemu.*|virt-manager)$"
-          "size 80% 80%, class:^(\\.?qemu.*|virt-manager)$"
-          "center, class:^(\\.?qemu.*|virt-manager)$"
-          "keepaspectratio, class:^(\\.?qemu.*|virt-manager)$"
-        ];
+        desktop.hyprland.settings =
+          let
+            inherit (hyprland) modKey namedWorkspaceIDs;
+          in
+          {
+            bind = [
+              "${modKey}, V, workspace, ${namedWorkspaceIDs.VM}"
+              "${modKey}SHIFT, V, movetoworkspace, ${namedWorkspaceIDs.VM}"
+            ];
+
+            windowrulev2 = [
+              "workspace name:VM silent, class:^(\\.?qemu.*|wlroots|virt-manager)$"
+              "float, class:^(\\.?qemu.*|virt-manager)$"
+              "size 80% 80%, class:^(\\.?qemu.*|virt-manager)$"
+              "center, class:^(\\.?qemu.*|virt-manager)$"
+              "keepaspectratio, class:^(\\.?qemu.*|virt-manager)$"
+            ];
+          };
+
+        ${ns}.desktop.hyprland.namedWorkspaces.VM = "monitor:${primaryMonitor.name}";
       };
 
       adminPackages = [ runVMScript ];

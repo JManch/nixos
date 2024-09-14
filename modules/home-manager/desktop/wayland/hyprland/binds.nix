@@ -238,10 +238,6 @@ mkIf (isHyprland config) {
           "${modShiftCtrl}, M, movetoworkspacesilent, emptym"
           "${mod}, S, togglespecialworkspace, social"
           "${modShift}, S, movetoworkspacesilent, special:social"
-          "${mod}, G, workspace, name:GAME"
-          "${modShift}, G, movetoworkspace, name:GAME"
-          "${mod}, V, workspace, name:VM"
-          "${modShift}, V, movetoworkspace, name:VM"
         ]
         ++ (concatMap (
           m:

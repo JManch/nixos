@@ -18,6 +18,7 @@ let
     imap
     optionalString
     optionals
+    mapAttrsToList
     ;
   inherit (lib.${ns})
     flakePkgs
@@ -50,9 +51,6 @@ mkIf (isHyprland config) {
 
   ${ns}.desktop = {
     # Optimise for performance in VM variant
-    # TODO: Add a hook to disable hardware cursor when launching a QEMU VM
-    # otherwise the cursor is upside down
-    # https://github.com/hyprwm/Hyprland/issues/6428
     hyprland = mkIf vmVariant (mkVMOverride {
       tearing = false;
       directScanout = false;
@@ -277,9 +275,11 @@ mkIf (isHyprland config) {
             + optionalString (i < 3) ", persistent:true"
           ) m.workspaces)
         ) monitors)
+        ++ (mapAttrsToList (
+          name: value:
+          "${cfg.namedWorkspaceIDs.${name}}, defaultName:${name}" + optionalString (value != "") ", ${value}"
+        ) cfg.namedWorkspaces)
         ++ [
-          "name:GAME, monitor:${primaryMonitor.name}"
-          "name:VM, monitor:${primaryMonitor.name}"
           "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
         ];
 

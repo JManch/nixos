@@ -41,7 +41,10 @@ let
   hyprland = addPatches hyprlandPkgs.hyprland [
     ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch
     ../../../../../patches/hyprlandDispatcherError.patch
-    ../../../../../patches/hyprlandResizeParamsFloats.diff
+    ../../../../../patches/hyprlandResizeParamsFloats.patch
+    # This is needed to fix our toggle fullscreen script when a special
+    # workspace is active
+    ../../../../../patches/hyprlandActiveWorkspace.patch
   ];
 in
 mkIf (isHyprland config) {

@@ -1,0 +1,21 @@
+diff --git a/src/debug/HyprCtl.cpp b/src/debug/HyprCtl.cpp
+index 683665be..a3a3944c 100644
+--- a/src/debug/HyprCtl.cpp
++++ b/src/debug/HyprCtl.cpp
+@@ -368,10 +368,12 @@ std::string activeWorkspaceRequest(eHyprCtlOutputFormat format, std::string requ
+         return "unsafe state";
+ 
+     std::string result = "";
+-    auto        w      = g_pCompositor->m_pLastMonitor->activeWorkspace;
+-
+-    if (!valid(w))
+-        return "internal error";
++    auto        w      = g_pCompositor->m_pLastMonitor->activeSpecialWorkspace;
++    if (!valid(w)) {
++        w = g_pCompositor->m_pLastMonitor->activeWorkspace;
++        if (!valid(w))
++            return "internal error";
++    }
+ 
+     return CHyprCtl::getWorkspaceData(w, format);
+ }

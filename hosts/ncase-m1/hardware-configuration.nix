@@ -1,3 +1,49 @@
+# WARN: Before performing bios updates disable the admin password. I think it
+# can potentially cause issues after the bios reset.
+
+# Bios options to change from default:
+
+# Tweaker/
+#   Precision Boost Overdrive: Disable
+#   Advanced CPU Settings/
+#     SVM Mode: Enabled
+#     Global C-state Control: Enabled
+#   Extreme Memory Profile(X.M.P.): Profile1 DDR4-3600
+# Settings/
+#   Platform Power/
+#     ErP: Enabled
+#     Wake on LAN: Disabled
+#   IO Ports/
+#     Above 4G Decoding: Enabled
+#     Re-Size BAR Support: Auto
+#     APP Center Download & Install Configuration/
+#       APP Center Download & Install: Disabled
+#   Miscellaneous/
+#     LEDs in System Power On State: Off
+#   Smart Fan 5/
+#     CPU_FAN (AIO pump. Only provides a reading, cannot control): Default
+#     SYS_FAN1 (Intake CPU radiator fans)/
+#       Speed Control: Manual
+#       Temperature Input: CPU
+#       Curve:
+#         1: 50*C, 30%
+#         2: 60*C, 33%
+#         3: 70*C, 40%
+#         4: 74*C, 60%
+#         5: 80*C, 100%
+
+# WARN: After changing the settings above save and reboot before proceeding.
+# This is to prevent the bios going into a broken state from changing too
+# many settings as I have painfully experienced before.
+
+# Boot/
+#   Security Option: Setup
+#   Fast Boot: Enabled
+#   Preferred Operation Mode: Advanced
+
+# WARN: Save and reboot again at this stage before setting admin password
+
+#   Administrator Password: **********************
 {
   networking.hostId = "625ec505";
   hardware.cpu.amd.updateMicrocode = true;

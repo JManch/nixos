@@ -159,6 +159,15 @@ let
           ${notifySend} --urgency=low -t 2000 'Hyprland' 'Synced Wayland clipboard with X11' || \
           ${notifySend} --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
       '';
+
+  moveToNextEmpty = pkgs.writeShellScript "hypr-move-to-next-empty" ''
+    fullscreen=$(${hyprctl} activewindow -j | ${jaq} -r '.fullscreen')
+    cmd="dispatch movetoworkspace emptym"
+    if [ "$fullscreen" = 1 ]; then
+        cmd+=";dispatch fullscreenstate 0 -1"
+    fi
+    ${hyprctl} --batch "$cmd"
+  '';
 in
 mkIf (isHyprland config) {
   # Force secondaryModKey VM variant because binds are repeated on host
@@ -234,7 +243,7 @@ mkIf (isHyprland config) {
           # Workspaces other
           "${mod}, N, workspace, previous"
           "${mod}, M, workspace, emptym"
-          "${modShift}, M, movetoworkspace, emptym"
+          "${modShift}, M, exec, ${moveToNextEmpty}"
           "${modShiftCtrl}, M, movetoworkspacesilent, emptym"
           "${mod}, S, togglespecialworkspace, social"
           "${modShift}, S, movetoworkspacesilent, special:social"

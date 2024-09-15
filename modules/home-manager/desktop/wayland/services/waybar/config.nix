@@ -57,8 +57,8 @@ mkIf (cfg.enable && isWayland) {
           src = pkgs.fetchFromGitHub {
             owner = "Alexays";
             repo = "Waybar";
-            rev = "21906f07b312d56f51ce7cd2b26925cd12880ada";
-            hash = "sha256-7FBkX2hJrnX1VSKiE1jawHWitA4hTHnSgD4g7RjvhM8=";
+            rev = "0d02f6877d88551ea2be0cd151c1e6354e208b1c";
+            hash = "sha256-Z2ZS4rD3FjNIblPlXpx9XhkvepZWhO4xnJNk7o5ebe0=";
           };
         })
         [

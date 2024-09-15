@@ -332,7 +332,7 @@ mkIf (cfg.enable && isWayland) {
   desktop.hyprland.settings =
     let
       inherit (config.${ns}.desktop.hyprland) modKey;
-      hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
+      hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
       jaq = getExe pkgs.jaq;
 
       monitorNameToNumMap = # bash
@@ -352,7 +352,7 @@ mkIf (cfg.enable && isWayland) {
         '';
 
       toggleActiveMonitorBar = pkgs.writeShellScript "hypr-toggle-active-monitor-waybar" ''
-        focused_monitor=$(${escapeShellArg hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
+        focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
         # Get ID of the monitor based on x pos sort
         ${monitorNameToNumMap}
         monitor_num=''${monitor_name_to_num[$focused_monitor]}
@@ -368,26 +368,44 @@ mkIf (cfg.enable && isWayland) {
         ];
         text = # bash
           ''
+            ${monitorNameToNumMap}
+            update_monitor_bar() {
+              monitor_num=''${monitor_name_to_num["$1"]}
+              if [[ ${
+                concatMapStringsSep "||" (workspace: "\"$2\" == \"${workspace}\"") cfg.autoHideWorkspaces
+              } ]]; then
+                systemctl kill --user --signal="SIGRTMIN+$(((0 << 3) | monitor_num ))" waybar
+              else
+                systemctl kill --user --signal="SIGRTMIN+$(((1 << 3) | monitor_num ))" waybar
+              fi
+            }
+
             open_workspace() {
               workspace_name="''${1#*>>}"
-              focused_monitor=$(${escapeShellArg hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
-              ${monitorNameToNumMap}
-              monitor_num=''${monitor_name_to_num[$focused_monitor]}
+              focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
+              update_monitor_bar "$focused_monitor" "$workspace_name"
+            }
 
-              if [[ ${
-                concatMapStringsSep "||" (
-                  workspace: "\"$workspace_name\" == \"${workspace}\""
-                ) cfg.autoHideWorkspaces
-              } ]]; then
-                  systemctl kill --user --signal="SIGRTMIN+$(((0 << 3) | monitor_num ))" waybar
-              else
-                  systemctl kill --user --signal="SIGRTMIN+$(((1 << 3) | monitor_num ))" waybar
-              fi
+            move_workspace() {
+              IFS=',' read -r -a args <<< "$1"
+              workspace_name="''${args[0]#*>>}"
+              monitor_name="''${args[1]}"
+              update_monitor_bar "$monitor_name" "$workspace_name"
+
+              # unhide/hide the bar on the monitor where this workspace came
+              # from through all monitors and update the bar based on their
+              # active workspace.
+              active_workspaces=$(${hyprctl} monitors -j | ${jaq} -r ".[] | select((.disabled == false) and (.name != \"$monitor_name\")) | \"\(.name) \(.activeWorkspace.name)\"")
+              while IFS= read -r line; do
+                read -r monitor_name workspace_name <<< "$line"
+                update_monitor_bar "$monitor_name" "$workspace_name"
+              done <<< "$active_workspaces"
             }
 
             handle() {
               case $1 in
                 workspace\>*) open_workspace "$1" ;;
+                moveworkspace\>*) move_workspace "$1" ;;
               esac
             }
 

@@ -9,7 +9,7 @@
     device = {
       type = "desktop";
       ipAddress = "192.168.88.254";
-      memory = 1024 * 32;
+      memory = 1024 * 64;
       hassIntegration.enable = true;
 
       cpu = {

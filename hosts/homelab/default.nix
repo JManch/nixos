@@ -189,7 +189,7 @@ in
 
       beammp-server = {
         enable = true;
-        map = "west_coast_usa";
+        map = "east_coast_usa";
         autoStart = false;
         openFirewall = true;
         interfaces = [ "wg-friends" ];

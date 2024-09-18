@@ -102,14 +102,18 @@ mkIf cfg.enable {
   xdg.desktopEntries.beam-mp =
     let
       terminal = config.${ns}.desktop.terminal.exePath;
-      protontricks = osConfig'.programs.steam.protontricks.package or pkgs.protontricks;
-      protontrick-launch = getExe' protontricks "protontricks-launch";
+      protontricks = (osConfig'.programs.steam.protontricks.package or pkgs.protontricks).override {
+        extraCompatPaths = lib.makeSearchPathOutput "steamcompattool" "" (
+          osConfig'.programs.steam.extraCompatPackages or [ ]
+        );
+      };
+      protontricks-launch = getExe' protontricks "protontricks-launch";
       launcherDir = "${dataHome}/Steam/steamapps/compatdata/284160/pfx/dosdevices/c:/users/steamuser/AppData/Roaming/BeamMP-Launcher";
       appID = toString steamAppIDs."BeamNG.drive";
     in
     mkIf config.${ns}.desktop.enable {
       name = "BeamMP";
-      exec = "${terminal} --title BeamMP -e ${protontrick-launch} --cwd-app --appid ${appID} ${launcherDir}/BeamMP-Launcher.exe";
+      exec = "${terminal} --title BeamMP -e ${protontricks-launch} --cwd-app --appid ${appID} ${launcherDir}/BeamMP-Launcher.exe";
       terminal = false;
       type = "Application";
       icon = "application-x-generic";

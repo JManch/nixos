@@ -210,6 +210,17 @@ in
               # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/#virtio-gpu-pci
               "-device virtio-vga-gl"
               "-display gtk,show-menubar=off,zoom-to-fit=off,gl=on"
+              # Alternative method using spice that should enable clipboard
+              # sharing once wayland support gets added:
+              # https://gitlab.freedesktop.org/spice/linux/vd_agent/-/issues/26
+              # WARN: This needs the virt-viewer package installed and maybe spice?
+              # Also needs services.spice-vdagentd enabled in the vmVariant
+
+              # "-spice unix=on,disable-ticketing=on"
+              # "-display spice-app,gl=on"
+              # "-device virtio-vga-gl"
+              # "-device virtio-serial-pci -chardev spicevmc,id=vdagent,debug=0,name=vdagent"
+              # "-device virtserialport,chardev=vdagent,name=com.redhat.spice.0"
             ];
 
             # Forward all TCP and UDP ports that are opened in the firewall on

@@ -309,6 +309,10 @@ in
           }
         '';
 
+      systemd.tmpfiles.rules = [
+        "d /tmp/tmp-vms 0777 root root"
+      ];
+
       persistence.directories = [ "/var/lib/libvirt" ];
     })
 

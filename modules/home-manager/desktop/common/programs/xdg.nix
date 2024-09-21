@@ -37,6 +37,8 @@ mkIf desktopEnabled {
       music = "${home}/music";
       pictures = "${home}/pictures";
       videos = "${home}/videos";
+      templates = "${home}/templates";
+      publicShare = "${home}/public";
       extraConfig.XDG_SCREENSHOTS_DIR = "${home}/pictures/screenshots";
     };
 

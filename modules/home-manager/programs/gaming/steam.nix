@@ -77,11 +77,13 @@ mkIf cfg.enable {
       "steam_app.*"
       "SDL Application"
       "factorio"
+      "hl2_linux"
     ];
 
     tearingExcludedClasses = map (game: "steam_app_${steamAppIDs.${game}}") [
       "Red Dead Redemption 2" # half-vsync without tearing is preferrable
       "Noita" # tearing lags cursor
+      "factorio"
     ];
   };
 

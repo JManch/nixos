@@ -27,7 +27,6 @@
   fetchPypi,
   pytest,
   pytest-asyncio,
-  pytest-runner,
   websockets,
 }:
 let
@@ -42,12 +41,16 @@ let
       sha256 = "sha256-Bn8PDAGNLeL3/g6mB9lGQm1jblHIOJl2w248McJ3oaE=";
     };
 
+    postPatch = ''
+      substituteInPlace setup.py \
+        --replace-fail "'pytest-runner'" ""
+    '';
+
     propagatedBuildInputs = [ ];
 
     checkInputs = [
       pytest
       pytest-asyncio
-      pytest-runner
     ];
 
     pythonImportsCheck = [ "async_property" ];

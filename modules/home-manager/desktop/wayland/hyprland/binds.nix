@@ -238,7 +238,7 @@ mkIf (isHyprland config) {
           "${modShiftCtrl}, I, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy window"}"
 
           # Plugins
-          # "${mod}, Escape, hyprexpo:expo, toggle"
+          "${mod}, Escape, hyprexpo:expo, toggle"
 
           # Workspaces other
           "${mod}, N, workspace, previous"

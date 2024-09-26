@@ -114,7 +114,7 @@ mkIf (isHyprland config) {
     enable = true;
     package = hyprland;
 
-    # plugins = with flakePkgs args "hyprland-plugins"; [ hyprexpo ];
+    plugins = with flakePkgs args "hyprland-plugins"; [ hyprexpo ];
 
     systemd = {
       enable = true;
@@ -287,14 +287,14 @@ mkIf (isHyprland config) {
           "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
         ];
 
-      # plugin = {
-      #   hyprexpo = {
-      #     columns = 3;
-      #     gap_size = 0;
-      #     workspace_method = "first m~1";
-      #     enable_gesture = false;
-      #   };
-      # };
+      plugin = {
+        hyprexpo = {
+          columns = 3;
+          gap_size = 0;
+          workspace_method = "first m~1";
+          enable_gesture = false;
+        };
+      };
     };
   };
 

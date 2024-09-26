@@ -128,7 +128,7 @@ in
     wireless = mkIf cfg.wireless.enable {
       enable = true;
       userControlled.enable = true;
-      environmentFile = config.age.secrets.wirelessNetworks.path;
+      secretsFile = config.age.secrets.wirelessNetworks.path;
       scanOnLowSignal = config.${ns}.device.type == "laptop";
       allowAuxiliaryImperativeNetworks = true;
 
@@ -140,12 +140,12 @@ in
         # Inspect the generated file at /run/wpa_supplicant/wpa_supplicant.conf
         # Manually reload config with `wpa_cli -i <wireless_interface> reconfigure`
         Mikrotik = {
-          psk = "@MIKROTIK@";
+          psk = "ext:MIKROTIK";
           priority = 3;
         };
 
         "Pixel 5" = {
-          pskRaw = "@PIXEL_5@";
+          pskRaw = "ext:PIXEL_5";
           priority = 1;
         };
       };

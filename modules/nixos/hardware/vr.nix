@@ -52,7 +52,6 @@ in
     ];
 
     userPackages = [
-      pkgs.opencomposite-helper
       xrPkgs.index_camera_passthrough
     ];
 

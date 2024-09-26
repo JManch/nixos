@@ -179,8 +179,8 @@ let
         trigger = singleton {
           platform = "numeric_state";
           entity_id = [ "sensor.joshua_mold_indicator" ];
-          above = mkIf enable 73;
-          below = mkIf (!enable) 67;
+          above = mkIf enable 85;
+          below = mkIf (!enable) 80;
           for.minutes = if enable then 0 else 30;
         };
         condition = singleton {

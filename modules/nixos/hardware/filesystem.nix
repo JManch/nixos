@@ -77,10 +77,12 @@ mkMerge [
     };
 
     boot = {
-      supportedFilesystems.zfs = true;
+      # ZFS does not always support the latest kernel so we have to manually
+      # set this to match whatever upstream supports
+      # https://github.com/NixOS/nixpkgs/pull/341596
+      kernelPackages = pkgs.linuxKernel.packages.linux_6_10;
 
-      # ZFS does not always support the latest kernel
-      kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
+      supportedFilesystems.zfs = true;
       zfs.package = mkIf cfg.zfs.unstable pkgs.zfs_unstable;
 
       # Set zfs devNodes to "/dev/disk/by-path" for VM installs to fix zpool

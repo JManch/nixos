@@ -52,86 +52,68 @@ mkIf (cfg.enable && isWayland) {
     # number. Actions are hide(0), show(1), toggle(2). This patch disables the
     # custom module signal functionality that I don't use.
     package =
-      (addPatches
-        (pkgs.waybar.overrideAttrs {
-          src = pkgs.fetchFromGitHub {
-            owner = "Alexays";
-            repo = "Waybar";
-            rev = "0d02f6877d88551ea2be0cd151c1e6354e208b1c";
-            hash = "sha256-Z2ZS4rD3FjNIblPlXpx9XhkvepZWhO4xnJNk7o5ebe0=";
-          };
-        })
-        [
-          ../../../../../../patches/waybarDisableReload.patch
-          (
-            let
-              sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
-                sort (a: b: a.number < b.number) monitors
-              );
-            in
-            pkgs.writeText "waybar-bar-toggle.patch" # cpp
-              ''
-                diff --git a/src/bar.cpp b/src/bar.cpp
-                index 872632ac..ba578b1e 100644
-                --- a/src/bar.cpp
-                +++ b/src/bar.cpp
-                @@ -405,6 +405,7 @@ void waybar::Bar::onMap(GdkEventAny*) {
-                 }
-                 
-                 void waybar::Bar::setVisible(bool value) {
-                +  if (value == visible) return;
-                   visible = value;
-                   if (auto mode = config.get("mode", {}); mode.isString()) {
-                     setMode(visible ? config["mode"].asString() : MODE_INVISIBLE);
-                diff --git a/src/main.cpp b/src/main.cpp
-                index ff446ffc..131c8fb7 100644
-                --- a/src/main.cpp
-                +++ b/src/main.cpp
-                @@ -93,8 +93,22 @@ int main(int argc, char* argv[]) {
-                 
-                     for (int sig = SIGRTMIN + 1; sig <= SIGRTMAX; ++sig) {
-                       std::signal(sig, [](int sig) {
-                +        std::vector<std::string> monitors = {${sortedMonitors}};
-                +        int action = (sig - SIGRTMIN) >> 3;
-                +        int monitorNum = (sig - SIGRTMIN) & ((1 << 3) - 1);
-                +        if (monitorNum >= monitors.size() || monitorNum < 1) {
-                +          spdlog::error("Monitor with number {} does not exist", monitorNum);
-                +          return;
-                +        }
-                +        auto& monitorName = monitors[monitorNum - 1];
-                         for (auto& bar : waybar::Client::inst()->bars) {
-                -          bar->handleSignal(sig);
-                +          if (bar->output->name == monitorName) {
-                +            if (action == 2)
-                +              bar->toggle();
-                +            else
-                +              bar->setVisible(action);
-                +            break;
-                +          }
-                         }
-                       });
-                     }
-              ''
-          )
-        ]
-      ).override
+      (addPatches pkgs.waybar [
+        ../../../../../../patches/waybarDisableReload.patch
+        (
+          let
+            sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
+              sort (a: b: a.number < b.number) monitors
+            );
+          in
+          pkgs.writeText "waybar-bar-toggle.patch" # cpp
+            ''
+              diff --git a/src/bar.cpp b/src/bar.cpp
+              index 872632ac..ba578b1e 100644
+              --- a/src/bar.cpp
+              +++ b/src/bar.cpp
+              @@ -405,6 +405,7 @@ void waybar::Bar::onMap(GdkEventAny*) {
+               }
+               
+               void waybar::Bar::setVisible(bool value) {
+              +  if (value == visible) return;
+                 visible = value;
+                 if (auto mode = config.get("mode", {}); mode.isString()) {
+                   setMode(visible ? config["mode"].asString() : MODE_INVISIBLE);
+              diff --git a/src/main.cpp b/src/main.cpp
+              index ff446ffc..131c8fb7 100644
+              --- a/src/main.cpp
+              +++ b/src/main.cpp
+              @@ -93,8 +93,22 @@ int main(int argc, char* argv[]) {
+               
+                   for (int sig = SIGRTMIN + 1; sig <= SIGRTMAX; ++sig) {
+                     std::signal(sig, [](int sig) {
+              +        std::vector<std::string> monitors = {${sortedMonitors}};
+              +        int action = (sig - SIGRTMIN) >> 3;
+              +        int monitorNum = (sig - SIGRTMIN) & ((1 << 3) - 1);
+              +        if (monitorNum >= monitors.size() || monitorNum < 1) {
+              +          spdlog::error("Monitor with number {} does not exist", monitorNum);
+              +          return;
+              +        }
+              +        auto& monitorName = monitors[monitorNum - 1];
+                       for (auto& bar : waybar::Client::inst()->bars) {
+              -          bar->handleSignal(sig);
+              +          if (bar->output->name == monitorName) {
+              +            if (action == 2)
+              +              bar->toggle();
+              +            else
+              +              bar->setVisible(action);
+              +            break;
+              +          }
+                       }
+                     });
+                   }
+            ''
+        )
+      ]).override
         {
           cavaSupport = false;
-          evdevSupport = true;
-          experimentalPatches = false;
-          hyprlandSupport = true;
           inputSupport = false;
           jackSupport = false;
           mpdSupport = false;
           mprisSupport = false;
-          nlSupport = true;
-          pulseSupport = true;
           rfkillSupport = false;
-          runTests = false;
           sndioSupport = false;
           swaySupport = false;
-          traySupport = true;
-          udevSupport = false;
           upowerSupport = false;
           wireplumberSupport = false;
           withMediaPlayer = false;

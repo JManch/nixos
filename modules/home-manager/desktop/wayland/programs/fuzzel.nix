@@ -3,11 +3,13 @@
   lib,
   pkgs,
   config,
+  osConfig',
   isWayland,
   ...
 }:
 let
   inherit (lib) mkIf getExe getExe';
+  inherit (osConfig'.${ns}.device) primaryMonitor;
   cfg = desktopCfg.programs.fuzzel;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
@@ -24,19 +26,21 @@ mkIf (cfg.enable && isWayland) {
         horizontal-pad = 20;
         vertical-pad = 12;
         inner-pad = 5;
+        anchor = "bottom";
+        y-margin = builtins.floor (primaryMonitor.height * 0.43);
 
         tabs = 4;
         prompt = "\"\"";
         icons-enabled = true;
         terminal = "${desktopCfg.terminal.exePath} -e";
         icon-theme = config.gtk.iconTheme.name;
-        layer = "overlay";
       };
 
       colors = {
         background = "${colors.base00}ff";
-        text = "${colors.base07}ff";
-        match = "${colors.base07}ff";
+        input = "${colors.base05}ff";
+        text = "${colors.base05}ff";
+        match = "${colors.base05}ff";
         selection = "${colors.base00}ff";
         selection-text = "${colors.base07}ff";
         selection-match = "${colors.base07}ff";

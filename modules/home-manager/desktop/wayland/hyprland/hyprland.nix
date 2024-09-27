@@ -63,7 +63,16 @@ mkIf (isHyprland config) {
     });
   };
 
-  home.packages = [ (flakePkgs args "grimblast").grimblast ];
+  home.packages =
+    [ (flakePkgs args "grimblast").grimblast ]
+    # These are needed for xdg-desktop-portal-hyprland screenshot
+    # functionality. Even though I use grimblast the portal may be used in some
+    # situations?
+    ++ (with pkgs; [
+      grim
+      slurp
+      hyprpicker
+    ]);
 
   # Install Hyprcursor package
   home.file = mkIf (cfg.hyprcursor.package != null) {

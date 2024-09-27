@@ -41,6 +41,7 @@ let
           coreutils
           chatterino2
           socat
+          jaq
         ])
         ++ [
           config.programs.firefox.finalPackage
@@ -48,8 +49,8 @@ let
         ];
       text = # bash
         ''
-          # If a new window is created in the twitch workspace correct the
-          # splitratio and move firefox and MPV windows to the left
+          # If a new window is created in the twitch workspace make it floating
+          # and position next to chat
           open_window() {
             IFS=',' read -r -a args <<< "$1"
             window_address="''${args[0]#*>>}"
@@ -82,6 +83,19 @@ let
           create_workspace() {
             workspace_name="''${1#*>>}"
             if [[ "$workspace_name" == "TWITCH" ]]; then
+              # Check if a special workspace is focused and, if so, close it
+              # (ideally hyprland would close the special workspace if the
+              # workspace that has been switched to is behind it)
+              activeworkspace=$(hyprctl activeworkspace -j)
+              id=$(echo "$activeworkspace" | jaq -r '.id')
+              if [ "$id" -lt 0 ]; then
+                name=$(echo "$activeworkspace" | jaq -r '.name')
+                hyprctl dispatch togglespecialworkspace "$name"
+              fi
+
+              # We can't use the [workspace id silent] exec dispatcher here
+              # because firefox doesn't respect it. Instead we have to assume
+              # that the TWITCH workspace is actively focused.
               chatterino > /dev/null 2>&1 &
               firefox --new-window twitch.tv/directory > /dev/null 2>&1 &
             fi

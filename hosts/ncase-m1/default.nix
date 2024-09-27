@@ -123,7 +123,7 @@
 
       wireguard.friends = {
         enable = true;
-        autoStart = true;
+        autoStart = false;
         routerPeer = true;
         routerAllowedIPs = [ "10.0.0.0/24" ];
         address = "10.0.0.2";
@@ -145,7 +145,7 @@
       };
 
       satisfactory-server = {
-        enable = true;
+        enable = false;
         autoStart = false;
         interfaces = [ "wg-friends" ];
       };

@@ -35,9 +35,7 @@
     nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-personal";
     nixpkgs-small.url = "github:NixOS/nixpkgs/nixos-unstable-small";
 
-    # Holding back rev until zfs issues are resolved
-    # https://github.com/nix-community/impermanence/issues/216
-    impermanence.url = "github:nix-community/impermanence?rev=63f4d0443e32b0dd7189001ee1894066765d18a5";
+    impermanence.url = "github:nix-community/impermanence";
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";

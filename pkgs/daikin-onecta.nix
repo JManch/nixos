@@ -12,7 +12,7 @@ buildHomeAssistantComponent rec {
     owner = "jwillemsen";
     repo = "daikin_onecta";
     rev = "refs/tags/v${version}";
-    hash = "sha256-xUaWKsbd8JPHcU4/RDuK3HLZJPSOKM5bGXZaLr2r8O0=";
+    hash = "sha256-kojIn/ElyI3poU3Lpl6qtPE8ACh7fsn6//5hBAz4s4s=";
   };
 
   meta = {

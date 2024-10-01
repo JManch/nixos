@@ -22,9 +22,8 @@
       xdg.lowercaseUserDirs = true;
 
       hyprland = {
-        # Disable for now until I can get it working on kernel 6.8 without the
-        # env var
-        tearing = false;
+        tearing = true;
+        # Causes artifacting https://github.com/hyprwm/Hyprland/issues/6994
         directScanout = false;
         logging = false;
       };

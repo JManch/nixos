@@ -80,11 +80,15 @@ mkIf cfg.enable {
       "hl2_linux"
     ];
 
-    tearingExcludedClasses = map (game: "steam_app_${steamAppIDs.${game}}") [
-      "Red Dead Redemption 2" # half-vsync without tearing is preferrable
-      "Noita" # tearing lags cursor
-      "factorio"
-    ];
+    tearingExcludedClasses =
+      map (game: "steam_app" + toString steamAppIDs.${game}) [
+        "Red Dead Redemption 2" # half-vsync without tearing is preferrable
+        "Noita" # tearing lags cursor
+        "BeamNG.drive" # tearing causes flashing in UI
+      ]
+      ++ [
+        "factorio"
+      ];
   };
 
   desktop.hyprland.settings.windowrulev2 = [

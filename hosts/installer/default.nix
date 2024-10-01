@@ -181,12 +181,13 @@ let
             "$host_config.system.build.toplevel.drvPath")
 
           ssh_ctrl=$(mktemp -d)
-          cleanup_ssh_ctrl() {
+          clean_up_ssh_ctrl() {
             for ctrl in "$ssh_ctrl"/ssh-*; do
               ssh -o ControlPath="$ctrl" -O exit dummyhost 2>/dev/null || true
             done
             rm -rf "$ssh_ctrl"
           }
+          add_exit_trap clean_up_ssh_ctrl
           ssh_opts="-o ControlMaster=auto -o ControlPath=$ssh_ctrl/ssh-%n -o ControlPersist=60"
 
           echo "### Copying system derivation to remote host ###"

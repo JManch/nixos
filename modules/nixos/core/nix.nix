@@ -141,59 +141,116 @@ let
   ) rebuildCmds;
 
   flakeUpdate = singleton (
-    pkgs.writers.writePython3Bin "flake-update" { } ''
-      import os
-      import json
-      import subprocess
+    pkgs.writeShellApplication {
+      name = "flake-update";
+      runtimeInputs = [ pkgs.jaq ];
+      text = # bash
+        ''
+          # List of critical inputs to check for revision changes
+          critical_inputs=(
+            "impermanence"
+            "home-manager"
+            "agenix"
+            "lanzaboote"
+            "disko"
+            "raspberry-pi-nix"
+            "rpi-firmware-nonfree-src"
+          )
 
-      os.chdir("/home/${adminUsername}/.config/nixos")
-      critical_inputs = [
-        "impermanence",
-        "home-manager",
-        "agenix",
-        "lanzaboote",
-        "disko",
-        "raspberry-pi-nix",
-        "rpi-firmware-nonfree-src",
-      ]
-      with open("flake.lock", "r") as file:
-          old_lock = json.load(file)["nodes"]
-      critical_inputs = [i for i in critical_inputs if i in old_lock]
+          # Inputs and with relateive file paths to check for changes in.
+          # Separate multiple file paths with spaces.
+          declare -A input_file_pairs=(
+            ["nixpkgs"]="nixos/modules/tasks/filesystems/zfs.nix"
+          )
 
-      try:
-          subprocess.run(["nix", "flake", "update"], check=True)
-      except subprocess.CalledProcessError as e:
-          exit(e.returncode)
+          input_exists_in_lockfiles() {
+            local input="$1"
+            local old_lock="$2"
+            local new_lock="$3"
+            if echo "$old_lock" | jaq -e ".\"$input\"" &>/dev/null &&
+               echo "$new_lock" | jaq -e ".\"$input\"" &>/dev/null; then
+              return 0
+            else
+              return 1
+            fi
+          }
 
-      with open("flake.lock", "r") as file:
-          new_lock = json.load(file)["nodes"]
+          old_lock=$(<"${configDir}/flake.lock" jaq -c '.nodes')
+          pushd "${configDir}" >/dev/null
+          nix flake update
+          popd >/dev/null
+          new_lock=$(<"${configDir}/flake.lock" jaq -c '.nodes')
 
-      first_diff = True
-      for input in critical_inputs:
-          if input in new_lock:
-              old_rev = old_lock[input]["locked"]["rev"]
-              new_rev = new_lock[input]["locked"]["rev"]
-              if new_rev != old_rev:
-                  if first_diff:
-                      print((
-                          "\033[1;31m\nCritical inputs have updated. "
-                          "Check changes using the URLs below:\n\033[0m"
-                      ))
-                      first_diff = False
+          first_diff=true
+          for input in "''${critical_inputs[@]}"; do
+            if input_exists_in_lockfiles "$input" "$old_lock" "$new_lock"; then
+              old_rev=$(echo "$old_lock" | jaq -r ".\"$input\".locked.rev")
+              new_rev=$(echo "$new_lock" | jaq -r ".\"$input\".locked.rev")
 
-                  print(f"\033[1m• Updated critical input '{input}':\033[0m")
-                  source = new_lock[input]["original"]
-                  if source["type"] == "github" or source["type"] == "gitlab":
-                      print((
-                          f"    'https://{source["type"]}.com/{source["owner"]}"
-                          f"/{source["repo"]}/compare/{old_rev}...{new_rev}'"
-                      ))
-                  else:
-                      print((
-                          f"\033[1;31m   Cannot get diff url, source type"
-                          f" {source["type"]} is unsupported\033[0m"
-                      ))
-    ''
+              if [ "$new_rev" != "$old_rev" ]; then
+                if $first_diff; then
+                  echo -e "\033[1;31m\nCritical inputs have updated. Check changes using the URLs below:\n\033[0m"
+                  first_diff=false
+                fi
+                echo -e "\033[1m• Updated critical input '$input':\033[0m"
+                source_type=$(echo "$new_lock" | jaq -r ".\"$input\".original.type")
+                if [[ "$source_type" == "github" || "$source_type" == "gitlab" ]]; then
+                  owner=$(echo "$new_lock" | jaq -r ".\"$input\".original.owner")
+                  repo=$(echo "$new_lock" | jaq -r ".\"$input\".original.repo")
+                  echo "    'https://$source_type.com/$owner/$repo/compare/$old_rev...$new_rev'"
+                else
+                  echo -e "\033[1;31m   Cannot get diff URL, source type $source_type is unsupported\033[0m"
+                fi
+              fi
+            fi
+          done
+
+          tmp_repos=$(mktemp -d)
+          cleanup() {
+            rm -rf "$tmp_repos"
+          }
+          trap cleanup EXIT
+          first_diff=true
+
+          for input in "''${!input_file_pairs[@]}"; do
+            file_paths="''${input_file_pairs[$input]}"
+            IFS=' ' read -r -a paths_array <<< "$file_paths"
+            for file_path in "''${paths_array[@]}"; do
+              if input_exists_in_lockfiles "$input" "$old_lock" "$new_lock"; then
+                old_rev=$(echo "$old_lock" | jaq -r ".\"$input\".locked.rev")
+                new_rev=$(echo "$new_lock" | jaq -r ".\"$input\".locked.rev")
+
+                source_type=$(echo "$new_lock" | jaq -r ".\"$input\".original.type")
+                if [ "$new_rev" != "$old_rev" ]; then
+                  if [[ "$source_type" == "github" || "$source_type" == "gitlab" ]]; then
+                    if [ ! -d "$tmp_repos/$input" ]; then
+                      owner=$(echo "$new_lock" | jaq -r ".\"$input\".original.owner")
+                      repo=$(echo "$new_lock" | jaq -r ".\"$input\".original.repo")
+                      git clone -q "https://$source_type.com/$owner/$repo" "$tmp_repos/$input"
+                    fi
+
+                    pushd "$tmp_repos/$input" >/dev/null
+                    diff_output=$(git diff "$old_rev" "$new_rev" -- "$file_path" 2>/dev/null)
+                    if [[ -n "$diff_output" ]]; then
+                      if $first_diff; then
+                        echo -e "\033[1;34m\nTracked input files have changed. View diffs below:\n\033[0m"
+                        first_diff=false
+                      fi
+                      echo -e "\033[1m• File changed for input '$input': $file_path\033[0m"
+                      diff_output_path=$(mktemp -p /tmp "$input-diff-XXXXX")
+                      echo "$diff_output" > "$diff_output_path"
+                      echo "    '$diff_output_path'"
+                    fi
+                    popd >/dev/null
+                  else
+                    echo -e "\033[1;31m• Cannot check file paths diff for input '$input', source type '$source_type' is unsupported\033[0m"
+                  fi
+                fi
+              fi
+            done
+          done
+        '';
+    }
   );
 in
 {

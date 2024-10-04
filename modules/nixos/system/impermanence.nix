@@ -15,12 +15,67 @@ let
     mkMerge
     mkAliasOptionModule
     concatStringsSep
+    substring
+    stringLength
     hasAttr
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.${ns}.system.virtualisation) vmVariant;
   cfg = config.${ns}.system.impermanence;
   homePersistence = config.home-manager.users.${username}.persistence;
+
+  # Print all files in the tmpfs file system that will be lost on shutdown
+  ephemeralFinder =
+    let
+      excludePaths = [
+        "tmp"
+        "root/.cache/nix"
+        "home/${username}/.mozilla"
+        "home/${username}/.cache/mozilla"
+        "home/${username}/.cache/mesa_shader_cache_db"
+        "home/${username}/.local/share/chatterino/Cache"
+        "home/${username}/.local/share/darkman/variants"
+      ];
+    in
+    pkgs.writeShellApplication {
+      name = "ephemeral";
+      runtimeInputs = [ pkgs.fd ];
+      text = # bash
+        ''
+          sudo fd --one-file-system --strip-cwd-prefix --base-directory / --type file --type symlink \
+            --hidden --exclude "{${concatStringsSep "," excludePaths}}" "''${@:1}"
+        '';
+    };
+
+  # Prints all files and directories in the persistent file system that are not
+  # defined as persistent in config
+  bloatFinder =
+    let
+      excludePaths = [
+        "var/nix-tmp"
+        "home/${username}/.mozilla"
+      ];
+
+      persistedFiles = map (v: substring 1 (stringLength v.filePath) v.filePath) config.persistence.files;
+      persistedDirs = map (
+        v: substring 1 (stringLength v.dirPath) v.dirPath
+      ) config.persistence.directories;
+    in
+    pkgs.writeShellApplication {
+      name = "bloat";
+      runtimeInputs = [ pkgs.fd ];
+      text = # bash
+        ''
+          sudo fd -au --base-directory /persist --type file --type symlink \
+            --exclude "/{${concatStringsSep "," (excludePaths ++ persistedFiles ++ persistedDirs)}}" \
+            "''${@:1}"
+
+          # Another pass for empty dirs
+          sudo fd -au --base-directory /persist --type empty --type dir \
+            --exclude "/{${concatStringsSep "," (excludePaths ++ persistedFiles ++ persistedDirs)}}" \
+            "''${@:1}"
+        '';
+    };
 in
 {
   imports = [
@@ -56,27 +111,10 @@ in
         "A /persist file system must be defined for impermanence"
       ];
 
-      programs.zsh.interactiveShellInit =
-        let
-          inherit (lib) getExe;
-          fd = getExe pkgs.fd;
-          extraExcludeDirs = [
-            "tmp"
-            "root/.cache/nix"
-            "home/${username}/.mozilla"
-            "home/${username}/.cache/mozilla"
-            "home/${username}/.local/share/chatterino/Cache"
-            "home/${username}/.config/darkman/variants"
-          ];
-        in
-        # bash
-        ''
-          # Prints a list of all ephemeral system files
-          impermanence() {
-            sudo ${fd} --one-file-system --strip-cwd-prefix --base-directory / --type f \
-              --hidden --exclude "{${concatStringsSep "," extraExcludeDirs}}" "''${@:1}"
-          }
-        '';
+      adminPackages = [
+        ephemeralFinder
+        bloatFinder
+      ];
 
       fileSystems."/persist".neededForBoot = true;
 
@@ -92,8 +130,9 @@ in
           # WARN: Systemd services that use DynamicUser without defining a
           # static User and Group cannot be persisted as it's impossible to
           # preallocated the correct UID/GID. It should be possible to work
-          # around this by adding User= and Group= to DynamicUser services and
-          # also declaratively creating the User and Group
+          # around this by declaratively creating a user and group for the
+          # service and using them for User and Group in the service's exec
+          # config.
         ];
 
         files = [

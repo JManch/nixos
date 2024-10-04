@@ -16,6 +16,7 @@ let
     concatMapStringsSep
     concatMap
     imap
+    attrNames
     optionalString
     optionals
     mapAttrsToList
@@ -38,7 +39,7 @@ let
 
   # Patch makes the togglespecialworkspace dispatcher always toggle instead
   # of moving the open special workspace to the active monitor
-  hyprland = addPatches hyprlandPkgs.hyprland [
+  hyprlandPkg = addPatches hyprlandPkgs.hyprland [
     ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch
     ../../../../../patches/hyprlandDispatcherError.patch
     ../../../../../patches/hyprlandResizeParamsFloats.patch
@@ -116,12 +117,12 @@ mkIf (isHyprland config) {
       pkgs.xdg-desktop-portal-gtk
       hyprlandPkgs.xdg-desktop-portal-hyprland
     ];
-    configPackages = [ hyprland ];
+    configPackages = [ hyprlandPkg ];
   };
 
   wayland.windowManager.hyprland = {
     enable = true;
-    package = hyprland;
+    package = hyprlandPkg;
 
     plugins = with flakePkgs args "hyprland-plugins"; [ hyprexpo ];
 
@@ -332,5 +333,55 @@ mkIf (isHyprland config) {
 
   programs.zsh.shellAliases = {
     hyprland-setup-dev = "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -B build";
+  };
+
+  systemd.user.services.hyprland-socket-listener = mkIf (cfg.eventScripts != { }) {
+    Unit = {
+      Description = "Hyprland socket listener";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session-pre.target" ];
+    };
+
+    Service = {
+      Type = "exec";
+      ExecStart = getExe (
+        pkgs.writeShellApplication {
+          name = "hypr-socket-listener";
+          runtimeInputs = [
+            hyprlandPkg
+            pkgs.socat
+          ];
+          text =
+            # bash
+            ''
+              ${concatMapStringsSep "\n" (
+                event: # bash
+                ''
+                  ${event}() {
+                    IFS=',' read -r -a args <<< "$1"
+                    # Strip event<< from the first element
+                    args[0]="''${args[0]#*>>}"
+
+                    # Call scripts for this event
+                    ${concatMapStringsSep "\n" (script: ''${script} "''${args[@]}"'') cfg.eventScripts.${event}}
+                  }
+                '') (attrNames cfg.eventScripts)}
+
+              handle() {
+                case $1 in
+              ${concatMapStringsSep "\n" (event: "    ${event}\\>*) ${event} \"$1\" ;;") (
+                attrNames cfg.eventScripts
+              )}
+                esac
+              }
+
+              socat -U - UNIX-CONNECT:"/$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" \
+                | while read -r line; do handle "$line"; done
+            '';
+        }
+      );
+    };
+
+    Install.WantedBy = [ "graphical-session.target" ];
   };
 }

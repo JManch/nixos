@@ -17,6 +17,7 @@ let
     mkForce
     getExe
     concatLines
+    singleton
     sort
     escapeShellArg
     concatMapStringsSep
@@ -35,6 +36,24 @@ let
   gamemode = osConfig'.${ns}.programs.gaming.gamemode;
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
   systemctl = getExe' pkgs.systemd "systemctl";
+  hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
+  jaq = getExe pkgs.jaq;
+
+  monitorNameToNumMap = # bash
+    ''
+      declare -A waybar_monitor_name_to_num
+      ${concatLines (
+        map (
+          m:
+          "waybar_monitor_name_to_num[${m.name}]='${
+            if m.mirror == null then
+              toString m.number
+            else
+              toString (getMonitorByName osConfig' m.mirror).number
+          }'"
+        ) monitors
+      )}
+    '';
 in
 mkIf (cfg.enable && isWayland) {
   programs.waybar = {
@@ -314,89 +333,16 @@ mkIf (cfg.enable && isWayland) {
   desktop.hyprland.settings =
     let
       inherit (config.${ns}.desktop.hyprland) modKey;
-      hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
-      jaq = getExe pkgs.jaq;
-
-      monitorNameToNumMap = # bash
-        ''
-          declare -A monitor_name_to_num
-          ${concatLines (
-            map (
-              m:
-              "monitor_name_to_num[${m.name}]='${
-                if m.mirror == null then
-                  toString m.number
-                else
-                  toString (getMonitorByName osConfig' m.mirror).number
-              }'"
-            ) monitors
-          )}
-        '';
 
       toggleActiveMonitorBar = pkgs.writeShellScript "hypr-toggle-active-monitor-waybar" ''
         focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
         # Get ID of the monitor based on x pos sort
         ${monitorNameToNumMap}
-        monitor_num=''${monitor_name_to_num[$focused_monitor]}
+        monitor_num=''${waybar_monitor_name_to_num[$focused_monitor]}
         ${systemctl} kill --user --signal="SIGRTMIN+$(((2 << 3) | monitor_num))" waybar
       '';
-
-      workspaceAutoToggle = pkgs.writeShellApplication {
-        name = "hypr-waybar-workspace-auto-toggle";
-        runtimeInputs = with pkgs; [
-          coreutils
-          socat
-          systemd
-        ];
-        text = # bash
-          ''
-            ${monitorNameToNumMap}
-            update_monitor_bar() {
-              monitor_num=''${monitor_name_to_num["$1"]}
-              if [[ ${
-                concatMapStringsSep "||" (workspace: "\"$2\" == \"${workspace}\"") cfg.autoHideWorkspaces
-              } ]]; then
-                systemctl kill --user --signal="SIGRTMIN+$(((0 << 3) | monitor_num ))" waybar
-              else
-                systemctl kill --user --signal="SIGRTMIN+$(((1 << 3) | monitor_num ))" waybar
-              fi
-            }
-
-            open_workspace() {
-              workspace_name="''${1#*>>}"
-              focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
-              update_monitor_bar "$focused_monitor" "$workspace_name"
-            }
-
-            move_workspace() {
-              IFS=',' read -r -a args <<< "$1"
-              workspace_name="''${args[0]#*>>}"
-              monitor_name="''${args[1]}"
-              update_monitor_bar "$monitor_name" "$workspace_name"
-
-              # unhide/hide the bar on the monitor where this workspace came
-              # from through all monitors and update the bar based on their
-              # active workspace.
-              active_workspaces=$(${hyprctl} monitors -j | ${jaq} -r ".[] | select((.disabled == false) and (.name != \"$monitor_name\")) | \"\(.name) \(.activeWorkspace.name)\"")
-              while IFS= read -r line; do
-                read -r monitor_name workspace_name <<< "$line"
-                update_monitor_bar "$monitor_name" "$workspace_name"
-              done <<< "$active_workspaces"
-            }
-
-            handle() {
-              case $1 in
-                workspace\>*) open_workspace "$1" ;;
-                moveworkspace\>*) move_workspace "$1" ;;
-              esac
-            }
-
-            socat -U - UNIX-CONNECT:"/$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" | while read -r line; do handle "$line"; done
-          '';
-      };
     in
     {
-      exec-once = mkIf (cfg.autoHideWorkspaces != [ ]) [ (getExe workspaceAutoToggle) ];
       bind = [
         # Toggle active monitor bar
         "${modKey}, B, exec, ${toggleActiveMonitorBar}"
@@ -405,5 +351,49 @@ mkIf (cfg.enable && isWayland) {
         # Restart waybar
         "${modKey}SHIFTCONTROL, B, exec, ${systemctl} restart --user waybar"
       ];
+    };
+
+  ${ns}.desktop.hyprland =
+    let
+      updateMonitorBar = # bash
+        ''
+          update_monitor_bar() {
+            ${monitorNameToNumMap}
+            monitor_num=''${waybar_monitor_name_to_num["$1"]}
+            if [[ ${
+              concatMapStringsSep "||" (workspace: "\"$2\" == \"${workspace}\"") cfg.autoHideWorkspaces
+            } ]]; then
+              systemctl kill --user --signal="SIGRTMIN+$(((0 << 3) | monitor_num ))" waybar
+            else
+              systemctl kill --user --signal="SIGRTMIN+$(((1 << 3) | monitor_num ))" waybar
+            fi
+          }
+        '';
+    in
+    {
+      # Update bar auto toggle when active workspace changes
+      eventScripts.workspace = singleton (pkgs.writeShellScript "hypr-waybar-auto-toggle-workspace" ''
+        ${updateMonitorBar}
+        workspace_name="$1"
+        focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
+        update_monitor_bar "$focused_monitor" "$workspace_name"
+      '').outPath;
+
+      # Update bar auto toggle when workspace is moved between monitors
+      eventScripts.moveworkspace = singleton (pkgs.writeShellScript "hypr-waybar-auto-toggle-moveworkspace" ''
+        ${updateMonitorBar}
+        workspace_name="$1"
+        monitor_name="$2"
+        waybar_update_monitor_bar "$monitor_name" "$workspace_name"
+
+        # unhide/hide the bar on the monitor where this workspace came
+        # from through all monitors and update the bar based on their
+        # active workspace.
+        active_workspaces=$(${hyprctl} monitors -j | ${jaq} -r ".[] | select((.disabled == false) and (.name != \"$monitor_name\")) | \"\(.name) \(.activeWorkspace.name)\"")
+        while IFS= read -r line; do
+          read -r monitor_name workspace_name <<< "$line"
+          update_monitor_bar "$monitor_name" "$workspace_name"
+        done <<< "$active_workspaces"
+      '').outPath;
     };
 }

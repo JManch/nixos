@@ -159,5 +159,15 @@ in
         )
       );
     };
+
+    eventScripts = mkOption {
+      type = types.attrsOf (types.listOf types.str);
+      default = { };
+      description = ''
+        Attribute set where the names are hyprland socket events and the values
+        are scripts to run when the event fires. The socket listener runs in a
+        systemd service.
+      '';
+    };
   };
 }

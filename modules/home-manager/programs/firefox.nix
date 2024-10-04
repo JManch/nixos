@@ -12,6 +12,7 @@ let
     getExe
     getExe'
     optional
+    singleton
     ;
   inherit (config.${ns}.programs) mpv;
   inherit (config.${ns}) desktop;
@@ -357,4 +358,14 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
       "${desktop.hyprland.modKey}SHIFT, Backspace, workspace, emptym"
       "${desktop.hyprland.modKey}SHIFT, Backspace, exec, ${firefox}"
     ];
+
+  ${ns}.desktop.hyprland.eventScripts.windowtitlev2 = singleton (pkgs.writeShellScript "hypr-bitwarden-windowtitlev2" ''
+    if [[ $2 == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
+      hyprctl --batch "\
+        dispatch setfloating address:0x$1; \
+        dispatch resizewindowpixel exact 20% 50%,address:0x$1; \
+        dispatch centerwindow; \
+      "
+    fi
+  '').outPath;
 }

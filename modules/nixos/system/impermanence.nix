@@ -13,6 +13,7 @@ let
     mkIf
     mkForce
     mkMerge
+    getExe
     mkAliasOptionModule
     concatStringsSep
     substring
@@ -23,6 +24,7 @@ let
   inherit (config.${ns}.system.virtualisation) vmVariant;
   cfg = config.${ns}.system.impermanence;
   homePersistence = config.home-manager.users.${username}.persistence;
+  fd = getExe pkgs.fd;
 
   # Print all files in the tmpfs file system that will be lost on shutdown
   ephemeralFinder =
@@ -37,15 +39,10 @@ let
         "home/${username}/.local/share/darkman/variants"
       ];
     in
-    pkgs.writeShellApplication {
-      name = "ephemeral";
-      runtimeInputs = [ pkgs.fd ];
-      text = # bash
-        ''
-          sudo fd --one-file-system --strip-cwd-prefix --base-directory / --type file --type symlink \
-            --hidden --exclude "{${concatStringsSep "," excludePaths}}" "''${@:1}"
-        '';
-    };
+    pkgs.writeShellScriptBin "ephemeral" ''
+      sudo ${fd} --one-file-system --strip-cwd-prefix --base-directory / --type file --type symlink \
+        --hidden --exclude "{${concatStringsSep "," excludePaths}}" "''${@:1}"
+    '';
 
   # Prints all files and directories in the persistent file system that are not
   # defined as persistent in config
@@ -61,21 +58,16 @@ let
         v: substring 1 (stringLength v.dirPath) v.dirPath
       ) config.persistence.directories;
     in
-    pkgs.writeShellApplication {
-      name = "bloat";
-      runtimeInputs = [ pkgs.fd ];
-      text = # bash
-        ''
-          sudo fd -au --base-directory /persist --type file --type symlink \
-            --exclude "/{${concatStringsSep "," (excludePaths ++ persistedFiles ++ persistedDirs)}}" \
-            "''${@:1}"
+    pkgs.writeShellScriptBin "bloat" ''
+      sudo ${fd} -au --base-directory /persist --type file --type symlink \
+        --exclude "/{${concatStringsSep "," (excludePaths ++ persistedFiles ++ persistedDirs)}}" \
+        "''${@:1}"
 
-          # Another pass for empty dirs
-          sudo fd -au --base-directory /persist --type empty --type dir \
-            --exclude "/{${concatStringsSep "," (excludePaths ++ persistedFiles ++ persistedDirs)}}" \
-            "''${@:1}"
-        '';
-    };
+      # Another pass for empty dirs
+      sudo ${fd} -au --base-directory /persist --type empty --type dir \
+        --exclude "/{${concatStringsSep "," (excludePaths ++ persistedFiles ++ persistedDirs)}}" \
+        "''${@:1}"
+    '';
 in
 {
   imports = [

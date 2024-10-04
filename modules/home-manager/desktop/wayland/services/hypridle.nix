@@ -37,11 +37,11 @@ mkIf (cfg.enable && isWayland) {
       listener =
         (singleton {
           timeout = cfg.lockTime;
-          on-timeout = locking.lockScript;
+          on-timeout = "${getExe' pkgs.systemd "loginctl"} lock-session";
         })
         ++ optional cfg.debug {
           timeout = 5;
-          on-timeout = "${lib.getExe pkgs.libnotify} 'Hypridle' 'Idle timeout triggered'";
+          on-timeout = "${getExe pkgs.libnotify} 'Hypridle' 'Idle timeout triggered'";
         };
     };
   };

@@ -205,7 +205,7 @@ mkIf (isHyprland config) {
           "${mod}, A, exec, ${toggleSwallowing}"
           "${modShift}, T, exec, ${scaleTabletToWindow}"
           "${modShiftCtrl}, T, exec, ${toggleGaps}"
-          "${mod}, Space, exec, ${config.${ns}.desktop.programs.locking.lockScript}"
+          "${mod}, Space, exec, ${getExe' pkgs.systemd "loginctl"} lock-session"
           "${modShiftCtrl}, V, exec, ${syncClipboard}"
 
           # Movement

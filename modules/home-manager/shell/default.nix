@@ -65,6 +65,7 @@ in
         rename
         nurl # tool for generating nix fetcher calls from urls
         file
+        jaq
       ])
       ++ [
         (flakePkgs args "yaml2nix").default

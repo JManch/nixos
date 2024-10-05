@@ -69,7 +69,7 @@ mkIf (cfg.enable && desktopEnabled) {
   };
 
   desktop.hyprland.binds = [
-    "${desktop.hyprland.modKey}, F1, exec, ${getExe darkmanPackage} toggle"
+    "${desktop.hyprland.modKey}SHIFT, C, exec, ${getExe darkmanPackage} toggle"
   ];
 
   systemd.user.services.darkman-solar-switcher = mkIf (cfg.switchMethod == "hass") {

@@ -22,18 +22,20 @@ let
   secondMonitor = lib.${ns}.getMonitorByNumber osConfig' 2;
   chatterinoPercentage = 17.5;
 
-  # This is the only way to load the twitch auth secret from agenix
-  streamlink = pkgs.streamlink.overrideAttrs (oldAttrs: {
-    nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.makeWrapper ];
-    postInstall = ''
+  # Wrap with twitch auth token config
+  streamlinkPkg = pkgs.symlinkJoin {
+    name = "streamlink-wrapped";
+    paths = [ pkgs.streamlink ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
       wrapProgram $out/bin/streamlink \
-        --add-flags "--config ${homeDirectory}/.config/streamlink/config" \
+        --add-flags '--config ${homeDirectory}/.config/streamlink/config' \
         --add-flags '--config "${streamlinkTwitchAuth.path}"'
     '';
-  });
+  };
 in
 mkIf cfg.enable {
-  home.packages = [ pkgs.chatterino2 ] ++ optional mpv.enable streamlink;
+  home.packages = [ pkgs.chatterino2 ] ++ optional mpv.enable streamlinkPkg;
 
   programs.mpv.profiles.streamlink = {
     # No point doing fancy scaling on streams

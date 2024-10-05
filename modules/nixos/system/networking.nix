@@ -17,7 +17,9 @@ let
     optional
     optionalAttrs
     imap0
+    optionals
     attrNames
+    hiPrio
     length
     getExe'
     allUnique
@@ -154,7 +156,16 @@ in
 
   services.resolved.enable = cfg.resolved.enable;
 
-  userPackages = optional (cfg.wireless.enable && desktop.enable) pkgs.wpa_supplicant_gui;
+  userPackages = optionals (cfg.wireless.enable && desktop.enable) [
+    pkgs.wpa_supplicant_gui
+    (hiPrio (
+      pkgs.runCommand "wpa-supplicant-desktop-rename" { } ''
+        mkdir -p $out/share/applications
+        substitute ${pkgs.wpa_supplicant_gui}/share/applications/wpa_gui.desktop $out/share/applications/wpa_gui.desktop \
+          --replace-fail "Name=wpa_gui" "Name=WPA GUI"
+      ''
+    ))
+  ];
   systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";
 
   systemd.services.disable-wifi-on-boot = mkIf (cfg.wireless.enable && cfg.wireless.disableOnBoot) {

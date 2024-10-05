@@ -6,21 +6,22 @@
   ...
 }:
 let
-  inherit (lib) mkIf mkBefore;
-
-  amdgpu_top = pkgs.amdgpu_top.overrideAttrs (oldAttrs: {
-    postInstall =
-      oldAttrs.postInstall
-      # bash
-      + ''
-        substituteInPlace $out/share/applications/amdgpu_top.desktop \
-          --replace "Name=AMDGPU TOP (GUI)" "Name=AMDGPU Top"
-      '';
-  });
+  inherit (lib) mkIf hiPrio mkBefore;
 in
 mkIf (config.${ns}.device.gpu.type == "amd") {
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
-  userPackages = [ amdgpu_top ];
+
+  userPackages = [
+    pkgs.amdgpu_top
+    (hiPrio (
+      pkgs.runCommand "amdgpu_top-desktop-rename" { } ''
+        mkdir -p $out/share/applications
+        substitute ${pkgs.amdgpu_top}/share/applications/amdgpu_top.desktop $out/share/applications/amdgpu_top.desktop \
+          --replace-fail "Name=AMDGPU TOP (GUI)" "Name=AMDGPU Top"
+      ''
+    ))
+  ];
+
   services.xserver.videoDrivers = [ "modesetting" ];
 
   # TODO: Use hardware.amdgpu option when I update my flake

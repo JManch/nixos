@@ -61,7 +61,7 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
     mkIf config.${ns}.desktop.enable {
       name = "Cava";
       genericName = "Audio Visualizer";
-      exec = "${terminal} --title Cava -e ${cava}";
+      exec = "${terminal} --title Cava --class cava -o font.size=9 -e ${cava}";
       terminal = false;
       type = "Application";
       icon = "audio-x-generic";

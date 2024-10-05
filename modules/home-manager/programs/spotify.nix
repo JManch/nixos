@@ -9,6 +9,7 @@
 let
   inherit (lib)
     mkIf
+    hiPrio
     getExe
     getExe'
     ;
@@ -37,15 +38,13 @@ let
 in
 mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
   home.packages = [
-    (pkgs.spotify.overrideAttrs (old: {
-      postInstall =
-        (old.postInstall or "")
-        # bash
-        + ''
-          substituteInPlace $out/share/applications/spotify.desktop \
-            --replace-fail Spotify "Spotify Desktop"
-        '';
-    }))
+    (hiPrio (
+      pkgs.runCommand "spotify-desktop-rename" { } ''
+        mkdir -p $out/share/applications
+        substitute ${pkgs.spotify}/share/applications/spotify.desktop $out/share/applications/spotify.desktop \
+          --replace-fail "Name=Spotify" "Name=Spotify Desktop"
+      ''
+    ))
     spotify-player
   ];
 

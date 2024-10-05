@@ -17,12 +17,12 @@ mkIf cfg.enable {
   home.packages = optional cfg.enable mint;
 
   xdg.desktopEntries.mint = {
-    name = "mint";
+    name = "Mint";
     genericName = "Mod Loader";
     exec = "${getExe mint}";
     terminal = false;
     type = "Application";
-    icon = "application-x-generic";
+    icon = "applications-games";
     categories = [ "Game" ];
   };
 

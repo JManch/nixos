@@ -7,11 +7,22 @@
   ...
 }:
 let
-  inherit (lib) mkIf optional;
+  inherit (lib) mkIf hiPrio optional;
   cfg = config.${ns}.programs.mpv;
 in
 mkIf cfg.enable {
-  home.packages = [ pkgs.yt-dlp ] ++ optional cfg.jellyfinShim.enable pkgs.jellyfin-mpv-shim;
+  home.packages = [
+    pkgs.yt-dlp
+    (hiPrio (
+      pkgs.runCommand "mpv-desktop-rename" { } ''
+        mkdir -p $out/share/applications
+        substitute ${config.programs.mpv.finalPackage}/share/applications/mpv.desktop $out/share/applications/mpv.desktop \
+          --replace-fail "Name=mpv Media Player" "Name=MPV Media Player"
+        substitute ${config.programs.mpv.finalPackage}/share/applications/umpv.desktop $out/share/applications/umpv.desktop \
+          --replace-fail "Name=umpv Media Player" "Name=UMPV Media Player"
+      ''
+    ))
+  ] ++ optional cfg.jellyfinShim.enable pkgs.jellyfin-mpv-shim;
 
   programs.mpv = {
     enable = true;

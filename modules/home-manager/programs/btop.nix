@@ -84,9 +84,9 @@ mkIf cfg.enable {
       terminal = config.${ns}.desktop.terminal.exePath;
     in
     mkIf config.${ns}.desktop.enable {
-      name = "btop";
+      name = "Btop";
       genericName = "Resource Monitor";
-      icon = "application-x-generic";
+      icon = "utilities-system-monitor";
       exec = "${terminal} --title btop -e ${btop}";
       terminal = false;
       type = "Application";

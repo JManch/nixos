@@ -13,6 +13,7 @@ let
     mkIf
     mkForce
     mapAttrs
+    hiPrio
     mapAttrs'
     getExe
     concatMapStringsSep
@@ -52,6 +53,16 @@ mkIf (cfg.enable && desktopEnabled) {
         lng = -0.1;
       };
   };
+
+  # Remove the "Toggle darkman" desktop entry
+  home.packages = [
+    (hiPrio (
+      pkgs.runCommand "darkman-desktop-disable" { } ''
+        install ${darkmanPackage}/share/applications/darkman.desktop -Dt $out/share/applications
+        echo "Hidden=1" >> $out/share/applications/darkman.desktop
+      ''
+    ))
+  ];
 
   xdg.portal.config.common = {
     "org.freedesktop.impl.portal.Settings" = [ "darkman" ];

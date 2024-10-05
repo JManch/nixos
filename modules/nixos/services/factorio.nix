@@ -1,7 +1,6 @@
 {
   ns,
   lib,
-  pkgs,
   config,
   ...
 }:
@@ -12,15 +11,6 @@ in
 mkIf cfg.enable {
   services.factorio = {
     enable = true;
-    # Until https://github.com/NixOS/nixpkgs/pull/338300
-    package = pkgs.factorio-headless.overrideAttrs {
-      version = "1.1.110";
-      src = pkgs.fetchurl {
-        name = "factorio_headless_x64-1.1.110.tar.xz";
-        url = "https://factorio.com/get-download/1.1.110/headless/linux64";
-        sha256 = "0sk4g9y051xjhiwdhj1yz808308zwsbpq3nps1ywvpp56vdycps8";
-      };
-    };
     public = false;
     saveName = "default";
     stateDirName = "factorio-server";

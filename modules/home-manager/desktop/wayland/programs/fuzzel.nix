@@ -38,7 +38,7 @@ mkIf (cfg.enable && isWayland) {
 
       colors = {
         background = "${colors.base00}ff";
-        input = "${colors.base05}ff";
+        input = "${colors.base07}ff";
         text = "${colors.base05}ff";
         match = "${colors.base05}ff";
         selection = "${colors.base00}ff";
@@ -54,9 +54,19 @@ mkIf (cfg.enable && isWayland) {
     };
   };
 
-  darkman.switchApps.fuzzel = {
-    paths = [ ".config/fuzzel/fuzzel.ini" ];
-  };
+  darkman.switchApps.fuzzel =
+    let
+      inherit (config.${ns}.colorScheme) dark light;
+    in
+    {
+      paths = [ ".config/fuzzel/fuzzel.ini" ];
+      colorOverrides = {
+        base05 = {
+          dark = dark.palette.base05;
+          light = light.palette.base04;
+        };
+      };
+    };
 
   desktop.hyprland.settings.bindr =
     let

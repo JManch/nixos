@@ -59,7 +59,7 @@ mkIf (cfg.enable && desktopEnabled) {
     (hiPrio (
       pkgs.runCommand "darkman-desktop-disable" { } ''
         install ${darkmanPackage}/share/applications/darkman.desktop -Dt $out/share/applications
-        echo "Hidden=1" >> $out/share/applications/darkman.desktop
+        echo "NoDisplay=true" >> $out/share/applications/darkman.desktop
       ''
     ))
   ];

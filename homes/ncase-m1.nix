@@ -60,7 +60,6 @@
 
     programs = {
       alacritty.enable = true;
-      foot.enable = true;
       btop.enable = true;
       cava.enable = true;
       torBrowser.enable = true;
@@ -71,7 +70,6 @@
       discord.enable = true;
       obs.enable = true;
       vscode.enable = true;
-      stremio.enable = true;
       mpv.enable = true;
       mpv.jellyfinShim.enable = true;
       chatterino.enable = true;

@@ -4,7 +4,7 @@
   pkgs,
   config,
   ...
-}@args:
+}:
 let
   inherit (lib)
     mkEnableOption
@@ -13,29 +13,8 @@ let
     mkIf
     optionals
     ;
-  inherit (lib.${ns}) scanPaths flakePkgs;
+  inherit (lib.${ns}) scanPaths;
   cfg = config.${ns}.shell;
-
-  tomato-c = pkgs.tomato-c.overrideAttrs (_: {
-    version = "2024-06-11";
-    src = pkgs.fetchFromGitHub {
-      owner = "gabrielzschmitz";
-      repo = "Tomato.C";
-      rev = "b3b85764362a7c120f3312f5b618102a4eac9f01";
-      hash = "sha256-7i+vn1dAK+bAGpBlKTnSBUpyJyRiPc7AiUF/tz+RyTI=";
-    };
-    patches = [ ];
-    postPatch = ''
-      substituteInPlace notify.c \
-        --replace-fail "/usr/local" "${placeholder "out"}"
-      substituteInPlace util.c \
-        --replace-fail "/usr/local" "${placeholder "out"}"
-      substituteInPlace tomato.desktop \
-        --replace-fail "/usr/local" "${placeholder "out"}"
-      substituteInPlace Makefile \
-        --replace-fail "sudo" ""
-    '';
-  });
 in
 {
   imports = scanPaths ./.;
@@ -67,10 +46,6 @@ in
         file
         jaq
       ])
-      ++ [
-        (flakePkgs args "yaml2nix").default
-        tomato-c
-      ]
       ++ optionals cfg.sillyTools (
         with pkgs;
         [

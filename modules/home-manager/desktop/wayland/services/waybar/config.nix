@@ -73,56 +73,12 @@ mkIf (cfg.enable && isWayland) {
     package =
       (addPatches pkgs.waybar [
         ../../../../../../patches/waybarDisableReload.patch
-        (
-          let
-            sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
-              sort (a: b: a.number < b.number) monitors
-            );
-          in
-          pkgs.writeText "waybar-bar-toggle.patch" # cpp
-            ''
-              diff --git a/src/bar.cpp b/src/bar.cpp
-              index 872632ac..ba578b1e 100644
-              --- a/src/bar.cpp
-              +++ b/src/bar.cpp
-              @@ -405,6 +405,7 @@ void waybar::Bar::onMap(GdkEventAny*) {
-               }
-               
-               void waybar::Bar::setVisible(bool value) {
-              +  if (value == visible) return;
-                 visible = value;
-                 if (auto mode = config.get("mode", {}); mode.isString()) {
-                   setMode(visible ? config["mode"].asString() : MODE_INVISIBLE);
-              diff --git a/src/main.cpp b/src/main.cpp
-              index ff446ffc..131c8fb7 100644
-              --- a/src/main.cpp
-              +++ b/src/main.cpp
-              @@ -93,8 +93,22 @@ int main(int argc, char* argv[]) {
-               
-                   for (int sig = SIGRTMIN + 1; sig <= SIGRTMAX; ++sig) {
-                     std::signal(sig, [](int sig) {
-              +        std::vector<std::string> monitors = {${sortedMonitors}};
-              +        int action = (sig - SIGRTMIN) >> 3;
-              +        int monitorNum = (sig - SIGRTMIN) & ((1 << 3) - 1);
-              +        if (monitorNum >= monitors.size() || monitorNum < 1) {
-              +          spdlog::error("Monitor with number {} does not exist", monitorNum);
-              +          return;
-              +        }
-              +        auto& monitorName = monitors[monitorNum - 1];
-                       for (auto& bar : waybar::Client::inst()->bars) {
-              -          bar->handleSignal(sig);
-              +          if (bar->output->name == monitorName) {
-              +            if (action == 2)
-              +              bar->toggle();
-              +            else
-              +              bar->setVisible(action);
-              +            break;
-              +          }
-                       }
-                     });
-                   }
-            ''
-        )
+        (pkgs.substituteAll {
+          src = ../../../../../../patches/waybarSignalToggle.patch;
+          sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
+            sort (a: b: a.number < b.number) monitors
+          );
+        })
       ]).override
         {
           cavaSupport = false;

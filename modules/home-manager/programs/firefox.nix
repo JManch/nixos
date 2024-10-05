@@ -37,6 +37,7 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
     # package to prevent launch unless sync has finished. That way I can use
     # other applications until firefox is ready.
     package = mkIf cfg.runInRam (
+      # Can't use pkgs.symlinkJoin here because home-manager wraps this package
       pkgs.firefox.overrideAttrs (old: {
         buildCommand =
           let

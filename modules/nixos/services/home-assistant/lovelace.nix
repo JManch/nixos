@@ -387,7 +387,7 @@ let
         visibility = singleton {
           condition = "state";
           entity = "person.${person}";
-          state = "not_home";
+          state = "home";
         };
       }) peopleList)
       ++ (map (data: {

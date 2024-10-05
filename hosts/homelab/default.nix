@@ -44,7 +44,7 @@ in
       mikrotik-backup.enable = true;
       index-checker.enable = true;
       fail2ban.enable = true;
-      mealie.enable = true;
+      mealie.enable = false;
       acme.enable = true;
       taskchampion-server.enable = true;
 

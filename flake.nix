@@ -86,8 +86,11 @@
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";
 
-    mint.url = "github:trumank/mint";
+    mint.url = "github:JManch/mint";
     mint.inputs.nixpkgs.follows = "nixpkgs";
+
+    broadcast-box.url = "github:JManch/broadcast-box";
+    broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
 
     yaml2nix.url = "github:euank/yaml2nix";
     yaml2nix.inputs.nixpkgs.follows = "nixpkgs";
@@ -108,8 +111,5 @@
 
     grimblast.url = "github:JManch/grimblast";
     grimblast.inputs.nixpkgs.follows = "nixpkgs";
-
-    broadcast-box.url = "github:JManch/broadcast-box";
-    broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
   };
 }

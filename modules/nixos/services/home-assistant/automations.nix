@@ -324,6 +324,14 @@ let
           state = "sms_could_not_be_sent";
         };
       }
+      {
+        condition = "not";
+        conditions = singleton {
+          condition = "state";
+          entity_id = "sensor.lewis_error";
+          state = "low_battery";
+        };
+      }
     ];
     action = singleton {
       action = "notify.adults";

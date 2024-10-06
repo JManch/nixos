@@ -11,7 +11,6 @@ let
   inherit (lib)
     mkIf
     optionals
-    optional
     getExe
     getExe'
     flatten
@@ -176,6 +175,28 @@ let
     fi
     ${hyprctl} --batch "$cmd"
   '';
+
+  modifyFocusedWindowVolume = pkgs.writeShellScript "hypr-modify-focused-window-volume" ''
+    pid=$(${hyprctl} activewindow -j | ${jaq} -r '.pid')
+    node=$(${getExe' pkgs.pipewire "pw-dump"} | ${jaq} -r \
+      "[.[] | select((.type == \"PipeWire:Interface:Node\") and (.info?.props?[\"application.process.id\"]? == "$pid"))] | sort_by(if .info?.state? == \"running\" then 0 else 1 end) | first")
+    if [ "$node" == "null" ]; then
+      ${notifySend} --urgency=critical -t 2000 \
+        'Pipewire' "Active window does not have an interface node"
+      exit 1
+    fi
+
+    id=$(echo "$node" | ${jaq} -r '.id')
+    name=$(echo "$node" | ${jaq} -r '.info.props["application.name"]')
+    media=$(echo "$node" | ${jaq} -r '.info.props["media.name"]')
+
+    wpctl set-volume "$id" "$1"
+    output=$(wpctl get-volume "$id")
+    volume=''${output#Volume: }
+    percentage="$(echo "$volume * 100" | ${bc})"
+    ${notifySend} --urgency=low -t 2000 \
+      -h 'string:x-canonical-private-synchronous:pipewire-window-volume' "''${name^} - $media" "Volume ''${percentage%.*}%"
+  '';
 in
 mkIf (isHyprland config) {
   # Force secondaryModKey VM variant because binds are repeated on host
@@ -277,7 +298,11 @@ mkIf (isHyprland config) {
             ]
           ) 10
         ))
-        ++ (optional audio.enable ", XF86AudioMute, exec, ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle");
+        ++ (optionals audio.enable [
+          ", XF86AudioMute, exec, ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle"
+          "${modShift}, XF86AudioRaiseVolume, exec, ${modifyFocusedWindowVolume} 5%+"
+          "${modShift}, XF86AudioLowerVolume, exec, ${modifyFocusedWindowVolume} 5%-"
+        ]);
 
       settings.bindm = [
         "${mod}, mouse:272, movewindow"

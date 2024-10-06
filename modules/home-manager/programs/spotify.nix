@@ -38,6 +38,7 @@ let
 in
 mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
   home.packages = [
+    pkgs.spotify
     (hiPrio (
       pkgs.runCommand "spotify-desktop-rename" { } ''
         mkdir -p $out/share/applications

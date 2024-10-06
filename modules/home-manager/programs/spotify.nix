@@ -26,14 +26,19 @@ let
     let
       jaq = getExe pkgs.jaq;
       notifySend = getExe pkgs.libnotify;
-      sleep = getExe' pkgs.coreutils "sleep";
+      pwDump = getExe' pkgs.pipewire "pw-dump";
+      bc = getExe pkgs.bc;
     in
     pkgs.writeShellScript "spotify-modify-volume" ''
-      ${spotifyPlayer} playback volume --offset -- $1
-      ${sleep} 0.2 # volume takes some time to update
-      new_volume=$(${spotifyPlayer} get key playback | ${jaq} -r '.device.volume_percent')
+      # WARN: Unfortunately getting the node ID of a specific application is
+      # tricky https://gitlab.freedesktop.org/pipewire/wireplumber/-/issues/395
+      spotify_id=$(${pwDump} | ${jaq} -r 'first(.[] | select((.type == "PipeWire:Interface:Node") and (.info?.props?["application.name"]? == "spotify"))) | .id')
+      wpctl set-volume -l 1.0 "$spotify_id" "$1"
+      output=$(wpctl get-volume "$spotify_id")
+      volume=''${output#Volume: }
+      percentage="$(echo "$volume * 100" | ${bc})"
       ${notifySend} --urgency=low -t 2000 \
-        -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${new_volume}%"
+        -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${percentage%.*}%"
     '';
 in
 mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
@@ -147,8 +152,8 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
         ", XF86AudioPrev, exec, ${playerctl} previous"
         ", XF86AudioPlay, exec, ${playerctl} play"
         ", XF86AudioPause, exec, ${playerctl} pause"
-        "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume} 5"
-        "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume} -5"
+        "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume} 5%+"
+        "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume} 5%-"
       ];
     };
 

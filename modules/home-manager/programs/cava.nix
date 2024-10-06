@@ -69,8 +69,8 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
     };
 
   desktop.hyprland.settings.windowrulev2 = [
-    "float, class:cava"
-    "size 50% 20%, class:cava"
-    "center 1, class:cava"
+    "float, class:^(cava)$"
+    "size 50% 20%, class:^(cava)$"
+    "center, class:^(cava)$"
   ];
 }

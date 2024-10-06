@@ -145,7 +145,7 @@ mkIf cfg.enable {
     windowrulev2 = [
       # Not using "name:" here does work however it causes my current workspace
       # to unexpectedly switch so it's needed
-      "workspace ${namedWorkspaceIDs.TWITCH}, class:mpv, title:^(twitch\.tv.*)$"
+      "workspace ${namedWorkspaceIDs.TWITCH}, class:^(mpv)$, title:^(twitch\.tv.*)$"
     ];
   };
 

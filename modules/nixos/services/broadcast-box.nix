@@ -32,6 +32,7 @@ in
       settings = {
         HTTP_ADDRESS = "${optionalString cfg.proxy "127.0.0.1"}:${toString cfg.port}";
         UDP_MUX_PORT = cfg.udpMuxPort;
+        DISABLE_STATUS = false;
       };
     };
 

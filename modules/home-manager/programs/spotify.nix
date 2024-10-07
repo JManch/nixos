@@ -152,6 +152,9 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
         ", XF86AudioPrev, exec, ${playerctl} previous"
         ", XF86AudioPlay, exec, ${playerctl} play"
         ", XF86AudioPause, exec, ${playerctl} pause"
+      ];
+
+      binde = [
         "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume} 5%+"
         "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume} 5%-"
       ];

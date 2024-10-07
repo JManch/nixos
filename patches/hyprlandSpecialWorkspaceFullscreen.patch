@@ -1,0 +1,38 @@
+diff --git a/src/managers/input/InputManager.cpp b/src/managers/input/InputManager.cpp
+index 03c72919..12cc1f94 100644
+--- a/src/managers/input/InputManager.cpp
++++ b/src/managers/input/InputManager.cpp
+@@ -134,14 +134,15 @@ void CInputManager::sendMotionEventsToFocused() {
+ }
+ 
+ void CInputManager::mouseMoveUnified(uint32_t time, bool refocus) {
+-    static auto PFOLLOWMOUSE      = CConfigValue<Hyprlang::INT>("input:follow_mouse");
+-    static auto PMOUSEREFOCUS     = CConfigValue<Hyprlang::INT>("input:mouse_refocus");
+-    static auto PFOLLOWONDND      = CConfigValue<Hyprlang::INT>("misc:always_follow_on_dnd");
+-    static auto PFLOATBEHAVIOR    = CConfigValue<Hyprlang::INT>("input:float_switch_override_focus");
+-    static auto PMOUSEFOCUSMON    = CConfigValue<Hyprlang::INT>("misc:mouse_move_focuses_monitor");
+-    static auto PRESIZEONBORDER   = CConfigValue<Hyprlang::INT>("general:resize_on_border");
+-    static auto PRESIZECURSORICON = CConfigValue<Hyprlang::INT>("general:hover_icon_on_border");
+-    static auto PZOOMFACTOR       = CConfigValue<Hyprlang::FLOAT>("cursor:zoom_factor");
++    static auto PFOLLOWMOUSE        = CConfigValue<Hyprlang::INT>("input:follow_mouse");
++    static auto PMOUSEREFOCUS       = CConfigValue<Hyprlang::INT>("input:mouse_refocus");
++    static auto PFOLLOWONDND        = CConfigValue<Hyprlang::INT>("misc:always_follow_on_dnd");
++    static auto PFLOATBEHAVIOR      = CConfigValue<Hyprlang::INT>("input:float_switch_override_focus");
++    static auto PMOUSEFOCUSMON      = CConfigValue<Hyprlang::INT>("misc:mouse_move_focuses_monitor");
++    static auto PRESIZEONBORDER     = CConfigValue<Hyprlang::INT>("general:resize_on_border");
++    static auto PRESIZECURSORICON   = CConfigValue<Hyprlang::INT>("general:hover_icon_on_border");
++    static auto PZOOMFACTOR         = CConfigValue<Hyprlang::FLOAT>("cursor:zoom_factor");
++    static auto PSPECIALFALLTHROUGH = CConfigValue<Hyprlang::INT>("input:special_fallthrough");
+ 
+     const auto  FOLLOWMOUSE = *PFOLLOWONDND && PROTO::data->dndActive() ? 1 : *PFOLLOWMOUSE;
+ 
+@@ -287,7 +288,8 @@ void CInputManager::mouseMoveUnified(uint32_t time, bool refocus) {
+ 
+     // then, we check if the workspace doesnt have a fullscreen window
+     const auto PWORKSPACE = PMONITOR->activeWorkspace;
+-    if (PWORKSPACE->m_bHasFullscreenWindow && !foundSurface && PWORKSPACE->m_efFullscreenMode == FSMODE_FULLSCREEN) {
++    if (PWORKSPACE->m_bHasFullscreenWindow && !foundSurface && PWORKSPACE->m_efFullscreenMode == FSMODE_FULLSCREEN &&
++        (!*PSPECIALFALLTHROUGH && !PMONITOR->activeSpecialWorkspace)) {
+         pFoundWindow = g_pCompositor->getFullscreenWindowOnWorkspace(PWORKSPACE->m_iID);
+ 
+         if (!pFoundWindow) {

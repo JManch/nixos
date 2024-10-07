@@ -76,10 +76,7 @@
       fileSystem = {
         type = "zfs";
         zfs.trim = true;
-        # Use unstable for now to avoid going all the way back to kernel 6.6
-        # https://github.com/NixOS/nixpkgs/commit/f8a1ba0e7db0dee3eec1258f31b25d004e461204
-        # Waiting on https://github.com/openzfs/zfs/pull/16472
-        zfs.unstable = true;
+        zfs.unstable = false;
         zfs.encryption.passphraseCred = "DHzAexF2RZGcSwvqCLwg/iAAAAABAAAADAAAABAAAABgFSFxxQ/0+azOxSEAAAAAgAAAAAAAAAALACMA8AAAACAAAAAAngAgfVDpsadj61Q6zefRbnRE7cvhHc1DpI7gMNKDXMKOOKIAEDlzP5LzG88yjmWHsJXE/EZ4qqjp3mzdnsYjQ82ro32k9AsMs7Tv8Uai9qgtc2vVYESqyVxLe2+mEBzyWBTxiJCDvqHUjJTHGzyA0gaDFhJViuPCCSo5T7iXgtUFZr52pC3U0fxTKkVm5Ya57cF/v7IFy1ag8NkuYBmzAE4ACAALAAAEEgAgS8Wltz3CoDBZ7R9XBd9Gs2m2N4Un83GJoQgIMu29yZIAEAAgDgR0f0bQLZDpQ9a2LAQA2PW6vjhxcdIkn88i9CEEhEVLxaW3PcKgMFntH1cF30azabY3hSfzcYmhCAgy7b3JkgAAAACUTpVoNuSuS15mZTCPiWRnI1koRkx6rlaq8HxWLtlHYbLtm55PnfMXp+Ol1NzsrEL+8gL0s1krIOe23toa4vM/pPGQvLk9qjD00alv7Tb02etK7Vl6UpeQSPRhXy+7hfjG9x++GFtz+7ZnoTNgwqpc6WNOHTmK1X6B2MrcIZQiWY2vZ4AL6NhHXVTzwFgwdd0f+7n1Jr0hLQ==";
       };
 

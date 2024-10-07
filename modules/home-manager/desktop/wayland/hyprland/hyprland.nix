@@ -43,9 +43,7 @@ let
     ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch
     ../../../../../patches/hyprlandDispatcherError.patch
     ../../../../../patches/hyprlandResizeParamsFloats.patch
-    # This is needed to fix our toggle fullscreen script when a special
-    # workspace is active
-    ../../../../../patches/hyprlandActiveWorkspace.patch
+    ../../../../../patches/hyprlandWindowRegexWhitespace.patch
   ];
 in
 mkIf (isHyprland config) {

@@ -67,9 +67,14 @@ let
   toggleFullscreen =
     pkgs.writeShellScript "hypr-toggle-fullscreen" # bash
       ''
-        active_workspace=$(${hyprctl} activeworkspace -j)
-        windows=$(echo $active_workspace | ${jaq} -r '.windows')
-        hasfullscreen=$(echo $active_workspace | ${jaq} -r '.hasfullscreen')
+        active_monitor=$(${hyprctl} monitors -j | jaq -r '.[] | select(.focused == true)')
+        id=$(echo "$active_monitor" | jaq -r '.specialWorkspace.id')
+        if [ "$id" -ge 0 ]; then
+          id=$(echo "$active_monitor" | jaq -r '.activeWorkspace.id')
+        fi
+        workspace=$(${hyprctl} workspaces -j | jaq -r ".[] | select(.id == $id)")
+        windows=$(echo $workspace | ${jaq} -r '.windows')
+        hasfullscreen=$(echo $workspace | ${jaq} -r '.hasfullscreen')
         if [[ $windows == 1 && $hasfullscreen == "false" ]]; then
           floating=$(${hyprctl} activewindow -j | ${jaq} -r '.floating')
           if [ $floating = "false" ]; then exit 0; fi

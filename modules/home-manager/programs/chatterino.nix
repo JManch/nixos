@@ -118,11 +118,11 @@ mkIf cfg.enable {
             # Check if a special workspace is focused and, if so, close it
             # (ideally hyprland would close the special workspace if the
             # workspace that has been switched to is behind it)
-            activeworkspace=$(hyprctl activeworkspace -j)
-            id=$(echo "$activeworkspace" | jaq -r '.id')
+            specialworkspace=$(hyprctl monitors -j | jaq -r '.[] | select(.focused == true) | .specialWorkspace')
+            id=$(echo "$specialworkspace" | jaq -r '.id')
             if [ "$id" -lt 0 ]; then
-              name=$(echo "$activeworkspace" | jaq -r '.name')
-              hyprctl dispatch togglespecialworkspace "$name"
+              name=$(echo "$specialworkspace" | jaq -r '.name')
+              hyprctl dispatch togglespecialworkspace "''${name#special:}"
             fi
 
             # We can't use the [workspace id silent] exec dispatcher here

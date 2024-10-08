@@ -1,6 +1,7 @@
 {
   ns,
   lib,
+  pkgs,
   config,
   inputs,
   ...
@@ -12,6 +13,7 @@ let
     optional
     genAttrs
     optionalString
+    getExe'
     ;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy;
@@ -37,6 +39,14 @@ in
     };
 
     systemd.services.broadcast-box.wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
+
+    # Playback for remote clients sometimes breaks until service is restarted
+    systemd.services.broadcast-box-restart = {
+      description = "Broadcast Box Restarter";
+      serviceConfig.Type = "oneshot";
+      serviceConfig.ExecStart = "${getExe' pkgs.systemd "systemctl"} restart broadcast-box";
+      startAt = "*-*-* 07:00:00";
+    };
 
     networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
       allowedTCPPorts = optional (!cfg.proxy) cfg.port;

@@ -297,6 +297,9 @@ mkIf (isHyprland config) {
           "special:social, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
         ];
 
+      # https://github.com/hyprwm/Hyprland/issues/6543
+      windowrulev2 = [ "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0" ];
+
       plugin = {
         hyprexpo = {
           columns = 3;

@@ -43,7 +43,6 @@ let
     ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch
     ../../../../../patches/hyprlandDispatcherError.patch
     ../../../../../patches/hyprlandResizeParamsFloats.patch
-    ../../../../../patches/hyprlandWindowRegexWhitespace.patch
     # Potential fix for https://github.com/hyprwm/Hyprland/issues/6820
     ../../../../../patches/hyprlandSpecialWorkspaceFullscreen.patch
   ];

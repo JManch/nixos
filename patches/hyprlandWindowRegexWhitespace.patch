@@ -1,0 +1,81 @@
+diff --git a/src/Compositor.cpp b/src/Compositor.cpp
+index f00e1e34..c92c5ef5 100644
+--- a/src/Compositor.cpp
++++ b/src/Compositor.cpp
+@@ -2446,36 +2446,20 @@ void CCompositor::scheduleFrameForMonitor(CMonitor* pMonitor, IOutput::scheduleF
+ }
+ 
+ PHLWINDOW CCompositor::getWindowByRegex(const std::string& regexp) {
+-    if (regexp.starts_with("active"))
+-        return m_pLastWindow.lock();
+-
+-    eFocusWindowMode mode = MODE_CLASS_REGEX;
++    // Trim leading whitespace
++    auto tRegexp = regexp;
++    auto pos     = tRegexp.find_first_not_of(" \t\n\r");
++    if (pos != std::string::npos)
++        tRegexp.erase(0, pos);
+ 
+-    std::regex       regexCheck(regexp);
+-    std::string      matchCheck;
+-    if (regexp.starts_with("class:")) {
+-        regexCheck = std::regex(regexp.substr(6));
+-    } else if (regexp.starts_with("initialclass:")) {
+-        mode       = MODE_INITIAL_CLASS_REGEX;
+-        regexCheck = std::regex(regexp.substr(13));
+-    } else if (regexp.starts_with("title:")) {
+-        mode       = MODE_TITLE_REGEX;
+-        regexCheck = std::regex(regexp.substr(6));
+-    } else if (regexp.starts_with("initialtitle:")) {
+-        mode       = MODE_INITIAL_TITLE_REGEX;
+-        regexCheck = std::regex(regexp.substr(13));
+-    } else if (regexp.starts_with("address:")) {
+-        mode       = MODE_ADDRESS;
+-        matchCheck = regexp.substr(8);
+-    } else if (regexp.starts_with("pid:")) {
+-        mode       = MODE_PID;
+-        matchCheck = regexp.substr(4);
+-    } else if (regexp.starts_with("floating") || regexp.starts_with("tiled")) {
++    if (tRegexp.starts_with("active")) {
++        return m_pLastWindow.lock();
++    } else if (tRegexp.starts_with("floating") || tRegexp.starts_with("tiled")) {
+         // first floating on the current ws
+         if (!valid(m_pLastWindow))
+             return nullptr;
+ 
+-        const bool FLOAT = regexp.starts_with("floating");
++        const bool FLOAT = tRegexp.starts_with("floating");
+ 
+         for (auto const& w : m_vWindows) {
+             if (!w->m_bIsMapped || w->m_bIsFloating != FLOAT || w->m_pWorkspace != m_pLastWindow->m_pWorkspace || w->isHidden())
+@@ -2487,6 +2471,30 @@ PHLWINDOW CCompositor::getWindowByRegex(const std::string& regexp) {
+         return nullptr;
+     }
+ 
++    eFocusWindowMode mode = MODE_CLASS_REGEX;
++
++    std::regex       regexCheck(regexp);
++    std::string      matchCheck;
++
++    if (tRegexp.starts_with("class:")) {
++        regexCheck = std::regex(tRegexp.substr(6));
++    } else if (tRegexp.starts_with("initialclass:")) {
++        mode       = MODE_INITIAL_CLASS_REGEX;
++        regexCheck = std::regex(tRegexp.substr(13));
++    } else if (tRegexp.starts_with("title:")) {
++        mode       = MODE_TITLE_REGEX;
++        regexCheck = std::regex(tRegexp.substr(6));
++    } else if (tRegexp.starts_with("initialtitle:")) {
++        mode       = MODE_INITIAL_TITLE_REGEX;
++        regexCheck = std::regex(tRegexp.substr(13));
++    } else if (tRegexp.starts_with("address:")) {
++        mode       = MODE_ADDRESS;
++        matchCheck = tRegexp.substr(8);
++    } else if (tRegexp.starts_with("pid:")) {
++        mode       = MODE_PID;
++        matchCheck = tRegexp.substr(4);
++    }
++
+     for (auto const& w : g_pCompositor->m_vWindows) {
+         if (!w->m_bIsMapped || (w->isHidden() && !g_pLayoutManager->getCurrentLayout()->isWindowReachable(w)))
+             continue;

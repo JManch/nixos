@@ -96,16 +96,16 @@ mkIf cfg.enable {
                 dispatch setfloating address:0x$window_address; \
                 dispatch movewindowpixel exact ${
                   toString (100 - chatterinoPercentage)
-                }% 0%,address:0x$window_address; \
-                dispatch resizewindowpixel exact ${toString chatterinoPercentage}% 100%,address:0x$window_address; \
+                }% 0%, address:0x$window_address; \
+                dispatch resizewindowpixel exact ${toString chatterinoPercentage}% 100%, address:0x$window_address; \
               "
             elif [[ "$window_class" == "mpv" || "$window_class" == "firefox" ]]; then
               hyprctl --batch "\
                 dispatch setfloating address:0x$window_address; \
-                dispatch movewindowpixel exact 0% 0%,address:0x$window_address; \
+                dispatch movewindowpixel exact 0% 0%, address:0x$window_address; \
                 dispatch resizewindowpixel exact ${
                   toString (100 - chatterinoPercentage)
-                }% 100%,address:0x$window_address; \
+                }% 100%, address:0x$window_address; \
               "
             fi
           fi

@@ -155,7 +155,7 @@ let
                     width = self.brTile.posX - self.tlTile.posX + self.brTile.width
 
                 instance.dispatch(
-                    ["movetoworkspacesilent", f"${namedWorkspaceIDs.F1},address:{self.window.address}"]
+                    ["movetoworkspacesilent", f"${namedWorkspaceIDs.F1}, address:{self.window.address}"]
                 )
                 instance.dispatch(
                     [
@@ -167,7 +167,7 @@ let
                 instance.dispatch(
                     [
                         "resizewindowpixel",
-                        f"exact {width} {height},address:{self.window.address}",
+                        f"exact {width} {height}, address:{self.window.address}",
                     ]
                 )
 

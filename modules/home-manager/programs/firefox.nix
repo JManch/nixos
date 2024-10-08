@@ -364,7 +364,7 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
     if [[ $2 == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
       hyprctl --batch "\
         dispatch setfloating address:0x$1; \
-        dispatch resizewindowpixel exact 20% 50%,address:0x$1; \
+        dispatch resizewindowpixel exact 20% 50%, address:0x$1; \
         dispatch centerwindow; \
       "
     fi

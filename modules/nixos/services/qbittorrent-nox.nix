@@ -22,8 +22,8 @@ let
 in
 mkIf cfg.enable {
   assertions = asserts [
-    wgnord.enable
-    "qBittorrent nox requires wgnord to be enabled"
+    wgnord.confinement.enable
+    "qBittorrent nox requires wgnord confinement to be enabled"
     caddy.enable
     "qBittorrent nox requires Caddy to be enabled"
   ];
@@ -38,16 +38,17 @@ mkIf cfg.enable {
 
   systemd.services.qbittorrent-nox = {
     description = "qBittorrent-nox";
-    after = [
-      "network-online.target"
-      "wgnord.service"
-    ];
+    after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
-    requires = [ "wgnord.service" ];
 
     environment = {
       QBT_PROFILE = "/var/lib/qbittorrent-nox";
       QBT_WEBUI_PORT = toString cfg.port;
+    };
+
+    vpnConfinement = {
+      enable = true;
+      vpnNamespace = "wgnord";
     };
 
     serviceConfig = hardeningBaseline config {
@@ -96,8 +97,13 @@ mkIf cfg.enable {
 
   services.caddy.virtualHosts."torrents.${fqDomain}".extraConfig = ''
     ${allowAddresses trustedAddresses}
-    reverse_proxy http://127.0.0.1:${toString cfg.port}
+    reverse_proxy http://${config.vpnNamespaces.wgnord.namespaceAddress}:${toString cfg.port}
   '';
+
+  vpnNamespaces.wgnord.portMappings = singleton {
+    from = cfg.port;
+    to = cfg.port;
+  };
 
   backups.qbittorrent-nox =
     let

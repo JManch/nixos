@@ -51,6 +51,9 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
 
+    vpn-confinement.url = "github:Maroka-chan/VPN-Confinement";
+    vpn-confinement.inputs.nixpkgs.follows = "nixpkgs";
+
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
     raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
     raspberry-pi-nix.inputs.rpi-firmware-nonfree-src.follows = "rpi-firmware-nonfree-src";

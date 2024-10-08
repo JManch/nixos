@@ -47,6 +47,7 @@ in
       mealie.enable = false;
       acme.enable = true;
       taskchampion-server.enable = true;
+      wgnord.confinement.enable = true;
 
       calibre = {
         enable = true;
@@ -132,12 +133,6 @@ in
       scrutiny = {
         server.enable = true;
         collector.enable = true;
-      };
-
-      wgnord = {
-        enable = true;
-        setDNS = false;
-        splitTunnel = true;
       };
 
       nfs.server = {

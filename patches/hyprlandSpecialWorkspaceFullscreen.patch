@@ -1,5 +1,5 @@
 diff --git a/src/managers/input/InputManager.cpp b/src/managers/input/InputManager.cpp
-index 03c72919..12cc1f94 100644
+index 03c72919..0c1a732c 100644
 --- a/src/managers/input/InputManager.cpp
 +++ b/src/managers/input/InputManager.cpp
 @@ -134,14 +134,15 @@ void CInputManager::sendMotionEventsToFocused() {
@@ -36,3 +36,14 @@ index 03c72919..12cc1f94 100644
          pFoundWindow = g_pCompositor->getFullscreenWindowOnWorkspace(PWORKSPACE->m_iID);
  
          if (!pFoundWindow) {
+@@ -298,9 +300,7 @@ void CInputManager::mouseMoveUnified(uint32_t time, bool refocus) {
+ 
+         const auto PWINDOWIDEAL = g_pCompositor->vectorToWindowUnified(mouseCoords, RESERVED_EXTENTS | INPUT_EXTENTS | ALLOW_FLOATING);
+ 
+-        if (PWINDOWIDEAL &&
+-            ((PWINDOWIDEAL->m_bIsFloating && PWINDOWIDEAL->m_bCreatedOverFullscreen) /* floating over fullscreen */
+-             || (PMONITOR->activeSpecialWorkspace == PWINDOWIDEAL->m_pWorkspace) /* on an open special workspace */))
++        if (PWINDOWIDEAL && PWINDOWIDEAL->m_bIsFloating && PWINDOWIDEAL->m_bCreatedOverFullscreen)
+             pFoundWindow = PWINDOWIDEAL;
+ 
+         if (!pFoundWindow->m_bIsX11) {

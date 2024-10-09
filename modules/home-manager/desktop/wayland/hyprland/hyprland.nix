@@ -275,7 +275,6 @@ mkIf (isHyprland config) {
       debug = {
         disable_logs = !cfg.logging;
         enable_stdout_logs = false;
-        error_position = 1;
       };
 
       workspace =

@@ -989,6 +989,16 @@ in
         '';
       };
     };
+
+    slskd = {
+      enable = mkEnableOption "Soulseek file sharing";
+
+      port = mkOption {
+        type = types.port;
+        default = 5030;
+        description = "Port for the slskd web interface to listen on";
+      };
+    };
   };
 
   config = {

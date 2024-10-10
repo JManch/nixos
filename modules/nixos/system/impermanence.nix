@@ -40,7 +40,7 @@ let
       ];
     in
     pkgs.writeShellScriptBin "ephemeral" ''
-      sudo ${fd} --one-file-system --strip-cwd-prefix --base-directory / --type file --type symlink \
+      sudo ${fd} --one-file-system --strip-cwd-prefix --base-directory / --type file \
         --hidden --exclude "{${concatStringsSep "," excludePaths}}" "''${@:1}"
     '';
 

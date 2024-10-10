@@ -3,10 +3,18 @@
   lib,
   pkgs,
   config,
+  username,
   ...
 }:
 let
-  inherit (lib) mkIf hiPrio mkBefore;
+  inherit (lib)
+    mkIf
+    hiPrio
+    mkBefore
+    optional
+    ;
+  davinciResolve =
+    config.home-manager.users.${username}.${ns}.programs.davinci-resolve.enable or false;
 in
 mkIf (config.${ns}.device.gpu.type == "amd") {
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
@@ -33,10 +41,14 @@ mkIf (config.${ns}.device.gpu.type == "amd") {
   # open source driver provided by AMD whilst RADV is made by Valve. Depending
   # on the application, one may perform better than the other so it's useful to
   # have both installed and toggle between them. RADV is installed as part of
-  # the Mesa driver package which is installed when hardware.opengl.driSupport is
-  # enabled. AMDVLK is installed through the extraPackages option. There is also
-  # the kernel module driver component which is amdgpu.
-  hardware.graphics.enable = true;
+  # the Mesa driver package which is installed by default when
+  # hardware.graphics is enabled. AMDVLK can be installed through the
+  # extraPackages option. There is also the kernel module driver component
+  # which is amdgpu.
+  hardware.graphics = {
+    enable = true;
+    extraPackages = optional davinciResolve pkgs.rocmPackages.clr.icd;
+  };
 
   persistenceHome = {
     directories = [

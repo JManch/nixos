@@ -199,6 +199,12 @@ in
         '';
       };
     };
+
+    vpnNamespace = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = "The default confinement VPN namespace to use";
+    };
   };
 
   config =
@@ -207,11 +213,12 @@ in
         sort
         zipListsWith
         init
+        mapAttrsToList
         tail
         head
         all
         ;
-      inherit (config.${ns}.device) monitors;
+      inherit (config.${ns}.device) monitors vpnNamespace;
     in
     {
       assertions = lib.${ns}.asserts [
@@ -223,6 +230,13 @@ in
           (monitors == [ ]) || ((all (a: a == 1) diff) && ((head sorted) == 1))
         )
         "Monitor numbers must be sequential and start from 1"
+        (
+          (vpnNamespace == null)
+          -> (all (x: x == false) (mapAttrsToList (_: v: v.vpnConfinement.enable) config.systemd.services))
+        )
+        "Services on this host have VPN confinement enabled but no VPN namespace is set"
+        ((vpnNamespace != null) -> (config.vpnNamespaces.${vpnNamespace}.enable or false))
+        "The VPN namespace '${vpnNamespace}' is not enabled or does not exist"
       ];
     };
 }

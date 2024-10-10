@@ -14,16 +14,15 @@ let
     singleton
     ;
   inherit (lib.${ns}) asserts hardeningBaseline;
-  inherit (config.${ns}.services) wgnord caddy nfs;
+  inherit (config.${ns}.services) caddy nfs;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (caddy) allowAddresses trustedAddresses;
+  inherit (config.${ns}.device) vpnNamespace;
   cfg = config.${ns}.services.qbittorrent-nox;
   qbittorrent-nox = pkgs.qbittorrent.override { guiSupport = false; };
 in
 mkIf cfg.enable {
   assertions = asserts [
-    wgnord.confinement.enable
-    "qBittorrent nox requires wgnord confinement to be enabled"
     caddy.enable
     "qBittorrent nox requires Caddy to be enabled"
   ];
@@ -47,8 +46,8 @@ mkIf cfg.enable {
     };
 
     vpnConfinement = {
+      inherit vpnNamespace;
       enable = true;
-      vpnNamespace = "wgnord";
     };
 
     serviceConfig = hardeningBaseline config {
@@ -97,10 +96,10 @@ mkIf cfg.enable {
 
   services.caddy.virtualHosts."torrents.${fqDomain}".extraConfig = ''
     ${allowAddresses trustedAddresses}
-    reverse_proxy http://${config.vpnNamespaces.wgnord.namespaceAddress}:${toString cfg.port}
+    reverse_proxy http://${config.vpnNamespaces.${vpnNamespace}.namespaceAddress}:${toString cfg.port}
   '';
 
-  vpnNamespaces.wgnord.portMappings = singleton {
+  vpnNamespaces.${vpnNamespace}.portMappings = singleton {
     from = cfg.port;
     to = cfg.port;
   };

@@ -3,15 +3,14 @@
   lib,
   pkgs,
   config,
-  selfPkgs,
   ...
 }:
 let
   cfg = config.${ns}.programs.winbox;
 in
 lib.mkIf cfg.enable {
-  # New v4 native linux version
-  userPackages = [ selfPkgs.winbox ];
+  # New native linux version
+  userPackages = [ pkgs.winbox4 ];
 
   # NOTE: If Winbox stops working, deleting the ~/.local/share/winbox/wine
   # directory tends to fix it

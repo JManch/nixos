@@ -121,31 +121,6 @@ mkIf cfg.enableInternal {
             state_class = "total";
           }
           {
-            name = "Joshua Dehumidifier Tank Status";
-            icon = "mdi:water";
-            state = ''
-              {% if is_state('switch.joshua_dehumidifier', 'off') %}
-                Unknown
-              {% elif is_state('switch.joshua_dehumidifier', 'on') and states('sensor.joshua_dehumidifier_power') | float == 0 %}
-                Full
-              {% else %}
-                Ok
-              {% endif %}
-            '';
-          }
-          {
-            name = "Joshua Critical Temperature";
-            icon = "mdi:thermometer-alert";
-            state = "{{ state_attr('sensor.joshua_mold_indicator', 'estimated_critical_temp') }}";
-            unit_of_measurement = "°C";
-          }
-          {
-            name = "Joshua Dew Point";
-            icon = "mdi:thermometer-water";
-            state = "{{ state_attr('sensor.joshua_mold_indicator', 'dewpoint') }}";
-            unit_of_measurement = "°C";
-          }
-          {
             name = "Days To Bin Collection";
             icon = "mdi:calendar";
             state = "{{ state_attr('sensor.next_bin_collection', 'daysTo') }}";
@@ -240,14 +215,6 @@ mkIf cfg.enableInternal {
     ];
 
     sensor = [
-      {
-        name = "Joshua Mold Indicator";
-        platform = "mold_indicator";
-        indoor_temp_sensor = "sensor.joshua_sensor_temperature";
-        indoor_humidity_sensor = "sensor.joshua_sensor_humidity";
-        outdoor_temp_sensor = "sensor.outdoor_sensor_temperature";
-        calibration_factor = 1.754;
-      }
       {
         name = "Smoothed Solar Power";
         platform = "filter";

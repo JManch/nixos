@@ -153,51 +153,6 @@ let
         false
       ];
 
-  joshuaDehumidifierTankFull = singleton {
-    alias = "Joshua Dehumidifier Full Notify";
-    mode = "single";
-    trigger = singleton {
-      platform = "state";
-      entity_id = "sensor.joshua_dehumidifier_tank_status";
-      to = "Full";
-      for.minutes = 1;
-    };
-    action = singleton {
-      action = "notify.mobile_app_${devices.joshua.name}";
-      data = {
-        title = "Dehumidifier";
-        message = "Tank full";
-      };
-    };
-  };
-
-  joshuaDehumidifierToggle =
-    map
-      (enable: {
-        alias = "Joshua Dehumidifier ${if enable then "Enable" else "Disable"}";
-        mode = "single";
-        trigger = singleton {
-          platform = "numeric_state";
-          entity_id = [ "sensor.joshua_mold_indicator" ];
-          above = mkIf enable 85;
-          below = mkIf (!enable) 80;
-          for.minutes = if enable then 0 else 30;
-        };
-        condition = singleton {
-          condition = "state";
-          entity_id = "input_boolean.joshua_dehumidifier_automatic_control";
-          state = "on";
-        };
-        action = singleton {
-          action = "switch.turn_${if enable then "on" else "off"}";
-          target.entity_id = "switch.joshua_dehumidifier";
-        };
-      })
-      [
-        true
-        false
-      ];
-
   binCollectionNotify = singleton {
     alias = "Bin Collection Notify";
     mode = "single";
@@ -263,6 +218,7 @@ let
             data = {
               channel = "Formula 1";
               importance = "high";
+              priority = "high";
               ttl = 0;
             };
           };
@@ -351,12 +307,10 @@ let
   hueTapLightSwitch =
     room: deviceId:
     let
-      smartLightingCfg = config.${ns}.services.hass.smartLightingRooms.${room};
-      roomId = smartLightingCfg.roomId or room;
-      hasAdaptiveLighting = smartLightingCfg.adaptiveLighting.enable or false;
+      inherit (cfg.rooms.${room}.lighting) adaptiveLighting;
     in
     singleton {
-      alias = "${formattedRoomName roomId} Hue Tap Light Switch";
+      alias = "${formattedRoomName room} Hue Tap Light Switch";
       mode = "single";
       trigger = map (button: {
         platform = "device";
@@ -383,13 +337,13 @@ let
             [
               (singleton {
                 action = "light.toggle";
-                target.entity_id = "light.${roomId}_lights";
+                target.entity_id = "light.${room}_lights";
               })
               (singleton (
-                if hasAdaptiveLighting then
+                if adaptiveLighting.enable then
                   {
                     action = "switch.toggle";
-                    target.entity_id = "switch.adaptive_lighting_${roomId}";
+                    target.entity_id = "switch.adaptive_lighting_${room}";
                   }
                 else
                   {
@@ -399,10 +353,10 @@ let
                   }
               ))
               (singleton (
-                if hasAdaptiveLighting then
+                if adaptiveLighting.enable then
                   {
                     action = "switch.toggle";
-                    target.entity_id = "switch.adaptive_lighting_sleep_mode_${roomId}";
+                    target.entity_id = "switch.adaptive_lighting_sleep_mode_${room}";
                   }
                 else
                   {
@@ -412,13 +366,13 @@ let
                   }
               ))
               (
-                optional hasAdaptiveLighting {
+                optional adaptiveLighting.enable {
                   action = "switch.turn_off";
-                  target.entity_id = "switch.adaptive_lighting_${roomId}";
+                  target.entity_id = "switch.adaptive_lighting_${room}";
                 }
                 ++ singleton {
                   action = "light.turn_on";
-                  target.entity_id = "light.${roomId}_lights";
+                  target.entity_id = "light.${room}_lights";
                   data.brightness_pct = 100;
                   data.kelvin = 6500;
                 }
@@ -503,8 +457,6 @@ mkIf cfg.enableInternal {
   services.home-assistant.config = {
     automation =
       heatingTimeToggle
-      ++ joshuaDehumidifierToggle
-      ++ joshuaDehumidifierTankFull
       ++ binCollectionNotify
       ++ washingMachineNotify
       ++ formula1Notify
@@ -513,8 +465,8 @@ mkIf cfg.enableInternal {
       ++ (hueLightSwitch "study" "49d9c39a26397a8a228ee484114aca0b")
       # TODO: Need a new battery and a firmware update I think because the action names are different
       # ++ (hueLightSwitch "joshua_room" "ad126eeb4153cd333afe86a9553c06ef")
-      ++ (hueTapLightSwitch "${people.person2}Room" "670ac1ecf423f069757c7ab30bec3142")
-      ++ (hueTapLightSwitch "${people.person3}Room" "0097121e144203512aeacef37a03650c")
+      ++ (hueTapLightSwitch "${people.person2}_room" "670ac1ecf423f069757c7ab30bec3142")
+      ++ (hueTapLightSwitch "${people.person3}_room" "0097121e144203512aeacef37a03650c")
       ++ mowerErrorNotify
       ++ shelliesStatusUpdate
       ++ optionals frigate.enable (frigateEntranceNotify ++ frigateCatNotify ++ frigateHighAlertNotify);
@@ -535,11 +487,6 @@ mkIf cfg.enableInternal {
       heating_enabled = {
         name = "Heating Enabled";
         icon = "mdi:heating-coil";
-      };
-
-      joshua_dehumidifier_automatic_control = {
-        name = "Joshua Dehumidifier Automatic Control";
-        icon = "mdi:air-humidifier";
       };
 
       high_alert_surveillance = {

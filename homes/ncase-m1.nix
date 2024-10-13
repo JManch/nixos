@@ -26,6 +26,7 @@
         # Causes artifacting https://github.com/hyprwm/Hyprland/issues/6994
         directScanout = false;
         logging = false;
+        hyprcursor.package = null;
       };
 
       terminal = {

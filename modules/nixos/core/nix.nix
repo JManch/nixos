@@ -153,6 +153,7 @@ let
             "agenix"
             "lanzaboote"
             "disko"
+            "vpn-confinement"
             "raspberry-pi-nix"
             "rpi-firmware-nonfree-src"
           )

@@ -38,7 +38,7 @@ mkIf (cfg.enable && isWayland) {
         color = "0xff${colors.base07}";
         font_size = 120;
         font_family = desktop.style.font.family;
-        position = "0, 150";
+        position = "0, 100";
         halign = "center";
         valign = "center";
       };
@@ -55,7 +55,7 @@ mkIf (cfg.enable && isWayland) {
         font_color = "0xff${colors.base07}";
         placeholder_text = "<i><span foreground=\"##${colors.base07}99\">Password...</span></i>";
         hide_input = false;
-        position = "0, -150";
+        position = "0, -100";
         halign = "center";
         valign = "center";
       };

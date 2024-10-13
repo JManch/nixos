@@ -18,7 +18,6 @@ let
   inherit (config.${ns}.system.networking) wiredInterface defaultGateway resolved;
   cfg = config.${ns}.services.wgnord;
   ip = getExe' pkgs.iproute "ip";
-  wg-quick = getExe' pkgs.wireguard-tools "wg-quick";
   wgnord = pkgs.wgnord.overrideAttrs (old: {
     src = old.src.overrideAttrs {
       patches = (old.patches or [ ]) ++ [
@@ -77,32 +76,17 @@ in
         "Wg-quick Nord VPN requires systemd resolved to be enabled"
       ];
 
-      systemd.services.wg-quick-wgnord = {
-        unitConfig = {
-          Description = "Nord WireGuard Quick VPN";
-          After = [ "network-online.target" ];
-          Wants = [ "network-online.target" ];
-          StartLimitBurst = 3;
-          StartLimitIntervalSec = 30;
-        };
-
-        serviceConfig = {
-          Type = "oneshot";
-
-          ExecStartPre = generateConfig;
-          ExecStart = "${wg-quick} up wgnord";
-          ExecStop = "${wg-quick} down wgnord";
-          RemainAfterExit = "yes";
-
-          Restart = "on-failure";
-          RestartSec = 10;
-        };
+      networking.wg-quick.interfaces.wgnord = {
+        autostart = false;
+        configFile = "/etc/wireguard/wgnord.conf";
       };
+
+      systemd.services.wg-quick-wgnord.preStart = generateConfig.outPath;
 
       programs.zsh = {
         shellAliases = {
-          vpn-up = "sudo systemctl start wg-quick-wgnord";
-          vpn-down = "sudo systemctl stop wg-quick-wgnord";
+          wgnord-up = "sudo systemctl start wg-quick-wgnord";
+          wgnord-down = "sudo systemctl stop wg-quick-wgnord";
         };
       };
     })

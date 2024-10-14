@@ -30,15 +30,6 @@ in
             bedWarmer = {
               enable = mkEnableOption "smart bed warmer integration";
 
-              thresholdTemp = mkOption {
-                type = types.float;
-                default = 19.0;
-                description = ''
-                  Bed warmer will enable before sleep time if room temperature is
-                  below this value
-                '';
-              };
-
               switchId = mkOption {
                 type = types.str;
                 example = "joshua_bed_warmer";
@@ -54,14 +45,23 @@ in
             cards = [
               {
                 type = "tile";
-                name = "Running";
-                entity = "switch.${switchId}";
-                icon = "mdi:bed-empty";
+                name = "Automatic Control";
+                entity = "input_boolean.${name}_bed_warmer_automatic_control";
                 color = "red";
               }
               {
                 type = "tile";
-                name = "Run time";
+                name = "Running";
+                entity = "switch.${switchId}";
+              }
+              {
+                type = "tile";
+                name = "Enable Temperature";
+                entity = "input_number.${name}_bed_warmer_enable_temperature";
+              }
+              {
+                type = "tile";
+                name = "Run Time";
                 entity = "input_number.${name}_bed_warmer_run_time";
                 icon = "mdi:timer";
               }
@@ -77,17 +77,34 @@ in
       room: roomCfg:
       let
         inherit (roomCfg) formattedRoomName sleepTracking sensors;
-        inherit (roomCfg.bedWarmer) switchId thresholdTemp;
+        inherit (roomCfg.bedWarmer) switchId;
       in
       mkIf roomCfg.bedWarmer.enable {
-        input_number."${room}_bed_warmer_run_time" = {
-          name = "${formattedRoomName} Bed Warmer Run Time";
-          mode = "box";
-          min = 1;
-          max = 240;
-          initial = 20;
-          unit_of_measurement = "min";
-          icon = "mdi:timer";
+        input_number = {
+          "${room}_bed_warmer_run_time" = {
+            name = "${formattedRoomName} Bed Warmer Run Time";
+            mode = "box";
+            min = 1;
+            max = 240;
+            initial = 20;
+            unit_of_measurement = "min";
+            icon = "mdi:timer";
+          };
+
+          "${room}_bed_warmer_enable_temperature" = {
+            name = "${formattedRoomName} Bed Warmer Enable Temperature";
+            mode = "box";
+            min = 18;
+            max = 22;
+            initial = 20;
+            unit_of_measurement = "°C";
+            icon = "mdi:thermometer";
+          };
+        };
+
+        input_boolean."${room}_bed_warmer_automatic_control" = {
+          name = "${formattedRoomName} Bed Warmer Automatic Control";
+          icon = "mdi:bed-empty";
         };
 
         automation =
@@ -112,9 +129,8 @@ in
               value_template = "{{ (now().timestamp() + states('input_number.${room}_bed_warmer_run_time') | float * 60) | round(0) == ${sleepTracking.wakeUpTimestamp} }}";
             };
             conditions = singleton {
-              condition = "numeric_state";
-              entity_id = "sensor.${sensors.temperature}";
-              below = thresholdTemp;
+              condition = "template";
+              value_template = "{{ states('sensor.${sensors.temperature}') | float <= states('input_number.${room}_bed_warmer_enable_temperature') | float }}";
             };
             actions = singleton {
               action = "switch.turn_on";

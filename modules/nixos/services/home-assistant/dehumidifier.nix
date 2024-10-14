@@ -114,7 +114,7 @@ in
 
   config.services.home-assistant.config = mkMerge (
     mapAttrsToList (
-      roomId: roomCfg:
+      room: roomCfg:
       let
         inherit (roomCfg) formattedRoomName deviceId sensors;
         inherit (roomCfg.dehumidifier)
@@ -143,17 +143,15 @@ in
             {
               name = "${formattedRoomName} Critical Temperature";
               icon = "mdi:thermometer-alert";
-              state = "{{ state_attr('sensor.${roomId}_mold_indicator', 'estimated_critical_temp') }}";
+              state = "{{ state_attr('sensor.${room}_mold_indicator', 'estimated_critical_temp') }}";
               unit_of_measurement = "°C";
             }
           ];
         };
 
-        input_boolean = {
-          "${roomId}_dehumidifier_automatic_control" = {
-            name = "${formattedRoomName} Dehumidifier Automatic Control";
-            icon = "mdi:air-humidifier";
-          };
+        input_boolean."${room}_dehumidifier_automatic_control" = {
+          name = "${formattedRoomName} Dehumidifier Automatic Control";
+          icon = "mdi:air-humidifier";
         };
 
         sensor = singleton {
@@ -172,24 +170,24 @@ in
             triggers = [
               {
                 platform = "numeric_state";
-                entity_id = [ "sensor.${roomId}_mold_indicator" ];
+                entity_id = [ "sensor.${room}_mold_indicator" ];
                 above = thresholds.upper;
               }
               {
                 platform = "numeric_state";
-                entity_id = [ "sensor.${roomId}_mold_indicator" ];
+                entity_id = [ "sensor.${room}_mold_indicator" ];
                 below = thresholds.lower;
               }
             ];
             conditions = singleton {
               condition = "state";
-              entity_id = "input_boolean.${roomId}_dehumidifier_automatic_control";
+              entity_id = "input_boolean.${room}_dehumidifier_automatic_control";
               state = "on";
             };
             action = singleton {
               "if" = singleton {
                 condition = "numeric_state";
-                entity_id = "sensor.${roomId}_mold_indicator";
+                entity_id = "sensor.${room}_mold_indicator";
                 above = thresholds.upper;
               };
               "then" = singleton {
@@ -208,7 +206,7 @@ in
             mode = "single";
             triggers = singleton {
               platform = "state";
-              entity_id = "sensor.${roomId}_dehumidifier_tank_status";
+              entity_id = "sensor.${room}_dehumidifier_tank_status";
               to = "Full";
               for.minutes = 1;
             };

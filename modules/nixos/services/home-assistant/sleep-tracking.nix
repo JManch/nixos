@@ -23,7 +23,7 @@ in
       types.submodule (
         { name, config, ... }:
         let
-          inherit (config.sleepTracking) useAlarm;
+          inherit (config.sleepTracking) useAlarm wakeUpTimestamp sleepDuration;
           inherit (config) deviceId;
         in
         {
@@ -45,6 +45,13 @@ in
                 else
                   "as_timestamp(today_at(states('input_datetime.${name}_wake_up_time')), default = 0) | round(0)";
               description = "Wake up timestamp expression to use in templates";
+            };
+
+            sleepTimestamp = mkOption {
+              type = types.str;
+              readOnly = true;
+              default = "(${wakeUpTimestamp} - ${sleepDuration}*60*60)";
+              description = "Sleep timestamp expression to use in templates";
             };
 
             sleepDuration = mkOption {

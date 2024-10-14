@@ -340,7 +340,12 @@ in
         roomId: roomCfg:
         let
           inherit (roomCfg) formattedRoomName;
-          inherit (roomCfg.sleepTracking) useAlarm wakeUpTimestamp sleepDuration;
+          inherit (roomCfg.sleepTracking)
+            useAlarm
+            wakeUpTimestamp
+            sleepTimestamp
+            sleepDuration
+            ;
           cfg' = roomCfg.lighting;
         in
         mkIf cfg'.enable (mkMerge [
@@ -446,7 +451,7 @@ in
                             sunrise_time = "{{ ${wakeUpTimestamp} | timestamp_custom('%H:%M:%S') }}";
                             # Set sunset 1.5 hours before sleep time so that lights
                             # will reach minimum brightness at sleep time
-                            sunset_time = "{{ (${wakeUpTimestamp} - (${sleepDuration} + 1.5)*60*60) | timestamp_custom('%H:%M:%S') }}";
+                            sunset_time = "{{ (${sleepTimestamp} - 1.5*60*60) | timestamp_custom('%H:%M:%S') }}";
                           };
                         };
                       }
@@ -588,7 +593,7 @@ in
                     {
                       # 1 hour after sleep time
                       platform = "template";
-                      value_template = "{{ (now().timestamp() + (${sleepDuration} - 1)*60*60) | round(0) == ${wakeUpTimestamp} }}";
+                      value_template = "{{ (now().timestamp() - 60*60) | round(0) == ${sleepTimestamp} }}";
                     }
                     {
                       platform = "state";

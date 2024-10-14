@@ -15,8 +15,6 @@ in
   daikin-onecta = pkgs.home-assistant.python.pkgs.callPackage ./daikin-onecta.nix { };
   multiviewer-for-f1 = callPackage ./multiviewer-for-f1.nix { };
   hyprpy = pkgs.python3Packages.callPackage ./hyprpy.nix { };
-  wg-nord = callPackage ./wg-nord.nix { };
   formulaone-card = callPackage ./formulaone-card.nix { };
-  winbox = callPackage ./winbox.nix { };
 }
 // import ./installers.nix ns lib self

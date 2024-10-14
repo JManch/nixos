@@ -3,6 +3,7 @@
   lib,
   pkgs,
   config,
+  inputs,
   ...
 }:
 let
@@ -53,7 +54,7 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
 
     dconf.settings =
       let
-        inherit (lib.hm.gvariant) mkUint32 mkDouble;
+        inherit (inputs.home-manager.lib.hm.gvariant) mkUint32 mkDouble;
       in
       {
         "org/gnome/desktop/peripherals/mouse" = {

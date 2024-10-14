@@ -2,16 +2,11 @@
   description = "Joshua's NixOS Flake";
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      home-manager,
-      ...
-    }:
+    { self, nixpkgs, ... }:
     let
       ns = "JManch";
       systems = [ "x86_64-linux" ];
-      lib = nixpkgs.lib.extend (final: _: (import ./lib final ns) // home-manager.lib);
+      lib = nixpkgs.lib.extend (final: _: import ./lib final ns);
       mkHost = lib.${ns}.mkHost self;
       forEachSystem = lib.${ns}.forEachSystem self systems;
     in

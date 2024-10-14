@@ -23,6 +23,7 @@ in
       types.submodule (
         { name, config, ... }:
         let
+          inherit (config) sleepTracking;
           inherit (config.bedWarmer) switchId;
         in
         {
@@ -42,30 +43,29 @@ in
             title = "Bed Warmer";
             priority = 6;
             type = "grid";
-            cards = [
-              {
+            cards =
+              optional sleepTracking.enable {
                 type = "tile";
                 name = "Automatic Control";
                 entity = "input_boolean.${name}_bed_warmer_automatic_control";
                 color = "red";
               }
-              {
+              ++ singleton {
                 type = "tile";
                 name = "Running";
                 entity = "switch.${switchId}";
               }
-              {
+              ++ optional sleepTracking.enable {
                 type = "tile";
                 name = "Enable Temperature";
                 entity = "input_number.${name}_bed_warmer_enable_temperature";
               }
-              {
+              ++ singleton {
                 type = "tile";
                 name = "Run Time";
                 entity = "input_number.${name}_bed_warmer_run_time";
                 icon = "mdi:timer";
-              }
-            ];
+              };
           };
         }
       )
@@ -84,14 +84,14 @@ in
           "${room}_bed_warmer_run_time" = {
             name = "${formattedRoomName} Bed Warmer Run Time";
             mode = "box";
-            min = 1;
+            min = 5;
             max = 240;
             initial = 20;
             unit_of_measurement = "min";
             icon = "mdi:timer";
           };
 
-          "${room}_bed_warmer_enable_temperature" = {
+          "${room}_bed_warmer_enable_temperature" = mkIf sleepTracking.enable {
             name = "${formattedRoomName} Bed Warmer Enable Temperature";
             mode = "box";
             min = 18;
@@ -102,7 +102,7 @@ in
           };
         };
 
-        input_boolean."${room}_bed_warmer_automatic_control" = {
+        input_boolean."${room}_bed_warmer_automatic_control" = mkIf sleepTracking.enable {
           name = "${formattedRoomName} Bed Warmer Automatic Control";
           icon = "mdi:bed-empty";
         };
@@ -126,7 +126,8 @@ in
             mode = "single";
             triggers = singleton {
               platform = "template";
-              value_template = "{{ (now().timestamp() + states('input_number.${room}_bed_warmer_run_time') | float * 60) | round(0) == ${sleepTracking.wakeUpTimestamp} }}";
+              # Enable 5 mins before sleep time
+              value_template = "{{ (now().timestamp() + 5*60) | round(0) == ${sleepTracking.sleepTimestamp} }}";
             };
             conditions = singleton {
               condition = "template";

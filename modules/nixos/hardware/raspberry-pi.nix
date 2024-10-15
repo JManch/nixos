@@ -29,7 +29,7 @@ mkIf cfg.enable {
   };
 
   # Build fails without this disabled
-  boot.initrd.systemd.enableTpm2 = false;
+  boot.initrd.systemd.tpm2.enable = false;
 
   # zfs has a dependency on samba which is broken under cross compilation
   boot.supportedFilesystems.zfs = lib.mkForce false;

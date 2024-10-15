@@ -18,6 +18,8 @@ let
     optional
     mapAttrsToList
     optionalString
+    filter
+    getName
     mkForce
     singleton
     concatStringsSep
@@ -260,7 +262,20 @@ in
 
   # Nice explanation of overlays: https://archive.is/f8goR
   nixpkgs = {
-    overlays = [ ];
+    overlays = [
+      (final: prev: {
+        # Fix for the nginx vod module not compiling with ffmpeg 7
+        # https://github.com/kaltura/nginx-vod-module/issues/1541
+        # (not sure why issues says 6 is not supported, it is)
+        nginxModules = prev.nginxModules // {
+          vod = prev.nginxModules.vod // {
+            inputs = filter (x: (getName x) != "ffmpeg-headless") prev.nginxModules.vod.inputs ++ [
+              pkgs.ffmpeg_6-headless
+            ];
+          };
+        };
+      })
+    ];
     config.allowUnfree = true;
   };
 

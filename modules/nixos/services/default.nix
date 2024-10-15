@@ -874,27 +874,6 @@ in
         description = "Whether to enable BeamMP Server autostart";
       };
 
-      map = mkOption {
-        type = types.enum [
-          "gridmap_v2"
-          "johnson_valley"
-          "automation_test_track"
-          "east_coast_usa"
-          "hirochi_raceway"
-          "italy"
-          "jungle_rock_island"
-          "industrial"
-          "small_island"
-          "smallgrid"
-          "utah"
-          "west_coast_usa"
-          "driver_training"
-          "derby"
-        ];
-        default = "east_coast_usa";
-        description = "Map the server runs";
-      };
-
       port = mkOption {
         type = types.port;
         default = 30814;

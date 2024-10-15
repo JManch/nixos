@@ -33,9 +33,6 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.${ns}.services.dns-server-stack;
 
-  # Patch Ctrld to enable loading endpoints from environment variables
-  ctrld = addPatches selfPkgs.ctrld [ ../../../patches/ctrldSecretEndpoint.patch ];
-
   # Declares hostnames for all devices on my local network
   homeHosts =
     inputs.nix-resources.secrets.homeHosts
@@ -58,67 +55,114 @@ mkIf cfg.enable {
     "The DNS server stack requires the device to have a router IP address set"
   ];
 
-  services.ctrld = {
-    enable = true;
-    package = ctrld;
+  users.users.ctrld = {
+    group = "ctrld";
+    isSystemUser = true;
+  };
+  users.groups.ctrld = { };
 
-    settings = {
-      service = {
-        log_level = if cfg.debug then "trace" else "notice";
-        cache_enable = true;
-        # Disable all LAN discovery techniques apart from hosts because our
-        # hosts file is extensive and we'd rather have manual control over this
-        # than Ctrld performing network scans.
-        discover_hosts = true;
-        discover_mdns = false;
-        discover_arp = false;
-        discover_dhcp = false;
-        discover_ptr = false;
-      };
+  systemd.services.ctrld =
+    let
+      # Patch Ctrld to enable loading endpoints from environment variables
+      ctrld = addPatches selfPkgs.ctrld [ ../../../patches/ctrldSecretEndpoint.patch ];
+      configFile = (pkgs.formats.toml { }).generate "ctrld.toml" settings;
 
-      network."0" = {
-        name = "Any Network";
-        cidrs = [ "0.0.0.0/0" ];
-      };
-
-      listener."0" = {
-        ip = "127.0.0.1";
-        port = cfg.ctrldListenPort;
-      };
-
-      listener."0".policy = {
-        name = "Failover DNS";
-        networks = singleton {
-          "network.0" = [
-            "upstream.0"
-            "upstream.1"
-          ];
-        };
-      };
-
-      upstream = {
-        "0" = {
-          name = "Control D Main Profile";
-          # The actual endpoint is loaded from an environment variable
-          endpoint = "https://dns.controld.com/secret";
-          bootstrap_ip = "76.76.2.22";
-          timeout = 3000;
-          type = "doh3";
+      settings = {
+        service = {
+          log_level = if cfg.debug then "trace" else "notice";
+          cache_enable = true;
+          # Disable all LAN discovery techniques apart from hosts because our
+          # hosts file is extensive and we'd rather have manual control over this
+          # than Ctrld performing network scans.
+          discover_hosts = true;
+          discover_mdns = false;
+          discover_arp = false;
+          discover_dhcp = false;
+          discover_ptr = false;
         };
 
-        "1" = {
-          name = "Google";
-          endpoint = "https://dns.google/dns-query";
-          bootstrap_ip = "8.8.8.8";
-          type = "doh";
+        network."0" = {
+          name = "Any Network";
+          cidrs = [ "0.0.0.0/0" ];
         };
+
+        listener."0" = {
+          ip = "127.0.0.1";
+          port = cfg.ctrldListenPort;
+        };
+
+        listener."0".policy = {
+          name = "Failover DNS";
+          networks = singleton {
+            "network.0" = [
+              "upstream.0"
+              "upstream.1"
+            ];
+          };
+        };
+
+        upstream = {
+          "0" = {
+            name = "Control D Main Profile";
+            # The actual endpoint is loaded from an environment variable
+            endpoint = "https://dns.controld.com/secret";
+            bootstrap_ip = "76.76.2.22";
+            timeout = 3000;
+            type = "doh3";
+          };
+
+          "1" = {
+            name = "Google";
+            endpoint = "https://dns.google/dns-query";
+            bootstrap_ip = "8.8.8.8";
+            type = "doh";
+          };
+        };
+
       };
+    in
+    {
+      unitConfig = {
+        Description = "Multiclient DNS forwarding proxy";
+        Before = [ "nss-lookup.target" ];
+        After = [ "network-online.target" ];
+        Wants = [
+          "network-online.target"
+          "nss-lookup.target"
+        ];
+        StartLimitIntervalSec = 5;
+        StartLimitBurst = 10;
+      };
+
+      serviceConfig = hardeningBaseline config {
+        ExecStart = "${getExe ctrld} run --config ${configFile}";
+        Restart = "always";
+        RestartSec = 10;
+        EnvironmentFile = config.age.secrets.ctrldEndpoint.path;
+
+        # WARN: Running as a custom user breaks the ctrld 'controlServer'
+        # because ctrld tries to write a socket file to /var/run. The
+        # 'controlServer' provides the ctrld start, stop, reload etc...
+        # commands. Since we are running ctrld in a systemd service we don't
+        # need these anyway and would prefer the extra security.
+        User = "ctrld";
+        Group = "ctrld";
+
+        RestrictAddressFamilies = [
+          "AF_UNIX"
+          "AF_INET"
+          "AF_INET6"
+          "AF_NETLINK"
+        ];
+
+        SystemCallFilter = [
+          "@system-service"
+          "~@privileged"
+        ];
+      };
+
+      wantedBy = [ "multi-user.target" ];
     };
-  };
-
-  systemd.services.ctrld.serviceConfig = hardeningBaseline config {
-    EnvironmentFile = config.age.secrets.ctrldEndpoint.path;
-  };
 
   # Populate hosts file for ctrld host discovery
   networking.hosts = mapAttrs (_: v: [ v ]) homeHosts;

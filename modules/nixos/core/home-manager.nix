@@ -55,7 +55,6 @@ in
         inherit inputs hostname vmVariant;
         inherit (args)
           self
-          pkgs'
           selfPkgs
           ns
           ;

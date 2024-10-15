@@ -28,7 +28,6 @@
     # should review changes after updating.
 
     nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-personal";
-    nixpkgs-small.url = "github:NixOS/nixpkgs/nixos-unstable-small";
 
     impermanence.url = "github:nix-community/impermanence";
 

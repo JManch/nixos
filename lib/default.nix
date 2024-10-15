@@ -39,10 +39,6 @@ in
             ;
           inherit (self) inputs;
           selfPkgs = self.packages.${system};
-          pkgs' = import self.inputs.nixpkgs-small {
-            inherit system;
-            config.allowUnfree = true;
-          };
         };
         modules =
           [

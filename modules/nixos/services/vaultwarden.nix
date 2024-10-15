@@ -2,7 +2,6 @@
   ns,
   lib,
   pkgs,
-  pkgs',
   config,
   inputs,
   ...
@@ -154,16 +153,15 @@ mkIf cfg.enable {
       publicKey = vaultwardenPublicBackupKey.path;
       cloudBackupScript = pkgs.writeShellApplication {
         name = "vaultwarden-cloud-backup";
-        runtimeInputs =
-          (with pkgs; [
-            coreutils
-            diffutils
-            gnutar
-            bzip2
-            age
-            rclone
-          ])
-          ++ [ pkgs'.shoutrrr ];
+        runtimeInputs = with pkgs; [
+          coreutils
+          diffutils
+          gnutar
+          bzip2
+          age
+          rclone
+          shoutrrr
+        ];
         text = # bash
           ''
             set -o errtrace

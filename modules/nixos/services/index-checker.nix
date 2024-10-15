@@ -2,14 +2,12 @@
   ns,
   lib,
   pkgs,
-  pkgs',
   config,
   ...
 }:
 let
   inherit (lib) mkIf getExe;
   cfg = config.${ns}.services.index-checker;
-  shoutrrr = getExe pkgs'.shoutrrr;
 
   pythonScript =
     pkgs.writers.writePython3 "index-checker"
@@ -48,15 +46,15 @@ mkIf cfg.enable {
       ExecStart = getExe (
         pkgs.writeShellApplication {
           name = "index-checker";
-          runtimeInputs = [
-            pkgs.coreutils
-            pkgs'.shoutrrr
+          runtimeInputs = with pkgs; [
+            coreutils
+            shoutrrr
           ];
           text = # bash
             ''
               set +e
               send_notif() {
-                ${shoutrrr} send \
+                shoutrrr send \
                   --url "$DISCORD_AUTH" \
                   --title "Index Status Changed" \
                   --message "$1"

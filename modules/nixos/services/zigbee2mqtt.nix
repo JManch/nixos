@@ -1,7 +1,6 @@
 {
   ns,
   lib,
-  pkgs',
   config,
   inputs,
   ...
@@ -26,7 +25,6 @@ mkMerge [
   (mkIf cfg.enable {
     services.zigbee2mqtt = {
       enable = true;
-      package = pkgs'.zigbee2mqtt;
       dataDir = "/var/lib/zigbee2mqtt";
       settings = {
         permit_join = false;

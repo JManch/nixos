@@ -970,22 +970,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-small": {
-      "locked": {
-        "lastModified": 1728984473,
-        "narHash": "sha256-eJ00CdiQCgB/icJhQLeeaIzX9U5E1auEb3rCw/+xHbw=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "b7f91a266c7565a43ff95814b1b4f624559cf318",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable-small",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs-stable": {
       "locked": {
         "lastModified": 1720386169,
@@ -1101,7 +1085,6 @@
         "nix-matlab": "nix-matlab",
         "nix-resources": "nix-resources",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-small": "nixpkgs-small",
         "nixpkgs-xr": "nixpkgs-xr",
         "raspberry-pi-nix": "raspberry-pi-nix",
         "rpi-firmware-nonfree-src": "rpi-firmware-nonfree-src",

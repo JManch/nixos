@@ -43,11 +43,13 @@ let
     pkgs.writeShellApplication {
       name = "gamemode-${mode}";
 
-      runtimeInputs = [
-        pkgs.coreutils
-        pkgs.libnotify
-        pkgs.gnugrep
-      ] ++ optional isHyprland homeConfig.wayland.windowManager.hyprland.package;
+      runtimeInputs =
+        (with pkgs; [
+          coreutils
+          libnotify
+          gnugrep
+        ])
+        ++ optional isHyprland homeConfig.wayland.windowManager.hyprland.package;
 
       text = ''
         # Load custom arguments into positional parameters
@@ -128,13 +130,11 @@ mkIf cfg.enable {
         '';
     });
 
-    settings = {
-      custom = {
-        # WARN: For gamemode script changes to be applied the user service must
-        # be manually restarted with `systemctl restart --user gamemoded`
-        start = getExe (startStopScript "start");
-        end = getExe (startStopScript "end");
-      };
+    settings.custom = {
+      # WARN: For gamemode script changes to be applied the user service must
+      # be manually restarted with `systemctl restart --user gamemoded`
+      start = getExe (startStopScript "start");
+      end = getExe (startStopScript "end");
     };
   };
 }

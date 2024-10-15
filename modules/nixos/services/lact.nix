@@ -2,7 +2,6 @@
   ns,
   lib,
   pkgs,
-  pkgs',
   config,
   hostname,
   ...
@@ -26,6 +25,7 @@ let
     "1002:744C-1EAE:7905-0000:08:00.0"
     "1002:744C-1EAE:7905-0000:09:00.0"
   ];
+
 in
 # This module is specifically for 7900XT on NCASE-M1 host
 mkIf cfg.enable {
@@ -40,67 +40,74 @@ mkIf cfg.enable {
   # https://wiki.archlinux.org/title/AMDGPU#Boot_parameter
   boot.kernelParams = [ "amdgpu.ppfeaturemask=0xffffffff" ];
 
-  services.lact = {
-    enable = true;
-    package = pkgs'.lact;
+  userPackages = [ pkgs.lact ];
 
-    # Can't use nix yaml because the keys for fan curve have to be integers
-    settings =
-      let
-        gpuConfig = # yaml
-          ''
-            fan_control_enabled: true
-            fan_control_settings:
-              mode: curve
-              static_speed: 0.5
-              temperature_key: edge
-              interval_ms: 500
-              curve:
-                60: 0.0
-                70: 0.5
-                75: 0.6
-                80: 0.65
-                90: 1
-            pmfw_options:
-              acoustic_limit: 3300
-              acoustic_target: 2000
-              minimum_pwm: 15
-              target_temperature: 80
-            # Run at 257 for slightly better performance but louder fans
-            power_cap: 231.0
-            performance_level: manual
-            max_core_clock: 2394
-            voltage_offset: -30
-            power_profile_mode_index: 0
-            power_states:
-              memory_clock:
-              - 0
-              - 1
-              - 2
-              - 3
-              core_clock:
-              - 0
-              - 1
-              - 2
-          '';
-      in
-      # yaml
-      ''
-        daemon:
-          log_level: info
-          admin_groups:
-          - wheel
-          - sudo
-          disable_clocks_cleanup: false
-        apply_settings_timer: 5
-        gpus:
-        ${concatMapStrings (gpuId: ''
-          # anchor for correct indendation
-            ${gpuId}:
-              ${replaceStrings [ "\n" ] [ "\n    " ] gpuConfig}
-        '') gpuIds}
-      '';
+  systemd.services.lact = {
+    unitConfig = {
+      Description = "AMDGPU Control Daemon";
+      After = [ "multi-user.service" ];
+    };
+    serviceConfig.ExecStart = "${getExe pkgs.lact} daemon";
+    wantedBy = [ "multi-user.target" ];
   };
+
+  # Can't generate yaml from nix because the keys for fan curve have to be
+  # integers
+  environment.etc."lact/config.yaml".text =
+    let
+      gpuConfig = # yaml
+        ''
+          fan_control_enabled: true
+          fan_control_settings:
+            mode: curve
+            static_speed: 0.5
+            temperature_key: edge
+            interval_ms: 500
+            curve:
+              60: 0.0
+              70: 0.5
+              75: 0.6
+              80: 0.65
+              90: 1
+          pmfw_options:
+            acoustic_limit: 3300
+            acoustic_target: 2000
+            minimum_pwm: 15
+            target_temperature: 80
+          # Run at 257 for slightly better performance but louder fans
+          power_cap: 231.0
+          performance_level: manual
+          max_core_clock: 2394
+          voltage_offset: -30
+          power_profile_mode_index: 0
+          power_states:
+            memory_clock:
+            - 0
+            - 1
+            - 2
+            - 3
+            core_clock:
+            - 0
+            - 1
+            - 2
+        '';
+    in
+    # yaml
+    ''
+      daemon:
+        log_level: info
+        admin_groups:
+        - wheel
+        - sudo
+        disable_clocks_cleanup: false
+      apply_settings_timer: 5
+      gpus:
+      ${concatMapStrings (gpuId: ''
+        # anchor for correct indendation
+          ${gpuId}:
+            ${replaceStrings [ "\n" ] [ "\n    " ] gpuConfig}
+      '') gpuIds}
+    '';
 
   # Pass --high-perf when using gamemoderun for higher power cap of 257. In
   # unigine superposition 4k optimised gives an 8% FPS increase (122fps ->

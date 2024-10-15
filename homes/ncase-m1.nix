@@ -102,7 +102,9 @@
         r2modman.enable = true;
         lutris.enable = true;
         prism-launcher.enable = true;
-        mint.enable = true;
+        # Disable until https://github.com/oxalica/rust-overlay/issues/191 /
+        # https://github.com/NixOS/nixpkgs/issues/348832 is resolved
+        mint.enable = false;
         ryujinx.enable = true;
       };
     };

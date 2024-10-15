@@ -226,14 +226,18 @@ let
                 source_type=$(echo "$new_lock" | jaq -r ".\"$input\".original.type")
                 if [ "$new_rev" != "$old_rev" ]; then
                   if [[ "$source_type" == "github" || "$source_type" == "gitlab" ]]; then
-                    if [ ! -d "$tmp_repos/$input" ]; then
-                      owner=$(echo "$new_lock" | jaq -r ".\"$input\".original.owner")
-                      repo=$(echo "$new_lock" | jaq -r ".\"$input\".original.repo")
-                      git clone -q "https://$source_type.com/$owner/$repo" "$tmp_repos/$input"
+                    owner=$(echo "$new_lock" | jaq -r ".\"$input\".original.owner")
+                    repo=$(echo "$new_lock" | jaq -r ".\"$input\".original.repo")
+                    repo_dir="$tmp_repos/$input"
+
+                    if [ -d "/home/${adminUsername}/files/repos/$repo/.git" ]; then
+                      repo_dir="/home/${adminUsername}/files/repos/$repo"
+                    elif [ ! -d "$tmp_repos/$input" ]; then
+                      git clone "https://$source_type.com/$owner/$repo" "$tmp_repos/$input"
                     fi
 
-                    pushd "$tmp_repos/$input" >/dev/null
-                    diff_output=$(git diff "$old_rev" "$new_rev" -- "$file_path" 2>/dev/null)
+                    pushd "$repo_dir" >/dev/null
+                    diff_output=$(git diff "$old_rev" "$new_rev" -- "$file_path" >/dev/null)
                     if [[ -n "$diff_output" ]]; then
                       if $first_diff; then
                         echo -e "\033[1;34m\nTracked input files have changed. View diffs below:\n\033[0m"

@@ -259,6 +259,15 @@ mkIf cfg.enable {
         User = "vaultwarden";
         Group = "vaultwarden";
         StateDirectory = "vaultwarden-cloud-backup";
+        # WARN: I've noticed that as the number of remote backup files grows,
+        # rclone backups slow down significantly because it downloads all
+        # remote files before every backup. I've seen it take 30 mins when the
+        # remote folder grows large enough. The timeout should workaround this
+        # by failing the service and notifying us when the rclone process is
+        # taking too long suggesting the remote dir has grown too big. When
+        # this happens rename the existing remote backup dir and replace it
+        # with an empty one.
+        TimeoutStartSec = 120;
       };
 
       wantedBy = [ "backup-vaultwarden.service" ];

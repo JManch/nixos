@@ -39,14 +39,10 @@ mkMerge [
           legacy_triggers = false;
         };
 
-        # Availability is useful for detecting when people turn off switches for
-        # smart lights. Once all our switches get replaced with smart ones I can
-        # disable this. I've changed the default active timeout from 10 to 5
-        # mins.
-        availability = {
-          active.timeout = 5;
-          passive.timeout = 1500;
-        };
+        # Availability is useful for detecting when people turn off switches
+        # for smart lights
+        # https://www.zigbee2mqtt.io/guide/configuration/device-availability.html#device-availability
+        availability = true;
 
         frontend = {
           host = cfg.address;

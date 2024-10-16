@@ -843,11 +843,11 @@
         "rust-overlay": "rust-overlay_2"
       },
       "locked": {
-        "lastModified": 1729012122,
-        "narHash": "sha256-1C52t4GmuA+cZ27zs/x/FfH4DbUnjEcj7RLJkZH/VG0=",
+        "lastModified": 1729100770,
+        "narHash": "sha256-7+g33Kp5u9ol0mVdr7Tx8uOcq+6kCUs5BPrMkedH5s8=",
         "owner": "JManch",
         "repo": "mint",
-        "rev": "25a5eaf2f187c14a756860acfb834e25af1eb3a8",
+        "rev": "ebb9c8c4fed5502874a443b61a2cc2f0b385a4ae",
         "type": "github"
       },
       "original": {

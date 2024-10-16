@@ -96,7 +96,7 @@ mkIf (isHyprland config) {
         -e '/^exec-once/d' \
         -e '/^monitor/d' \
         -e 's/, monitor:(.*),//g' \
-        ${concatMapStringsSep " " (m: "-e 's/${m.name}/WL-${toString m.number}/g'") monitors} \
+        -e 's/${primaryMonitor.name}/WAYLAND-1/g' \
         ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf
       ${
         # Add monitor config

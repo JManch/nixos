@@ -267,7 +267,7 @@ in
             ];
 
             windowrulev2 = [
-              "workspace ${namedWorkspaceIDs.VM} silent, class:^(\\.?qemu.*|wlroots|virt-manager)$"
+              "workspace ${namedWorkspaceIDs.VM} silent, class:^(\\.?qemu.*|aquamarine|virt-manager)$"
               "float, class:^(\\.?qemu.*|virt-manager)$"
               "size 80% 80%, class:^(\\.?qemu.*|virt-manager)$"
               "center, class:^(\\.?qemu.*|virt-manager)$"

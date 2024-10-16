@@ -358,10 +358,7 @@ in
           };
         };
 
-        input_text.announcement_message = {
-          name = "Announcement Message";
-          initial = "Dinner is ready";
-        };
+        input_text.announcement_message.name = "Announcement Message";
       }
       ++ (map (person: {
         input_text."${person}_announcement_response" = {

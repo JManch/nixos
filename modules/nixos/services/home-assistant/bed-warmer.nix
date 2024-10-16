@@ -86,7 +86,6 @@ in
             mode = "box";
             min = 5;
             max = 240;
-            initial = 20;
             unit_of_measurement = "min";
             icon = "mdi:timer";
           };
@@ -96,7 +95,6 @@ in
             mode = "box";
             min = 18;
             max = 22;
-            initial = 20;
             unit_of_measurement = "°C";
             icon = "mdi:thermometer";
           };

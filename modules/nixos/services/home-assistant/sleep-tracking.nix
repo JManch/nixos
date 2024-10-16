@@ -101,7 +101,6 @@ in
       mkIf roomCfg.sleepTracking.enable {
         input_number."${roomId}_sleep_duration" = {
           name = "${formattedRoomName} Sleep Duration";
-          initial = 8;
           min = 5;
           max = 11;
           step = 0.5;

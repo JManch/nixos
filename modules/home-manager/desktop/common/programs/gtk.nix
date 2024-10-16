@@ -11,14 +11,14 @@ let
   inherit (lib) mkIf getExe';
   inherit (config.${ns}) colorScheme;
   inherit (config.${ns}.desktop.services) darkman;
-  inherit (config.${ns}.desktop.style) cursor;
+  inherit (config.${ns}.desktop.style) cursor customTheme;
   inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) gtkThemeFromScheme;
   cfg = config.${ns}.desktop;
   darkTheme = gtkThemeFromScheme { scheme = colorScheme.dark; };
   lightTheme = gtkThemeFromScheme { scheme = colorScheme.light; };
 in
 mkIf desktopEnabled {
-  home.packages = mkIf (cfg.style.customTheme) [
+  home.packages = mkIf customTheme [
     darkTheme
     lightTheme
   ];
@@ -29,7 +29,7 @@ mkIf desktopEnabled {
     # If darkman is enabled the theme will be applied using gsettings in the
     # switch script
     theme = mkIf (cfg.style.customTheme && !darkman.enable) {
-      name = darkTheme.slug;
+      name = colorScheme.dark.slug;
       package = darkTheme;
     };
 

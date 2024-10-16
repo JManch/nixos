@@ -319,6 +319,7 @@ in
         trusted-users = [ adminUsername ];
         substituters = [ "https://nix-community.cachix.org" ];
         trusted-public-keys = [ "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
+        build-dir = mkIf impermanence.enable "/var/nix-tmp";
       };
 
       gc = {
@@ -361,12 +362,8 @@ in
   # system would break things.
   # Relevant github issue: https://github.com/NixOS/nixpkgs/issues/54707
 
-  # NOTE: When nix updates to 2.23, replace this with the new build-dir conf
-  # https://hydra.nixos.org/build/263397466/download/1/manual/command-ref/conf-file.html?highlight=build-dir#conf-build-dir
-
   # List of programs that require the bind mount to compile:
   # - mongodb
-  systemd.services.nix-daemon.environment.TMPDIR = mkIf impermanence.enable "/var/nix-tmp";
   systemd.tmpfiles.rules = mkIf impermanence.enable [
     "d /var/nix-tmp 0755 root root"
     "d /persist/var/nix-tmp 0755 root root"

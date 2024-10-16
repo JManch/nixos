@@ -14,10 +14,8 @@ let
     types
     optionalAttrs
     genAttrs
-    elem
     hasPrefix
     attrNames
-    optional
     filter
     ;
 in
@@ -48,7 +46,7 @@ in
           option:
           cfg.${option}
           # Merge will override cfg.interfaces options so concat lists
-          ++ optional (elem interface (attrNames cfg.interfaces)) cfg.interfaces.${interface}.${option}
+          ++ cfg.interfaces.${interface}.${option} or [ ]
         )
       );
     in

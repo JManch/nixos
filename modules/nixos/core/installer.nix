@@ -222,33 +222,51 @@ let
       '';
   };
 
-in
-{
-  adminPackages = [
-    remoteInstallScript
-    setupSdImage
-  ];
+  buildInstaller = pkgs.writeShellApplication {
+    name = "build-installer";
+    runtimeInputs = [ pkgs.nix ];
+    text = ''
+      if [ -z "$1" ]; then
+        echo "Usage: build-installer <name>"
+        exit 1
+      fi
+      installer=$1
 
-  programs.zsh.interactiveShellInit = # bash
-    ''
-      build-installer() {
-        if [ -z "$1" ]; then
-          echo "Usage: build-installer <name>"
-          return 1
-        fi
+      flake="/home/${adminUsername}/.config/nixos"
+      if [ ! -d $flake ]; then
+        echo "Flake does not exist locally so using remote from github"
+        flake="github:JManch/nixos"
+      fi
 
-        flake="/home/${adminUsername}/.config/nixos"
-        if [ ! -d $flake ]; then
-          echo "Flake does not exist locally so using remote from github"
-          flake="github:JManch/nixos"
-        fi
+      # shellcheck disable=SC2016
+      installer_exists=$(nix eval --impure --expr 'with import <nixpkgs> {}; pkgs.lib.hasAttr "installer-'"$installer"'" (builtins.getFlake "'"$flake"'").packages.''${pkgs.stdenv.system}')
+      if [[ $installer_exists = "false" ]]; then
+        echo "Error: Installer '$installer' does not exist" >&2
+        exit 1
+      fi
 
-        host_config="$flake#nixosConfigurations.$1.config"
+      # In the installer name matches a hostname it means it's a custom
+      # installer with a custom implementation
+      # shellcheck disable=SC2016
+      host_exists=$(nix eval --impure --expr 'with import <nixpkgs> {}; pkgs.lib.hasAttr "'"$installer"'" (builtins.getFlake "'"$flake"'").nixosConfigurations')
+      if [[ $host_exists = "true" ]]; then
+        host_config="$flake#nixosConfigurations.$installer.config"
         fs_type=$(nix eval --raw "$host_config.${ns}.hardware.fileSystem.type")
         result=$(nix build "$flake#installer-$1" --print-out-paths)
         if [ "$fs_type" = "sd-image" ]; then
           sudo ${getExe setupSdImage} "$1" "$result"
         fi
-      }
+      else
+        nix build "$flake#installer-$1" --print-out-paths
+      fi
     '';
+  };
+
+in
+{
+  adminPackages = [
+    remoteInstallScript
+    setupSdImage
+    buildInstaller
+  ];
 }

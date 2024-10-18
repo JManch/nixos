@@ -344,6 +344,8 @@ in
         }
       '';
 
+    # How to fix database collation warnings: https://dba.stackexchange.com/a/330184
+
     services.postgresql = {
       enable = true;
       ensureDatabases = [ "hass" ];

@@ -56,6 +56,7 @@ let
   isServer = (config.${ns}.device.type == "server");
   resticExe = getExe pkgs.restic;
   homeBackups = optionalAttrs homeManager.enable config.home-manager.users.${username}.backups;
+  vmInstall = inputs.vmInstall.value;
 
   backupTimerConfig = {
     OnCalendar = cfg.backupSchedule;
@@ -277,7 +278,7 @@ mkMerge [
     # Restore tool: https://github.com/viltgroup/bucket-restore
   })
 
-  (mkIf (cfg.enable && !vmVariant) {
+  (mkIf (cfg.enable && !vmVariant && !vmInstall) {
     assertions = asserts [
       (all (v: v == true) (
         mapAttrsToList (
@@ -414,7 +415,7 @@ mkMerge [
     };
   })
 
-  (mkIf (cfg.server.enable && !vmVariant) {
+  (mkIf (cfg.server.enable && !vmVariant && !vmInstall) {
     assertions = asserts [
       caddy.enable
       "Restic server requires Caddy to be enabled"

@@ -431,11 +431,15 @@ in
     # at any point, the app resets.
     # https://github.com/home-assistant/iOS/issues/2824
     # https://github.com/home-assistant/iOS/blob/4770757f42da86eaadc949c3a2e97925f6a73ce8/Sources/Shared/API/Authentication/TokenManager.swift#L149
+
+    # Edit: I no longer publically expose my reverse proxy so this workaround
+    # isn't needed as my firewall just drops the connection. Leaving the note
+    # for future reference.
     services.caddy.virtualHosts."home.${fqDomain}".extraConfig = ''
       @block {
         not remote_ip ${concatStringsSep " " trustedAddresses}
       }
-      respond @block "Access denied" 404 {
+      respond @block "Access denied" 403 {
         close
       }
       reverse_proxy http://127.0.0.1:${toString cfg.port}

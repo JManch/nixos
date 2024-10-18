@@ -42,6 +42,8 @@
     };
 
     hardware = {
+      secureBoot.enable = true;
+
       fileSystem = {
         type = "zfs";
         tmpfsTmp = true;
@@ -58,11 +60,6 @@
       audio.enable = true;
       ssh.server.enable = true;
       networking.wiredInterface = "enp3s0";
-
-      windows.bootEntry = {
-        enable = true;
-        fsAlias = "HD0b65535a1";
-      };
 
       desktop = {
         enable = true;

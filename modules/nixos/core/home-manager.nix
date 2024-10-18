@@ -43,6 +43,7 @@ in
               shell.promptColor = "purple";
               programs.git.enable = true;
               programs.neovim.enable = true;
+              programs.btop.enable = true;
             };
             home.stateVersion = config.home-manager.users.${username}.home.stateVersion;
           };

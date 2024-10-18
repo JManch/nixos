@@ -117,7 +117,7 @@ in
       # the host in a virtual machine. This is NOT the same as a vmVariant.
       # Matches options in modules/profiles/qemu_guest.nix as conditional
       # imports are not possible.
-      boot = mkIf (inputs.vmInstall.value) {
+      boot = mkIf inputs.vmInstall.value {
         initrd.availableKernelModules = mkVMOverride [
           "ahci"
           "xhci_pci"

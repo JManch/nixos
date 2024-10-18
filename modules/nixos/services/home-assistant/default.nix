@@ -165,7 +165,14 @@ in
               hash = "sha256-XwaOQJvosCUXMZYrKX7sMWJIrMx36RhuVYUq163vvNg=";
             };
           })
-          pkgs.home-assistant-custom-components.waste_collection_schedule
+          (pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs {
+            src = pkgs.fetchFromGitHub {
+              owner = "mampfes";
+              repo = "hacs_waste_collection_schedule";
+              rev = "refs/tags/2.3.0";
+              hash = "sha256-2bKixWPuexX3iGFlUmgeIT2/Ne2SED0f8B5Zw2ICG/k=";
+            };
+          })
           (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs {
             src = pkgs.fetchFromGitHub {
               owner = "basnijholt";

@@ -23,8 +23,44 @@ let
     ;
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.age.secrets) caddyPorkbunVars;
   inherit (config.${ns}.system.virtualisation) vmVariant;
   cfg = config.${ns}.services.caddy;
+
+  # This is a horrible workaround for building caddy with the porkbun plugin
+  # Waiting for a proper solution https://github.com/NixOS/nixpkgs/issues/14671
+  porkbunVersion = "v0.2.1";
+  caddyWithPorkbun =
+    (pkgs.caddy.overrideAttrs (old: {
+      vendorHash = "sha256-1OJelf2Ui7Iz4SoXStfTwEtLi/fSpgfR2gqsZi7KBZE=";
+      preBuild = ''
+        chmod -R u+w vendor
+        [ -f vendor/go.mod ] && mv -t . vendor/go.{mod,sum}
+        go generate
+        sed -i "/standard/a _ \"github.com/caddy-dns/porkbun\"" ./cmd/caddy/main.go
+      '';
+    })).override
+      {
+        buildGoModule =
+          args:
+          pkgs.buildGoModule (
+            args
+            // {
+              modBuildPhase = ''
+                ${getExe pkgs.gnused} -i "/standard/a     _ \"github.com/caddy-dns/porkbun\"" ./cmd/caddy/main.go
+                cat ./cmd/caddy/main.go
+                go get github.com/caddy-dns/porkbun@${porkbunVersion}
+                go generate
+                go mod vendor
+              '';
+
+              modInstallPhase = ''
+                mv -t vendor go.mod go.sum
+                cp -r vendor $out
+              '';
+            }
+          );
+      };
 
   generateCerts =
     let
@@ -90,11 +126,17 @@ mkMerge [
 
     services.caddy = {
       enable = true;
+      package = caddyWithPorkbun;
       # Does not work when the admin API is off
       enableReload = false;
 
       globalConfig = ''
         admin off
+
+        acme_dns porkbun {
+          api_key {env.PORKBUN_API_KEY}
+          api_secret_key {env.PORKBUN_API_SECRET_KEY}
+        }
       '';
 
       virtualHosts."logs.${fqDomain}".extraConfig = ''
@@ -110,12 +152,8 @@ mkMerge [
       '';
     };
 
-    networking.firewall.allowedTCPPorts = [
-      443
-      80
-    ];
     networking.firewall.allowedUDPPorts = [ 443 ];
-    ${ns}.system.networking.publicPorts = [
+    networking.firewall.allowedTCPPorts = [
       443
       80
     ];
@@ -130,6 +168,7 @@ mkMerge [
 
     # Extra hardening
     systemd.services.caddy.serviceConfig = hardeningBaseline config {
+      EnvironmentFile = caddyPorkbunVars.path;
       DynamicUser = false;
       PrivateUsers = false;
       SystemCallFilter = [

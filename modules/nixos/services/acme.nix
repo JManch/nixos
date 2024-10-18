@@ -6,22 +6,24 @@
 }:
 let
   inherit (lib) mkIf singleton;
+  inherit (config.age.secrets) acmePorkbunVars;
   cfg = config.${ns}.services.acme;
 in
 mkIf cfg.enable {
   security.acme = {
     acceptTerms = true;
-    defaults.email = "JManch@protonmail.com";
-    defaults.webroot = "/var/lib/acme/acme-challenge";
+    defaults = {
+      email = "JManch@protonmail.com";
+      dnsProvider = "porkbun";
+      environmentFile = acmePorkbunVars.path;
+    };
   };
 
   backups.acme = {
     paths = [ "/var/lib/acme" ];
-    restore.pathOwnership = {
-      "/var/lib/acme" = {
-        user = "acme";
-        group = "acme";
-      };
+    restore.pathOwnership."/var/lib/acme" = {
+      user = "acme";
+      group = "acme";
     };
   };
 

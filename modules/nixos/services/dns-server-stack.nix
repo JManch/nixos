@@ -30,7 +30,7 @@ let
     singleton
     ;
   inherit (lib.${ns}) addPatches asserts hardeningBaseline;
-  inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (inputs.nix-resources.secrets) oldFqDomain fqDomain;
   cfg = config.${ns}.services.dns-server-stack;
 
   # Declares hostnames for all devices on my local network
@@ -221,6 +221,8 @@ mkIf cfg.enable {
           # Return NXDOMAIN for AAAA requests. Otherwise AAAA requests resolve to
           # the public DDNS CNAME response which resolves to public IP.
           "/${fqDomain}/"
+          # Return NXDOMAIN for old fqDomain
+          "/${oldFqDomain}/"
         ];
 
         # Host records create PTR entries as well. Using addn-hosts created

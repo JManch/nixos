@@ -142,7 +142,7 @@ in
         # Inspect the generated file at /run/wpa_supplicant/wpa_supplicant.conf
         # Manually reload config with `wpa_cli -i <wireless_interface> reconfigure`
         Mikrotik = {
-          psk = "ext:MIKROTIK";
+          pskRaw = "ext:MIKROTIK";
           priority = 3;
         };
 

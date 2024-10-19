@@ -54,7 +54,6 @@ let
         driver_numbers = {
             "Max Verstappen": 1,
             "Franco Colapinto": 43,
-            "Daniel Ricciardo": 3,
             "Lando Norris": 4,
             "Pierre Gasly": 10,
             "Sergio Perez": 11,
@@ -72,6 +71,7 @@ let
             "George Russell": 63,
             "Valtteri Bottas": 77,
             "Oscar Piastri": 81,
+            "Liam Lawson": 30,
         }
 
 

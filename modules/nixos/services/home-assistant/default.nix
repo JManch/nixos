@@ -365,7 +365,10 @@ in
       # It's useful for debugging performance problems though this is unlikely
       # with my simple deployment.
       # https://git.postgresql.org/gitweb/?p=postgresql.git;a=commit;h=64da07c41a8c0a680460cdafc79093736332b6cf
-      settings.log_checkpoints = false;
+      settings = {
+        log_checkpoints = false;
+        full_page_writes = mkIf (config.${ns}.hardware.fileSystem.type == "zfs") false;
+      };
     };
 
     systemd.services.postgresql.serviceConfig = hardeningBaseline config {

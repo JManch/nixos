@@ -303,7 +303,11 @@ in
         };
       };
 
-      virtualisation.libvirtd.enable = true;
+      virtualisation.libvirtd = {
+        enable = true;
+        onBoot = "ignore";
+        onShutdown = "shutdown";
+      };
 
       programs.zsh.interactiveShellInit = # bash
         ''

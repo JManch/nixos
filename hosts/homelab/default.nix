@@ -22,6 +22,7 @@ in
     };
 
     hardware = {
+      secureBoot.enable = true;
       graphics.hardwareAcceleration = true;
       printing.server.enable = true;
 

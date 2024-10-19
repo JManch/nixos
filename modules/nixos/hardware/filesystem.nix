@@ -144,11 +144,19 @@ mkMerge [
                               prompt )
                                 # Attempt to load the passphrase from systemd-creds then fallback to manual
                                 # passphrase entry
-                                # WARN: We need to decrypt here instead of using
-                                # SetCredentialEncrypted so that import will still work if decryption
-                                # fails. For some reason if SetCredentialEncrypted creds fail to decrypt,
-                                # the entire service fails.
-                                ${systemd-creds} decrypt --name= - - <<< "${cfg.zfs.encryption.passphraseCred}" | ${zfs} load-key "$ds" \
+
+                                if [ ! -v tpm_passphrase ]; then
+                                  # We need to decrypt here instead of using SetCredentialEncrypted so that
+                                  # import will still work if decryption fails. For some reason if
+                                  # SetCredentialEncrypted creds fail to decrypt, the entire service fails.
+
+                                  # Store the passphrase in a variable so that the same passphrase can be used to
+                                  # decrypt multiple datasets. Obviously this makes the assumption that all our
+                                  # datasets are encrypted with the same passphrase.
+                                  tpm_passphrase="$(${systemd-creds} decrypt --name= - - <<< "${cfg.zfs.encryption.passphraseCred}" || true)";
+                                fi
+
+                                echo "$tpm_passphrase" | ${zfs} load-key "$ds" \
                                   && success=true || success=false
                                 tries=10
                         ''

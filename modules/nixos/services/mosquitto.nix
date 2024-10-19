@@ -50,18 +50,6 @@ mkMerge [
       ];
     };
 
-    # Only for cert validation. I figured that using ACME for cert generation
-    # is easier than trying to get the certs out of Caddy due to
-    # https://caddy.community/t/certificate-file-permissions-when-sharing-certificates/13211
-    services.caddy.virtualHosts."http://mqtt.${fqDomain}".extraConfig = ''
-      handle /.well-known/acme-challenge/* {
-        root * /var/lib/acme/acme-challenge
-        file_server
-      }
-
-      respond "Access denied" 403
-    '';
-
     users.groups.acme.members = [ "mosquitto" ];
     security.acme.certs."mqtt.${fqDomain}" = { };
 

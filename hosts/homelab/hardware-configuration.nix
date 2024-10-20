@@ -1,3 +1,6 @@
+# WARN: Sometimes the GPU on this thing breaks causing frigate hwaccel to fail
+# and monitor output to not work. CMOS reset does NOT fix it. I've fixed it
+# before by removing the hard drive bay inside the case.
 {
   networking.hostId = "8d4ed64c";
   hardware.cpu.amd.updateMicrocode = true;

@@ -1,4 +1,9 @@
-{ ns, config, ... }:
+{
+  ns,
+  config,
+  inputs,
+  ...
+}:
 let
   inherit (config.${ns}.services) wireguard;
 in
@@ -30,6 +35,7 @@ in
         type = "zfs";
         extendedLoaderTimeout = true;
         zfs.trim = true;
+        zfs.encryption.passphraseCred = inputs.nix-resources.secrets.zfsPassphrases.homelab;
       };
 
       coral = {

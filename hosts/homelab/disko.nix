@@ -4,13 +4,14 @@
 
   disko.devices = {
     # The attribute name of the disk gets used for the disk partlabel
-    disk."256GB-NVME" = {
+    disk."1TB-SSD" = {
       type = "disk";
       device =
         if inputs.vmInstall.value then
           "/dev/disk/by-path/pci-0000:04:00.0"
         else
-          "/dev/disk/by-id/nvme-SAMSUNG_MZVPV256HDGL-000H1_S27GNY0HB13473";
+          # "/dev/disk/by-id/nvme-SAMSUNG_MZVPV256HDGL-000H1_S27GNY0HB13473";
+          "/dev/disk/by-id/ata-CT1000MX500SSD1_1923E209C93E";
       content = {
         type = "gpt";
         partitions = {
@@ -28,11 +29,12 @@
               ];
             };
           };
+
           zfs = {
             size = "100%";
             content = {
               type = "zfs";
-              pool = "zroot";
+              pool = "homelab-zpool";
             };
           };
         };
@@ -47,7 +49,7 @@
       ];
     };
 
-    zpool.zroot = {
+    zpool.homelab-zpool = {
       type = "zpool";
       options.ashift = "12";
 
@@ -61,22 +63,36 @@
       };
 
       datasets = {
-        nix = {
+        homelab-nixos.type = "zfs_fs";
+
+        "homelab-nixos/nix" = {
           type = "zfs_fs";
           mountpoint = "/nix";
           options.mountpoint = "legacy";
         };
 
-        persist = {
+        "homelab-nixos/persist" = {
           type = "zfs_fs";
           mountpoint = "/persist";
-          options.mountpoint = "legacy";
+          options = {
+            mountpoint = "legacy";
+            encryption = "aes-256-gcm";
+            keyformat = "passphrase";
+            keylocation = "prompt";
+          };
         };
 
-        tmp = {
+        "homelab-nixos/persist/tmp" = {
           type = "zfs_fs";
           mountpoint = "/tmp";
           options.mountpoint = "legacy";
+        };
+
+        "homelab-nixos/persist/postgresql" = {
+          type = "zfs_fs";
+          mountpoint = "/persist/var/lib/postgresql";
+          options.mountpoint = "legacy";
+          options.recordsize = "8k";
         };
       };
     };

@@ -11,6 +11,8 @@ let
     mkEnableOption
     types
     mkDefault
+    attrValues
+    any
     mapAttrsToList
     hasAttr
     hasPrefix
@@ -75,8 +77,14 @@ in
           enable = mkOption {
             type = types.bool;
             readOnly = true;
+            # Check for any pool datasets with encryption enable or child
+            # datasets with encryption enabled
             default = lib.any (v: v == true) (
-              mapAttrsToList (_: pool: hasAttr "encryption" pool.rootFsOptions) config.disko.devices.zpool
+              mapAttrsToList (
+                _: pool:
+                (hasAttr "encryption" pool.rootFsOptions)
+                || (any (dataset: hasAttr "encryption" dataset.options) (attrValues pool.datasets))
+              ) config.disko.devices.zpool
             );
             description = ''
               Whether the file system uses ZFS disk encryption. Derived from disko

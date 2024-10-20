@@ -125,6 +125,11 @@ in
       };
     };
 
+    air-vpn = {
+      enable = mkEnableOption "Wireguard AirVPN";
+      confinement.enable = mkEnableOption "Confinement Wireguard AirVPN";
+    };
+
     jellyfin = {
       enable = mkEnableOption "Jellyfin";
       openFirewall = mkEnableOption "opening the firewall";

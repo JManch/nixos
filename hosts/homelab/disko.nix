@@ -88,6 +88,20 @@
           options.mountpoint = "legacy";
         };
 
+        "homelab-nixos/persist/torrents-tmp" = {
+          type = "zfs_fs";
+          mountpoint = "/persist/var/lib/qbittorrent-nox/qBittorrent/downloads-tmp";
+          options.mountpoint = "legacy";
+          options.recordsize = "16k";
+        };
+
+        "homelab-nixos/persist/torrents" = {
+          type = "zfs_fs";
+          mountpoint = "/persist/var/lib/qbittorrent-nox/qBittorrent/downloads";
+          options.mountpoint = "legacy";
+          options.recordsize = "1M";
+        };
+
         "homelab-nixos/persist/postgresql" = {
           type = "zfs_fs";
           mountpoint = "/persist/var/lib/postgresql";

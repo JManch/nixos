@@ -15,7 +15,7 @@ let
     ;
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (config.${ns}.services) caddy nfs;
-  inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (inputs.nix-resources.secrets) fqDomain qBittorrentPort;
   inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.${ns}.device) vpnNamespace;
   cfg = config.${ns}.services.qbittorrent-nox;
@@ -71,7 +71,7 @@ mkIf cfg.enable {
 
   systemd.tmpfiles.rules = [
     "d /var/lib/qbittorrent-nox/qBittorrent/downloads 0775 qbittorrent-nox qbittorrent-nox"
-    "d /var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin 0775 qbittorrent-nox qbittorrent-nox"
+    "d /var/lib/qbittorrent-nox/qBittorrent/downloads-tmp 0775 qbittorrent-nox qbittorrent-nox"
   ];
 
   fileSystems."/export/jellyfin" = mkIf nfs.server.enable {
@@ -99,9 +99,16 @@ mkIf cfg.enable {
     reverse_proxy http://${config.vpnNamespaces.${vpnNamespace}.namespaceAddress}:${toString cfg.port}
   '';
 
-  vpnNamespaces.${vpnNamespace}.portMappings = singleton {
-    from = cfg.port;
-    to = cfg.port;
+  vpnNamespaces.${vpnNamespace} = {
+    portMappings = singleton {
+      from = cfg.port;
+      to = cfg.port;
+    };
+
+    openVPNPorts = singleton {
+      port = qBittorrentPort;
+      protocol = "tcp";
+    };
   };
 
   backups.qbittorrent-nox =

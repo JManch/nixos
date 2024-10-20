@@ -166,22 +166,6 @@ in
           list.
         '';
       };
-
-      mediaDirs = mkOption {
-        type = types.attrsOf types.str;
-        default = { };
-
-        example = {
-          shows = "/home/${username}/videos/shows";
-          movies = "/home/${username}/videos/movies";
-        };
-
-        description = ''
-          Attribute set of media directories that will be bind mount to
-          /var/lib/jellyfin/media. Key is the directory name in the bind
-          location.
-        '';
-      };
     };
 
     ollama = {

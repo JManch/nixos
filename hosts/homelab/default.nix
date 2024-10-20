@@ -184,10 +184,6 @@ in
           "10.30.30.6/32"
           "${address}/${toString subnet}"
         ];
-        mediaDirs = {
-          shows = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/shows";
-          movies = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/movies";
-        };
       };
 
       beammp-server = {

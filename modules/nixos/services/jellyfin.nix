@@ -17,10 +17,7 @@ let
     mkMerge
     optional
     mkForce
-    optionalString
-    mapAttrsToList
     genAttrs
-    attrNames
     ;
   inherit (config.${ns}.system.networking) publicPorts;
   inherit (config.${ns}.services) caddy;
@@ -49,14 +46,7 @@ mkMerge [
 
     systemd.services.jellyfin = {
       wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
-
-      serviceConfig = {
-        # Bind mount home media directories so jellyfin can access them
-        BindReadOnlyPaths = mapAttrsToList (
-          name: dir: "${dir}:/var/lib/jellyfin/media${optionalString (name != "") "/${name}"}"
-        ) cfg.mediaDirs;
-        SocketBindDeny = publicPorts;
-      };
+      serviceConfig.SocketBindDeny = publicPorts;
     };
 
     networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
@@ -71,15 +61,6 @@ mkMerge [
     });
 
     # Jellyfin module has good default hardening
-
-    systemd.tmpfiles.rules =
-      [ "d /var/lib/jellyfin/media 0700 ${jellyfin.user} ${jellyfin.group}" ]
-      ++ map (
-        name:
-        "d /var/lib/jellyfin/media${
-          optionalString (name != "") "/${name}"
-        } 0700 ${jellyfin.user} ${jellyfin.group}"
-      ) (attrNames cfg.mediaDirs);
 
     backups.jellyfin = {
       paths = [ "/var/lib/jellyfin" ];

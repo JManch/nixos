@@ -72,7 +72,7 @@ in
       assertions = asserts [
         ((cfg.excludeSubnets != [ ]) -> (defaultGateway != null))
         "Default gateway must be set to use wgnord subnet exclusion"
-        (resolved.enable)
+        resolved.enable
         "Wg-quick Nord VPN requires systemd resolved to be enabled"
       ];
 

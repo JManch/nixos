@@ -13,6 +13,7 @@ let
     getExe'
     mkForce
     ;
+  inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.audio;
 
   toggleMic =
@@ -52,6 +53,14 @@ in
       systemd.user.sockets = {
         pipewire.unitConfig.ConditionUser = "!@system";
         pipewire-pulse.unitConfig.ConditionUser = "!@system";
+      };
+
+      hm = mkIf homeManager.enable {
+        desktop.hyprland.settings.windowrulev2 = [
+          "float, class:^(org.pulseaudio.pavucontrol)$"
+          "size 30% 30%, class:^(org.pulseaudio.pavucontrol)$"
+          "center, class:^(org.pulseaudio.pavucontrol)$"
+        ];
       };
     })
 

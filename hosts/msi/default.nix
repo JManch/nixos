@@ -81,6 +81,8 @@
     };
 
     services = {
+      scrutiny.collector.enable = true;
+
       restic = {
         enable = true;
         backupSchedule = "*-*-* 14:00:00";

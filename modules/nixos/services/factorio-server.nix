@@ -20,6 +20,7 @@ mkIf cfg.enable {
         sha256 = "sha256-5qZKnuWx03c80fQKpc946Rlg6t5sUI/TZcNHUq/fJ2I=";
       };
     };
+    requireUserVerification = false;
     public = false;
     saveName = "default";
     stateDirName = "factorio-server";

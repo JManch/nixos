@@ -2,11 +2,14 @@
   lib,
   inputs,
   username,
+  hostname,
   ...
 }:
 let
   inherit (lib) optionalAttrs;
   vmInstall = inputs.vmInstall.value;
+  poolName = "${hostname}-zpool";
+  pseudoRoot = "${hostname}-nixos";
 in
 {
   imports = [ inputs.disko.nixosModules.default ];
@@ -41,7 +44,7 @@ in
               size = "100%";
               content = {
                 type = "zfs";
-                pool = "ncase-m1-zpool";
+                pool = poolName;
               };
             };
           };
@@ -61,7 +64,7 @@ in
             size = "100%";
             content = {
               type = "zfs";
-              pool = "ncase-m1-zpool-1";
+              pool = "${poolName}-1";
             };
           };
         };
@@ -87,21 +90,21 @@ in
         };
       in
       {
-        ncase-m1-zpool = {
+        ${poolName} = {
           type = "zpool";
           options.ashift = "12";
           inherit rootFsOptions;
 
           datasets = {
-            ncase-m1-nixos.type = "zfs_fs";
+            ${pseudoRoot}.type = "zfs_fs";
 
-            "ncase-m1-nixos/nix" = {
+            "${pseudoRoot}/nix" = {
               type = "zfs_fs";
               mountpoint = "/nix";
               options.mountpoint = "legacy";
             };
 
-            "ncase-m1-nixos/persist" = {
+            "${pseudoRoot}/persist" = {
               type = "zfs_fs";
               options = optionalAttrs (!vmInstall) {
                 encryption = "aes-256-gcm";
@@ -110,7 +113,7 @@ in
               };
             };
 
-            "ncase-m1-nixos/persist/steam" = {
+            "${pseudoRoot}/persist/steam" = {
               type = "zfs_fs";
               mountpoint = "/persist/home/${username}/.local/share/Steam";
               options.mountpoint = "legacy";
@@ -119,15 +122,15 @@ in
           };
         };
 
-        ncase-m1-zpool-1 = {
+        "${poolName}-1" = {
           type = "zpool";
           options.ashift = "12";
           inherit rootFsOptions;
 
           datasets = {
-            ncase-m1-nixos.type = "zfs_fs";
+            ${pseudoRoot}.type = "zfs_fs";
 
-            "ncase-m1-nixos/persist" = {
+            "${pseudoRoot}/persist" = {
               type = "zfs_fs";
               mountpoint = "/persist";
               options =
@@ -141,28 +144,28 @@ in
                 };
             };
 
-            "ncase-m1-nixos/persist/videos" = {
+            "${pseudoRoot}/persist/videos" = {
               type = "zfs_fs";
               mountpoint = "/persist/home/${username}/videos";
               options.mountpoint = "legacy";
               options.recordsize = "1M";
             };
 
-            "ncase-m1-nixos/persist/pictures" = {
+            "${pseudoRoot}/persist/pictures" = {
               type = "zfs_fs";
               mountpoint = "/persist/home/${username}/pictures";
               options.mountpoint = "legacy";
               options.recordsize = "1M";
             };
 
-            "ncase-m1-nixos/persist/music" = {
+            "${pseudoRoot}/persist/music" = {
               type = "zfs_fs";
               mountpoint = "/persist/home/${username}/music";
               options.mountpoint = "legacy";
               options.recordsize = "1M";
             };
 
-            "ncase-m1-nixos/persist/downloads" = {
+            "${pseudoRoot}/persist/downloads" = {
               type = "zfs_fs";
               mountpoint = "/persist/home/${username}/downloads";
               options.mountpoint = "legacy";

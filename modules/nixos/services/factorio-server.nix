@@ -12,12 +12,12 @@ in
 mkIf cfg.enable {
   services.factorio = {
     enable = true;
-    package = pkgs.factorio-headless.overrideAttrs {
-      version = "2.0.7";
+    package = pkgs.factorio-headless.overrideAttrs rec {
+      version = "2.0.8";
       src = pkgs.fetchurl {
-        name = "factorio_headless_x64-2.0.7.tar.xz";
-        url = "https://factorio.com/get-download/2.0.7/headless/linux64";
-        sha256 = "sha256-5qZKnuWx03c80fQKpc946Rlg6t5sUI/TZcNHUq/fJ2I=";
+        name = "factorio_headless_x64-${version}.tar.xz";
+        url = "https://factorio.com/get-download/${version}/headless/linux64";
+        sha256 = "sha256-2VlMTVUqPk+WWxiKR3TajIsBD8I92w78Y7HZSBjd4co=";
       };
     };
     requireUserVerification = false;

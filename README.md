@@ -9,9 +9,8 @@
 - Fully modular configuration utilising NixOS module options
 - Tmpfs root file system with opt-in persistence, no stateful cruft
 - Persistent ZFS file system with full-disk encryption and compression
-- Home Manager dotfile management
+- Passwordless disk decryption with Secure Boot and TPM
 - Declarative base-16 color scheme config with light/dark theme switching
-- Customised Hyprland desktop environment
 - Secret management using Agenix (secrets stored in private repo)
 - Declarative Restic backup system with remote redundancy
 
@@ -44,15 +43,6 @@ The configuration also supports running a VM-variant of any host using `run-vm
 <hostname>`. This enables easy debugging/testing of host configurations. It's
 particularly useful for bisecting old versions of configurations to debug
 regressions.
-
-## Theming
-
-Uses Nix-colors, Darkman, and Home Manager for declarative theme switching
-between light and dark color schemes. An application in Home Manager can have
-dynamic theme switching enabled by declaring:
-``` nix
-darkman.switchApps.<app_name>.paths = [ <app_config_paths> ];
-```
 
 ## Secret Management
 

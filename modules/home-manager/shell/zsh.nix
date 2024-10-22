@@ -36,7 +36,9 @@ mkIf cfg.enable {
       path = "${config.xdg.stateHome}/zsh/zsh_history";
       extended = true;
       ignoreDups = true;
+      ignoreSpace = true;
       expireDuplicatesFirst = true;
+      size = 500000;
     };
 
     shellAliases = {

@@ -15,6 +15,7 @@ let
   cfg = desktop.services.dunst;
   colors = config.colorScheme.palette;
   systemctl = getExe' pkgs.systemd "systemctl";
+  dunstctl = getExe' config.services.dunst.package "dunstctl";
 in
 mkIf (cfg.enable && desktopEnabled) {
   services.dunst = {
@@ -96,6 +97,11 @@ mkIf (cfg.enable && desktopEnabled) {
         light = "${light.palette.base00}";
       };
     };
+  };
+
+  ${ns}.desktop.programs.locking = {
+    preLockScript = "${dunstctl} set-paused true";
+    postUnlockScript = "${dunstctl} set-paused false";
   };
 
   desktop.hyprland.settings.layerrule = [

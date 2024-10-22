@@ -50,7 +50,7 @@ in
       mosquitto.enable = true;
       qbittorrent-nox.enable = true;
       mikrotik-backup.enable = true;
-      index-checker.enable = true;
+      index-checker.enable = false;
       fail2ban.enable = true;
       mealie.enable = false;
       acme.enable = true;

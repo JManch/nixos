@@ -134,6 +134,10 @@ mkMerge [
                 # the script using `systemd.service.<name>.script`. To avoid
                 # infinite recursion we override ExecStart with a new script
                 # containing a modified version of the original script.
+
+                # Generate with passphrase creds with:
+                # systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2 --tpm2-pcrs=7+11+12 --name=zfs-passphrase - -
+                # WARN: I'm not sure if PCRs 11+12 are viable, needs testing
                 customImportScript = getExe (
                   pkgs.writeShellScriptBin "zfs-import-${pool}-custom" (
                     replaceStrings [ "prompt )\n      tries=3\n      success=false\n" ]
@@ -168,11 +172,7 @@ mkMerge [
               in
               nameValuePair "zfs-import-${pool}" {
                 after = [ "tpm2.target" ];
-                serviceConfig = {
-                  # Generate with:
-                  # systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2 --name=zfs-passphrase - -
-                  ExecStart = mkForce customImportScript;
-                };
+                serviceConfig.ExecStart = mkForce customImportScript;
               }
             ) rootPools
           );

@@ -422,10 +422,9 @@ in
             sudo systemctl stop home-assistant
           '';
 
-          postRestoreScript = # bash
-            ''
-              sudo -u postgres ${pg_restore} -U postgres --dbname postgres --clean --create ${backup}
-            '';
+          postRestoreScript = ''
+            sudo -u postgres ${pg_restore} -U postgres --dbname postgres --clean --create ${backup}
+          '';
         };
     };
 
@@ -460,19 +459,19 @@ in
         directory = "/var/lib/hass";
         user = "hass";
         group = "hass";
-        mode = "700";
+        mode = "0700";
       }
       {
         directory = "/var/lib/postgresql";
         user = "postgres";
         group = "postgres";
-        mode = "750";
+        mode = "0750";
       }
       {
         directory = "/var/backup/postgresql";
         user = "postgres";
         group = "postgres";
-        mode = "750";
+        mode = "0700";
       }
     ];
 

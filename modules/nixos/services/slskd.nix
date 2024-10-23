@@ -47,6 +47,6 @@ mkIf cfg.enable {
     directory = "/var/lib/slskd";
     user = "slskd";
     group = "slskd";
-    mode = "750";
+    mode = "0755";
   };
 }

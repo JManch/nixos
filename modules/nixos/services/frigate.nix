@@ -314,7 +314,7 @@ mkIf cfg.enable {
     directory = "/var/lib/frigate";
     user = "frigate";
     group = "frigate";
-    mode = "700";
+    mode = "0750";
   };
 
   virtualisation.vmVariant = {

@@ -216,14 +216,16 @@ mkMerge [
           StartLimitIntervalSec = 30;
         };
 
-        serviceConfig = {
+        serviceConfig = hardeningBaseline config {
+          DynamicUser = false;
           ExecStart = runGoAccess.outPath;
           Restart = "on-failure";
           RestartSec = 10;
           User = "caddy";
           Group = "caddy";
           StateDirectory = [ "goaccess" ];
-        } // hardeningBaseline config { DynamicUser = false; };
+          StateDirectoryMode = "0750";
+        };
 
         wantedBy = [ "multi-user.target" ];
       };
@@ -253,7 +255,7 @@ mkMerge [
         directory = "/var/lib/caddy";
         user = caddy.user;
         group = caddy.group;
-        mode = "700";
+        mode = "0755";
       };
 
     virtualisation.vmVariant = {

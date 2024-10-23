@@ -94,7 +94,7 @@ mkMerge [
       services.rpcbind.enable = true;
 
       # Need to do this as well
-      systemd.tmpfiles.rules = map (f: "d /mnt/nfs/${f.path} 0775 ${f.user} ${f.group}") fileSystems;
+      systemd.tmpfiles.rules = map (f: "d /mnt/nfs/${f.path} 0775 ${f.user} ${f.group} - -") fileSystems;
 
       fileSystems = listToAttrs (
         map (f: {

@@ -394,6 +394,6 @@ mkIf cfg.enable {
     directory = "/var/lib/minecraft";
     user = "minecraft";
     group = "minecraft";
-    mode = "755";
+    mode = "0700";
   };
 }

@@ -62,7 +62,7 @@ mkMerge [
       directory = "/var/lib/mosquitto";
       user = "mosquitto";
       group = "mosquitto";
-      mode = "700";
+      mode = "0700";
     };
   })
 ]

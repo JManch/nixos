@@ -365,8 +365,8 @@ in
   # List of programs that require the bind mount to compile:
   # - mongodb
   systemd.tmpfiles.rules = mkIf impermanence.enable [
-    "d /var/nix-tmp 0755 root root"
-    "d /persist/var/nix-tmp 0755 root root"
+    "d /var/nix-tmp 0755 root root - -"
+    "d /persist/var/nix-tmp 0755 root root - -"
   ];
 
   programs.command-not-found.enable = false;

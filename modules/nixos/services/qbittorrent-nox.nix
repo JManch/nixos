@@ -55,6 +55,7 @@ mkIf cfg.enable {
       User = "qbittorrent-nox";
       Group = "qbittorrent-nox";
       StateDirectory = "qbittorrent-nox";
+      StateDirectoryMode = "750";
       ExecStart = getExe' qbittorrent-nox "qbittorrent-nox";
       Restart = "always";
       RestrictAddressFamilies = [
@@ -63,15 +64,14 @@ mkIf cfg.enable {
         "AF_INET6"
         "AF_NETLINK"
       ];
-      UMask = "0002";
     };
 
     wantedBy = [ "multi-user.target" ];
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/qbittorrent-nox/qBittorrent/downloads 0775 qbittorrent-nox qbittorrent-nox"
-    "d /var/lib/qbittorrent-nox/qBittorrent/downloads-tmp 0775 qbittorrent-nox qbittorrent-nox"
+    "d /var/lib/qbittorrent-nox/qBittorrent/downloads 0755 qbittorrent-nox qbittorrent-nox - -"
+    "d /var/lib/qbittorrent-nox/qBittorrent/downloads-tmp 0755 qbittorrent-nox qbittorrent-nox - -"
   ];
 
   fileSystems."/export/jellyfin" = mkIf nfs.server.enable {
@@ -136,6 +136,6 @@ mkIf cfg.enable {
     directory = "/var/lib/qbittorrent-nox";
     user = "qbittorrent-nox";
     group = "qbittorrent-nox";
-    mode = "750";
+    mode = "0750";
   };
 }

@@ -66,7 +66,7 @@ mkIf cfg.enable {
     directory = "/var/cache/tuigreet";
     user = "greeter";
     group = "greeter";
-    mode = "755";
+    mode = "0755";
   };
 
   persistenceHome.directories = [ ".local/share/keyrings" ];

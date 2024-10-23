@@ -31,6 +31,6 @@ mkIf cfg.enable {
     directory = "/var/lib/acme";
     user = "acme";
     group = "acme";
-    mode = "755";
+    mode = "0755";
   };
 }

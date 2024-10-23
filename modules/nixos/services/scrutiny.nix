@@ -100,6 +100,7 @@ mkMerge [
         Type = "oneshot";
         User = "influxdb2";
         Group = "influxdb2";
+        UMask = "0077";
         ExecStart = pkgs.writeShellScript "scrutiny-influxdb2-backup" ''
           rm -rf /var/backup/influxdb2/scrutiny/*
           # NOTE: This does a full backup of the influxdb so if another
@@ -109,6 +110,11 @@ mkMerge [
         '';
       };
     };
+
+    systemd.tmpfiles.rules = [
+      "d /var/backup/influxdb2 0700 indluxdb2 influxdb2 - -"
+      "d /var/backup/influxdb2/scrutiny 0700 indluxdb2 influxdb2 - -"
+    ];
 
     backups.scrutiny = {
       paths = [
@@ -155,19 +161,19 @@ mkMerge [
         directory = "/var/lib/scrutiny";
         user = "scrutiny";
         group = "scrutiny";
-        mode = "750";
+        mode = "0750";
       }
       {
         directory = "/var/lib/influxdb2";
         user = "influxdb2";
         group = "influxdb2";
-        mode = "750";
+        mode = "0755";
       }
       {
         directory = "/var/backup/influxdb2/scrutiny";
         user = "influxdb2";
         group = "influxdb2";
-        mode = "750";
+        mode = "0750";
       }
     ];
 

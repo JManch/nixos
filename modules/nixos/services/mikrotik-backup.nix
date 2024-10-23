@@ -78,13 +78,15 @@ mkIf cfg.enable {
     after = [ "mikrotik-backup.service" ];
   };
 
+  systemd.tmpfiles.rules = [
+    "d ${backupDir} 0700 mikrotik-backup mikrotik-backup - -"
+  ];
+
   backups.mikrotik = {
     paths = [ backupDir ];
-    restore.pathOwnership = {
-      "${backupDir}" = {
-        user = "mikrotik-backup";
-        group = "mikrotik-backup";
-      };
+    restore.pathOwnership.${backupDir} = {
+      user = "mikrotik-backup";
+      group = "mikrotik-backup";
     };
   };
 
@@ -92,6 +94,6 @@ mkIf cfg.enable {
     directory = backupDir;
     user = "mikrotik-backup";
     group = "mikrotik-backup";
-    mode = "700";
+    mode = "0700";
   };
 }

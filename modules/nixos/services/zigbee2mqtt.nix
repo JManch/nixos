@@ -94,7 +94,7 @@ mkMerge [
       directory = dataDir;
       user = "zigbee2mqtt";
       group = "zigbee2mqtt";
-      mode = "770";
+      mode = "0700";
     };
   })
 

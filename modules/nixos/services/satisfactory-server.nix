@@ -46,6 +46,7 @@ mkIf cfg.enable {
       ExecStartPre = "${steamcmd} +force_install_dir ${dataDir} +login anonymous +app_update 1690800 validate +quit";
       ExecStart = "${steam-run} ${dataDir}/FactoryServer.sh";
       StateDirectory = "satisfactory-server";
+      StateDirectoryMode = "0750";
 
       ProtectProc = "default";
       ProcSubset = "all";
@@ -70,6 +71,6 @@ mkIf cfg.enable {
     directory = "/var/lib/satisfactory-server";
     user = "satisfactory";
     group = "satisfactory";
-    mode = "755";
+    mode = "0750";
   };
 }

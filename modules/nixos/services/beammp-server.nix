@@ -134,6 +134,6 @@ mkIf cfg.enable {
     directory = "/var/lib/beammp-server";
     user = "beammp";
     group = "beammp";
-    mode = "755";
+    mode = "0755";
   };
 }

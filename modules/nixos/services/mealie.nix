@@ -43,6 +43,6 @@ mkIf cfg.enable {
     directory = "/var/lib/private/mealie";
     user = "mealie";
     group = "mealie";
-    mode = "755";
+    mode = "0755";
   };
 }

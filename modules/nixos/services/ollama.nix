@@ -44,6 +44,6 @@ mkIf cfg.enable {
     directory = "/var/lib/private/ollama";
     user = "ollama";
     group = "ollama";
-    mode = "755";
+    mode = "0755";
   };
 }

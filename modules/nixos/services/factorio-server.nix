@@ -13,11 +13,11 @@ mkIf cfg.enable {
   services.factorio = {
     enable = true;
     package = pkgs.factorio-headless.overrideAttrs rec {
-      version = "2.0.8";
+      version = "2.0.9";
       src = pkgs.fetchurl {
         name = "factorio_headless_x64-${version}.tar.xz";
         url = "https://factorio.com/get-download/${version}/headless/linux64";
-        sha256 = "sha256-2VlMTVUqPk+WWxiKR3TajIsBD8I92w78Y7HZSBjd4co=";
+        sha256 = "sha256-9JkHez4sExNFLDUPH68X2zHK4qD6c49pFm6Xw8qjyG0=";
       };
     };
     requireUserVerification = false;
@@ -62,6 +62,6 @@ mkIf cfg.enable {
     directory = "/var/lib/private/factorio-server";
     user = "factorio";
     group = "factorio";
-    mode = "755";
+    mode = "0755";
   };
 }

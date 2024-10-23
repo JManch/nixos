@@ -411,7 +411,7 @@ mkMerge [
     # expensive
     persistence.directories = singleton {
       directory = "/var/cache/restic-repo-maintenance";
-      mode = "700";
+      mode = "0700";
     };
   })
 
@@ -563,16 +563,16 @@ mkMerge [
         directory = cfg.server.dataDir;
         user = "restic";
         group = "restic";
-        mode = "700";
+        mode = "0700";
       }
       # Persist cache because we want to avoid read operations from B2 storage
       {
         directory = "/var/cache/restic-remote-copy";
-        mode = "700";
+        mode = "0700";
       }
       {
         directory = "/var/cache/restic-remote-maintenance";
-        mode = "700";
+        mode = "0700";
       }
     ];
   })

@@ -83,13 +83,13 @@ mkIf cfg.enable {
       directory = "/var/lib/calibre-web";
       user = "calibre-web";
       group = "calibre-web";
-      mode = "700";
+      mode = "0755";
     }
     {
       directory = "/var/lib/calibre-library";
       user = "calibre-web";
       group = "calibre-web";
-      mode = "700";
+      mode = "0700";
     }
   ];
 
@@ -105,9 +105,7 @@ mkIf cfg.enable {
       '';
     in
     {
-      services.calibre-web = {
-        listen.ip = mkVMOverride "0.0.0.0";
-      };
+      services.calibre-web.listen.ip = mkVMOverride "0.0.0.0";
 
       systemd.services.calibre-web.serviceConfig = {
         ExecStartPre = mkBefore [ createDummyLibrary.outPath ];

@@ -147,6 +147,11 @@ mkIf cfg.enable {
 
   adminPackages = [ restoreScript ];
 
+  systemd.tmpfiles.rules = [
+    "d /var/backup/vaultwarden 0700 vaultwarden vaultwarden - -"
+    "d /var/backup/vaultwarden-archive 0700 vaultwarden vaultwarden - -"
+  ];
+
   systemd.services.vaultwarden-cloud-backup =
     let
       inherit (config.services.vaultwarden) backupDir;
@@ -259,6 +264,8 @@ mkIf cfg.enable {
         User = "vaultwarden";
         Group = "vaultwarden";
         StateDirectory = "vaultwarden-cloud-backup";
+        StateDirectoryMode = "0700";
+        UMask = "0077";
         # WARN: I've noticed that as the number of remote backup files grows,
         # rclone backups slow down significantly because it downloads all
         # remote files before every backup. I've seen it take 30 mins when the
@@ -329,28 +336,28 @@ mkIf cfg.enable {
       directory = "/var/lib/bitwarden_rs";
       user = "vaultwarden";
       group = "vaultwarden";
-      mode = "770";
+      mode = "0700";
     }
     {
       # Just stores rclone config files
       directory = "/var/lib/vaultwarden-cloud-backup";
       user = "vaultwarden";
       group = "vaultwarden";
-      mode = "770";
+      mode = "0700";
     }
     {
       # Stores the latest vault backup
       directory = "/var/backup/vaultwarden";
       user = "vaultwarden";
       group = "vaultwarden";
-      mode = "770";
+      mode = "0700";
     }
     {
       # Stores last two compressed backups
       directory = "/var/backup/vaultwarden-archive";
       user = "vaultwarden";
       group = "vaultwarden";
-      mode = "770";
+      mode = "0700";
     }
   ];
 

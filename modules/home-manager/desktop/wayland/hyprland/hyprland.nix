@@ -83,6 +83,7 @@ mkIf (isHyprland config) {
   xdg.configFile."hypr/hyprland.conf".onChange =
     let
       hyprDir = "${config.xdg.configHome}/hypr";
+      m = primaryMonitor;
     in
     # bash
     ''
@@ -98,16 +99,9 @@ mkIf (isHyprland config) {
         -e 's/, monitor:(.*),//g' \
         -e 's/${primaryMonitor.name}/WAYLAND-1/g' \
         ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf
-      ${
-        # Add monitor config
-        concatMapStringsSep "\n" (
-          m:
-          let
-            res = "${toString m.width}x${toString m.height}";
-          in
-          "echo \"monitor=WL-${toString m.number},${res},${toString m.position.x}x${toString m.position.y},1\" >> ${hyprDir}/hyprlandd.conf"
-        ) monitors
-      }
+
+      # Add monitor config
+      echo "monitor=WAYLAND-${toString m.number},${toString m.width}x${toString m.height},${toString m.position.x}x${toString m.position.y},1" >> ${hyprDir}/hyprlandd.conf
     '';
 
   xdg.portal = {
@@ -223,24 +217,30 @@ mkIf (isHyprland config) {
 
         bezier = [
           "easeInOutQuart,0.76,0,0.24,1"
-          "fluent_decel, 0, 0.2, 0.4, 1"
+          "fluentDecel, 0, 0.2, 0.4, 1"
           "easeOutCirc, 0, 0.55, 0.45, 1"
           "easeOutCubic, 0.33, 1, 0.68, 1"
           "easeinoutsine, 0.37, 0, 0.63, 1"
+          "easeOutQuint, 0.23, 1, 0.32, 1"
+          "linear, 0, 0, 1, 1"
         ];
 
         animation = [
-          "windowsIn,1,3,easeOutCubic, popin 30%"
-          "windowsOut,1,3,fluent_decel, popin 70%"
-          "windowsMove,1,2,easeinoutsine, slide"
+          "windowsIn, 1, 3, easeOutCubic, popin 30%"
+          "windowsOut, 1, 3, fluentDecel, popin 70%"
+          "windowsMove, 1, 4, easeOutQuint"
           "fadeIn, 1, 3, easeOutCubic"
           "fadeOut, 1, 1.7, easeOutCubic"
           "fadeSwitch, 0, 1, easeOutCirc"
           "fadeShadow, 1, 10, easeOutCirc"
-          "fadeDim, 1, 4, fluent_decel"
+          "fadeDim, 1, 4, fluentDecel"
           "border, 1, 2.7, easeOutCirc"
-          "borderangle, 1, 30, fluent_decel, once"
+          "borderangle, 1, 30, fluentDecel, once"
           "workspaces, 1, 3, easeOutCubic, slide"
+          "specialWorkspace, 1, 3, easeOutCubic, slidevert"
+          "layers, 1, 3.81, easeOutQuint"
+          "layersIn, 1, 4, easeOutQuint, slide"
+          "layersOut, 1, 1.5, linear, fade"
         ];
       };
 

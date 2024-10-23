@@ -107,5 +107,6 @@ mkIf (cfg.enable && desktopEnabled) {
   desktop.hyprland.settings.layerrule = [
     "blur, notifications"
     "xray 0, notifications"
+    "animation slide, notifications"
   ];
 }

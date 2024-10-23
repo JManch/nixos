@@ -239,7 +239,7 @@ mkIf (isHyprland config) {
           "workspaces, 1, 3, easeOutCubic, slide"
           "specialWorkspace, 1, 3, easeOutCubic, slidevert"
           "layers, 1, 3.81, easeOutQuint"
-          "layersIn, 1, 4, easeOutQuint, slide"
+          "layersIn, 1, 4, easeOutQuint, fade"
           "layersOut, 1, 1.5, linear, fade"
         ];
       };

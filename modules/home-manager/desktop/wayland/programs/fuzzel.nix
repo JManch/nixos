@@ -68,10 +68,13 @@ mkIf (cfg.enable && isWayland) {
       };
     };
 
-  desktop.hyprland.settings.bindr =
+  desktop.hyprland.settings =
     let
       inherit (desktopCfg.hyprland) modKey;
       fuzzel = getExe pkgs.fuzzel;
     in
-    [ "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} fuzzel || ${fuzzel}" ];
+    {
+      bindr = [ "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} fuzzel || ${fuzzel}" ];
+      layerrule = [ "animation slide, launcher" ];
+    };
 }

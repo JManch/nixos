@@ -136,8 +136,8 @@ mkMerge [
                 # containing a modified version of the original script.
 
                 # Generate with passphrase creds with:
-                # systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2 --tpm2-pcrs=7+11+12 --name=zfs-passphrase - -
-                # WARN: I'm not sure if PCRs 11+12 are viable, needs testing
+                # systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2 --name=zfs-passphrase - -
+                # PCR 11 doesn't seem to work unfortunately
                 customImportScript = getExe (
                   pkgs.writeShellScriptBin "zfs-import-${pool}-custom" (
                     replaceStrings [ "prompt )\n      tries=3\n      success=false\n" ]

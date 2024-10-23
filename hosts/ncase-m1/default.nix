@@ -1,4 +1,9 @@
-{ ns, inputs, ... }:
+{
+  ns,
+  inputs,
+  username,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -107,6 +112,14 @@
       lact.enable = true;
       scrutiny.collector.enable = true;
       mosquitto.explorer.enable = true;
+
+      jellyfin = {
+        enable = true;
+        openFirewall = true;
+        autoStart = false;
+        backup = false;
+        mediaDirs.shows = "/home/${username}/videos/shows";
+      };
 
       restic = {
         enable = true;

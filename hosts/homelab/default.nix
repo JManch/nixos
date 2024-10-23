@@ -179,11 +179,17 @@ in
         openFirewall = false;
         autoStart = true;
         reverseProxy.enable = true;
+
         # Google TV on guest VLAN
-        allowedAddresses = with wireguard.friends; [
+        reverseProxy.allowedAddresses = with wireguard.friends; [
           "10.30.30.6/32"
           "${address}/${toString subnet}"
         ];
+
+        mediaDirs = {
+          shows = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/shows";
+          movies = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/movies";
+        };
       };
 
       beammp-server = {

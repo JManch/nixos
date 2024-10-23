@@ -18,7 +18,13 @@ let
     optional
     mkForce
     genAttrs
+    attrNames
+    mapAttrsToList
+    length
+    splitString
+    all
     ;
+  inherit (lib.${ns}) asserts;
   inherit (config.${ns}.system.networking) publicPorts;
   inherit (config.${ns}.services) caddy;
   inherit (caddy) allowAddresses trustedAddresses;
@@ -36,6 +42,13 @@ mkMerge [
   }
 
   (mkIf cfg.enable {
+    assertions = asserts [
+      (all (n: n != "") (attrNames cfg.mediaDirs))
+      "Jellyfin media dir target cannot be empty"
+      (all (n: (length (splitString "/" n)) == 1) (attrNames cfg.mediaDirs))
+      "Jellyfin media dir target cannot be a subdir"
+    ];
+
     services.jellyfin = {
       enable = true;
       openFirewall = cfg.openFirewall;
@@ -48,6 +61,24 @@ mkMerge [
       wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
       serviceConfig.SocketBindDeny = publicPorts;
     };
+
+    systemd.mounts = mapAttrsToList (target: source: {
+      what = source;
+      where = "/var/lib/jellyfin/media/${target}";
+      bindsTo = [ "jellyfin.service" ];
+      requiredBy = [ "jellyfin.service" ];
+      before = [ "jellyfin.service" ];
+      options = "bind,ro";
+      mountConfig.DirectoryMode = "0700";
+    }) cfg.mediaDirs;
+
+    systemd.tmpfiles.rules =
+      [
+        "d /var/lib/jellyfin/media 0700 jellyfin jellyfin - -"
+      ]
+      ++ mapAttrsToList (
+        target: _: "d /var/lib/jellyfin/media/${target} 0700 jellyfin jellyfin - -"
+      ) cfg.mediaDirs;
 
     networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
       allowedTCPPorts = [
@@ -62,7 +93,7 @@ mkMerge [
 
     # Jellyfin module has good default hardening
 
-    backups.jellyfin = {
+    backups.jellyfin = mkIf cfg.backup {
       paths = [ "/var/lib/jellyfin" ];
       exclude = [
         "transcodes"
@@ -86,25 +117,25 @@ mkMerge [
         directory = "/var/lib/jellyfin";
         user = jellyfin.user;
         group = jellyfin.group;
-        mode = "700";
+        mode = "0700";
       }
       {
         directory = "/var/cache/jellyfin";
         user = jellyfin.user;
         group = jellyfin.group;
-        mode = "700";
+        mode = "0700";
       }
     ];
   })
 
   (mkIf cfg.reverseProxy.enable {
-    assertions = lib.${ns}.asserts [
+    assertions = asserts [
       caddy.enable
       "Jellyfin reverse proxy requires caddy to be enabled"
     ];
 
     services.caddy.virtualHosts."jellyfin.${fqDomain}".extraConfig = ''
-      ${allowAddresses (trustedAddresses ++ cfg.allowedAddresses)}
+      ${allowAddresses (trustedAddresses ++ cfg.reverseProxy.allowedAddresses)}
       reverse_proxy http://${cfg.reverseProxy.address}:8096
     '';
   })

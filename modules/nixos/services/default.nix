@@ -134,6 +134,14 @@ in
       enable = mkEnableOption "Jellyfin";
       openFirewall = mkEnableOption "opening the firewall";
 
+      backup = mkEnableOption "Jellyfin backups" // {
+        default = true;
+      };
+
+      autoStart = mkEnableOption "Jellyfin auto start" // {
+        default = true;
+      };
+
       reverseProxy = {
         enable = mkEnableOption "Jellyfin Caddy virtual host";
 
@@ -141,6 +149,15 @@ in
           type = types.str;
           default = "127.0.0.1";
           description = "IP address that reverse proxy should point to";
+        };
+
+        allowedAddresses = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = ''
+            List of address to give access to Jellyfin in addition to the trusted
+            list.
+          '';
         };
       };
 
@@ -152,18 +169,17 @@ in
         '';
       };
 
-      autoStart = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Jellyfin service auto start";
-      };
-
-      allowedAddresses = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
+      mediaDirs = mkOption {
+        type = types.attrsOf types.str;
+        default = { };
+        example = {
+          shows = "/home/${username}/videos/shows";
+          movies = "/home/${username}/videos/movies";
+        };
         description = ''
-          List of address to give access to Jellyfin in addition to the trusted
-          list.
+          Attribute set of media directories that will be bind mount to
+          /var/lib/jellyfin/media. Attribute name is target bind path relative
+          to media dir and value is absolute source dir.
         '';
       };
     };

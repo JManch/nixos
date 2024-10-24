@@ -108,6 +108,13 @@
           options.mountpoint = "legacy";
           options.recordsize = "8k";
         };
+
+        "homelab-nixos/persist/srv" = {
+          type = "zfs_fs";
+          mountpoint = "/persist/srv";
+          options.mountpoint = "legacy";
+          options.recordsize = "1M";
+        };
       };
     };
   };

@@ -162,6 +162,13 @@ in
         };
       };
 
+      file-server = {
+        enable = true;
+        allowedAddresses = [
+          "${ncaseM1IPAddress}/32"
+        ] ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
+      };
+
       minecraft-server = {
         enable = true;
         memory = 2000;

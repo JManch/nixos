@@ -114,6 +114,7 @@ in
         hideMounts = true;
 
         directories = [
+          "/srv"
           "/var/log"
           "/var/tmp"
           "/var/lib/systemd"

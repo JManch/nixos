@@ -15,19 +15,16 @@ let
     ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.audio;
+  wpctl = getExe' pkgs.wireplumber "wpctl";
+  notifySend = getExe pkgs.libnotify;
 
-  toggleMic =
-    let
-      wpctl = getExe' pkgs.wireplumber "wpctl";
-      notifySend = getExe pkgs.libnotify;
-    in
-    pkgs.writeShellScript "toggle-mic" ''
-      ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle
-      status=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@)
-      message=$([[ "$status" == *MUTED* ]] && echo "Muted" || echo "Unmuted")
-      ${notifySend} -u critical -t 2000 \
-        -h 'string:x-canonical-private-synchronous:microphone-toggle' 'Microphone' "$message"
-    '';
+  toggleMic = pkgs.writeShellScript "toggle-mic" ''
+    ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+    status=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@)
+    message=$([[ "$status" == *MUTED* ]] && echo "Muted" || echo "Unmuted")
+    ${notifySend} -u critical -t 2000 \
+      -h 'string:x-canonical-private-synchronous:microphone-toggle' 'Microphone' "$message"
+  '';
 in
 {
   config = mkMerge [
@@ -53,6 +50,21 @@ in
       systemd.user.sockets = {
         pipewire.unitConfig.ConditionUser = "!@system";
         pipewire-pulse.unitConfig.ConditionUser = "!@system";
+      };
+
+      systemd.user.services.unmute-pipewire-devices = {
+        description = "Unmute source and sink devices on login";
+        after = [ "pipewire.service" ];
+        wants = [ "pipewire.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = pkgs.writeShellScript "unmute-pipewire-devices" ''
+            ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ 0
+            ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ 0
+          '';
+        };
+        wantedBy = [ "default.target" ];
       };
 
       hm = mkIf homeManager.enable {

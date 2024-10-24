@@ -10,13 +10,17 @@
 let
   inherit (lib)
     mkIf
+    all
     mkMerge
     mapAttrs
+    mapAttrs'
     getExe
+    attrNames
     mkVMOverride
     toUpper
     concatStringsSep
     concatMapStrings
+    nameValuePair
     concatMapStringsSep
     genAttrs
     singleton
@@ -122,6 +126,13 @@ mkMerge [
     assertions = asserts [
       (cfg.trustedAddresses != [ ])
       "Caddy requires trusted addresses to be set"
+      (all (subdomain: cfg.virtualHosts.${subdomain}.allowedAddresses != [ ]) (
+        attrNames cfg.virtualHosts
+      ))
+      ''
+        Caddy virtual host has no allowed addresses. This is probably bad as it
+        may allow access from all addresses.
+      ''
     ];
 
     services.caddy = {
@@ -132,25 +143,50 @@ mkMerge [
 
       globalConfig = ''
         admin off
-
-        acme_dns porkbun {
-          api_key {env.PORKBUN_API_KEY}
-          api_secret_key {env.PORKBUN_API_SECRET_KEY}
-        }
       '';
 
-      virtualHosts."logs.${fqDomain}".extraConfig = ''
-        ${cfg.allowAddresses cfg.trustedAddresses}
-        root * /var/lib/goaccess/
-        file_server * browse
+      virtualHosts = mapAttrs' (
+        subdomain: cfg':
+        nameValuePair "${subdomain}.${fqDomain}" {
+          # Instead of using the global acme_dns option we have to configure
+          # ACME DNS on every host. This is because it's not possible to use a
+          # custom resolver in the global option. We need a custom resolver
+          # because our local DNS server redirects requests to our domain which
+          # breaks the DNS challenge somehow.
+          # I think this describes the issue I was facing:
+          # https://github.com/go-acme/lego/issues/1754#issuecomment-1441038533
+          extraConfig = ''
+            tls {
+              dns porkbun {
+                api_key {env.PORKBUN_API_KEY}
+                api_secret_key {env.PORKBUN_SECRET_API_KEY}
+              }
+              resolvers 1.1.1.1
+            }
 
-        @websockets {
-          header Connection *Upgrade*
-          header Upgrade websocket
+            @block {
+              not remote_ip ${concatStringsSep " " cfg'.allowedAddresses}
+            }
+            respond @block "Access denied" 403 {
+              close
+            }
+
+            ${cfg'.extraConfig}
+          '';
         }
-        reverse_proxy @websockets http://127.0.0.1:7890
-      '';
+      ) config.${ns}.services.caddy.virtualHosts;
     };
+
+    ${ns}.services.caddy.virtualHosts.logs.extraConfig = ''
+      root * /var/lib/goaccess/
+      file_server * browse
+
+      @websockets {
+        header Connection *Upgrade*
+        header Upgrade websocket
+      }
+      reverse_proxy @websockets http://127.0.0.1:7890
+    '';
 
     networking.firewall.allowedUDPPorts = [ 443 ];
     networking.firewall.allowedTCPPorts = [

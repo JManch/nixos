@@ -2,14 +2,11 @@
   ns,
   lib,
   config,
-  inputs,
   ...
 }:
 let
   inherit (lib) mkIf singleton;
   inherit (config.${ns}.services) caddy;
-  inherit (caddy) allowAddresses trustedAddresses;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.device) vpnNamespace;
   cfg = config.${ns}.services.slskd;
 in
@@ -38,8 +35,7 @@ mkIf cfg.enable {
     to = cfg.port;
   };
 
-  services.caddy.virtualHosts."slskd.${fqDomain}".extraConfig = ''
-    ${allowAddresses trustedAddresses}
+  ${ns}.services.caddy.virtualHosts.slskd.extraConfig = ''
     reverse_proxy http://${config.vpnNamespaces.${vpnNamespace}.namespaceAddress}:${toString cfg.port}
   '';
 

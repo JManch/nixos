@@ -15,8 +15,7 @@ let
     ;
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (config.${ns}.services) caddy nfs;
-  inherit (inputs.nix-resources.secrets) fqDomain qBittorrentPort;
-  inherit (caddy) allowAddresses trustedAddresses;
+  inherit (inputs.nix-resources.secrets) qBittorrentPort;
   inherit (config.${ns}.device) vpnNamespace;
   cfg = config.${ns}.services.qbittorrent-nox;
   qbittorrent-nox = pkgs.qbittorrent.override { guiSupport = false; };
@@ -79,25 +78,26 @@ mkIf cfg.enable {
     options = [ "bind" ];
   };
 
-  ${ns}.services.nfs.server.fileSystems =
-    let
-      inherit (config.${ns}.system.reservedIDs.jellyfin) uid gid;
-    in
-    [
-      {
-        path = "jellyfin";
-        clients = {
-          # all_squash doesn't change the ownership of existing files
-          # It just affects the access priviledges somehow through NFS I think?
-          "ncase-m1.lan" = "ro,no_subtree_check,all_squash,anonuid=${toString uid},anongid=${toString gid}";
-        };
-      }
-    ];
+  ${ns}.services = {
+    nfs.server.fileSystems =
+      let
+        inherit (config.${ns}.system.reservedIDs.jellyfin) uid gid;
+      in
+      [
+        {
+          path = "jellyfin";
+          clients = {
+            # all_squash doesn't change the ownership of existing files
+            # It just affects the access priviledges somehow through NFS I think?
+            "ncase-m1.lan" = "ro,no_subtree_check,all_squash,anonuid=${toString uid},anongid=${toString gid}";
+          };
+        }
+      ];
 
-  services.caddy.virtualHosts."torrents.${fqDomain}".extraConfig = ''
-    ${allowAddresses trustedAddresses}
-    reverse_proxy http://${config.vpnNamespaces.${vpnNamespace}.namespaceAddress}:${toString cfg.port}
-  '';
+    caddy.virtualHosts.torrents.extraConfig = ''
+      reverse_proxy http://${config.vpnNamespaces.${vpnNamespace}.namespaceAddress}:${toString cfg.port}
+    '';
+  };
 
   vpnNamespaces.${vpnNamespace} = {
     portMappings = singleton {

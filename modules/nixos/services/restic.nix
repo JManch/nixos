@@ -547,16 +547,13 @@ mkMerge [
       };
     };
 
-    services.caddy.virtualHosts = {
-      "restic.${fqDomain}".extraConfig = ''
-        ${allowAddresses trustedAddresses}
-        # Because syncing involves many HTTP requests logs get very large.
-        # Exclude LAN IPs from logs to circumvent this.
-        @lan remote_ip ${concatStringsSep " " trustedAddresses}
-        log_skip @lan
-        reverse_proxy http://127.0.0.1:${toString cfg.server.port}
-      '';
-    };
+    ${ns}.services.caddy.virtualHosts.restic.extraConfig = ''
+      # Because syncing involves many HTTP requests logs get very large.
+      # Exclude LAN IPs from logs to circumvent this.
+      @lan remote_ip ${concatStringsSep " " trustedAddresses}
+      log_skip @lan
+      reverse_proxy http://127.0.0.1:${toString cfg.server.port}
+    '';
 
     persistence.directories = [
       {

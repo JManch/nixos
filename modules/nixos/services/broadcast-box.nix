@@ -15,9 +15,7 @@ let
     optionalString
     getExe'
     ;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy;
-  inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.${ns}.services.broadcast-box;
 in
 {
@@ -55,9 +53,10 @@ in
 
     networking.firewall.allowedUDPPorts = [ cfg.udpMuxPort ];
 
-    services.caddy.virtualHosts = mkIf cfg.proxy {
-      "stream.${fqDomain}".extraConfig = ''
-        ${allowAddresses (trustedAddresses ++ cfg.allowedAddresses)}
+    ${ns}.services.caddy.virtualHosts.stream = mkIf cfg.proxy {
+      allowTrustedAddresses = false;
+      extraAllowedAddresses = cfg.allowedAddresses;
+      extraConfig = ''
         reverse_proxy http://127.0.0.1:${toString cfg.port}
       '';
     };

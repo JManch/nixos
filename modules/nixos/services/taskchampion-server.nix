@@ -2,15 +2,12 @@
   ns,
   lib,
   config,
-  inputs,
   ...
 }:
 let
   inherit (lib) mkIf singleton;
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (config.${ns}.services) caddy;
-  inherit (caddy) allowAddresses trustedAddresses;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.${ns}.services.taskchampion-server;
 in
 mkIf cfg.enable {
@@ -29,8 +26,7 @@ mkIf cfg.enable {
     StateDirectory = "taskchampion-sync-server";
   };
 
-  services.caddy.virtualHosts."tasks.${fqDomain}".extraConfig = ''
-    ${allowAddresses trustedAddresses}
+  ${ns}.services.caddy.virtualHosts.tasks.extraConfig = ''
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 

@@ -16,7 +16,6 @@ let
   inherit (lib.${ns}) asserts;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy mosquitto;
-  inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.age.secrets) zigbee2mqttYamlSecrets mqttZigbee2mqttPassword;
   inherit (config.services.zigbee2mqtt) dataDir;
   cfg = config.${ns}.services.zigbee2mqtt;
@@ -104,8 +103,7 @@ mkMerge [
       "Zigbee2mqtt proxy requires Caddy to be enabled"
     ];
 
-    services.caddy.virtualHosts."zigbee.${fqDomain}".extraConfig = ''
-      ${allowAddresses trustedAddresses}
+    ${ns}.services.caddy.virtualHosts.zigbee.extraConfig = ''
       basic_auth {
         admin $2a$14$6SspBEu6Yi82Bx3VdT4S1eshOACOuf4DdFlQrg2kYcDomTOrsF/ru
       }

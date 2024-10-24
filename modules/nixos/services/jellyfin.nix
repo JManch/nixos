@@ -8,7 +8,6 @@
   ns,
   lib,
   config,
-  inputs,
   ...
 }:
 let
@@ -27,9 +26,7 @@ let
   inherit (lib.${ns}) asserts;
   inherit (config.${ns}.system.networking) publicPorts;
   inherit (config.${ns}.services) caddy;
-  inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.services) jellyfin;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.${ns}.services.jellyfin;
   uid = 1500;
   gid = 1500;
@@ -134,9 +131,11 @@ mkMerge [
       "Jellyfin reverse proxy requires caddy to be enabled"
     ];
 
-    services.caddy.virtualHosts."jellyfin.${fqDomain}".extraConfig = ''
-      ${allowAddresses (trustedAddresses ++ cfg.reverseProxy.allowedAddresses)}
-      reverse_proxy http://${cfg.reverseProxy.address}:8096
-    '';
+    ${ns}.services.caddy.virtualHosts.jellyfin = {
+      inherit (cfg.reverseProxy) extraAllowedAddresses;
+      extraConfig = ''
+        reverse_proxy http://${cfg.reverseProxy.address}:8096
+      '';
+    };
   })
 ]

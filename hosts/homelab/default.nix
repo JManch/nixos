@@ -1,11 +1,13 @@
 {
   ns,
+  self,
   config,
   inputs,
   ...
 }:
 let
   inherit (config.${ns}.services) wireguard;
+  ncaseM1IPAddress = self.nixosConfigurations.ncase-m1.config.${ns}.device.ipAddress;
 in
 {
   imports = [
@@ -108,7 +110,9 @@ in
         autoStart = true;
         proxy = true;
         interfaces = [ "wg-friends" ];
-        allowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
+        allowedAddresses = [
+          "${ncaseM1IPAddress}/32"
+        ] ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };
 
       factorio-server = {
@@ -162,6 +166,7 @@ in
         enable = true;
         memory = 2000;
         interfaces = [ "wg-friends" ];
+        extraAllowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
         plugins = [
           "vivecraft"
           "squaremap"
@@ -181,7 +186,7 @@ in
         reverseProxy.enable = true;
 
         # Google TV on guest VLAN
-        reverseProxy.allowedAddresses = with wireguard.friends; [
+        reverseProxy.extraAllowedAddresses = with wireguard.friends; [
           "10.30.30.6/32"
           "${address}/${toString subnet}"
         ];

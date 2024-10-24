@@ -3,7 +3,6 @@
   lib,
   pkgs,
   config,
-  inputs,
   ...
 }:
 let
@@ -13,9 +12,7 @@ let
     mkForce
     singleton
     ;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy;
-  inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.${ns}.hardware.printing;
 
   dcp9015cdwlpr = pkgs.dcp9020cdwlpr.overrideAttrs (oldAttrs: rec {
@@ -124,8 +121,7 @@ mkMerge [
       };
     };
 
-    services.caddy.virtualHosts."printing.${fqDomain}".extraConfig = ''
-      ${allowAddresses trustedAddresses}
+    ${ns}.services.caddy.virtualHosts.printing.extraConfig = ''
       reverse_proxy http://localhost:631 {
         header_up host localhost
       }

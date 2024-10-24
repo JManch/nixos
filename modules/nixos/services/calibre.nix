@@ -3,7 +3,6 @@
   lib,
   pkgs,
   config,
-  inputs,
   ...
 }:
 let
@@ -14,9 +13,7 @@ let
     getExe'
     ;
   inherit (lib.${ns}) asserts addPatches hardeningBaseline;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy;
-  inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.${ns}.services.calibre;
 in
 mkIf cfg.enable {
@@ -51,10 +48,12 @@ mkIf cfg.enable {
     ReadWritePaths = [ "/var/lib/calibre-library" ];
   };
 
-  services.caddy.virtualHosts."calibre.${fqDomain}".extraConfig = ''
-    ${allowAddresses (trustedAddresses ++ cfg.extraAllowedAddresses)}
-    reverse_proxy http://127.0.0.1:${toString cfg.port}
-  '';
+  ${ns}.services.caddy.virtualHosts.calibre = {
+    inherit (cfg) extraAllowedAddresses;
+    extraConfig = ''
+      reverse_proxy http://127.0.0.1:${toString cfg.port}
+    '';
+  };
 
   # Expose wireless server for kobo ereader transfers
   networking.firewall.allowedTCPPorts = [ 9090 ];

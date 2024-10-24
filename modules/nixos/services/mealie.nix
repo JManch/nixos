@@ -9,10 +9,14 @@ let
   inherit (lib) mkIf singleton;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy;
-  inherit (caddy) allowAddresses trustedAddresses;
   cfg = config.${ns}.services.mealie;
 in
 mkIf cfg.enable {
+  assertions = lib.${ns}.asserts [
+    caddy.enable
+    "Mealie requires Caddy to be enabled"
+  ];
+
   services.mealie = {
     enable = true;
     listenAddress = "127.0.0.1";
@@ -34,8 +38,7 @@ mkIf cfg.enable {
     Group = "mealie";
   };
 
-  services.caddy.virtualHosts."mealie.${fqDomain}".extraConfig = ''
-    ${allowAddresses trustedAddresses}
+  ${ns}.services.caddy.virtualHosts.mealie.extraConfig = ''
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 

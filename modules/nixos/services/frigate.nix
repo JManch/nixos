@@ -2,7 +2,6 @@
   ns,
   lib,
   config,
-  inputs,
   hostname,
   ...
 }:
@@ -18,9 +17,7 @@ let
   inherit (config.${ns}.device) ipAddress;
   inherit (config.${ns}.system.networking) publicPorts;
   inherit (config.${ns}.services) hass mosquitto caddy;
-  inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.age.secrets) cctvVars mqttFrigatePassword;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.${ns}.services.frigate;
 in
 mkIf cfg.enable {
@@ -54,6 +51,10 @@ mkIf cfg.enable {
           hashedPasswordFile = mqttFrigatePassword.path;
         };
       };
+
+      caddy.virtualHosts.cctv.extraConfig = ''
+        reverse_proxy http://127.0.0.1:${toString cfg.port}
+      '';
     };
   };
 
@@ -304,11 +305,6 @@ mkIf cfg.enable {
     addr = "127.0.0.1";
     port = cfg.port;
   };
-
-  services.caddy.virtualHosts."cctv.${fqDomain}".extraConfig = ''
-    ${allowAddresses trustedAddresses}
-    reverse_proxy http://127.0.0.1:${toString cfg.port}
-  '';
 
   persistence.directories = singleton {
     directory = "/var/lib/frigate";

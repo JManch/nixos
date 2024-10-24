@@ -18,7 +18,6 @@ let
     ;
   inherit (config.${ns}.system.virtualisation) vmVariant;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.${ns}.services) caddy fail2ban;
   inherit (config.age.secrets)
     rcloneConfig
@@ -280,19 +279,16 @@ mkIf cfg.enable {
       wantedBy = [ "backup-vaultwarden.service" ];
     };
 
-  services.caddy.virtualHosts = {
-    # Unfortunately the bitwarden app does not support TLS client authentication
-    # https://github.com/bitwarden/mobile/issues/582
-    # https://github.com/bitwarden/mobile/pull/2629
-    "vaultwarden.${fqDomain}".extraConfig = ''
-      ${allowAddresses trustedAddresses}
-      reverse_proxy http://127.0.0.1:${toString cfg.port} {
-        # Send the true remote IP to Rocket, so that Vaultwarden can put this
-        # in the log
-        header_up X-Real-IP {remote_host}
-      }
-    '';
-  };
+  # Unfortunately the bitwarden app does not support TLS client authentication
+  # https://github.com/bitwarden/mobile/issues/582
+  # https://github.com/bitwarden/mobile/pull/2629
+  ${ns}.services.caddy.virtualHosts.vaultwarden.extraConfig = ''
+    reverse_proxy http://127.0.0.1:${toString cfg.port} {
+      # Send the true remote IP to Rocket, so that Vaultwarden can put this
+      # in the log
+      header_up X-Real-IP {remote_host}
+    }
+  '';
 
   backups.vaultwarden = {
     paths = [ "/var/backup/vaultwarden-archive" ];

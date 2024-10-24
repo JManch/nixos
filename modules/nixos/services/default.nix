@@ -11,6 +11,7 @@ let
   inherit (lib)
     mkEnableOption
     mkOption
+    optionals
     types
     concatStringsSep
     mkAliasOptionModule
@@ -59,13 +60,13 @@ in
           };
 
           routerAllowedIPs = mkOption {
-            type = types.listOf types.str;
+            type = with types; listOf str;
             default = [ ];
             description = "List of allowed IPs for router peer";
           };
 
           peers = mkOption {
-            type = types.listOf types.attrs;
+            type = with types; listOf attrs;
             default = [ ];
             description = "Wireguard peers";
           };
@@ -98,7 +99,7 @@ in
       enable = mkEnableOption "Greetd with TUIgreet";
 
       sessionDirs = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         apply = concatStringsSep ":";
         default = [ ];
         description = "Directories that contain .desktop files to be used as session definitions";
@@ -110,7 +111,7 @@ in
       confinement.enable = mkEnableOption "Confinement Wireguard NordVPN";
 
       excludeSubnets = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of subnets to exclude from being routed through the VPN. Does
@@ -151,8 +152,8 @@ in
           description = "IP address that reverse proxy should point to";
         };
 
-        allowedAddresses = mkOption {
-          type = types.listOf types.str;
+        extraAllowedAddresses = mkOption {
+          type = with types; listOf str;
           default = [ ];
           description = ''
             List of address to give access to Jellyfin in addition to the trusted
@@ -162,7 +163,7 @@ in
       };
 
       interfaces = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of additional interfaces for Jellyfin to be exposed on.
@@ -189,7 +190,7 @@ in
       autoStart = mkEnableOption "Ollama service auto start";
 
       interfaces = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of additional interfaces for Ollama to be exposed on.
@@ -205,7 +206,7 @@ in
       '';
 
       allowedAddresses = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of address to give access to Broadcast Box in addition to the
@@ -214,7 +215,7 @@ in
       };
 
       interfaces = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of additional interfaces for Broadcast Box to be exposed on.
@@ -238,7 +239,7 @@ in
       enable = mkEnableOption "Caddy";
 
       interfaces = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of additional interfaces for Caddy to be exposed on.
@@ -246,7 +247,7 @@ in
       };
 
       trustedAddresses = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         example = [
           "192.168.89.2/32"
@@ -259,7 +260,7 @@ in
       };
 
       extraFail2banTrustedAddresses = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           Caddy fail2ban filter addresses to trust in addition to trusted
@@ -268,7 +269,7 @@ in
       };
 
       goAccessExcludeIPRanges = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of address ranges excluded from go access using their strange
@@ -276,20 +277,54 @@ in
         '';
       };
 
-      allowAddresses = mkOption {
-        type = types.functionTo types.lines;
-        readOnly = true;
-        default = addresses: ''
-          @block {
-            not remote_ip ${concatStringsSep " " addresses}
-          }
-          respond @block "Access denied" 403 {
-            close
-          }
-        '';
+      virtualHosts = mkOption {
+        type = types.attrsOf (
+          types.submodule (
+            { config, ... }:
+            {
+              options = {
+                allowTrustedAddresses =
+                  mkEnableOption ''
+                    access to this virtual host from all trusted address as
+                    configured with `caddy.trustedAddresses`
+                  ''
+                  // {
+                    default = true;
+                  };
+
+                extraAllowedAddresses = mkOption {
+                  type = with types; listOf str;
+                  default = [ ];
+                  description = ''
+                    Extra addresses in addition to the trusted address (assuming
+                    `allowTrustedAddresses` is enabled) to give access to this
+                    virtual host.
+                  '';
+                };
+
+                allowedAddresses = mkOption {
+                  type = with types; listOf str;
+                  readOnly = true;
+                  default =
+                    (optionals config.allowTrustedAddresses cfg.caddy.trustedAddresses) ++ config.extraAllowedAddresses;
+                };
+
+                extraConfig = mkOption {
+                  type = types.lines;
+                  default = null;
+                  description = ''
+                    Extra config to append to the virtual host, like the upstream
+                    option
+                  '';
+                };
+              };
+            }
+          )
+        );
+        default = { };
         description = ''
-          Template for blocking access to a host from all addresses apart from
-          the provided list.
+          Wrapper for Caddy virtual host config that configures DNS ACME and
+          remote IP address blocking.
         '';
       };
     };
@@ -315,7 +350,7 @@ in
       };
 
       interfaces = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of additional interfaces for dnsmasq to be exposed on.
@@ -420,7 +455,7 @@ in
       };
 
       extraAllowedAddresses = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of address to give access to Jellyfin in addition to the trusted
@@ -520,7 +555,7 @@ in
         enable = mkEnableOption "NFS server";
 
         supportedMachines = mkOption {
-          type = types.listOf types.str;
+          type = with types; listOf str;
           default = [ ];
           description = ''
             List of machines that this host can share NFS exports with.
@@ -568,7 +603,7 @@ in
         enable = mkEnableOption "NFS client";
 
         supportedMachines = mkOption {
-          type = types.listOf types.str;
+          type = with types; listOf str;
           default = [ ];
           description = "List of machines this host can accept NFS file systems from";
         };
@@ -599,7 +634,7 @@ in
                 };
 
                 options = mkOption {
-                  type = types.listOf types.str;
+                  type = with types; listOf str;
                   default = [
                     "x-systemd.automount"
                     "noauto"
@@ -811,11 +846,20 @@ in
         };
 
         interfaces = mkOption {
-          type = types.listOf types.str;
+          type = with types; listOf str;
           default = [ ];
           description = ''
             List of additional interfaces for the Minecraft server to be
             exposed on.
+          '';
+        };
+
+        extraAllowedAddresses = mkOption {
+          type = with types; listOf str;
+          default = [ ];
+          description = ''
+            List of address to give access to virtual hosts in addition to the
+            trusted list.
           '';
         };
 
@@ -886,7 +930,7 @@ in
       };
 
       interfaces = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of additional interfaces for BeamMP Server to be exposed on.
@@ -908,7 +952,7 @@ in
       enable = mkEnableOption "Avahi";
 
       interfaces = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = "List of interfaces to be used by avahi";
       };
@@ -944,7 +988,7 @@ in
       };
 
       interfaces = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of additional interfaces for the Factorio server to be exposed
@@ -965,7 +1009,7 @@ in
       };
 
       interfaces = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of additional interfaces for the Satisfactory server to be
@@ -981,6 +1025,16 @@ in
         type = types.port;
         default = 5030;
         description = "Port for the slskd web interface to listen on";
+      };
+    };
+
+    file-server = {
+      enable = mkEnableOption "File sharing server";
+
+      allowedAddresses = mkOption {
+        type = with types; listOf str;
+        default = [ ];
+        description = "List of address to give access to the file server";
       };
     };
   };

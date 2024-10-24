@@ -19,7 +19,6 @@ let
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy;
-  inherit (caddy) allowAddresses trustedAddresses;
   inherit (config.age.secrets) scrutinyVars;
   cfg = config.${ns}.services.scrutiny;
   influx = getExe' pkgs.influxdb2 "influx";
@@ -151,8 +150,7 @@ mkMerge [
       after = [ "scrutiny-influxdb2-backup.service" ];
     };
 
-    services.caddy.virtualHosts."disks.${fqDomain}".extraConfig = ''
-      ${allowAddresses trustedAddresses}
+    ${ns}.services.caddy.virtualHosts.disks.extraConfig = ''
       reverse_proxy http://127.0.0.1:${toString cfg.server.port}
     '';
 

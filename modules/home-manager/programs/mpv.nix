@@ -119,5 +119,9 @@ mkIf cfg.enable {
       }
     '';
 
+  desktop.hyprland.settings.windowrulev2 = [
+    "workspace emptym, class:^(mpv)$"
+  ];
+
   persistence.directories = optional cfg.jellyfinShim.enable ".config/jellyfin-mpv-shim";
 }

@@ -36,6 +36,12 @@ let
       spotify_id=$(${pwDump} | ${jaq} -r 'first(.[] | select((.type == "PipeWire:Interface:Node") and (.info?.props?["application.name"]? == "spotify"))) | .id')
       increment=$1
 
+      if [ -z "$spotify_id" ]; then
+        ${notifySend} --urgency=critical -t 2000 \
+          -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' 'Application not running'
+        exit 1
+      fi
+
       round_volume() {
         multiple=''${increment#-}
         add_half=$(echo "scale=10; ($1 + $multiple/2)" | ${bc})

@@ -8,7 +8,7 @@ lib.mkIf config.${ns}.shell.enable {
   programs.eza = {
     enable = true;
     git = true;
-    icons = true;
+    icons = "auto";
     enableBashIntegration = false;
     enableZshIntegration = false;
     enableFishIntegration = false;

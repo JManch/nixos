@@ -25,6 +25,7 @@ let
   modifySpotifyVolume =
     let
       jaq = getExe pkgs.jaq;
+      awk = getExe pkgs.gawk;
       notifySend = getExe pkgs.libnotify;
       pwDump = getExe' pkgs.pipewire "pw-dump";
       bc = getExe pkgs.bc;
@@ -33,12 +34,22 @@ let
       # WARN: Unfortunately getting the node ID of a specific application is
       # tricky https://gitlab.freedesktop.org/pipewire/wireplumber/-/issues/395
       spotify_id=$(${pwDump} | ${jaq} -r 'first(.[] | select((.type == "PipeWire:Interface:Node") and (.info?.props?["application.name"]? == "spotify"))) | .id')
-      wpctl set-volume -l 1.0 "$spotify_id" "$1"
-      output=$(wpctl get-volume "$spotify_id")
-      volume=''${output#Volume: }
-      percentage="$(echo "$volume * 100" | ${bc})"
+      increment=$1
+
+      round_volume() {
+        multiple=''${increment#-}
+        add_half=$(echo "scale=10; ($1 + $multiple/2)" | ${bc})
+        rounded="$(echo "($add_half / $multiple) * $multiple" | ${bc})"
+        echo "$(echo "scale=2; $rounded / 100" | ${bc})"
+      }
+
+      current_vol=$(wpctl get-volume "$spotify_id" | ${awk} '{print $2 * 100}')
+      new_vol=$(round_volume $((current_vol + $increment)))
+
+      wpctl set-volume -l 1.0 "$spotify_id" "$new_vol"
+      actual_vol=$(wpctl get-volume "$spotify_id" | ${awk} '{print $2 * 100}')
       ${notifySend} --urgency=low -t 2000 \
-        -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${percentage%.*}%"
+        -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${actual_vol%.*}%"
     '';
 in
 mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
@@ -155,8 +166,8 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
       ];
 
       binde = [
-        "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume} 5%+"
-        "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume} 5%-"
+        "${modKey}, XF86AudioRaiseVolume, exec, ${modifySpotifyVolume} 5"
+        "${modKey}, XF86AudioLowerVolume, exec, ${modifySpotifyVolume} -5"
       ];
     };
 

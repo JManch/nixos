@@ -222,7 +222,6 @@ mkIf (isHyprland config) {
           "easeOutCubic, 0.33, 1, 0.68, 1"
           "easeinoutsine, 0.37, 0, 0.63, 1"
           "easeOutQuint, 0.23, 1, 0.32, 1"
-          "linear, 0, 0, 1, 1"
         ];
 
         animation = [
@@ -232,15 +231,10 @@ mkIf (isHyprland config) {
           "fadeIn, 1, 3, easeOutCubic"
           "fadeOut, 1, 1.7, easeOutCubic"
           "fadeSwitch, 0, 1, easeOutCirc"
-          "fadeShadow, 1, 10, easeOutCirc"
           "fadeDim, 1, 4, fluentDecel"
-          "border, 1, 2.7, easeOutCirc"
-          "borderangle, 1, 30, fluentDecel, once"
           "workspaces, 1, 3, easeOutCubic, slide"
           "specialWorkspace, 1, 3, easeOutCubic, slidevert"
-          "layers, 1, 3.81, easeOutQuint"
-          "layersIn, 1, 4, easeOutQuint, fade"
-          "layersOut, 1, 1.5, linear, fade"
+          "layers, 1, 4, easeOutQuint"
         ];
       };
 

@@ -15,6 +15,9 @@ mkIf cfg.enable {
     defaults = {
       email = "JManch@protonmail.com";
       dnsProvider = "porkbun";
+      # Because our local resolver redirects queries for our domain we have to
+      # manually specify a public resolver otherwise DNS challenge fails
+      dnsResolver = "1.1.1.1:53";
       environmentFile = acmePorkbunVars.path;
     };
   };

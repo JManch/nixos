@@ -46,7 +46,7 @@ mkIf cfg.enable {
         windowcontrols = false;
         volumecontrol = true;
         compactmode = false;
-        bottomhover = true;
+        bottomhover = false;
         showontop = false;
         raisesubswithosc = false;
       };

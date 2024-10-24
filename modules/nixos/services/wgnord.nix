@@ -17,7 +17,7 @@ let
   inherit (lib.${ns}) asserts;
   inherit (config.${ns}.system.networking) wiredInterface defaultGateway resolved;
   cfg = config.${ns}.services.wgnord;
-  ip = getExe' pkgs.iproute "ip";
+  ip = getExe' pkgs.iproute2 "ip";
   wgnord = pkgs.wgnord.overrideAttrs (old: {
     src = old.src.overrideAttrs {
       patches = (old.patches or [ ]) ++ [

@@ -51,7 +51,7 @@ mkIf cfg.enable {
       libedgetpu
       # Even though this is technically not needed for pci version, Frigate
       # throws an error without it
-      pkgs.libusb
+      pkgs.libusb1
     ];
   };
 

@@ -70,7 +70,7 @@ in
       hm = mkIf homeManager.enable {
         desktop.hyprland.settings.windowrulev2 = [
           "float, class:^(org.pulseaudio.pavucontrol)$"
-          "size 30% 30%, class:^(org.pulseaudio.pavucontrol)$"
+          "size 50% 50%, class:^(org.pulseaudio.pavucontrol)$"
           "center, class:^(org.pulseaudio.pavucontrol)$"
         ];
       };

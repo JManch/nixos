@@ -20,7 +20,6 @@ let
     optionalAttrs
     getExe'
     mkVMOverride
-    concatStringsSep
     escapeShellArg
     singleton
     attrNames
@@ -32,9 +31,7 @@ let
     hardeningBaseline
     ;
   inherit (config.${ns}.services) frigate mosquitto caddy;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets) mqttHassPassword mqttFaikinPassword;
-  inherit (caddy) trustedAddresses;
   inherit (secrets.general) people;
   cfg = config.${ns}.services.hass;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };

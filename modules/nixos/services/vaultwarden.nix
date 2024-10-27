@@ -147,7 +147,7 @@ mkIf cfg.enable {
   adminPackages = [ restoreScript ];
 
   systemd.tmpfiles.rules = [
-    "d /var/backup/vaultwarden 0700 vaultwarden vaultwarden - -"
+    # Upstream module creates the /var/backup/vaultwarden dir
     "d /var/backup/vaultwarden-archive 0700 vaultwarden vaultwarden - -"
   ];
 

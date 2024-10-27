@@ -223,7 +223,7 @@ in
         staticIPAddress = "192.168.89.2/24";
         defaultGateway = "192.168.89.1";
         firewall.enable = true;
-        tcpOptimisations = true;
+        tcpOptimisations = false;
       };
     };
   };

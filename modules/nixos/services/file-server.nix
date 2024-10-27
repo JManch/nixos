@@ -23,6 +23,9 @@ lib.mkIf cfg.enable {
   ];
 
   ${ns}.services.caddy.virtualHosts.files = {
+    # On my weak server file transfers are significantly faster over HTTP than
+    # HTTPS
+    forceHttp = true;
     allowTrustedAddresses = false;
     extraAllowedAddresses = cfg.allowedAddresses;
     extraConfig = ''

@@ -19,6 +19,7 @@ let
     mkVMOverride
     toUpper
     concatStringsSep
+    optionalString
     concatMapStrings
     nameValuePair
     concatMapStringsSep
@@ -147,7 +148,7 @@ mkMerge [
 
       virtualHosts = mapAttrs' (
         subdomain: cfg':
-        nameValuePair "${subdomain}.${fqDomain}" {
+        nameValuePair "${optionalString cfg'.forceHttp "http://"}${subdomain}.${fqDomain}" {
           # Instead of using the global acme_dns option we have to configure
           # ACME DNS on every host. This is because it's not possible to use a
           # custom resolver in the global option. We need a custom resolver

@@ -283,6 +283,10 @@ in
             { config, ... }:
             {
               options = {
+                forceHttp = mkEnableOption ''
+                  forcing the virtual host to use HTTP instead of HTTPS
+                '';
+
                 allowTrustedAddresses =
                   mkEnableOption ''
                     access to this virtual host from all trusted address as

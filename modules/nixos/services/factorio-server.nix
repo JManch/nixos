@@ -13,11 +13,11 @@ mkIf cfg.enable {
   services.factorio = {
     enable = true;
     package = pkgs.factorio-headless.overrideAttrs rec {
-      version = "2.0.10";
+      version = "2.0.11";
       src = pkgs.fetchurl {
         name = "factorio_headless_x64-${version}.tar.xz";
         url = "https://factorio.com/get-download/${version}/headless/linux64";
-        sha256 = "sha256-LX3SEvpvcVIYpeM7rX1ZOviZj6e/fOcnNDFZ7h+MI/Q=";
+        sha256 = "sha256-eEjy2LKzKg7+uKQBZXRZSG7am4BywiHQ+cC0UCkNoNY=";
       };
     };
     requireUserVerification = false;
@@ -27,7 +27,7 @@ mkIf cfg.enable {
     port = cfg.port;
     bind = "0.0.0.0";
     openFirewall = true;
-    nonBlockingSaving = false;
+    nonBlockingSaving = true;
     loadLatestSave = true;
     lan = true;
     game-name = "NixOS Factorio Server";

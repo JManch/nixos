@@ -111,8 +111,8 @@ mkMerge [
     };
 
     systemd.tmpfiles.rules = [
-      "d /var/backup/influxdb2 0700 indluxdb2 influxdb2 - -"
-      "d /var/backup/influxdb2/scrutiny 0700 indluxdb2 influxdb2 - -"
+      "d /var/backup/influxdb2 0700 influxdb2 influxdb2 - -"
+      "d /var/backup/influxdb2/scrutiny 0700 influxdb2 influxdb2 - -"
     ];
 
     backups.scrutiny = {

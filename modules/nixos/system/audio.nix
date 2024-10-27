@@ -54,12 +54,25 @@ in
 
       systemd.user.services.unmute-pipewire-devices = {
         description = "Unmute source and sink devices on login";
-        after = [ "pipewire.service" ];
-        wants = [ "pipewire.service" ];
+        after = [ "wireplumber.service" ];
+        wants = [ "wireplumber.service" ];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
           ExecStart = pkgs.writeShellScript "unmute-pipewire-devices" ''
+            sleep 2
+            attempt=0
+            while ! ${wpctl} inspect @DEFAULT_AUDIO_SINK@ &>/dev/null; do
+              if (( attempt >= 10 )); then
+                echo "PipeWire failed to initialise in time"
+                exit 1
+              fi
+
+              echo "Waiting for PipeWire to initialise..."
+              ((attempt++))
+              sleep 2
+            done
+
             ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ 0
             ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ 0
           '';

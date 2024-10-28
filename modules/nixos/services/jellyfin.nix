@@ -18,13 +18,17 @@ let
     mkForce
     genAttrs
     attrNames
+    attrValues
     mapAttrsToList
+    optionalString
     length
+    hasPrefix
     splitString
     all
     ;
   inherit (lib.${ns}) asserts;
   inherit (config.${ns}.system.networking) publicPorts;
+  inherit (config.${ns}.system) impermanence;
   inherit (config.${ns}.services) caddy;
   inherit (config.services) jellyfin;
   cfg = config.${ns}.services.jellyfin;
@@ -44,6 +48,8 @@ mkMerge [
       "Jellyfin media dir target cannot be empty"
       (all (n: (length (splitString "/" n)) == 1) (attrNames cfg.mediaDirs))
       "Jellyfin media dir target cannot be a subdir"
+      (all (n: !hasPrefix "/persist" n) (attrValues cfg.mediaDirs))
+      "Jellyfin media dirs should NOT be prefixed with /persist"
     ];
 
     services.jellyfin = {
@@ -60,7 +66,7 @@ mkMerge [
     };
 
     systemd.mounts = mapAttrsToList (target: source: {
-      what = source;
+      what = (optionalString impermanence.enable "/persist") + source;
       where = "/var/lib/jellyfin/media/${target}";
       bindsTo = [ "jellyfin.service" ];
       requiredBy = [ "jellyfin.service" ];

@@ -160,17 +160,39 @@ mkIf cfg.enable {
         runtimeInputs = with pkgs; [
           coreutils
           diffutils
+          wget
           gnutar
           bzip2
           age
           rclone
           shoutrrr
         ];
-        text = # bash
+        text =
+          let
+            # This function breaks treesitter syntax highlighting so put here
+            onFailureFunc = ''
+              on_failure() {
+                echo "Sending failure email"
+                send_notification "Failure" "$(cat <<EOF
+              Time: $(date +"%Y-%m-%d %H:%M:%S")
+              Error: line $LINENO: $BASH_COMMAND failed
+              EOF
+              )"
+              }
+            '';
+          in
+          # bash
           ''
             set -o errtrace
             umask 0077
             time=$(date +%s)
+
+            # Abort if network interface is down as rclone authentication will
+            # break and need manual intervention to fix otherwise
+            if ! wget -q --spider http://google.com; then
+              echo "Error: Internet connection cannot be established, aborting backup" >&2
+              exit 1
+            fi
 
             send_notification() {
               if [ "$1" = "Failure" ]; then
@@ -189,14 +211,7 @@ mkIf cfg.enable {
                 --message "$2"
             }
 
-            on_failure() {
-              echo "Sending failure email"
-              send_notification "Failure" "$(cat <<EOF
-            Time: $(date +"%Y-%m-%d %H:%M:%S")
-            Error: line $LINENO: $BASH_COMMAND failed
-            EOF
-            )"
-            }
+            ${onFailureFunc}
             trap on_failure ERR
 
             tmp=$(mktemp -d)
@@ -223,8 +238,8 @@ mkIf cfg.enable {
             cp "$time" "$archive_dir/latest"
             cp "$time-sha256" "$archive_dir/latest-sha256"
 
-            # Because rclone has writes refresh client keys to it's configuration
-            # we have to maintain a writeable copy of the config. When we detect
+            # Because rclone writes refresh client keys to its configuration we
+            # have to maintain a writeable copy of the config. When we detect
             # that the agenix config has been changed we replace it.
             state_dir="/var/lib/vaultwarden-cloud-backup"
             if ! cmp -s "$state_dir/rcloneConfigOriginal" "${rcloneConfig.path}"; then

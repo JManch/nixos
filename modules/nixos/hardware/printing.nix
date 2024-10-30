@@ -10,7 +10,9 @@ let
     mkIf
     mkMerge
     mkForce
+    mkBefore
     singleton
+    getExe'
     ;
   inherit (config.${ns}.services) caddy;
   cfg = config.${ns}.hardware.printing;
@@ -138,6 +140,18 @@ mkMerge [
         "network-online.target"
         "nss-lookup.target"
       ];
+
+      # Without this, the service will fail on every system activation if the
+      # printer is down
+      script =
+        mkBefore
+          # bash
+          ''
+            if ! ${getExe' pkgs.iputils "ping"} -c 1 -W 1 "printer.lan" &>/dev/null; then
+              echo "Cannot setup printer, host is down"
+              exit 0
+            fi
+          '';
     };
   })
 ]

@@ -55,6 +55,9 @@
     rpi-firmware-nonfree-src.url = "github:RPi-Distro/firmware-nonfree/bookworm";
     rpi-firmware-nonfree-src.flake = false;
 
+    nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
+    nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
+
     # Inputs that provide imported home-manager modules
 
     nix-colors.url = "github:misterio77/nix-colors";
@@ -76,9 +79,6 @@
 
     hyprlock.url = "github:hyprwm/hyprlock";
     hyprlock.inputs.nixpkgs.follows = "nixpkgs";
-
-    nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
-    nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";

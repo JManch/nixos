@@ -229,6 +229,7 @@ let
                   if [[ "$source_type" == "github" || "$source_type" == "gitlab" ]]; then
                     owner=$(echo "$new_lock" | jaq -r ".\"$input\".original.owner")
                     repo=$(echo "$new_lock" | jaq -r ".\"$input\".original.repo")
+                    ref=$(echo "$new_lock" | jaq -r ".\"$input\".original.ref")
                     repo_dir="$tmp_repos/$input"
 
                     if [ -d "/home/${adminUsername}/files/repos/$repo/.git" ]; then
@@ -238,6 +239,14 @@ let
                     fi
 
                     pushd "$repo_dir" >/dev/null
+
+                    # In our local nixpkgs repo origin is our fork
+                    if [[ "$repo" == "nixpkgs" && "$repo_dir" != "$tmp_repos/$input" && "$owner" == "NixOS" ]]; then
+                      git fetch upstream "$ref" >/dev/null
+                    else
+                      git fetch origin "$ref" >/dev/null
+                    fi
+
                     diff_output=$(git diff "$old_rev" "$new_rev" -- "$file_path" >/dev/null)
                     if [[ -n "$diff_output" ]]; then
                       if $first_diff; then

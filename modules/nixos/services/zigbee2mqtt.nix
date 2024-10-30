@@ -68,6 +68,8 @@ mkMerge [
     # Upstream module has good systemd hardening
 
     systemd.services.zigbee2mqtt = {
+      # Fix for zigbee2mqtt hanging on shutdown due to mosquitto stopping first
+      after = [ "mosquitto.service" ];
       startLimitBurst = 3;
       startLimitIntervalSec = 300;
       serviceConfig = {

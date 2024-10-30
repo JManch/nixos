@@ -44,17 +44,7 @@ in
 
     services.monado = {
       enable = true;
-      package = pkgs.monado.overrideAttrs {
-        version = "9afaca98cdbeead836988c0c4be87533795287fc";
-        src = pkgs.fetchgit {
-          url = "https://gitlab.freedesktop.org/monado/monado.git";
-          rev = "9afaca98cdbeead836988c0c4be87533795287fc";
-          fetchSubmodules = false;
-          deepClone = false;
-          leaveDotGit = false;
-          sha256 = "sha256-FP6bHI67AzcR1YftPHheL2fp80HjBOjc2xGq/VrMpb4=";
-        };
-      };
+      highPriority = true;
       defaultRuntime = true;
     };
 

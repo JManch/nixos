@@ -42,7 +42,13 @@ mkIf cfg.enable {
           ]
         )
       );
-      extraLibraries = (pkgs: optional gamingCfg.gamemode.enable pkgs.gamemode.lib);
+
+      # TODO: Drop this and the customPackage option once
+      # https://github.com/NixOS/nixpkgs/pull/351928#pullrequestreview-2401583217
+      # gets merged. The gamescope deps above may no longer be needed either.
+      extraLibraries = (
+        pkgs: optional gamingCfg.gamemode.enable config.${ns}.programs.gaming.gamemode.customPackage
+      );
     };
   };
 

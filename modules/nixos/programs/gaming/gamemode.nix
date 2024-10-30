@@ -7,8 +7,28 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) mkIf getExe hiPrio;
   cfg = config.${ns}.programs.gaming.gamemode;
+
+  gamemoderunCustom = pkgs.symlinkJoin {
+    name = "gamemoderun-custom-args";
+    paths = [ pkgs.gamemode ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      # Have to write the arguments to a file so that the gamemode start script
+      # can read them from the file. I'm not aware of any other way to pass
+      # custom arguments to the start script (and it does not inherit env vars)
+
+      # We can't write to /tmp because steam runs in a chroot with its own
+      # tmp dir. Any files we write there will not be accessible from our
+      # gamemoderun start script. Our home directory is bind mounted in the
+      # chroot so that is accessible.
+      wrapProgram $out/bin/gamemoderun --run '
+        rm -f "/home/${username}/.gamemode-custom-args"
+        echo "$GAMEMODE_CUSTOM_ARGS" > "/home/${username}/.gamemode-custom-args"
+      '
+    '';
+  };
 
   startStopScript =
     let
@@ -20,10 +40,9 @@ let
         toUpper
         optional
         ;
-      inherit (homeConfig.${ns}.desktop) hyprland;
+      inherit (config.hm.${ns}.desktop) hyprland;
       inherit (config.${ns}.system) desktop;
       inherit (config.${ns}.device) primaryMonitor;
-      homeConfig = config.home-manager.users.${username};
       isHyprland = lib.${ns}.isHyprland config;
 
       # Remap the killactive key to use the shift modifier
@@ -49,24 +68,42 @@ let
           libnotify
           gnugrep
         ])
-        ++ optional isHyprland homeConfig.wayland.windowManager.hyprland.package;
+        ++ optional isHyprland config.hm.wayland.windowManager.hyprland.package;
 
       text = ''
-        # Load custom arguments into positional parameters
+        # Load custom arguments from file that our wrapper wrote to
         args_file="/home/${username}/.gamemode-custom-args"
+        args_array=()
         if [ -e "$args_file" ]; then
-          set -- "$(cat "$args_file")"
+          IFS=',' read -r -a args_array <<< "$(<"$args_file")"
           rm "$args_file"
         fi
 
+        arg_exists() {
+          local arg="$1"
+          for elem in "''${args_array[@]}"; do
+            if [[ "$elem" == "$arg" ]]; then
+              return 0
+            fi
+          done
+          return 1
+        }
+
         ${optionalString isHyprland # bash
           ''
-            hyprctl --instance 0 --batch "\
-              ${optionalString hyprland.blur "keyword decoration:blur:enabled ${blur mode};\\"}
-              keyword monitor ${
-                lib.${ns}.getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = refreshRate mode; })
-              }; \
-              ${killActiveRebind (mode == "end")}"
+            hyprCtlCommands="${optionalString hyprland.blur "keyword decoration:blur:enabled ${blur mode}"};"
+
+            # Refresh rate and keybinds don't matter for VR
+            if ! arg_exists "vr"; then
+              hyprCtlCommands="$hyprCtlCommands \
+                keyword monitor ${
+                  lib.${ns}.getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = refreshRate mode; })
+                }; \
+                ${killActiveRebind (mode == "end")} \
+              "
+            fi
+
+            hyprctl --instance 0 --batch "$hyprCtlCommands"
           ''
         }
 
@@ -92,43 +129,18 @@ mkIf cfg.enable {
   # https://github.com/FeralInteractive/gamemode/issues/452
   users.users.${username}.extraGroups = [ "gamemode" ];
 
+  # This allows us to pass a comma seperated list of custom arguments to
+  # gamemode start and stop scripts with the GAMEMODE_CUSTOM_ARGS env var. For
+  # example, setting GAMEMODE_CUSTOM_ARGS=high-perf,vr sets a higher GPU power cap
+  # in our start script and enables the VR profile on our GPU.
+  environment.systemPackages = [ (hiPrio gamemoderunCustom) ];
+
+  # So that apps like Steam can use our wrapped package. Not using a overlay to
+  # avoid building apps with gamemode dep like PrismLauncher from source.
+  ${ns}.programs.gaming.gamemode.customPackage = gamemoderunCustom;
+
   programs.gamemode = {
     enable = true;
-    # WARN: This override won't work in packages that depend on gamemode like
-    # prismlauncher. An overlay would fix this but I don't want to always build
-    # prismlauncher from source.
-    package = pkgs.gamemode.overrideAttrs (old: {
-      # This allows us to pass custom arguments to gamemoderun. For example,
-      # passing --high-perf sets a higher GPU power cap in our start script.
-      # The custom arguments must be the first arguments passed to
-      # gamemoderun. We have to write to a file like this because it's better
-      # to run the script in the gamemode environment than in steam's FHS
-      # environment where a bunch of stuff (like lib-notify) doesn't work.
-
-      # We can't write to /tmp because steam runs in a chroot with its own
-      # tmp dir. Any files we write there will not be accessible from our
-      # gamemoderun start script. Our home directory is bind mounted in the
-      # chroot so that is accessible.
-      postFixup =
-        old.postFixup
-        + ''
-          wrapProgram $out/bin/gamemoderun --run '
-          rm -f /home/${username}/.gamemode-custom-args
-          while test $# -gt 0
-          do
-            case "$1" in
-              --high-perf)
-                ;&
-              --low-perf) echo -n "$1 " >> /home/${username}/.gamemode-custom-args;
-                ;;
-              *) break
-                ;;
-            esac
-            shift
-          done
-          '
-        '';
-    });
 
     settings.custom = {
       # WARN: For gamemode script changes to be applied the user service must

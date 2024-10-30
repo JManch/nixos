@@ -13,6 +13,15 @@ in
     gamemode = {
       enable = mkEnableOption "Gamemode";
 
+      customPackage = mkOption {
+        type = types.package;
+        readOnly = true;
+        description = ''
+          Wrapped gamemode package that supports passing custom args to
+          gamemoderun
+        '';
+      };
+
       startScript = mkOption {
         type = types.lines;
         default = "";

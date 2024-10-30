@@ -135,13 +135,20 @@ mkIf cfg.enable {
         '';
     in
     {
-      startScript = ''
-        id=$(${getId})
-        ${setPowerProfile 1}
-        if [[ "$*" == *"--high-perf"* ]]; then
-          ${setPowerCap 257}
-        fi
-      '';
+      startScript =
+        # bash
+        ''
+          id=$(${getId})
+          if arg_exists "high-perf"; then
+            ${setPowerCap 257}
+          fi
+
+          if arg_exists "vr"; then
+            ${setPowerProfile 4}
+          else
+            ${setPowerProfile 1}
+          fi
+        '';
 
       stopScript = ''
         id=$(${getId})

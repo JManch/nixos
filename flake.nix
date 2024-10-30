@@ -27,9 +27,11 @@
     # Critical inputs that provide imported NixOS modules or overlays. Ideally
     # should review changes after updating.
 
-    nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-personal";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     impermanence.url = "github:nix-community/impermanence";
+
+    vpn-confinement.url = "github:Maroka-chan/VPN-Confinement";
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -44,9 +46,6 @@
 
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
-
-    vpn-confinement.url = "github:Maroka-chan/VPN-Confinement";
-    vpn-confinement.inputs.nixpkgs.follows = "nixpkgs";
 
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
     raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";

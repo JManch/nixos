@@ -12,10 +12,20 @@ let
     mkBefore
     optional
     ;
+  cfg = config.${ns}.hardware.graphics.amd;
   davinciResolve = config.hm.${ns}.programs.davinci-resolve.enable or false;
 in
 mkIf (config.${ns}.device.gpu.type == "amd") {
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
+
+  # Copied from https://github.com/Atemu/nixos-config/blob/7beb94aec277fb4cbf31360bdbd0a3e9e635a619/modules/amdgpu/module.nix
+  # https://github.com/Atemu/nixos-config/blob/master/LICENSE
+  boot.extraModulePackages = mkIf (cfg.kernelPatches != [ ]) [
+    (pkgs.callPackage ./amdgpu-kernel-module.nix {
+      inherit (config.boot.kernelPackages) kernel;
+      patches = cfg.kernelPatches;
+    })
+  ];
 
   userPackages = [
     pkgs.amdgpu_top

@@ -53,9 +53,6 @@ mkIf cfg.enable {
   # RDR2 Modded Launch Arguments:
   # WINEDLLOVERRIDES=EasyHook,EasyHook64,EasyLoad64,NativeInterop,version,dinput8,ScriptHookRDR2,ModManager.Core,ModManager.NativeInterop,NLog=n,b %command%
 
-  # VR Launch Arguments:
-  # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc XRT_COMPOSITOR_SCALE_PERCENTAGE=140 XRT_COMPOSITOR_COMPUTE=1 SURVIVE_GLOBALSCENESOLVER=0 SURVIVE_TIMECODE_OFFSET_MS=-6.94 %command%
-
   # Assetto Corsa Setup:
   # - Run assetto corsa once then close
   # - Launch winecfg in protontricks and enable hidden files in wine file browser

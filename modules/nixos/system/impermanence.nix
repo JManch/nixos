@@ -39,7 +39,7 @@ let
         "home/${username}/.local/share/darkman/variants"
       ];
     in
-    pkgs.writeShellScriptBin "ephemeral" ''
+    pkgs.writeShellScriptBin "impermanence-ephemeral" ''
       sudo ${fd} --one-file-system --strip-cwd-prefix --base-directory / --type file \
         --hidden --exclude "{${concatStringsSep "," excludePaths}}" "''${@:1}"
     '';
@@ -58,7 +58,7 @@ let
         v: substring 1 (stringLength v.dirPath) v.dirPath
       ) config.persistence.directories;
     in
-    pkgs.writeShellScriptBin "bloat" ''
+    pkgs.writeShellScriptBin "impermanence-bloat" ''
       sudo ${fd} -au --base-directory /persist --type file --type symlink \
         --exclude "/{${concatStringsSep "," (excludePaths ++ persistedFiles ++ persistedDirs)}}" \
         "''${@:1}"

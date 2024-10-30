@@ -219,7 +219,7 @@ in
       desktop.enable = false;
 
       networking = {
-        wiredInterface = "enp1s0";
+        wiredInterface = "enp0s16u1u4c2";
         staticIPAddress = "192.168.89.2/24";
         defaultGateway = "192.168.89.1";
         firewall.enable = true;

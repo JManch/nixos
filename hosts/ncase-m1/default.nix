@@ -31,6 +31,8 @@
 
       monitors = [
         {
+          # DP-1 is rightmost port, furthest from HDMI
+          # Use DP-3 (port next to HDMI) for VR headset
           name = "DP-1";
           number = 1;
           refreshRate = 144.0;

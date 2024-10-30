@@ -23,7 +23,7 @@ let
   inherit (config.${ns}.core) homeManager;
   inherit (config.${ns}.system.virtualisation) vmVariant;
   cfg = config.${ns}.system.impermanence;
-  homePersistence = config.home-manager.users.${username}.persistence;
+  homePersistence = config.hm.persistence;
   fd = getExe pkgs.fd;
 
   # Print all files in the tmpfs file system that will be lost on shutdown

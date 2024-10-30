@@ -772,7 +772,7 @@ in
               ;
             inherit (config.${ns}.core) homeManager;
             inherit (config.${ns}.system) impermanence;
-            homeBackups = optionalAttrs homeManager.enable config.home-manager.users.${username}.backups;
+            homeBackups = optionalAttrs homeManager.enable config.hm.backups;
           in
           mapAttrs (
             name: value:

@@ -45,7 +45,7 @@ in
               programs.neovim.enable = true;
               programs.btop.enable = true;
             };
-            home.stateVersion = config.home-manager.users.${username}.home.stateVersion;
+            home.stateVersion = config.hm.home.stateVersion;
           };
         })
       ];

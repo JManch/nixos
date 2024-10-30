@@ -3,7 +3,6 @@
   lib,
   pkgs,
   config,
-  username,
   ...
 }:
 let
@@ -13,8 +12,7 @@ let
     mkBefore
     optional
     ;
-  davinciResolve =
-    config.home-manager.users.${username}.${ns}.programs.davinci-resolve.enable or false;
+  davinciResolve = config.hm.${ns}.programs.davinci-resolve.enable or false;
 in
 mkIf (config.${ns}.device.gpu.type == "amd") {
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];

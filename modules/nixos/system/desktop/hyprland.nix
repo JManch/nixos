@@ -2,7 +2,6 @@
   ns,
   lib,
   config,
-  username,
   ...
 }:
 let
@@ -10,8 +9,7 @@ let
   inherit (lib.${ns}) asserts isHyprland;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
-  homeConfig = config.home-manager.users.${username};
-  hyprlandPackage = homeConfig.wayland.windowManager.hyprland.package;
+  hyprlandPackage = config.hm.wayland.windowManager.hyprland.package;
 in
 mkIf (cfg.enable && isHyprland config) {
   assertions = asserts [

@@ -15,7 +15,7 @@ let
     mkVMOverride
     mod
     ;
-  inherit (config.home-manager.users.${username}.${ns}.desktop) terminal hyprland;
+  inherit (config.hm.${ns}.desktop) terminal hyprland;
   inherit (config.${ns}.device)
     monitors
     cpu

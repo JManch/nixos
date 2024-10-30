@@ -4,7 +4,6 @@
   pkgs,
   config,
   inputs,
-  username,
   hostname,
   ...
 }:
@@ -27,7 +26,7 @@ let
   inherit (config.${ns}.core) homeManager;
   inherit (config.${ns}.system) desktop;
   cfg = config.${ns}.system.networking;
-  homeFirewall = config.home-manager.users.${username}.firewall;
+  homeFirewall = config.hm.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
   vlanIds = attrNames cfg.vlans;
 in

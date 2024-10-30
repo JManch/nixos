@@ -55,7 +55,7 @@ let
   cfg = config.${ns}.services.restic;
   isServer = (config.${ns}.device.type == "server");
   resticExe = getExe pkgs.restic;
-  homeBackups = optionalAttrs homeManager.enable config.home-manager.users.${username}.backups;
+  homeBackups = optionalAttrs homeManager.enable config.hm.backups;
   vmInstall = inputs.vmInstall.value;
 
   backupTimerConfig = {

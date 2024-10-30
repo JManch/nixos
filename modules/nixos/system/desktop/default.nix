@@ -3,7 +3,6 @@
   lib,
   pkgs,
   config,
-  username,
   ...
 }:
 let
@@ -55,7 +54,7 @@ in
       default =
         (
           if config.${ns}.core.homeManager.enable then
-            (elem config.home-manager.users.${username}.${ns}.desktop.windowManager waylandWindowManagers)
+            (elem config.hm.${ns}.desktop.windowManager waylandWindowManagers)
           else
             false
         )

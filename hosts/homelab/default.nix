@@ -29,8 +29,7 @@ in
     };
 
     hardware = {
-      # Temporarily disabling to debug NIC crashes
-      secureBoot.enable = false;
+      secureBoot.enable = true;
       graphics.hardwareAcceleration = true;
       printing.server.enable = true;
 

@@ -1035,6 +1035,14 @@ in
     file-server = {
       enable = mkEnableOption "File sharing server";
 
+      uploadAlias = {
+        enable = mkEnableOption "shell alias for uploading files";
+        serverAddress = mkOption {
+          type = types.str;
+          description = "File server address to use in alias";
+        };
+      };
+
       allowedAddresses = mkOption {
         type = with types; listOf str;
         default = [ ];

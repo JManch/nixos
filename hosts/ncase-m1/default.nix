@@ -161,6 +161,11 @@
         autoStart = false;
         interfaces = [ "wg-friends" ];
       };
+
+      file-server.uploadAlias = {
+        enable = true;
+        serverAddress = "homelab.lan";
+      };
     };
 
     system = {

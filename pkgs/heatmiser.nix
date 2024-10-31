@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2018 Francesco Gazzetta
+# Copyright (c) 2018 Francesco Gazzetta, Joshua Manchester
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 {
-  lib,
   fetchFromGitHub,
   buildHomeAssistantComponent,
   buildPythonPackage,
@@ -46,30 +45,21 @@ let
         --replace-fail "'pytest-runner'" ""
     '';
 
-    propagatedBuildInputs = [ ];
-
-    checkInputs = [
+    nativeCheckInputs = [
       pytest
       pytest-asyncio
     ];
 
     pythonImportsCheck = [ "async_property" ];
-
-    meta = with lib; {
-      homepage = "https://github.com/ryananguiano/async_property";
-      description = "Python decorator for async properties";
-      license = licenses.mit;
-      maintainers = with maintainers; [ graham33 ];
-    };
   };
 
   neohubapi = buildPythonPackage rec {
     pname = "neohubapi";
-    version = "1.0";
+    version = "2.2";
 
     src = fetchPypi {
       inherit pname version;
-      sha256 = "sha256-lmz9jgdBN+VnZnE/ckNUK9YNINtVj90iCZbCQBL/XXc=";
+      hash = "sha256-2MputN0iJ7fEt9ZsAmplv5beURpBeZYB4JL/u7SDMTc=";
     };
 
     propagatedBuildInputs = [
@@ -77,37 +67,20 @@ let
       websockets
     ];
 
-    checkInputs = [ ];
-
     pythonImportsCheck = [ "neohubapi" ];
-
-    meta = with lib; {
-      homepage = "https://gitlab.com/neohubapi/neohubapi";
-      description = "Async library to communicate with Heatmiser NeoHub 2 API";
-      license = licenses.mit;
-      maintainers = with maintainers; [ graham33 ];
-    };
   };
 in
-buildHomeAssistantComponent {
-  owner = "graham33";
+buildHomeAssistantComponent rec {
+  owner = "MindrustUK";
   domain = "heatmiserneo";
-  version = "0.0.1-pre0d4905c";
-  format = "other";
+  version = "1.6-unstable-2024-10-31";
 
   src = fetchFromGitHub {
-    owner = "MindrustUK";
+    inherit owner;
     repo = "heatmiser-for-home-assistant";
-    rev = "0d4905c022fca39c3b8134ece7246e3fabc00a84";
-    sha256 = "sha256-nrpAvPyo4OFJcGdZKshaAxXmk6LvyOnJv99XEejXCh4=";
+    rev = "9c36223c8c7efff373ba304b08dfd9cde4c1d50f";
+    hash = "sha256-saNc5gMqpHrPoSNHDKbxhYl9OVldLkRY4BjKU0fw/Vw=";
   };
 
   propagatedBuildInputs = [ neohubapi ];
-
-  meta = with lib; {
-    homepage = "https://github.com/MindrustUK/heatmiser-for-home-assistant";
-    license = licenses.asl20;
-    description = "Heatmiser Neo-Hub / Neostat / Neostat-e support for home-assistant.io";
-    maintainers = with maintainers; [ graham33 ];
-  };
 }

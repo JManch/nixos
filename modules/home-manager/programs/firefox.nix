@@ -332,8 +332,14 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
 
   # The extension must also be installed https://github.com/Baldomo/open-in-mpv
   home.packages = optional mpv.enable pkgs.open-in-mpv;
-  xdg.mimeApps.defaultApplications = mkIf mpv.enable {
-    "x-scheme-handler/mpv" = [ "open-in-mpv.desktop" ];
+  xdg.mimeApps.defaultApplications = {
+    "x-scheme-handler/mpv" = mkIf mpv.enable [ "open-in-mpv.desktop" ];
+
+    # Set firefox as default browser
+    "default-web-browser" = [ "firefox.desktop" ];
+    "text/html" = [ "firefox.desktop" ];
+    "x-scheme-handler/http" = [ "firefox.desktop" ];
+    "x-scheme-handler/https" = [ "firefox.desktop" ];
   };
 
   backups.firefox = mkIf cfg.backup {

@@ -7,7 +7,7 @@
 let
   inherit (lib) mkIf;
   inherit (config.${ns}.core) homeManager;
-  cfg = config.${ns}.system.bluetooth;
+  cfg = config.${ns}.hardware.bluetooth;
 in
 mkIf cfg.enable {
   hardware.bluetooth.enable = true;

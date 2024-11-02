@@ -24,6 +24,7 @@ in
   imports = lib.${ns}.scanPathsExcept ./. [ "raspberry-pi.nix" ];
 
   options.${ns}.hardware = {
+    bluetooth.enable = mkEnableOption "bluetooth";
     valve-index.enable = mkEnableOption "virtual reality";
     secureBoot.enable = mkEnableOption "secure boot";
     fanatec.enable = mkEnableOption "support for Fanatec hardware";

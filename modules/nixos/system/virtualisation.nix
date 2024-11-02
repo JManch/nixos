@@ -162,11 +162,11 @@ in
 
           hardware = {
             coral.enable = mkVMOverride false;
+            bluetooth.enable = mkVMOverride false;
             printing.client.enable = mkVMOverride false;
           };
 
           system = {
-            bluetooth.enable = mkVMOverride false;
             audio.enable = mkVMOverride false;
             virtualisation.libvirt.enable = mkVMOverride false;
             virtualisation.containerisation.enable = mkVMOverride false;

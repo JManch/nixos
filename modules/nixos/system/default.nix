@@ -22,8 +22,6 @@ in
   imports = scanPaths ./.;
 
   options.${ns}.system = {
-    bluetooth.enable = mkEnableOption "bluetooth";
-
     ssh = {
       server.enable = mkEnableOption "SSH server";
       agent.enable = mkEnableOption "SSH authentication agent" // {

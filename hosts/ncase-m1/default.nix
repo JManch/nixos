@@ -77,6 +77,7 @@
 
     hardware = {
       secureBoot.enable = true;
+      bluetooth.enable = true;
       valve-index.enable = true;
       fanatec.enable = true;
 
@@ -172,7 +173,6 @@
       impermanence.enable = true;
       ssh.server.enable = true;
       windows.enable = true;
-      bluetooth.enable = true;
       virtualisation.libvirt.enable = true;
 
       desktop = {

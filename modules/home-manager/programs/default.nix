@@ -34,6 +34,7 @@ in
     prism-launcher.enable = mkEnableOption "Prism Launcher";
     unity.enable = mkEnableOption "Unity Game Engine";
     foot.enable = mkEnableOption "Foot";
+    chromium.enable = mkEnableOption "Chromium";
     zed.enable = mkEnableOption "Zed Editor";
     foliate.enable = mkEnableOption "Foliate Ebook Reader";
     rnote.enable = mkEnableOption "Rnote";

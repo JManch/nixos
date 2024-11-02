@@ -80,6 +80,7 @@
       qbittorrent.enable = true;
       filenDesktop.enable = true;
       multiviewerF1.enable = true;
+      chromium.enable = true;
       foliate.enable = true;
       rnote.enable = true;
       jellyfin-media-player.enable = true;

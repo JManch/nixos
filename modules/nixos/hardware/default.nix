@@ -24,7 +24,7 @@ in
   imports = lib.${ns}.scanPathsExcept ./. [ "raspberry-pi.nix" ];
 
   options.${ns}.hardware = {
-    vr.enable = mkEnableOption "virtual reality";
+    valve-index.enable = mkEnableOption "virtual reality";
     secureBoot.enable = mkEnableOption "secure boot";
     fanatec.enable = mkEnableOption "support for Fanatec hardware";
 

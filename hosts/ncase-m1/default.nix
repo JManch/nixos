@@ -77,7 +77,7 @@
 
     hardware = {
       secureBoot.enable = true;
-      vr.enable = true;
+      valve-index.enable = true;
       fanatec.enable = true;
 
       fileSystem = {

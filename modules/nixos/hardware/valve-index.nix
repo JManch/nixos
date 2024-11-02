@@ -11,7 +11,7 @@ let
   inherit (config.${ns}.core) homeManager;
   inherit (config.hm.xdg) dataHome;
   inherit (config.${ns}.device) primaryMonitor gpu;
-  cfg = config.${ns}.hardware.vr;
+  cfg = config.${ns}.hardware.valve-index;
 in
 {
   # Issues
@@ -65,6 +65,13 @@ in
       # compositor refresh from a power of two of your HMD refresh, typically
       # provides a large performance boost
       U_PACING_APP_USE_MIN_FRAME_PERIOD = "1";
+
+      # Display modes:
+      # - 0: 2880x1600@90.00
+      # - 1: 2880x1600@144.00
+      # - 2: 2880x1600@120.02
+      # - 3: 2880x1600@80.00
+      XRT_COMPOSITOR_DESIRED_MODE = "0";
 
       # Use SteamVR tracking (requires calibration with SteamVR)
       STEAMVR_LH_ENABLE = "true";

@@ -65,6 +65,29 @@ mkIf cfg.enable {
           blinking = "On";
         };
       };
+
+      keyboard.bindings = [
+        {
+          key = "K";
+          mods = "Alt";
+          action = "ScrollLineUp";
+        }
+        {
+          key = "J";
+          mods = "Alt";
+          action = "ScrollLineDown";
+        }
+        {
+          key = "D";
+          mods = "Alt";
+          action = "ScrollHalfPageDown";
+        }
+        {
+          key = "U";
+          mods = "Alt";
+          action = "ScrollHalfPageUp";
+        }
+      ];
     };
   };
 

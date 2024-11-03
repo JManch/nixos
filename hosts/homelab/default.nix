@@ -135,6 +135,7 @@ in
         routerPeer = true;
         routerAllowedIPs = [ "10.0.0.0/24" ];
         address = "10.0.0.7";
+        listenPort = 51820;
         subnet = 24;
         dns = {
           host = true;

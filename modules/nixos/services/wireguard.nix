@@ -123,17 +123,18 @@ in
             # destination IP address is on the same network and if it can be directly
             # communicated with rather than going through the default gateway.
             address = [ "${cfg.address}/${toString cfg.subnet}" ];
+            listenPort = cfg.listenPort;
             autostart = cfg.autoStart;
             privateKeyFile = config.age.secrets."wg-${interface}-key".path;
             dns = mkIf cfg.dns.enable [ cfg.dns.address ];
 
             peers =
               cfg.peers
-              ++ optional (cfg.routerPeer) {
+              ++ optional cfg.routerPeer {
                 publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
                 allowedIPs = cfg.routerAllowedIPs;
                 endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:13232";
-                persistentKeepalive = 25;
+                persistentKeepalive = mkIf (cfg.listenPort == null) 25;
               };
 
             # Route incoming DNS traffic on the wireguard interface to the DNS server
@@ -157,6 +158,8 @@ in
         hosts = mkIf (!cfg.dns.enable && hasAttr interface inputs.nix-resources.secrets.wireguardHosts) (
           mapAttrs (_: v: [ "${v}.${interface}" ]) inputs.nix-resources.secrets.wireguardHosts.${interface}
         );
+
+        firewall.allowedUDPPorts = optional (cfg.listenPort != null) cfg.listenPort;
 
         # Open DNS ports if we are hosting a DNS server
         firewall.interfaces."wg-${interface}" = mkIf cfg.dns.host {
@@ -192,7 +195,6 @@ in
             baseline = config.systemd.services.dnsmasq;
           in
           {
-
             unitConfig = baseline.unitConfig // {
               Description = "Dnsmasq daemon for ${interface} wireguard VPN";
               PartOf = [ "wg-quick-${interface}.service" ];
@@ -201,17 +203,19 @@ in
             serviceConfig = baseline.serviceConfig // {
               ExecStartPre = "${dnsmasq} -C ${configFile} --test";
               ExecStart = "${dnsmasq} -k --user=dnsmasq -C ${configFile}";
+              SocketBindAllow = cfg.dns.port;
+
               CapabilityBoundingSet = [
                 "CAP_CHOWN"
                 "CAP_SETUID"
                 "CAP_SETGID"
               ];
+
               AmbientCapabilities = [
                 "CAP_CHOWN"
                 "CAP_SETUID"
                 "CAP_SETGID"
               ];
-              SocketBindAllow = cfg.dns.port;
             };
 
             wantedBy = [ "wg-quick-wg-${interface}.service" ];

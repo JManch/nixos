@@ -52,6 +52,20 @@ in
             description = "Assigned IP address for this device on the VPN along with the subnet mask";
           };
 
+          listenPort = mkOption {
+            type = with types; nullOr port;
+            default = null;
+            example = "51820";
+            description = ''
+              Optional port for Wireguard to listen on. Useful on for static
+              clients that need a reliable VPN connection (persistent keep
+              alive can be temperamental). If set, will open the port in the
+              firewall and disable persistent keep alive. Note that this
+              client's peers must manually specify the endpoint address and
+              port.
+            '';
+          };
+
           subnet = mkOption {
             type = types.int;
             default = null;

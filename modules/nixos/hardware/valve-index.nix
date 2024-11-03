@@ -15,7 +15,6 @@ let
   inherit (lib)
     mkIf
     getExe
-    optional
     optionals
     ;
   inherit (config.${ns}.core) homeManager;
@@ -23,23 +22,7 @@ let
   inherit (config.${ns}.device) primaryMonitor gpu;
   inherit (config.${ns}.hardware) bluetooth;
   cfg = config.${ns}.hardware.valve-index;
-
-  # Web app for changing lighthouse power states, requires bluetooth and
-  # chromium to be enabled
-  lighthousePm = pkgs.makeDesktopItem {
-    name = "lighthouse-pm";
-    desktopName = "Lighthouse PM";
-    type = "Application";
-    exec = "${getExe pkgs.chromium} --app=https://jeroen1602.github.io/lighthouse_pm/ --enable-experimental-web-platform-features";
-    icon =
-      (pkgs.fetchFromGitHub {
-        owner = "jeroen1602";
-        repo = "lighthouse_pm";
-        rev = "15dda79ce14c1bcf2c9fc5eeb491496ca91061da";
-        hash = "sha256-Oo04kHZ+8H7wv5/dirychl9XzR6qjoDKeEYtmzA7++U=";
-      })
-      + "/local_assets/app-icon-512.png";
-  };
+  lighthouse = getExe pkgs.lighthouse-steamvr;
 in
 mkIf cfg.enable {
   assertions = lib.${ns}.asserts [
@@ -49,9 +32,7 @@ mkIf cfg.enable {
 
   nixpkgs.overlays = [ inputs.nixpkgs-xr.overlays.default ];
 
-  userPackages = [
-    pkgs.index_camera_passthrough
-  ] ++ optional bluetooth.enable lighthousePm;
+  userPackages = [ pkgs.index_camera_passthrough ];
 
   # Enables asynchronous reprojection in SteamVR by allowing any application
   # to acquire high priority queues
@@ -69,47 +50,51 @@ mkIf cfg.enable {
     defaultRuntime = true;
   };
 
-  systemd.user.services.monado.environment = {
-    # Environment variable reference:
-    # https://monado.freedesktop.org/getting-started.html#environment-variables
+  systemd.user.services.monado = {
+    preStart = mkIf bluetooth.enable "${lighthouse} --state on";
+    postStop = mkIf bluetooth.enable "${lighthouse} --state off";
+    environment = {
+      # Environment variable reference:
+      # https://monado.freedesktop.org/getting-started.html#environment-variables
 
-    # Using defaults from envision lighthouse profile:
-    # https://gitlab.com/gabmus/envision/-/blob/main/src/profiles/lighthouse.rs
+      # Using defaults from envision lighthouse profile:
+      # https://gitlab.com/gabmus/envision/-/blob/main/src/profiles/lighthouse.rs
 
-    XRT_COMPOSITOR_SCALE_PERCENTAGE = "140"; # global super sampling
-    XRT_COMPOSITOR_COMPUTE = "1";
-    # These two enable a window that contains debug info and a mirror view
-    # which monado calls a "peek window"
-    XRT_DEBUG_GUI = "1";
-    XRT_CURATED_GUI = "1";
-    # Description I can't find the source of: Set to 1 to unlimit the
-    # compositor refresh from a power of two of your HMD refresh, typically
-    # provides a large performance boost
-    U_PACING_APP_USE_MIN_FRAME_PERIOD = "1";
+      XRT_COMPOSITOR_SCALE_PERCENTAGE = "140"; # global super sampling
+      XRT_COMPOSITOR_COMPUTE = "1";
+      # These two enable a window that contains debug info and a mirror view
+      # which monado calls a "peek window"
+      XRT_DEBUG_GUI = "1";
+      XRT_CURATED_GUI = "1";
+      # Description I can't find the source of: Set to 1 to unlimit the
+      # compositor refresh from a power of two of your HMD refresh, typically
+      # provides a large performance boost
+      U_PACING_APP_USE_MIN_FRAME_PERIOD = "1";
 
-    # Display modes:
-    # - 0: 2880x1600@90.00
-    # - 1: 2880x1600@144.00
-    # - 2: 2880x1600@120.02
-    # - 3: 2880x1600@80.00
-    XRT_COMPOSITOR_DESIRED_MODE = "0";
+      # Display modes:
+      # - 0: 2880x1600@90.00
+      # - 1: 2880x1600@144.00
+      # - 2: 2880x1600@120.02
+      # - 3: 2880x1600@80.00
+      XRT_COMPOSITOR_DESIRED_MODE = "0";
 
-    # Use SteamVR tracking (requires calibration with SteamVR)
-    STEAMVR_LH_ENABLE = "true";
+      # Use SteamVR tracking (requires calibration with SteamVR)
+      STEAMVR_LH_ENABLE = "true";
 
-    # Application launch envs:
-    # SURVIVE_ envs are no longer needed
-    # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc for Steam applications
+      # Application launch envs:
+      # SURVIVE_ envs are no longer needed
+      # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc for Steam applications
 
-    # Per-app supersampling applied after global XRT_COMPOSITOR_SCALE_PERCENTAGE.
-    # I think super sampling with global gives higher quality.
-    # OXR_VIEWPORT_SCALE_PERCENTAGE=100
+      # Per-app supersampling applied after global XRT_COMPOSITOR_SCALE_PERCENTAGE.
+      # I think super sampling with global gives higher quality.
+      # OXR_VIEWPORT_SCALE_PERCENTAGE=100
 
-    # If using Lact on an AMD GPU can set GAMEMODE_CUSTOM_ARGS=vr when using
-    # gamemoderun command to automatically enable the VR power profile
+      # If using Lact on an AMD GPU can set GAMEMODE_CUSTOM_ARGS=vr when using
+      # gamemoderun command to automatically enable the VR power profile
 
-    # Baseline launch options for Steam games:
-    # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc GAMEMODE_CUSTOM_ARGS=vr gamemoderun %command%
+      # Baseline launch options for Steam games:
+      # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc GAMEMODE_CUSTOM_ARGS=vr gamemoderun %command%
+    };
   };
 
   hm = {

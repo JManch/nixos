@@ -15,7 +15,9 @@ let
   inherit (lib)
     mkIf
     getExe
+    getExe'
     optionals
+    optionalString
     singleton
     ;
   inherit (config.${ns}.core) homeManager;
@@ -23,7 +25,6 @@ let
   inherit (config.${ns}.device) primaryMonitor gpu;
   inherit (config.${ns}.hardware) bluetooth;
   cfg = config.${ns}.hardware.valve-index;
-  lighthouse = getExe pkgs.lighthouse-steamvr;
 in
 mkIf cfg.enable {
   assertions = lib.${ns}.asserts [
@@ -51,52 +52,76 @@ mkIf cfg.enable {
     defaultRuntime = true;
   };
 
-  systemd.user.services.monado = {
-    preStart = mkIf bluetooth.enable "${lighthouse} --state on";
-    postStop = mkIf bluetooth.enable "${lighthouse} --state off";
-    environment = {
-      # Environment variable reference:
-      # https://monado.freedesktop.org/getting-started.html#environment-variables
+  systemd.user.services.monado =
+    let
+      lighthouse = getExe pkgs.lighthouse-steamvr;
+      pactl = getExe' pkgs.pulseaudio "pactl";
+      grep = getExe pkgs.gnugrep;
+      awk = getExe pkgs.gawk;
+    in
+    {
+      preStart = ''
+        ${optionalString bluetooth.enable "${lighthouse} --state on"}
 
-      # Using defaults from envision lighthouse profile:
-      # https://gitlab.com/gabmus/envision/-/blob/main/src/profiles/lighthouse.rs
+        # Monado doesn't change the default mic so we have to do it manually
+        echo "$(${pactl} get-default-source)" > /tmp/monado-default-mic
+        index_source=$(${pactl} list short sources | ${grep} "Valve_VR_Radio" | ${awk} '{print $2}')
+        ${pactl} set-default-source "$index_source"
+      '';
 
-      XRT_COMPOSITOR_SCALE_PERCENTAGE = "140"; # global super sampling
-      XRT_COMPOSITOR_COMPUTE = "1";
-      # These two enable a window that contains debug info and a mirror view
-      # which monado calls a "peek window"
-      XRT_DEBUG_GUI = "1";
-      XRT_CURATED_GUI = "1";
-      # Description I can't find the source of: Set to 1 to unlimit the
-      # compositor refresh from a power of two of your HMD refresh, typically
-      # provides a large performance boost
-      U_PACING_APP_USE_MIN_FRAME_PERIOD = "1";
+      postStop = ''
+        # Restore default mic
+        if [ -f /tmp/monado-default-mic ]; then
+          ${pactl} set-default-source $(</tmp/monado-default-mic)
+          rm -f /tmp/monado-default-mic
+        fi
 
-      # Display modes:
-      # - 0: 2880x1600@90.00
-      # - 1: 2880x1600@144.00
-      # - 2: 2880x1600@120.02
-      # - 3: 2880x1600@80.00
-      XRT_COMPOSITOR_DESIRED_MODE = "0";
+        ${optionalString bluetooth.enable "${lighthouse} --state off"}
+      '';
 
-      # Use SteamVR tracking (requires calibration with SteamVR)
-      STEAMVR_LH_ENABLE = "true";
+      environment = {
+        # Environment variable reference:
+        # https://monado.freedesktop.org/getting-started.html#environment-variables
 
-      # Application launch envs:
-      # SURVIVE_ envs are no longer needed
-      # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc for Steam applications
+        # Using defaults from envision lighthouse profile:
+        # https://gitlab.com/gabmus/envision/-/blob/main/src/profiles/lighthouse.rs
 
-      # Per-app supersampling applied after global XRT_COMPOSITOR_SCALE_PERCENTAGE.
-      # I think super sampling with global gives higher quality.
-      # OXR_VIEWPORT_SCALE_PERCENTAGE=100
+        XRT_COMPOSITOR_SCALE_PERCENTAGE = "140"; # global super sampling
+        XRT_COMPOSITOR_COMPUTE = "1";
+        # These two enable a window that contains debug info and a mirror view
+        # which monado calls a "peek window"
+        XRT_DEBUG_GUI = "1";
+        XRT_CURATED_GUI = "1";
+        # Description I can't find the source of: Set to 1 to unlimit the
+        # compositor refresh from a power of two of your HMD refresh, typically
+        # provides a large performance boost
+        U_PACING_APP_USE_MIN_FRAME_PERIOD = "1";
 
-      # If using Lact on an AMD GPU can set GAMEMODE_CUSTOM_ARGS=vr when using
-      # gamemoderun command to automatically enable the VR power profile
+        # Display modes:
+        # - 0: 2880x1600@90.00
+        # - 1: 2880x1600@144.00
+        # - 2: 2880x1600@120.02
+        # - 3: 2880x1600@80.00
+        XRT_COMPOSITOR_DESIRED_MODE = "0";
 
-      # Baseline launch options for Steam games:
-      # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc GAMEMODE_CUSTOM_ARGS=vr gamemoderun %command%
+        # Use SteamVR tracking (requires calibration with SteamVR)
+        STEAMVR_LH_ENABLE = "true";
+
+        # Application launch envs:
+        # SURVIVE_ envs are no longer needed
+        # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc for Steam applications
+
+        # Per-app supersampling applied after global XRT_COMPOSITOR_SCALE_PERCENTAGE.
+        # I think super sampling with global gives higher quality.
+        # OXR_VIEWPORT_SCALE_PERCENTAGE=100
+
+        # If using Lact on an AMD GPU can set GAMEMODE_CUSTOM_ARGS=vr when using
+        # gamemoderun command to automatically enable the VR power profile
+
+        # Baseline launch options for Steam games:
+        # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc GAMEMODE_CUSTOM_ARGS=vr gamemoderun %command%
+      };
     };
-  };
 
   # Fix for audio cutting out when GPU is under load
   # https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/Troubleshooting#stuttering-audio-in-virtual-machine

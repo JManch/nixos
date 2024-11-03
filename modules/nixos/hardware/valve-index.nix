@@ -16,6 +16,7 @@ let
     mkIf
     getExe
     optionals
+    singleton
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.hm.xdg) dataHome;
@@ -94,6 +95,20 @@ mkIf cfg.enable {
 
       # Baseline launch options for Steam games:
       # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc GAMEMODE_CUSTOM_ARGS=vr gamemoderun %command%
+    };
+  };
+
+  # Fix for audio cutting out when GPU is under load
+  # https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/Troubleshooting#stuttering-audio-in-virtual-machine
+  services.pipewire.wireplumber.extraConfig."99-valve-index"."monitor.alsa.rules" = singleton {
+    matches = singleton {
+      # Run `wpctl status` then `wpctl inspect <id>` to get object path
+      "object.path" = "alsa:acp:HDMI:5:playback";
+    };
+    actions.update-props = {
+      # This adds latency so set to minimum value that fixes problem
+      "api.alsa.period-size" = 1024;
+      "api.alsa.headroom" = 8192;
     };
   };
 

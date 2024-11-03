@@ -23,6 +23,7 @@ let
     "Deep Rock Galactic" = 548430;
     Noita = 881100;
     iRacing = 266410;
+    BONELAB = 1592190;
   };
 
 in

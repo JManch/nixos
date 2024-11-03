@@ -7,7 +7,6 @@
 {
   ns,
   lib,
-  pkgs,
   config,
   ...
 }:
@@ -55,12 +54,6 @@ mkMerge [
 
     services.jellyfin = {
       enable = true;
-      # Waiting on https://github.com/NixOS/nixpkgs/pull/351966
-      package =
-        (import (fetchTarball {
-          url = "https://github.com/dotlambda/nixpkgs/archive/bf8b641d2d58a80650ac486525d7ec5a306b69da.tar.gz";
-          sha256 = "sha256:0d74f9kj4qwlvr71rpz27f0c044pfkf2fq43y7gb0jbccj832rka";
-        }) { inherit (pkgs.stdenv) system; }).jellyfin;
       openFirewall = cfg.openFirewall;
     };
 

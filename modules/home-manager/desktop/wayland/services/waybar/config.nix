@@ -156,21 +156,21 @@ mkIf (cfg.enable && isWayland) {
         pulseaudio = mkIf audio.enable {
           format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%{format_source}";
           format-muted = "<span color='#${colors.base08}'>󰖁</span> {volume:2}%";
-          format-source = "";
-          format-source-muted = "<span color='#${colors.base08}'>  󰍭</span> Muted";
+          format-source = "<span color='#${colors.base04}'>  󰍬</span> Unmuted";
+          format-source-muted = "";
 
           format-icons = {
-            headphone = "";
             hdmi = "󰍹";
 
             default = [
-              "<span></span>"
-              "<span>󰕾</span>"
-              "<span></span>"
+              "󰖀"
+              "󰕾"
+              "󰕾"
             ];
-          };
+          } // cfg.audioDeviceIcons;
 
-          on-click = "${getExe' pkgs.wireplumber "wpctl"} set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          on-click = "${getExe pkgs.pavucontrol}";
+          on-click-right = "${getExe' pkgs.wireplumber "wpctl"} set-mute @DEFAULT_AUDIO_SINK@ toggle";
           tooltip = false;
         };
 

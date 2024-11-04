@@ -17,19 +17,31 @@ let
     getExe
     getExe'
     optionals
-    optionalString
     singleton
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.hm.xdg) dataHome;
   inherit (config.${ns}.device) primaryMonitor gpu;
   inherit (config.${ns}.hardware) bluetooth;
+  inherit (config.${ns}.system) audio;
+  inherit (config.${ns}.programs.gaming) gamemode;
+  inherit (config.${ns}.services) lact;
   cfg = config.${ns}.hardware.valve-index;
 in
 mkIf cfg.enable {
   assertions = lib.${ns}.asserts [
     homeManager.enable
-    "VR requires home manager to be enabled"
+    "Valve Index requires home manager to be enabled"
+    gamemode.enable
+    "Valve Index requires gamemode to be enabled"
+    audio.enable
+    "Valve Index requires audio to be enabled"
+    (audio.defaultSource != null)
+    "Valve Index requires `audio.defaultSource` to be set"
+    lact.enable
+    "Valve Index requires lact to be enabled"
+    bluetooth.enable
+    "Valve Index requires bluetooth to be enabled"
   ];
 
   nixpkgs.overlays = [ inputs.nixpkgs-xr.overlays.default ];
@@ -61,7 +73,7 @@ mkIf cfg.enable {
     in
     {
       preStart = ''
-        ${optionalString bluetooth.enable "${lighthouse} --state on"}
+        ${lighthouse} --state on
 
         # Monado doesn't change the default mic so we have to do it manually
         index_source=$(${pactl} list short sources | ${grep} "Valve_VR_Radio" | ${awk} '{print $2}')
@@ -72,7 +84,7 @@ mkIf cfg.enable {
       postStop = ''
         ${pactl} set-default-source ${audio.defaultSource}
 
-        ${optionalString bluetooth.enable "${lighthouse} --state off"}
+        ${lighthouse} --state off
       '';
 
       environment = {

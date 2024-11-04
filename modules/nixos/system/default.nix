@@ -192,6 +192,29 @@ in
     audio = {
       enable = mkEnableOption "Pipewire audio";
       extraAudioTools = mkEnableOption "extra audio tools including Easyeffects and Helvum";
+
+      alsaDeviceAliases = mkOption {
+        type = with types; attrsOf str;
+        default = { };
+        description = ''
+          Attribute set of alsa devices to rename where the name is the
+          original name and the value is the new name. The original name can be
+          found using `pamixer --list-sinks` or `pamixer --list-sources`.
+        '';
+      };
+
+      defaultSink = mkOption {
+        type = with types; nullOr str;
+        default = null;
+        description = "System default audio sink name from `pactl list short sinks`";
+      };
+
+      defaultSource = mkOption {
+        type = with types; nullOr str;
+        default = null;
+        description = "System default audio source name from `pactl list short sources`";
+      };
+
       scripts = {
         toggleMic = mkOption {
           type = types.str;

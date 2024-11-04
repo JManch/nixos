@@ -12,10 +12,14 @@ let
     getExe
     getExe'
     mkForce
+    singleton
+    optionalString
+    mapAttrsToList
     ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.audio;
   wpctl = getExe' pkgs.wireplumber "wpctl";
+  pactl = getExe' pkgs.pulseaudio "pactl";
   notifySend = getExe pkgs.libnotify;
 
   toggleMic = pkgs.writeShellScript "toggle-mic" ''
@@ -42,6 +46,15 @@ in
         jack.enable = true;
         pulse.enable = true;
         wireplumber.enable = true;
+
+        wireplumber.extraConfig = mkIf (cfg.alsaDeviceAliases != { }) {
+          "99-alsa-device-aliases"."monitor.alsa.rules" = mapAttrsToList (old: new: {
+            matches = singleton {
+              "node.name" = old;
+            };
+            actions.update-props."node.description" = new;
+          }) cfg.alsaDeviceAliases;
+        };
       };
 
       # Do not start pipewire user sockets for non-system users. This prevents
@@ -52,14 +65,14 @@ in
         pipewire-pulse.unitConfig.ConditionUser = "!@system";
       };
 
-      systemd.user.services.unmute-pipewire-devices = {
-        description = "Unmute source and sink devices on login";
+      systemd.user.services.setup-pipewire-devices = {
+        description = "Setup source and sink devices on login";
         after = [ "wireplumber.service" ];
         wants = [ "wireplumber.service" ];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
-          ExecStart = pkgs.writeShellScript "unmute-pipewire-devices" ''
+          ExecStart = pkgs.writeShellScript "setup-pipewire-devices" ''
             sleep 2
             attempt=0
             while ! ${wpctl} inspect @DEFAULT_AUDIO_SINK@ &>/dev/null; do
@@ -73,8 +86,10 @@ in
               sleep 2
             done
 
+            ${optionalString (cfg.defaultSink != null) "${pactl} set-default-sink \"${cfg.defaultSink}\""}
+            ${optionalString (cfg.defaultSource != null) "${pactl} set-default-source \"${cfg.defaultSource}\""}
             ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ 0
-            ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ 0
+            ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ 1
           '';
         };
         wantedBy = [ "default.target" ];

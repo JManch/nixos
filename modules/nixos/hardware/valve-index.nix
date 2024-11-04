@@ -64,17 +64,13 @@ mkIf cfg.enable {
         ${optionalString bluetooth.enable "${lighthouse} --state on"}
 
         # Monado doesn't change the default mic so we have to do it manually
-        echo "$(${pactl} get-default-source)" > /tmp/monado-default-mic
         index_source=$(${pactl} list short sources | ${grep} "Valve_VR_Radio" | ${awk} '{print $2}')
         ${pactl} set-default-source "$index_source"
+        ${pactl} set-source-mute "$index_source" 1
       '';
 
       postStop = ''
-        # Restore default mic
-        if [ -f /tmp/monado-default-mic ]; then
-          ${pactl} set-default-source $(</tmp/monado-default-mic)
-          rm -f /tmp/monado-default-mic
-        fi
+        ${pactl} set-default-source ${audio.defaultSource}
 
         ${optionalString bluetooth.enable "${lighthouse} --state off"}
       '';

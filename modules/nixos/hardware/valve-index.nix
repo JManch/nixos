@@ -36,8 +36,8 @@ mkIf cfg.enable {
     "Valve Index requires gamemode to be enabled"
     audio.enable
     "Valve Index requires audio to be enabled"
-    (audio.defaultSource != null)
-    "Valve Index requires `audio.defaultSource` to be set"
+    (audio.defaultSource != null && audio.defaultSink != null)
+    "Valve Index requires the default sink and source devices to be set"
     lact.enable
     "Valve Index requires lact to be enabled"
     bluetooth.enable
@@ -68,23 +68,32 @@ mkIf cfg.enable {
     let
       lighthouse = getExe pkgs.lighthouse-steamvr;
       pactl = getExe' pkgs.pulseaudio "pactl";
-      grep = getExe pkgs.gnugrep;
-      awk = getExe pkgs.gawk;
+      sleep = getExe' pkgs.coreutils "sleep";
     in
     {
       preStart = ''
-        ${lighthouse} --state on
+        if [ ! -f "/tmp/disable-lighthouse-control" ]; then
+          ${lighthouse} --state on
+        fi
 
-        # Monado doesn't change the default mic so we have to do it manually
-        index_source=$(${pactl} list short sources | ${grep} "Valve_VR_Radio" | ${awk} '{print $2}')
-        ${pactl} set-default-source "$index_source"
-        ${pactl} set-source-mute "$index_source" 1
+        # Monado doesn't change audio devices so we have to do it manually
+        ${pactl} set-default-source "${cfg.audio.source}"
+        ${pactl} set-source-mute "${cfg.audio.source}" 1
+      '';
+
+      # The sink device is available after the headset has powered on
+      postStart = ''
+        ${sleep} 10
+        ${pactl} set-default-sink "${cfg.audio.sink}"
       '';
 
       postStop = ''
         ${pactl} set-default-source ${audio.defaultSource}
+        ${pactl} set-default-sink ${audio.defaultSink}
 
-        ${lighthouse} --state off
+        if [ ! -f "/tmp/disable-lighthouse-control" ]; then
+          ${lighthouse} --state off
+        fi
       '';
 
       environment = {

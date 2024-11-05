@@ -25,9 +25,24 @@ in
 
   options.${ns}.hardware = {
     bluetooth.enable = mkEnableOption "bluetooth";
-    valve-index.enable = mkEnableOption "virtual reality";
     secureBoot.enable = mkEnableOption "secure boot";
     fanatec.enable = mkEnableOption "support for Fanatec hardware";
+
+    valve-index = {
+      enable = mkEnableOption "virtual reality";
+
+      audio = {
+        source = mkOption {
+          type = types.str;
+          description = "Name of the Index source device from `pactl list short sources`";
+        };
+
+        sink = mkOption {
+          type = types.str;
+          description = "Name of the Index sink device from `pactl list short sinks`";
+        };
+      };
+    };
 
     raspberryPi = {
       enable = mkOption {

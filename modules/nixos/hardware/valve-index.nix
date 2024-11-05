@@ -46,7 +46,21 @@ mkIf cfg.enable {
 
   nixpkgs.overlays = [ inputs.nixpkgs-xr.overlays.default ];
 
-  userPackages = [ pkgs.index_camera_passthrough ];
+  userPackages = [
+    pkgs.index_camera_passthrough
+    (pkgs.makeDesktopItem {
+      name = "monado";
+      desktopName = "Monado";
+      type = "Application";
+      exec = "${getExe' pkgs.systemd "systemctl"} start --user monado";
+      icon = (
+        pkgs.fetchurl {
+          url = "https://gitlab.freedesktop.org/uploads/-/system/group/avatar/5604/monado_icon_medium.png";
+          hash = "sha256-Wx4BBHjNyuboDVQt8yV0tKQNDny4EDwRBtMSk9XHNVA=";
+        }
+      );
+    })
+  ];
 
   # Enables asynchronous reprojection in SteamVR by allowing any application
   # to acquire high priority queues

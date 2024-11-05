@@ -54,57 +54,36 @@ in
       lockScript = mkOption {
         type = types.str;
         readOnly = true;
-        default =
-          let
-            osAudio = osConfig'.${ns}.system.audio;
-            preLock = ''
-              ${optionalString osAudio.enable ''
-                wpctl set-mute @DEFAULT_AUDIO_SINK@ 1
-                wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1
-              ''}
+        default = getExe (
+          pkgs.writeShellApplication {
+            name = "lock-script";
+
+            runtimeInputs = with pkgs; [
+              wireplumber
+              gnugrep
+              procps
+              coreutils
+            ];
+
+            text = ''
+              # Exit if locking is currently running
+              pgrep -x ${builtins.baseNameOf (getExe cfg.locking.package)} && exit 1
+
+              # Create a unique lock file so forked processes can track if precisely
+              # this instance of the locker is still running
+              lockfile="/tmp/lock-$$-$(date +%s)"
+              touch "$lockfile"
+              trap 'rm -f "$lockfile"' EXIT
+
               ${cfg.locking.preLockScript}
-            '';
-
-            postLock = cfg.locking.postLockScript;
-
-            postUnlock = ''
-              ${optionalString osAudio.enable ''
-                wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
-                wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0
-              ''}
+              ${escapeShellArg (getExe cfg.locking.package)} &
+              LOCKER_PID=$!
+              ${cfg.locking.postLockScript}
+              wait $LOCKER_PID
               ${cfg.locking.postUnlockScript}
             '';
-          in
-          getExe (
-            pkgs.writeShellApplication {
-              name = "lock-script";
-
-              runtimeInputs = with pkgs; [
-                wireplumber
-                gnugrep
-                procps
-                coreutils
-              ];
-
-              text = ''
-                # Exit if locking is currently running
-                pgrep -x ${builtins.baseNameOf (getExe cfg.locking.package)} && exit 1
-
-                # Create a unique lock file so forked processes can track if precisely
-                # this instance of the locker is still running
-                lockfile="/tmp/lock-$$-$(date +%s)"
-                touch "$lockfile"
-                trap 'rm -f "$lockfile"' EXIT
-
-                ${preLock}
-                ${escapeShellArg (getExe cfg.locking.package)} &
-                LOCKER_PID=$!
-                ${postLock}
-                wait $LOCKER_PID
-                ${postUnlock}
-              '';
-            }
-          );
+          }
+        );
       };
     };
   };

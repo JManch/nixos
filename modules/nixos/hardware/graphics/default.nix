@@ -13,10 +13,7 @@ let
     ;
 in
 {
-  imports = [
-    ./amd.nix
-    ./nvidia.nix
-  ];
+  imports = lib.${ns}.scanPathsExcept ./. [ "amdgpu-kernel-module.nix" ];
 
   options.${ns}.hardware.graphics = {
     hardwareAcceleration = mkEnableOption ''

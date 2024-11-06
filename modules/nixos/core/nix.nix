@@ -273,8 +273,22 @@ in
   persistenceAdminHome.directories = [ ".remote-builds" ];
 
   # Nice explanation of overlays: https://archive.is/f8goR
+  # How to override python packages:
+  # https://nixos.org/manual/nixpkgs/unstable/#how-to-override-a-python-package-using-overlays
   nixpkgs = {
-    overlays = [ (final: prev: { }) ];
+    overlays = [
+      (final: prev: {
+        # For some reason tesla-powerwall tests broke after a nixpkgs update
+        # even though the derivation was unchanged
+        pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+          (python-final: python-prev: {
+            tesla-powerwall = python-prev.tesla-powerwall.overridePythonAttrs {
+              doCheck = false;
+            };
+          })
+        ];
+      })
+    ];
     config.allowUnfree = true;
   };
 

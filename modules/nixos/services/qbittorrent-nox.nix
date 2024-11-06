@@ -53,6 +53,7 @@ mkIf cfg.enable {
       DynamicUser = false;
       User = "qbittorrent-nox";
       Group = "qbittorrent-nox";
+      UMask = "0022";
       StateDirectory = "qbittorrent-nox";
       StateDirectoryMode = "750";
       ExecStart = getExe' qbittorrent-nox "qbittorrent-nox";

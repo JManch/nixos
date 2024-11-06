@@ -135,10 +135,6 @@ mkIf cfg.enable {
   # in our start script and enables the VR profile on our GPU.
   environment.systemPackages = [ (hiPrio gamemoderunCustom) ];
 
-  # So that apps like Steam can use our wrapped package. Not using a overlay to
-  # avoid building apps with gamemode dep like PrismLauncher from source.
-  ${ns}.programs.gaming.gamemode.customPackage = gamemoderunCustom;
-
   programs.gamemode = {
     enable = true;
 

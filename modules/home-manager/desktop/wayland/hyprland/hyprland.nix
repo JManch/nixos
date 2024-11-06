@@ -175,7 +175,7 @@ mkIf (isHyprland config) {
 
       decoration = {
         rounding = desktopCfg.style.cornerRadius - 2;
-        drop_shadow = false;
+        shadow.enabled = false;
 
         blur = {
           enabled = cfg.blur;

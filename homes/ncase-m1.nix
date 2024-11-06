@@ -72,7 +72,8 @@
       obs.enable = true;
       vscode.enable = true;
       mpv.enable = true;
-      mpv.jellyfinShim.enable = true;
+      # Disable until https://github.com/NixOS/nixpkgs/pull/353833
+      mpv.jellyfinShim.enable = false;
       chatterino.enable = true;
       images.enable = true;
       anki.enable = true;

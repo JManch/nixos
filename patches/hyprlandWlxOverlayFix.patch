@@ -1,0 +1,260 @@
+From 6f230cdfe0360423cd832b87d8ff299fe1b12902 Mon Sep 17 00:00:00 2001
+From: Joshua Manchester <JManch@protonmail.com>
+Date: Mon, 4 Nov 2024 22:49:22 +0000
+Subject: [PATCH 1/2] pointer: map devices across all outputs by default
+
+---
+ src/devices/VirtualPointer.cpp  |  2 +-
+ src/managers/PointerManager.cpp | 52 +++++++++++++++------------------
+ 2 files changed, 25 insertions(+), 29 deletions(-)
+
+diff --git a/src/devices/VirtualPointer.cpp b/src/devices/VirtualPointer.cpp
+index 7ad18775d78..514c8c32ddd 100644
+--- a/src/devices/VirtualPointer.cpp
++++ b/src/devices/VirtualPointer.cpp
+@@ -38,7 +38,7 @@ CVirtualPointer::CVirtualPointer(SP<CVirtualPointerV1Resource> resource) : point
+     listeners.holdBegin      = pointer->events.holdBegin.registerListener([this](std::any d) { pointerEvents.holdBegin.emit(d); });
+     listeners.holdEnd        = pointer->events.holdEnd.registerListener([this](std::any d) { pointerEvents.holdEnd.emit(d); });
+ 
+-    boundOutput = resource->boundOutput ? resource->boundOutput->szName : "entire";
++    boundOutput = resource->boundOutput ? resource->boundOutput->szName : "";
+ 
+     deviceName = pointer->name;
+ }
+diff --git a/src/managers/PointerManager.cpp b/src/managers/PointerManager.cpp
+index b309ba82120..9983583891f 100644
+--- a/src/managers/PointerManager.cpp
++++ b/src/managers/PointerManager.cpp
+@@ -668,9 +668,7 @@ void CPointerManager::move(const Vector2D& deltaLogical) {
+ }
+ 
+ void CPointerManager::warpAbsolute(Vector2D abs, SP<IHID> dev) {
+-
+-    PHLMONITOR currentMonitor = g_pCompositor->m_pLastMonitor.lock();
+-    if (!currentMonitor || !dev)
++    if (!dev)
+         return;
+ 
+     if (!std::isnan(abs.x))
+@@ -678,16 +676,29 @@ void CPointerManager::warpAbsolute(Vector2D abs, SP<IHID> dev) {
+     if (!std::isnan(abs.y))
+         abs.y = std::clamp(abs.y, 0.0, 1.0);
+ 
+-    // in logical global
+-    CBox mappedArea = currentMonitor->logicalBox();
++    // find x and y size of the entire space
++    Vector2D bottomRight = {-9999999, -9999999}, topLeft = {9999999, 9999999};
++    for (auto const& m : g_pCompositor->m_vMonitors) {
++        const auto EXTENT = m->logicalBox().extent();
++        const auto POS    = m->logicalBox().pos();
++        if (EXTENT.x > bottomRight.x)
++            bottomRight.x = EXTENT.x;
++        if (EXTENT.y > bottomRight.y)
++            bottomRight.y = EXTENT.y;
++        if (POS.x < topLeft.x)
++            topLeft.x = POS.x;
++        if (POS.y < topLeft.y)
++            topLeft.y = POS.y;
++    }
++    CBox mappedArea = {topLeft, bottomRight - topLeft};
+ 
+     switch (dev->getType()) {
+         case HID_TYPE_TABLET: {
+             CTablet* TAB = reinterpret_cast<CTablet*>(dev.get());
+             if (!TAB->boundOutput.empty()) {
+                 if (const auto PMONITOR = g_pCompositor->getMonitorFromString(TAB->boundOutput); PMONITOR) {
+-                    currentMonitor = PMONITOR->self.lock();
+-                    mappedArea     = currentMonitor->logicalBox();
++                    if (const auto boundMonitor = PMONITOR->self.lock(); boundMonitor)
++                        mappedArea = boundMonitor->logicalBox();
+                 }
+             }
+ 
+@@ -696,14 +707,15 @@ void CPointerManager::warpAbsolute(Vector2D abs, SP<IHID> dev) {
+                 mappedArea.w = TAB->boundBox.w;
+                 mappedArea.h = TAB->boundBox.h;
+             }
++
+             break;
+         }
+         case HID_TYPE_TOUCH: {
+             ITouch* TOUCH = reinterpret_cast<ITouch*>(dev.get());
+             if (!TOUCH->boundOutput.empty()) {
+                 if (const auto PMONITOR = g_pCompositor->getMonitorFromString(TOUCH->boundOutput); PMONITOR) {
+-                    currentMonitor = PMONITOR->self.lock();
+-                    mappedArea     = currentMonitor->logicalBox();
++                    if (const auto boundMonitor = PMONITOR->self.lock(); boundMonitor)
++                        mappedArea = boundMonitor->logicalBox();
+                 }
+             }
+             break;
+@@ -711,25 +723,9 @@ void CPointerManager::warpAbsolute(Vector2D abs, SP<IHID> dev) {
+         case HID_TYPE_POINTER: {
+             IPointer* POINTER = reinterpret_cast<IPointer*>(dev.get());
+             if (!POINTER->boundOutput.empty()) {
+-                if (POINTER->boundOutput == "entire") {
+-                    // find x and y size of the entire space
+-                    Vector2D bottomRight = {-9999999, -9999999}, topLeft = {9999999, 9999999};
+-                    for (auto const& m : g_pCompositor->m_vMonitors) {
+-                        const auto EXTENT = m->logicalBox().extent();
+-                        const auto POS    = m->logicalBox().pos();
+-                        if (EXTENT.x > bottomRight.x)
+-                            bottomRight.x = EXTENT.x;
+-                        if (EXTENT.y > bottomRight.y)
+-                            bottomRight.y = EXTENT.y;
+-                        if (POS.x < topLeft.x)
+-                            topLeft.x = POS.x;
+-                        if (POS.y < topLeft.y)
+-                            topLeft.y = POS.y;
+-                    }
+-                    mappedArea = {topLeft, bottomRight - topLeft};
+-                } else if (const auto PMONITOR = g_pCompositor->getMonitorFromString(POINTER->boundOutput); PMONITOR) {
+-                    currentMonitor = PMONITOR->self.lock();
+-                    mappedArea     = currentMonitor->logicalBox();
++                if (const auto PMONITOR = g_pCompositor->getMonitorFromString(POINTER->boundOutput); PMONITOR) {
++                    if (const auto boundMonitor = PMONITOR->self.lock(); boundMonitor)
++                        mappedArea = boundMonitor->logicalBox();
+                 }
+             }
+             break;
+
+From be87d0b7d655b11372bb935198e4b50f44975fef Mon Sep 17 00:00:00 2001
+From: Joshua Manchester <JManch@protonmail.com>
+Date: Tue, 5 Nov 2024 13:31:13 +0000
+Subject: [PATCH 2/2] tablet: add absolute_region_position option
+
+---
+ src/config/ConfigDescriptions.hpp   |  8 +++++++-
+ src/config/ConfigManager.cpp        |  2 ++
+ src/devices/Tablet.hpp              |  3 ++-
+ src/managers/PointerManager.cpp     | 26 +++++++++++++-------------
+ src/managers/input/InputManager.cpp |  3 +++
+ 5 files changed, 27 insertions(+), 15 deletions(-)
+
+diff --git a/src/config/ConfigDescriptions.hpp b/src/config/ConfigDescriptions.hpp
+index 07034e71402..d8d2868bace 100644
+--- a/src/config/ConfigDescriptions.hpp
++++ b/src/config/ConfigDescriptions.hpp
+@@ -620,10 +620,16 @@ inline static const std::vector<SConfigOptionDescription> CONFIG_OPTIONS = {
+     },
+     SConfigOptionDescription{
+         .value       = "input:tablet:region_position",
+-        .description = "position of the mapped region in monitor layout.",
++        .description = "position of the mapped region in monitor layout relative to the top left corner of the bound monitor or all monitors.",
+         .type        = CONFIG_OPTION_VECTOR,
+         .data        = SConfigOptionDescription::SVectorData{{}, {-20000, -20000}, {20000, 20000}},
+     },
++    SConfigOptionDescription{
++        .value       = "input:tablet:absolute_region_position",
++        .description = "whether to treat the region_position as an absolute position in monitor layout. Only applies when output is empty",
++        .type        = CONFIG_OPTION_BOOL,
++        .data        = SConfigOptionDescription::SBoolData{false},
++    },
+     SConfigOptionDescription{
+         .value       = "input:tablet:region_size",
+         .description = "size of the mapped region. When this variable is set, tablet input will be mapped to the region. [0, 0] or invalid size means unset.",
+diff --git a/src/config/ConfigManager.cpp b/src/config/ConfigManager.cpp
+index c5d53e6a08c..90c0dad51ea 100644
+--- a/src/config/ConfigManager.cpp
++++ b/src/config/ConfigManager.cpp
+@@ -514,6 +514,7 @@ CConfigManager::CConfigManager() {
+     m_pConfig->addConfigValue("input:tablet:transform", Hyprlang::INT{0});
+     m_pConfig->addConfigValue("input:tablet:output", {STRVAL_EMPTY});
+     m_pConfig->addConfigValue("input:tablet:region_position", Hyprlang::VEC2{0, 0});
++    m_pConfig->addConfigValue("input:tablet:absolute_region_position", Hyprlang::INT{0});
+     m_pConfig->addConfigValue("input:tablet:region_size", Hyprlang::VEC2{0, 0});
+     m_pConfig->addConfigValue("input:tablet:relative_input", Hyprlang::INT{0});
+     m_pConfig->addConfigValue("input:tablet:left_handed", Hyprlang::INT{0});
+@@ -623,6 +624,7 @@ CConfigManager::CConfigManager() {
+     m_pConfig->addSpecialConfigValue("device", "output", {STRVAL_EMPTY});
+     m_pConfig->addSpecialConfigValue("device", "enabled", Hyprlang::INT{1});                  // only for mice, touchpads, and touchdevices
+     m_pConfig->addSpecialConfigValue("device", "region_position", Hyprlang::VEC2{0, 0});      // only for tablets
++    m_pConfig->addSpecialConfigValue("device", "absolute_region_position", Hyprlang::INT{0}); // only for tablets
+     m_pConfig->addSpecialConfigValue("device", "region_size", Hyprlang::VEC2{0, 0});          // only for tablets
+     m_pConfig->addSpecialConfigValue("device", "relative_input", Hyprlang::INT{0});           // only for tablets
+     m_pConfig->addSpecialConfigValue("device", "active_area_position", Hyprlang::VEC2{0, 0}); // only for tablets
+diff --git a/src/devices/Tablet.hpp b/src/devices/Tablet.hpp
+index 01901721086..0ef0912f59a 100644
+--- a/src/devices/Tablet.hpp
++++ b/src/devices/Tablet.hpp
+@@ -92,10 +92,11 @@ class CTablet : public IHID {
+     WP<CTablet> self;
+ 
+     bool        relativeInput = false;
++    bool        absolutePos   = false;
+     std::string hlName        = "";
+     std::string boundOutput   = "";
+     CBox        activeArea;
+-    CBox        boundBox; // output-local
++    CBox        boundBox;
+ 
+   private:
+     CTablet(SP<Aquamarine::ITablet> tablet);
+diff --git a/src/managers/PointerManager.cpp b/src/managers/PointerManager.cpp
+index 9983583891f..62be9e1137b 100644
+--- a/src/managers/PointerManager.cpp
++++ b/src/managers/PointerManager.cpp
+@@ -697,36 +697,36 @@ void CPointerManager::warpAbsolute(Vector2D abs, SP<IHID> dev) {
+             CTablet* TAB = reinterpret_cast<CTablet*>(dev.get());
+             if (!TAB->boundOutput.empty()) {
+                 if (const auto PMONITOR = g_pCompositor->getMonitorFromString(TAB->boundOutput); PMONITOR) {
+-                    if (const auto boundMonitor = PMONITOR->self.lock(); boundMonitor)
+-                        mappedArea = boundMonitor->logicalBox();
++                    mappedArea = PMONITOR->logicalBox();
++
++                    // apply the bound box relative to the bound output
++                    mappedArea.translate(TAB->boundBox.pos());
+                 }
+-            }
++            } else if (TAB->absolutePos) {
++                mappedArea.x = TAB->boundBox.x;
++                mappedArea.y = TAB->boundBox.y;
++            } else
++                mappedArea.translate(TAB->boundBox.pos());
+ 
+-            mappedArea.translate(TAB->boundBox.pos());
+             if (!TAB->boundBox.empty()) {
+                 mappedArea.w = TAB->boundBox.w;
+                 mappedArea.h = TAB->boundBox.h;
+             }
+-
+             break;
+         }
+         case HID_TYPE_TOUCH: {
+             ITouch* TOUCH = reinterpret_cast<ITouch*>(dev.get());
+             if (!TOUCH->boundOutput.empty()) {
+-                if (const auto PMONITOR = g_pCompositor->getMonitorFromString(TOUCH->boundOutput); PMONITOR) {
+-                    if (const auto boundMonitor = PMONITOR->self.lock(); boundMonitor)
+-                        mappedArea = boundMonitor->logicalBox();
+-                }
++                if (const auto PMONITOR = g_pCompositor->getMonitorFromString(TOUCH->boundOutput); PMONITOR)
++                    mappedArea = PMONITOR->logicalBox();
+             }
+             break;
+         }
+         case HID_TYPE_POINTER: {
+             IPointer* POINTER = reinterpret_cast<IPointer*>(dev.get());
+             if (!POINTER->boundOutput.empty()) {
+-                if (const auto PMONITOR = g_pCompositor->getMonitorFromString(POINTER->boundOutput); PMONITOR) {
+-                    if (const auto boundMonitor = PMONITOR->self.lock(); boundMonitor)
+-                        mappedArea = boundMonitor->logicalBox();
+-                }
++                if (const auto PMONITOR = g_pCompositor->getMonitorFromString(POINTER->boundOutput); PMONITOR)
++                    mappedArea = PMONITOR->logicalBox();
+             }
+             break;
+         }
+diff --git a/src/managers/input/InputManager.cpp b/src/managers/input/InputManager.cpp
+index af725927c93..2c2cf80f50f 100644
+--- a/src/managers/input/InputManager.cpp
++++ b/src/managers/input/InputManager.cpp
+@@ -1579,6 +1579,9 @@ void CInputManager::setTabletConfigs() {
+             const auto REGION_SIZE = g_pConfigManager->getDeviceVec(NAME, "region_size", "input:tablet:region_size");
+             t->boundBox            = {REGION_POS, REGION_SIZE};
+ 
++            const auto ABSOLUTE_REGION_POS = g_pConfigManager->getDeviceInt(NAME, "absolute_region_position", "input:tablet:absolute_region_position");
++            t->absolutePos                 = ABSOLUTE_REGION_POS;
++
+             const auto ACTIVE_AREA_SIZE = g_pConfigManager->getDeviceVec(NAME, "active_area_size", "input:tablet:active_area_size");
+             const auto ACTIVE_AREA_POS  = g_pConfigManager->getDeviceVec(NAME, "active_area_position", "input:tablet:active_area_position");
+             if (ACTIVE_AREA_SIZE.x != 0 || ACTIVE_AREA_SIZE.y != 0) {

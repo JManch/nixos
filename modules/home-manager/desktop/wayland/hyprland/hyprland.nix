@@ -45,6 +45,7 @@ let
     ../../../../../patches/hyprlandResizeParamsFloats.patch
     # Potential fix for https://github.com/hyprwm/Hyprland/issues/6820
     ../../../../../patches/hyprlandSpecialWorkspaceFullscreen.patch
+    ../../../../../patches/hyprlandWlxOverlayFix.patch
   ];
 in
 mkIf (isHyprland config) {

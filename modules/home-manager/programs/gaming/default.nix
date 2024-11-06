@@ -24,7 +24,6 @@ in
   imports = lib.${ns}.scanPaths ./.;
 
   options.${ns}.programs.gaming = {
-    steam.enable = mkEnableOption "Steam configuration";
     mangohud.enable = mkEnableOption "MangoHud";
     r2modman.enable = mkEnableOption "r2modman";
     lutris.enable = mkEnableOption "Lutris";

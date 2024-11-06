@@ -206,9 +206,7 @@
         defaultSink = "alsa_output.pci-0000_0b_00.4.analog-stereo";
 
         alsaDeviceAliases = {
-          "alsa_input.usb-Valve_Corporation_Valve_VR_Radio___HMD_Mic_8BABED88E1-LYM-01.mono-fallback" = "Valve Index";
           "alsa_input.usb-BLUE_MICROPHONE_Blue_Snowball_201306-00.mono-fallback" = "Blue Snowball";
-          "alsa_output.pci-0000_09_00.1.hdmi-stereo-extra1" = "Valve Index";
           "alsa_output.pci-0000_0b_00.4.analog-stereo" = "Headphones";
           "alsa_output.pci-0000_09_00.1.hdmi-stereo" = "Dell Monitor";
           "alsa_output.pci-0000_09_00.1.hdmi-stereo-extra3" = "Asus Monitor";

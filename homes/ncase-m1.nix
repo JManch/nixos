@@ -43,7 +43,6 @@
 
       services = {
         waybar.enable = true;
-        waybar.audioDeviceIcons."alsa_output.pci-0000_09_00.1.hdmi-stereo-extra1" = "";
         dunst.enable = true;
         wlsunset.enable = true;
         hypridle.enable = true;

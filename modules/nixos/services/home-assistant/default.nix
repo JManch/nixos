@@ -383,11 +383,6 @@ in
       };
     };
 
-    systemd.services.postgresql.serviceConfig = hardeningBaseline config {
-      DynamicUser = false;
-      PrivateUsers = false;
-    };
-
     services.postgresqlBackup = {
       enable = true;
       location = "/var/backup/postgresql";

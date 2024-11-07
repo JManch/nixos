@@ -103,6 +103,9 @@ in
         "A /persist file system must be defined for impermanence"
       ];
 
+      # TODO: Remove once https://github.com/nix-community/impermanence/issues/229 is resolved
+      systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
+
       adminPackages = [
         ephemeralFinder
         bloatFinder

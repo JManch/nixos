@@ -49,7 +49,7 @@ let
       # --fast would be bad to use
       text = # bash
         ''
-          flake="/home/${adminUsername}/.config/nixos"
+          flake="${configDir}"
           if [ ! -d $flake ]; then
             echo "Flake does not exist locally so using remote from github"
             flake="github:JManch/nixos"
@@ -93,7 +93,7 @@ let
             exit 1
           fi
 
-          flake="/home/${adminUsername}/.config/nixos"
+          flake="${configDir}"
           if [ ! -d $flake ]; then
             echo "Flake does not exist locally so using remote from github"
             flake="github:JManch/nixos"
@@ -129,7 +129,6 @@ let
               nix-copy-closure --from "$hostname.lan" "$remote_system"
               nvd --color always diff "$remote_system" "$nixos_system"
             ''
-          # bash
           else
             optionalString (cmd != "build") # bash
               ''

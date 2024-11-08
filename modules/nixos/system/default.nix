@@ -67,7 +67,7 @@ in
       };
 
       mappedTCPPorts = mkOption {
-        type = types.listOf (types.attrsOf types.port);
+        type = with types; listOf (attrsOf port);
         default = [ ];
         example = [
           {
@@ -83,7 +83,7 @@ in
       };
 
       mappedUDPPorts = mkOption {
-        type = types.listOf (types.attrsOf types.port);
+        type = with types; listOf (attrsOf port);
         default = [ ];
         example = [
           {

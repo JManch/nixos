@@ -5,7 +5,7 @@
   config,
   inputs,
   ...
-}:
+}@args:
 let
   inherit (lib) mkIf optionalString optional;
   inherit (config.${ns}.desktop.services) darkman;
@@ -16,6 +16,9 @@ mkIf cfg.enable {
 
   programs.neovim = {
     enable = true;
+    # Until https://github.com/neovim/neovim/pull/30747 gets into a stable
+    # release. It fixes semantic token errors.
+    package = (lib.${ns}.flakePkgs args "neovim").default;
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;

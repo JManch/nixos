@@ -91,6 +91,9 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
+    neovim.url = "github:nix-community/neovim-nightly-overlay";
+    neovim.inputs.nixpkgs.follows = "nixpkgs";
+
     # Personal inputs
 
     firstBoot.url = "github:JManch/false";

@@ -29,8 +29,8 @@ lib.mkIf cfg.enable {
         src = pkgs.fetchFromGitHub {
           owner = "dimtpap";
           repo = "obs-pipewire-audio-capture";
-          rev = "7bb128951a607aa92ce4e4535df628feb19e9d88";
-          sha256 = "sha256-Lp5YO/Rkwa8IRN3Nc9X8oyTu8FtiH83rnGPzWZhypVA=";
+          rev = "c8c57b39fddf01c365f3d1234edc983ee0da1b5b";
+          hash = "sha256-qdwJS4WJxoIg2lIq3aHgBBrQr0Y56X4eZJzOjkwXegE=";
         };
         cmakeFlags = [ ];
       })

@@ -40,9 +40,7 @@ mkMerge [
     # Mirror: https://archive.is/wwZaP
 
     boot.loader.systemd-boot = {
-      extraFiles = {
-        "EFI/edk2-shell/shellx64.efi" = pkgs.edk2-uefi-shell.efi;
-      };
+      extraFiles."EFI/edk2-shell/shellx64.efi" = pkgs.edk2-uefi-shell.efi;
 
       extraEntries = {
         "windows.conf" = ''

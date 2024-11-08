@@ -92,30 +92,30 @@ mkIf cfg.enable {
       sleep = getExe' pkgs.coreutils "sleep";
     in
     {
-      preStart = ''
-        if [ ! -f "/tmp/disable-lighthouse-control" ]; then
-          ${lighthouse} --state on
-        fi
+      serviceConfig = {
+        ExecStartPre = "-${pkgs.writeShellScript "monado-exec-start-pre" ''
+          if [ ! -f "/tmp/disable-lighthouse-control" ]; then
+            ${lighthouse} --state on
+          fi
 
-        # Monado doesn't change audio devices so we have to do it manually
-        ${pactl} set-default-source "${cfg.audio.source}"
-        ${pactl} set-source-mute "${cfg.audio.source}" 1
-      '';
+          # Monado doesn't change audio devices so we have to do it manually
+          ${pactl} set-default-source "${cfg.audio.source}"
+          ${pactl} set-source-mute "${cfg.audio.source}" 1
+          ${pactl} set-card-profile "${cfg.audio.card}" "${cfg.audio.profile}"
 
-      # The sink device is available after the headset has powered on
-      postStart = ''
-        ${sleep} 10
-        ${pactl} set-default-sink "${cfg.audio.sink}"
-      '';
+          # The sink device is available after the headset has powered on
+          (${sleep} 10; ${pactl} set-default-sink "${cfg.audio.sink}") &
+        ''}";
 
-      postStop = ''
-        ${pactl} set-default-source ${audio.defaultSource}
-        ${pactl} set-default-sink ${audio.defaultSink}
+        ExecStopPre = "-${pkgs.writeShellScript "monado-exec-stop-post" ''
+          ${pactl} set-default-source ${audio.defaultSource}
+          ${pactl} set-default-sink ${audio.defaultSink}
 
-        if [ ! -f "/tmp/disable-lighthouse-control" ]; then
-          ${lighthouse} --state off
-        fi
-      '';
+          if [ ! -f "/tmp/disable-lighthouse-control" ]; then
+            ${lighthouse} --state off
+          fi
+        ''}";
+      };
 
       environment = {
         # Environment variable reference:

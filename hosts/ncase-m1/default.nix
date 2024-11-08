@@ -82,8 +82,12 @@
 
       valve-index = {
         enable = true;
-        audio.source = "alsa_input.usb-Valve_Corporation_Valve_VR_Radio___HMD_Mic_8BABED88E1-LYM-01.mono-fallback";
-        audio.sink = "alsa_output.pci-0000_09_00.1.hdmi-stereo-extra1";
+        audio = {
+          card = "alsa_card.pci-0000_09_00.1";
+          profile = "output:hdmi-stereo-extra1";
+          source = "alsa_input.usb-Valve_Corporation_Valve_VR_Radio___HMD_Mic_8BABED88E1-LYM-01.mono-fallback";
+          sink = "alsa_output.pci-0000_09_00.1.hdmi-stereo-extra1";
+        };
       };
 
       fileSystem = {

@@ -32,6 +32,16 @@ in
       enable = mkEnableOption "virtual reality";
 
       audio = {
+        card = mkOption {
+          type = types.str;
+          description = "Name of the Index audio card from `pact list cards`";
+        };
+
+        profile = mkOption {
+          type = types.str;
+          description = "Name of the Index audio profile from `pactl list cards`";
+        };
+
         source = mkOption {
           type = types.str;
           description = "Name of the Index source device from `pactl list short sources`";

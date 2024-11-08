@@ -46,7 +46,7 @@ let
         shift $(( OPTIND - 1 ))
 
         if [ "$#" -ne 1 ]; then
-          echo "Usage: build-vm <hostname>"
+          echo "Usage: run-vm <hostname>"
           exit 1
         fi
         hostname=$1

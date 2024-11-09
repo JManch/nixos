@@ -107,7 +107,7 @@ mkIf cfg.enable {
           (${sleep} 10; ${pactl} set-default-sink "${cfg.audio.sink}") &
         ''}";
 
-        ExecStopPre = "-${pkgs.writeShellScript "monado-exec-stop-post" ''
+        ExecStopPost = "-${pkgs.writeShellScript "monado-exec-stop-post" ''
           ${pactl} set-default-source ${audio.defaultSource}
           ${pactl} set-default-sink ${audio.defaultSink}
 

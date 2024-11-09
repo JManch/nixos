@@ -75,13 +75,9 @@ mkMerge [
       mountConfig.DirectoryMode = "0700";
     }) cfg.mediaDirs;
 
-    systemd.tmpfiles.rules =
-      [
-        "d /var/lib/jellyfin/media 0700 jellyfin jellyfin - -"
-      ]
-      ++ mapAttrsToList (
-        target: _: "d /var/lib/jellyfin/media/${target} 0700 jellyfin jellyfin - -"
-      ) cfg.mediaDirs;
+    systemd.tmpfiles.rules = [
+      "d /var/lib/jellyfin/media 0700 jellyfin jellyfin - -"
+    ];
 
     networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
       allowedTCPPorts = [

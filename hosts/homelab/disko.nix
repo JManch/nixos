@@ -118,4 +118,14 @@
       };
     };
   };
+
+  # Need to mount these after the impermanence bind mount as impermanence does
+  # not use rbind. This is only necessary for mountpoints that are subdirs of
+  # impermanence bind mounts.
+  fileSystems = {
+    "/persist/var/lib/qbittorrent-nox/qBittorrent/downloads".depends = [ "/var/lib/qbittorrent-nox" ];
+    "/persist/var/lib/qbittorrent-nox/qBittorrent/downloads-tmp".depends = [
+      "/var/lib/qbittorrent-nox"
+    ];
+  };
 }

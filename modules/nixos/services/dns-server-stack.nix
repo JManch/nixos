@@ -18,7 +18,6 @@ let
   inherit (lib)
     mkIf
     mkForce
-    mkVMOverride
     mapAttrs'
     mapAttrs
     mapAttrsToList
@@ -31,6 +30,7 @@ let
     ;
   inherit (lib.${ns}) addPatches asserts hardeningBaseline;
   inherit (inputs.nix-resources.secrets) oldFqDomain fqDomain;
+  inherit (config.${ns}.system.virtualisation) vmVariant;
   cfg = config.${ns}.services.dns-server-stack;
 
   # Declares hostnames for all devices on my local network
@@ -69,7 +69,7 @@ mkIf cfg.enable {
 
       settings = {
         service = {
-          log_level = if cfg.debug then "trace" else "notice";
+          log_level = if (cfg.debug || vmVariant) then "trace" else "notice";
           cache_enable = true;
           # Disable all LAN discovery techniques apart from hosts because our
           # hosts file is extensive and we'd rather have manual control over this
@@ -181,7 +181,7 @@ mkIf cfg.enable {
     services.dns-server-stack = {
       dnsmasqConfig = {
         port = cfg.listenPort;
-        log-queries = cfg.debug;
+        log-queries = cfg.debug || vmVariant;
 
         # Do not read from hosts because it contains an entry that points
         # ${hostname}.lan to ::1 and 127.0.0.2. Don't want this in responses so
@@ -316,15 +316,4 @@ mkIf cfg.enable {
 
       wantedBy = [ "multi-user.target" ];
     };
-
-  # Enable extra debugging in our vmVariant and replace secrets
-  virtualisation.vmVariant = {
-    services.ctrld.settings = {
-      service.log_level = mkVMOverride "trace";
-    };
-
-    services.dnsmasq.settings = {
-      log-queries = mkVMOverride true;
-    };
-  };
 }

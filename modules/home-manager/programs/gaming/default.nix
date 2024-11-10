@@ -30,6 +30,7 @@ in
     prism-launcher.enable = mkEnableOption "Prism Launcher";
     mint.enable = mkEnableOption "DRG Mod Loader";
     ryujinx.enable = mkEnableOption "Ryujinx";
+    osu.enable = mkEnableOption "Osu";
 
     gameClasses = mkOption {
       type = with types; listOf str;

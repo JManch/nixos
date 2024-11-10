@@ -39,9 +39,8 @@ let
   inherit (lib.${ns}) asserts upperFirstChar;
   inherit (config.${ns}.services) caddy;
   inherit (config.${ns}.core) homeManager;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.system.virtualisation) vmVariant;
-  inherit (caddy) allowAddresses trustedAddresses;
+  inherit (caddy) trustedAddresses;
   inherit (cfg) backups;
   inherit (config.age.secrets)
     resticPasswordFile

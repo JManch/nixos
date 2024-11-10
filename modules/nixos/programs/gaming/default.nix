@@ -13,16 +13,36 @@ in
     gamemode = {
       enable = mkEnableOption "Gamemode";
 
-      startScript = mkOption {
-        type = types.lines;
-        default = "";
-        description = "Bash script to run when gamemode starts";
+      wrappedPackage = mkOption {
+        type = types.package;
+        readOnly = true;
+        description = "Wrapped gamemode package with profile functionality";
       };
 
-      stopScript = mkOption {
-        type = types.lines;
-        default = "";
-        description = "Bash script to run when gamemode stops";
+      profiles = mkOption {
+        type = types.attrsOf (
+          types.submodule {
+            options = {
+              includeDefaultProfile = mkEnableOption "the default profile scripts in this profile";
+
+              startScript = mkOption {
+                type = types.lines;
+                default = "";
+              };
+
+              stopScript = mkOption {
+                type = types.lines;
+                default = "";
+              };
+            };
+          }
+        );
+        default = { };
+        description = ''
+          Attribute set of Gamemode profiles with start/stop bash scripts.
+          Gamemode profiles can be enabled by setting the GAMEMODE_PROFILES
+          environment variable to a comma separated list of profile names.
+        '';
       };
     };
   };

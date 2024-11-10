@@ -32,6 +32,31 @@ in
     ryujinx.enable = mkEnableOption "Ryujinx";
     osu.enable = mkEnableOption "Osu";
 
+    gamemode.profiles = mkOption {
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            includeDefaultProfile = mkEnableOption "the default profile scripts in this profile";
+
+            startScript = mkOption {
+              type = types.lines;
+              default = "";
+            };
+
+            stopScript = mkOption {
+              type = types.lines;
+              default = "";
+            };
+          };
+        }
+      );
+      default = { };
+      description = ''
+        Script profiles to run in gamemode start/stop scripts. Profiles defined
+        in HM must be mutually exclusive to those defined in NixOS.
+      '';
+    };
+
     gameClasses = mkOption {
       type = with types; listOf str;
       default = [ ];

@@ -109,11 +109,7 @@ mkIf cfg.enable {
       '') gpuIds}
     '';
 
-  # Pass --high-perf when using gamemoderun for higher power cap of 257. In
-  # unigine superposition 4k optimised gives an 8% FPS increase (122fps ->
-  # 132fps). Max core clock speeds go 2000MHz -> 2200Mhz. Thermals are a fair
-  # bit worse though, ~200rpm fan increase.
-  ${ns}.programs.gaming.gamemode =
+  ${ns}.programs.gaming.gamemode.profiles =
     let
       ncat = getExe' pkgs.nmap "ncat";
       jaq = getExe pkgs.jaq;
@@ -135,25 +131,41 @@ mkIf cfg.enable {
         '';
     in
     {
-      startScript =
-        # bash
-        ''
+      # Just change the power profile to 3D_FULL_SCREEN by default
+      default = {
+        startScript = ''
           id=$(${getId})
-          if arg_exists "high-perf"; then
-            ${setPowerCap 257}
-          fi
-
-          if arg_exists "vr"; then
-            ${setPowerProfile 4}
-          else
-            ${setPowerProfile 1}
-          fi
+          ${setPowerProfile 1}
         '';
 
-      stopScript = ''
-        id=$(${getId})
-        ${setPowerProfile 0}
-        ${setPowerCap 231}
-      '';
+        stopScript = ''
+          id=$(${getId})
+          ${setPowerProfile 0}
+        '';
+      };
+
+      vr = {
+        startScript = ''
+          id=$(${getId})
+          ${setPowerProfile 4}
+          ${setPowerCap 257}
+        '';
+
+        stopScript = ''
+          id=$(${getId})
+          ${setPowerProfile 0}
+          ${setPowerCap 231}
+        '';
+      };
+
+      # Use the high_perf profile for higher power cap of 257. In unigine
+      # superposition 4k optimised gives an 8% FPS increase (122fps -> 132fps).
+      # Max core clock speeds go 2000MHz -> 2200Mhz. Thermals are a fair bit
+      # worse though, ~200rpm fan increase.
+      high_perf = {
+        includeDefaultProfile = true;
+        startScript = "${setPowerCap 257}";
+        stopScript = "${setPowerCap 231}";
+      };
     };
 }

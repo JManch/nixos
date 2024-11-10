@@ -25,9 +25,9 @@ in
     default = [ ];
     example = [ "eno1" ];
     description = ''
-      If set, networking.firewall.allowed* options are exclusively applied
-      to these interfaces.  Otherwise, networking.firewall.allowed* options
-      apply to all interfaces.
+      If set, networking.firewall.allowed* options are exclusively applied to
+      these interfaces. Otherwise, networking.firewall.allowed* options apply
+      to all interfaces.
     '';
   };
 

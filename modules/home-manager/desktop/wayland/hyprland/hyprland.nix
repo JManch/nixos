@@ -45,10 +45,6 @@ let
     ../../../../../patches/hyprlandResizeParamsFloats.patch
     # Potential fix for https://github.com/hyprwm/Hyprland/issues/6820
     ../../../../../patches/hyprlandSpecialWorkspaceFullscreen.patch
-    (pkgs.fetchpatch2 {
-      url = "https://github.com/hyprwm/Hyprland/pull/8352/commits/373248d16f8a324b169742eb0f8a28f42432925b.patch";
-      hash = "sha256-SJsq3RODkJ/B3GTQ+6s5iBISvIrZRujOVSXaWou5IRU=";
-    })
   ];
 in
 mkIf (isHyprland config) {

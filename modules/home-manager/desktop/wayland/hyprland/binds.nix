@@ -265,9 +265,6 @@ mkIf (isHyprland config) {
           "${modShiftCtrl}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save window"}"
           "${modShiftCtrl}, I, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy window"}"
 
-          # Plugins
-          "${mod}, Escape, hyprexpo:expo, toggle"
-
           # Workspaces other
           "${mod}, N, workspace, previous"
           "${mod}, M, workspace, emptym"
@@ -297,6 +294,9 @@ mkIf (isHyprland config) {
             ]
           ) 10
         ))
+        ++ (optionals cfg.plugins.enable [
+          "${mod}, Escape, hyprexpo:expo, toggle"
+        ])
         ++ (optionals audio.enable [
           ", XF86AudioMute, exec, ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle"
           "${modShift}, XF86AudioRaiseVolume, exec, ${modifyFocusedWindowVolume} 5%+"

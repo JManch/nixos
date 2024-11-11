@@ -117,7 +117,7 @@ mkIf (isHyprland config) {
     enable = true;
     package = hyprlandPkg;
 
-    plugins = with flakePkgs args "hyprland-plugins"; [ hyprexpo ];
+    plugins = optionals cfg.plugins.enable (with flakePkgs args "hyprland-plugins"; [ hyprexpo ]);
 
     systemd = {
       enable = true;
@@ -290,7 +290,7 @@ mkIf (isHyprland config) {
       # https://github.com/hyprwm/Hyprland/issues/6543
       windowrulev2 = [ "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0" ];
 
-      plugin = {
+      plugin = mkIf cfg.plugins.enable {
         hyprexpo = {
           columns = 3;
           gap_size = 0;

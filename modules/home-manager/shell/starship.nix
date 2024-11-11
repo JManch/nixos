@@ -18,7 +18,6 @@ lib.mkIf cfg.enable {
       memory_usage.disabled = true;
       hostname.format = "$hostname ";
       username.format = "$user@";
-      git_status.stashed = "";
 
       character = {
         success_symbol = "[❯](${cfg.promptColor})";
@@ -38,6 +37,13 @@ lib.mkIf cfg.enable {
         disabled = false;
         added_style = "green";
         deleted_style = "red";
+      };
+
+      git_status = {
+        stashed = "";
+        ahead = "󱦲";
+        behind = "󱦳";
+        diverged = "󰹺";
       };
     };
   };

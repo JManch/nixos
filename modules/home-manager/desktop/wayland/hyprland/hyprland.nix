@@ -45,7 +45,10 @@ let
     ../../../../../patches/hyprlandResizeParamsFloats.patch
     # Potential fix for https://github.com/hyprwm/Hyprland/issues/6820
     ../../../../../patches/hyprlandSpecialWorkspaceFullscreen.patch
-    ../../../../../patches/hyprlandWlxOverlayFix.patch
+    (pkgs.fetchpatch2 {
+      url = "https://github.com/hyprwm/Hyprland/pull/8352/commits/373248d16f8a324b169742eb0f8a28f42432925b.patch";
+      hash = "sha256-SJsq3RODkJ/B3GTQ+6s5iBISvIrZRujOVSXaWou5IRU=";
+    })
   ];
 in
 mkIf (isHyprland config) {
@@ -196,15 +199,10 @@ mkIf (isHyprland config) {
         repeat_delay = 500;
         repeat_rate = 30;
 
-        tablet =
-          let
-            inherit (primaryMonitor) position width height;
-          in
-          {
-            transform = 1;
-            region_position = "${toString position.x} ${toString position.y}";
-            region_size = "${toString width} ${toString height}";
-          };
+        tablet = {
+          output = "current";
+          transform = 1;
+        };
       };
 
       cursor = {

@@ -123,18 +123,10 @@ let
         tablet_width=152
         tablet_height=95
         window=$(${hyprctl} activewindow -j)
-        monitor=$(${hyprctl} monitors -j | ${jaq} -r '.[] | select(.focused == true)')
         width=$(echo $window | ${jaq} -r '.size[0]')
         height=$(echo $window | ${jaq} -r '.size[1]')
         pos_x=$(echo $window | ${jaq} -r '.at[0]')
         pos_y=$(echo $window | ${jaq} -r '.at[1]')
-        # For some reason the tablet region position need to be relative to the
-        # active monitor even though I'm not binding the tablet to an output. I
-        # think this is a Hyprland bug.
-        mon_pos_x=$(echo $monitor | ${jaq} -r '.x')
-        mon_pos_y=$(echo $monitor | ${jaq} -r '.y')
-        pos_x=$((pos_x - mon_pos_x))
-        pos_y=$((pos_y - mon_pos_y))
         new_width=$(echo "scale=0; $height*$tablet_width/$tablet_height" | ${bc} -l)
         new_height=$(echo "scale=0; $width*$tablet_height/$tablet_width" | ${bc} -l)
 
@@ -152,6 +144,8 @@ let
 
         ${hyprctl} --batch "\
           keyword input:tablet:region_size $region_width $region_height; \
+          keyword input:tablet:output \"\"; \
+          keyword input:tablet:absolute_region_position true; \
           keyword input:tablet:region_position $region_pos_x $region_pos_y \
         "
         ${notifySend} --urgency=low -t 2000 -h \

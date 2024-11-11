@@ -21,7 +21,10 @@ let
   cfg = config.${ns}.hardware;
 in
 {
-  imports = lib.${ns}.scanPathsExcept ./. [ "raspberry-pi.nix" ];
+  imports = lib.${ns}.scanPathsExcept ./. [
+    "raspberry-pi.nix"
+    "nix-on-droid.nix"
+  ];
 
   options.${ns}.hardware = {
     bluetooth.enable = mkEnableOption "bluetooth";

@@ -5,9 +5,13 @@
     { self, nixpkgs, ... }:
     let
       ns = "JManch";
-      systems = [ "x86_64-linux" ];
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
       lib = nixpkgs.lib.extend (final: _: import ./lib final ns);
       mkHost = lib.${ns}.mkHost self;
+      mkDroidHost = lib.${ns}.mkDroidHost self;
       forEachSystem = lib.${ns}.forEachSystem self systems;
     in
     {
@@ -19,6 +23,10 @@
         (mkHost "homelab" "joshua" "x86_64-linux")
         (mkHost "msi" "lauren" "x86_64-linux")
         (mkHost "pi-3" "joshua" "aarch64-linux")
+      ];
+
+      nixOnDroidConfigurations = lib.listToAttrs [
+        (mkDroidHost "pixel-5")
       ];
     };
 
@@ -35,6 +43,10 @@
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    nix-on-droid.url = "github:nix-community/nix-on-droid";
+    nix-on-droid.inputs.nixpkgs.follows = "nixpkgs";
+    nix-on-droid.inputs.home-manager.follows = "home-manager";
 
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";

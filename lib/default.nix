@@ -30,6 +30,7 @@ in
       name = hostname;
       value = nixosSystem {
         specialArgs = {
+          inherit (self) inputs;
           inherit
             self
             hostname
@@ -37,7 +38,6 @@ in
             lib
             ns
             ;
-          inherit (self) inputs;
           selfPkgs = self.packages.${system};
         };
         modules =
@@ -56,6 +56,38 @@ in
             ../modules/nixos/hardware/raspberry-pi.nix
           ];
       };
+    };
+
+    mkDroidHost = self: hostname: {
+      name = hostname;
+      value =
+        let
+          inherit (self.inputs) nixpkgs nix-on-droid;
+          system = "aarch64-linux";
+        in
+        nix-on-droid.lib.nixOnDroidConfiguration {
+          pkgs = import nixpkgs {
+            inherit system;
+            config = {
+              allowUnfree = true;
+              overlays = [ nix-on-droid.overlays.default ];
+            };
+          };
+          modules = [
+            ../hosts/${hostname}
+            ../modules/nixos/hardware/nix-on-droid.nix
+          ];
+          extraSpecialArgs = {
+            inherit (self) inputs;
+            inherit
+              ns
+              lib
+              self
+              hostname
+              ;
+            selfPkgs = self.packages.${system};
+          };
+        };
     };
 
     forEachSystem =

@@ -10,6 +10,7 @@ let
     mkIf
     getExe'
     singleton
+    concatStringsSep
     ;
   cfg = config.${ns}.services.greetd;
 in
@@ -34,7 +35,7 @@ mkIf cfg.enable {
         command = ''
           ${getExe' pkgs.greetd.tuigreet "tuigreet"} \
           --time \
-          --sessions ${cfg.sessionDirs} \
+          --sessions ${concatStringsSep ":" cfg.sessionDirs} \
           --remember \
           --remember-session
         '';

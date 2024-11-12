@@ -114,7 +114,6 @@ in
 
       sessionDirs = mkOption {
         type = with types; listOf str;
-        apply = concatStringsSep ":";
         default = [ ];
         description = "Directories that contain .desktop files to be used as session definitions";
       };

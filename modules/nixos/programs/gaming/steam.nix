@@ -6,7 +6,11 @@
   ...
 }:
 let
-  inherit (lib) mkIf mapAttrs' nameValuePair;
+  inherit (lib)
+    mkIf
+    mapAttrs'
+    nameValuePair
+    ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.hm.xdg) dataHome;
   cfg = config.${ns}.programs.gaming.steam;
@@ -72,7 +76,7 @@ mkIf cfg.enable {
   hm = mkIf homeManager.enable {
     ${ns}.programs.gaming = {
       gameClasses = [
-        "steam_app.*"
+        "steam_app\\.*"
         "cs2"
         "factorio"
         "hl2_linux"
@@ -82,11 +86,8 @@ mkIf cfg.enable {
         map (game: "steam_app" + toString steamAppIDs.${game}) [
           "Red Dead Redemption 2" # half-vsync without tearing is preferrable
           "Noita" # tearing lags cursor
-          "BeamNG.drive" # tearing causes flashing in UI
         ]
-        ++ [
-          "factorio"
-        ];
+        ++ [ "factorio" ];
     };
 
     # Fix slow steam client downloads https://redd.it/16e1l4h
@@ -115,22 +116,6 @@ mkIf cfg.enable {
       "size 360 700, class:^(steam)$, title:^(Friends List)$"
       "center, class:^(steam)$, title:^(Friends List)$"
     ];
-
-    xdg.desktopEntries.beam-mp =
-      let
-        inherit (config.hm.${ns}) desktop;
-        terminal = desktop.terminal.exePath;
-        launcherDir = "${dataHome}/Steam/steamapps/compatdata/284160/pfx/dosdevices/c:/users/steamuser/AppData/Roaming/BeamMP-Launcher";
-        appID = toString steamAppIDs."BeamNG.drive";
-      in
-      mkIf desktop.enable {
-        name = "BeamMP";
-        exec = "${terminal} --title BeamMP -e protontricks-launch --cwd-app --appid ${appID} ${launcherDir}/BeamMP-Launcher.exe";
-        terminal = false;
-        type = "Application";
-        icon = "applications-games";
-        categories = [ "Game" ];
-      };
 
     persistence.directories = [ ".factorio" ];
   };

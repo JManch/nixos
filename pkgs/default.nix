@@ -11,6 +11,7 @@ in
   thermal-comfort = pkgs.home-assistant.python.pkgs.callPackage ./thermal-comfort.nix { };
   thermal-comfort-icons = callPackage ./thermal-comfort-icons.nix { };
   beammp-server = callPackage ./beammp-server { };
+  beammp-launcher = callPackage ./beammp-launcher.nix { };
   heatmiser = pkgs.home-assistant.python.pkgs.callPackage ./heatmiser.nix { };
   daikin-onecta = pkgs.home-assistant.python.pkgs.callPackage ./daikin-onecta.nix { };
   multiviewer-for-f1 = callPackage ./multiviewer-for-f1.nix { };

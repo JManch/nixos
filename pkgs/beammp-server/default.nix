@@ -16,14 +16,14 @@
   toml11,
   nlohmann_json,
 }:
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "beammp-server";
   version = "3.4.1";
 
   src = fetchFromGitHub {
     owner = "BeamMP";
     repo = "BeamMP-Server";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-dAo/HxFjXHi8F0dd9CGmyOWtWCwnKf4aKJl8A7ZzLAQ=";
     fetchSubmodules = true;
   };
@@ -54,11 +54,11 @@ stdenv.mkDerivation rec {
     install BeamMP-Server -D -t "$out/bin"
   '';
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/BeamMP/BeamMP-Server";
     description = "Server for the multiplayer mod BeamMP for BeamNG.drive";
-    license = [ licenses.agpl3Only ];
-    maintainers = with maintainers; [ JManch ];
+    license = [ lib.licenses.agpl3Only ];
+    maintainers = with lib.maintainers; [ JManch ];
     mainProgram = "BeamMP-Server";
   };
-}
+})

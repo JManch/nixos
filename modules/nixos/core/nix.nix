@@ -270,6 +270,7 @@ in
 {
   adminPackages = rebuildScripts ++ remoteRebuildScripts ++ flakeUpdate;
   persistenceAdminHome.directories = [ ".remote-builds" ];
+  boot.binfmt.emulatedSystems = cfg.builder.emulatedSystems;
 
   # Nice explanation of overlays: https://archive.is/f8goR
   # How to override python packages:
@@ -297,8 +298,8 @@ in
     in
     {
       channel.enable = false;
-      daemonIOSchedClass = mkIf (!cfg.builder) "idle";
-      daemonCPUSchedPolicy = mkIf (!cfg.builder) "idle";
+      daemonIOSchedClass = mkIf (!cfg.builder.enable) "idle";
+      daemonCPUSchedPolicy = mkIf (!cfg.builder.enable) "idle";
 
       # Populates the nix registry with all our flake inputs `nix registry list`
       # Enables referencing flakes with short name in nix commands 

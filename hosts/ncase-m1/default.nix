@@ -72,7 +72,8 @@
 
     core = {
       homeManager.enable = true;
-      builder = true;
+      builder.enable = true;
+      builder.emulatedSystems = [ "aarch64-linux" ];
     };
 
     hardware = {

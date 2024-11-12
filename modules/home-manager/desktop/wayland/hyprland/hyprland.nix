@@ -41,10 +41,15 @@ let
   # of moving the open special workspace to the active monitor
   hyprlandPkg = addPatches hyprlandPkgs.hyprland [
     ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch
-    ../../../../../patches/hyprlandDispatcherError.patch
     ../../../../../patches/hyprlandResizeParamsFloats.patch
     # Potential fix for https://github.com/hyprwm/Hyprland/issues/6820
     ../../../../../patches/hyprlandSpecialWorkspaceFullscreen.patch
+    # Fixes center window rule centering windows on the active monitor instead
+    # of the monitor they are on
+    ../../../../../patches/hyprlandCenterRuleFix.patch
+    # Makes exact resizeparams in dispatchers relative to the window's current
+    # monitor instead of the last active monitor
+    ../../../../../patches/hyprlandBetterResizeArgs.patch
   ];
 in
 mkIf (isHyprland config) {

@@ -245,11 +245,10 @@ mkIf (isHyprland config) {
           "${modShift}, K, workspace, m+1"
 
           # Monitors
-          "${modShift}, Comma, movecurrentworkspacetomonitor, ${(getMonitorByNumber 2).name}"
-          "${modShift}, Period, movecurrentworkspacetomonitor, ${(getMonitorByNumber 1).name}"
           "${modShift}, H, focusmonitor, l"
           "${modShift}, L, focusmonitor, r"
           "${mod}, TAB, focusmonitor, +1"
+          "${modShift}, TAB, movecurrentworkspacetomonitor, +1"
 
           # Dwindle
           "${mod}, P, pseudo,"

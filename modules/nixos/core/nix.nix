@@ -22,6 +22,7 @@ let
     singleton
     concatStringsSep
     ;
+  inherit (lib.${ns}) flakePkgs;
   inherit (config.${ns}.system) impermanence;
   cfg = config.${ns}.core;
   configDir = "/home/${adminUsername}/.config/nixos";
@@ -63,6 +64,67 @@ let
         '';
     }
   ) rebuildCmds;
+
+  droidRebuildScripts =
+    map
+      (
+        cmd:
+        pkgs.writeShellApplication {
+          name = "droid-rebuild-${cmd}";
+          runtimeInputs = [
+            pkgs.nix
+            pkgs.openssh
+            (flakePkgs args "nix-on-droid").nix-on-droid
+          ];
+          text = # bash
+            ''
+              if [ "$#" = 0 ]; then
+                echo "Usage: droid-rebuild-${cmd} <hostname>"
+                exit 1
+              fi
+              hostname=$1
+
+              droid_hosts=(${concatStringsSep " " (builtins.attrNames self.nixOnDroidConfigurations)})
+              for host in "''${droid_hosts[@]}"; do
+                if [[ $host = "$hostname" ]]; then
+                  match=1
+                  break
+                fi
+              done
+
+              if [[ $match = 0 ]]; then
+                echo "Error: Droid host '$hostname' does not exist" >&2
+                exit 1
+              fi
+
+              flake="${configDir}"
+              if [ ! -d $flake ]; then
+                echo "Flake does not exist locally so using remote from github"
+                flake="github:JManch/nixos"
+              fi
+
+              remote_builds="/home/${adminUsername}/.remote-builds/$hostname"
+              mkdir -p "$remote_builds"
+              trap "popd >/dev/null 2>&1 || true" EXIT
+              pushd "$remote_builds" >/dev/null 2>&1
+              nix-on-droid build --flake "$flake#$hostname"
+              store_path="$(readlink "/home/${adminUsername}/.remote-builds/$hostname/result")"
+              ${
+                if (cmd == "switch") then # bash
+                  ''
+                    NIX_SSHOPTS="-o Port=8022" nix copy --to "ssh://nix-on-droid@$hostname.lan" "$store_path"
+                    ssh -p 8022 "nix-on-droid@$hostname.lan" "$store_path/activate"
+                  ''
+                else
+                  "echo \"$store_path\""
+              }
+            '';
+        }
+      )
+      [
+        "build"
+        "switch"
+      ];
 
   remoteRebuildScripts = map (
     cmd:
@@ -268,7 +330,7 @@ let
   );
 in
 {
-  adminPackages = rebuildScripts ++ remoteRebuildScripts ++ flakeUpdate;
+  adminPackages = rebuildScripts ++ remoteRebuildScripts ++ droidRebuildScripts ++ flakeUpdate;
   persistenceAdminHome.directories = [ ".remote-builds" ];
   boot.binfmt.emulatedSystems = cfg.builder.emulatedSystems;
 
@@ -388,7 +450,7 @@ in
   programs.nix-index = {
     # Nix-index doesn't work with cross compilation
     enable = with pkgs; stdenv.hostPlatform == stdenv.buildPlatform;
-    package = (lib.${ns}.flakePkgs args "nix-index-database").nix-index-with-db;
+    package = (flakePkgs args "nix-index-database").nix-index-with-db;
   };
 
   programs.zsh = {

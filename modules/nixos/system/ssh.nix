@@ -70,7 +70,7 @@ in
       (mapAttrs (host: _: {
         publicKeyFile = ../../../hosts/${host}/ssh_host_ed25519_key.pub;
         extraHostNames = ([ "${host}.lan" ] ++ optional (host == hostname) "localhost");
-      }) self.nixosConfigurations)
+      }) (self.nixosConfigurations ++ self.nixOnDroidConfigurations))
       // {
         "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
         "joshua-pixel-5.lan".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOywqvmr4U7iEPwXCe5ZILFCapiplnvf/gU11++Aw2Y2";

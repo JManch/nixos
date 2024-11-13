@@ -30,6 +30,7 @@ in
     bluetooth.enable = mkEnableOption "bluetooth";
     secureBoot.enable = mkEnableOption "secure boot";
     fanatec.enable = mkEnableOption "support for Fanatec hardware";
+    tablet.enable = mkEnableOption "OpenTabletDriver";
 
     valve-index = {
       enable = mkEnableOption "virtual reality";

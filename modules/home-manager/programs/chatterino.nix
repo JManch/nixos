@@ -9,7 +9,6 @@
 let
   inherit (lib)
     mkIf
-    singleton
     optional
     getExe
     ;
@@ -78,75 +77,57 @@ mkIf cfg.enable {
 
   ${ns}.desktop = {
     services.waybar.autoHideWorkspaces = [ "TWITCH" ];
-    hyprland = {
-      namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false";
-
-      eventScripts = {
-        # If a new window is created in the twitch workspace make it floating
-        # and position next to chat
-        openwindow = singleton (pkgs.writeShellScript "hypr-chatterino-openwindow" ''
-          window_address="$1"
-          workspace_name="$2"
-          window_class="$3"
-          # Windows sent to the twitch workspace with windowrules with have
-          # the workspace ID as their workspace name
-          if [[ "$workspace_name" =~ ^(name:|)TWITCH$ || "$workspace_name" = "${namedWorkspaceIDs.TWITCH}" ]]; then
-            if [ "$window_class" = "com.chatterino." ]; then
-              hyprctl --batch "\
-                dispatch setfloating address:0x$window_address; \
-                dispatch movewindowpixel exact ${
-                  toString (100 - chatterinoPercentage)
-                }% 0%, address:0x$window_address; \
-                dispatch resizewindowpixel exact ${toString chatterinoPercentage}% 100%, address:0x$window_address; \
-              "
-            elif [[ "$window_class" == "mpv" || "$window_class" == "firefox" ]]; then
-              hyprctl --batch "\
-                dispatch setfloating address:0x$window_address; \
-                dispatch movewindowpixel exact 0% 0%, address:0x$window_address; \
-                dispatch resizewindowpixel exact ${
-                  toString (100 - chatterinoPercentage)
-                }% 100%, address:0x$window_address; \
-              "
-            fi
-          fi
-        '').outPath;
-
-        # Initialise the twitch workspace with firefox and chatterino
-        createworkspace = singleton (pkgs.writeShellScript "hypr-chatterino-createworkspace" ''
-          workspace_name="$1"
-          if [[ "$workspace_name" == "TWITCH" ]]; then
-            # Check if a special workspace is focused and, if so, close it
-            # (ideally hyprland would close the special workspace if the
-            # workspace that has been switched to is behind it)
-            specialworkspace=$(hyprctl monitors -j | jaq -r '.[] | select(.focused == true) | .specialWorkspace')
-            id=$(echo "$specialworkspace" | jaq -r '.id')
-            if [ "$id" -lt 0 ]; then
-              name=$(echo "$specialworkspace" | jaq -r '.name')
-              hyprctl dispatch togglespecialworkspace "''${name#special:}"
-            fi
-
-            # We can't use the [workspace id silent] exec dispatcher here
-            # because firefox doesn't respect it. Instead we have to assume
-            # that the TWITCH workspace is actively focused.
-
-            # Have to launch these in a new scope to avoid polluting the
-            # journal output of our socket service (systemd still intercept
-            # stdout even though we redirect to /dev/null)
-            systemd-run --user --scope --quiet chatterino > /dev/null 2>&1 &
-            systemd-run --user --scope --quiet firefox --new-window twitch.tv/directory > /dev/null 2>&1 &
-          fi
-        '').outPath;
-      };
-    };
+    hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false";
   };
 
   desktop.hyprland.settings = {
     bind = [ "${desktopCfg.hyprland.modKey}, T, workspace, ${namedWorkspaceIDs.TWITCH}" ];
-    windowrulev2 = [
-      # Not using "name:" here does work however it causes my current workspace
-      # to unexpectedly switch so it's needed
-      "workspace ${namedWorkspaceIDs.TWITCH}, class:^(mpv)$, title:^(twitch\.tv.*)$"
+    workspace = [
+      "${namedWorkspaceIDs.TWITCH}, on-created-empty:${pkgs.writeShellScript "hypr-chatterino-create-workspace" ''
+        # Check if a special workspace is focused and, if so, close it
+        # (ideally hyprland would close the special workspace if the
+        # workspace that has been switched to is behind it)
+        specialworkspace=$(hyprctl monitors -j | jaq -r '.[] | select(.focused == true) | .specialWorkspace')
+        id=$(echo "$specialworkspace" | jaq -r '.id')
+        if [ "$id" -lt 0 ]; then
+          name=$(echo "$specialworkspace" | jaq -r '.name')
+          hyprctl dispatch togglespecialworkspace "''${name#special:}"
+        fi
+
+        # We can't use the [workspace id silent] exec dispatcher here
+        # because firefox doesn't respect it. Instead we have to assume
+        # that the TWITCH workspace is actively focused.
+
+        # Have to launch these in a new scope to avoid polluting the
+        # journal output of our socket service (systemd still intercept
+        # stdout even though we redirect to /dev/null)
+        systemd-run --user --scope --quiet chatterino > /dev/null 2>&1 &
+        systemd-run --user --scope --quiet firefox --new-window twitch.tv/directory > /dev/null 2>&1 &
+      ''}"
     ];
+    windowrulev2 =
+      let
+        workspaceMatch = "workspace:${namedWorkspaceIDs.TWITCH}";
+      in
+      [
+        # Rules for chatterino window on twitch workspace
+        "float, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
+        "move ${
+          toString (100 - chatterinoPercentage)
+        }% 0%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
+        "size ${toString chatterinoPercentage}% 100%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
+
+        # Rules for firefox window opened on twitch workspace
+        "float, ${workspaceMatch}, class:^(firefox)$"
+        "move 0% 0%, ${workspaceMatch}, class:^(firefox)$"
+        "size ${toString (100 - chatterinoPercentage)}% 100%, ${workspaceMatch}, class:^(firefox)$"
+
+        # Rules for mpv twitch streams opened on twitch workspace or other workspaces
+        "workspace ${namedWorkspaceIDs.TWITCH} silent, class:^(mpv)$, title:^(twitch\\.tv.*)$"
+        "float, class:^(mpv)$, title:^(twitch\\.tv.*)$"
+        "move 0% 0%, class:^(mpv)$, title:^(twitch\\.tv.*)$"
+        "size ${toString (100 - chatterinoPercentage)}% 100%, class:^(mpv)$, title:^(twitch\\.tv.*)$"
+      ];
   };
 
   persistence.directories = [ ".local/share/chatterino/Settings" ];

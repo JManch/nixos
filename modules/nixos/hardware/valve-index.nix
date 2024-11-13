@@ -213,16 +213,10 @@ mkIf cfg.enable {
           "${modKey}SHIFT, Grave, movetoworkspace, ${namedWorkspaceIDs.VR}"
         ];
 
-        windowrulev2 =
-          [
-            "workspace ${namedWorkspaceIDs.VR} silent, class:^(monado-service)$"
-            "center, class:^(monado-service)$"
-          ]
-          ++ optionals bluetooth.enable [
-            "float, initialTitle:^(jeroen1602.github.io_/lighthouse_pm/)$"
-            "size 15% 40%, initialTitle:^(jeroen1602.github.io_/lighthouse_pm/)$"
-            "center, initialTitle:^(jeroen1602.github.io_/lighthouse_pm/)$"
-          ];
+        windowrulev2 = [
+          "workspace ${namedWorkspaceIDs.VR} silent, class:^(monado-service)$"
+          "center, class:^(monado-service)$"
+        ];
       };
   };
 }

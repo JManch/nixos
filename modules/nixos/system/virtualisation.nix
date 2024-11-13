@@ -7,7 +7,7 @@
   username,
   adminUsername,
   ...
-}:
+}@args:
 let
   inherit (lib)
     mkIf
@@ -313,7 +313,7 @@ in
       programs.zsh.interactiveShellInit = # bash
         ''
           ssh-vm() {
-            ssh-add-quiet
+            ${lib.${ns}.sshAddQuiet args}
             echo "Attempting SSH connection to VM..."; 
             # Extra connection attempts as VM may be starting up
             ssh \

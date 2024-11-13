@@ -3,7 +3,7 @@
   lib,
   config,
   ...
-}:
+}@args:
 let
   inherit (lib) mkIf getExe;
   cfg = config.${ns}.programs.git;
@@ -41,7 +41,7 @@ mkIf cfg.enable {
     initExtra = # bash
       ''
         lazygit() {
-          ssh-add-quiet
+          ${lib.${ns}.sshAddQuiet args}
           command ${getExe config.programs.lazygit.package} "$@"
         }
       '';

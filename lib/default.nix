@@ -142,6 +142,17 @@ in
         }
       '';
 
+    sshAddQuiet =
+      args: # bash
+      let
+        ssh-add = args.lib.getExe' args.options._module.args.value.pkgs.openssh "ssh-add";
+      in
+      ''
+        if [[ "$(${ssh-add} -l)" == "The agent has no identities." ]]; then
+          ${ssh-add}
+        fi
+      '';
+
     getMonitorByNumber =
       osConfig: number:
       let

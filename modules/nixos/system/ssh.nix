@@ -1,7 +1,6 @@
 {
   ns,
   lib,
-  pkgs,
   self,
   config,
   username,
@@ -15,7 +14,6 @@ let
     mapAttrs
     mkVMOverride
     optional
-    getExe'
     singleton
     ;
   inherit (config.${ns}.system) virtualisation;
@@ -80,25 +78,7 @@ in
       };
   };
 
-  programs.zsh = {
-    shellAliases = {
-      "ssh-forget" = "ssh -o UserKnownHostsFile=/dev/null";
-    };
-
-    interactiveShellInit =
-      let
-        sshAdd = getExe' pkgs.openssh "ssh-add";
-      in
-      # bash
-      ''
-        ssh-add-quiet() {
-          keys=$(${sshAdd} -l)
-          if [[ "$keys" == "The agent has no identities." ]]; then
-            ${sshAdd}
-          fi
-        }
-      '';
-  };
+  programs.zsh.shellAliases.ssh-forget = "ssh -o UserKnownHostsFile=/dev/null";
 
   # WARN: For some reason enabling the agent on hosts where the primary user
   # does not have admin priviledges causes sudo commands to fail after `su

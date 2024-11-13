@@ -26,6 +26,15 @@ let
 in
 {
   ${ns} = {
+    flakeUtils = self: {
+      forEachSystem = lib.${ns}.forEachSystem self [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+      mkHost = lib.${ns}.mkHost self;
+      mkDroidHost = lib.${ns}.mkDroidHost self;
+    };
+
     mkHost = self: hostname: username: system: {
       name = hostname;
       value = nixosSystem {

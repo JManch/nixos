@@ -5,14 +5,8 @@
     { self, nixpkgs, ... }:
     let
       ns = "JManch";
-      systems = [
-        "x86_64-linux"
-        "aarch64-linux"
-      ];
       lib = nixpkgs.lib.extend (final: _: import ./lib final ns);
-      mkHost = lib.${ns}.mkHost self;
-      mkDroidHost = lib.${ns}.mkDroidHost self;
-      forEachSystem = lib.${ns}.forEachSystem self systems;
+      inherit (lib.${ns}.flakeUtils self) forEachSystem mkHost mkDroidHost;
     in
     {
       templates = import ./templates;

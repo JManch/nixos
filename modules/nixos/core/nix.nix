@@ -218,6 +218,7 @@ let
             "raspberry-pi-nix"
             "rpi-firmware-nonfree-src"
             "nixpkgs-xr"
+            "nix-on-droid"
           )
 
           # Inputs and with relateive file paths to check for changes in.

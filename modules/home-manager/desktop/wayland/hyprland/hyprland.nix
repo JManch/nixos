@@ -192,7 +192,7 @@ mkIf (isHyprland config) {
 
       input = {
         follow_mouse = 1;
-        mouse_refocus = false;
+        mouse_refocus = true;
         accel_profile = "flat";
         sensitivity = 0;
 

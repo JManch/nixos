@@ -1,17 +1,29 @@
 {
   ns,
   lib,
+  pkgs,
   config,
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf hiPrio;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.hardware.bluetooth;
 in
 mkIf cfg.enable {
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
+
+  environment.systemPackages = [
+    (hiPrio (
+      pkgs.runCommand "blueman-autostart-disable" { } ''
+        mkdir -p $out/etc/xdg/autostart
+        substitute ${pkgs.blueman}/etc/xdg/autostart/blueman.desktop $out/etc/xdg/autostart/blueman.desktop \
+          --replace-fail "Type=Application" "Type=Application
+        Hidden=true"
+      ''
+    ))
+  ];
 
   hm = mkIf homeManager.enable {
     desktop.hyprland.settings.windowrulev2 = [

@@ -85,6 +85,9 @@
     hyprlock.url = "github:hyprwm/hyprlock";
     hyprlock.inputs.nixpkgs.follows = "nixpkgs";
 
+    hyprpolkitagent.url = "github:hyprwm/hyprpolkitagent";
+    hyprpolkitagent.inputs.nixpkgs.follows = "nixpkgs";
+
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";
 

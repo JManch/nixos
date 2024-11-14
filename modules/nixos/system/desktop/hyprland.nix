@@ -3,14 +3,14 @@
   lib,
   config,
   ...
-}:
+}@args:
 let
   inherit (lib)
     mkIf
     mkForce
     getExe
     ;
-  inherit (lib.${ns}) asserts isHyprland;
+  inherit (lib.${ns}) asserts isHyprland flakePkgs;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
   hyprlandPackage = config.hm.wayland.windowManager.hyprland.package;
@@ -34,6 +34,10 @@ mkIf (cfg.enable && isHyprland config) {
       comment = "Hyprland managed by UWSM";
     };
   };
+
+  # https://discourse.nixos.org/t/how-to-enable-upstream-systemd-user-services-declaratively/7649/9
+  systemd.packages = [ (flakePkgs args "hyprpolkitagent").default ];
+  systemd.user.services.hyprpolkitagent.wantedBy = [ "graphical-session.target" ];
 
   nix.settings = {
     substituters = [ "https://hyprland.cachix.org" ];

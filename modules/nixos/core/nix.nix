@@ -336,6 +336,7 @@ in
   adminPackages = rebuildScripts ++ remoteRebuildScripts ++ droidRebuildScripts ++ flakeUpdate;
   persistenceAdminHome.directories = [ ".remote-builds" ];
   boot.binfmt.emulatedSystems = cfg.builder.emulatedSystems;
+  services.getty.helpLine = mkForce "";
 
   # Nice explanation of overlays: https://archive.is/f8goR
   # How to override python packages:

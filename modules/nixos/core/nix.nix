@@ -373,6 +373,16 @@ in
             install -Dm644 xdg-terminals.list -t $out/share/xdg-terminal-exec
           '';
         });
+
+        uwsm = prev.uwsm.overrideAttrs {
+          version = "0.20.4";
+          src = prev.fetchFromGitHub {
+            owner = "Vladimir-csp";
+            repo = "uwsm";
+            rev = "refs/tags/v${final.uwsm.version}";
+            hash = "sha256-cvIkjDtGEEYCGFFfN7HhOFzUajLcDgt8CWqFyuJlvK4=";
+          };
+        };
       })
     ];
     config.allowUnfree = true;

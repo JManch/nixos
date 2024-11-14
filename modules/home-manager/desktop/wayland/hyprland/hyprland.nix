@@ -230,7 +230,7 @@ mkIf (isHyprland config) {
         focus_on_activate = false;
         mouse_move_enables_dpms = true;
         key_press_enables_dpms = true;
-        background_color = "0xff${colors.base00}";
+        background_color = "0x000000";
         new_window_takes_over_fullscreen = 2;
         enable_swallow = false;
       };

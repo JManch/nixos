@@ -84,6 +84,7 @@ mkIf (cfg.enable && desktopEnabled) {
     };
 
     Service = {
+      Slice = [ "background.slice" ];
       ExecStart = getExe (
         pkgs.writeShellApplication {
           name = "darkman-solar-switcher";

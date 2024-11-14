@@ -14,13 +14,10 @@ let
     getExe'
     ;
   cfg = config.${ns}.programs.spotify;
-  desktopCfg = config.${ns}.desktop;
 
   spotify-player =
     (lib.${ns}.addPatches pkgs.spotify-player [ ../../../patches/spotifyPlayerNotifs.patch ]).override
       { withDaemon = false; };
-
-  spotifyPlayer = getExe spotify-player;
 
   modifySpotifyVolume =
     let
@@ -138,7 +135,7 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
   xdg.desktopEntries.spotify-player = mkIf config.${ns}.desktop.enable {
     name = "Spotify";
     genericName = "Music Player";
-    exec = "${desktopCfg.terminal.exePath} --title Spotify --option font.size=11 -e ${spotifyPlayer}";
+    exec = ''xdg-terminal-exec --title=Spotify -e "zsh" "-c" "alacritty msg config font.size=11 || true; spotify_player"'';
     terminal = false;
     type = "Application";
     categories = [ "Audio" ];

@@ -233,7 +233,6 @@ mkIf (isHyprland config) {
         background_color = "0xff${colors.base00}";
         new_window_takes_over_fullscreen = 2;
         enable_swallow = false;
-        swallow_regex = "^(${desktopCfg.terminal.class})$";
       };
 
       render = {

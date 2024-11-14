@@ -1,9 +1,4 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ ns, ... }:
 {
   ${ns} = {
     core = {
@@ -28,11 +23,6 @@
         directScanout = false;
         logging = false;
         hyprcursor.package = null;
-      };
-
-      terminal = {
-        exePath = lib.getExe config.programs.alacritty.package;
-        class = "Alacritty";
       };
 
       programs = {

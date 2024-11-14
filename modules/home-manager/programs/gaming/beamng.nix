@@ -9,6 +9,7 @@
 }:
 let
   inherit (lib) mkIf;
+  inherit (config.${ns}) desktop;
 in
 lib.mkIf (osConfig'.${ns}.programs.gaming.steam.enable or false) {
   # Native Linux version setup:
@@ -26,26 +27,21 @@ lib.mkIf (osConfig'.${ns}.programs.gaming.steam.enable or false) {
 
   home.packages = [ selfPkgs.beammp-launcher ];
 
-  xdg.desktopEntries.beammp-launcher =
-    let
-      inherit (config.${ns}) desktop;
-      terminal = desktop.terminal.exePath;
-    in
-    mkIf desktop.enable {
-      name = "BeamMP Launcher";
-      exec = "${terminal} --title BeamMP -e BeamMP-Launcher --no-launch --no-update";
-      settings.Path = "${config.xdg.dataHome}/BeamMP";
-      terminal = false;
-      type = "Application";
-      icon = (
-        pkgs.fetchurl {
-          name = "beammp-icon.png";
-          url = "https://avatars.githubusercontent.com/u/76395149";
-          hash = "sha256-hogRsoB4l+pRh59QN6bNdUFHIP+d94HNwhTCftmhrp8=";
-        }
-      );
-      categories = [ "Game" ];
-    };
+  xdg.desktopEntries.beammp-launcher = mkIf desktop.enable {
+    name = "BeamMP Launcher";
+    exec = "xdg-terminal-exec --title=BeamMP -e BeamMP-Launcher --no-launch --no-update";
+    settings.Path = "${config.xdg.dataHome}/BeamMP";
+    terminal = false;
+    type = "Application";
+    icon = (
+      pkgs.fetchurl {
+        name = "beammp-icon.png";
+        url = "https://avatars.githubusercontent.com/u/76395149";
+        hash = "sha256-hogRsoB4l+pRh59QN6bNdUFHIP+d94HNwhTCftmhrp8=";
+      }
+    );
+    categories = [ "Game" ];
+  };
 
   # Just to create the .local/share/BeamMP dir
   xdg.dataFile."BeamMP/nix-placeholder".text = "";

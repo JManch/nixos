@@ -25,23 +25,6 @@ let
     waylandDesktopEnvironments
     ;
   cfg = config.${ns}.desktop;
-
-  terminalSubmodule = {
-    options = {
-      exePath = mkOption {
-        type = types.str;
-        default = null;
-        example = literalExpression "${lib.getExe config.programs.alacritty.package}";
-      };
-
-      class = mkOption {
-        type = types.str;
-        default = null;
-        example = "Alacritty";
-        description = "Window class of the terminal";
-      };
-    };
-  };
 in
 {
   imports = scanPaths ./.;
@@ -57,12 +40,6 @@ in
       type = types.nullOr (types.enum [ "hyprland" ]);
       default = null;
       description = "Window manager to use";
-    };
-
-    terminal = mkOption {
-      type = types.submodule terminalSubmodule;
-      default = null;
-      description = "Information about the default terminal";
     };
 
     isWayland = mkOption {
@@ -152,9 +129,9 @@ in
         "You cannot use a desktop environment with a window manager"
         (cfg.windowManager != null -> length osConfig'.${ns}.device.monitors != 0)
         "Device monitors must be configured to use a window manager"
-        (cfg.terminal != null)
-        "Desktop default terminal must be set"
       ]);
+
+      home.packages = [ pkgs.xdg-terminal-exec ];
 
       _module.args = {
         inherit (cfg) isWayland;

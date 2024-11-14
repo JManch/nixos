@@ -35,7 +35,6 @@ mkIf (cfg.enable && isWayland) {
         tabs = 4;
         prompt = "\"\"";
         icons-enabled = true;
-        terminal = "${desktopCfg.terminal.exePath} -e";
         icon-theme = config.gtk.iconTheme.name;
       };
 

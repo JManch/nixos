@@ -4,6 +4,7 @@
   pkgs,
   config,
   inputs,
+  selfPkgs,
   username,
   adminUsername,
   ...
@@ -15,7 +16,7 @@ let
     mkVMOverride
     mod
     ;
-  inherit (config.hm.${ns}.desktop) terminal hyprland;
+  inherit (config.hm.${ns}.desktop) hyprland;
   inherit (config.${ns}.device)
     monitors
     cpu
@@ -33,6 +34,7 @@ let
       gnutar
       age
       openssh
+      xdg-terminal-exec
     ];
     text = # bash
       ''
@@ -98,8 +100,8 @@ let
           ${
             if config.${ns}.system.desktop.enable && homeManager.enable then # bash
               ''
-                ${terminal.exePath} -e "zsh" "-i" "-c" "ssh-vm; zsh -i" &
-                ${terminal.exePath} --class qemu -e "$runscript"
+                xdg-terminal-exec "zsh" "-i" "-c" "ssh-vm; zsh -i" &
+                xdg-terminal-exec --app-id=qemu -e "$runscript"
               ''
             else
               "$runscript"

@@ -78,18 +78,13 @@ mkIf cfg.enable {
     paths = [ ".config/${themePath}" ];
   };
 
-  xdg.desktopEntries.btop =
-    let
-      btop = getExe config.programs.btop.package;
-      terminal = config.${ns}.desktop.terminal.exePath;
-    in
-    mkIf config.${ns}.desktop.enable {
-      name = "Btop";
-      genericName = "Resource Monitor";
-      icon = "utilities-system-monitor";
-      exec = "${terminal} --title btop -e ${btop}";
-      terminal = false;
-      type = "Application";
-      categories = [ "System" ];
-    };
+  xdg.desktopEntries.btop = mkIf config.${ns}.desktop.enable {
+    name = "Btop";
+    genericName = "Resource Monitor";
+    icon = "utilities-system-monitor";
+    exec = "xdg-terminal-exec --title=btop --app-id=btop -e btop";
+    terminal = false;
+    type = "Application";
+    categories = [ "System" ];
+  };
 }

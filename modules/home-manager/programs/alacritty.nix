@@ -1,11 +1,12 @@
 {
   ns,
   lib,
+  pkgs,
   config,
   ...
 }:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib) mkIf singleton hiPrio;
   inherit (config.${ns}) desktop;
   cfg = config.${ns}.programs.alacritty;
   colors = config.colorScheme.palette;
@@ -91,9 +92,24 @@ mkIf cfg.enable {
     };
   };
 
+  home.packages = [
+    # Modify the desktop entry to comply with the xdg-terminal-exec spec
+    # https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/3
+    (hiPrio (
+      pkgs.runCommand "alacritty-desktop-modify" { } ''
+        mkdir -p $out/share/applications
+        substitute ${pkgs.alacritty}/share/applications/Alacritty.desktop $out/share/applications/Alacritty.desktop \
+          --replace-fail "Type=Application" "Type=Application
+        X-TerminalArgAppId=--class
+        X-TerminalArgDir=--working-directory
+        X-TerminalArgHold=--hold
+        X-TerminalArgTitle=--title"
+      ''
+    ))
+  ];
+
   darkman.switchApps.alacritty = {
     paths = [ ".config/alacritty/alacritty.toml" ];
-
     extraReplacements = singleton {
       dark = "opacity = 0.7";
       light = "opacity = 1";

@@ -9,9 +9,7 @@
 let
   inherit (lib)
     mkIf
-    getExe
     mkForce
-    mkDefault
     ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
@@ -47,11 +45,6 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
     ]);
 
   hm = mkIf homeManager.enable {
-    ${ns}.desktop.terminal = {
-      exePath = mkDefault (getExe pkgs.gnome-console);
-      class = mkDefault "org.gnome.Consolez";
-    };
-
     dconf.settings =
       let
         inherit (inputs.home-manager.lib.hm.gvariant) mkUint32 mkDouble;

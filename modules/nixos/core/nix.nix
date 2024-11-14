@@ -225,6 +225,8 @@ let
           # Separate multiple file paths with spaces.
           declare -A input_file_pairs=(
             ["nixpkgs"]="nixos/modules/tasks/filesystems/zfs.nix"
+            ["nixpkgs"]="nixos/modules/programs/wayland/hyprland.nix"
+            ["nixpkgs"]="nixos/modules/programs/wayland/uwsm.nix"
           )
 
           input_exists_in_lockfiles() {

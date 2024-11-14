@@ -357,13 +357,12 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
 
   desktop.hyprland.binds =
     let
-      inherit (config.${ns}) desktop;
-      firefox = getExe config.programs.firefox.finalPackage;
+      inherit (config.${ns}.desktop.hyprland) modKey;
     in
     [
-      "${desktop.hyprland.modKey}, Backspace, exec, ${firefox}"
-      "${desktop.hyprland.modKey}SHIFT, Backspace, workspace, emptym"
-      "${desktop.hyprland.modKey}SHIFT, Backspace, exec, ${firefox}"
+      "${modKey}, Backspace, exec, uwsm app firefox"
+      "${modKey}SHIFT, Backspace, workspace, emptym"
+      "${modKey}SHIFT, Backspace, exec, uwsm app firefox"
     ];
 
   ${ns}.desktop.hyprland.eventScripts.windowtitlev2 = singleton (pkgs.writeShellScript "hypr-bitwarden-windowtitlev2" ''

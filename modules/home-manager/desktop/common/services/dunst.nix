@@ -8,7 +8,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe';
+  inherit (lib) mkIf getExe' mkForce;
   inherit (config.${ns}) desktop;
   inherit (config.${ns}.colorScheme) light;
   inherit (osConfig'.${ns}.device) primaryMonitor;
@@ -102,6 +102,11 @@ mkIf (cfg.enable && desktopEnabled) {
   ${ns}.desktop.programs.locking = {
     preLockScript = "${dunstctl} set-paused true";
     postUnlockScript = "${dunstctl} set-paused false";
+  };
+
+  systemd.user.services.dunst = {
+    Unit.After = mkForce [ "graphical-session.target" ];
+    Service.Slice = [ "background-graphical.slice" ];
   };
 
   desktop.hyprland.settings.layerrule = [

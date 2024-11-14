@@ -318,9 +318,12 @@ mkIf cfg.enable {
   systemd.user.services.hyprland-multiviewer-tiler = mkIf (lib.${ns}.isHyprland config) {
     Unit = {
       Description = "Hyprland Multiviewer F1 Tiler";
+      After = "graphical-session.target";
+      PartOf = "graphical-session.target";
     };
 
     Service = {
+      Slice = [ "app-graphical.slice" ];
       Environment = [ "PYTHONUNBUFFERED=1" ];
       ExecStart = hyprlandMultiviewerTiler;
       ExecStopPost = pkgs.writeShellScript "hyprland-multiviewer-tiling-exec-stop-post" ''

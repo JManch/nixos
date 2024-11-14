@@ -106,8 +106,8 @@ mkIf cfg.enable {
   };
 
   desktop.hyprland.binds = [
-    "${desktop.hyprland.modKey}, Return, exec, alacritty"
+    "${desktop.hyprland.modKey}, Return, exec, uwsm app alacritty"
     "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
-    "${desktop.hyprland.modKey}SHIFT, Return, exec, alacritty"
+    "${desktop.hyprland.modKey}SHIFT, Return, exec, uwsm app alacritty"
   ];
 }

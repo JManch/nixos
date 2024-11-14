@@ -28,10 +28,11 @@ mkIf (cfg.enable && isWayland) {
       Description = "Animated wallpaper daemon";
       Before = [ "set-wallpaper.service" ];
       PartOf = [ "graphical-session.target" ];
-      After = [ "graphical-session-pre.target" ];
+      After = [ "graphical-session.target" ];
     };
 
     Service = {
+      Slice = [ "background-graphical.slice" ];
       ExecStart = "${getExe' pkgs.swww "swww-daemon"} --no-cache";
     };
 

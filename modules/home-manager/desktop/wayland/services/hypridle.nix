@@ -10,6 +10,7 @@
 let
   inherit (lib)
     mkIf
+    mkForce
     optional
     getExe
     getExe'
@@ -44,6 +45,11 @@ mkIf (cfg.enable && isWayland) {
           on-timeout = "${getExe pkgs.libnotify} 'Hypridle' 'Idle timeout triggered'";
         };
     };
+  };
+
+  systemd.user.services.hypridle = {
+    Unit.After = mkForce [ "graphical-session.target" ];
+    Service.Slice = [ "background-graphical.slice" ];
   };
 
   ${ns}.desktop.programs.locking.postLockScript =

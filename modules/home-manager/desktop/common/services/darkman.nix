@@ -54,6 +54,11 @@ mkIf (cfg.enable && desktopEnabled) {
       };
   };
 
+  systemd.user.services.darkman = {
+    Unit.After = [ "graphical-session.target" ];
+    Service.Slice = mkForce [ "background-graphical.slice" ];
+  };
+
   # Remove the "Toggle darkman" desktop entry
   home.packages = [
     (hiPrio (

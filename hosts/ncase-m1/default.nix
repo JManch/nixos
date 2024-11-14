@@ -121,7 +121,6 @@
 
     services = {
       udisks.enable = true;
-      greetd.enable = true;
       lact.enable = true;
       scrutiny.collector.enable = true;
       mosquitto.explorer.enable = true;
@@ -188,6 +187,8 @@
       desktop = {
         enable = true;
         desktopEnvironment = null;
+        displayManager = "uwsm";
+        uwsm.defaultDesktop = "hyprland-uwsm.desktop";
       };
 
       networking = {

@@ -24,12 +24,35 @@ in
   options.${ns}.system.desktop = {
     enable = mkEnableOption "desktop functionality";
 
+    uwsm.defaultDesktop = mkOption {
+      type = with types; nullOr str;
+      example = "hyprland-uwsm.desktop";
+      description = ''
+        If set, UWSM will automatically launch the set desktop without
+        prompting for selection.
+      '';
+    };
+
     suspend.enable = mkOption {
       type = types.bool;
       default = true;
       description = ''
         Whether to enable suspend to RAM. Disable on hosts where the hardware
         does not support it.
+      '';
+    };
+
+    displayManager = mkOption {
+      type =
+        with types;
+        nullOr (enum [
+          "greetd"
+          "uwsm"
+        ]);
+      default = null;
+      description = ''
+        The display manager to use. If null, will be nothing or whatever the
+        desktop environment uses.
       '';
     };
 

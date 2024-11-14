@@ -51,9 +51,12 @@ mkIf (osConfig'.${ns}.device.hassIntegration.enable or false) {
   systemd.user.services.hass-active-heartbeat = {
     Unit = {
       Description = "Home assistant host active heartbeat";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
     };
 
     Service = {
+      Slice = [ "background-graphical.slice" ];
       ExecStart = pkgs.writeShellScript "hass-active-heartbeat" ''
         while true
         do

@@ -1,15 +1,15 @@
 {
   ns,
   lib,
-  pkgs,
   config,
   osConfig',
   isWayland,
   ...
 }:
 let
-  inherit (lib) mkIf getExe getExe';
+  inherit (lib) mkIf;
   inherit (osConfig'.${ns}.device) primaryMonitor;
+  inherit (osConfig'.programs) uwsm;
   cfg = desktopCfg.programs.fuzzel;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
@@ -20,6 +20,9 @@ mkIf (cfg.enable && isWayland) {
 
     settings = {
       main = {
+        launch-prefix = mkIf uwsm.enable "uwsm app --";
+        terminal = "xdg-terminal-exec";
+
         font = "${desktopCfg.style.font.family}:size=18";
         lines = 5;
         width = 30;
@@ -71,10 +74,11 @@ mkIf (cfg.enable && isWayland) {
   desktop.hyprland.settings =
     let
       inherit (desktopCfg.hyprland) modKey;
-      fuzzel = getExe pkgs.fuzzel;
     in
     {
-      bindr = [ "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} fuzzel || ${fuzzel}" ];
+      bindr = [
+        "${modKey}, ${modKey}_L, exec, pkill fuzzel || fuzzel"
+      ];
       layerrule = [ "animation slide, launcher" ];
     };
 }

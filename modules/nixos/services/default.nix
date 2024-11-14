@@ -13,7 +13,6 @@ let
     mkOption
     optionals
     types
-    concatStringsSep
     mkAliasOptionModule
     attrNames
     mkDefault
@@ -108,16 +107,6 @@ in
         type = types.attrsOf (types.submodule { options = wgInterfaceOptions; });
         description = "Wireguard VPN interfaces";
       };
-
-    greetd = {
-      enable = mkEnableOption "Greetd with TUIgreet";
-
-      sessionDirs = mkOption {
-        type = with types; listOf str;
-        default = [ ];
-        description = "Directories that contain .desktop files to be used as session definitions";
-      };
-    };
 
     wgnord = {
       enable = mkEnableOption "Wireguard NordVPN";

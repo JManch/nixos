@@ -27,9 +27,7 @@ let
   bc = getExe' pkgs.bc "bc";
   notifySend = getExe pkgs.libnotify;
   hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
-
-  getMonitorByNumber = number: lib.${ns}.getMonitorByNumber osConfig' number;
-
+  loginctl = getExe' pkgs.systemd "loginctl";
   disableShadersCommand = command: "${cfg.disableShaders}; ${command}; ${cfg.enableShaders}";
 
   toggleDwindleGaps =
@@ -214,7 +212,7 @@ mkIf (isHyprland config) {
       settings.bind =
         [
           # General
-          "${modShiftCtrl}, Q, exit,"
+          "${modShiftCtrl}, Q, exec, ${loginctl} terminate-session \"$XDG_SESSION_ID\""
           "${mod}, ${cfg.killActiveKey}, killactive,"
           "${mod}, C, exec, ${toggleFloating}"
           "${mod}, E, exec, ${toggleFullscreen}"
@@ -225,7 +223,7 @@ mkIf (isHyprland config) {
           "${mod}, A, exec, ${toggleSwallowing}"
           "${modShift}, T, exec, ${scaleTabletToWindow}"
           "${modShiftCtrl}, T, exec, ${toggleGaps}"
-          "${mod}, Space, exec, ${getExe' pkgs.systemd "loginctl"} lock-session"
+          "${mod}, Space, exec, ${loginctl} lock-session"
           "${modShiftCtrl}, V, exec, ${syncClipboard}"
 
           # Movement

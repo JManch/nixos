@@ -26,8 +26,10 @@ mkIf (cfg.enable && isWayland) {
     Unit = {
       Description = "Day/night gamma adjustments for Wayland compositors";
       PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
     };
 
+    Service.Slice = [ "background-graphical.slice" ];
     Service.ExecStart =
       let
         args = "-t 4000 -T 6500";

@@ -274,8 +274,8 @@ mkIf (cfg.enable && isWayland) {
   };
 
   systemd.user.services.waybar = {
-    # Waybar spams restarts during shutdown otherwise
-    Service.Restart = mkForce "no";
+    Unit.After = mkForce [ "graphical-session.target" ];
+    Service.Slice = [ "app-graphical.slice" ];
   };
 
   darkman.switchApps.waybar = {

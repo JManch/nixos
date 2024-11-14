@@ -10,36 +10,26 @@ let
     mkIf
     getExe'
     singleton
-    concatStringsSep
     ;
-  cfg = config.${ns}.services.greetd;
+  cfg = config.${ns}.system.desktop;
 in
-mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
-    config.${ns}.system.desktop.enable
-    "Greetd requires desktop to be enabled"
-    (cfg.sessionDirs != [ ])
-    "Greetd session dirs must be set"
-  ];
-
+mkIf (cfg.enable && (cfg.displayManager == "greetd")) {
   # WARN: Ever since https://github.com/linux-pam/linux-pam/pull/784 there
   # is a delay after entering the username during login. Because I use a
   # strong hashing algorithm it's quite noticeable.
   services.greetd = {
     enable = true;
-    settings = {
-      default_session = {
-        # greetd should run as the greeter user, this settings is not related
-        # to the user that will log in
-        user = "greeter";
-        command = ''
-          ${getExe' pkgs.greetd.tuigreet "tuigreet"} \
-          --time \
-          --sessions ${concatStringsSep ":" cfg.sessionDirs} \
-          --remember \
-          --remember-session
-        '';
-      };
+    settings.default_session = {
+      # greetd should run as the greeter user otherwise it automatically logs
+      # in without prompting for password
+      user = "greeter";
+      command = ''
+        ${getExe' pkgs.greetd.tuigreet "tuigreet"} \
+        --time \
+        --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions \
+        --remember-session \
+        --remember
+      '';
     };
   };
 

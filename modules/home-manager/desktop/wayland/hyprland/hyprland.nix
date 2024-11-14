@@ -10,6 +10,7 @@
 let
   inherit (lib)
     mkIf
+    mkOrder
     mkVMOverride
     getExe
     getExe'
@@ -120,27 +121,12 @@ mkIf (isHyprland config) {
 
   wayland.windowManager.hyprland = {
     enable = true;
+    systemd.enable = false; # we use UWSM instead
     package = hyprlandPkg;
-
     plugins = optionals cfg.plugins.enable (with flakePkgs args "hyprland-plugins"; [ hyprexpo ]);
 
-    systemd = {
-      enable = true;
-      extraCommands = [
-        # This works because hyprland-session.target BindsTo
-        # graphical-session.target so starting hyprland-session.target also
-        # starts graphical-session.target. We stop graphical-session.target
-        # instead of hyprland-session.target because, by default, home-manager
-        # services bind to graphical-session.target. Also, we basically ignore
-        # hyprland-session.target in our config because we manage modularity in
-        # Nix rather than with systemd.
-        # https://github.com/nix-community/home-manager/issues/4484
-        "systemctl --user stop graphical-session.target"
-        "systemctl --user start hyprland-session.target"
-      ];
-    };
-
     settings = {
+      exec-once = mkOrder 2000 [ "uwsm finalize" ];
       env =
         [
           "XDG_CURRENT_DESKTOP,Hyprland"
@@ -337,7 +323,7 @@ mkIf (isHyprland config) {
     Unit = {
       Description = "Hyprland socket listener";
       PartOf = [ "graphical-session.target" ];
-      After = [ "graphical-session-pre.target" ];
+      After = [ "graphical-session.target" ];
     };
 
     Service = {

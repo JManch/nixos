@@ -97,12 +97,8 @@ mkIf cfg.enable {
         # We can't use the [workspace id silent] exec dispatcher here
         # because firefox doesn't respect it. Instead we have to assume
         # that the TWITCH workspace is actively focused.
-
-        # Have to launch these in a new scope to avoid polluting the
-        # journal output of our socket service (systemd still intercept
-        # stdout even though we redirect to /dev/null)
-        systemd-run --user --scope --quiet chatterino > /dev/null 2>&1 &
-        systemd-run --user --scope --quiet firefox --new-window twitch.tv/directory > /dev/null 2>&1 &
+        uwsm app chatterino &
+        uwsm app -- firefox --new-window twitch.tv/directory
       ''}"
     ];
     windowrulev2 =

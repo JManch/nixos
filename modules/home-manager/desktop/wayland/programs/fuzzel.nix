@@ -20,7 +20,7 @@ mkIf (cfg.enable && isWayland) {
 
     settings = {
       main = {
-        launch-prefix = mkIf uwsm.enable "uwsm app --";
+        launch-prefix = mkIf uwsm.enable "app2unit --fuzzel-compat --";
         terminal = "xdg-terminal-exec";
 
         font = "${desktopCfg.style.font.family}:size=18";

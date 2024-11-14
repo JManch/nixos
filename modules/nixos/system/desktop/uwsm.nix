@@ -3,6 +3,7 @@
   lib,
   pkgs,
   config,
+  selfPkgs,
   ...
 }:
 let
@@ -25,6 +26,12 @@ mkMerge [
   }
 
   (mkIf (cfg.enable && config.programs.uwsm.enable) {
+    environment = {
+      systemPackages = [ selfPkgs.app2unit ];
+      sessionVariables.APP2UNIT_SLICES = "a=app-graphical.slice b=background-graphical.slice s=session-graphical.slice";
+      sessionVariables.APP2UNIT_TYPE = "scope";
+    };
+
     systemd.user.services.fumon = {
       wantedBy = [ "graphical-session.target" ];
       path = [ pkgs.libnotify ];

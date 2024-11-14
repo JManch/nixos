@@ -17,5 +17,6 @@ in
   multiviewer-for-f1 = callPackage ./multiviewer-for-f1.nix { };
   hyprpy = pkgs.python3Packages.callPackage ./hyprpy.nix { };
   formulaone-card = callPackage ./formulaone-card.nix { };
+  app2unit = callPackage ./app2unit.nix { };
 }
 // import ./installers.nix ns lib self

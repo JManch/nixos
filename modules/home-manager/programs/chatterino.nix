@@ -97,8 +97,8 @@ mkIf cfg.enable {
         # We can't use the [workspace id silent] exec dispatcher here
         # because firefox doesn't respect it. Instead we have to assume
         # that the TWITCH workspace is actively focused.
-        uwsm app chatterino &
-        uwsm app -- firefox --new-window twitch.tv/directory
+        app2unit chatterino &
+        app2unit -- firefox --new-window twitch.tv/directory
       ''}"
     ];
     windowrulev2 =

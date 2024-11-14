@@ -58,15 +58,8 @@ mkIf (config.${ns}.device.gpu.type == "amd") {
     extraPackages = optional davinciResolve pkgs.rocmPackages.clr.icd;
   };
 
-  persistenceHome = {
-    directories = [
-      ".cache/AMD"
-      ".cache/mesa_shader_cache"
-    ];
-
-    files = [
-      ".cache/radv_builtin_shaders32"
-      ".cache/radv_builtin_shaders64"
-    ];
-  };
+  persistenceHome.directories = [
+    ".cache/AMD"
+    ".cache/mesa_shader_cache"
+  ];
 }

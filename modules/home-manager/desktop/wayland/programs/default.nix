@@ -57,14 +57,6 @@ in
         default = getExe (
           pkgs.writeShellApplication {
             name = "lock-script";
-
-            runtimeInputs = with pkgs; [
-              wireplumber
-              gnugrep
-              procps
-              coreutils
-            ];
-
             text = ''
               # Exit if locking is currently running
               pgrep -x ${builtins.baseNameOf (getExe cfg.locking.package)} && exit 1

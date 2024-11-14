@@ -6,7 +6,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe' singleton;
+  inherit (lib) mkIf singleton;
   cfg = config.${ns}.shell;
 in
 mkIf cfg.enable {
@@ -75,18 +75,14 @@ mkIf cfg.enable {
         }
       '';
 
-    initExtra =
-      let
-        reboot = getExe' pkgs.systemd "reboot";
-      in
-      # bash
+    initExtra = # bash
       ''
         setopt interactivecomments
 
         reboot() {
           read -q "REPLY?Are you sure you want to reboot? (y/N)"
           if [[ $REPLY =~ ^[Yy]$ ]]; then
-            ${reboot}
+            command reboot
           fi
         }
 

@@ -1,21 +1,18 @@
 {
   ns,
   lib,
-  pkgs,
   config,
   osConfig',
   desktopEnabled,
   ...
 }:
 let
-  inherit (lib) mkIf getExe' mkForce;
+  inherit (lib) mkIf mkForce;
   inherit (config.${ns}) desktop;
   inherit (config.${ns}.colorScheme) light;
   inherit (osConfig'.${ns}.device) primaryMonitor;
   cfg = desktop.services.dunst;
   colors = config.colorScheme.palette;
-  systemctl = getExe' pkgs.systemd "systemctl";
-  dunstctl = getExe' config.services.dunst.package "dunstctl";
 in
 mkIf (cfg.enable && desktopEnabled) {
   services.dunst = {
@@ -89,7 +86,7 @@ mkIf (cfg.enable && desktopEnabled) {
 
   darkman.switchApps.dunst = {
     paths = [ ".config/dunst/dunstrc" ];
-    reloadScript = "${systemctl} restart --user dunst";
+    reloadScript = "systemctl restart --user dunst";
 
     colorOverrides = {
       base00 = {
@@ -100,8 +97,8 @@ mkIf (cfg.enable && desktopEnabled) {
   };
 
   ${ns}.desktop.programs.locking = {
-    preLockScript = "${dunstctl} set-paused true";
-    postUnlockScript = "${dunstctl} set-paused false";
+    preLockScript = "dunstctl set-paused true";
+    postUnlockScript = "dunstctl set-paused false";
   };
 
   systemd.user.services.dunst = {

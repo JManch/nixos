@@ -7,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) mkIf;
   cfg = config.${ns}.programs.btop;
   colors = config.colorScheme.palette;
   themePath = "btop/themes/custom.theme";

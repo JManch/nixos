@@ -13,7 +13,6 @@ let
     mkOrder
     mkVMOverride
     getExe
-    getExe'
     concatMapStringsSep
     concatMap
     imap
@@ -294,14 +293,13 @@ mkIf (isHyprland config) {
   darkman.switchApps.hyprland =
     let
       inherit (config.${ns}.colorScheme) colorMap dark;
-      hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
       mapDarkColor = base: colorMap.${base} // { light = dark.palette.${base}; };
     in
     {
       paths = [ ".config/hypr/hyprland.conf" ];
       # Only reload if gamemode is not active to avoid overriding
       # gamemode-specific hyprland settings
-      reloadScript = "${getExe' pkgs.gamemode "gamemoded"} --status | grep 'is active' -q || ${hyprctl} reload";
+      reloadScript = "gamemoded --status | grep 'is active' -q || hyprctl reload";
       colorOverrides = {
         base00 = mapDarkColor "base00";
         base01 = mapDarkColor "base01";
@@ -330,10 +328,7 @@ mkIf (isHyprland config) {
       ExecStart = getExe (
         pkgs.writeShellApplication {
           name = "hypr-socket-listener";
-          runtimeInputs = [
-            hyprlandPkg
-            pkgs.socat
-          ];
+          runtimeInputs = [ pkgs.socat ];
           text =
             # bash
             ''

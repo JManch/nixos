@@ -10,7 +10,6 @@ let
     mkEnableOption
     mkOption
     types
-    getExe'
     naturalSort
     attrNames
     nameValuePair
@@ -20,7 +19,6 @@ let
     ;
   inherit (lib.${ns}) scanPaths flakePkgs;
   cfg = config.${ns}.desktop.hyprland;
-  hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
 in
 {
   imports = scanPaths ./. ++ [
@@ -121,14 +119,14 @@ in
     enableShaders = mkOption {
       type = types.str;
       readOnly = true;
-      default = "${escapeShellArg hyprctl} keyword decoration:screen_shader '${cfg.shaderDir}/monitorGamma.frag'";
+      default = "hyprctl keyword decoration:screen_shader '${cfg.shaderDir}/monitorGamma.frag'";
       description = "Command to enable Hyprland screen shaders";
     };
 
     disableShaders = mkOption {
       type = types.str;
       readOnly = true;
-      default = "${escapeShellArg hyprctl} keyword decoration:screen_shader '${cfg.shaderDir}/blank.frag'";
+      default = "hyprctl keyword decoration:screen_shader '${cfg.shaderDir}/blank.frag'";
       description = "Command to disable Hyprland screen shaders";
     };
 

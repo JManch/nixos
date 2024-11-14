@@ -31,7 +31,6 @@ let
   inherit (config.${ns}.services.hass) curlCommand;
   inherit (config.xdg) dataHome;
   cfg = desktop.services.darkman;
-  darkmanPackage = config.services.darkman.package;
 in
 mkIf (cfg.enable && desktopEnabled) {
   assertions = lib.${ns}.asserts [
@@ -63,7 +62,7 @@ mkIf (cfg.enable && desktopEnabled) {
   home.packages = [
     (hiPrio (
       pkgs.runCommand "darkman-desktop-disable" { } ''
-        install ${darkmanPackage}/share/applications/darkman.desktop -Dt $out/share/applications
+        install ${config.services.darkman.package}/share/applications/darkman.desktop -Dt $out/share/applications
         echo "NoDisplay=true" >> $out/share/applications/darkman.desktop
       ''
     ))
@@ -74,7 +73,7 @@ mkIf (cfg.enable && desktopEnabled) {
   };
 
   desktop.hyprland.binds = [
-    "${desktop.hyprland.modKey}SHIFT, C, exec, ${getExe darkmanPackage} toggle"
+    "${desktop.hyprland.modKey}SHIFT, C, exec, darkman toggle"
   ];
 
   systemd.user.services.darkman-solar-switcher = mkIf (cfg.switchMethod == "hass") {
@@ -88,11 +87,6 @@ mkIf (cfg.enable && desktopEnabled) {
       ExecStart = getExe (
         pkgs.writeShellApplication {
           name = "darkman-solar-switcher";
-          runtimeInputs = [
-            pkgs.coreutils
-            pkgs.jaq
-            darkmanPackage
-          ];
           text = # bash
             ''
               set +e
@@ -233,7 +227,7 @@ mkIf (cfg.enable && desktopEnabled) {
               # If the current theme is light then activate the light variant.
               # Prevents the theme resetting to dark when doing home manager
               # rebuilds.
-              theme=$(${getExe darkmanPackage} get 2>/dev/null || echo "")
+              theme=$(darkman get 2>/dev/null || echo "")
               if [ "$theme" = "light" ]; then
                 run cp "${dataHome}/darkman/variants/${path}.light" "${dataHome}/darkman/variants/${path}"
               else

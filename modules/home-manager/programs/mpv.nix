@@ -101,7 +101,6 @@ mkIf cfg.enable {
 
   programs.zsh.initExtra =
     let
-      mpv = lib.getExe config.programs.mpv.package;
       ytDlp = lib.getExe pkgs.yt-dlp;
     in
     # bash
@@ -111,7 +110,7 @@ mkIf cfg.enable {
             echo "Usage: screenshare <ip:port>"
             return 1
         fi
-        eval "${mpv} 'srt://$1?mode=caller' --no-cache --profile=low-latency --untimed"
+        eval "mpv 'srt://$1?mode=caller' --no-cache --profile=low-latency --untimed"
       };
 
       yt-dlp-audio () {

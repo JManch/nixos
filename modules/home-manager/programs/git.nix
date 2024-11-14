@@ -5,10 +5,9 @@
   ...
 }@args:
 let
-  inherit (lib) mkIf getExe;
   cfg = config.${ns}.programs.git;
 in
-mkIf cfg.enable {
+lib.mkIf cfg.enable {
   programs.git = {
     enable = true;
     userEmail = "JManch@protonmail.com";
@@ -42,7 +41,7 @@ mkIf cfg.enable {
       ''
         lazygit() {
           ${lib.${ns}.sshAddQuiet args}
-          command ${getExe config.programs.lazygit.package} "$@"
+          command lazygit "$@"
         }
       '';
   };

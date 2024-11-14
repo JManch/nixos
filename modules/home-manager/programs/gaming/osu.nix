@@ -7,16 +7,10 @@
   ...
 }:
 let
-  inherit (lib)
-    mkIf
-    getExe'
-    escapeShellArg
-    hiPrio
-    ;
+  inherit (lib) mkIf hiPrio;
   inherit (lib.${ns}) isHyprland getMonitorHyprlandCfgStr;
   inherit (osConfig'.${ns}.device) primaryMonitor;
   cfg = config.${ns}.programs.gaming.osu;
-  hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
 in
 mkIf cfg.enable {
   home.packages = [
@@ -34,7 +28,7 @@ mkIf cfg.enable {
     gameClasses = [ "osu!" ];
     gamemode.profiles.osu = mkIf (isHyprland config) {
       startScript = ''
-        ${hyprctl} --instance 0 --batch "\
+        hyprctl --instance 0 --batch "\
           keyword monitor ${
             getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
           }; \
@@ -48,7 +42,7 @@ mkIf cfg.enable {
 
       # FIX: Hyprland bug: active_area_size cannot be reset by setting it to 0 0
       stopScript = ''
-        ${hyprctl} --instance 0 --batch "\
+        hyprctl --instance 0 --batch "\
           keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
           keyword input:tablet:active_area_size 152 95; \
           keyword input:tablet:active_area_position 0 0; \

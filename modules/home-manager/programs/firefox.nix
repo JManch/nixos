@@ -10,7 +10,6 @@ let
   inherit (lib)
     mkIf
     getExe
-    getExe'
     optional
     singleton
     ;
@@ -40,15 +39,11 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
       # Can't use pkgs.symlinkJoin here because home-manager wraps this package
       pkgs.firefox.overrideAttrs (old: {
         buildCommand =
-          let
-            systemctl = getExe' pkgs.systemd "systemctl";
-            notifySend = getExe pkgs.libnotify;
-          in
           old.buildCommand
           # bash
           + ''
-            wrapProgram $out/bin/firefox --run "${systemctl} is-active --quiet --user firefox-persist-init \
-              || { ${notifySend} -u critical -t 3000 'Firefox' 'Initial sync has not yet finished'; exit 0; }"
+            wrapProgram $out/bin/firefox --run "systemctl is-active --quiet --user firefox-persist-init \
+              || { notify-send -u critical -t 3000 'Firefox' 'Initial sync has not yet finished'; exit 0; }"
           '';
       })
     );
@@ -244,14 +239,13 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
   systemd.user =
     let
       rsync = getExe pkgs.rsync;
-      fd = getExe pkgs.fd;
       persistDir = "/persist/${homeDirectory}/.mozilla/";
       tmpfsDir = "${homeDirectory}/.mozilla/";
 
       syncToTmpfs = # bash
         ''
           # Do not delete the existing Nix store links when syncing
-          ${fd} -Ht l --base-directory "${tmpfsDir}" | \
+          fd -Ht l --base-directory "${tmpfsDir}" | \
             ${rsync} -ah --no-links --delete --info=stats1 \
             --exclude-from=- "${persistDir}" "${tmpfsDir}"
         '';

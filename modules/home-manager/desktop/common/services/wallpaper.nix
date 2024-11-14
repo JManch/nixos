@@ -22,7 +22,6 @@ let
 
   setWallpaper = pkgs.writeShellApplication {
     name = "set-wallpaper";
-    runtimeInputs = optional darkman.enable config.services.darkman.package;
     text = # bash
       ''
         randomise=${boolToString cfg.randomise.enable};
@@ -56,12 +55,6 @@ let
 
   randomiseWallpaper = pkgs.writeShellApplication {
     name = "randomise-wallpaper";
-    runtimeInputs =
-      (with pkgs; [
-        coreutils
-        findutils
-      ])
-      ++ optional darkman.enable config.services.darkman.package;
     text = # bash
       ''
         function randomise_cache() {

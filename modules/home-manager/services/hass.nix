@@ -10,8 +10,6 @@
 let
   inherit (lib)
     mkIf
-    getExe
-    getExe'
     optionalString
     toLower
     ;
@@ -24,11 +22,11 @@ let
       data ? null,
     }:
     ''
-      ${getExe pkgs.curl} -s --max-time 1 \
-            -H "Authorization: Bearer $(<"${hassToken.path}")" \
-            -H "Content-Type: application/json" \
-            ${optionalString (data != null) "-d '{${data}}'"} \
-            ${hassIntegration.endpoint}/api/${endpoint}'';
+      curl -s --max-time 1 \
+        -H "Authorization: Bearer $(<"${hassToken.path}")" \
+        -H "Content-Type: application/json" \
+        ${optionalString (data != null) "-d '{${data}}'"} \
+        ${hassIntegration.endpoint}/api/${endpoint}'';
 
   updateActiveState =
     state:
@@ -61,7 +59,7 @@ mkIf (osConfig'.${ns}.device.hassIntegration.enable or false) {
         while true
         do
           ${updateActiveState "on"}
-          ${getExe' pkgs.coreutils "sleep"} 60
+          sleep 60
         done
       '';
       ExecStopPost = (updateActiveState "off").outPath;

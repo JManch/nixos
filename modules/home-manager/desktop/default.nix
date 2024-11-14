@@ -131,7 +131,13 @@ in
         "Device monitors must be configured to use a window manager"
       ]);
 
-      home.packages = [ pkgs.xdg-terminal-exec ];
+      home.packages = with pkgs; [
+        xdg-terminal-exec
+        # Packages scripts rely on
+        libnotify
+        bc
+        jaq
+      ];
 
       _module.args = {
         inherit (cfg) isWayland;

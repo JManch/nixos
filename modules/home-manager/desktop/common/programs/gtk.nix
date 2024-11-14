@@ -39,6 +39,8 @@ mkIf desktopEnabled {
     };
   };
 
+  systemd.user.services.xdg-desktop-portal-gtk.serviceConfig.Slice = [ "session.slice" ];
+
   darkman.switchScripts.gtk =
     let
       schemas = pkgs.gsettings-desktop-schemas;

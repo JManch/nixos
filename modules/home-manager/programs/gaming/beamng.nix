@@ -20,7 +20,7 @@ lib.mkIf (osConfig'.${ns}.programs.gaming.steam.enable or false) {
     # Disable tearing in both the steam and linux version as it causes flashing
     # in the UI
     tearingExcludedClasses = [
-      "steam_app284160"
+      "steam_app_284160"
       "BeamNG\\.drive.x64"
     ];
   };

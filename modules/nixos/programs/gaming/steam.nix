@@ -76,14 +76,14 @@ mkIf cfg.enable {
   hm = mkIf homeManager.enable {
     ${ns}.programs.gaming = {
       gameClasses = [
-        "steam_app\\.*"
+        "steam_app_.*"
         "cs2"
         "factorio"
         "hl2_linux"
       ];
 
       tearingExcludedClasses =
-        map (game: "steam_app" + toString steamAppIDs.${game}) [
+        map (game: "steam_app_" + toString steamAppIDs.${game}) [
           "Red Dead Redemption 2" # half-vsync without tearing is preferrable
           "Noita" # tearing lags cursor
         ]

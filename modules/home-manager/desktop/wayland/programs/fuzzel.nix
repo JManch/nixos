@@ -1,6 +1,7 @@
 {
   ns,
   lib,
+  pkgs,
   config,
   osConfig',
   isWayland,
@@ -55,6 +56,17 @@ mkIf (cfg.enable && isWayland) {
       };
     };
   };
+
+  home.packages = mkIf uwsm.enable [
+    (pkgs.runCommand "uuctl-desktop-customise" { } ''
+      mkdir -p $out/share/applications
+      substitute ${osConfig'.programs.uwsm.package}/share/applications/uuctl.desktop $out/share/applications/uuctl.desktop \
+        --replace-fail "Name=uuctl" "Name=Unit Manager" \
+        --replace-fail "Exec=uuctl" "Exec=uuctl fuzzel --dmenu -R --log-no-syslog --log-level=warning --font=\"${desktopCfg.style.font.family}:size=16\" --width=60 --lines=10 --y-margin=${
+          toString (builtins.floor (primaryMonitor.height * 0.36))
+        } -p"
+    '')
+  ];
 
   darkman.switchApps.fuzzel =
     let

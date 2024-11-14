@@ -325,6 +325,7 @@ mkIf (isHyprland config) {
 
     Service = {
       Type = "exec";
+      Slice = [ "background-graphical.slice" ];
       ExecStart = getExe (
         pkgs.writeShellApplication {
           name = "hypr-socket-listener";

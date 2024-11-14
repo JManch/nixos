@@ -269,6 +269,7 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
 
         Service = {
           Type = "oneshot";
+          Slice = [ "app-graphical.slice" ];
           ExecStart =
             (pkgs.writeShellScript "firefox-persist-init" # bash
               ''
@@ -300,6 +301,7 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
 
         Service = {
           Type = "oneshot";
+          Slice = [ "background-graphical.slice" ];
           CPUSchedulingPolicy = "idle";
           IOSchedulingClass = "idle";
           ExecStart =

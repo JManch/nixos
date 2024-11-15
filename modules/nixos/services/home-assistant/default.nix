@@ -28,7 +28,6 @@ let
     scanPaths
     asserts
     upperFirstChar
-    hardeningBaseline
     ;
   inherit (config.${ns}.services) frigate mosquitto caddy;
   inherit (config.age.secrets) mqttHassPassword mqttFaikinPassword;

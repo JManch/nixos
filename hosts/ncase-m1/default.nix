@@ -187,8 +187,7 @@
       desktop = {
         enable = true;
         desktopEnvironment = null;
-        displayManager = "uwsm";
-        uwsm.defaultDesktop = "hyprland-uwsm.desktop";
+        displayManager = "greetd";
       };
 
       networking = {

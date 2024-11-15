@@ -94,6 +94,9 @@ in
     # Enables wayland for all apps that support it
     environment.sessionVariables.NIXOS_OZONE_WL = mkIf isWayland "1";
 
+    # Some apps like vscode needs this
+    services.gnome.gnome-keyring.enable = true;
+
     # Necessary for xdg-portal home-manager module to work with useUserPackages enabled
     # https://github.com/nix-community/home-manager/pull/5184
     # NOTE: When https://github.com/nix-community/home-manager/pull/2548 gets

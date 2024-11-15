@@ -8,7 +8,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe';
+  inherit (lib) mkIf getExe' hiPrio;
   inherit (config.${ns}) colorScheme;
   inherit (config.${ns}.desktop.services) darkman;
   inherit (config.${ns}.desktop.style) cursor customTheme;
@@ -21,6 +21,13 @@ mkIf desktopEnabled {
   home.packages = mkIf customTheme [
     darkTheme
     lightTheme
+    (hiPrio (
+      pkgs.runCommand "xdg-desktop-portal-gtk-session-slice" { } ''
+        install -Dm644 ${pkgs.xdg-desktop-portal-gtk}/share/systemd/user/xdg-desktop-portal-gtk.service -t $out/share/systemd/user
+        echo "Slice=session.slice" >> $out/share/systemd/user/xdg-desktop-portal-gtk.service
+        chmod 444 $out/share/systemd/user/xdg-desktop-portal-gtk.service
+      ''
+    ))
   ];
 
   gtk = {
@@ -38,8 +45,6 @@ mkIf desktopEnabled {
       package = pkgs.papirus-icon-theme;
     };
   };
-
-  systemd.user.services.xdg-desktop-portal-gtk.serviceConfig.Slice = [ "session.slice" ];
 
   darkman.switchScripts.gtk =
     let

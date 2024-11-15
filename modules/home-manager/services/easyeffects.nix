@@ -1,12 +1,18 @@
 {
   ns,
   lib,
+  pkgs,
   config,
   osConfig',
   ...
 }:
 let
-  inherit (lib) mkIf mkForce;
+  inherit (lib)
+    mkIf
+    getExe
+    mkForce
+    getExe'
+    ;
   inherit (osConfig'.${ns}.system) audio;
   cfg = config.${ns}.services.easyeffects;
 in
@@ -19,20 +25,25 @@ mkIf (cfg.enable && (audio.enable or true)) {
   services.easyeffects.enable = true;
   systemd.user.services.easyeffects.Install.WantedBy = mkForce [ ];
 
-  programs.waybar.settings.bar = {
-    pulseaudio = {
-      "on-click-middle" = # bash
-        ''
-          systemctl is-active --quiet --user easyeffects && {
-            systemctl stop --user easyeffects
-            notify-send --urgency=low -t 3000 'Easyeffects disabled'
-          } || {
-            systemctl start --user easyeffects
-            notify-send --urgency=low -t 3000 'Easyeffects enabled'
-          }
-        '';
+  programs.waybar.settings.bar =
+    let
+      systemctl = getExe' pkgs.systemd "systemctl";
+      notifySend = getExe pkgs.libnotify;
+    in
+    {
+      pulseaudio = {
+        "on-click-middle" = # bash
+          ''
+            ${systemctl} is-active --quiet --user easyeffects && {
+              ${systemctl} stop --user easyeffects
+              ${notifySend} --urgency=low -t 3000 'Easyeffects disabled'
+            } || {
+              ${systemctl} start --user easyeffects
+              ${notifySend} --urgency=low -t 3000 'Easyeffects enabled'
+            }
+          '';
+      };
     };
-  };
 
   xdg.configFile = {
     "easyeffects/input/improved-microphone.json".text = # json

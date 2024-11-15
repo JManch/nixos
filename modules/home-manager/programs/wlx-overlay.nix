@@ -5,7 +5,10 @@
   osConfig',
   ...
 }:
-lib.mkIf (osConfig'.${ns}.hardware.valve-index.enable or false) {
+let
+  inherit (lib) mkIf getExe;
+in
+mkIf (osConfig'.${ns}.hardware.valve-index.enable or false) {
   home.packages = [ pkgs.wlx-overlay-s ];
 
   systemd.user.services.wlx-overlay-s = {
@@ -18,7 +21,7 @@ lib.mkIf (osConfig'.${ns}.hardware.valve-index.enable or false) {
         "graphical-session.target"
       ];
     };
-    Service.ExecStart = "wlx-overlay-s --show";
+    Service.ExecStart = "${getExe pkgs.wlx-overlay-s} --show";
     Install.WantedBy = [ "monado.service" ];
   };
 

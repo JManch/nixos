@@ -6,7 +6,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf getExe';
   cfg = config.${ns}.desktop.services.wayvnc;
 in
 # TODO: WIP
@@ -20,7 +20,7 @@ mkIf false {
     };
 
     Service = {
-      ExecStart = "wayvnc";
+      ExecStart = getExe' pkgs.wayvnc "wayvnc";
       Restart = "on-failure";
       RestartSec = 30;
     };

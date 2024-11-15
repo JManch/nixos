@@ -7,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf getExe;
   cfg = config.${ns}.programs.btop;
   colors = config.colorScheme.palette;
   themePath = "btop/themes/custom.theme";
@@ -78,13 +78,18 @@ mkIf cfg.enable {
     paths = [ ".config/${themePath}" ];
   };
 
-  xdg.desktopEntries.btop = mkIf config.${ns}.desktop.enable {
-    name = "Btop";
-    genericName = "Resource Monitor";
-    icon = "utilities-system-monitor";
-    exec = "xdg-terminal-exec --title=btop --app-id=btop -e btop";
-    terminal = false;
-    type = "Application";
-    categories = [ "System" ];
-  };
+  xdg.desktopEntries.btop =
+    let
+      xdg-terminal = getExe pkgs.xdg-terminal-exec;
+      btop = getExe config.programs.btop.package;
+    in
+    mkIf config.${ns}.desktop.enable {
+      name = "Btop";
+      genericName = "Resource Monitor";
+      icon = "utilities-system-monitor";
+      exec = "${xdg-terminal} --title=btop --app-id=btop -e ${btop}";
+      terminal = false;
+      type = "Application";
+      categories = [ "System" ];
+    };
 }

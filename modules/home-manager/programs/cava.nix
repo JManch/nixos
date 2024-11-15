@@ -1,12 +1,13 @@
 {
   ns,
   lib,
+  pkgs,
   config,
   osConfig',
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf getExe;
   cfg = config.${ns}.programs.cava;
 in
 mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
@@ -53,15 +54,21 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
     };
   };
 
-  xdg.desktopEntries.cava = mkIf config.${ns}.desktop.enable {
-    name = "Cava";
-    genericName = "Audio Visualizer";
-    exec = ''xdg-terminal-exec --title=Cava --app-id=cava -e "zsh" "-c" "alacritty msg config font.size=9 || true; cava"'';
-    terminal = false;
-    type = "Application";
-    icon = "audio-x-generic";
-    categories = [ "Audio" ];
-  };
+  xdg.desktopEntries.cava =
+    let
+      xdg-terminal = getExe pkgs.xdg-terminal-exec;
+      alacritty = getExe config.programs.alacritty.package;
+      cava = getExe config.programs.cava.package;
+    in
+    mkIf config.${ns}.desktop.enable {
+      name = "Cava";
+      genericName = "Audio Visualizer";
+      exec = ''${xdg-terminal} --title=Cava --app-id=cava -e "\\$SHELL" "-c" "${alacritty} msg config font.size=9 || true; ${cava}"'';
+      terminal = false;
+      type = "Application";
+      icon = "audio-x-generic";
+      categories = [ "Audio" ];
+    };
 
   desktop.hyprland.settings.windowrulev2 = [
     "float, class:^(cava)$"

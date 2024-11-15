@@ -35,6 +35,7 @@ mkIf (cfg.enable && isWayland) {
         args = "-t 4000 -T 6500";
         wlsunset = getExe pkgs.wlsunset;
         sunwait = getExe pkgs.sunwait;
+        grep = getExe pkgs.gnugrep;
       in
       if cfg.transition then
         "${wlsunset} ${args} -l ${latitude} -L ${longitude}"
@@ -45,7 +46,7 @@ mkIf (cfg.enable && isWayland) {
         (pkgs.writeShellScript "wlsunset-manual-sun-times" ''
           line=$(
             ${sunwait} report offset 30 ${latitude}N ${longitude}E \
-            | grep 'twilight & offset')
+            | ${grep} 'twilight & offset')
 
           sunrise=$(echo "$line" | awk '{print $6}')
           sunset=$(echo "$line" | awk '{print $8}')

@@ -372,6 +372,8 @@ in
             install -Dm644 xdg-terminal-exec.1.gz -t $out/share/man/man1
             install -Dm644 xdg-terminals.list -t $out/share/xdg-terminal-exec
           '';
+
+          meta.mainProgram = "xdg-terminal-exec";
         });
 
         uwsm = prev.uwsm.overrideAttrs {

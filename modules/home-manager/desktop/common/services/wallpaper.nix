@@ -22,6 +22,7 @@ let
 
   setWallpaper = pkgs.writeShellApplication {
     name = "set-wallpaper";
+    runtimeInputs = optional darkman.enable config.services.darkman.package;
     text = # bash
       ''
         randomise=${boolToString cfg.randomise.enable};

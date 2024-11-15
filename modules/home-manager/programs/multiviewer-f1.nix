@@ -7,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf getExe;
   inherit (config.${ns}.desktop.hyprland) modKey namedWorkspaceIDs;
   cfg = config.${ns}.programs.multiviewerF1;
 
@@ -328,7 +328,7 @@ mkIf cfg.enable {
       ExecStart = hyprlandMultiviewerTiler;
       ExecStopPost = pkgs.writeShellScript "hyprland-multiviewer-tiling-exec-stop-post" ''
         if [ "$SERVICE_RESULT" != "success" ]; then
-          notify-send --urgency=critical -t 5000 "Multiviewer F1 Tiler" "Exited unexpectedly"
+          ${getExe pkgs.libnotify} --urgency=critical -t 5000 "Multiviewer F1 Tiler" "Exited unexpectedly"
         fi
       '';
     };

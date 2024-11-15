@@ -10,11 +10,14 @@
 let
   inherit (lib)
     mkIf
+    getExe
+    getExe'
     optionalString
     toLower
     ;
   inherit (osConfig'.${ns}.device) hassIntegration;
   inherit (config.age.secrets) hassToken;
+  systemctl = getExe' pkgs.systemd "systemctl";
 
   curlCommand =
     {
@@ -22,11 +25,11 @@ let
       data ? null,
     }:
     ''
-      curl -s --max-time 1 \
-        -H "Authorization: Bearer $(<"${hassToken.path}")" \
-        -H "Content-Type: application/json" \
-        ${optionalString (data != null) "-d '{${data}}'"} \
-        ${hassIntegration.endpoint}/api/${endpoint}'';
+      ${getExe pkgs.curl} -s --max-time 1 \
+            -H "Authorization: Bearer $(<"${hassToken.path}")" \
+            -H "Content-Type: application/json" \
+            ${optionalString (data != null) "-d '{${data}}'"} \
+            ${hassIntegration.endpoint}/api/${endpoint}'';
 
   updateActiveState =
     state:
@@ -41,8 +44,8 @@ mkIf (osConfig'.${ns}.device.hassIntegration.enable or false) {
 
     # Update the active state when locking
     desktop.programs.locking = {
-      postLockScript = "systemctl stop --user hass-active-heartbeat";
-      postUnlockScript = "systemctl start --user hass-active-heartbeat";
+      postLockScript = "${systemctl} stop --user hass-active-heartbeat";
+      postUnlockScript = "${systemctl} start --user hass-active-heartbeat";
     };
   };
 
@@ -59,7 +62,7 @@ mkIf (osConfig'.${ns}.device.hassIntegration.enable or false) {
         while true
         do
           ${updateActiveState "on"}
-          sleep 60
+          ${getExe' pkgs.coreutils "sleep"} 60
         done
       '';
       ExecStopPost = (updateActiveState "off").outPath;

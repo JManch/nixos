@@ -99,11 +99,7 @@ mkIf cfg.enable {
     "jellyfin-mpv-shim/input.conf".source = config.xdg.configFile."mpv/input.conf".source;
   };
 
-  programs.zsh.initExtra =
-    let
-      ytDlp = lib.getExe pkgs.yt-dlp;
-    in
-    # bash
+  programs.zsh.initExtra = # bash
     ''
       screenshare () {
         if [[ -z "$1" ]]; then
@@ -114,7 +110,7 @@ mkIf cfg.enable {
       };
 
       yt-dlp-audio () {
-        eval "${ytDlp} --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s' '$1'"
+        eval "yt-dlp --extract-audio --audio-format mp3 --audio-quality 0 -o '%(title)s.%(ext)s' '$1'"
       }
     '';
 

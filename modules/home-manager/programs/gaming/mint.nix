@@ -5,16 +5,17 @@
   ...
 }@args:
 let
+  inherit (lib) mkIf getExe;
   cfg = config.${ns}.programs.gaming.mint;
   mint = (lib.${ns}.flakePkgs args "mint").default;
 in
-lib.mkIf cfg.enable {
+mkIf cfg.enable {
   home.packages = [ mint ];
 
   xdg.desktopEntries.mint = {
     name = "Mint";
     genericName = "Mod Loader";
-    exec = "mint";
+    exec = "${getExe mint}";
     terminal = false;
     type = "Application";
     icon = "applications-games";

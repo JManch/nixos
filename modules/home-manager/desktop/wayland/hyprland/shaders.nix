@@ -11,6 +11,7 @@ let
     mkIf
     concatMap
     concatLines
+    escapeShellArg
     any
     getExe
     getExe'
@@ -76,7 +77,7 @@ mkIf (lib.${ns}.isHyprland config) {
 
   wayland.windowManager.hyprland.settings =
     let
-      hyprctl = getExe' config.wayland.windowManager.hyprland.package "hyprctl";
+      hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
       jaq = getExe pkgs.jaq;
       toggleShader =
         pkgs.writeShellScript "hypr-toggle-shader" # bash

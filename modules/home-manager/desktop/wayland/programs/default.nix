@@ -3,7 +3,6 @@
   lib,
   pkgs,
   config,
-  osConfig',
   ...
 }:
 let
@@ -12,7 +11,6 @@ let
     mkEnableOption
     mkOption
     types
-    optionalString
     escapeShellArg
     ;
   cfg = config.${ns}.desktop.programs;
@@ -57,6 +55,10 @@ in
         default = getExe (
           pkgs.writeShellApplication {
             name = "lock-script";
+            runtimeInputs = with pkgs; [
+              coreutils
+              procps
+            ];
             text = ''
               # Exit if locking is currently running
               pgrep -x ${builtins.baseNameOf (getExe cfg.locking.package)} && exit 1

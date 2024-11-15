@@ -51,7 +51,7 @@ mkIf cfg.enable {
       name = "monado";
       desktopName = "Monado";
       type = "Application";
-      exec = "systemctl start --user monado";
+      exec = "${getExe' pkgs.systemd "systemctl"} start --user monado";
       icon = (
         pkgs.fetchurl {
           url = "https://gitlab.freedesktop.org/uploads/-/system/group/avatar/5604/monado_icon_medium.png";

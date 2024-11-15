@@ -28,7 +28,8 @@ mkIf (cfg.enable && (cfg.displayManager == "greetd")) {
         --time \
         --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions \
         --remember-session \
-        --remember
+        --remember \
+        --asterisks
       '';
     };
   };

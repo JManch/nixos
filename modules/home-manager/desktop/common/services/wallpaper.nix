@@ -55,6 +55,12 @@ let
 
   randomiseWallpaper = pkgs.writeShellApplication {
     name = "randomise-wallpaper";
+    runtimeInputs =
+      (with pkgs; [
+        coreutils
+        findutils
+      ])
+      ++ optional darkman.enable config.services.darkman.package;
     text = # bash
       ''
         function randomise_cache() {

@@ -26,6 +26,7 @@ in
 
     uwsm.defaultDesktop = mkOption {
       type = with types; nullOr str;
+      default = null;
       example = "hyprland-uwsm.desktop";
       description = ''
         If set, UWSM will automatically launch the set desktop without

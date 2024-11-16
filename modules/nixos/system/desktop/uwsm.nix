@@ -50,7 +50,7 @@ mkMerge [
           # bash
           ''
             if uwsm check may-start ${optionalString select "&& uwsm select"}; then
-              exec systemd-cat -t uwsm_start uwsm start ${if select then "default" else defaultDesktop}
+              exec systemd-cat -t uwsm-start uwsm start ${if select then "default" else defaultDesktop}
             fi
           ''
       );

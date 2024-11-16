@@ -80,6 +80,7 @@
       secureBoot.enable = true;
       bluetooth.enable = true;
       fanatec.enable = true;
+      tablet.enable = true;
 
       valve-index = {
         enable = true;

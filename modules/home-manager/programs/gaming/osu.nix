@@ -11,7 +11,6 @@ let
     mkIf
     getExe'
     escapeShellArg
-    hiPrio
     ;
   inherit (lib.${ns}) isHyprland getMonitorHyprlandCfgStr;
   inherit (osConfig'.${ns}.device) primaryMonitor;
@@ -20,14 +19,19 @@ let
 in
 mkIf cfg.enable {
   home.packages = [
-    pkgs.osu-lazer-bin
-    (hiPrio (
-      pkgs.runCommand "osu-desktop-gamemoderun" { } ''
-        mkdir -p $out/share/applications
-        substitute ${pkgs.osu-lazer-bin}/share/applications/osu\!.desktop $out/share/applications/osu\!.desktop \
-          --replace-fail "Exec=osu! %u" "Exec=env GAMEMODE_PROFILES=osu gamemoderun osu! %u"
-      ''
-    ))
+    # The upstream flatpak uses an illegal XDG desktop file ID which breaks
+    # UWSM app launcher (we patch the Exec command at the same time)
+    # https://specifications.freedesktop.org/desktop-entry-spec/latest/file-naming.html
+    (pkgs.osu-lazer-bin.overrideAttrs (old: {
+      buildCommand =
+        old.buildCommand
+        # bash
+        + ''
+          substitute $out/share/applications/osu\!.desktop $out/share/applications/osu.desktop \
+            --replace-fail "Exec=osu! %u" "Exec=env GAMEMODE_PROFILES=osu gamemoderun osu! %u"
+          rm $out/share/applications/osu\!.desktop
+        '';
+    }))
   ];
 
   ${ns}.programs.gaming = {

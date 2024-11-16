@@ -120,6 +120,19 @@ mkIf (isHyprland config) {
     configPackages = [ hyprlandPkg ];
   };
 
+  xdg.configFile."uwsm/env-hyprland".text =
+    optionalString (cfg.hyprcursor.package != null) ''
+      HYPRCURSOR_THEME=${cfg.hyprcursor.name}
+      HYPRCURSOR_SIZE=${toString config.${ns}.desktop.style.cursor.size}
+    ''
+    + optionalString (osConfig'.${ns}.device.gpu.type == "nvidia") ''
+      LIBVA_DRIVER_NAME=nvidia
+      GBM_BACKEND=nvidia-drm
+      __GLX_VENDOR_LIBRARY_NAME=nvidia
+      __GL_GSYNC_ALLOWED=0
+      __GL_VRR_ALLOWED=0
+    '';
+
   wayland.windowManager.hyprland = {
     enable = true;
     systemd.enable = false; # we use UWSM instead
@@ -128,23 +141,6 @@ mkIf (isHyprland config) {
 
     settings = {
       exec-once = mkOrder 2000 [ "uwsm finalize" ];
-      env =
-        [
-          "XDG_CURRENT_DESKTOP,Hyprland"
-          "XDG_SESSION_TYPE,wayland"
-          "XDG_SESSION_DESKTOP,Hyprland"
-        ]
-        ++ optionals (cfg.hyprcursor.package != null) [
-          "HYPRCURSOR_THEME,${cfg.hyprcursor.name}"
-          "HYPRCURSOR_SIZE,${toString config.${ns}.desktop.style.cursor.size}"
-        ]
-        ++ optionals (osConfig'.${ns}.device.gpu.type == "nvidia") [
-          "LIBVA_DRIVER_NAME,nvidia"
-          "GBM_BACKEND,nvidia-drm"
-          "__GLX_VENDOR_LIBRARY_NAME,nvidia"
-          "__GL_GSYNC_ALLOWED,0"
-          "__GL_VRR_ALLOWED,0"
-        ];
 
       monitor =
         (map (m: if !m.enabled then "${m.name},disable" else getMonitorHyprlandCfgStr m) monitors)

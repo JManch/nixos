@@ -57,18 +57,26 @@ in
         };
       };
 
-      # Do not start pipewire user sockets for non-system users. This prevents
-      # pipewire sockets unnecessarily starting for the greeter user during
-      # login.
-      systemd.user.sockets = {
-        pipewire.unitConfig.ConditionUser = "!@system";
-        pipewire-pulse.unitConfig.ConditionUser = "!@system";
+      # Do not start pipewire user sockets or services for non-system users.
+      # This prevents pipewire unnecessarily starting for the greeter user
+      # during login.
+      systemd.user = {
+        sockets = {
+          pipewire.unitConfig.ConditionUser = "!@system";
+          pipewire-pulse.unitConfig.ConditionUser = "!@system";
+        };
+        services = {
+          pipewire.unitConfig.ConditionUser = "!@system";
+          wireplumber.unitConfig.ConditionUser = "!@system";
+          pipewire-pulse.unitConfig.ConditionUser = "!@system";
+        };
       };
 
       systemd.user.services.setup-pipewire-devices = {
         description = "Setup source and sink devices on login";
         after = [ "wireplumber.service" ];
         wants = [ "wireplumber.service" ];
+        unitConfig.ConditionUser = "!@system";
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;

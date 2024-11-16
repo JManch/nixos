@@ -22,13 +22,7 @@ in
 {
   services.openssh = mkIf cfg.server.enable {
     enable = true;
-
-    # Some devices are weird with port 22
-    ports = [
-      22
-      2222
-    ];
-
+    ports = [ 22 ];
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;

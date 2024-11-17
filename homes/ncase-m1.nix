@@ -53,7 +53,7 @@
     programs = {
       alacritty.enable = true;
       btop.enable = true;
-      cava.enable = true;
+      cava.enable = false; # broken package
       torBrowser.enable = true;
       git.enable = true;
       neovim.enable = true;
@@ -63,8 +63,7 @@
       obs.enable = true;
       vscode.enable = true;
       mpv.enable = true;
-      # Disable until https://github.com/NixOS/nixpkgs/pull/353833
-      mpv.jellyfinShim.enable = false;
+      mpv.jellyfinShim.enable = true;
       chatterino.enable = true;
       images.enable = true;
       anki.enable = true;
@@ -94,7 +93,7 @@
         r2modman.enable = true;
         lutris.enable = true;
         prism-launcher.enable = true;
-        mint.enable = true;
+        mint.enable = false; # broken package
         ryujinx.enable = true;
         osu.enable = true;
       };

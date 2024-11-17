@@ -62,6 +62,7 @@ in
             # Raspberry-pi-nix does not have an enable option so we have to
             # conditionally import like this
             self.inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+            self.inputs.raspberry-pi-nix.nixosModules.sd-image
             ../modules/nixos/hardware/raspberry-pi.nix
           ];
       };

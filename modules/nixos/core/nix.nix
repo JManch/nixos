@@ -344,16 +344,6 @@ in
   nixpkgs = {
     overlays = [
       (final: prev: {
-        # For some reason tesla-powerwall tests broke after a nixpkgs update
-        # even though the derivation was unchanged
-        pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-          (python-final: python-prev: {
-            tesla-powerwall = python-prev.tesla-powerwall.overridePythonAttrs {
-              doCheck = false;
-            };
-          })
-        ];
-
         xdg-terminal-exec = prev.stdenvNoCC.mkDerivation (finalAttrs: {
           pname = "xdg-terminal-exec";
           version = "0.12.0";

@@ -13,6 +13,7 @@ let
     singleton
     attrNames
     mapAttrs
+    filterAttrs
     concatMap
     splitString
     mapAttrsToList
@@ -21,7 +22,6 @@ let
   inherit (lib.${ns}) upperFirstChar;
   inherit (config.${ns}.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (secrets.lovelace) heating hvac;
   inherit (secrets.general) people userIds peopleList;
   inherit (config.${ns}.services.hass) rooms;
 
@@ -878,14 +878,12 @@ mkIf cfg.enableInternal {
           cfg.homeAnnouncements.lovelaceView
           cfg.guineaPigs.lovelaceView
           energy
-        ]
-        ++ optional frigate.enable cctv
-        ++ [
-          heating
-          hvac
           outside
         ]
-        ++ mapAttrsToList (_: roomCfg: roomCfg.lovelace.dashboard) rooms;
+        ++ optional frigate.enable cctv
+        ++ mapAttrsToList (_: roomCfg: roomCfg.lovelace.dashboard) (
+          filterAttrs (_: v: v.lovelace.enable) rooms
+        );
     };
   };
 }

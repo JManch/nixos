@@ -116,7 +116,7 @@ in
     mapAttrsToList (
       room: roomCfg:
       let
-        inherit (roomCfg) formattedRoomName deviceId sensors;
+        inherit (roomCfg) formattedRoomName deviceId climate;
         inherit (roomCfg.dehumidifier)
           thresholds
           switchId
@@ -157,8 +157,8 @@ in
         sensor = singleton {
           name = "${formattedRoomName} Mold Indicator";
           platform = "mold_indicator";
-          indoor_temp_sensor = "sensor.${sensors.temperature}";
-          indoor_humidity_sensor = "sensor.${sensors.humidity}";
+          indoor_temp_sensor = "sensor.${climate.temperature}";
+          indoor_humidity_sensor = "sensor.${climate.humidity}";
           outdoor_temp_sensor = "sensor.outdoor_sensor_temperature";
           calibration_factor = calibrationFactor;
         };

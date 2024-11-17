@@ -9,6 +9,7 @@ let
   inherit (secrets.general) people userIds devices;
   inherit (lib)
     mkOption
+    mkEnableOption
     types
     concatMapStringsSep
     splitString
@@ -49,21 +50,11 @@ in
               description = "Mobile device belonging to the room owner";
             };
 
-            sensors = {
-              temperature = mkOption {
-                type = types.str;
-                example = "joshua_sensor_temperature";
-                description = "Entity ID of numeric temperature sensor in the room";
-              };
-
-              humidity = mkOption {
-                type = types.str;
-                example = "joshua_sensor_humidity";
-                description = "Entity ID of numeric humidity sensor in the room";
-              };
-            };
-
             lovelace = {
+              enable = mkEnableOption "lovelace for this room" // {
+                default = true;
+              };
+
               dashboard = mkOption {
                 type = types.attrs;
                 readOnly = true;
@@ -120,14 +111,14 @@ in
       joshua_room = {
         person = "joshua";
 
-        sensors = {
+        climate = {
           temperature = "joshua_sensor_temperature";
           humidity = "joshua_sensor_humidity";
-        };
 
-        airConditioning = {
-          enable = true;
-          climateId = "joshua_faikin_mqtt_hvac";
+          airConditioning = {
+            enable = false; # until I reinstall faikin
+            id = "joshua_faikin_mqtt_hvac";
+          };
         };
 
         dehumidifier = {
@@ -207,11 +198,13 @@ in
       lounge = {
         lighting = {
           enable = true;
+
           adaptiveLighting = {
             enable = true;
             takeOverControl = true;
             minBrightness = 50;
           };
+
           floorPlan = {
             enable = true;
             lights =
@@ -233,9 +226,13 @@ in
           };
         };
 
-        underfloorHeating = {
-          enable = true;
-          climateId = "lounge_underfloor_heating";
+        climate = {
+          temperature = "lounge_underfloor_heating_current_temperature";
+
+          underfloorHeating = {
+            enable = true;
+            id = "lounge_underfloor_heating";
+          };
         };
 
         lovelace.sections = singleton {
@@ -268,11 +265,6 @@ in
       };
 
       study = {
-        sensors = {
-          temperature = "study_ac_climatecontrol_room_temperature";
-          humidity = "study_ac_climatecontrol_room_humidity";
-        };
-
         lighting = {
           enable = true;
           basicLights = true;
@@ -292,21 +284,25 @@ in
           };
         };
 
-        airConditioning = {
-          enable = true;
-          climateId = "study_ac_room_temperature";
+        climate = {
+          temperature = "study_ac_climatecontrol_room_temperature";
+          humidity = "study_ac_climatecontrol_room_humidity";
+
+          airConditioning = {
+            enable = true;
+            id = "study_ac_room_temperature";
+          };
         };
       };
 
       master_bedroom = {
-        sensors = {
+        climate = {
           temperature = "master_ac_climatecontrol_room_temperature";
           humidity = "master_ac_climatecontrol_room_humidity";
-        };
-
-        airConditioning = {
-          enable = true;
-          climateId = "master_ac_room_temperature";
+          airConditioning = {
+            enable = true;
+            id = "master_ac_room_temperature";
+          };
         };
       };
 
@@ -317,19 +313,19 @@ in
         {
           inherit person;
 
-          sensors = {
-            temperature = "${person}_ac_climatecontrol_room_temperature";
+          climate = {
+            temperature = "${person}_underfloor_heating_current_temperature";
             humidity = "${person}_ac_climatecontrol_room_humidity";
-          };
 
-          airConditioning = {
-            enable = true;
-            climateId = "${person}_ac_room_temperature";
-          };
+            airConditioning = {
+              enable = true;
+              id = "${person}_ac_room_temperature";
+            };
 
-          underfloorHeating = {
-            enable = true;
-            climateId = "${person}_underfloor_heating";
+            underfloorHeating = {
+              enable = true;
+              id = "${person}_underfloor_heating";
+            };
           };
 
           sleepTracking.enable = true;
@@ -357,14 +353,14 @@ in
             useAlarm = true;
           };
 
-          sensors = {
+          climate = {
             temperature = "${person}_ac_climatecontrol_room_temperature";
             humidity = "${person}_ac_climatecontrol_room_humidity";
-          };
 
-          airConditioning = {
-            enable = true;
-            climateId = "${person}_ac_room_temperature";
+            airConditioning = {
+              enable = true;
+              id = "${person}_ac_room_temperature";
+            };
           };
 
           lighting = {
@@ -395,14 +391,19 @@ in
             useAlarm = true;
           };
 
-          sensors = {
+          climate = {
             temperature = "${person}_ac_climatecontrol_room_temperature";
             humidity = "${person}_ac_climatecontrol_room_humidity";
-          };
 
-          airConditioning = {
-            enable = true;
-            climateId = "${person}_ac_room_temperature";
+            airConditioning = {
+              enable = true;
+              id = "${person}_ac_room_temperature";
+            };
+
+            underfloorHeating = {
+              enable = true;
+              id = "${person}_underfloor_heating";
+            };
           };
 
           lighting = {
@@ -442,6 +443,28 @@ in
             };
           };
         };
+
+      joshua_bathroom = {
+        lovelace.enable = false;
+        climate = {
+          temperature = "joshua_bathroom_underfloor_heating_current_temperature";
+          underfloorHeating = {
+            enable = true;
+            id = "joshua_bathroom_underfloor_heating";
+          };
+        };
+      };
+
+      "${people.person1}_bathroom" = {
+        lovelace.enable = false;
+        climate = {
+          temperature = "${people.person1}_bathroom_underfloor_heating_current_temperature";
+          underfloorHeating = {
+            enable = true;
+            id = "${people.person1}_bathroom_underfloor_heating";
+          };
+        };
+      };
     };
   };
 }

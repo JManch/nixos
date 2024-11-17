@@ -94,65 +94,6 @@ let
     };
   }) cameras;
 
-  heatingTimeToggle =
-    map
-      (
-        enable:
-        let
-          stringMode = if enable then "enable" else "disable";
-          oppositeMode = if enable then "disable" else "enable";
-        in
-        {
-          alias = "Heating ${if enable then "Enable" else "Disable"}";
-          mode = "single";
-          trigger = [
-            {
-              platform = "homeassistant";
-              event = "start";
-            }
-            {
-              platform = "time";
-              at = "input_datetime.heating_${stringMode}_time";
-            }
-          ];
-          condition =
-            let
-              timeCond = {
-                condition = "time";
-                after = "input_datetime.heating_${stringMode}_time";
-                before = "input_datetime.heating_${oppositeMode}_time";
-              };
-            in
-            optional (!enable) timeCond
-            ++ optional enable {
-              condition = "and";
-              conditions = [
-                timeCond
-                {
-                  condition = "state";
-                  entity_id = "input_boolean.heating_enabled";
-                  state = "on";
-                }
-              ];
-            };
-          action = singleton {
-            action = "climate.set_hvac_mode";
-            metadata = { };
-            data = {
-              hvac_mode = if enable then "heat" else "off";
-            };
-            target.entity_id = [
-              "climate.joshua_radiator_thermostat"
-              "climate.hallway_radiator_thermostat"
-            ];
-          };
-        }
-      )
-      [
-        true
-        false
-      ];
-
   binCollectionNotify = singleton {
     alias = "Bin Collection Notify";
     mode = "single";
@@ -456,8 +397,7 @@ in
 mkIf cfg.enableInternal {
   services.home-assistant.config = {
     automation =
-      heatingTimeToggle
-      ++ binCollectionNotify
+      binCollectionNotify
       ++ washingMachineNotify
       ++ formula1Notify
       ++ lightsAvailabilityNotify
@@ -471,28 +411,9 @@ mkIf cfg.enableInternal {
       ++ shelliesStatusUpdate
       ++ optionals frigate.enable (frigateEntranceNotify ++ frigateCatNotify ++ frigateHighAlertNotify);
 
-    input_datetime = {
-      heating_disable_time = {
-        name = "Heating Disable Time";
-        has_time = true;
-      };
-
-      heating_enable_time = {
-        name = "Heating Enable Time";
-        has_time = true;
-      };
-    };
-
-    input_boolean = {
-      heating_enabled = {
-        name = "Heating Enabled";
-        icon = "mdi:heating-coil";
-      };
-
-      high_alert_surveillance = {
-        name = "High Alert Surveillance";
-        icon = "mdi:cctv";
-      };
+    input_boolean.high_alert_surveillance = {
+      name = "High Alert Surveillance";
+      icon = "mdi:cctv";
     };
   };
 }

@@ -250,54 +250,6 @@ mkIf cfg.enableInternal {
       # }
     ];
 
-    switch = [
-      {
-        platform = "template";
-        switches = {
-          hallway_thermostat = {
-            friendly_name = "Hallway Thermostat Switch";
-            value_template = "{{ is_state_attr('climate.hallway_radiator_thermostat', 'hvac_action', 'heating') }}";
-
-            turn_on = singleton {
-              action = "climate.set_temperature";
-              target.entity_id = "climate.hallway_radiator_thermostat";
-              data = {
-                temperature = "{{ state_attr('climate.joshua_radiator_thermostat', 'temperature') |float + 2 }}";
-                hvac_mode = "heat";
-              };
-            };
-
-            turn_off = singleton {
-              action = "climate.set_temperature";
-              target.entity_id = "climate.hallway_radiator_thermostat";
-              data = {
-                temperature = 5;
-                hvac_mode = "heat";
-              };
-            };
-          };
-        };
-      }
-    ];
-
-    climate = singleton {
-      platform = "generic_thermostat";
-      name = "Joshua Radiator Thermostat";
-      heater = "switch.hallway_thermostat";
-      target_sensor = "sensor.joshua_sensor_temperature";
-      min_temp = 17;
-      max_temp = 24;
-      target_temp = 19;
-      eco_temp = 17;
-      comfort_temp = 21;
-      # Difference to target temp required to switch on
-      cold_tolerance = 1;
-      # Minimum amount of time before reacting to new switch state
-      min_cycle_duration.minutes = 10;
-      away_temp = 16;
-      precision = 0.5;
-    };
-
     thermal_comfort = singleton {
       custom_icons = true;
       sensor = [

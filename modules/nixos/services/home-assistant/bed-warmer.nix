@@ -76,7 +76,7 @@ in
     mapAttrsToList (
       room: roomCfg:
       let
-        inherit (roomCfg) formattedRoomName sleepTracking sensors;
+        inherit (roomCfg) formattedRoomName sleepTracking climate;
         inherit (roomCfg.bedWarmer) switchId;
       in
       mkIf roomCfg.bedWarmer.enable {
@@ -129,7 +129,7 @@ in
             };
             conditions = singleton {
               condition = "template";
-              value_template = "{{ states('sensor.${sensors.temperature}') | float <= states('input_number.${room}_bed_warmer_enable_temperature') | float }}";
+              value_template = "{{ states('sensor.${climate.temperature}') | float <= states('input_number.${room}_bed_warmer_enable_temperature') | float }}";
             };
             actions = singleton {
               action = "switch.turn_on";

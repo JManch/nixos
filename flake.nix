@@ -68,9 +68,6 @@
     nix-colors.url = "github:misterio77/nix-colors";
     nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
 
-    ags.url = "github:Aylur/ags";
-    ags.inputs.nixpkgs.follows = "nixpkgs";
-
     # Inputs that provide packages
 
     hyprland.url = "github:hyprwm/Hyprland";

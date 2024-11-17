@@ -41,6 +41,8 @@ mkMerge [
       ];
     };
 
+    # Info on launching a uwsm desktop entry with uwsm start:
+    # https://github.com/NixOS/nixpkgs/pull/355416#issuecomment-2481432259
     programs.zsh.interactiveShellInit =
       let
         select = defaultDesktop == null;

@@ -33,9 +33,6 @@ mkIf cfg.enable {
   ];
 
   ${ns} = {
-    # Always consider a public port because of router forwarding rule
-    system.networking.publicPorts = [ cfg.webrtc.port ];
-
     services = {
       frigate.rtspAddress =
         {
@@ -54,6 +51,10 @@ mkIf cfg.enable {
 
       caddy.virtualHosts.cctv.extraConfig = ''
         reverse_proxy http://127.0.0.1:${toString cfg.port}
+      '';
+
+      caddy.virtualHosts.go2rtc.extraConfig = ''
+        reverse_proxy http://127.0.0.1:1984
       '';
     };
   };
@@ -128,12 +129,9 @@ mkIf cfg.enable {
             "0,576,173,576,63,306,199,262,416,149,418,43,549,34,548,117,690,136,775,98,903,132,643,264,679,320,619,378,356,576,1024,576,1024,0,0,0"
           ];
 
-          zones = {
-            entrance.coordinates = "548,102,575,129,414,138,415,110";
-            driveway-zone.coordinates = "0.195,0.386,0.22,0.574,0.321,0.908,0.633,0.606,0.625,0.464,0.871,0.227,0.757,0.171,0.539,0.209,0.405,0.225";
-          };
-
-          review.alerts.required_zones = [ "driveway-zone" ];
+          zones.entrance.coordinates = "0.535,0.177,0.569,0.233,0.411,0.256,0.405,0.191";
+          zones.entrance.inertia = 1;
+          review.alerts.required_zones = [ "entrance" ];
           objects.filters.car.mask = [ "648,0,648,46,419,51,411,120,647,249,1024,576,0,576,0,0" ];
         };
 
@@ -159,13 +157,9 @@ mkIf cfg.enable {
             "1024,0,1024,445,994,411,981,309,951,262,860,252,752,249,749,305,811,313,810,408,661,496,537,492,282,456,0,453,0,0"
           ];
 
-          zones.entrance.coordinates = "0.934,0.48,0.798,0.476,0.789,0.822,0.938,0.827";
-          review.alerts.required_zones = [ "entrance" ];
-
+          # Disable alerts on this camera
+          review.alerts.labels = [ ];
           objects.filters.car.mask = [ "1024,576,0,576,0,306,1024,316" ];
-
-          # WARN: Remove this temporary mask
-          objects.filters.person.mask = [ "926,342,1024,576,707,576" ];
         };
       };
 
@@ -190,7 +184,7 @@ mkIf cfg.enable {
         enabled = true;
         events.retain = {
           default = 10;
-          mode = "active_objects";
+          mode = "motion";
         };
       };
 
@@ -199,8 +193,6 @@ mkIf cfg.enable {
   };
 
   systemd.services.frigate.serviceConfig = hardeningBaseline config {
-    # WARN: The upstream module tries to set a read only bind path with BindPaths
-    # which is invalid, I'm not sure if it affects functionality?
     DynamicUser = false;
     ProtectProc = "default";
     ProcSubset = "all";
@@ -242,13 +234,14 @@ mkIf cfg.enable {
       };
 
       webrtc = mkIf cfg.webrtc.enable {
+        # Use a fixed TCP port UDP port to simplify firewall rules
+        # Don't need to publically expose these ports since we use VPN
         listen = ":${toString cfg.webrtc.port}";
+
         candidates = [
           "${ipAddress}:${toString cfg.webrtc.port}"
-          # "stun" here translates to Google's STUN server in the go2rtc code
-          # https://github.com/AlexxIT/go2rtc/blob/5fa31fe4d6cf0e77562b755d52e8ed0165f89d25/internal/webrtc/candidates.go#L21
-          # https://github.com/AlexxIT/go2rtc/blob/5fa31fe4d6cf0e77562b755d52e8ed0165f89d25/pkg/webrtc/helpers.go#L170
-          "stun:${toString cfg.webrtc.port}"
+          # If using "stun" here it translates to Google's STUN server
+          # "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString cfg.webrtc.port}"
         ];
       };
 
@@ -290,6 +283,7 @@ mkIf cfg.enable {
     SocketBindAllow = [
       8554
       1984
+      5353 # for mDNS
     ] ++ optional cfg.webrtc.enable cfg.webrtc.port;
     # go2rtc sometimes randomly crashes
     Restart = "on-failure";
@@ -297,8 +291,8 @@ mkIf cfg.enable {
   };
 
   networking.firewall = mkIf cfg.webrtc.enable {
-    allowedTCPPorts = cfg.webrtc.port;
-    allowedUDPPorts = cfg.webrtc.port;
+    allowedTCPPorts = [ cfg.webrtc.port ];
+    allowedUDPPorts = [ cfg.webrtc.port ];
   };
 
   services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = singleton {

@@ -97,10 +97,7 @@ in
 
       frigate = {
         enable = true;
-        # Disabling in an attempt to workaround https://github.com/AlexxIT/go2rtc/issues/716
-        # TODO: Update: this is likely fixed by go2rtc 1.9.2 but there are new
-        # webrtc options and I need to go through them
-        webrtc.enable = false;
+        webrtc.enable = true;
         nvrAddress = "192.168.40.6";
       };
 

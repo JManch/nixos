@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 {
+  lib,
   fetchFromGitHub,
   buildHomeAssistantComponent,
   buildPythonPackage,
@@ -73,13 +74,13 @@ in
 buildHomeAssistantComponent rec {
   owner = "MindrustUK";
   domain = "heatmiserneo";
-  version = "1.6-unstable-2024-10-31";
+  version = "3.0.0-beta.3";
 
   src = fetchFromGitHub {
     inherit owner;
     repo = "heatmiser-for-home-assistant";
-    rev = "9c36223c8c7efff373ba304b08dfd9cde4c1d50f";
-    hash = "sha256-saNc5gMqpHrPoSNHDKbxhYl9OVldLkRY4BjKU0fw/Vw=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-lqxwvyB/CTRao4H6kCFPG2dYw8c2o1NF+L1/QHDfF/w=";
   };
 
   propagatedBuildInputs = [ neohubapi ];

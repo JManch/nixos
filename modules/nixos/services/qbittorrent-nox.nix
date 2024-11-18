@@ -8,17 +8,12 @@
   ...
 }:
 let
-  inherit (lib)
-    mkIf
-    getExe'
-    singleton
-    ;
+  inherit (lib) mkIf getExe' singleton;
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (config.${ns}.services) caddy nfs;
   inherit (inputs.nix-resources.secrets) qBittorrentPort;
   inherit (config.${ns}.device) vpnNamespace;
   cfg = config.${ns}.services.qbittorrent-nox;
-  qbittorrent-nox = pkgs.qbittorrent.override { guiSupport = false; };
 in
 mkIf cfg.enable {
   assertions = asserts [
@@ -56,7 +51,7 @@ mkIf cfg.enable {
       UMask = "0022";
       StateDirectory = "qbittorrent-nox";
       StateDirectoryMode = "750";
-      ExecStart = getExe' qbittorrent-nox "qbittorrent-nox";
+      ExecStart = getExe' pkgs.qbittorrent-nox "qbittorrent-nox";
       Restart = "always";
       RestrictAddressFamilies = [
         "AF_UNIX"

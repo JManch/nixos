@@ -10,89 +10,17 @@ let
     mkIf
     imap
     optional
-    optionals
-    attrNames
     singleton
     splitString
     concatMapStringsSep
     ;
   inherit (lib.${ns}) upperFirstChar;
   inherit (secrets.general) devices people;
-  inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.${ns}.services) frigate;
   cfg = config.${ns}.services.hass;
-  cameras = attrNames config.services.frigate.settings.cameras;
   secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
 
   formattedRoomName =
     room: (concatMapStringsSep " " (string: upperFirstChar string) (splitString "_" room));
-
-  frigateEntranceNotify = singleton {
-    alias = "Entrance Person Notify";
-    use_blueprint = {
-      path = "SgtBatten/frigate_notifications.yaml";
-      input = {
-        camera = "camera.driveway";
-        state_filter = true;
-        state_entity = "input_boolean.high_alert_surveillance";
-        state_filter_states = [ "off" ];
-        notify_device = devices.joshua.id;
-        notify_group = "Adults Except ${upperFirstChar people.person5}";
-        base_url = "https://home.${fqDomain}";
-        group = "frigate-entrance-notification";
-        title = "Security Alert";
-        message = "A {{ label }} {{ 'is loitering' if loitering else 'was detected' }} in the entrance";
-        update_thumbnail = true;
-        alert_once = true;
-        zone_filter = true;
-        zones = [ "entrance" ];
-      };
-    };
-  };
-
-  frigateCatNotify = map (camera: {
-    alias = "${upperFirstChar camera} Cat Notify";
-    use_blueprint = {
-      path = "SgtBatten/frigate_notifications.yaml";
-      input = {
-        camera = "camera.${camera}";
-        notify_device = devices.joshua.id;
-        notify_group = "Adults Except ${upperFirstChar people.person5}";
-        sticky = true;
-        group = "frigate-cat-notification";
-        base_url = "https://home.${fqDomain}";
-        ios_live_view = "camera.${camera}";
-        title = "Cat Detected";
-        mess = "A cat {{ 'is loitering' if loitering else 'was detected' }} on the {{ camera_name }} camera";
-        color = "#f44336";
-        update_thumbnail = true;
-        labels = [ "cat" ];
-      };
-    };
-  }) cameras;
-
-  frigateHighAlertNotify = map (camera: {
-    alias = "High Alert ${upperFirstChar camera} Notify";
-    use_blueprint = {
-      path = "SgtBatten/frigate_notifications.yaml";
-      input = {
-        camera = "camera.${camera}";
-        state_filter = true;
-        state_entity = "input_boolean.high_alert_surveillance";
-        state_filter_states = [ "on" ];
-        notify_device = devices.joshua.id;
-        notify_group = "Adults Except ${upperFirstChar people.person5}";
-        sticky = true;
-        group = "frigate-notification";
-        base_url = "https://home.${fqDomain}";
-        title = "Security Alert";
-        ios_live_view = "camera.${camera}";
-        message = "A {{ label }} {{ 'is loitering' if loitering else 'was detected' }} on the {{ camera_name }} camera";
-        color = "#f44336";
-        update_thumbnail = true;
-      };
-    };
-  }) cameras;
 
   binCollectionNotify = singleton {
     alias = "Bin Collection Notify";
@@ -408,12 +336,6 @@ mkIf cfg.enableInternal {
       ++ (hueTapLightSwitch "${people.person2}_room" "670ac1ecf423f069757c7ab30bec3142")
       ++ (hueTapLightSwitch "${people.person3}_room" "0097121e144203512aeacef37a03650c")
       ++ mowerErrorNotify
-      ++ shelliesStatusUpdate
-      ++ optionals frigate.enable (frigateEntranceNotify ++ frigateCatNotify ++ frigateHighAlertNotify);
-
-    input_boolean.high_alert_surveillance = {
-      name = "High Alert Surveillance";
-      icon = "mdi:cctv";
-    };
+      ++ shelliesStatusUpdate;
   };
 }

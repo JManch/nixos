@@ -8,7 +8,6 @@
 let
   inherit (lib)
     mkIf
-    optional
     optionals
     singleton
     attrNames
@@ -21,7 +20,6 @@ let
     ;
   inherit (lib.${ns}) upperFirstChar;
   inherit (config.${ns}.services) frigate;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (secrets.general) people userIds peopleList;
   inherit (config.${ns}.services.hass) rooms;
 
@@ -678,89 +676,6 @@ let
     ];
   };
 
-  cctv = {
-    title = "CCTV";
-    path = "cctv";
-    type = "sections";
-    max_columns = 2;
-    subview = true;
-    sections = [
-      {
-        title = "Live Views";
-        type = "grid";
-        cards = map (camera: {
-          cameras = singleton {
-            camera_entity = "camera.${camera}";
-            frigate.url = "https://cctv.${fqDomain}";
-            live_provider = "go2rtc";
-            go2rtc.modes = [ (if frigate.webrtc.enable then "webrtc" else "mse") ];
-          };
-          live = {
-            show_image_during_load = true;
-            transition_effect = "none";
-          };
-          menu = {
-            style = "hover-card";
-            buttons = {
-              cameras.enabled = false;
-              expand.enabled = false;
-              fullscreen.enabled = true;
-              timeline.enabled = true;
-            };
-          };
-          performance.profile = "low";
-          type = "custom:frigate-card";
-        }) cameras;
-      }
-      {
-        title = "Last Seen";
-        type = "grid";
-        cards = map (camera: {
-          show_state = true;
-          show_name = false;
-          camera_view = "auto";
-          entity = "image.${camera}_person";
-          type = "picture-entity";
-          layout_options = {
-            grid_columns = 2;
-            grid_rows = "auto";
-          };
-        }) cameras;
-      }
-      {
-        title = "Settings";
-        type = "grid";
-        cards =
-          (singleton {
-            type = "tile";
-            entity = "input_boolean.high_alert_surveillance";
-            name = "High Alert Mode";
-            color = "red";
-            layout_options = {
-              grid_columns = 4;
-              grid_rows = 1;
-            };
-          })
-          ++ map (camera: {
-            type = "tile";
-            entity = "switch.${camera}_detect";
-          }) cameras;
-      }
-      {
-        title = "Debug";
-        type = "grid";
-        cards = map (camera: {
-          type = "tile";
-          entity = "binary_sensor.${camera}_motion";
-        }) cameras;
-        visibility = singleton {
-          condition = "user";
-          users = [ userIds.joshua ];
-        };
-      }
-    ];
-  };
-
   outside = {
     title = "Outside";
     path = "outside";
@@ -880,7 +795,6 @@ mkIf cfg.enableInternal {
           energy
           outside
         ]
-        ++ optional frigate.enable cctv
         ++ mapAttrsToList (_: roomCfg: roomCfg.lovelace.dashboard) (
           filterAttrs (_: v: v.lovelace.enable) rooms
         );

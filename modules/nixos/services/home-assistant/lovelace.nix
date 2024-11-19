@@ -783,21 +783,19 @@ let
   };
 in
 mkIf cfg.enableInternal {
-  services.home-assistant = {
-    lovelaceConfig = {
-      title = "Dashboard";
+  services.home-assistant.lovelaceConfig = {
+    title = "Dashboard";
 
-      views =
-        [
-          home
-          cfg.homeAnnouncements.lovelaceView
-          cfg.guineaPigs.lovelaceView
-          energy
-          outside
-        ]
-        ++ mapAttrsToList (_: roomCfg: roomCfg.lovelace.dashboard) (
-          filterAttrs (_: v: v.lovelace.enable) rooms
-        );
-    };
+    views =
+      [
+        home
+        cfg.homeAnnouncements.lovelaceView
+        cfg.guineaPigs.lovelaceView
+        energy
+        outside
+      ]
+      ++ mapAttrsToList (_: roomCfg: roomCfg.lovelace.dashboard) (
+        filterAttrs (_: v: v.lovelace.enable) rooms
+      );
   };
 }

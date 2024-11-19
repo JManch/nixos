@@ -87,14 +87,7 @@ let
   }) cameras;
 in
 mkIf frigate.enable {
-  services.home-assistant.config = {
-    automation = entranceNotify ++ highAlertNotify ++ catNotify;
-
-    input_boolean.high_alert_surveillance = {
-      name = "High Alert Surveillance";
-      icon = "mdi:cctv";
-    };
-
+  services.home-assistant = {
     lovelaceConfig.views = mkAfter (singleton {
       title = "CCTV";
       path = "cctv";
@@ -177,5 +170,14 @@ mkIf frigate.enable {
         }
       ];
     });
+
+    config = {
+      automation = entranceNotify ++ highAlertNotify ++ catNotify;
+
+      input_boolean.high_alert_surveillance = {
+        name = "High Alert Surveillance";
+        icon = "mdi:cctv";
+      };
+    };
   };
 }

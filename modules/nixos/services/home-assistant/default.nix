@@ -27,7 +27,6 @@ let
   inherit (lib.${ns})
     scanPaths
     asserts
-    upperFirstChar
     ;
   inherit (config.${ns}.services) frigate mosquitto caddy;
   inherit (config.age.secrets) mqttHassPassword mqttFaikinPassword;
@@ -152,6 +151,7 @@ in
         "mobile_app"
         "profiler"
         "isal" # https://www.home-assistant.io/integrations/isal
+        "local_file"
         "local_todo"
         "local_calendar"
         "generic_thermostat"
@@ -264,24 +264,6 @@ in
             "::1"
           ];
         };
-
-        camera = [
-          {
-            platform = "local_file";
-            file_path = "/var/lib/hass/media/lounge_floorplan.png";
-            name = "Lounge Floorplan";
-          }
-          {
-            platform = "local_file";
-            file_path = "/var/lib/hass/media/study_floorplan.png";
-            name = "Study Floorplan";
-          }
-          {
-            platform = "local_file";
-            file_path = "/var/lib/hass/media/${people.person3}_room_floorplan.png";
-            name = "${upperFirstChar people.person3} Room Floorplan";
-          }
-        ];
 
         lovelace.resources = [
           {

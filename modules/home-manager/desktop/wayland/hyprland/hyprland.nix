@@ -230,6 +230,8 @@ mkIf (isHyprland config) {
         background_color = "0x000000";
         new_window_takes_over_fullscreen = 2;
         enable_swallow = false;
+        # Otherwise it sometimes appears briefly during shutdown
+        lockdead_screen_delay = 10000;
       };
 
       render = {

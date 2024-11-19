@@ -14,9 +14,7 @@ let
     mapAttrs
     filterAttrs
     concatMap
-    splitString
     mapAttrsToList
-    concatMapStringsSep
     ;
   inherit (lib.${ns}) upperFirstChar;
   inherit (config.${ns}.services) frigate;
@@ -290,21 +288,7 @@ let
           entity = "person.${person}";
           state = "home";
         };
-      }) peopleList)
-      ++ (map (data: {
-        type = "entity";
-        display_type = "complete";
-        entity = "light.${data.light}";
-        name =
-          concatMapStringsSep " " (string: upperFirstChar string) (splitString "_" data.room)
-          + " Ceiling Lights";
-        icon = "mdi:lightbulb-alert";
-        visibility = singleton {
-          condition = "state";
-          entity = "light.${data.light}";
-          state = "unavailable";
-        };
-      }) cfg.ceilingLightRooms);
+      }) peopleList);
     sections = [
       {
         title = "";

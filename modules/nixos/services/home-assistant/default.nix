@@ -30,9 +30,7 @@ let
     ;
   inherit (config.${ns}.services) frigate mosquitto caddy;
   inherit (config.age.secrets) mqttHassPassword mqttFaikinPassword;
-  inherit (secrets.general) people;
   cfg = config.${ns}.services.hass;
-  secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
   cameras = attrNames config.services.frigate.settings.cameras;
 in
 {
@@ -50,31 +48,6 @@ in
     port = mkOption {
       type = types.port;
       default = 8123;
-    };
-
-    ceilingLightRooms = mkOption {
-      type = types.listOf types.attrs;
-      internal = true;
-      readOnly = true;
-      default = [
-        {
-          room = "joshua_room";
-          light = "joshua_bulb_ceiling";
-        }
-        {
-          room = "lounge";
-          light = "lounge_spot_ceiling_1";
-        }
-        {
-          room = "study";
-          light = "study_spot_ceiling_1";
-        }
-        {
-          room = "${people.person2}_room";
-          light = "${people.person2}_spot_ceiling_1";
-        }
-      ];
-      description = "Rooms with smart ceiling lights that should not be switched off";
     };
   };
 

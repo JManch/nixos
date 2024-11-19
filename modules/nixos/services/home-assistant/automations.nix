@@ -100,24 +100,6 @@ let
       ];
   };
 
-  lightsAvailabilityNotify = map (data: {
-    alias = (formattedRoomName data.room) + " Ceiling Lights Availability Notify";
-    mode = "single";
-    trigger = singleton {
-      platform = "state";
-      entity_id = [ "light.${data.light}" ];
-      to = "unavailable";
-      for.minutes = 1;
-    };
-    action = singleton {
-      action = "notify.mobile_app_${devices.joshua.name}";
-      data = {
-        title = "${formattedRoomName data.room} Lights Became Unavailable";
-        message = "Turn the switch back on";
-      };
-    };
-  }) cfg.ceilingLightRooms;
-
   mowerErrorNotify = singleton {
     alias = "Automower Error Notify";
     mode = "single";
@@ -328,7 +310,6 @@ mkIf cfg.enableInternal {
       binCollectionNotify
       ++ washingMachineNotify
       ++ formula1Notify
-      ++ lightsAvailabilityNotify
       ++ (hueLightSwitch "lounge" "12a188fc9e93182d852924b602153741")
       ++ (hueLightSwitch "study" "49d9c39a26397a8a228ee484114aca0b")
       # TODO: Need a new battery and a firmware update I think because the action names are different

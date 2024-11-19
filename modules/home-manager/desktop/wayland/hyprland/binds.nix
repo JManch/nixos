@@ -260,7 +260,7 @@ mkIf (isHyprland config) {
         "${modShiftCtrl}, I, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy window"}"
 
         # Workspaces other
-        "${mod}, N, workspace, previous"
+        "${mod}, N, workspace, previous_per_monitor"
         "${mod}, M, workspace, emptym"
         "${modShift}, M, exec, ${moveToNextEmpty}"
         "${modShiftCtrl}, M, movetoworkspacesilent, emptym"

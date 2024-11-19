@@ -314,8 +314,8 @@ mkIf cfg.enableInternal {
       ++ (hueLightSwitch "study" "49d9c39a26397a8a228ee484114aca0b")
       # TODO: Need a new battery and a firmware update I think because the action names are different
       # ++ (hueLightSwitch "joshua_room" "ad126eeb4153cd333afe86a9553c06ef")
-      ++ (hueTapLightSwitch "${people.person2}_room" "670ac1ecf423f069757c7ab30bec3142")
-      ++ (hueTapLightSwitch "${people.person3}_room" "0097121e144203512aeacef37a03650c")
+      ++ (hueTapLightSwitch "${people.person2}" "670ac1ecf423f069757c7ab30bec3142")
+      ++ (hueTapLightSwitch "${people.person3}" "0097121e144203512aeacef37a03650c")
       ++ mowerErrorNotify
       ++ shelliesStatusUpdate;
   };

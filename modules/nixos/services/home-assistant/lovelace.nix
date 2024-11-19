@@ -319,10 +319,10 @@ let
             (navigationButton "Lounge" "lounge" "mdi:sofa")
             (navigationButton "Study" "study" "mdi:chair-rolling")
             (navigationButton "Master" "master-bedroom" "mdi:bed-king")
-            (navigationButton "Joshua" "joshua-room" "mdi:bed")
-            (navigationButton "${upperPeople.person3}" "${people.person3}-room" "mdi:bed")
-            (navigationButton "${upperPeople.person2}" "${people.person2}-room" "mdi:bed")
-            (navigationButton "${upperPeople.person1}" "${people.person1}-room" "mdi:bed")
+            (navigationButton "Joshua" "joshua" "mdi:bed")
+            (navigationButton upperPeople.person3 people.person3 "mdi:bed")
+            (navigationButton upperPeople.person2 people.person2 "mdi:bed")
+            (navigationButton upperPeople.person1 people.person1 "mdi:bed")
           ];
       }
       {

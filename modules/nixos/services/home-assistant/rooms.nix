@@ -40,7 +40,6 @@ in
             formattedRoomName = mkOption {
               default = concatMapStringsSep " " (s: lib.${ns}.upperFirstChar s) (splitString "_" name);
               readOnly = true;
-              example = "Joshua Room";
             };
 
             deviceId = mkOption {
@@ -108,7 +107,7 @@ in
 
   config = {
     ${ns}.services.hass.rooms = {
-      joshua_room = {
+      joshua = {
         person = "joshua";
 
         climate = {
@@ -116,7 +115,7 @@ in
           humidity = "joshua_sensor_humidity";
 
           airConditioning = {
-            enable = false; # until I reinstall faikin
+            enable = true;
             id = "joshua_faikin_mqtt_hvac";
           };
         };
@@ -306,7 +305,7 @@ in
         };
       };
 
-      "${people.person1}_room" =
+      "${people.person1}" =
         let
           person = people.person1;
         in
@@ -341,7 +340,7 @@ in
           };
         };
 
-      "${people.person2}_room" =
+      "${people.person2}" =
         let
           person = people.person2;
         in
@@ -379,7 +378,7 @@ in
           };
         };
 
-      "${people.person3}_room" =
+      "${people.person3}" =
         let
           person = people.person3;
         in

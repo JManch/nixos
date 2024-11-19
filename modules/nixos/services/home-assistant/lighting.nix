@@ -220,7 +220,7 @@ in
             };
           };
 
-          config.lovelace.sections = singleton {
+          config.lovelace.sections = optional config.lighting.enable {
             title = "Lighting";
             priority = 1;
             type = "grid";
@@ -337,7 +337,7 @@ in
 
     services.home-assistant.config = mkMerge (
       mapAttrsToList (
-        roomId: roomCfg:
+        room: roomCfg:
         let
           inherit (roomCfg) formattedRoomName;
           inherit (roomCfg.sleepTracking)
@@ -361,12 +361,12 @@ in
                 };
                 condition = singleton {
                   condition = "state";
-                  entity_id = "input_boolean.${roomId}_wake_up_lights";
+                  entity_id = "input_boolean.${room}_wake_up_lights";
                   state = "on";
                 };
                 action = singleton {
                   action = "light.turn_on";
-                  target.entity_id = "light.${roomId}_lights";
+                  target.entity_id = "light.${room}_lights";
                 };
               }
               ++ optional cfg'.adaptiveLighting.enable {
@@ -381,7 +381,7 @@ in
                     }
                     {
                       platform = "state";
-                      entity_id = [ "input_number.${roomId}_sleep_duration" ];
+                      entity_id = [ "input_number.${room}_sleep_duration" ];
                       from = null;
                     }
                   ]
@@ -389,7 +389,7 @@ in
                     if (!useAlarm) then
                       singleton {
                         platform = "state";
-                        entity_id = [ "input_datetime.${roomId}_wake_up_time" ];
+                        entity_id = [ "input_datetime.${room}_wake_up_time" ];
                         from = null;
                       }
                     else
@@ -413,7 +413,7 @@ in
                       addFor:
                       singleton {
                         condition = "state";
-                        entity_id = "input_number.${roomId}_sleep_duration";
+                        entity_id = "input_number.${room}_sleep_duration";
                         state = "unavailable";
                       }
                       ++ singleton (
@@ -431,7 +431,7 @@ in
                         else
                           {
                             condition = "state";
-                            entity_id = "input_datetime.${roomId}_wake_up_time";
+                            entity_id = "input_datetime.${room}_wake_up_time";
                             state = "unavailable";
                           }
                       );
@@ -446,7 +446,7 @@ in
                         sequence = singleton {
                           action = "adaptive_lighting.change_switch_settings";
                           data = {
-                            entity_id = "switch.adaptive_lighting_${roomId}";
+                            entity_id = "switch.adaptive_lighting_${room}";
                             use_defaults = "current";
                             sunrise_time = "{{ ${wakeUpTimestamp} | timestamp_custom('%H:%M:%S') }}";
                             # Set sunset 1.5 hours before sleep time so that lights
@@ -463,7 +463,7 @@ in
                         sequence = singleton {
                           action = "adaptive_lighting.change_switch_settings";
                           data = {
-                            entity_id = "switch.adaptive_lighting_${roomId}";
+                            entity_id = "switch.adaptive_lighting_${room}";
                             use_defaults = "configuration";
                           };
                         };
@@ -472,7 +472,7 @@ in
                   };
               };
 
-            input_boolean."${roomId}_wake_up_lights" = {
+            input_boolean."${room}_wake_up_lights" = {
               name = "${formattedRoomName} Wake Up Lights";
               icon = "mdi:weather-sunset-up";
             };
@@ -480,10 +480,10 @@ in
 
           (mkIf cfg'.adaptiveLighting.enable {
             adaptive_lighting = singleton {
-              name = "${formattedRoomName} ";
+              name = formattedRoomName;
               lights =
                 if cfg'.adaptiveLighting.lights == null then
-                  [ "light.${roomId}_lights" ]
+                  [ "light.${room}_lights" ]
                 else
                   cfg'.adaptiveLighting.lights;
               min_brightness = cfg'.adaptiveLighting.minBrightness;
@@ -511,19 +511,19 @@ in
                 trigger = [
                   {
                     platform = "state";
-                    entity_id = [ "switch.adaptive_lighting_sleep_mode_${roomId}" ];
+                    entity_id = [ "switch.adaptive_lighting_sleep_mode_${room}" ];
                     from = null;
                   }
                   {
                     platform = "state";
-                    entity_id = [ "light.${roomId}_lights" ];
+                    entity_id = [ "light.${room}_lights" ];
                     to = "on";
                     id = "lights_on";
                   }
                 ];
                 condition = singleton {
                   condition = "state";
-                  entity_id = "switch.adaptive_lighting_${roomId}";
+                  entity_id = "switch.adaptive_lighting_${room}";
                   state = "on";
                 };
                 action = [
@@ -533,7 +533,7 @@ in
                       {
                         conditions = singleton {
                           condition = "state";
-                          entity_id = "switch.adaptive_lighting_sleep_mode_${roomId}";
+                          entity_id = "switch.adaptive_lighting_sleep_mode_${room}";
                           state = "on";
                         };
                         sequence = singleton {
@@ -547,12 +547,12 @@ in
                           conditions = [
                             {
                               condition = "state";
-                              entity_id = "switch.adaptive_lighting_sleep_mode_${roomId}";
+                              entity_id = "switch.adaptive_lighting_sleep_mode_${room}";
                               state = "off";
                             }
                             {
                               condition = "state";
-                              entity_id = "light.${roomId}_lights";
+                              entity_id = "light.${room}_lights";
                               state = "on";
                             }
                             {
@@ -597,7 +597,7 @@ in
                     }
                     {
                       platform = "state";
-                      entity_id = [ "input_number.${roomId}_sleep_duration" ];
+                      entity_id = [ "input_number.${room}_sleep_duration" ];
                       from = null;
                     }
                   ]
@@ -611,13 +611,13 @@ in
                     else
                       {
                         platform = "state";
-                        entity_id = [ "input_datetime.${roomId}_wake_up_time" ];
+                        entity_id = [ "input_datetime.${room}_wake_up_time" ];
                         from = null;
                       }
                   );
                 condition = singleton {
                   condition = "state";
-                  entity_id = "switch.adaptive_lighting_${roomId}";
+                  entity_id = "switch.adaptive_lighting_${room}";
                   state = "on";
                 };
                 action = singleton {
@@ -633,7 +633,7 @@ in
                         };
                         sequence = singleton {
                           action = "switch.turn_on";
-                          target.entity_id = "switch.adaptive_lighting_sleep_mode_${roomId}";
+                          target.entity_id = "switch.adaptive_lighting_sleep_mode_${room}";
                         };
                       }
                       {
@@ -643,7 +643,7 @@ in
                         };
                         sequence = singleton {
                           action = "switch.turn_off";
-                          target.entity_id = "switch.adaptive_lighting_sleep_mode_${roomId}";
+                          target.entity_id = "switch.adaptive_lighting_sleep_mode_${room}";
                         };
                       }
                     ];
@@ -685,7 +685,7 @@ in
                     conditions = [
                       {
                         condition = "state";
-                        entity_id = "light.${roomId}_lights";
+                        entity_id = "light.${room}_lights";
                         state = "off";
                       }
                       (solarCondition true)
@@ -710,7 +710,7 @@ in
                   };
                   "then" = singleton {
                     action = "light.turn_on";
-                    target.entity_id = "light.${roomId}_lights";
+                    target.entity_id = "light.${room}_lights";
                   };
                   "else" = [
                     # It's important to delay before checking conditions as
@@ -722,7 +722,7 @@ in
                         conditions = [
                           {
                             condition = "state";
-                            entity_id = "light.${roomId}_lights";
+                            entity_id = "light.${room}_lights";
                             state = "on";
                           }
                           {
@@ -759,7 +759,7 @@ in
                       };
                       "then" = singleton {
                         action = "light.turn_off";
-                        target.entity_id = "light.${roomId}_lights";
+                        target.entity_id = "light.${room}_lights";
                       };
                     }
                   ];

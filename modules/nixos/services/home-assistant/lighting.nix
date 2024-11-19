@@ -656,7 +656,7 @@ in
               alias = "${formattedRoomName} Lights Toggle";
               trace.stored_traces = 5;
               mode = "queued";
-              trigger = [
+              triggers = [
                 {
                   platform = "numeric_state";
                   entity_id = [ "sensor.smoothed_solar_power" ];
@@ -670,12 +670,7 @@ in
                   id = "solar";
                 }
               ] ++ cfg'.automatedToggle.presenceTriggers;
-              condition = singleton {
-                condition = "numeric_state";
-                entity_id = "sensor.${roomCfg.deviceId}_sleep_confidence";
-                below = 90;
-              };
-              action =
+              actions =
                 let
                   solarCondition = below: {
                     condition = "numeric_state";
@@ -694,6 +689,23 @@ in
                         state = "off";
                       }
                       (solarCondition true)
+                      {
+                        condition = "or";
+                        conditions = [
+                          {
+                            condition = "not";
+                            conditions = singleton {
+                              condition = "trigger";
+                              id = [ "solar" ];
+                            };
+                          }
+                          {
+                            condition = "numeric_state";
+                            entity_id = "sensor.${roomCfg.deviceId}_sleep_confidence";
+                            below = 90;
+                          }
+                        ];
+                      }
                     ] ++ cfg'.automatedToggle.presenceConditions;
                   };
                   "then" = singleton {
@@ -723,6 +735,23 @@ in
                                   condition = "trigger";
                                   id = [ "solar" ];
                                 };
+                              }
+                            ];
+                          }
+                          {
+                            condition = "or";
+                            conditions = [
+                              {
+                                condition = "not";
+                                conditions = singleton {
+                                  condition = "trigger";
+                                  id = [ "solar" ];
+                                };
+                              }
+                              {
+                                condition = "numeric_state";
+                                entity_id = "sensor.${roomCfg.deviceId}_sleep_confidence";
+                                below = 90;
                               }
                             ];
                           }

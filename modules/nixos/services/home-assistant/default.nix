@@ -157,6 +157,7 @@ in
         "generic_thermostat"
         "generic_hygrostat"
         "mold_indicator"
+        "history_stats"
         "webostv"
         "powerwall"
         "co2signal"

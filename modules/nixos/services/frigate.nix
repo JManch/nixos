@@ -132,7 +132,14 @@ mkIf cfg.enable {
           zones.entrance.coordinates = "0.535,0.177,0.569,0.233,0.411,0.256,0.405,0.191";
           zones.entrance.inertia = 1;
           review.alerts.required_zones = [ "entrance" ];
-          objects.filters.car.mask = [ "648,0,648,46,419,51,411,120,647,249,1024,576,0,576,0,0" ];
+
+          # I feel like this zone shouldn't be necessary as I'd expect all
+          # events in non-alert zones to be treated as detections but
+          # detections don't work without this...
+          zones.driveway-zone.coordinates = "0,0.063,0.41,0.253,0.569,0.229,1,0.088,1,1,0,1";
+          review.detections.required_zones = [ "driveway-zone" ];
+
+          objects.filters.car.mask = [ "0.633,0,0.633,0.08,0.409,0.089,0.406,0.28,0.621,0.479,1,1,0,1,0,0" ];
         };
 
         poolhouse = {
@@ -157,8 +164,8 @@ mkIf cfg.enable {
             "1024,0,1024,445,994,411,981,309,951,262,860,252,752,249,749,305,811,313,810,408,661,496,537,492,282,456,0,453,0,0"
           ];
 
-          # Disable alerts on this camera
-          review.alerts.labels = [ ];
+          # Only alert for cats on this camera
+          review.alerts.labels = [ "cat" ];
           objects.filters.car.mask = [ "1024,576,0,576,0,306,1024,316" ];
         };
       };
@@ -173,6 +180,12 @@ mkIf cfg.enable {
         width = 1024; # The source cam is 704 but we stretch it
         height = 576;
       };
+
+      review.alerts.labels = [
+        "person"
+        "car"
+        "cat"
+      ];
 
       objects.track = [
         "person"

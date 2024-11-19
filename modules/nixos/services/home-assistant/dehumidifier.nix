@@ -137,12 +137,6 @@ in
           {
             sensor = [
               {
-                name = "${formattedRoomName} Dehumidifier Running";
-                icon = "mdi:water";
-                state = "{{ is_state('switch.${switchId}', 'on') and is_state('binary_sensor.${room}_dehumidifier_tank_full', 'off') }}";
-              }
-
-              {
                 name = "${formattedRoomName} Critical Temperature";
                 icon = "mdi:thermometer-alert";
                 state = "{{ state_attr('sensor.${room}_mold_indicator', 'estimated_critical_temp') }}";
@@ -155,11 +149,17 @@ in
                 icon = "mdi:gauge";
                 state = ''
                   {% set runtime = states('sensor.${room}_dehumidifier_runtime') | float(0) %}
-                  {% set fill_time = states('sensor.${room}_dehumidifier_fill_time') | float(108000) %}
+                  {% set fill_time = states('sensor.${room}_dehumidifier_fill_time') | float(30) %}
                   {{ (runtime / fill_time * 100) | round(1) }}
                 '';
               }
             ];
+            binary_sensor = singleton {
+              name = "${formattedRoomName} Dehumidifier Running";
+              icon = "mdi:water";
+              state = "{{ is_state('switch.${switchId}', 'on') and is_state('binary_sensor.${room}_dehumidifier_full', 'off') }}";
+              device_class = "running";
+            };
           }
           {
             trigger = singleton {
@@ -225,7 +225,7 @@ in
           {
             name = "${formattedRoomName} Dehumidifier Runtime";
             platform = "history_stats";
-            entity_id = "sensor.${room}_dehumidifier_running";
+            entity_id = "binary_sensor.${room}_dehumidifier_running";
             state = "on";
             type = "time";
             start = "{{ states('sensor.${room}_dehumidifier_last_emptied') | float(0) }}";

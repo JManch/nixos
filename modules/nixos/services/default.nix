@@ -185,6 +185,16 @@ in
           to media dir and value is absolute source dir.
         '';
       };
+
+      jellyseerr = {
+        enable = mkEnableOption "Jellyseerr behind a reverse proxy";
+
+        port = mkOption {
+          type = types.port;
+          default = 5055;
+          description = "Jellyseerr listening port";
+        };
+      };
     };
 
     ollama = {
@@ -546,13 +556,16 @@ in
       };
     };
 
-    qbittorrent-nox = {
-      enable = mkEnableOption "headless qBittorrent client";
-
-      port = mkOption {
-        type = types.port;
-        default = 8087;
-        description = "Listen port of the qBittorrent web GUI";
+    torrent-stack = {
+      enable = mkEnableOption "Torrent stack using arr services";
+      mediaDir = mkOption {
+        type = types.str;
+        default = "/data/media";
+        description = ''
+          Absolute path to persistent directory where torrent downloads and
+          media library will be stored. Will not be bind mounted or modified if
+          impermanence is enabled.
+        '';
       };
     };
 

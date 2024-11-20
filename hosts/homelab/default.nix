@@ -193,17 +193,13 @@ in
         openFirewall = false;
         autoStart = true;
         reverseProxy.enable = true;
+        jellyseerr.enable = true;
 
         # Google TV on guest VLAN
         reverseProxy.extraAllowedAddresses = with wireguard.friends; [
           "10.30.30.6/32"
           "${address}/${toString subnet}"
         ];
-
-        mediaDirs = {
-          shows = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/shows";
-          movies = "/var/lib/qbittorrent-nox/qBittorrent/downloads/jellyfin/movies";
-        };
       };
 
       beammp-server = {

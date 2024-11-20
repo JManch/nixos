@@ -21,6 +21,7 @@ let
     attrValues
     mapAttrsToList
     optionalString
+    singleton
     length
     hasPrefix
     splitString
@@ -29,7 +30,7 @@ let
   inherit (lib.${ns}) asserts;
   inherit (config.${ns}.system.networking) publicPorts;
   inherit (config.${ns}.system) impermanence;
-  inherit (config.${ns}.services) caddy;
+  inherit (config.${ns}.services) caddy torrent-stack;
   inherit (config.services) jellyfin;
   cfg = config.${ns}.services.jellyfin;
   uid = 1500;
@@ -138,6 +139,44 @@ mkMerge [
       extraConfig = ''
         reverse_proxy http://${cfg.reverseProxy.address}:8096
       '';
+    };
+  })
+
+  (mkIf cfg.jellyseerr.enable {
+    assertions = asserts [
+      (cfg.enable && torrent-stack.enable)
+      "Jellyseerr requires Jellyfin and the Torrent stack to be enabled"
+    ];
+
+    users.groups.jellyseerr = { };
+    users.users.jellyseerr = {
+      group = "jellyseerr";
+      isSystemUser = true;
+    };
+
+    services.jellyseerr = {
+      enable = jellyfin.enable;
+      openFirewall = false;
+      port = cfg.jellyseerr.port;
+    };
+
+    systemd.services.jellyseerr = {
+      serviceConfig = {
+        User = "jellyseerr";
+        Group = "jellyseerr";
+        SupplementaryGroups = [ "media" ];
+      };
+    };
+
+    ${ns}.services.caddy.virtualHosts.jellyseerr.extraConfig = ''
+      reverse_proxy http://127.0.0.1:${toString cfg.jellyseerr.port}
+    '';
+
+    persistence.directories = singleton {
+      directory = "/var/lib/private/jellyseerr";
+      user = "jellyseerr";
+      group = "jellyseerr";
+      mode = "0750";
     };
   })
 ]

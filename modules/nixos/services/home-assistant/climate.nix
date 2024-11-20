@@ -148,7 +148,7 @@ in
               {
                 name = "Automatically Toggle";
                 type = "tile";
-                entity = "input_boolean.central_heating_enabled";
+                entity = "input_boolean.central_heating_toggle_enable";
                 grid_options.columns = 12;
                 grid_options.rows = 1;
               }
@@ -242,21 +242,16 @@ in
             at = "input_datetime.central_heating_disable_time";
           }
         ];
+        conditions = singleton {
+          condition = "state";
+          entity_id = "input_boolean.central_heating_toggle_enable";
+          state = "on";
+        };
         actions = singleton {
           "if" = singleton {
-            condition = "and";
-            conditions = [
-              {
-                condition = "time";
-                after = "input_datetime.central_heating_enable_time";
-                before = "input_datetime.central_heating_disable_time";
-              }
-              {
-                condition = "state";
-                entity_id = "input_boolean.central_heating_enabled";
-                state = "on";
-              }
-            ];
+            condition = "time";
+            after = "input_datetime.central_heating_enable_time";
+            before = "input_datetime.central_heating_disable_time";
           };
           "then" = singleton {
             action = "climate.turn_on";
@@ -281,8 +276,8 @@ in
         };
       };
 
-      input_boolean.central_heating_enabled = {
-        name = "Central Heating Enabled";
+      input_boolean.central_heating_toggle_enable = {
+        name = "Central Heating Toggle Enable";
         icon = "mdi:heating-coil";
       };
     };

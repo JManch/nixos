@@ -13,11 +13,11 @@ mkIf cfg.enable {
   services.factorio = {
     enable = true;
     package = pkgs.factorio-headless.overrideAttrs rec {
-      version = "2.0.15";
+      version = "2.0.20";
       src = pkgs.fetchurl {
         name = "factorio_headless_x64-${version}.tar.xz";
         url = "https://factorio.com/get-download/${version}/headless/linux64";
-        hash = "sha256-cLRBy4B4EaYFhsARBySMHY164EO9HyNnX8kk+6qlONg=";
+        hash = "sha256-xKkB8vHb7btBZUVg20xvq2g6MMIDNOgF1O90DAQWUVo=";
       };
     };
     requireUserVerification = false;

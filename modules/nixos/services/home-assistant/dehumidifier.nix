@@ -110,6 +110,7 @@ in
                 graph = "line";
                 entity = "sensor.${name}_dehumidifier_tank_level";
                 name = "Tank Level";
+                detail = 2;
                 grid_options.columns = 12;
                 grid_options.rows = 2;
               }
@@ -162,25 +163,46 @@ in
             };
           }
           {
-            trigger = singleton {
-              platform = "state";
-              entity_id = "switch.${switchId}";
-              to = "on";
-              for.minutes = 2;
-            };
+            trigger = [
+              {
+                platform = "state";
+                entity_id = "switch.${switchId}";
+                to = "on";
+                for.minutes = 2;
+              }
+              {
+                platform = "numeric_state";
+                entity_id = "sensor.${powerId}";
+                below = 1;
+                for.seconds = 10;
+              }
+              {
+                platform = "numeric_state";
+                entity_id = "sensor.${powerId}";
+                above = 1;
+                for.seconds = 10;
+              }
+            ];
 
             binary_sensor = singleton {
               name = "${formattedRoomName} Dehumidifier Full";
               icon = "mdi:gauge-full";
-              state = "{{ states('sensor.${powerId}') | float == 0 }}";
+              state = ''
+                {## Should only update the full state if the switch is on ##}
+                {% if is_state('switch.${switchId}', 'on') %}
+                  states('sensor.${powerId}') | float == 0
+                {% else %}
+                  states('binary_sensor.${room}_dehumidifier_full')
+                {% endif %}
+              '';
             };
           }
           {
             trigger = singleton {
               platform = "state";
               entity_id = "binary_sensor.${room}_dehumidifier_full";
-              from = "on";
-              to = "off";
+              from = "off";
+              to = "on";
             };
 
             sensor = singleton {
@@ -195,9 +217,6 @@ in
               entity_id = "binary_sensor.${room}_dehumidifier_full";
               from = "on";
               to = "off";
-              # To make sure it runs after the fill time sensor above triggers
-              # as this will reset the runtime
-              for.seconds = 30;
             };
 
             sensor = singleton {
@@ -229,7 +248,7 @@ in
             state = "on";
             type = "time";
             start = "{{ states('sensor.${room}_dehumidifier_last_emptied') | float(0) }}";
-            end = "{{ now() }}";
+            end = "{{ now().timestamp() }}";
           }
         ];
 
@@ -283,8 +302,8 @@ in
             actions = singleton {
               action = "notify.mobile_app_${deviceId}";
               data = {
-                title = "Dehumidifier";
-                message = "Tank full";
+                title = "${formattedRoomName} Dehumidifier";
+                message = "Tank full after {{ states('sensor.${room}_dehumidifier_runtime') }} hours of runtime";
                 data = {
                   channel = "Dehumidifier";
                   importance = "high";

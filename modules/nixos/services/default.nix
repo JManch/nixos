@@ -345,9 +345,9 @@ in
       };
     };
 
-    dns-server-stack = {
+    dns-stack = {
       enable = mkEnableOption ''
-        a DNS server stack using Ctrld and dnsmasq. Intended for use on server
+        a DNS stack using Ctrld and dnsmasq. Intended for use on server
         devices to provide DNS services on a network.
       '';
       enableIPv6 = mkEnableOption "IPv6 DNS responses";

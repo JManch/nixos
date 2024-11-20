@@ -31,7 +31,7 @@ let
   inherit (lib.${ns}) addPatches asserts hardeningBaseline;
   inherit (inputs.nix-resources.secrets) oldFqDomain fqDomain;
   inherit (config.${ns}.system.virtualisation) vmVariant;
-  cfg = config.${ns}.services.dns-server-stack;
+  cfg = config.${ns}.services.dns-stack;
 
   # Declares hostnames for all devices on my local network
   homeHosts =
@@ -48,11 +48,11 @@ in
 mkIf cfg.enable {
   assertions = asserts [
     (config.${ns}.device.type == "server")
-    "DNS server stack can only be used on server devices"
+    "DNS stack can only be used on server devices"
     (config.${ns}.device.ipAddress != null)
-    "The DNS server stack requires the device to have a static IP address set"
+    "The DNS stack requires the device to have a static IP address set"
     (cfg.routerAddress != "")
-    "The DNS server stack requires the device to have a router IP address set"
+    "The DNS stack requires the device to have a router IP address set"
   ];
 
   users.users.ctrld = {
@@ -178,7 +178,7 @@ mkIf cfg.enable {
     # Disable systemd-resolved to simplify DNS stack
     system.networking.resolved.enable = mkForce false;
 
-    services.dns-server-stack = {
+    services.dns-stack = {
       dnsmasqConfig = {
         port = cfg.listenPort;
         log-queries = cfg.debug || vmVariant;

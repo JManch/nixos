@@ -60,7 +60,7 @@ let
     substring
     mkMerge
     ;
-  inherit (config.${ns}.services) dns-server-stack;
+  inherit (config.${ns}.services) dns-stack;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (lib.${ns}) asserts;
   interfaces = config.${ns}.services.wireguard;
@@ -95,8 +95,8 @@ in
       asserts [
         (config.age.secrets."wg-${interface}-key" != null)
         "A private key secret for Wireguard VPN interface '${interface}' is missing"
-        (cfg.dns.host -> dns-server-stack.enable)
-        "The DNS server stack must be enabled on this host to allow VPN DNS hosting"
+        (cfg.dns.host -> dns-stack.enable)
+        "The DNS stack must be enabled on this host to allow VPN DNS hosting"
         (cfg.routerPeer -> (cfg.routerAllowedIPs != [ ]))
         ''
           The `routerAllowedIPs` list for Wireguard VPN interface ${interface}
@@ -176,8 +176,8 @@ in
       mkIf (cfg.enable && cfg.dns.host) {
         "dnsmasq-wg-${interface}" =
           let
-            # Use dns-server-stack dnsmsaq config as baseline
-            settings = dns-server-stack.dnsmasqConfig // {
+            # Use dns-stack dnsmsaq config as baseline
+            settings = dns-stack.dnsmasqConfig // {
               port = cfg.dns.port;
 
               address = [
@@ -190,7 +190,7 @@ in
               ) inputs.nix-resources.secrets.wireguardHosts.${interface};
             };
 
-            configFile = dns-server-stack.generateDnsmasqConfig "dnsmasq-wg-${interface}.conf" settings;
+            configFile = dns-stack.generateDnsmasqConfig "dnsmasq-wg-${interface}.conf" settings;
             dnsmasq = getExe pkgs.dnsmasq;
             baseline = config.systemd.services.dnsmasq;
           in

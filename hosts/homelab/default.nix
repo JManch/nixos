@@ -93,7 +93,7 @@ in
         mediaDir = "/persist/media";
       };
 
-      dns-server-stack = {
+      dns-stack = {
         enable = true;
         routerAddress = "192.168.88.1";
         enableIPv6 = false;

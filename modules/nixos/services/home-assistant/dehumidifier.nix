@@ -84,7 +84,7 @@ in
                 name = "Tank Full";
                 visibility = singleton {
                   condition = "state";
-                  entity = "sensor.${name}_dehumidifier_full";
+                  entity = "binary_sensor.${name}_dehumidifier_full";
                   state = "on";
                 };
                 hide_state = true;
@@ -190,9 +190,9 @@ in
               state = ''
                 {## Should only update the full state if the switch is on ##}
                 {% if is_state('switch.${switchId}', 'on') %}
-                  states('sensor.${powerId}') | float == 0
+                  {{ states('sensor.${powerId}') | float == 0 }}
                 {% else %}
-                  states('binary_sensor.${room}_dehumidifier_full')
+                  {{ states('binary_sensor.${room}_dehumidifier_full') }}
                 {% endif %}
               '';
             };
@@ -208,7 +208,8 @@ in
             sensor = singleton {
               name = "${formattedRoomName} Dehumidifier Fill Time";
               icon = "mdi:timer";
-              state = "{{ states('${room}_dehumidifier_runtime') }}";
+              state = "{{ states('sensor.${room}_dehumidifier_runtime') }}";
+              unit_of_measurement = "h";
             };
           }
           {

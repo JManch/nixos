@@ -124,6 +124,8 @@ in
           enable = true;
           switchId = "joshua_dehumidifier";
           calibrationFactor = 1.754;
+          thresholds.upper = 88;
+          thresholds.lower = 80;
         };
 
         sleepTracking = {

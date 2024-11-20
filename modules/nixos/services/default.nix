@@ -562,9 +562,8 @@ in
         type = types.str;
         default = "/data/media";
         description = ''
-          Absolute path to persistent directory where torrent downloads and
-          media library will be stored. Will not be bind mounted or modified if
-          impermanence is enabled.
+          Absolute path to directory where torrent downloads and media library
+          will be stored.
         '';
       };
     };

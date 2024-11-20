@@ -90,7 +90,7 @@ in
 
       torrent-stack = {
         enable = true;
-        mediaDir = "/persist/media";
+        mediaDir = "/media";
       };
 
       dns-stack = {

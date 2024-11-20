@@ -13,16 +13,19 @@ let
     getExe
     getExe'
     head
+    hasPrefix
     genAttrs
     stringToCharacters
+    optionalString
     singleton
     ;
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (config.${ns}.services) caddy jellyfin;
+  inherit (config.${ns}.system) impermanence;
   inherit (inputs.nix-resources.secrets) qBittorrentPort;
   inherit (config.${ns}.device) vpnNamespace;
-  inherit (cfg) mediaDir;
   cfg = config.${ns}.services.torrent-stack;
+  mediaDir = (optionalString impermanence.enable "/persist") + cfg.mediaDir;
 
   # Arr config is very imperative so these have to be hardcoded
   ports = {
@@ -36,12 +39,16 @@ mkIf cfg.enable {
   assertions = asserts [
     caddy.enable
     "Torrent stack requires Caddy to be enabled"
-    (head (stringToCharacters mediaDir) == "/")
-    "Media dir must be an absolute path to persistent storage"
+    (head (stringToCharacters cfg.mediaDir) == "/")
+    "Torrent stack media dir must be an absolute path"
+    (!hasPrefix "/persist" cfg.mediaDir)
+    "Torrent stack media dir should NOT be prefixed with /persist"
   ];
 
   systemd.tmpfiles.rules = [
     "d ${mediaDir} 0750 root media - -"
+    # Torrents are downloaded and seeded here. They are hardlinked by the
+    # relevant arr service to a media dir.
     "d ${mediaDir}/torrents 0775 root media - -"
     "d ${mediaDir}/movies 0775 root media - -"
     "d ${mediaDir}/shows 0775 root media - -"

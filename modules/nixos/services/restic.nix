@@ -15,6 +15,7 @@ let
     mkMerge
     all
     elem
+    hasPrefix
     mapAttrs
     mapAttrsToList
     getExe
@@ -282,10 +283,14 @@ mkMerge [
       (all (v: v == true) (
         mapAttrsToList (
           _: backup:
-          all (v: v == true) (map (path: elem path backup.paths) (attrNames backup.restore.pathOwnership))
+          all (v: v == true) (
+            map (path: (elem path backup.paths) || (all (p: hasPrefix path p) backup.paths)) (
+              attrNames backup.restore.pathOwnership
+            )
+          )
         ) backups
       ))
-      "Restic pathOwnership paths must also be defined as backup paths"
+      "Restic pathOwnership paths must be a part of the backup paths"
       (all (v: v == true) (
         mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "") backup.paths)) cfg.backups
       ))

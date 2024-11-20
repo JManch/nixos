@@ -59,11 +59,9 @@ mkIf cfg.enable {
 
   backups.satisfactory = {
     paths = [ "/var/lib/satisfactory-server/.config/Epic/FactoryGame/Saved/SaveGames" ];
-    restore.pathOwnership = {
-      "/var/lib/satisfactory-server/.config/Epic/FactoryGame/Saved/SaveGames" = {
-        user = "satisfactory";
-        group = "satisfactory";
-      };
+    restore.pathOwnership."/var/lib/satisfactory-server" = {
+      user = "satisfactory";
+      group = "satisfactory";
     };
   };
 

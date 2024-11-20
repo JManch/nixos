@@ -247,7 +247,7 @@ mkIf cfg.enable {
 
           restore = {
             removeExisting = false;
-            pathOwnership.${configPath} = {
+            pathOwnership."/var/lib/qbittorrent-nox" = {
               user = "qbittorrent-nox";
               group = "qbittorrent-nox";
             };
@@ -262,7 +262,7 @@ mkIf cfg.enable {
       ]
       (service: {
         paths = [ "/var/lib/${service}/Backups" ];
-        restore.pathOwnership."/var/lib/${service}/Backups" = {
+        restore.pathOwnership."/var/lib/${service}" = {
           user = service;
           group = service;
         };

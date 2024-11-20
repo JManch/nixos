@@ -73,8 +73,10 @@ mkIf cfg.enable {
       User = "qbittorrent-nox";
       Group = "qbittorrent-nox";
       SupplementaryGroups = [ "media" ];
-      # Downloaded files need 0770 so media group can write
-      UMask = "0002";
+      # Downloaded files need read+write permissions for all users so that
+      # sonarr and radarr can create hard links. File access should still be
+      # protected by parent media dir.
+      UMask = "0000";
       StateDirectory = "qbittorrent-nox";
       StateDirectoryMode = "750";
       ReadWritePaths = mediaDir;

@@ -88,16 +88,9 @@
           options.mountpoint = "legacy";
         };
 
-        "homelab-nixos/persist/torrents-tmp" = {
+        "homelab-nixos/persist/media" = {
           type = "zfs_fs";
-          mountpoint = "/persist/var/lib/qbittorrent-nox/qBittorrent/downloads-tmp";
-          options.mountpoint = "legacy";
-          options.recordsize = "16k";
-        };
-
-        "homelab-nixos/persist/torrents" = {
-          type = "zfs_fs";
-          mountpoint = "/persist/var/lib/qbittorrent-nox/qBittorrent/downloads";
+          mountpoint = "/persist/media";
           options.mountpoint = "legacy";
           options.recordsize = "1M";
         };
@@ -119,13 +112,14 @@
     };
   };
 
-  # Need to mount these after the impermanence bind mount as impermanence does
-  # not use rbind. This is only necessary for mountpoints that are subdirs of
-  # impermanence bind mounts.
-  fileSystems = {
-    "/persist/var/lib/qbittorrent-nox/qBittorrent/downloads".depends = [ "/var/lib/qbittorrent-nox" ];
-    "/persist/var/lib/qbittorrent-nox/qBittorrent/downloads-tmp".depends = [
-      "/var/lib/qbittorrent-nox"
-    ];
-  };
+  # WARN: If a mountpoint is a subdir of an impermanence bind mount, it must be
+  # ordered after the impermanance bind mount as impermanence does not use
+  # rbind. An example from an old mountpoint I no longer use:
+
+  # fileSystems = {
+  #   "/persist/var/lib/qbittorrent-nox/qBittorrent/downloads".depends = [ "/var/lib/qbittorrent-nox" ];
+  #   "/persist/var/lib/qbittorrent-nox/qBittorrent/downloads-tmp".depends = [
+  #     "/var/lib/qbittorrent-nox"
+  #   ];
+  # };
 }

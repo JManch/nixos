@@ -50,7 +50,6 @@ in
       hass.enable = true;
       unifi.enable = true;
       mosquitto.enable = true;
-      qbittorrent-nox.enable = true;
       mikrotik-backup.enable = true;
       index-checker.enable = false;
       fail2ban.enable = true;
@@ -87,6 +86,11 @@ in
           "192.168.89.2"
           "192.168.88.0-192.168.88.255"
         ];
+      };
+
+      torrent-stack = {
+        enable = true;
+        mediaDir = "/persist/media";
       };
 
       dns-server-stack = {

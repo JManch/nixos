@@ -22,7 +22,7 @@ let
     singleton
     concatStringsSep
     ;
-  inherit (lib.${ns}) flakePkgs;
+  inherit (lib.${ns}) flakePkgs sshAddQuiet;
   inherit (config.${ns}.system) impermanence;
   cfg = config.${ns}.core;
   configDir = "/home/${adminUsername}/.config/nixos";
@@ -194,6 +194,7 @@ let
           else
             optionalString (cmd != "build") # bash
               ''
+                ${sshAddQuiet args}
                 nixos-rebuild ${cmd} ${optionalString (cmd != "boot") "--fast"} \
                   --use-remote-sudo --flake "$flake#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
               ''

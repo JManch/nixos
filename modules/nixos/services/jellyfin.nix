@@ -28,7 +28,6 @@ let
     all
     ;
   inherit (lib.${ns}) asserts;
-  inherit (config.${ns}.system.networking) publicPorts;
   inherit (config.${ns}.system) impermanence;
   inherit (config.${ns}.services) caddy torrent-stack;
   inherit (config.services) jellyfin;
@@ -61,10 +60,7 @@ mkMerge [
     users.users.jellyfin.uid = uid;
     users.groups.jellyfin.gid = gid;
 
-    systemd.services.jellyfin = {
-      wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
-      serviceConfig.SocketBindDeny = publicPorts;
-    };
+    systemd.services.jellyfin.wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
 
     systemd.mounts = mapAttrsToList (target: source: {
       what = (optionalString impermanence.enable "/persist") + source;

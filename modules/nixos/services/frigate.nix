@@ -15,7 +15,6 @@ let
     ;
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (config.${ns}.device) ipAddress;
-  inherit (config.${ns}.system.networking) publicPorts;
   inherit (config.${ns}.services) hass mosquitto caddy;
   inherit (config.age.secrets) cctvVars mqttFrigatePassword;
   cfg = config.${ns}.services.frigate;
@@ -218,11 +217,6 @@ mkIf cfg.enable {
     DeviceAllow = [ ];
     UMask = "0027";
     EnvironmentFile = cctvVars.path;
-  };
-
-  # Nginx upstream module has good systemd hardening
-  systemd.services.nginx.serviceConfig = {
-    SocketBindDeny = publicPorts;
   };
 
   # We just use go2rtc to provide a low latency WebRTC stream. It is lazy so

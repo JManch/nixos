@@ -21,7 +21,6 @@ let
     hiPrio
     length
     getExe'
-    allUnique
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.${ns}.system) desktop;
@@ -36,8 +35,6 @@ in
     "Wired networking interface must be set"
     ((cfg.staticIPAddress != null) -> (cfg.defaultGateway != null))
     "Default gateway must be set when using a static IPV4 address"
-    (allUnique cfg.publicPorts)
-    "`networking.publicPorts` contains duplicate ports"
     (vlanIds != [ ] -> cfg.useNetworkd)
     "VLAN config only works with networkd"
     (length vlanIds <= 10)

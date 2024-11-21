@@ -245,7 +245,6 @@ in
         CapabilityBoundingSet = "";
         AmbientCapabilities = "";
         DeviceAllow = "";
-        SocketBindDeny = config.${ns}.system.networking.publicPorts;
         MemoryDenyWriteExecute = true;
         UMask = "0077";
       }

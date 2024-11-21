@@ -29,13 +29,6 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
   programs.firefox = {
     enable = true;
 
-    # Ideally we would make the sync service a strict dependency of
-    # graphical-session.target to ensure that firefox cannot be launched before
-    # the sync has finished (if firefox launches it creates files and breaks
-    # the sync). However, I don't want graphical-session.target to be delayed
-    # ~10 secs every boot until the sync finishes. Instead, I wrap the firefox
-    # package to prevent launch unless sync has finished. That way I can use
-    # other applications until firefox is ready.
     package = mkIf cfg.runInRam (
       # Can't use pkgs.symlinkJoin here because home-manager wraps this package
       pkgs.firefox.overrideAttrs (old: {
@@ -241,6 +234,14 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
 
   # Use systemd to synchronise Firefox data with persistent storage. Allows for
   # running Firefox on tmpfs with improved performance.
+
+  # Ideally we would make the sync service a strict dependency of
+  # graphical-session.target to ensure that firefox cannot be launched before
+  # the sync has finished (if firefox launches it creates files and breaks
+  # the sync). However, I don't want graphical-session.target to be delayed
+  # ~10 secs every boot until the sync finishes. Instead, I wrap the firefox
+  # package to prevent launch unless sync has finished. That way I can use
+  # other applications until firefox is ready.
   systemd.user =
     let
       rsync = getExe pkgs.rsync;

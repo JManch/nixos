@@ -142,30 +142,29 @@ in
 
       customComponents =
         [
-          (pkgs.home-assistant-custom-components.miele.overrideAttrs {
-            src = pkgs.fetchFromGitHub {
-              owner = "astrandb";
-              repo = "miele";
-              rev = "refs/tags/v2024.8.1";
-              hash = "sha256-XwaOQJvosCUXMZYrKX7sMWJIrMx36RhuVYUq163vvNg=";
-            };
-          })
-          (pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs {
-            src = pkgs.fetchFromGitHub {
-              owner = "mampfes";
-              repo = "hacs_waste_collection_schedule";
-              rev = "refs/tags/2.3.0";
-              hash = "sha256-2bKixWPuexX3iGFlUmgeIT2/Ne2SED0f8B5Zw2ICG/k=";
-            };
-          })
-          (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs {
-            src = pkgs.fetchFromGitHub {
-              owner = "basnijholt";
-              repo = "adaptive-lighting";
-              rev = "refs/tags/1.23.0";
-              hash = "sha256-Yq8mKk2j2CHyHvwyej0GeFQhuy1MFXwt0o+lDOGwrBU=";
-            };
-          })
+          pkgs.home-assistant-custom-components.waste_collection_schedule
+          pkgs.home-assistant-custom-components.adaptive_lighting
+          (
+            (pkgs.home-assistant-custom-components.miele.override {
+              pymiele = pkgs.python3Packages.pymiele.overrideAttrs {
+                version = "0.2.0";
+                src = pkgs.fetchPypi {
+                  pname = "pymiele";
+                  version = "0.2.0";
+                  hash = "sha256-/iUpbvD77MURTltnStm47PEqXnfVuHf4m3+h9V2cn68=";
+                };
+                propagatedBuildsInputs = [ pkgs.python3Packages.aiohttp ];
+              };
+            }).overrideAttrs
+            {
+              src = pkgs.fetchFromGitHub {
+                owner = "astrandb";
+                repo = "miele";
+                rev = "refs/tags/v2024.11.1";
+                hash = "sha256-fM/ARQ4wJt2/vIVsdWpAur/YWPvBH5fOPYqiaz4DxzU=";
+              };
+            }
+          )
           selfPkgs.heatmiser
           selfPkgs.thermal-comfort
           selfPkgs.daikin-onecta

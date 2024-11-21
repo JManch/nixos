@@ -5,11 +5,7 @@
   ...
 }@args:
 let
-  inherit (lib)
-    mkIf
-    mkForce
-    getExe
-    ;
+  inherit (lib) mkIf mkForce;
   inherit (lib.${ns}) asserts isHyprland flakePkgs;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
@@ -21,19 +17,14 @@ mkIf (cfg.enable && isHyprland config) {
     "Hyprland requires Home Manager to be enabled"
   ];
 
-  programs.hyprland.enable = true;
+  programs.hyprland = {
+    enable = true;
+    package = hyprlandPackage;
+    withUWSM = true;
+  };
 
   # We configure xdg-portal with home-manager
   xdg.portal.enable = mkForce false;
-
-  programs.uwsm = {
-    enable = true;
-    waylandCompositors.hyprland = {
-      binPath = getExe hyprlandPackage;
-      prettyName = "Hyprland";
-      comment = "Hyprland managed by UWSM";
-    };
-  };
 
   # https://discourse.nixos.org/t/how-to-enable-upstream-systemd-user-services-declaratively/7649/9
   systemd.packages = [ (flakePkgs args "hyprpolkitagent").default ];

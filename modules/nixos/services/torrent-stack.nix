@@ -295,5 +295,11 @@ mkIf cfg.enable {
       group = "radarr";
       mode = "0750";
     }
+    {
+      directory = "/var/lib/prowlarr";
+      user = "prowlarr";
+      group = "prowlarr";
+      mode = "0750";
+    }
   ];
 }

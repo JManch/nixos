@@ -1185,11 +1185,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1732136647,
-        "narHash": "sha256-wBBTb7nLjPSM1fK8byzaM+pPWT6Ef+G4x4uMrd0pPTE=",
+        "lastModified": 1732223044,
+        "narHash": "sha256-HAMehK0yDoFJhNBoWsYA1ZogJWcSwhGvlnRr5RA4Srw=",
         "ref": "refs/heads/main",
-        "rev": "f1d778852b41cf031636c00ccb74f4b0a190aa64",
-        "revCount": 215,
+        "rev": "3393d869dbc532efb34a91e2cb0a825f97e54ff1",
+        "revCount": 217,
         "type": "git",
         "url": "ssh://git@github.com/JManch/nix-resources"
       },
@@ -1377,6 +1377,22 @@
         "type": "github"
       }
     },
+    "recyclarr-templates": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1727883511,
+        "narHash": "sha256-B93RXnPaNeBXrTBwpb4X4nYxf4slag3+6LwFSgN+39E=",
+        "owner": "recyclarr",
+        "repo": "config-templates",
+        "rev": "98ef6bcc8dddf12ef55ddb9d9bfc070a2c99b998",
+        "type": "github"
+      },
+      "original": {
+        "owner": "recyclarr",
+        "repo": "config-templates",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "agenix": "agenix",
@@ -1403,6 +1419,7 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-xr": "nixpkgs-xr",
         "raspberry-pi-nix": "raspberry-pi-nix",
+        "recyclarr-templates": "recyclarr-templates",
         "rpi-firmware-nonfree-src": "rpi-firmware-nonfree-src",
         "vmInstall": "vmInstall",
         "vpn-confinement": "vpn-confinement"

@@ -100,6 +100,9 @@
     neovim.url = "github:nix-community/neovim-nightly-overlay";
     neovim.inputs.nixpkgs.follows = "nixpkgs";
 
+    recyclarr-templates.url = "github:recyclarr/config-templates";
+    recyclarr-templates.flake = false;
+
     # Personal inputs
 
     firstBoot.url = "github:JManch/false";

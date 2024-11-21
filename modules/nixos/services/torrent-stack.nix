@@ -24,6 +24,7 @@ let
   inherit (config.${ns}.system) impermanence;
   inherit (inputs.nix-resources.secrets) qBittorrentPort;
   inherit (config.${ns}.device) vpnNamespace;
+  inherit (config.age.secrets) recyclarrSecrets;
   cfg = config.${ns}.services.torrent-stack;
   mediaDir = (optionalString impermanence.enable "/persist") + cfg.mediaDir;
 
@@ -195,6 +196,99 @@ mkIf cfg.enable {
       ];
     };
   };
+
+  users.groups.recyclarr = { };
+  users.users.recyclarr = {
+    group = "recyclarr";
+    home = "/var/lib/recyclarr";
+    isSystemUser = true;
+  };
+
+  systemd.services.recyclarr =
+    let
+      inherit (inputs) recyclarr-templates;
+      dataDir = "/var/lib/recyclarr";
+
+      recyclarrConfig = (pkgs.formats.yaml { }).generate "recyclarr.yaml" {
+        sonarr.shows = {
+          delete_old_custom_formats = true;
+          replace_existing_custom_formats = true;
+          base_url = "http://localhost:${toString ports.sonarr}";
+          api_key = "sonarr_api_key";
+
+          include = [
+            { template = "sonarr-quality-definition-series"; }
+            { template = "sonarr-v4-quality-profile-web-1080p"; }
+            { template = "sonarr-v4-custom-formats-web-1080p"; }
+            { template = "sonarr-quality-definition-anime"; }
+            { template = "sonarr-v4-quality-profile-anime"; }
+            { template = "sonarr-v4-custom-formats-anime"; }
+          ];
+        };
+
+        radarr.movies = {
+          delete_old_custom_formats = true;
+          replace_existing_custom_formats = true;
+          base_url = "http://localhost:${toString ports.radarr}";
+          api_key = "radarr_api_key";
+
+          include = [
+            { template = "radarr-quality-definition-movie"; }
+            { template = "radarr-quality-profile-remux-web-1080p"; }
+            { template = "radarr-custom-formats-remux-web-1080p"; }
+            { template = "radarr-quality-profile-anime"; }
+            { template = "radarr-custom-formats-anime"; }
+          ];
+        };
+      };
+    in
+    {
+      description = "Recyclarr";
+      startAt = "Wed *-*-* 12:00:00";
+
+      after = [
+        "network.target"
+        "radarr.service"
+        "sonarr.service"
+      ];
+      requisite = [
+        "radarr.service"
+        "sonarr.service"
+      ];
+
+      serviceConfig = hardeningBaseline config {
+        DynamicUser = false;
+        User = "recyclarr";
+        Group = "recyclarr";
+        ExecStartPre = getExe (
+          pkgs.writeShellApplication {
+            name = "recyclarr-setup";
+            runtimeInputs = with pkgs; [
+              gnused
+              coreutils
+            ];
+            text = # bash
+              ''
+                cat ${recyclarrConfig} > "${dataDir}/recyclarr.yaml"
+
+                cat "${recyclarrSecrets.path}" > "${dataDir}/secrets.yaml"
+                sed 's/sonarr_api_key/!secret sonarr_api_key/' -i "${dataDir}/recyclarr.yaml"
+                sed 's/radarr_api_key/!secret radarr_api_key/' -i "${dataDir}/recyclarr.yaml"
+
+                rm -rf "${dataDir}/includes"
+                cp --no-preserve=mode -r "${recyclarr-templates}/radarr/includes" "${dataDir}"
+                cp --no-preserve=mode -r "${recyclarr-templates}/sonarr/includes" "${dataDir}"
+              '';
+          }
+        );
+        ExecStart = "${getExe pkgs.recyclarr} sync --app-data ${dataDir}";
+        StateDirectory = "recyclarr";
+        StateDirectoryMode = "750";
+        MemoryDenyWriteExecute = false;
+        # sed -i doesn't work with ~@priviledged
+        SystemCallFilter = [ "@system-service" ];
+      };
+    };
 
   users.groups.media = { };
   users.users.${username}.extraGroups = [ "media" ];

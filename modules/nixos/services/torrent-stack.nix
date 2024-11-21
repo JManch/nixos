@@ -200,7 +200,6 @@ mkIf cfg.enable {
   users.groups.recyclarr = { };
   users.users.recyclarr = {
     group = "recyclarr";
-    home = "/var/lib/recyclarr";
     isSystemUser = true;
   };
 

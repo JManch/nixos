@@ -6,13 +6,13 @@
 }:
 stdenvNoCC.mkDerivation rec {
   pname = "formulaone-card";
-  version = "1.9.2";
+  version = "1.9.7";
 
   src = fetchFromGitHub {
     owner = "marcokreeft87";
     repo = "formulaone-card";
     rev = version;
-    hash = "sha256-n6z9ujgp1FSrNS0gvyX22/CTT4EXVPFCd+GboA8Jj1M=";
+    hash = "sha256-OkfJPZsEgS2f0KiHIuMvto/94Uk9s4H+B7kUFoA2kZQ=";
   };
 
   dontBuild = true;

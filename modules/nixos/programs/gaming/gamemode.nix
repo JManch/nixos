@@ -18,7 +18,7 @@ let
     boolToString
     mapAttrsToList
     optionalString
-    concatStringsSep
+    concatLines
     ;
   inherit (lib.${ns})
     asserts
@@ -90,7 +90,7 @@ let
         fi
 
         # Load a profile if its name is one of the args
-        ${concatStringsSep "\n" (
+        ${concatLines (
           mapAttrsToList (profile: cfg': ''
             if profile_exists "${profile}"; then
               ${optionalString cfg'.includeDefaultProfile profiles.default."${mode}Script"}

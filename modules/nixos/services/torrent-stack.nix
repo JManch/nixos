@@ -394,5 +394,11 @@ mkIf cfg.enable {
       group = "prowlarr";
       mode = "0750";
     }
+    {
+      directory = "/var/lib/recyclarr";
+      user = "recyclarr";
+      group = "recyclarr";
+      mode = "0750";
+    }
   ];
 }

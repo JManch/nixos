@@ -205,8 +205,13 @@ mkIf cfg.enable {
 
   systemd.services.recyclarr =
     let
-      inherit (inputs) recyclarr-templates;
       dataDir = "/var/lib/recyclarr";
+
+      templates = pkgs.runCommand "recyclarr-merged-templates" {} ''
+        mkdir $out
+        cp --no-preserve=mode -r "${inputs.recyclarr-templates}"/radarr/includes $out
+        cp --no-preserve=mode -r "${inputs.recyclarr-templates}"/sonarr/includes $out
+      '';
 
       recyclarrConfig = (pkgs.formats.yaml { }).generate "recyclarr.yaml" {
         sonarr.shows = {
@@ -268,15 +273,11 @@ mkIf cfg.enable {
             ];
             text = # bash
               ''
-                cat ${recyclarrConfig} > "${dataDir}/recyclarr.yaml"
-
-                cat "${recyclarrSecrets.path}" > "${dataDir}/secrets.yaml"
-                sed 's/sonarr_api_key/!secret sonarr_api_key/' -i "${dataDir}/recyclarr.yaml"
-                sed 's/radarr_api_key/!secret radarr_api_key/' -i "${dataDir}/recyclarr.yaml"
-
-                rm -rf "${dataDir}/includes"
-                cp --no-preserve=mode -r "${recyclarr-templates}/radarr/includes" "${dataDir}"
-                cp --no-preserve=mode -r "${recyclarr-templates}/sonarr/includes" "${dataDir}"
+                install -m644 "${recyclarrConfig}" "${dataDir}"/recyclarr.yaml
+                install -m644 "${recyclarrSecrets.path}" "${dataDir}"/secrets.yaml
+                sed 's/sonarr_api_key/!secret sonarr_api_key/' -i "${dataDir}"/recyclarr.yaml
+                sed 's/radarr_api_key/!secret radarr_api_key/' -i "${dataDir}"/recyclarr.yaml
+                ln -sf "${templates}"/includes -t "${dataDir}"
               '';
           }
         );

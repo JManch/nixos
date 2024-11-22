@@ -6,11 +6,11 @@
 }:
 stdenvNoCC.mkDerivation rec {
   pname = "frigate-hass-card";
-  version = "6.0.0-beta.8";
+  version = "5.2.0";
 
   src = fetchzip {
     url = "https://github.com/dermotduffy/frigate-hass-card/releases/download/v${version}/frigate-hass-card.zip";
-    hash = "sha256-bNLxtgwBMEOpxFrr+shwj/ODay3pG0dbiXgbw58ov6U=";
+    hash = "sha256-g8Rg6Y3KN1DLexqEPUt61PotpeBSCo3rD4iSz97ml+U=";
   };
 
   dontBuild = true;

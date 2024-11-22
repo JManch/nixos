@@ -25,6 +25,10 @@
     };
 
   # To use a local flake as an input set url to "git+file://<PATH>"
+
+  # When locking a flake to a rev, it's important to manually run `nix flake
+  # update <input>` otherwise the inputs of the locked flake will not be
+  # updated https://github.com/NixOS/nix/issues/7860
   inputs = {
     # Critical inputs that provide imported NixOS modules or overlays. Ideally
     # should review changes after updating.
@@ -97,7 +101,8 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
-    neovim.url = "github:nix-community/neovim-nightly-overlay";
+    # Locked to avoid broken auto formatting
+    neovim.url = "github:nix-community/neovim-nightly-overlay?rev=973f6526dd30053a7ef98017272207af00bd615b";
     neovim.inputs.nixpkgs.follows = "nixpkgs";
 
     recyclarr-templates.url = "github:recyclarr/config-templates";

@@ -38,24 +38,29 @@ mkIf (cfg.enable && isWayland) {
         color = "0xff${colors.base07}";
         font_size = 120;
         font_family = desktop.style.font.family;
-        position = "0, 100";
+        position = "0, 60";
         halign = "center";
         valign = "center";
       };
 
       input-field = singleton {
         monitor = "";
-        size = "350, 60";
+        size = "447, 60";
         fade_on_empty = false;
-        outline_thickness = 0;
+        outline_thickness = 3;
         dots_size = 0.2;
         dots_spacing = 0.2;
         dots_center = true;
         inner_color = "0xff${colors.base00}";
+        outer_color = "0xff${colors.base07}";
         font_color = "0xff${colors.base07}";
-        placeholder_text = "<i><span foreground=\"##${colors.base07}99\">Password...</span></i>";
+        check_color = "0xff${colors.base0D}";
+        fail_color = "0xff${colors.base08}";
+        placeholder_text = "<span foreground=\"##${colors.base03}\">Password...</span>";
+        fail_text = "<span foreground=\"##${colors.base08}\">Incorrect password</span>";
         hide_input = false;
-        position = "0, -100";
+        position = "0, -60";
+        rounding = 10;
         halign = "center";
         valign = "center";
       };

@@ -241,8 +241,8 @@ mkIf cfg.enable {
       };
 
       webrtc = mkIf cfg.webrtc.enable {
-        # Use a fixed TCP port UDP port to simplify firewall rules
-        # Don't need to publically expose these ports since we use VPN
+        # Use a fixed UDP port to simplify firewall rules Don't need to
+        # publically expose these ports since we use VPN
         listen = ":${toString cfg.webrtc.port}";
 
         candidates = [

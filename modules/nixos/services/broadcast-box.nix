@@ -19,7 +19,7 @@ let
   cfg = config.${ns}.services.broadcast-box;
 in
 {
-  imports = [ inputs.broadcast-box.nixosModules.default ];
+  imports = [ "${inputs.nixpkgs-broadcast-box}/nixos/modules/services/video/broadcast-box.nix" ];
 
   config = mkIf cfg.enable {
     assertions = lib.${ns}.asserts [
@@ -27,10 +27,21 @@ in
       "Broadcast box proxy mode requires caddy to be enabled"
     ];
 
+    nixpkgs.overlays = [
+      (_: _: {
+        inherit (import inputs.nixpkgs-broadcast-box { inherit (pkgs.stdenv) system; }) broadcast-box;
+      })
+    ];
+
     services.broadcast-box = {
       enable = true;
+      openFirewall = true;
+      web = {
+        inherit (cfg) port;
+        address = optionalString cfg.proxy "127.0.0.1";
+        openFirewall = true;
+      };
       settings = {
-        HTTP_ADDRESS = "${optionalString cfg.proxy "127.0.0.1"}:${toString cfg.port}";
         UDP_MUX_PORT = cfg.udpMuxPort;
         DISABLE_STATUS = false;
       };

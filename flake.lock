@@ -1215,6 +1215,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-broadcast-box": {
+      "locked": {
+        "lastModified": 1732458694,
+        "narHash": "sha256-hHMF9g9GO2eGZLguX8mykN4Sd4FgmzYKoDOT5j7gFP0=",
+        "owner": "JManch",
+        "repo": "nixpkgs",
+        "rev": "f18597a9be796d195bef8a17d71259f8b7497f7d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JManch",
+        "ref": "broadcast-box",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-docs": {
       "locked": {
         "lastModified": 1705957679,
@@ -1418,6 +1434,7 @@
         "nix-on-droid": "nix-on-droid",
         "nix-resources": "nix-resources",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-broadcast-box": "nixpkgs-broadcast-box",
         "nixpkgs-xr": "nixpkgs-xr",
         "raspberry-pi-nix": "raspberry-pi-nix",
         "recyclarr-templates": "recyclarr-templates",

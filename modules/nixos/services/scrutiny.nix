@@ -45,10 +45,8 @@ mkMerge [
         "network-online.target"
         "nss-lookup.target"
       ];
-      wants = [
-        "network-online.target"
-        "nss-lookup.target"
-      ];
+      wants = [ "network-online.target" ];
+      requires = [ "nss-lookup.target" ];
     };
   })
 

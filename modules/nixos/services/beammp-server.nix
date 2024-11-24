@@ -71,13 +71,11 @@ mkIf cfg.enable {
   users.groups.beammp = { };
 
   systemd.services.beammp-server = {
-    unitConfig = {
-      Description = "BeamMP Server";
-      After = [ "network-online.target" ];
-      Wants = [ "network-online.target" ];
-      StartLimitBurst = 3;
-      StartLimitIntervalSec = 30;
-    };
+    description = "BeamMP Server";
+    after = [ "network.target" ];
+    startLimitBurst = 3;
+    startLimitIntervalSec = 30;
+    wantedBy = mkIf cfg.autoStart [ "multi-user.target" ];
 
     serviceConfig = lib.${ns}.hardeningBaseline config {
       ExecStartPre = getExe (
@@ -115,8 +113,6 @@ mkIf cfg.enable {
         "~@resources"
       ];
     };
-
-    wantedBy = mkIf cfg.autoStart [ "multi-user.target" ];
   };
 
   networking.firewall = {

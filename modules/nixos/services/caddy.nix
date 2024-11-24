@@ -242,16 +242,15 @@ mkMerge [
         '';
       in
       {
-        unitConfig = {
-          Description = "GoAccess log analyzer";
-          PartOf = [ "caddy.service" ];
-          After = [
-            "caddy.service"
-            "network.target"
-          ];
-          StartLimitBurst = 3;
-          StartLimitIntervalSec = 30;
-        };
+        description = "GoAccess";
+        partOf = [ "caddy.service" ];
+        after = [
+          "caddy.service"
+          "network.target"
+        ];
+        wantedBy = [ "caddy.service" ];
+        startLimitBurst = 3;
+        startLimitIntervalSec = 30;
 
         serviceConfig = hardeningBaseline config {
           DynamicUser = false;
@@ -263,8 +262,6 @@ mkMerge [
           StateDirectory = [ "goaccess" ];
           StateDirectoryMode = "0750";
         };
-
-        wantedBy = [ "multi-user.target" ];
       };
 
     services.fail2ban.jails.caddy-status = {

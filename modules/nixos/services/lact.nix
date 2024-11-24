@@ -43,12 +43,14 @@ mkIf cfg.enable {
   userPackages = [ pkgs.lact ];
 
   systemd.services.lact = {
-    unitConfig = {
-      Description = "AMDGPU Control Daemon";
-      After = [ "multi-user.service" ];
-    };
-    serviceConfig.ExecStart = "${getExe pkgs.lact} daemon";
+    description = "AMDGPU Control Daemon";
+    after = [ "multi-user.target" ];
     wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      ExecStart = "${getExe pkgs.lact} daemon";
+      Nice = -10;
+      Restart = "on-failure";
+    };
   };
 
   # Can't generate yaml from nix because the keys for fan curve have to be

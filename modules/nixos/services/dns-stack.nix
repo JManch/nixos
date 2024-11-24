@@ -122,17 +122,11 @@ mkIf cfg.enable {
       };
     in
     {
-      unitConfig = {
-        Description = "Multiclient DNS forwarding proxy";
-        Before = [ "nss-lookup.target" ];
-        After = [ "network-online.target" ];
-        Wants = [
-          "network-online.target"
-          "nss-lookup.target"
-        ];
-        StartLimitIntervalSec = 5;
-        StartLimitBurst = 10;
-      };
+      description = "Ctrld";
+      after = [ "network.target" ];
+      wantedBy = [ "dnsmasq.service" ];
+      startLimitIntervalSec = 5;
+      startLimitBurst = 10;
 
       serviceConfig = hardeningBaseline config {
         ExecStart = "${getExe ctrld} run --config ${configFile}";
@@ -160,8 +154,6 @@ mkIf cfg.enable {
           "~@privileged"
         ];
       };
-
-      wantedBy = [ "multi-user.target" ];
     };
 
   # Populate hosts file for ctrld host discovery
@@ -273,10 +265,11 @@ mkIf cfg.enable {
       kill = getExe' pkgs.coreutils "kill";
     in
     {
-      unitConfig = {
-        Description = "Dnsmasq daemon";
-        After = [ "network.target" ];
-      };
+      description = "Dnsmasq";
+      after = [ "network.target" ];
+      before = [ "nss-lookup.target" ];
+      wants = [ "nss-lookup.target" ];
+      wantedBy = [ "multi-user.target" ];
 
       serviceConfig = hardeningBaseline config {
         ExecStartPre = "${dnsmasq} -C ${configFile} --test";
@@ -313,7 +306,5 @@ mkIf cfg.enable {
         SocketBindDeny = "any";
         SocketBindAllow = cfg.listenPort;
       };
-
-      wantedBy = [ "multi-user.target" ];
     };
 }

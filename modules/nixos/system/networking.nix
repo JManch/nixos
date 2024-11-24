@@ -166,19 +166,15 @@ in
 
   systemd.services.disable-wifi-on-boot = mkIf (cfg.wireless.enable && cfg.wireless.disableOnBoot) {
     restartIfChanged = false;
-
-    unitConfig = {
-      Description = "Disable wireless interface on boot";
-      After = [ "systemd-networkd.service" ];
-    };
+    description = "Disable wifi on boot";
+    after = [ "systemd-networkd.service" ];
+    wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
-      ExecStart = "${rfkill} block wifi";
       Type = "oneshot";
+      ExecStart = "${rfkill} block wifi";
       RemainAfterExit = true;
     };
-
-    wantedBy = [ "multi-user.target" ];
   };
 
   programs.zsh.shellAliases =

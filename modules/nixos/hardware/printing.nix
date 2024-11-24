@@ -136,10 +136,8 @@ mkMerge [
         "network-online.target"
         "nss-lookup.target"
       ];
-      wants = [
-        "network-online.target"
-        "nss-lookup.target"
-      ];
+      wants = [ "network-online.target" ];
+      requires = [ "nss-lookup.target" ];
 
       # Without this, the service will fail on every system activation if the
       # printer is down

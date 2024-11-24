@@ -195,10 +195,14 @@ in
             baseline = config.systemd.services.dnsmasq;
           in
           {
-            unitConfig = baseline.unitConfig // {
-              Description = "Dnsmasq daemon for ${interface} wireguard VPN";
-              PartOf = [ "wg-quick-${interface}.service" ];
-            };
+            description = "wg-${interface} dnsmasq";
+            after = [
+              "network.target"
+              "wg-quick-wg-${interface}.service"
+            ];
+            partOf = [ "wg-quick-wg-${interface}.service" ];
+            requires = [ "wg-quick-wg-${interface}.service" ];
+            wantedBy = [ "wg-quick-wg-${interface}.service" ];
 
             serviceConfig = baseline.serviceConfig // {
               ExecStartPre = "${dnsmasq} -C ${configFile} --test";
@@ -217,8 +221,6 @@ in
                 "CAP_SETGID"
               ];
             };
-
-            wantedBy = [ "wg-quick-wg-${interface}.service" ];
           };
       }
     ) interfaces

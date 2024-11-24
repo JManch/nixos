@@ -260,15 +260,14 @@ mkIf cfg.enable {
       };
     in
     {
-      unitConfig = {
-        Description = "Vaultwarden cloud backup";
-        After = [
-          "backup-vaultwarden.service"
-          "network-online.target"
-        ];
-        Requires = [ "backup-vaultwarden.service" ];
-        Wants = [ "network-online.target" ];
-      };
+      description = "Vaultwarden cloud backup";
+      after = [
+        "backup-vaultwarden.service"
+        "network-online.target"
+      ];
+      wants = [ "network-online.target" ];
+      requires = [ "backup-vaultwarden.service" ];
+      wantedBy = [ "backup-vaultwarden.service" ];
 
       serviceConfig = {
         EnvironmentFile = [ vaultwardenSMTPVars.path ];
@@ -290,8 +289,6 @@ mkIf cfg.enable {
         # with an empty one.
         TimeoutStartSec = 120;
       };
-
-      wantedBy = [ "backup-vaultwarden.service" ];
     };
 
   # Unfortunately the bitwarden app does not support TLS client authentication

@@ -27,16 +27,16 @@
 
 buildGoModule rec {
   pname = "ctrld";
-  version = "1.3.10";
+  version = "1.3.11";
 
   src = fetchFromGitHub {
     owner = "Control-D-Inc";
     repo = "ctrld";
     rev = "v${version}";
-    hash = "sha256-gUGN6kW1kVnCqzjZpA6s6y7H/fTc63UUbR5bfdr2ues=";
+    hash = "sha256-McUQghJc8ecS3Le7CGkUCkhkcIO9+h9IJicrBMW2yJk=";
   };
 
-  vendorHash = "sha256-I7LaF38vyK8riqfUWyZCAdtbK7KdU7g4PhS/Pac5T00=";
+  vendorHash = "sha256-QPq75h8NaG8Aoxf7fuNkqRSZRK4DQsP41aPhD9nZ7ks=";
 
   doCheck = false;
 

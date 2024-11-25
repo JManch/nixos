@@ -9,6 +9,7 @@
   pkgs,
   config,
   inputs,
+  username,
   ...
 }:
 let
@@ -19,7 +20,6 @@ let
     singleton
     ;
   inherit (config.${ns}.core) homeManager;
-  inherit (config.hm.xdg) dataHome;
   inherit (config.${ns}.device) primaryMonitor gpu;
   inherit (config.${ns}.hardware) bluetooth;
   inherit (config.${ns}.system) audio;
@@ -89,10 +89,32 @@ mkIf cfg.enable {
       lighthouse = getExe pkgs.lighthouse-steamvr;
       pactl = getExe' pkgs.pulseaudio "pactl";
       sleep = getExe' pkgs.coreutils "sleep";
+
+      openvrPaths = pkgs.writeText "monado-openvrpaths" ''
+        {
+          "config": [
+            "/home/${username}/.local/share/Steam/config"
+          ],
+          "external_drivers": null,
+          "jsonid": "vrpathreg",
+          "log": [
+            "/home/${username}/.local/share/Steam/logs"
+          ],
+          "runtime": [
+            "${pkgs.opencomposite}/lib/opencomposite"
+          ],
+          "version": 1
+        }
+      '';
     in
     {
       serviceConfig = {
         ExecStartPre = "-${pkgs.writeShellScript "monado-exec-start-pre" ''
+          ln -sf "$XDG_CONFIG_HOME/openxr/1/active_runtime.json" ${
+            config.environment.etc."xdg/openxr/1/active_runtime.json".source
+          }
+          ln -sf "$XDG_CONFIG_HOME/openvr/openvrpaths.vrpath" ${openvrPaths}
+
           if [ ! -f "/tmp/disable-lighthouse-control" ]; then
             ${lighthouse} --state on
           fi
@@ -113,6 +135,8 @@ mkIf cfg.enable {
           if [ ! -f "/tmp/disable-lighthouse-control" ]; then
             ${lighthouse} --state off
           fi
+
+          rm -rf "$XDG_CONFIG_HOME"/{openxr,openvr}
         ''}";
       };
 
@@ -174,29 +198,6 @@ mkIf cfg.enable {
   };
 
   hm = {
-    xdg.configFile = {
-      "openxr/1/active_runtime.json".source =
-        config.environment.etc."xdg/openxr/1/active_runtime.json".source;
-
-      "openvr/openvrpaths.vrpath".text = # json
-        ''
-          {
-            "config": [
-              "${dataHome}/Steam/config"
-            ],
-            "external_drivers": null,
-            "jsonid": "vrpathreg",
-            "log": [
-              "${dataHome}/Steam/logs"
-            ],
-            "runtime": [
-              "${pkgs.opencomposite}/lib/opencomposite"
-            ],
-            "version": 1
-          }
-        '';
-    };
-
     ${ns}.desktop = {
       hyprland.namedWorkspaces.VR = "monitor:${primaryMonitor.name}";
       services.waybar.audioDeviceIcons.${cfg.audio.sink} = "";

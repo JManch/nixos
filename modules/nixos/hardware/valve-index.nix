@@ -26,6 +26,7 @@ let
   inherit (config.${ns}.programs.gaming) gamemode;
   inherit (config.${ns}.services) lact;
   cfg = config.${ns}.hardware.valve-index;
+  systemctl = getExe' pkgs.systemd "systemctl";
 in
 mkIf cfg.enable {
   assertions = lib.${ns}.asserts [
@@ -51,13 +52,27 @@ mkIf cfg.enable {
       name = "monado";
       desktopName = "Monado";
       type = "Application";
-      exec = "${getExe' pkgs.systemd "systemctl"} start --user monado";
+      exec = "${systemctl} start --user monado";
       icon = (
         pkgs.fetchurl {
           url = "https://gitlab.freedesktop.org/uploads/-/system/group/avatar/5604/monado_icon_medium.png";
           hash = "sha256-Wx4BBHjNyuboDVQt8yV0tKQNDny4EDwRBtMSk9XHNVA=";
         }
       );
+    })
+    (pkgs.makeDesktopItem {
+      name = "start-vr";
+      desktopName = "Start VR";
+      type = "Application";
+      exec = "${systemctl} start --user valve-index";
+      icon = "applications-system";
+    })
+    (pkgs.makeDesktopItem {
+      name = "stop-vr";
+      desktopName = "Stop VR";
+      type = "Application";
+      exec = "${systemctl} stop --user valve-index";
+      icon = "applications-system";
     })
   ];
 
@@ -84,12 +99,52 @@ mkIf cfg.enable {
     defaultRuntime = true;
   };
 
-  systemd.user.services.monado =
+  systemd.user.services.valve-index =
     let
-      lighthouse = getExe pkgs.lighthouse-steamvr;
       pactl = getExe' pkgs.pulseaudio "pactl";
       sleep = getExe' pkgs.coreutils "sleep";
+      lighthouse = getExe pkgs.lighthouse-steamvr;
+      notify-send = getExe pkgs.libnotify;
+    in
+    {
+      description = "Valve Index";
+      partOf = [ "monado.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart =
+          pkgs.writeShellScript "valve-index-start" # bash
+            ''
+              ${notify-send} --urgency=critical -t 5000 'Valve Index' 'Starting'
+              if [ ! -f "/tmp/disable-lighthouse-control" ]; then
+                ${lighthouse} --state on
+              fi
 
+              # Monado doesn't change audio devices so we have to do it manually
+              ${pactl} set-default-source "${cfg.audio.source}"
+              ${pactl} set-source-mute "${cfg.audio.source}" 1
+              ${pactl} set-card-profile "${cfg.audio.card}" "${cfg.audio.profile}"
+
+              # The sink device is available after the headset has powered on
+              (${sleep} 10; ${pactl} set-default-sink "${cfg.audio.sink}") &
+            '';
+
+        ExecStop =
+          pkgs.writeShellScript "valve-index-stop" # bash
+            ''
+              ${notify-send} --urgency=critical -t 5000 'Valve Index' 'Stopping'
+              ${pactl} set-default-source ${audio.defaultSource}
+              ${pactl} set-default-sink ${audio.defaultSink}
+
+              if [ ! -f "/tmp/disable-lighthouse-control" ]; then
+                ${lighthouse} --state off
+              fi
+            '';
+      };
+    };
+
+  systemd.user.services.monado =
+    let
       openvrPaths = pkgs.writeText "monado-openvrpaths" ''
         {
           "config": [
@@ -108,34 +163,19 @@ mkIf cfg.enable {
       '';
     in
     {
+      requires = [ "valve-index.service" ];
+      after = [ "valve-index.service" ];
       serviceConfig = {
+        Slice = [ "app-graphical.slice" ];
+
         ExecStartPre = "-${pkgs.writeShellScript "monado-exec-start-pre" ''
           ln -sf "$XDG_CONFIG_HOME/openxr/1/active_runtime.json" ${
             config.environment.etc."xdg/openxr/1/active_runtime.json".source
           }
           ln -sf "$XDG_CONFIG_HOME/openvr/openvrpaths.vrpath" ${openvrPaths}
-
-          if [ ! -f "/tmp/disable-lighthouse-control" ]; then
-            ${lighthouse} --state on
-          fi
-
-          # Monado doesn't change audio devices so we have to do it manually
-          ${pactl} set-default-source "${cfg.audio.source}"
-          ${pactl} set-source-mute "${cfg.audio.source}" 1
-          ${pactl} set-card-profile "${cfg.audio.card}" "${cfg.audio.profile}"
-
-          # The sink device is available after the headset has powered on
-          (${sleep} 10; ${pactl} set-default-sink "${cfg.audio.sink}") &
         ''}";
 
         ExecStopPost = "-${pkgs.writeShellScript "monado-exec-stop-post" ''
-          ${pactl} set-default-source ${audio.defaultSource}
-          ${pactl} set-default-sink ${audio.defaultSink}
-
-          if [ ! -f "/tmp/disable-lighthouse-control" ]; then
-            ${lighthouse} --state off
-          fi
-
           rm -rf "$XDG_CONFIG_HOME"/{openxr,openvr}
         ''}";
       };

@@ -117,7 +117,7 @@ in
     # parameters. This is annoying because the LSP complains about pkgs being an
     # unused argument when it actually is used. This method avoids that.
     flakePkgs =
-      args: flake: args.inputs.${flake}.packages.${args.options._module.args.value.pkgs.stdenv.system};
+      args: flake: args.inputs.${flake}.packages.${args.options._module.args.value.pkgs.system};
 
     addPatches =
       pkg: patches:

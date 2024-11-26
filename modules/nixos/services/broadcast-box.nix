@@ -29,7 +29,7 @@ in
 
     nixpkgs.overlays = [
       (_: _: {
-        inherit (import inputs.nixpkgs-broadcast-box { inherit (pkgs.stdenv) system; }) broadcast-box;
+        inherit (inputs.nixpkgs-broadcast-box.legacyPackages.${pkgs.system}) broadcast-box;
       })
     ];
 

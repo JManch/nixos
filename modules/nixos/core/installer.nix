@@ -239,7 +239,7 @@ let
       fi
 
       # shellcheck disable=SC2016
-      installer_exists=$(nix eval --impure --expr 'with import <nixpkgs> {}; pkgs.lib.hasAttr "installer-'"$installer"'" (builtins.getFlake "'"$flake"'").packages.''${pkgs.stdenv.system}')
+      installer_exists=$(nix eval --impure --expr 'with import <nixpkgs> {}; pkgs.lib.hasAttr "installer-'"$installer"'" (builtins.getFlake "'"$flake"'").packages.''${pkgs.system}')
       if [[ $installer_exists = "false" ]]; then
         echo "Error: Installer '$installer' does not exist" >&2
         exit 1

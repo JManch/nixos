@@ -48,6 +48,7 @@ in
 
     services = {
       hass.enable = true;
+      postgresql.enable = true;
       unifi.enable = true;
       mosquitto.enable = true;
       mikrotik-backup.enable = true;

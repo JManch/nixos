@@ -36,6 +36,7 @@ in
     unifi.enable = mkEnableOption "Unifi Controller";
     fail2ban.enable = mkEnableOption "Fail2ban";
     acme.enable = mkEnableOption "ACME";
+    postgresql.enable = mkEnableOption "Postgresql";
 
     wireguard =
       let

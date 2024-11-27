@@ -28,7 +28,12 @@ let
     scanPaths
     asserts
     ;
-  inherit (config.${ns}.services) frigate mosquitto caddy;
+  inherit (config.${ns}.services)
+    frigate
+    mosquitto
+    caddy
+    postgresql
+    ;
   inherit (config.age.secrets) mqttHassPassword mqttFaikinPassword;
   cfg = config.${ns}.services.hass;
   cameras = attrNames config.services.frigate.settings.cameras;
@@ -57,6 +62,8 @@ in
       "Home Assistant is only intended to work on host 'homelab'"
       caddy.enable
       "Home Assistant requires Caddy to be enabled"
+      postgresql.enable
+      "Home Assistant requires postgresql to be enabled"
     ];
 
     ${ns}.services = {
@@ -317,54 +324,15 @@ in
         }
       '';
 
-    # How to fix database collation warnings: https://dba.stackexchange.com/a/330184
-
     services.postgresql = {
-      enable = true;
       ensureDatabases = [ "hass" ];
       ensureUsers = singleton {
         name = "hass";
         ensureDBOwnership = true;
       };
-
-      # Version 15 enabled checkout logging by default which is quite verbose.
-      # It's useful for debugging performance problems though this is unlikely
-      # with my simple deployment.
-      # https://git.postgresql.org/gitweb/?p=postgresql.git;a=commit;h=64da07c41a8c0a680460cdafc79093736332b6cf
-      settings = {
-        log_checkpoints = false;
-        full_page_writes = mkIf (config.${ns}.hardware.fileSystem.type == "zfs") false;
-      };
     };
 
-    services.postgresqlBackup = {
-      enable = true;
-      location = "/var/backup/postgresql";
-      databases = [ "hass" ];
-      # -Fc enables restoring with pg_restore
-      pgdumpOptions = "-C -Fc";
-      # The c format is compressed by default
-      compression = "none";
-      startAt = [ ];
-    };
-
-    # WARN: When upgrading postgresql to a new major version, make sure to use
-    # the pq_dump and pq_restore binaries from the version you're upgrading to. 
-
-    # Postgresql stateVersion upgrade steps:
-    # - Stop home-assistant service
-    # - nix shell n#postgresql-<new-version>
-    # - sudo -i -u postgres; pg_dump -C -Fc hass | cat > /var/backup/postgresql/hass-migration-<version>.sql
-    # - Stop postgresql.service
-    # - Move /persist/var/lib/postgresql to /persist/var/lib/postgresql-<version> as a backup
-    # - In Nix configuration, disable the home-assistant target below and upgrade the stateVersion
-    # - rebuild-boot the host then reboot
-    # - sudo -i -u postgres; pg_restore -U postgres --dbname postgres --clean --create /var/backup/...
-    # - Re-enable the home-assistant target then rebuild-switch
-
-    # Set this to false to prevent home-assistant from starting on the boot
-    # after the database has been updated and the old dump needs to be restored
-    systemd.targets.home-assistant.enable = true;
+    services.postgresqlBackup.databases = [ "hass" ];
 
     backups.hass = {
       paths = [
@@ -394,26 +362,12 @@ in
       after = [ "postgresqlBackup-hass.service" ];
     };
 
-    persistence.directories = [
-      {
-        directory = "/var/lib/hass";
-        user = "hass";
-        group = "hass";
-        mode = "0700";
-      }
-      {
-        directory = "/var/lib/postgresql";
-        user = "postgres";
-        group = "postgres";
-        mode = "0750";
-      }
-      {
-        directory = "/var/backup/postgresql";
-        user = "postgres";
-        group = "postgres";
-        mode = "0700";
-      }
-    ];
+    persistence.directories = singleton {
+      directory = "/var/lib/hass";
+      user = "hass";
+      group = "hass";
+      mode = "0700";
+    };
 
     virtualisation.vmVariant = {
       networking.firewall.allowedTCPPorts = [ cfg.port ];

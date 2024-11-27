@@ -3,6 +3,7 @@
 #   https://github.com/ValveSoftware/Proton/issues/7382
 # - The input in some OpenVR games that use legacy controls (such as Boneworks)
 #   does not work.
+# - Some games are broken with Monado so require suffering with SteamVR
 {
   ns,
   lib,
@@ -27,6 +28,7 @@ let
   inherit (config.${ns}.services) lact;
   cfg = config.${ns}.hardware.valve-index;
   systemctl = getExe' pkgs.systemd "systemctl";
+  lighthouse = getExe pkgs.lighthouse-steamvr;
 in
 mkIf cfg.enable {
   assertions = lib.${ns}.asserts [
@@ -95,6 +97,7 @@ mkIf cfg.enable {
 
   services.monado = {
     enable = true;
+    forceDefaultRuntime = true;
     highPriority = true;
     defaultRuntime = true;
   };
@@ -103,8 +106,6 @@ mkIf cfg.enable {
     let
       pactl = getExe' pkgs.pulseaudio "pactl";
       sleep = getExe' pkgs.coreutils "sleep";
-      lighthouse = getExe pkgs.lighthouse-steamvr;
-      notify-send = getExe pkgs.libnotify;
     in
     {
       description = "Valve Index";
@@ -115,30 +116,22 @@ mkIf cfg.enable {
         ExecStart =
           pkgs.writeShellScript "valve-index-start" # bash
             ''
-              ${notify-send} --urgency=critical -t 5000 'Valve Index' 'Starting'
-              if [ ! -f "/tmp/disable-lighthouse-control" ]; then
-                ${lighthouse} --state on
-              fi
-
-              # Monado doesn't change audio devices so we have to do it manually
+              # Monado doesn't change audio devices so we have to do it
+              # manually. SteamVR changes the default sink but doesn't set the
+              # default source or the card profile.
               ${pactl} set-default-source "${cfg.audio.source}"
               ${pactl} set-source-mute "${cfg.audio.source}" 1
               ${pactl} set-card-profile "${cfg.audio.card}" "${cfg.audio.profile}"
 
-              # The sink device is available after the headset has powered on
+              # The sink device can only bet set after the headset has powered on
               (${sleep} 10; ${pactl} set-default-sink "${cfg.audio.sink}") &
             '';
 
         ExecStop =
           pkgs.writeShellScript "valve-index-stop" # bash
             ''
-              ${notify-send} --urgency=critical -t 5000 'Valve Index' 'Stopping'
               ${pactl} set-default-source ${audio.defaultSource}
               ${pactl} set-default-sink ${audio.defaultSink}
-
-              if [ ! -f "/tmp/disable-lighthouse-control" ]; then
-                ${lighthouse} --state off
-              fi
             '';
       };
     };
@@ -169,14 +162,19 @@ mkIf cfg.enable {
         Slice = [ "app-graphical.slice" ];
 
         ExecStartPre = "-${pkgs.writeShellScript "monado-exec-start-pre" ''
-          ln -sf "$XDG_CONFIG_HOME/openxr/1/active_runtime.json" ${
-            config.environment.etc."xdg/openxr/1/active_runtime.json".source
-          }
           ln -sf "$XDG_CONFIG_HOME/openvr/openvrpaths.vrpath" ${openvrPaths}
+
+          if [ ! -f "/tmp/disable-lighthouse-control" ]; then
+            ${lighthouse} --state on
+          fi
         ''}";
 
         ExecStopPost = "-${pkgs.writeShellScript "monado-exec-stop-post" ''
           rm -rf "$XDG_CONFIG_HOME"/{openxr,openvr}
+
+          if [ ! -f "/tmp/disable-lighthouse-control" ]; then
+            ${lighthouse} --state off
+          fi
         ''}";
       };
 

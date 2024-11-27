@@ -399,6 +399,17 @@ in
     frigate = {
       enable = mkEnableOption "Frigate";
 
+      coral = {
+        enable = mkEnableOption "Google Coral Accelerator";
+        type = mkOption {
+          type = types.enum [
+            "pci"
+            "usb"
+          ];
+          description = "Coral device type";
+        };
+      };
+
       port = mkOption {
         type = types.port;
         default = 5000;

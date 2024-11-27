@@ -74,6 +74,13 @@ mkIf cfg.enable {
       tls.enabled = false;
       ffmpeg.hwaccel_args = "preset-vaapi";
 
+      detectors = mkIf cfg.coral.enable {
+        coral = {
+          type = "edgetpu";
+          device = cfg.coral.type;
+        };
+      };
+
       mqtt = mkIf (hass.enable && mosquitto.enable) {
         enabled = true;
         host = "127.0.0.1";

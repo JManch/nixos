@@ -39,11 +39,6 @@ in
         zfs.trim = true;
         zfs.encryption.passphraseCred = inputs.nix-resources.secrets.zfsPassphrases.homelab;
       };
-
-      coral = {
-        enable = true;
-        type = "pci";
-      };
     };
 
     services = {
@@ -102,6 +97,8 @@ in
 
       frigate = {
         enable = true;
+        coral.enable = true;
+        coral.type = "pci";
         webrtc.enable = true;
         nvrAddress = "192.168.40.6";
       };

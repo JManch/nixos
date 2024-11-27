@@ -157,17 +157,6 @@ in
         };
     };
 
-    coral = {
-      enable = mkEnableOption "Google Coral TPU";
-      type = mkOption {
-        type = types.enum [
-          "pci"
-          "usb"
-        ];
-        description = "Connection type of Google Coral TPU";
-      };
-    };
-
     printing = {
       server.enable = mkEnableOption "printing server";
 

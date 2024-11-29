@@ -26,7 +26,7 @@ in
   options.${ns}.programs.gaming = {
     mangohud.enable = mkEnableOption "MangoHud";
     r2modman.enable = mkEnableOption "r2modman";
-    lutris.enable = mkEnableOption "Lutris";
+    bottles.enable = mkEnableOption "Bottles";
     prism-launcher.enable = mkEnableOption "Prism Launcher";
     mint.enable = mkEnableOption "DRG Mod Loader";
     ryujinx.enable = mkEnableOption "Ryujinx";

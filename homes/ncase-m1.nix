@@ -91,7 +91,7 @@
       gaming = {
         mangohud.enable = true;
         r2modman.enable = true;
-        lutris.enable = true;
+        bottles.enable = true;
         prism-launcher.enable = true;
         mint.enable = false; # broken package
         ryujinx.enable = true;

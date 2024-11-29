@@ -12,7 +12,7 @@ let
     mkOption
     types
     concatStringsSep
-    concatStrings
+    concatMapStrings
     optional
     ;
   inherit (config.${ns}.desktop) hyprland;
@@ -77,7 +77,15 @@ in
       type = with types; listOf str;
       default = [ ];
       description = ''
-        List of game window classes that should be excluded from tearing.
+        Regex list of classes of games that should be excluded from tearing.
+      '';
+    };
+
+    tearingExcludedTitles = mkOption {
+      type = with types; listOf str;
+      default = [ ];
+      description = ''
+        Regex list of titles of games that should be excluded from tearing.
       '';
     };
 
@@ -86,14 +94,15 @@ in
       readOnly = true;
       apply =
         let
-          inherit (config.${ns}.programs.gaming) tearingExcludedClasses gameClasses;
-          tearingRegex = concatStringsSep "|" gameClasses;
-          tearingExcludedRegex = concatStrings (map (class: "(?!${class}$)") tearingExcludedClasses);
+          inherit (config.${ns}.programs.gaming) tearingExcludedClasses tearingExcludedTitles gameClasses;
+          tearingClassRegex = concatStringsSep "|" gameClasses;
+          excludeRegex = list: concatMapStrings (x: "(?!${x}$)") list;
         in
-        _: "^${tearingExcludedRegex}(${tearingRegex})$";
+        _:
+        "class:^${excludeRegex tearingExcludedClasses}(${tearingClassRegex})$, title:^${excludeRegex tearingExcludedTitles}(.*)$";
       description = ''
         The complete regex expression for tearing that matches all game classes
-        and excludes all excluded tearing classes.
+        and excludes all excluded tearing classes and titles.
       '';
     };
   };
@@ -111,7 +120,7 @@ in
       {
         windowrulev2 = [
           "workspace ${namedWorkspaceIDs.GAME}, class:${cfg.gameRegex}"
-        ] ++ optional hyprland.tearing "immediate, class:${cfg.tearingRegex}";
+        ] ++ optional hyprland.tearing "immediate, ${cfg.tearingRegex}";
 
         bind = [
           "${modKey}, G, workspace, ${namedWorkspaceIDs.GAME}"

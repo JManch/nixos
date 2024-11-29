@@ -15,11 +15,13 @@ let
     optional
     mkOption
     ;
+  inherit (lib.${ns}) scanPaths upperFirstChar;
+  inherit (config.${ns}.desktop.xdg) lowercaseUserDirs;
   impermanence = osConfig'.${ns}.system.impermanence or null;
   cfg = config.${ns}.core;
 in
 {
-  imports = lib.${ns}.scanPaths ./.;
+  imports = scanPaths ./.;
 
   options.${ns}.core = {
     configManager = mkEnableOption "this host as a NixOS config manager";
@@ -39,15 +41,20 @@ in
   config = {
     _module.args.osConfig' = if cfg.standalone then null else osConfig;
 
-    persistence.directories = [
-      "downloads"
-      "pictures"
-      "music"
-      "videos"
-      "files"
-      ".cache/nix"
-      ".local/share/systemd" # needed for persistent user timers to work properly
-    ] ++ optional cfg.configManager ".config/nixos";
+    persistence.directories =
+      (map (xdgDir: if !lowercaseUserDirs then upperFirstChar xdgDir else xdgDir) [
+        "downloads"
+        "pictures"
+        "music"
+        "videos"
+      ])
+      ++ [
+        "files"
+        "games"
+        ".cache/nix"
+        ".local/share/systemd" # needed for persistent user timers to work properly
+      ]
+      ++ optional cfg.configManager ".config/nixos";
 
     backups = {
       nixos = mkIf cfg.configManager { paths = [ ".config/nixos" ]; };
@@ -60,7 +67,6 @@ in
             absPath = "${optionalString (impermanence.enable or false) "/persist"}${config.home.homeDirectory}";
           in
           [
-            "${absPath}/files/games"
             "${absPath}/files/repos"
             "${absPath}/files/software"
           ];

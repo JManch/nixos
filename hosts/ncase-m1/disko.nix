@@ -119,6 +119,13 @@ in
               options.mountpoint = "legacy";
               options.recordsize = "1M";
             };
+
+            "${pseudoRoot}/persist/games" = {
+              type = "zfs_fs";
+              mountpoint = "/persist/home/${username}/games";
+              options.mountpoint = "legacy";
+              options.recordsize = "1M";
+            };
           };
         };
 

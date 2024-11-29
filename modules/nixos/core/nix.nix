@@ -422,7 +422,9 @@ in
         # Do not load the default global registry
         # https://channels.nixos.org/flake-registry.json
         flake-registry = "";
-        trusted-users = [ adminUsername ];
+        # WARN: Do not use this, it's insecure
+        # https://github.com/NixOS/nix/issues/9649#issuecomment-1868001568
+        # trusted-users = [ adminUsername ];
         substituters = [
           "https://nix-community.cachix.org"
           "https://nix-on-droid.cachix.org"

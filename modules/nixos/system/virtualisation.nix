@@ -162,7 +162,6 @@ in
           };
 
           hardware = {
-            coral.enable = mkVMOverride false;
             bluetooth.enable = mkVMOverride false;
             printing.client.enable = mkVMOverride false;
             valve-index.enable = mkVMOverride false;

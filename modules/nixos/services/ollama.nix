@@ -1,49 +1,87 @@
 {
   ns,
   lib,
-  pkgs,
   config,
+  hostname,
   ...
 }:
 let
-  inherit (lib)
-    mkIf
-    mkForce
-    singleton
-    optional
-    genAttrs
-    ;
+  inherit (lib) mkIf mkForce genAttrs;
   cfg = config.${ns}.services.ollama;
 in
 mkIf cfg.enable {
-  userPackages = [ pkgs.oterm ];
+  assertions = lib.${ns}.asserts [
+    (hostname == "ncase-m1")
+    "Ollama is only intended to work on host 'ncase-m1'"
+  ];
 
   services.ollama = {
     enable = true;
     user = "ollama";
     group = "ollama";
-    listenAddress = "0.0.0.0:11434";
+    host = "0.0.0.0";
+    port = 11434;
+    acceleration = "rocm";
+    # Since my 7900xt isn't "offically" supported by rocm I need this
+    rocmOverrideGfx = "11.0.0";
+    loadModels = [
+      "llama3.2"
+      "qwen2.5-coder:32b-instruct-q3_K_M"
+      "qwen2.5:32b-instruct-q3_K_M"
+      "mistral-small:22b-instruct-2409-q5_1"
+    ];
   };
 
-  systemd.services.ollama = {
-    wantedBy = mkForce (optional cfg.autoStart [ "multi-user.target" ]);
+  systemd.services.ollama.wantedBy = mkForce [ ];
+
+  services.open-webui = {
+    enable = true;
+    host = "0.0.0.0";
+    port = 11111;
     environment = {
-      # For ollama-ui to work
-      OLLAMA_ORIGINS = "http://10.0.0.2:8000";
+      SCARF_NO_ANALYTICS = "True";
+      DO_NOT_TRACK = "True";
+      ANONYMIZED_TELEMETRY = "False";
+      OLLAMA_API_BASE_URL = "http://127.0.0.1:11434";
+      WEBUI_AUTH = "False";
+    };
+  };
+
+  users.groups.open-webui = { };
+  users.users.open-webui = {
+    group = "open-webui";
+    isSystemUser = true;
+  };
+
+  systemd.services.open-webui = {
+    wantedBy = mkForce [ "ollama.service" ];
+    after = [ "ollama.service" ];
+    partOf = [ "ollama.service" ];
+    serviceConfig = {
+      User = "open-webui";
+      Group = "open-webui";
     };
   };
 
   networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
     allowedTCPPorts = [
       11434
-      8000
+      11111
     ];
   });
 
-  persistence.directories = singleton {
-    directory = "/var/lib/private/ollama";
-    user = "ollama";
-    group = "ollama";
-    mode = "0755";
-  };
+  persistence.directories = [
+    {
+      directory = "/var/lib/private/ollama";
+      user = "ollama";
+      group = "ollama";
+      mode = "0755";
+    }
+    {
+      directory = "/var/lib/private/open-webui";
+      user = "open-webui";
+      group = "open-webui";
+      mode = "0755";
+    }
+  ];
 }

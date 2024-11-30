@@ -200,7 +200,6 @@ in
 
     ollama = {
       enable = mkEnableOption "Ollama";
-      autoStart = mkEnableOption "Ollama service auto start";
 
       interfaces = mkOption {
         type = with types; listOf str;

@@ -6,7 +6,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf mkForce genAttrs;
+  inherit (lib) mkIf genAttrs;
   cfg = config.${ns}.services.ollama;
 in
 mkIf cfg.enable {
@@ -32,8 +32,6 @@ mkIf cfg.enable {
     ];
   };
 
-  systemd.services.ollama.wantedBy = mkForce [ ];
-
   services.open-webui = {
     enable = true;
     host = "0.0.0.0";
@@ -53,14 +51,9 @@ mkIf cfg.enable {
     isSystemUser = true;
   };
 
-  systemd.services.open-webui = {
-    wantedBy = mkForce [ "ollama.service" ];
-    after = [ "ollama.service" ];
-    partOf = [ "ollama.service" ];
-    serviceConfig = {
-      User = "open-webui";
-      Group = "open-webui";
-    };
+  systemd.services.open-webui.serviceConfig = {
+    User = "open-webui";
+    Group = "open-webui";
   };
 
   networking.firewall.interfaces = genAttrs cfg.interfaces (_: {

@@ -157,6 +157,8 @@ mkMerge [
     };
 
     systemd.services.jellyseerr = {
+      # Jellyfin scan runs every 5 mins and pollutes the journal
+      environment.LOG_LEVEL = "warning";
       serviceConfig = {
         User = "jellyseerr";
         Group = "jellyseerr";

@@ -1035,11 +1035,11 @@
     "neovim-config": {
       "flake": false,
       "locked": {
-        "lastModified": 1731036580,
-        "narHash": "sha256-n3PKhgzcGOjano5E9I3rXBN4nenqRB6HfBiOEvBkgM8=",
+        "lastModified": 1732983649,
+        "narHash": "sha256-Pqh4KjtaLWHycHS8EFjVa+38iBpF3QG2ay337NkphBc=",
         "owner": "JManch",
         "repo": "nvim",
-        "rev": "b73a0277a7cb8d7fcd1e67d763d4bf3327cae24a",
+        "rev": "2d498174572fa362db0c5ba6159a2d5ce585b181",
         "type": "github"
       },
       "original": {

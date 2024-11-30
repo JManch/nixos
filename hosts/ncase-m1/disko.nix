@@ -126,6 +126,13 @@ in
               options.mountpoint = "legacy";
               options.recordsize = "1M";
             };
+
+            "${pseudoRoot}/persist/models" = {
+              type = "zfs_fs";
+              mountpoint = "/persist/var/lib/private/ollama";
+              options.mountpoint = "legacy";
+              options.recordsize = "1M";
+            };
           };
         };
 

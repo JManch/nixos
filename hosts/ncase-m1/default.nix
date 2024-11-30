@@ -125,6 +125,7 @@
       lact.enable = true;
       scrutiny.collector.enable = true;
       mosquitto.explorer.enable = true;
+      ollama.enable = true;
 
       jellyfin = {
         enable = true;
@@ -160,11 +161,6 @@
       nfs.client = {
         enable = false;
         supportedMachines = [ "homelab.lan" ];
-      };
-
-      ollama = {
-        enable = false;
-        interfaces = [ "wg-friends" ];
       };
 
       satisfactory-server = {

@@ -12,7 +12,7 @@ let
     types
     mkIf
     ;
-  inherit (lib.${ns}) scanPaths;
+  inherit (lib.${ns}) scanPaths addPatches;
   cfg = config.${ns}.shell;
 in
 {
@@ -44,6 +44,7 @@ in
         file
         jaq
       ])
+      ++ [ (addPatches pkgs.microfetch [ ../../../patches/microfetchIcon.patch ]) ];
 
     home.sessionVariables.COLORTERM = "truecolor";
   };

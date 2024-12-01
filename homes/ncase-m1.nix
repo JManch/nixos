@@ -6,10 +6,7 @@
       backupFiles = true;
     };
 
-    shell = {
-      enable = true;
-      sillyTools = true;
-    };
+    shell.enable = true;
 
     desktop = {
       enable = true;

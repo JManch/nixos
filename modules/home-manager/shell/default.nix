@@ -11,7 +11,6 @@ let
     mkOption
     types
     mkIf
-    optionals
     ;
   inherit (lib.${ns}) scanPaths;
   cfg = config.${ns}.shell;
@@ -21,7 +20,6 @@ in
 
   options.${ns}.shell = {
     enable = mkEnableOption "custom shell environment";
-    sillyTools = mkEnableOption "installation of silly shell tools";
 
     promptColor = mkOption {
       type = types.str;
@@ -46,14 +44,6 @@ in
         file
         jaq
       ])
-      ++ optionals cfg.sillyTools (
-        with pkgs;
-        [
-          fortune
-          cowsay
-          lolcat
-        ]
-      );
 
     home.sessionVariables.COLORTERM = "truecolor";
   };

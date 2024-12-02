@@ -218,11 +218,10 @@ in
       enable = mkEnableOption "features for systems dual-booting Window";
       bootEntry = {
         enable = mkEnableOption "Windows systemd-boot boot entry";
-        bootstrap = mkEnableOption "edk2-shell for Windows boot entry setup";
 
         fsAlias = mkOption {
-          type = types.str;
-          default = "";
+          type = types.nullOr types.str;
+          default = null;
           description = "The fs alias of the windows partition";
         };
       };

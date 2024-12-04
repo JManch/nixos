@@ -46,6 +46,14 @@ mkIf cfg.enable {
     "Torrent stack media dir should NOT be prefixed with /persist"
   ];
 
+  # FIX: Remove once https://github.com/NixOS/nixpkgs/issues/360592 is resolved
+  nixpkgs.config.permittedInsecurePackages = [
+    "aspnetcore-runtime-6.0.36"
+    "aspnetcore-runtime-wrapped-6.0.36"
+    "dotnet-sdk-6.0.428"
+    "dotnet-sdk-wrapped-6.0.428"
+  ];
+
   systemd.tmpfiles.rules = [
     "d ${mediaDir} 0750 root media - -"
     # Torrents are downloaded and seeded here. They are hardlinked by the
@@ -207,7 +215,7 @@ mkIf cfg.enable {
     let
       dataDir = "/var/lib/recyclarr";
 
-      templates = pkgs.runCommand "recyclarr-merged-templates" {} ''
+      templates = pkgs.runCommand "recyclarr-merged-templates" { } ''
         mkdir $out
         cp --no-preserve=mode -r "${inputs.recyclarr-templates}"/radarr/includes $out
         cp --no-preserve=mode -r "${inputs.recyclarr-templates}"/sonarr/includes $out

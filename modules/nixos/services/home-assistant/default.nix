@@ -178,13 +178,38 @@ in
           selfPkgs.daikin-onecta
         ]
         ++ optional frigate.enable (
-          pkgs.home-assistant-custom-components.frigate.overrideAttrs {
+          let
+            hass-web-proxy-lib = pkgs.python3Packages.buildPythonPackage rec {
+              pname = "hass-web-proxy-lib";
+              version = "0.0.7";
+
+              src = pkgs.python3Packages.fetchPypi {
+                inherit version;
+                pname = "hass_web_proxy_lib";
+                hash = "sha256-bhz71tNOpZ+4tSlndS+UbC3w2WW5+dAMtpk7TnnFpuQ=";
+              };
+
+              doCheck = false;
+              pyproject = true;
+              build-system = [ pkgs.python3Packages.setuptools ];
+            };
+          in
+          pkgs.home-assistant-custom-components.frigate.overridePythonAttrs {
+            version = "5.5.1";
             src = pkgs.fetchFromGitHub {
               owner = "blakeblackshear";
               repo = "frigate-hass-integration";
-              rev = "v5.4.0";
-              hash = "sha256-V2Y+xUAA/Lu7u82WUlUI5CFi9SGWe6ocVQtlXeVg2ZA=";
+              rev = "v5.5.1";
+              hash = "sha256-B5rh4iyIC/I9E9PH8q3u5gO3iLj4CskcyxWoXSId7/Y=";
             };
+            postPatch = ''
+              substituteInPlace requirements.txt custom_components/frigate/manifest.json \
+                --replace-fail 'hass-web-proxy-lib==0.0.7' 'hass-web-proxy-lib'
+            '';
+            dependencies = [
+              pkgs.python3Packages.pytz
+              hass-web-proxy-lib
+            ];
           }
         );
 

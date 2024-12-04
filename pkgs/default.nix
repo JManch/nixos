@@ -18,5 +18,6 @@ in
   hyprpy = pkgs.python3Packages.callPackage ./hyprpy.nix { };
   formulaone-card = callPackage ./formulaone-card.nix { };
   app2unit = callPackage ./app2unit.nix { };
+  microfetch = lib.${ns}.addPatches pkgs.microfetch [ ../patches/microfetchIcon.patch ];
 }
 // import ./installers.nix ns lib self

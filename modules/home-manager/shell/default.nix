@@ -3,6 +3,7 @@
   lib,
   pkgs,
   config,
+  selfPkgs,
   ...
 }:
 let
@@ -12,11 +13,10 @@ let
     types
     mkIf
     ;
-  inherit (lib.${ns}) scanPaths addPatches;
   cfg = config.${ns}.shell;
 in
 {
-  imports = scanPaths ./.;
+  imports = lib.${ns}.scanPaths ./.;
 
   options.${ns}.shell = {
     enable = mkEnableOption "custom shell environment";
@@ -44,7 +44,7 @@ in
         file
         jaq
       ])
-      ++ [ (addPatches pkgs.microfetch [ ../../../patches/microfetchIcon.patch ]) ];
+      ++ [ selfPkgs.microfetch ];
 
     home.sessionVariables.COLORTERM = "truecolor";
   };

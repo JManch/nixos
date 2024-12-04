@@ -155,23 +155,43 @@ in
 
           automatedToggle = {
             enable = true;
-            presenceTriggers = singleton {
-              platform = "state";
-              entity_id = "binary_sensor.ncase_m1_active";
-              from = null;
+
+            luminence = {
+              sensor = "joshua_presence_illuminance";
+              threshold = 12.0;
             };
+
+            presenceTriggers = [
+              {
+                platform = "state";
+                entity_id = "binary_sensor.joshua_presence_occupancy";
+                from = null;
+              }
+              {
+                platform = "state";
+                entity_id = "binary_sensor.ncase_m1_active";
+                from = null;
+              }
+            ];
 
             presenceConditions = singleton {
               condition = "state";
-              entity_id = "binary_sensor.ncase_m1_active";
+              entity_id = "binary_sensor.joshua_presence_occupancy";
               state = "on";
             };
 
-            noPresenceConditions = singleton {
-              condition = "state";
-              entity_id = "binary_sensor.ncase_m1_active";
-              state = "off";
-            };
+            noPresenceConditions = [
+              {
+                condition = "state";
+                entity_id = "binary_sensor.joshua_presence_occupancy";
+                state = "off";
+              }
+              {
+                condition = "state";
+                entity_id = "binary_sensor.ncase_m1_active";
+                state = "off";
+              }
+            ];
           };
         };
 
@@ -184,11 +204,21 @@ in
           title = "Devices";
           priority = 10;
           type = "grid";
-          cards = singleton {
-            type = "history-graph";
-            entities = [ { entity = "binary_sensor.ncase_m1_active"; } ];
-            hours_to_show = 24;
-          };
+          cards = [
+            {
+              type = "history-graph";
+              entities = [ { entity = "binary_sensor.ncase_m1_active"; } ];
+              hours_to_show = 24;
+            }
+            {
+              type = "history-graph";
+              entities = singleton {
+                name = "Presence";
+                entity = "binary_sensor.joshua_presence_occupancy";
+              };
+              hours_to_show = 24;
+            }
+          ];
           visibility = singleton {
             condition = "user";
             users = [ userIds.joshua ];

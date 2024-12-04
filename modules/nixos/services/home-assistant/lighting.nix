@@ -28,17 +28,18 @@ in
           options.lighting = mkOption {
             description = ''
               Modular smart lighting functionality for the room. Also generates
-              lovelace cards that can be added to the room's dashboard. Smart lighting
-              features include: (1) adaptive lighting that changes lighting color and
-              brightness to match the sun (in bedrooms, the adaptive lighting schedule
-              is synced with the users wake-up and sleep-time determined from their
-              next phone alarm and desired sleep duration configured in the dashboard),
-              (2) wake-up lighting that automatically turns on the lights 1 hour before
-              wake-up time and gradually increases brightness, (3) automated lighting
-              toggle based on presence in the room and the natural outdoor brightness
-              (inferred from solar power generation), and (4), automated sleep mode
-              that dims the brightness and optionally turns off certain lights when the
-              user's phone is placed on charge around sleep time.
+              lovelace cards that can be added to the room's dashboard. Smart
+              lighting features include: (1) adaptive lighting that changes
+              lighting color and brightness to match the sun (in bedrooms, the
+              adaptive lighting schedule is synced with the users wake-up and
+              sleep-time determined from their next phone alarm and desired
+              sleep duration configured in the dashboard), (2) wake-up lighting
+              that automatically turns on the lights 1 hour before wake-up time
+              and gradually increases brightness, (3) automated lighting toggle
+              based on luminence and presence in the room , and (4), automated
+              sleep mode that dims the brightness and optionally turns off
+              certain lights when the user's phone is placed on charge around
+              sleep time.
             '';
             default = { };
             type = types.submodule {
@@ -164,9 +165,23 @@ in
 
                 automatedToggle = {
                   enable = mkEnableOption ''
-                    automaticlly toggle the lights based on outdoor solar generation.
-                    Requires some sort of presence detection in the room.
+                    automaticlly toggle the lights based on luminence and,
+                    optionally, presence
                   '';
+
+                  luminence = {
+                    sensor = mkOption {
+                      type = types.str;
+                      default = "smoothed_solar_power";
+                      description = "Entity ID of luminence sensor";
+                    };
+
+                    threshold = mkOption {
+                      type = types.float;
+                      default = 2.0;
+                      description = "Luminence threshold for turning on lights";
+                    };
+                  };
 
                   presenceTriggers = mkOption {
                     type = with types; listOf attrs;
@@ -177,9 +192,9 @@ in
                       from = null;
                     };
                     description = ''
-                      Custom additional triggers that signify a change to presence
-                      in the room. This can be presence enabling or disabling. Must
-                      be used in conjunction with `presenceConditions` and
+                      Triggers that signify a change to presence in the room.
+                      This can be presence enabling or disabling. Must be used
+                      in conjunction with `presenceConditions` and
                       `noPresenceConditions` to have an effect.
                     '';
                   };
@@ -213,6 +228,17 @@ in
                     description = ''
                       Conditions for no room presence that signifies lights should
                       be turned off
+                    '';
+                  };
+
+                  offDelay = mkOption {
+                    type = types.nullOr types.int;
+                    default = null;
+                    description = ''
+                      Delay lighting switch off this many seconds after
+                      presence is no longer detected. Useful for less accurate
+                      presence sensors which may trigger before leaving the
+                      room.
                     '';
                   };
                 };
@@ -652,118 +678,164 @@ in
           })
 
           (mkIf cfg'.automatedToggle.enable {
-            automation = singleton {
-              alias = "${formattedRoomName} Lights Toggle";
-              trace.stored_traces = 5;
-              mode = "queued";
-              triggers = [
-                {
-                  platform = "numeric_state";
-                  entity_id = [ "sensor.smoothed_solar_power" ];
-                  above = 2;
-                  id = "solar";
-                }
-                {
-                  platform = "numeric_state";
-                  entity_id = [ "sensor.smoothed_solar_power" ];
-                  below = 2;
-                  id = "solar";
-                }
-              ] ++ cfg'.automatedToggle.presenceTriggers;
-              actions =
-                let
-                  solarCondition = below: {
-                    condition = "numeric_state";
-                    entity_id = "sensor.smoothed_solar_power";
-                    below = mkIf below 2;
-                    above = mkIf (!below) 2;
+            automation = [
+              {
+                alias = "${formattedRoomName} Lights Toggle";
+                trace.stored_traces = 5;
+                mode = "queued";
+                triggers = [
+                  {
+                    platform = "numeric_state";
+                    entity_id = [ "sensor.${cfg'.automatedToggle.luminence.sensor}" ];
+                    above = cfg'.automatedToggle.luminence.threshold;
+                    id = "luminence";
+                  }
+                  {
+                    platform = "numeric_state";
+                    entity_id = [ "sensor.${cfg'.automatedToggle.luminence.sensor}" ];
+                    below = cfg'.automatedToggle.luminence.threshold;
+                    id = "luminence";
+                  }
+                ] ++ cfg'.automatedToggle.presenceTriggers;
+                conditions = singleton {
+                  condition = "state";
+                  entity_id = "input_boolean.${room}_automated_lights_toggle";
+                  state = "on";
+                };
+                actions =
+                  let
+                    luminenceCondition = below: {
+                      condition = "numeric_state";
+                      entity_id = "sensor.${cfg'.automatedToggle.luminence.sensor}";
+                      below = mkIf below cfg'.automatedToggle.luminence.threshold;
+                      above = mkIf (!below) cfg'.automatedToggle.luminence.threshold;
+                    };
+                  in
+                  singleton {
+                    "if" = singleton {
+                      condition = "and";
+                      conditions = [
+                        {
+                          condition = "state";
+                          entity_id = "light.${room}_lights";
+                          state = "off";
+                        }
+                        (luminenceCondition true)
+                        {
+                          condition = "or";
+                          conditions = [
+                            {
+                              condition = "not";
+                              conditions = singleton {
+                                condition = "trigger";
+                                id = [ "luminence" ];
+                              };
+                            }
+                            {
+                              condition = "numeric_state";
+                              entity_id = "sensor.${roomCfg.deviceId}_sleep_confidence";
+                              below = 90;
+                            }
+                          ];
+                        }
+                      ] ++ cfg'.automatedToggle.presenceConditions;
+                    };
+                    "then" = singleton {
+                      action = "light.turn_on";
+                      target.entity_id = "light.${room}_lights";
+                    };
+                    "else" =
+                      optional (cfg'.automatedToggle.offDelay != null) { delay.seconds = cfg'.automatedToggle.offDelay; }
+                      ++ [
+                        {
+                          "if" = singleton {
+                            condition = "and";
+                            conditions = [
+                              {
+                                condition = "state";
+                                entity_id = "light.${room}_lights";
+                                state = "on";
+                              }
+                              {
+                                condition = "or";
+                                conditions = [
+                                  (luminenceCondition false)
+                                  {
+                                    condition = "not";
+                                    conditions = singleton {
+                                      condition = "trigger";
+                                      id = [ "luminence" ];
+                                    };
+                                  }
+                                ];
+                              }
+                              {
+                                condition = "or";
+                                conditions = [
+                                  {
+                                    condition = "not";
+                                    conditions = singleton {
+                                      condition = "trigger";
+                                      id = [ "luminence" ];
+                                    };
+                                  }
+                                  {
+                                    condition = "numeric_state";
+                                    entity_id = "sensor.${roomCfg.deviceId}_sleep_confidence";
+                                    below = 90;
+                                  }
+                                ];
+                              }
+                            ] ++ cfg'.automatedToggle.noPresenceConditions;
+                          };
+                          "then" = singleton {
+                            action = "light.turn_off";
+                            target.entity_id = "light.${room}_lights";
+                          };
+                        }
+                      ];
                   };
-                in
-                singleton {
-                  "if" = singleton {
-                    condition = "and";
-                    conditions = [
-                      {
-                        condition = "state";
-                        entity_id = "light.${room}_lights";
-                        state = "off";
-                      }
-                      (solarCondition true)
-                      {
-                        condition = "or";
-                        conditions = [
-                          {
-                            condition = "not";
-                            conditions = singleton {
-                              condition = "trigger";
-                              id = [ "solar" ];
-                            };
-                          }
-                          {
-                            condition = "numeric_state";
-                            entity_id = "sensor.${roomCfg.deviceId}_sleep_confidence";
-                            below = 90;
-                          }
-                        ];
-                      }
-                    ] ++ cfg'.automatedToggle.presenceConditions;
-                  };
-                  "then" = singleton {
-                    action = "light.turn_on";
-                    target.entity_id = "light.${room}_lights";
-                  };
-                  "else" = [
-                    # It's important to delay before checking conditions as
-                    # state can change during the delay
-                    { delay.seconds = 30; }
+              }
+              {
+                # This automated disabled automated light toggling if the
+                # lights are "manually" turned off. We treat anything trigger
+                # that was not an automation as "manual". This way turning
+                # lights off to sleep will keep them off regardless of
+                # presence/lumination until an automation like wake up lighting
+                # turns them back on.
+                alias = "${formattedRoomName} Automated Lights Toggle";
+                mode = "single";
+                triggers = singleton {
+                  platform = "state";
+                  entity_id = [ "light.${room}_lights" ];
+                  from = null;
+                };
+                actions = singleton {
+                  "if" = [
                     {
-                      "if" = singleton {
-                        condition = "and";
-                        conditions = [
-                          {
-                            condition = "state";
-                            entity_id = "light.${room}_lights";
-                            state = "on";
-                          }
-                          {
-                            condition = "or";
-                            conditions = [
-                              (solarCondition false)
-                              {
-                                condition = "not";
-                                conditions = singleton {
-                                  condition = "trigger";
-                                  id = [ "solar" ];
-                                };
-                              }
-                            ];
-                          }
-                          {
-                            condition = "or";
-                            conditions = [
-                              {
-                                condition = "not";
-                                conditions = singleton {
-                                  condition = "trigger";
-                                  id = [ "solar" ];
-                                };
-                              }
-                              {
-                                condition = "numeric_state";
-                                entity_id = "sensor.${roomCfg.deviceId}_sleep_confidence";
-                                below = 90;
-                              }
-                            ];
-                          }
-                        ] ++ cfg'.automatedToggle.noPresenceConditions;
-                      };
-                      "then" = singleton {
-                        action = "light.turn_off";
-                        target.entity_id = "light.${room}_lights";
-                      };
+                      condition = "state";
+                      entity_id = "light.${room}_lights";
+                      state = "off";
+                    }
+                    {
+                      condition = "template";
+                      value_template = "{{ trigger.to_state.context.parent_id == none }}";
                     }
                   ];
+                  "then" = singleton {
+                    action = "input_boolean.turn_off";
+                    target.entity_id = "input_boolean.${room}_automated_lights_toggle";
+                  };
+                  "else" = singleton {
+                    action = "input_boolean.turn_on";
+                    target.entity_id = "input_boolean.${room}_automated_lights_toggle";
+                  };
                 };
+              }
+            ];
+
+            input_boolean."${room}_automated_lights_toggle" = {
+              name = "${formattedRoomName} Automated Lights Toggle";
             };
           })
         ])

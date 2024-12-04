@@ -77,7 +77,7 @@ mkIf (cfg.enable && desktopEnabled) {
     "${desktop.hyprland.modKey}SHIFT, C, exec, ${getExe darkman.package} toggle"
   ];
 
-  systemd.user.services.darkman-solar-switcher = mkIf (cfg.switchMethod == "hass") {
+  systemd.user.services.darkman-luminence-switcher = mkIf (cfg.switchMethod == "hass") {
     Unit = {
       Description = "Switch darkman theme based on home assistant brightness entity";
       Requires = [ "darkman.service" ];
@@ -88,7 +88,7 @@ mkIf (cfg.enable && desktopEnabled) {
       Slice = [ "background-graphical.slice" ];
       ExecStart = getExe (
         pkgs.writeShellApplication {
-          name = "darkman-solar-switcher";
+          name = "darkman-luminence-switcher";
           runtimeInputs = [
             pkgs.coreutils
             pkgs.jaq
@@ -107,9 +107,7 @@ mkIf (cfg.enable && desktopEnabled) {
 
               while true
               do
-                state=$(${
-                  curlCommand { endpoint = "states/binary_sensor.dark_mode_brightness_threshold"; }
-                } | jaq -r .state)
+                state=$(${curlCommand { endpoint = "states/binary_sensor.${cfg.hassEntity}"; }} | jaq -r .state)
                 if [[ "$state" = "on" && ("$current_theme" = "dark" || "$current_theme" = "null") ]]; then
                   switch_theme "light"
                 elif [[ "$state" = "off" && ("$current_theme" = "light" || "$current_theme" = "null") ]]; then

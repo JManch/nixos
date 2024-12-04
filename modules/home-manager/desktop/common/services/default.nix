@@ -43,6 +43,13 @@ in
         '';
       };
 
+      hassEntity = mkOption {
+        type = types.str;
+        description = ''
+          Hass binary_sensor entity to determine dark mode toggle
+        '';
+      };
+
       switchScripts = mkOption {
         type = types.attrsOf (types.functionTo types.lines);
         default = { };

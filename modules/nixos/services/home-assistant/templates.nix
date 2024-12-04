@@ -182,12 +182,12 @@ mkIf cfg.enableInternal {
       }
       (
         let
-          threshold = 1;
+          threshold = 10;
           triggers =
             (map
               (enable: {
                 platform = "numeric_state";
-                entity_id = [ "sensor.smoothed_solar_power" ];
+                entity_id = [ "sensor.joshua_presence_illuminance" ];
                 above = mkIf enable threshold;
                 below = mkIf (!enable) threshold;
                 for.minutes = 10;
@@ -205,10 +205,10 @@ mkIf cfg.enableInternal {
         {
           trigger = triggers;
           binary_sensor = {
-            name = "Dark Mode Brightness Threshold";
+            name = "Joshua Dark Mode Brightness Threshold";
             icon = "mdi:white-balance-sunny";
             device_class = "light";
-            state = "{{ (states('sensor.smoothed_solar_power') | float) > ${toString threshold} }}";
+            state = "{{ (states('sensor.joshua_presence_illuminance') | float) > ${toString threshold} }}";
           };
         }
       )

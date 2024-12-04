@@ -10,6 +10,7 @@ let
     mkIf
     types
     mkEnableOption
+    genAttrs
     mkOption
     elem
     ;
@@ -106,25 +107,18 @@ in
       "/share/applications"
     ];
 
-    systemd = mkIf (!cfg.suspend.enable) {
-      targets = {
-        sleep = {
+    systemd.targets = mkIf (!cfg.suspend.enable) (
+      genAttrs
+        [
+          "sleep"
+          "suspend"
+          "hibernate"
+          "hybrid-sleep"
+        ]
+        (_: {
           enable = false;
-          unitConfig.DefaultDependencies = "no";
-        };
-        suspend = {
-          enable = false;
-          unitConfig.DefaultDependencies = "no";
-        };
-        hibernate = {
-          enable = false;
-          unitConfig.DefaultDependencies = "no";
-        };
-        hybrid-sleep = {
-          enable = false;
-          unitConfig.DefaultDependencies = "no";
-        };
-      };
-    };
+          unitConfig.DefaultDependencies = false;
+        })
+    );
   };
 }

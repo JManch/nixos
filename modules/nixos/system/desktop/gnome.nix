@@ -17,6 +17,7 @@ let
     appindicator
     night-theme-switcher
     dash-to-dock
+    alphabetical-app-grid
   ];
 in
 mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {

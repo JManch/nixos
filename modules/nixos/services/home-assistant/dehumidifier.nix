@@ -105,15 +105,6 @@ in
                 entity = "sensor.${name}_critical_temperature";
                 name = "Critical Temperature";
               }
-              {
-                type = "sensor";
-                graph = "line";
-                entity = "sensor.${name}_dehumidifier_tank_level";
-                name = "Tank Level";
-                detail = 2;
-                grid_options.columns = 12;
-                grid_options.rows = 2;
-              }
             ];
           };
         }
@@ -136,25 +127,12 @@ in
       mkIf roomCfg.dehumidifier.enable {
         template = [
           {
-            sensor = [
-              {
-                name = "${formattedRoomName} Critical Temperature";
-                icon = "mdi:thermometer-alert";
-                state = "{{ state_attr('sensor.${room}_mold_indicator', 'estimated_critical_temp') }}";
-                unit_of_measurement = "°C";
-              }
-
-              {
-                name = "${formattedRoomName} Dehumidifier Tank Level";
-                unit_of_measurement = "%";
-                icon = "mdi:gauge";
-                state = ''
-                  {% set runtime = states('sensor.${room}_dehumidifier_runtime') | float(0) %}
-                  {% set fill_time = states('sensor.${room}_dehumidifier_fill_time') | float(30) %}
-                  {{ (runtime / fill_time * 100) | round(1) }}
-                '';
-              }
-            ];
+            sensor = singleton {
+              name = "${formattedRoomName} Critical Temperature";
+              icon = "mdi:thermometer-alert";
+              state = "{{ state_attr('sensor.${room}_mold_indicator', 'estimated_critical_temp') }}";
+              unit_of_measurement = "°C";
+            };
             binary_sensor = singleton {
               name = "${formattedRoomName} Dehumidifier Running";
               icon = "mdi:water";
@@ -201,21 +179,6 @@ in
             trigger = singleton {
               platform = "state";
               entity_id = "binary_sensor.${room}_dehumidifier_full";
-              from = "off";
-              to = "on";
-            };
-
-            sensor = singleton {
-              name = "${formattedRoomName} Dehumidifier Fill Time";
-              icon = "mdi:timer";
-              state = "{{ states('sensor.${room}_dehumidifier_runtime') }}";
-              unit_of_measurement = "h";
-            };
-          }
-          {
-            trigger = singleton {
-              platform = "state";
-              entity_id = "binary_sensor.${room}_dehumidifier_full";
               from = "on";
               to = "off";
             };
@@ -233,25 +196,14 @@ in
           icon = "mdi:air-humidifier";
         };
 
-        sensor = [
-          {
-            name = "${formattedRoomName} Mold Indicator";
-            platform = "mold_indicator";
-            indoor_temp_sensor = "sensor.${climate.temperature}";
-            indoor_humidity_sensor = "sensor.${climate.humidity}";
-            outdoor_temp_sensor = "sensor.outdoor_sensor_temperature";
-            calibration_factor = calibrationFactor;
-          }
-          {
-            name = "${formattedRoomName} Dehumidifier Runtime";
-            platform = "history_stats";
-            entity_id = "binary_sensor.${room}_dehumidifier_running";
-            state = "on";
-            type = "time";
-            start = "{{ states('sensor.${room}_dehumidifier_last_emptied') | float(0) }}";
-            end = "{{ now().timestamp() }}";
-          }
-        ];
+        sensor = singleton {
+          name = "${formattedRoomName} Mold Indicator";
+          platform = "mold_indicator";
+          indoor_temp_sensor = "sensor.${climate.temperature}";
+          indoor_humidity_sensor = "sensor.${climate.humidity}";
+          outdoor_temp_sensor = "sensor.outdoor_sensor_temperature";
+          calibration_factor = calibrationFactor;
+        };
 
         automation = [
           {
@@ -304,7 +256,7 @@ in
               action = "notify.mobile_app_${deviceId}";
               data = {
                 title = "${formattedRoomName} Dehumidifier";
-                message = "Tank full after {{ states('sensor.${room}_dehumidifier_runtime') }} hours of runtime";
+                message = "Tank full after {{ ((now().timestamp() - states('sensor.${room}_dehumidifier_last_emptied') | float) / 86400) | round(1) }} days";
                 data = {
                   channel = "Dehumidifier";
                   importance = "high";

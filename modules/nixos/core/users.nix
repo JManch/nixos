@@ -19,6 +19,7 @@ in
       {
         ${username} = {
           isNormalUser = true;
+          description = lib.${ns}.upperFirstChar username; # displayed in GDM
           hashedPasswordFile = config.age.secrets."${username}Passwd".path;
           extraGroups = optional priviledgedUser "wheel";
         };

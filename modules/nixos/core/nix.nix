@@ -368,12 +368,12 @@ in
         });
 
         uwsm = prev.uwsm.overrideAttrs {
-          version = "0.20.4";
+          version = "git";
           src = prev.fetchFromGitHub {
             owner = "Vladimir-csp";
             repo = "uwsm";
-            rev = "refs/tags/v${final.uwsm.version}";
-            hash = "sha256-cvIkjDtGEEYCGFFfN7HhOFzUajLcDgt8CWqFyuJlvK4=";
+            rev = "5fafff9a1e0464b46a528193c07f36a791d912b6";
+            hash = "sha256-yjKKDizL0Ibne1oUn18h21XBfpGYdMFyD/wdSPQA/Zs=";
           };
         };
       })

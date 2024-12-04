@@ -92,7 +92,6 @@ in
       inherit (config.${ns}.core) adminUsername;
     };
 
-    security.sudo.extraConfig = "Defaults lecture=never";
     time.timeZone = "Europe/London";
 
     environment.sessionVariables = {

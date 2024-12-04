@@ -10,8 +10,10 @@ let
   inherit (config.${ns}.core) homeManager;
 in
 {
-  # Show asterisks when typing sudo password
-  security.sudo.extraConfig = "Defaults pwfeedback";
+  security.sudo.extraConfig = ''
+    Defaults lecture=never
+    Defaults pwfeedback
+  '';
 
   security.pam.services = mkIf (homeManager.enable) {
     swaylock = mkIf swaylock.enable { };

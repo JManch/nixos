@@ -194,7 +194,7 @@ let
                 if adaptiveLighting.enable then
                   {
                     action = "switch.toggle";
-                    target.entity_id = "switch.adaptive_lighting_${room}";
+                    target.entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
                   }
                 else
                   {
@@ -207,7 +207,7 @@ let
                 if adaptiveLighting.enable then
                   {
                     action = "switch.toggle";
-                    target.entity_id = "switch.adaptive_lighting_sleep_mode_${room}";
+                    target.entity_id = "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting";
                   }
                 else
                   {
@@ -219,7 +219,7 @@ let
               (
                 optional adaptiveLighting.enable {
                   action = "switch.turn_off";
-                  target.entity_id = "switch.adaptive_lighting_${room}";
+                  target.entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
                 }
                 ++ singleton {
                   action = "light.turn_on";

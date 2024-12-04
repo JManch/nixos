@@ -345,14 +345,6 @@ in
   nixpkgs = {
     overlays = [
       (final: prev: {
-        inherit
-          (import (fetchTarball {
-            url = "https://github.com/JManch/nixpkgs/archive/49ab9e2f2bf2a905f650764da0e6dc1b5199c644.tar.gz";
-            sha256 = "sha256:0gn3bk4pga1jidl31657wkxzbc7x7ipwd4hq3a8fbggsv9k38pdf";
-          }) { inherit (pkgs) system; })
-          bibata-cursors
-          ;
-
         xdg-terminal-exec = prev.stdenvNoCC.mkDerivation (finalAttrs: {
           pname = "xdg-terminal-exec";
           version = "0.12.0";

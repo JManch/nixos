@@ -145,6 +145,7 @@ in
         "husqvarna_automower"
         "roborock"
         "unifi"
+        "esphome"
       ] ++ optional mosquitto.enable "mqtt";
 
       customComponents =

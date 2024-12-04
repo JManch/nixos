@@ -97,8 +97,6 @@ mkIf cfg.enable {
 
   services.monado = {
     enable = true;
-    # FIX: Remove once upstream improve-reproduciblity patch is removed
-    package = pkgs.monado.overrideAttrs { patches = [ ]; };
     forceDefaultRuntime = true;
     highPriority = true;
     defaultRuntime = true;

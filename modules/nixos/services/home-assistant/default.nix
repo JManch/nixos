@@ -182,8 +182,8 @@ in
             src = pkgs.fetchFromGitHub {
               owner = "blakeblackshear";
               repo = "frigate-hass-integration";
-              rev = "v5.5.1";
-              hash = "sha256-B5rh4iyIC/I9E9PH8q3u5gO3iLj4CskcyxWoXSId7/Y=";
+              rev = "v5.4.0";
+              hash = "sha256-V2Y+xUAA/Lu7u82WUlUI5CFi9SGWe6ocVQtlXeVg2ZA=";
             };
           }
         );

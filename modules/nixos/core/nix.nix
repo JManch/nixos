@@ -408,6 +408,7 @@ in
           "nix-command"
           "auto-allocate-uids"
         ];
+        allow-import-from-derivation = false;
         auto-optimise-store = true;
         # Do not create a bunch of nixbld users
         auto-allocate-uids = true;

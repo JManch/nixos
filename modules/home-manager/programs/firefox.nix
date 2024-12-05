@@ -12,7 +12,6 @@ let
     getExe
     getExe'
     optional
-    optionalString
     singleton
     ;
   inherit (config.${ns}.programs) mpv;
@@ -25,6 +24,8 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
   assertions = lib.${ns}.asserts [
     (cfg.runInRam -> (impermanence.enable or false))
     "Firefox run in RAM option can only be used on hosts with impermanence enabled"
+    (cfg.hideToolbar -> (!pkgs.hostPlatform.isDarwin))
+    "Hide toolbar does not currently work on darwin because of how we hardcode the userChrome.css path to avoid IFD"
   ];
 
   programs.firefox = {
@@ -137,35 +138,41 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
           "network.connectivity-service.enabled" = false;
         };
 
-        userChrome = ''
+        userChrome = mkIf (!cfg.hideToolbar) ''
           * {
             font-family: "${desktop.style.font.family}" !important;
             font-size: 15px !important;
           }
-
-          ${optionalString cfg.hideToolbar (
-            builtins.readFile (
-              let
-                src = pkgs.fetchFromGitHub {
-                  owner = "MrOtherGuy";
-                  repo = "firefox-csshacks";
-                  rev = "fe0cb2cb7bdd10471973d5713ffe1a9e6d2feaef";
-                  hash = "sha256-xUDZO3n1QhGhFKuZvrYGsnhMiA3n15o/y7egSUrJffo=";
-                };
-              in
-              pkgs.runCommand "firefox-hide-toolbar-css" { buildInputs = [ pkgs.gnused ]; } ''
-                install -m644 "${src}/chrome/autohide_toolbox.css" $out
-                # Preferred activation distance
-                sed 's/^  --uc-toolbox-rotation:.*/  --uc-toolbox-rotation: 70deg;/' -i $out
-                # Without this replacement the tab bar has a black background
-                sed 's/^@media  (-moz-platform: windows){/@media {/' -i $out
-              ''
-            )
-          )}
         '';
       };
     };
   };
+
+  home.file.".mozilla/firefox/default/chrome/userChrome.css".source = mkIf cfg.hideToolbar (
+    let
+      font = pkgs.writeText "user-chrome-font.css" ''
+        * {
+          font-family: "${desktop.style.font.family}" !important;
+          font-size: 15px !important;
+        }
+      '';
+
+      src = pkgs.fetchFromGitHub {
+        owner = "MrOtherGuy";
+        repo = "firefox-csshacks";
+        rev = "fe0cb2cb7bdd10471973d5713ffe1a9e6d2feaef";
+        hash = "sha256-xUDZO3n1QhGhFKuZvrYGsnhMiA3n15o/y7egSUrJffo=";
+      };
+    in
+    pkgs.runCommand "firefox-hide-toolbar-css" { buildInputs = [ pkgs.gnused ]; } ''
+      cat ${font} > $out
+      cat ${src}/chrome/autohide_toolbox.css >> $out
+      # Preferred activation distance
+      sed 's/^  --uc-toolbox-rotation:.*/  --uc-toolbox-rotation: 70deg;/' -i $out
+      # Without this replacement the tab bar has a black background
+      sed 's/^@media  (-moz-platform: windows){/@media {/' -i $out
+    ''
+  );
 
   # Use systemd to synchronise Firefox data with persistent storage. Allows for
   # running Firefox on tmpfs with improved performance.

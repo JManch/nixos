@@ -977,16 +977,6 @@ in
       };
     };
 
-    avahi = {
-      enable = mkEnableOption "Avahi";
-
-      interfaces = mkOption {
-        type = with types; listOf str;
-        default = [ ];
-        description = "List of interfaces to be used by avahi";
-      };
-    };
-
     mealie = {
       enable = mkEnableOption "Mealie";
 

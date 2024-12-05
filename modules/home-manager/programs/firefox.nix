@@ -13,6 +13,7 @@ let
     getExe'
     optional
     singleton
+    optionalString
     ;
   inherit (config.${ns}.programs) mpv;
   inherit (config.${ns}) desktop;
@@ -31,7 +32,7 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
   programs.firefox = {
     enable = true;
 
-    package = mkIf cfg.runInRam (
+    package =
       # Can't use pkgs.symlinkJoin here because home-manager wraps this package
       pkgs.firefox.overrideAttrs (old: {
         buildCommand =
@@ -39,14 +40,20 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
             systemctl = getExe' pkgs.systemd "systemctl";
             notifySend = getExe pkgs.libnotify;
           in
-          old.buildCommand
+          # Setting MESA_SHADER_CACHE_DIR here fixes the following log spam:
+          # Failed to create /home/joshua/.cache for shader cache (Permission denied)---disabling.
+          # I've got no idea why firefox can't access ~/.cache
+          # Same issue but with flatpak: https://github.com/zen-browser/desktop/issues/2767
           # bash
-          + ''
-            wrapProgram $out/bin/firefox --run "${systemctl} is-active --quiet --user firefox-persist-init \
-              || { ${notifySend} -u critical -t 3000 'Firefox' 'Initial sync has not yet finished'; exit 0; }"
+          ''
+            ${old.buildCommand}
+            wrapProgram $out/bin/firefox \
+              --set MESA_SHADER_CACHE_DIR "${config.home.homeDirectory}/.mozilla/.cache" \
+              ${optionalString cfg.runInRam ''
+                --run "${systemctl} is-active --quiet --user firefox-persist-init \
+                              || { ${notifySend} -u critical -t 3000 'Firefox' 'Initial sync has not yet finished'; exit 0; }"''}
           '';
-      })
-    );
+      });
 
     profiles = {
       default = {

@@ -77,7 +77,7 @@ mkIf cfg.enable {
 
   ${ns}.desktop = {
     services.waybar.autoHideWorkspaces = [ "TWITCH" ];
-    hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false";
+    hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false, gapsin:0, gapsout:0";
   };
 
   desktop.hyprland.settings = {

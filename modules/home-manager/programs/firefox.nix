@@ -268,7 +268,7 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
 
         Timer = {
           Unit = "firefox-persist-sync.service";
-          OnCalendar = "*:0/15";
+          OnCalendar = "*:0/30";
         };
 
         Install.WantedBy = [ "timers.target" ];

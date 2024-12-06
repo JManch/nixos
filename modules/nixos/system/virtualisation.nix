@@ -268,11 +268,11 @@ in
             ];
 
             windowrulev2 = [
-              "workspace ${namedWorkspaceIDs.VM} silent, class:^(\\.?qemu.*|aquamarine|virt-manager)$"
-              "float, class:^(\\.?qemu.*|virt-manager)$"
-              "size 80% 80%, class:^(\\.?qemu.*|virt-manager)$"
-              "center, class:^(\\.?qemu.*|virt-manager)$"
-              "keepaspectratio, class:^(\\.?qemu.*|virt-manager)$"
+              "workspace ${namedWorkspaceIDs.VM} silent, class:^(\\.?qemu.*|aquamarine|\\.virt-manager-wrapped)$"
+              "float, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+              "size 80% 80%, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+              "center, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+              "keepaspectratio, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
             ];
           };
 

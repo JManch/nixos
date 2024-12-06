@@ -49,7 +49,7 @@ let
     resticRepositoryFile
     resticReadWriteBackblazeVars
     resticReadOnlyBackblazeVars
-    resticNotifVars
+    notifVars
     healthCheckResticRemoteCopy
     ;
   cfg = config.${ns}.services.restic;
@@ -75,14 +75,14 @@ let
       restartIfChanged = false;
       serviceConfig = {
         Type = "oneshot";
-        EnvironmentFile = resticNotifVars.path;
+        EnvironmentFile = notifVars.path;
         ExecStart =
           let
             shoutrrr = getExe pkgs.shoutrrr;
           in
           pkgs.writeShellScript "${name}" ''
             ${shoutrrr} send \
-              --url "discord://$DISCORD_AUTH" \
+              --url "discord://$RESTIC_DISCORD_AUTH" \
               --title "${title}" \
               --message "${message} failed on host ${hostname}"
 
@@ -350,10 +350,7 @@ mkMerge [
               ${value.postBackupScript}
             '';
 
-            serviceConfig = {
-              EnvironmentFile = resticNotifVars.path;
-              CacheDirectory = mkForce "";
-            };
+            serviceConfig.CacheDirectory = mkForce "";
           }
         ) backups)
         (mapAttrs' (

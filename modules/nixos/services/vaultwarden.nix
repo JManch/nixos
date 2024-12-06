@@ -20,6 +20,7 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy fail2ban;
   inherit (config.age.secrets)
+    notifVars
     rcloneConfig
     vaultwardenVars
     vaultwardenSMTPVars
@@ -196,9 +197,9 @@ mkIf cfg.enable {
 
             send_notification() {
               if [ "$1" = "Failure" ]; then
-                discord_auth=$DISCORD_AUTH_FAILURE
+                discord_auth=$VAULTWARDEN_DISCORD_AUTH_FAILURE
               else
-                discord_auth=$DISCORD_AUTH_SUCCESS
+                discord_auth=$VAULTWARDEN_DISCORD_AUTH_SUCCESS
               fi
 
               shoutrrr send \
@@ -207,7 +208,7 @@ mkIf cfg.enable {
                 --message "$2"
 
               shoutrrr send \
-                --url "smtp://$SMTP_URL_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=Vaultwarden%20Backup%20$1%20$time" \
+                --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=Vaultwarden%20Backup%20$1%20$time" \
                 --message "$2"
             }
 
@@ -270,7 +271,7 @@ mkIf cfg.enable {
       wantedBy = [ "backup-vaultwarden.service" ];
 
       serviceConfig = {
-        EnvironmentFile = [ vaultwardenSMTPVars.path ];
+        EnvironmentFile = [ notifVars.path ];
         Type = "oneshot";
         ExecStart = getExe cloudBackupScript;
         ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckVaultwarden.path})\"'";

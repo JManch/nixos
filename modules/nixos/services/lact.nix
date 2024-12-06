@@ -135,25 +135,25 @@ mkIf cfg.enable {
     {
       # Just change the power profile to 3D_FULL_SCREEN by default
       default = {
-        startScript = ''
+        start = ''
           id=$(${getId})
           ${setPowerProfile 1}
         '';
 
-        stopScript = ''
+        stop = ''
           id=$(${getId})
           ${setPowerProfile 0}
         '';
       };
 
       vr = {
-        startScript = ''
+        start = ''
           id=$(${getId})
           ${setPowerProfile 4}
           ${setPowerCap 257}
         '';
 
-        stopScript = ''
+        stop = ''
           id=$(${getId})
           ${setPowerProfile 0}
           ${setPowerCap 231}
@@ -166,8 +166,8 @@ mkIf cfg.enable {
       # worse though, ~200rpm fan increase.
       high_perf = {
         includeDefaultProfile = true;
-        startScript = "${setPowerCap 257}";
-        stopScript = "${setPowerCap 231}";
+        start = "${setPowerCap 257}";
+        stop = "${setPowerCap 231}";
       };
     };
 }

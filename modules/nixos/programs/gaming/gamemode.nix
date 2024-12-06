@@ -86,17 +86,21 @@ let
 
         # If no custom args were provided, load the default profile
         if (( ! ''${#profiles[@]} )); then
-          ${profiles.default."${mode}Script" or ""}
+          : # to avoid empty if statement
+          ${profiles.default.${mode}}
         fi
 
         # Load a profile if its name is one of the args
         ${concatLines (
-          mapAttrsToList (profile: cfg': ''
-            if profile_exists "${profile}"; then
-              ${optionalString cfg'.includeDefaultProfile profiles.default."${mode}Script"}
-              ${cfg'."${mode}Script"}
-            fi
-          '') profiles
+          mapAttrsToList (
+            profile: cfg': # bash
+            ''
+              if profile_exists "${profile}"; then
+                : # to avoid empty if statement
+                ${optionalString cfg'.includeDefaultProfile profiles.default.${mode}}
+                ${cfg'.${mode}}
+              fi
+            '') profiles
         )}
 
         ${optionalString (desktop.desktopEnvironment == null) # bash
@@ -149,8 +153,8 @@ mkIf cfg.enable {
           keyword unbind ${hyprland.modKey}${optionalString (!isStart) "SHIFTCONTROL"}, W; \
           keyword bind ${hyprland.modKey}${optionalString isStart "SHIFTCONTROL"}, W, killactive'';
       in
-      mkIf (isHyprland config) {
-        startScript = ''
+      {
+        start = optionalString (isHyprland config) ''
           ${hyprctl} --instance 0 --batch "\
             keyword monitor ${
               getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
@@ -160,7 +164,7 @@ mkIf cfg.enable {
           "
         '';
 
-        stopScript = ''
+        stop = optionalString (isHyprland config) ''
           ${hyprctl} --instance 0 --batch "\
             keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
             ${killActiveRebind false}; \

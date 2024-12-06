@@ -37,7 +37,7 @@ mkIf cfg.enable {
   ${ns}.programs.gaming = {
     gameClasses = [ "osu!" ];
     gamemode.profiles.osu = mkIf (isHyprland config) {
-      startScript = ''
+      start = ''
         ${hyprctl} --instance 0 --batch "\
           keyword monitor ${
             getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
@@ -51,7 +51,7 @@ mkIf cfg.enable {
       '';
 
       # FIX: Hyprland bug: active_area_size cannot be reset by setting it to 0 0
-      stopScript = ''
+      stop = ''
         ${hyprctl} --instance 0 --batch "\
           keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
           keyword input:tablet:active_area_size 152 95; \

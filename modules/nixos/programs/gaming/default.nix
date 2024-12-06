@@ -25,12 +25,12 @@ in
             options = {
               includeDefaultProfile = mkEnableOption "the default profile scripts in this profile";
 
-              startScript = mkOption {
+              start = mkOption {
                 type = types.lines;
                 default = "";
               };
 
-              stopScript = mkOption {
+              stop = mkOption {
                 type = types.lines;
                 default = "";
               };

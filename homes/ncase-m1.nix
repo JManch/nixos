@@ -51,7 +51,7 @@
     programs = {
       alacritty.enable = true;
       btop.enable = true;
-      cava.enable = false; # broken package
+      cava.enable = true;
       torBrowser.enable = true;
       git.enable = true;
       neovim.enable = true;

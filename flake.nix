@@ -73,6 +73,9 @@
     nix-colors.url = "github:misterio77/nix-colors";
     nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
 
+    gnome-keybinds.url = "github:JManch/hm-gnome-keybinds";
+    gnome-keybinds.inputs.nixpkgs.follows = "nixpkgs";
+
     # Inputs that provide packages
 
     hyprland.url = "github:hyprwm/Hyprland";

@@ -10,6 +10,9 @@ let
   inherit (lib)
     mkIf
     mkForce
+    foldl'
+    genList
+    optionalAttrs
     ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
@@ -45,6 +48,8 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
       clapper
     ]);
 
+  home-manager.sharedModules = [ inputs.gnome-keybinds.homeManagerModules.default ];
+
   hm = mkIf homeManager.enable {
     dconf.settings =
       let
@@ -61,6 +66,8 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
           # Focus follows mouse
           focus-mode = "sloppy";
           resize-with-right-button = true;
+          dynamic-workspaces = false;
+          num-workspaces = cfg.gnome.workspaceCount;
         };
 
         "org/gnome/mutter" = {
@@ -106,11 +113,63 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
           scroll-action = "cycle-windows";
           apply-custom-theme = true;
           show-trash = false;
+          hot-keys = false;
         };
 
         "org/gnome/system/location" = {
           enabled = false;
         };
+      };
+
+    gnome-keybinds.binds =
+      let
+        workspaceBinds = foldl' (acc: bind: acc // bind) { } (
+          genList (
+            w':
+            let
+              w = toString (w' + 1);
+            in
+            {
+              "switch-to-workspace-${w}" = "<Super>${if w == "10" then "0" else w}";
+              "move-to-workspace-${w}" = "<Shift><Super>${if w == "10" then "0" else w}";
+            }
+            // optionalAttrs (w' < 9) {
+              "switch-to-application-${w}" = [ ];
+              "open-new-window-application-${w}" = [ ];
+            }
+          ) cfg.gnome.workspaceCount
+        );
+      in
+      workspaceBinds
+      // {
+        toggle-maximized = "<Super>f";
+        toggle-fullscreen = "<Shift><Super>f";
+        show-desktop = "<Super>d";
+        screensaver = [ ];
+        switch-to-workspace-left = "<Super>Left";
+        switch-to-workspace-right = "<Super>Right";
+        move-to-workspace-left = "<Shift><Super>Left";
+        move-to-workspace-right = "<Shift><Super>Right";
+        move-to-monitor-left = "<Shift><Control><Super>Left";
+        move-to-monitor-right = "<Shift><Control><Super>Right";
+        toggle-tiled-left = "<Super>bracketleft";
+        toggle-tiled-right = "<Super>bracketright";
+        mic-mute = "<Super>m";
+        toggle-message-tray = [ ];
+      }
+      // optionalAttrs cfg.gnome.advancedBinds {
+        toggle-maximized = "<Super>e";
+        toggle-fullscreen = "<Shift><Super>e";
+        close = "<Super>w";
+        toggle-tiled-left = "<Super>h";
+        toggle-tiled-right = "<Super>l";
+        switch-to-workspace-left = "<Super>j";
+        switch-to-workspace-right = "<Super>k";
+        switch-to-workspace-last = "<Super>n";
+        focus-active-notification = [ ];
+        move-to-workspace-last = "<Shift><Super>n";
+        next = "<Super>period";
+        previous = "<Super>comma";
       };
   };
 }

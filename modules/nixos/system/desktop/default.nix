@@ -73,6 +73,16 @@ in
       '';
     };
 
+    gnome = {
+      advancedBinds = mkEnableOption "advanced binds";
+
+      workspaceCount = mkOption {
+        type = types.ints.between 1 10;
+        default = 4;
+        description = "Number of Gnome workspaces to create";
+      };
+    };
+
     isWayland = mkOption {
       type = types.bool;
       readOnly = true;

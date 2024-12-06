@@ -434,6 +434,26 @@
         "type": "github"
       }
     },
+    "gnome-keybinds": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1733472558,
+        "narHash": "sha256-/9414ug8I9vS4YOiWvTbLcPvDzNTgQLusUuTcdXtlXQ=",
+        "owner": "JManch",
+        "repo": "hm-gnome-keybinds",
+        "rev": "479d86fe2edd8316319e08ffb533de38f846b2ad",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JManch",
+        "repo": "hm-gnome-keybinds",
+        "type": "github"
+      }
+    },
     "gomod2nix": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -1476,6 +1496,7 @@
         "broadcast-box": "broadcast-box",
         "disko": "disko",
         "firstBoot": "firstBoot",
+        "gnome-keybinds": "gnome-keybinds",
         "grimblast": "grimblast",
         "home-manager": "home-manager",
         "hypridle": "hypridle",

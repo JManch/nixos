@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   inputs,
@@ -9,6 +8,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     mkForce
     optional

@@ -1,11 +1,7 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}@args:
+{ lib, config, ... }@args:
 let
   inherit (lib)
+    ns
     mkAliasOptionModule
     mkEnableOption
     mkOption

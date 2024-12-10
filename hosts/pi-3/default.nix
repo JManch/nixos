@@ -1,5 +1,5 @@
 {
-  ns,
+  lib,
   pkgs,
   inputs,
   ...
@@ -10,7 +10,7 @@ in
 {
   imports = [ ./hardware-configuration.nix ];
 
-  ${ns} = {
+  ${lib.ns} = {
     core.homeManager.enable = false;
     hardware.fileSystem.type = "sd-image";
 

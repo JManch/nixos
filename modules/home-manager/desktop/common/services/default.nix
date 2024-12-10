@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   inputs,
@@ -8,6 +7,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkEnableOption
     mkOption
     types
@@ -16,12 +16,15 @@ let
 in
 {
   imports = lib.${ns}.scanPaths ./. ++ [
-    (mkAliasOptionModule [ "darkman" ] [
-      ns
-      "desktop"
-      "services"
-      "darkman"
-    ])
+    (mkAliasOptionModule
+      [ "darkman" ]
+      [
+        ns
+        "desktop"
+        "services"
+        "darkman"
+      ]
+    )
   ];
 
   options.${ns}.desktop.services = {

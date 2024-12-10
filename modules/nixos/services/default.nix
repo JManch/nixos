@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -9,6 +8,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkEnableOption
     mkOption
     optionals
@@ -21,12 +21,15 @@ let
 in
 {
   imports = lib.${ns}.scanPaths ./. ++ [
-    (mkAliasOptionModule [ "backups" ] [
-      ns
-      "services"
-      "restic"
-      "backups"
-    ])
+    (mkAliasOptionModule
+      [ "backups" ]
+      [
+        ns
+        "services"
+        "restic"
+        "backups"
+      ]
+    )
   ];
 
   options.${ns}.services = {
@@ -789,6 +792,7 @@ in
           backups:
           let
             inherit (lib)
+              ns
               optionalAttrs
               mapAttrs'
               mapAttrs

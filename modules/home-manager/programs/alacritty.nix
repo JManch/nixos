@@ -1,12 +1,16 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  inherit (lib) mkIf singleton hiPrio;
+  inherit (lib)
+    ns
+    mkIf
+    singleton
+    hiPrio
+    ;
   inherit (config.${ns}) desktop;
   cfg = config.${ns}.programs.alacritty;
   colors = config.colorScheme.palette;

@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.${ns}.programs.jellyfin-media-player;
+  cfg = config.${lib.ns}.programs.jellyfin-media-player;
 in
 lib.mkIf cfg.enable {
   home.packages = [ pkgs.jellyfin-media-player ];

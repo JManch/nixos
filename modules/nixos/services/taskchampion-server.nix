@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib) ns mkIf singleton;
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (config.${ns}.services) caddy;
   cfg = config.${ns}.services.taskchampion-server;

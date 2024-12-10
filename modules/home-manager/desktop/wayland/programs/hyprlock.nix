@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   inputs,
@@ -8,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib) ns mkIf singleton;
   inherit (config.${ns}) desktop;
   cfg = config.${ns}.desktop.programs.hyprlock;
   colors = config.colorScheme.palette;

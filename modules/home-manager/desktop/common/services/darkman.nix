@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -10,6 +9,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     mkForce
     mapAttrs

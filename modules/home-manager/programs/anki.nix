@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) ns mkIf;
   inherit (config.${ns}.desktop) isWayland;
   cfg = config.${ns}.programs.anki;
 in

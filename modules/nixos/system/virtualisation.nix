@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -10,6 +9,7 @@
 }@args:
 let
   inherit (lib)
+    ns
     mkIf
     mkMerge
     mkVMOverride

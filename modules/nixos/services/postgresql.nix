@@ -2,8 +2,8 @@
 
 # State version upgrade procedure:
 
-# WARN: When upgrading postgresql to a new major version, make sure to use
-# the pq_dump and pq_restore binaries from the version you're upgrading to. 
+# WARN: When upgrading postgresql to a new major version, make sure to use the
+# pq_dump and pq_restore binaries from the version you're upgrading to.
 
 # - Stop home-assistant service
 # - nix shell n#postgresql-<new-version>
@@ -14,14 +14,9 @@
 # - rebuild-boot the host then reboot
 # - sudo -i -u postgres; pg_restore -U postgres --dbname postgres --clean --create /var/backup/...
 # - Re-enable the home-assistant target then rebuild-switch
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) ns mkIf;
   cfg = config.${ns}.services.postgresql;
 in
 mkIf cfg.enable {

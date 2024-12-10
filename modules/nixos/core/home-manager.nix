@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   inputs,
   config,
@@ -9,23 +8,29 @@
   ...
 }@args:
 let
-  inherit (lib) mkIf mkMerge;
+  inherit (lib) ns mkIf mkMerge;
   inherit (config.${ns}.system.virtualisation) vmVariant;
   cfg = config.${ns}.core.homeManager;
 in
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-    (lib.mkAliasOptionModule [ "hm" ] [
-      "home-manager"
-      "users"
-      username
-    ])
-    (lib.mkAliasOptionModule [ "hmAdmin" ] [
-      "home-manager"
-      "users"
-      adminUsername
-    ])
+    (lib.mkAliasOptionModule
+      [ "hm" ]
+      [
+        "home-manager"
+        "users"
+        username
+      ]
+    )
+    (lib.mkAliasOptionModule
+      [ "hmAdmin" ]
+      [
+        "home-manager"
+        "users"
+        adminUsername
+      ]
+    )
   ];
 
   config = mkIf cfg.enable {

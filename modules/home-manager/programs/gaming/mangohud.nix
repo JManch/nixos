@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -7,7 +6,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) ns mkIf;
   inherit (config.${ns}.desktop.style) cornerRadius;
   cfg = config.${ns}.programs.gaming.mangohud;
   device = osConfig'.${ns}.device or null;

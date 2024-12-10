@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) ns mkIf;
   inherit (config.hm.programs) swaylock hyprlock;
   inherit (config.${ns}.core) homeManager;
 in

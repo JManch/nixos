@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -7,7 +6,12 @@
   ...
 }:
 let
-  inherit (lib) mkIf mkForce optionalString;
+  inherit (lib)
+    ns
+    mkIf
+    mkForce
+    optionalString
+    ;
   inherit (config.${ns}.system) impermanence;
   cfg = config.${ns}.hardware.secureBoot;
 in

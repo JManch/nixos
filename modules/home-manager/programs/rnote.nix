@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -7,7 +6,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) ns mkIf;
   inherit (lib.hm.gvariant) mkTuple;
   cfg = config.${ns}.programs.rnote;
 in

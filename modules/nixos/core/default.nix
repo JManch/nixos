@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -9,6 +8,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkOption
     mkEnableOption
     types
@@ -17,19 +17,25 @@ let
 in
 {
   imports = lib.${ns}.scanPaths ./. ++ [
-    (mkAliasOptionModule [ "userPackages" ] [
-      "users"
-      "users"
-      username
-      "packages"
-    ])
+    (mkAliasOptionModule
+      [ "userPackages" ]
+      [
+        "users"
+        "users"
+        username
+        "packages"
+      ]
+    )
 
-    (mkAliasOptionModule [ "adminPackages" ] [
-      "users"
-      "users"
-      adminUsername
-      "packages"
-    ])
+    (mkAliasOptionModule
+      [ "adminPackages" ]
+      [
+        "users"
+        "users"
+        adminUsername
+        "packages"
+      ]
+    )
   ];
 
   options.${ns}.core = {

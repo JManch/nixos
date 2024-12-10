@@ -1,6 +1,6 @@
-{ ns, ... }:
+{ lib, ... }:
 {
-  ${ns} = {
+  ${lib.ns} = {
     core.standalone = true;
 
     shell = {

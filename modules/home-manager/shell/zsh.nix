@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib) ns mkIf singleton;
   cfg = config.${ns}.shell;
 in
 mkIf cfg.enable {

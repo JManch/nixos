@@ -7,7 +7,6 @@
 # stutter during gamma adjustments if audio is coming from monitors. This
 # includes using the headphone jack on a monitor.
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -15,7 +14,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) ns mkIf getExe;
   cfg = config.${ns}.desktop.services.wlsunset;
   latitude = "50.8";
   longitude = "-0.1";

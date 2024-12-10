@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe';
+  inherit (lib) ns mkIf getExe';
   inherit (osConfig'.${ns}.device) primaryMonitor;
   cfg = desktopCfg.programs.swaylock;
   desktopCfg = config.${ns}.desktop;

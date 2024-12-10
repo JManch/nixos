@@ -1,4 +1,4 @@
-{ ns, lib, ... }:
+{ lib, ... }:
 {
-  imports = lib.${ns}.scanPaths ./.;
+  imports = lib.${lib.ns}.scanPaths ./.;
 }

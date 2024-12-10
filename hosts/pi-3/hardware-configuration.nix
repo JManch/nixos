@@ -1,10 +1,10 @@
-{ ns, pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   networking.hostId = "bc80a660";
 
   raspberry-pi-nix.board = "bcm2711";
 
-  ${ns}.hardware.raspberryPi.uboot = {
+  ${lib.ns}.hardware.raspberryPi.uboot = {
     enable = true;
     package = pkgs.ubootRaspberryPi3_64bit;
   };

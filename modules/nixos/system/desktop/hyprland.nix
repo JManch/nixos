@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}@args:
+{ lib, config, ... }@args:
 let
-  inherit (lib) mkIf mkForce;
+  inherit (lib) ns mkIf mkForce;
   inherit (lib.${ns}) asserts isHyprland flakePkgs;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;

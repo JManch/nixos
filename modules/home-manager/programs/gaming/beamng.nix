@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) ns mkIf getExe;
   inherit (config.${ns}) desktop;
 in
 lib.mkIf (osConfig'.${ns}.programs.gaming.steam.enable or false) {

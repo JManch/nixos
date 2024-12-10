@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +7,12 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe' hiPrio;
+  inherit (lib)
+    ns
+    mkIf
+    getExe'
+    hiPrio
+    ;
   inherit (config.${ns}) colorScheme;
   inherit (config.${ns}.desktop.services) darkman;
   inherit (config.${ns}.desktop.style) cursor customTheme;

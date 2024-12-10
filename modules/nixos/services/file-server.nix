@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   inputs,
   config,
@@ -7,7 +6,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf mkMerge;
+  inherit (lib) ns mkIf mkMerge;
   inherit (config.${ns}.services) caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.${ns}.services.file-server;

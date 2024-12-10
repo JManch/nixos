@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib) ns mkIf singleton;
   cfg = config.${ns}.services.hass;
 
   # The shelly should be configured with input mode "Switch", output type

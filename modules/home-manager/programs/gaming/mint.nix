@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}@args:
+{ lib, config, ... }@args:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) ns mkIf getExe;
   cfg = config.${ns}.programs.gaming.mint;
   mint = (lib.${ns}.flakePkgs args "mint").default;
 in

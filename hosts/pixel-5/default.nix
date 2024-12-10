@@ -1,9 +1,6 @@
+{ lib, ... }:
 {
-  ns,
-  ...
-}:
-{
-  ${ns}.nix-on-droid = {
+  ${lib.ns}.nix-on-droid = {
     uid = 10405;
     gid = 10405;
     ssh.server = {

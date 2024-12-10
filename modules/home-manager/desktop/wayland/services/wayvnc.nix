@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  inherit (lib) mkIf getExe';
+  inherit (lib) ns mkIf getExe';
   cfg = config.${ns}.desktop.services.wayvnc;
 in
 # TODO: WIP

@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   config,
   vmVariant,
   ...
 }:
 let
-  inherit (lib) mkIf optional;
+  inherit (lib) ns mkIf optional;
   inherit (config.home) username;
   cfg = config.${ns}.services.syncthing;
 in

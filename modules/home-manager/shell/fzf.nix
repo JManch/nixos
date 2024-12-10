@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) ns mkIf getExe;
   fd = getExe pkgs.fd;
   bat = getExe pkgs.bat;
 in

@@ -1,13 +1,13 @@
 {
-  ns,
+  lib,
   self,
   config,
   inputs,
   ...
 }:
 let
-  inherit (config.${ns}.services) wireguard;
-  ncaseM1IPAddress = self.nixosConfigurations.ncase-m1.config.${ns}.device.ipAddress;
+  inherit (config.${lib.ns}.services) wireguard;
+  ncaseM1IPAddress = self.nixosConfigurations.ncase-m1.config.${lib.ns}.device.ipAddress;
 in
 {
   imports = [
@@ -15,7 +15,7 @@ in
     ./hardware-configuration.nix
   ];
 
-  ${ns} = {
+  ${lib.ns} = {
     core.homeManager.enable = true;
 
     device = {

@@ -1,5 +1,5 @@
 {
-  ns,
+  lib,
   inputs,
   username,
   ...
@@ -10,7 +10,7 @@
     ./disko.nix
   ];
 
-  ${ns} = {
+  ${lib.ns} = {
     device = {
       type = "desktop";
       ipAddress = "192.168.88.254";

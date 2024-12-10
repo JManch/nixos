@@ -34,7 +34,6 @@
 # base0E: "#A37ACC"
 # base0F: "#E6BA7E"
 {
-  ns,
   lib,
   config,
   inputs,
@@ -42,6 +41,7 @@
 }:
 let
   inherit (lib)
+    ns
     types
     mkOption
     genAttrs

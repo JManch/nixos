@@ -1,14 +1,14 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
+  inherit (lib) ns mkIf;
   cfg = config.${ns}.programs.winbox;
 in
-lib.mkIf cfg.enable {
+mkIf cfg.enable {
   # New native linux version
   userPackages = [ pkgs.winbox4 ];
 

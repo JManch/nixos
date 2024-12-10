@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   config,
   inputs,
@@ -8,6 +7,7 @@
 let
   inherit (secrets.general) people userIds devices;
   inherit (lib)
+    ns
     mkOption
     mkEnableOption
     types

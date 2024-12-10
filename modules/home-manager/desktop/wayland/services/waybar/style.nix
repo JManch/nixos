@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   config,
   isWayland,
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) ns mkIf;
   cfg = desktopCfg.services.waybar;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;

@@ -1,17 +1,16 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.${ns}.programs.gaming.bottles;
+  cfg = config.${lib.ns}.programs.gaming.bottles;
 in
 lib.mkIf cfg.enable {
   home.packages = [ pkgs.bottles ];
 
-  ${ns}.programs.gaming = {
+  ${lib.ns}.programs.gaming = {
     gameClasses = [ "steam_proton" ];
     tearingExcludedTitles = [ "Red Dead Redemption" ];
   };

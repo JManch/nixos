@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.${ns}.programs.stremio;
+  cfg = config.${lib.ns}.programs.stremio;
 in
 lib.mkIf cfg.enable {
   home.packages = [ pkgs.stremio ];

@@ -1,6 +1,11 @@
-{ ns, lib, ... }:
+{ lib, ... }:
 let
-  inherit (lib) mkOption types mkEnableOption;
+  inherit (lib)
+    ns
+    mkOption
+    types
+    mkEnableOption
+    ;
 in
 {
   imports = lib.${ns}.scanPaths ./.;

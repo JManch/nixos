@@ -1,11 +1,11 @@
-{ ns, ... }:
+{ lib, ... }:
 {
   imports = [
     ./disko.nix
     ./hardware-configuration.nix
   ];
 
-  ${ns} = {
+  ${lib.ns} = {
     device = {
       type = "desktop";
       ipAddress = "192.168.88.244";

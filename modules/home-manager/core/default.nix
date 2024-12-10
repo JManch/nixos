@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   config,
   osConfig,
@@ -8,6 +7,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     optionalString
     types

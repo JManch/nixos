@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   config,
   inputs,
   ...
 }:
 let
-  cfg = config.${ns}.programs.davinci-resolve;
+  cfg = config.${lib.ns}.programs.davinci-resolve;
 in
 {
   imports = [ inputs.nix-resources.homeManagerModules.davinci-resolve-studio ];

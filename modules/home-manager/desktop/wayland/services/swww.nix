@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +7,12 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe getExe';
+  inherit (lib)
+    ns
+    mkIf
+    getExe
+    getExe'
+    ;
   cfg = config.${ns}.desktop.programs.swww;
   transition =
     let

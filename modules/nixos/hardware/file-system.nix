@@ -8,7 +8,6 @@
 # - config.system.build.destroyScript
 # - config.system.build.mountScript (useful for rescues)
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -17,6 +16,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     mkVMOverride
     nameValuePair
@@ -141,7 +141,8 @@ mkMerge [
                 # PCR 11 doesn't seem to work unfortunately
                 customImportScript = getExe (
                   pkgs.writeShellScriptBin "zfs-import-${pool}-custom" (
-                    replaceStrings [ "prompt )\n      tries=3\n      success=false\n" ]
+                    replaceStrings
+                      [ "prompt )\n      tries=3\n      success=false\n" ]
                       [
                         # bash
                         ''

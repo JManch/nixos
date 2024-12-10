@@ -1,11 +1,7 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
   inherit (lib)
+    ns
     mkIf
     mkMerge
     types

@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   config,
   inputs,
   ...
 }:
 let
-  cfg = config.${ns}.hardware.fanatec;
+  cfg = config.${lib.ns}.hardware.fanatec;
 in
 lib.mkIf cfg.enable {
   boot = {

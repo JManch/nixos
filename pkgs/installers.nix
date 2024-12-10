@@ -1,4 +1,4 @@
-ns: lib: self:
+lib: self:
 let
   inherit (lib)
     listToAttrs
@@ -15,7 +15,6 @@ let
       (nixosSystem {
         specialArgs = {
           inherit
-            ns
             lib
             self
             base

@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   config,
   osConfig',
@@ -7,6 +6,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     mkEnableOption
     mkOption

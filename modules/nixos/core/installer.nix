@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   self,
@@ -8,6 +7,7 @@
 }:
 let
   inherit (lib)
+    ns
     concatStringsSep
     attrNames
     filterAttrs

@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -7,7 +6,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib) ns mkIf singleton;
   inherit (config.${ns}.services) caddy;
   cfg = config.${ns}.services.unifi;
 in

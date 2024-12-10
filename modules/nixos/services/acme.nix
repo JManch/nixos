@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib) ns mkIf singleton;
   inherit (config.age.secrets) acmePorkbunVars;
   cfg = config.${ns}.services.acme;
 in

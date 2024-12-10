@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) ns mkIf;
   inherit (osConfig'.${ns}.device) primaryMonitor;
   inherit (osConfig'.programs) uwsm;
   cfg = desktopCfg.programs.fuzzel;

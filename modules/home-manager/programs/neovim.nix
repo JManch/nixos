@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -7,7 +6,12 @@
   ...
 }@args:
 let
-  inherit (lib) mkIf optionalString optional;
+  inherit (lib)
+    ns
+    mkIf
+    optionalString
+    optional
+    ;
   inherit (config.${ns}.desktop.services) darkman;
   cfg = config.${ns}.programs.neovim;
 in

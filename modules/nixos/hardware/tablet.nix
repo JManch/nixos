@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
-  cfg = config.${ns}.hardware.tablet;
+  cfg = config.${lib.ns}.hardware.tablet;
 in
 lib.mkIf cfg.enable {
   hardware.opentabletdriver.enable = true;

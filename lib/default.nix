@@ -25,6 +25,7 @@ let
     ;
 in
 {
+  inherit ns;
   ${ns} = {
     flakeUtils = self: {
       forEachSystem = lib.${ns}.forEachSystem self [
@@ -45,7 +46,6 @@ in
             hostname
             username
             lib
-            ns
             ;
           selfPkgs = self.packages.${system};
         };
@@ -90,7 +90,6 @@ in
           extraSpecialArgs = {
             inherit (self) inputs;
             inherit
-              ns
               lib
               self
               hostname

@@ -3,7 +3,6 @@
 # - nix shell nixpkgs#gitMinimal nixpkgs#openssh
 # - nix-on-droid switch --flake github:JManch/nixos#<hostname>
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -13,6 +12,7 @@
 }@args:
 let
   inherit (lib)
+    ns
     mkIf
     types
     mkOption

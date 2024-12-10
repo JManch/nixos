@@ -1,12 +1,8 @@
 # https://jinja.palletsprojects.com/en/3.1.x/templates/
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
   inherit (lib)
+    ns
     mkIf
     attrNames
     singleton

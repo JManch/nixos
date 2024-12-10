@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -7,7 +6,12 @@
   ...
 }:
 let
-  inherit (lib) mkIf hiPrio optional;
+  inherit (lib)
+    ns
+    mkIf
+    hiPrio
+    optional
+    ;
   cfg = config.${ns}.programs.mpv;
 in
 mkIf cfg.enable {

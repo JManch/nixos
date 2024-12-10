@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) ns mkIf;
   cfg = config.${ns}.programs.gaming.gamescope;
 in
 mkIf cfg.enable {

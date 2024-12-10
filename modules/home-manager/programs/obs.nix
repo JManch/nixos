@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.${ns}.programs.obs;
+  cfg = config.${lib.ns}.programs.obs;
 in
 lib.mkIf cfg.enable {
   programs.obs-studio = {

@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   self,
   config,
@@ -10,6 +9,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     mapAttrs
     optional

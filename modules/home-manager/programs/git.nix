@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}@args:
+{ lib, config, ... }@args:
 let
-  cfg = config.${ns}.programs.git;
+  cfg = config.${lib.ns}.programs.git;
 in
 lib.mkIf cfg.enable {
   programs.git = {
@@ -40,7 +35,7 @@ lib.mkIf cfg.enable {
     initExtra = # bash
       ''
         lazygit() {
-          ${lib.${ns}.sshAddQuiet args}
+          ${lib.${lib.ns}.sshAddQuiet args}
           command lazygit "$@"
         }
       '';

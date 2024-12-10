@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.${ns}.programs.discord;
+  cfg = config.${lib.ns}.programs.discord;
 in
 lib.mkIf cfg.enable {
   home.packages = with pkgs; [

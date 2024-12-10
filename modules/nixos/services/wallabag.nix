@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf toUpper;
+  inherit (lib) ns mkIf toUpper;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.system) virtualisation;
   cfg = config.${ns}.services.wallabag;

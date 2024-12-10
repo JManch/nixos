@@ -1,4 +1,4 @@
-ns: lib: pkgs: self:
+lib: pkgs: self:
 let
   inherit (pkgs) callPackage;
 in
@@ -18,6 +18,6 @@ in
   hyprpy = pkgs.python3Packages.callPackage ./hyprpy.nix { };
   formulaone-card = callPackage ./formulaone-card.nix { };
   app2unit = callPackage ./app2unit.nix { };
-  microfetch = lib.${ns}.addPatches pkgs.microfetch [ ../patches/microfetchIcon.patch ];
+  microfetch = lib.${lib.ns}.addPatches pkgs.microfetch [ ../patches/microfetchIcon.patch ];
 }
-// import ./installers.nix ns lib self
+// import ./installers.nix lib self

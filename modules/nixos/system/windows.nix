@@ -1,12 +1,16 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  inherit (lib) mkIf mkMerge optional;
+  inherit (lib)
+    ns
+    mkIf
+    mkMerge
+    optional
+    ;
   inherit (config.${ns}.hardware) secureBoot;
   inherit (cfg.bootEntry) fsAlias;
   cfg = config.${ns}.system.windows;

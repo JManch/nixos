@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   osConfig',
@@ -8,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf mkForce;
+  inherit (lib) ns mkIf mkForce;
   udisks = osConfig'.${ns}.services.udisks;
 in
 mkIf (desktopEnabled && udisks.enable && !vmVariant) {

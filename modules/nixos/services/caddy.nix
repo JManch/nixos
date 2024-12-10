@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -9,6 +8,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     all
     mkMerge

@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   config,
   hostname,
   ...
 }:
 let
-  inherit (lib) mkIf genAttrs;
+  inherit (lib) ns mkIf genAttrs;
   cfg = config.${ns}.services.ollama;
 in
 mkIf cfg.enable {

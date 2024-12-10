@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   config,
   username,
@@ -8,6 +7,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkEnableOption
     mkOption
     types

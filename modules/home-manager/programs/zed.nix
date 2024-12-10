@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  cfg = config.${ns}.programs.zed;
+  cfg = config.${lib.ns}.programs.zed;
   jsonFormat = pkgs.formats.json { };
 in
 lib.mkIf cfg.enable {

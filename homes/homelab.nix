@@ -1,6 +1,6 @@
-{ ns, ... }:
+{ lib, ... }:
 {
-  ${ns} = {
+  ${lib.ns} = {
     shell = {
       enable = true;
       promptColor = "blue";

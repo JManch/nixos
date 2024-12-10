@@ -5,7 +5,6 @@
 # local network. We use the Ctrld dns forwarding proxy because it provides
 # extra statistics to the web UI for monitoring and enables DoH/3.
 {
-  ns,
   lib,
   pkgs,
   self,
@@ -16,6 +15,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     mkForce
     mapAttrs'

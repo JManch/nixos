@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) ns mkIf;
   cfg = config.${ns}.system.desktop;
 in
 mkIf (cfg.enable && cfg.desktopEnvironment == "xfce") {

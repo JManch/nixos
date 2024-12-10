@@ -5,7 +5,6 @@
 #   does not work.
 # - Some games are broken with Monado so require suffering with SteamVR
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -15,6 +14,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     getExe
     getExe'

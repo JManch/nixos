@@ -1,12 +1,7 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
-  inherit (config.${ns}.desktop) style;
-  cfg = config.${ns}.programs.foot;
+  inherit (config.${lib.ns}.desktop) style;
+  cfg = config.${lib.ns}.programs.foot;
 in
 lib.mkIf cfg.enable {
   programs.foot = {

@@ -1,12 +1,16 @@
 {
-  ns,
   lib,
   pkgs,
   config,
   ...
 }:
 let
-  inherit (lib) mkIf genAttrs singleton;
+  inherit (lib)
+    ns
+    mkIf
+    genAttrs
+    singleton
+    ;
   cfg = config.${ns}.services.factorio-server;
 in
 mkIf cfg.enable {

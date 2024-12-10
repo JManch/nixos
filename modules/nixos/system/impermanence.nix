@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -10,6 +9,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     mkForce
     mkMerge
@@ -73,27 +73,36 @@ in
   imports = [
     inputs.impermanence.nixosModules.impermanence
 
-    (mkAliasOptionModule [ "persistence" ] [
-      "environment"
-      "persistence"
-      "/persist"
-    ])
+    (mkAliasOptionModule
+      [ "persistence" ]
+      [
+        "environment"
+        "persistence"
+        "/persist"
+      ]
+    )
 
-    (mkAliasOptionModule [ "persistenceHome" ] [
-      "environment"
-      "persistence"
-      "/persist"
-      "users"
-      username
-    ])
+    (mkAliasOptionModule
+      [ "persistenceHome" ]
+      [
+        "environment"
+        "persistence"
+        "/persist"
+        "users"
+        username
+      ]
+    )
 
-    (mkAliasOptionModule [ "persistenceAdminHome" ] [
-      "environment"
-      "persistence"
-      "/persist"
-      "users"
-      adminUsername
-    ])
+    (mkAliasOptionModule
+      [ "persistenceAdminHome" ]
+      [
+        "environment"
+        "persistence"
+        "/persist"
+        "users"
+        adminUsername
+      ]
+    )
   ];
 
   config = mkMerge [

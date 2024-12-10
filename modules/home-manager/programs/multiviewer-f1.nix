@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -7,7 +6,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) ns mkIf getExe;
   inherit (config.${ns}.desktop.hyprland) modKey namedWorkspaceIDs;
   cfg = config.${ns}.programs.multiviewerF1;
 

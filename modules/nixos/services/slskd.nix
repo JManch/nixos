@@ -1,11 +1,6 @@
-{
-  ns,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib) ns mkIf singleton;
   inherit (config.${ns}.services) caddy;
   inherit (config.${ns}.device) vpnNamespace;
   cfg = config.${ns}.services.slskd;

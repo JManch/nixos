@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf optionalAttrs;
+  inherit (lib) ns mkIf optionalAttrs;
   cfg = config.${ns}.desktop.xdg;
   home = config.home.homeDirectory;
 in

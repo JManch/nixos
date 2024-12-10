@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   pkgs,
   osConfig',
   ...
 }:
 let
-  inherit (lib) mkIf getExe;
+  inherit (lib) ns mkIf getExe;
 in
 mkIf (osConfig'.${ns}.hardware.valve-index.enable or false) {
   home.packages = [ pkgs.wlx-overlay-s ];

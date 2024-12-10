@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +7,12 @@
   ...
 }:
 let
-  inherit (lib) mkIf getExe' mkForce;
+  inherit (lib)
+    ns
+    mkIf
+    getExe'
+    mkForce
+    ;
   inherit (config.${ns}) desktop;
   inherit (config.${ns}.colorScheme) light;
   inherit (osConfig'.${ns}.device) primaryMonitor;

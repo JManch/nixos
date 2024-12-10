@@ -38,7 +38,6 @@
 # Be careful when adding custom routes as their subnets must not encapsulate
 # the subnets of any existing routes.
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -47,6 +46,7 @@
 }:
 let
   inherit (lib)
+    ns
     mkIf
     all
     getExe

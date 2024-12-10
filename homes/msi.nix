@@ -1,4 +1,4 @@
-{ ns, pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   home.packages = with pkgs; [
     libreoffice
@@ -8,7 +8,7 @@
     netflix
   ];
 
-  ${ns} = {
+  ${lib.ns} = {
     desktop = {
       enable = true;
       style.cursor = {

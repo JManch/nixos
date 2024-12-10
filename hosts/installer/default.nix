@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   self,
@@ -8,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) concatStringsSep;
+  inherit (lib) ns concatStringsSep;
   installScript = pkgs.writeShellApplication {
     name = "install-local";
 

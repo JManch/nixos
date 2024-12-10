@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   config,
@@ -8,7 +7,7 @@
   ...
 }:
 let
-  inherit (lib) optional;
+  inherit (lib) ns optional;
   inherit (config.${ns}.core) priviledgedUser;
 in
 {

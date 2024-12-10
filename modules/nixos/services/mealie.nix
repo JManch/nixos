@@ -1,12 +1,11 @@
 {
-  ns,
   lib,
   config,
   inputs,
   ...
 }:
 let
-  inherit (lib) mkIf singleton;
+  inherit (lib) ns mkIf singleton;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy;
   cfg = config.${ns}.services.mealie;

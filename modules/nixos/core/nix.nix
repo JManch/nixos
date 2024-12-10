@@ -1,5 +1,4 @@
 {
-  ns,
   lib,
   pkgs,
   self,
@@ -11,6 +10,7 @@
 }@args:
 let
   inherit (lib)
+    ns
     mkIf
     mkMerge
     mapAttrs

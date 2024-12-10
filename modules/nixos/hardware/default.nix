@@ -16,6 +16,7 @@ let
     mapAttrsToList
     hasAttr
     hasPrefix
+    removeAttrs
     literalExpression
     ;
   cfg = config.${ns}.hardware;
@@ -67,9 +68,7 @@ in
       };
 
       uboot = {
-        enable = mkEnableOption "uboot bootloader (disable on newer pis)" // {
-          default = null;
-        };
+        enable = removeAttrs (mkEnableOption "uboot bootloader (disable on newer pis)") [ "default" ];
 
         package = mkOption {
           type = types.package;
@@ -99,9 +98,11 @@ in
         description = "The type of filesystem on this host";
       };
 
+      ext4.trim = removeAttrs (mkEnableOption "ext4 automatic trimming") [ "default" ];
+
       zfs = {
         unstable = mkEnableOption "unstable ZFS";
-        trim = mkEnableOption "ZFS automatic trimming";
+        trim = removeAttrs (mkEnableOption "ZFS automatic trimming") [ "default" ];
 
         encryption = {
           enable = mkOption {
@@ -152,7 +153,7 @@ in
                 memory
               else
                 1024 * 4;
-            description = "Size of swap partition in megabytes";
+            description = "Size of swap file in megabytes";
           };
         };
     };

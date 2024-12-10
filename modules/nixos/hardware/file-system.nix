@@ -73,6 +73,10 @@ mkMerge [
     };
   }
 
+  (mkIf (cfg.type == "ext4") {
+    services.fstrim.enable = cfg.ext4.trim;
+  })
+
   (mkIf (cfg.type == "zfs") {
     # We use legacy ZFS mountpoints and use systemd to mount them rather than
     # ZFS' auto-mount. Might want to switch to using the ZFS native mountpoints

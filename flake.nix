@@ -67,6 +67,7 @@
 
     nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
     nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
+    nixpkgs-xr.inputs.treefmt-nix.follows = "";
 
     # Inputs that provide imported home-manager modules
 

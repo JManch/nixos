@@ -140,11 +140,12 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
     let
       xdg-terminal = getExe pkgs.xdg-terminal-exec;
       alacritty = getExe config.programs.alacritty.package;
+      zsh = getExe pkgs.zsh;
     in
     mkIf config.${ns}.desktop.enable {
       name = "Spotify";
       genericName = "Music Player";
-      exec = ''${xdg-terminal} --title=Spotify -e "\\$SHELL" "-c" "${alacritty} msg config font.size=11 || true; ${spotify-player}"'';
+      exec = ''${xdg-terminal} --title=Spotify -e ${zsh} "-c" "${alacritty} msg config font.size=11 || true; ${spotify-player}"'';
       terminal = false;
       type = "Application";
       categories = [ "Audio" ];

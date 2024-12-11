@@ -58,11 +58,12 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
       xdg-terminal = getExe pkgs.xdg-terminal-exec;
       alacritty = getExe config.programs.alacritty.package;
       cava = getExe config.programs.cava.package;
+      zsh = getExe pkgs.zsh;
     in
     mkIf config.${ns}.desktop.enable {
       name = "Cava";
       genericName = "Audio Visualizer";
-      exec = ''${xdg-terminal} --title=Cava --app-id=cava -e "\\$SHELL" "-c" "${alacritty} msg config font.size=9 || true; ${cava}"'';
+      exec = ''${xdg-terminal} --title=Cava --app-id=cava -e ${zsh} "-c" "${alacritty} msg config font.size=9 || true; ${cava}"'';
       terminal = false;
       type = "Application";
       icon = "audio-x-generic";

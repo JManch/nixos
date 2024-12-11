@@ -34,7 +34,9 @@ let
     caddy
     postgresql
     ;
-  inherit (config.age.secrets) mqttHassPassword mqttFaikinPassword;
+  inherit (config.${ns}.device) ipAddress;
+  inherit (config.age.secrets) everythingPresenceVars mqttHassPassword mqttFaikinPassword;
+  inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.${ns}.services.hass;
   cameras = attrNames config.services.frigate.settings.cameras;
 in
@@ -43,6 +45,7 @@ in
 
   options.${ns}.services.hass = {
     enable = mkEnableOption "Home Assistant";
+    everythingPresenceContainer = mkEnableOption "everything presence container";
 
     enableInternal = mkOption {
       type = types.bool;
@@ -387,6 +390,20 @@ in
       requires = [ "postgresqlBackup-hass.service" ];
       after = [ "postgresqlBackup-hass.service" ];
     };
+
+    virtualisation.oci-containers.containers.everything-presence =
+      mkIf cfg.everythingPresenceContainer
+        {
+          image = "everythingsmarthome/everything-presence-mmwave-configurator:1.1.1";
+          ports = [ "8099:8099" ];
+          environment.HA_URL = "http://${ipAddress}:8123";
+          environmentFiles = [ everythingPresenceVars.path ];
+        };
+
+    networking.firewall.allowedTCPPorts = mkIf cfg.everythingPresenceContainer [ 8099 ];
+    networking.firewall.interfaces.podman0.allowedTCPPorts = mkIf cfg.everythingPresenceContainer [
+      8123
+    ];
 
     persistence.directories = singleton {
       directory = "/var/lib/hass";

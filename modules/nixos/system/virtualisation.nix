@@ -332,7 +332,7 @@ in
       persistence.directories = [ "/var/lib/libvirt" ];
     })
 
-    (mkIf cfg.containerisation.enable {
+    (mkIf (config.virtualisation.oci-containers.containers != { }) {
       virtualisation.oci-containers.backend = "podman";
 
       persistence.directories = [ "/var/lib/containers" ];

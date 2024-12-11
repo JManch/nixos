@@ -43,6 +43,7 @@ in
 
     services = {
       hass.enable = true;
+      hass.everythingPresenceContainer = false;
       postgresql.enable = true;
       unifi.enable = true;
       mosquitto.enable = true;

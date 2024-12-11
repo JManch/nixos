@@ -438,11 +438,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1733472558,
-        "narHash": "sha256-/9414ug8I9vS4YOiWvTbLcPvDzNTgQLusUuTcdXtlXQ=",
+        "lastModified": 1733860783,
+        "narHash": "sha256-Xb3uSWiKej+67O1OiZwo/TTh3ttWnlz4uB9VxamcqTc=",
         "owner": "JManch",
         "repo": "hm-gnome-keybinds",
-        "rev": "479d86fe2edd8316319e08ffb533de38f846b2ad",
+        "rev": "1f1a9a2a12dd672a903dff2990d01595c7fed7ad",
         "type": "github"
       },
       "original": {

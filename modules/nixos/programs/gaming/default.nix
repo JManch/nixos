@@ -12,8 +12,12 @@ in
 
   options.${ns}.programs.gaming = {
     enable = mkEnableOption "gaming optimisations";
-    steam.enable = mkEnableOption "Steam";
     gamescope.enable = mkEnableOption "Gamescope";
+
+    steam = {
+      enable = mkEnableOption "Steam";
+      lanTransfer = mkEnableOption "opening ports for LAN game transfer";
+    };
 
     gamemode = {
       enable = mkEnableOption "Gamemode";

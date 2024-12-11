@@ -115,6 +115,7 @@
       gaming = {
         enable = true;
         steam.enable = true;
+        steam.lanTransfer = true;
         gamescope.enable = true;
         gamemode.enable = true;
       };

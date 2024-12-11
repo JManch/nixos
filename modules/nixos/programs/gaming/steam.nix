@@ -10,6 +10,7 @@ let
     mkIf
     mapAttrs'
     nameValuePair
+    singleton
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.hm.xdg) dataHome;
@@ -66,6 +67,14 @@ mkIf cfg.enable {
     enable = true;
     protontricks.enable = true;
     extraCompatPackages = [ pkgs.proton-ge-bin ];
+  };
+
+  networking.firewall = mkIf cfg.lanTransfer {
+    allowedTCPPorts = [ 27040 ];
+    allowedUDPPortRanges = singleton {
+      from = 27031;
+      to = 27036;
+    };
   };
 
   persistenceHome.directories = [

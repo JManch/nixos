@@ -19,5 +19,6 @@ in
   formulaone-card = callPackage ./formulaone-card.nix { };
   app2unit = callPackage ./app2unit.nix { };
   microfetch = lib.${lib.ns}.addPatches pkgs.microfetch [ ../patches/microfetchIcon.patch ];
+  xdg-terminal-exec = callPackage ./xdg-terminal-exec.nix { };
 }
 // import ./installers.nix lib self

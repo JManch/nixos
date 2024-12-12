@@ -5,16 +5,15 @@
   pydantic,
   ...
 }:
-buildPythonPackage {
+buildPythonPackage rec {
   pname = "hyprpy";
-  version = "0.1.8";
+  version = "0.1.9";
 
-  # PR fixes issue with fullscreen state
   src = fetchFromGitHub {
     repo = "hyprpy";
-    owner = "Evangelospro";
-    rev = "867e7c97670ac9a322af64d5e46dfa46c68805b6";
-    hash = "sha256-SPfFl1meI32hafFObyOvTHtcLMJB1SSd7aV29ian+Xc=";
+    owner = "ulinja";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-xnvoiHxDxYVwR1ZrKRGWB5oManaJSP/2sDsQ7KLRpmE=";
   };
 
   format = "pyproject";

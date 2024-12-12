@@ -295,13 +295,16 @@ mkIf cfg.enable {
   # Unfortunately the bitwarden app does not support TLS client authentication
   # https://github.com/bitwarden/mobile/issues/582
   # https://github.com/bitwarden/mobile/pull/2629
-  ${ns}.services.caddy.virtualHosts.vaultwarden.extraConfig = ''
-    reverse_proxy http://127.0.0.1:${toString cfg.port} {
-      # Send the true remote IP to Rocket, so that Vaultwarden can put this
-      # in the log
-      header_up X-Real-IP {remote_host}
-    }
-  '';
+  ${ns}.services.caddy.virtualHosts.vaultwarden = {
+    inherit (cfg) extraAllowedAddresses;
+    extraConfig = ''
+      reverse_proxy http://127.0.0.1:${toString cfg.port} {
+        # Send the true remote IP to Rocket, so that Vaultwarden can put this
+        # in the log
+        header_up X-Real-IP {remote_host}
+      }
+    '';
+  };
 
   backups.vaultwarden = {
     paths = [ "/var/backup/vaultwarden-archive" ];

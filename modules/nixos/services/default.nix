@@ -224,8 +224,7 @@ in
         type = with types; listOf str;
         default = [ ];
         description = ''
-          List of address to give access to Broadcast Box in addition to the
-          trusted list.
+          List of address to give access to Broadcast Box.
         '';
       };
 
@@ -501,6 +500,15 @@ in
       port = mkOption {
         type = types.port;
         default = 8222;
+      };
+
+      extraAllowedAddresses = mkOption {
+        type = with types; listOf str;
+        default = [ ];
+        description = ''
+          List of address to give access to Vaultwarden in addition to the
+          trusted list.
+        '';
       };
     };
 

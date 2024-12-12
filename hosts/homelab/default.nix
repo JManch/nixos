@@ -66,6 +66,7 @@ in
       vaultwarden = {
         enable = true;
         adminInterface = false;
+        extraAllowedAddresses = [ "10.0.0.0/24" ];
       };
 
       caddy = {

@@ -83,7 +83,8 @@ mkIf (isHyprland config) {
 
   # Install Hyprcursor package
   home.file = mkIf (cfg.hyprcursor.package != null) {
-    ".icons/${cfg.hyprcursor.name}".source = "${cfg.hyprcursor.package}/share/icons/${cfg.hyprcursor.name}";
+    ".icons/${cfg.hyprcursor.name}".source =
+      "${cfg.hyprcursor.package}/share/icons/${cfg.hyprcursor.name}";
   };
 
   # Generate hyprland debug config

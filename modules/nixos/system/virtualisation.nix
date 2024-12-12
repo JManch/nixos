@@ -170,7 +170,6 @@ in
           system = {
             audio.enable = mkVMOverride false;
             virtualisation.libvirt.enable = mkVMOverride false;
-            virtualisation.containerisation.enable = mkVMOverride false;
             virtualisation.vmVariant = true;
 
             networking = {

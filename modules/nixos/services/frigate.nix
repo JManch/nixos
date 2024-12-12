@@ -137,13 +137,14 @@ mkIf cfg.enable {
 
           zones.entrance.coordinates = "0.535,0.177,0.569,0.233,0.411,0.256,0.405,0.191";
           zones.entrance.inertia = 1;
-          review.alerts.required_zones = [ "entrance" ];
+          # Disabling this because it seems reduce detection rates
+          # review.alerts.required_zones = [ "entrance" ];
 
           # I feel like this zone shouldn't be necessary as I'd expect all
           # events in non-alert zones to be treated as detections but
           # detections don't work without this...
-          zones.driveway-zone.coordinates = "0,0.063,0.41,0.253,0.569,0.229,1,0.088,1,1,0,1";
-          review.detections.required_zones = [ "driveway-zone" ];
+          # zones.driveway-zone.coordinates = "0,0.063,0.41,0.253,0.569,0.229,1,0.088,1,1,0,1";
+          # review.detections.required_zones = [ "driveway-zone" ];
 
           objects.filters.car.mask = [ "0.633,0,0.633,0.08,0.409,0.089,0.406,0.28,0.621,0.479,1,1,0,1,0,0" ];
         };

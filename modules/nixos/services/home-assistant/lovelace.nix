@@ -366,11 +366,18 @@ let
                 grid_columns = 4;
                 grid_rows = 2;
               };
-              visibility = singleton {
-                condition = "state";
-                entity = "lawn_mower.lewis";
-                state_not = "docked";
-              };
+              visibility = [
+                {
+                  condition = "state";
+                  entity = "lawn_mower.lewis";
+                  state_not = "docked";
+                }
+                {
+                  condition = "state";
+                  entity = "lawn_mower.lewis";
+                  state_not = "unavailable";
+                }
+              ];
             }
           ]
           ++ (optionals frigate.enable (

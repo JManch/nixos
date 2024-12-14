@@ -185,6 +185,13 @@ in
               options.mountpoint = "legacy";
               options.recordsize = "1M";
             };
+
+            "${pseudoRoot}/persist/vm-images" = {
+              type = "zfs_fs";
+              mountpoint = "/persist/images";
+              options.mountpoint = "legacy";
+              options.recordsize = "64K"; # optimised for qcow2 images
+            };
           };
         };
       };

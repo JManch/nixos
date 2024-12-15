@@ -19,6 +19,7 @@ let
     isType
     optional
     mapAttrsToList
+    sort
     optionalString
     replaceStrings
     listToAttrs
@@ -346,6 +347,15 @@ in
   persistenceAdminHome.directories = [ ".remote-builds" ];
   boot.binfmt.emulatedSystems = cfg.builder.emulatedSystems;
   services.getty.helpLine = mkForce "";
+
+  # Useful for finding the exact config that built a generation
+  environment.etc.current-flake.source = ../../..;
+
+  # Include flake git rev in system label
+  system.nixos.label = concatStringsSep "-" (
+    (sort (x: y: x < y) config.system.nixos.tags)
+    ++ [ "${config.system.nixos.version}-${self.sourceInfo.shortRev or "dirty"}" ]
+  );
 
   # Nice explanation of overlays: https://archive.is/f8goR
   # How to override python packages:

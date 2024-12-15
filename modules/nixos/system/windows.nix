@@ -18,7 +18,7 @@ in
 mkMerge [
   (mkIf cfg.enable {
     # Enable mounting windows ntfs drive
-    environment.systemPackages = [ pkgs.ntfs3g ];
+    boot.supportedFilesystems.ntfs = true;
   })
 
   (mkIf cfg.bootEntry.enable {
@@ -37,7 +37,7 @@ mkMerge [
 
     # How to get the fs alias:
     # 1. Run `sudo blkid | grep vfat` and take note of the PARTUUID of the Windows 'EFI system partition'
-    # 2. Enable bootEntry.bootstrap and reboot into edk2-shell
+    # 2. Make sure cfg.fsAlias is null and reboot into edk2-shell
     # 3. Take note of the fs alias starting with HD... for matching PARTUUID
     # 4. Set bootEntry.fsAlias to the alias and disable bootEntry.bootstrap
 
@@ -46,7 +46,7 @@ mkMerge [
     # Mirror: https://archive.is/wwZaP
 
     boot.loader.systemd-boot = {
-      extraFiles."EFI/edk2-shell/shellx64.efi" = mkIf (fsAlias == null) pkgs.edk2-uefi-shell.efi;
+      extraFiles."EFI/edk2-shell/shellx64.efi" = pkgs.edk2-uefi-shell.efi;
 
       extraEntries = {
         "windows.conf" = mkIf (fsAlias != null) ''
@@ -57,7 +57,7 @@ mkMerge [
 
         "edk2-shell.conf" = mkIf (fsAlias == null) ''
           title edk2-shell
-          efi /efi/edk2-shell/shellx64.efi
+          efi /EFI/edk2-shell/shellx64.efi
         '';
       };
 

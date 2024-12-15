@@ -480,11 +480,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1711594267,
-        "narHash": "sha256-fpBj2EA1TU9wdo9v48U/CMrl20yYKSw88eX8qgjbcSY=",
+        "lastModified": 1734196751,
+        "narHash": "sha256-uZq+t3GjMnz2zVNAY+e8lg171ePhMSP3DyKF3QzOu+8=",
         "owner": "JManch",
         "repo": "grimblast",
-        "rev": "93f81de950370511e1654350565f4da94449ff00",
+        "rev": "4386874c3c53bcd917639bc0efcb8167e3eaf65f",
         "type": "github"
       },
       "original": {

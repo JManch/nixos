@@ -165,9 +165,26 @@ let
   syncClipboard =
     pkgs.writeShellScript "sync-clipboard" # bash
       ''
+        set -o pipefail
         echo -n "$(${getExe' pkgs.wl-clipboard "wl-paste"} -n)" | ${getExe pkgs.xclip} -selection clipboard && \
           ${notifySend} --urgency=low -t 2000 'Hyprland' 'Synced Wayland clipboard with X11' || \
           ${notifySend} --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
+      '';
+
+  copyScreenshotText =
+    pkgs.writeShellScript "copy-screenshot-text" # bash
+      ''
+        set -o pipefail
+        ${cfg.disableShaders}
+        text=$(${grimblast} --freeze save area - | ${getExe pkgs.tesseract} stdin stdout)
+        exit=$?
+        ${cfg.enableShaders}
+        if [ $exit -eq 0 ]; then
+          echo "$text" | ${getExe' pkgs.wl-clipboard "wl-copy"}
+          ${notifySend} -t 5000 -a Grimblast "Text Copied" "$text"
+        else
+          ${notifySend} --urgency=critical -t 5000 "Screenshot" "Failed to copy text"
+        fi
       '';
 
   moveToNextEmpty = pkgs.writeShellScript "hypr-move-to-next-empty" ''
@@ -260,6 +277,7 @@ mkIf (isHyprland config) {
         "${modShift}, I, exec, ${disableShadersCommand "${grimblast} --notify save output"}"
         "${modShiftCtrl}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save window"}"
         "${modShiftCtrl}, I, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy window"}"
+        "${modShiftCtrl}, C, exec, ${copyScreenshotText}"
 
         # Workspaces other
         "${mod}, N, workspace, previous_per_monitor"
@@ -335,16 +353,14 @@ mkIf (isHyprland config) {
         fi
 
         declare -A monitor_num_to_name
-        ${
-          concatMapStringsSep "\n  " (m: "monitor_num_to_name[${toString m.number}]='${m.name}'") monitors
-        }
+        ${concatMapStringsSep "\n  " (
+          m: "monitor_num_to_name[${toString m.number}]='${m.name}'"
+        ) monitors}
 
         declare -A monitor_name_to_cfg
-        ${
-          concatMapStringsSep "\n  " (
-            m: "monitor_name_to_cfg[${m.name}]='${getMonitorHyprlandCfgStr m}'"
-          ) monitors
-        }
+        ${concatMapStringsSep "\n  " (
+          m: "monitor_name_to_cfg[${m.name}]='${getMonitorHyprlandCfgStr m}'"
+        ) monitors}
 
         if [[ ! -v monitor_num_to_name[$1] ]]; then
           echo "Error: monitor with number '$1' does not exist"

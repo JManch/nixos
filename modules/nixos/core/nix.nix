@@ -231,12 +231,10 @@ let
             "nix-on-droid"
           )
 
-          # Inputs and with relateive file paths to check for changes in.
+          # Inputs and with relative file paths to check for changes in.
           # Separate multiple file paths with spaces.
           declare -A input_file_pairs=(
-            ["nixpkgs"]="nixos/modules/tasks/filesystems/zfs.nix"
-            ["nixpkgs"]="nixos/modules/programs/wayland/hyprland.nix"
-            ["nixpkgs"]="nixos/modules/programs/wayland/uwsm.nix"
+            ["nixpkgs"]="nixos/modules/tasks/filesystems/zfs.nix nixos/modules/programs/wayland/hyprland.nix nixos/modules/programs/wayland/uwsm.nix"
           )
 
           input_exists_in_lockfiles() {
@@ -307,19 +305,19 @@ let
                     if [ -d "/home/${adminUsername}/files/repos/$repo/.git" ]; then
                       repo_dir="/home/${adminUsername}/files/repos/$repo"
                     elif [ ! -d "$tmp_repos/$input" ]; then
-                      git clone "https://$source_type.com/$owner/$repo" "$tmp_repos/$input"
+                      git clone "https://$source_type.com/$owner/$repo" "$tmp_repos/$input" -q
                     fi
 
                     pushd "$repo_dir" >/dev/null
 
                     # In our local nixpkgs repo origin is our fork
                     if [[ "$repo" == "nixpkgs" && "$repo_dir" != "$tmp_repos/$input" && "$owner" == "NixOS" ]]; then
-                      git fetch upstream "$ref" >/dev/null
+                      git fetch upstream "$ref" -q
                     else
-                      git fetch origin "$ref" >/dev/null
+                      git fetch origin "$ref" -q
                     fi
 
-                    diff_output=$(git diff "$old_rev" "$new_rev" -- "$file_path" >/dev/null)
+                    diff_output=$(git diff "$old_rev" "$new_rev" -- "$file_path")
                     if [[ -n "$diff_output" ]]; then
                       if $first_diff; then
                         echo -e "\033[1;34m\nTracked input files have changed. View diffs below:\n\033[0m"

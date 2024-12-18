@@ -194,6 +194,7 @@ in
             minecraft-server.enable = mkVMOverride false;
             mikrotik-backup.enable = mkVMOverride false;
             index-checker.enable = mkVMOverride false;
+            ollama.enable = mkVMOverride false;
           };
         };
 

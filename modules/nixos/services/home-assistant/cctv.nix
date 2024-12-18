@@ -71,6 +71,7 @@ let
       path = "SgtBatten/frigate_notifications.yaml";
       input = {
         camera = "camera.${camera}";
+        custom_filter = "{{ states('sensor.outdoor_sensor_temperature') | float(0) >= 20 }}";
         notify_device = devices.joshua.id;
         notify_group = "Adults Except ${upperFirstChar people.person5}";
         sticky = true;

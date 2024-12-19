@@ -446,8 +446,9 @@ in
                             state = "unavailable";
                             # Alarm has to be unavailable for 5 minutes for it to be considered unavailable
                             # and for adaptive lighting to be reset to default. This is because when the
-                            # alarm goes off, it always becomes unavailable for a few seconds and if this
-                            # reset the lights it potentially flashbangs you when waking up.
+                            # alarm goes off the next alarm entity becomes unavailable for a few seconds.
+                            # This resets adaptive lighting and potentially potentially flashbangs you when
+                            # waking up.
                             for = mkIf addFor { minutes = 5; };
                           }
                         else
@@ -700,105 +701,101 @@ in
                 };
                 actions =
                   let
-                    luminenceCondition = below: {
-                      condition = "numeric_state";
-                      entity_id = "sensor.${cfg'.automatedToggle.luminence.sensor}";
-                      below = mkIf below cfg'.automatedToggle.luminence.threshold;
-                      above = mkIf (!below) cfg'.automatedToggle.luminence.threshold;
-                    };
+                    luminenceCondition =
+                      below:
+                      singleton {
+                        condition = "numeric_state";
+                        entity_id = "sensor.${cfg'.automatedToggle.luminence.sensor}";
+                        below = mkIf below cfg'.automatedToggle.luminence.threshold;
+                        above = mkIf (!below) cfg'.automatedToggle.luminence.threshold;
+                      };
+
+                    triggeredByLuminence =
+                      yes:
+                      singleton (
+                        if yes then
+                          {
+                            condition = "trigger";
+                            id = [ "luminence" ];
+                          }
+                        else
+                          {
+                            condition = "not";
+                            conditions = singleton {
+                              condition = "trigger";
+                              id = [ "luminence" ];
+                            };
+                          }
+                      );
+
+                    timeToWake = "(${wakeUpTimestamp} - (now().timestamp() | round(0)))";
+                    isSleeping =
+                      yes:
+                      singleton {
+                        condition = "template";
+                        value_template = "{{ ${wakeUpTimestamp} != 0 and ${
+                          if yes then
+                            # 30 minute grace period after wake-up to account for lie-ins
+                            "${timeToWake} <= ${sleepDuration}*60*60 or ${timeToWake} >= 23.5*60*60"
+                          else
+                            "${timeToWake} > ${sleepDuration}*60*60"
+                        } }}";
+                      };
                   in
                   singleton {
-                    "if" = singleton {
-                      condition = "and";
-                      conditions = [
-                        {
-                          condition = "state";
-                          entity_id = "light.${room}_lights";
-                          state = "off";
-                        }
-                        (luminenceCondition true)
-                        {
-                          condition = "or";
-                          conditions = [
-                            {
-                              condition = "not";
-                              conditions = singleton {
-                                condition = "trigger";
-                                id = [ "luminence" ];
-                              };
-                            }
-                            {
-                              condition = "numeric_state";
-                              entity_id = "sensor.${roomCfg.deviceId}_sleep_confidence";
-                              below = 90;
-                            }
-                          ];
-                        }
-                      ] ++ cfg'.automatedToggle.presenceConditions;
-                    };
+                    "if" =
+                      cfg'.automatedToggle.presenceConditions
+                      ++ luminenceCondition true
+                      # If the room has sleep tracking we can add an additional check to ensure that
+                      # lights do not turn on whilst sleeping even if presence conditions are met
+                      ++ optional roomCfg.sleepTracking.enable {
+                        condition = "or";
+                        conditions = triggeredByLuminence false ++ isSleeping false;
+                      };
                     "then" = singleton {
                       action = "light.turn_on";
                       target.entity_id = "light.${room}_lights";
                     };
                     "else" =
-                      optional (cfg'.automatedToggle.offDelay != null) { delay.seconds = cfg'.automatedToggle.offDelay; }
-                      ++ [
-                        {
-                          "if" = singleton {
-                            condition = "and";
-                            conditions = [
-                              {
-                                condition = "state";
-                                entity_id = "light.${room}_lights";
-                                state = "on";
-                              }
-                              {
-                                condition = "or";
-                                conditions = [
-                                  (luminenceCondition false)
-                                  {
-                                    condition = "not";
-                                    conditions = singleton {
-                                      condition = "trigger";
-                                      id = [ "luminence" ];
-                                    };
-                                  }
-                                ];
-                              }
-                              {
-                                condition = "or";
-                                conditions = [
-                                  {
-                                    condition = "not";
-                                    conditions = singleton {
-                                      condition = "trigger";
-                                      id = [ "luminence" ];
-                                    };
-                                  }
-                                  {
-                                    condition = "numeric_state";
-                                    entity_id = "sensor.${roomCfg.deviceId}_sleep_confidence";
-                                    below = 90;
-                                  }
-                                ];
-                              }
-                            ] ++ cfg'.automatedToggle.noPresenceConditions;
-                          };
-                          "then" = singleton {
-                            action = "light.turn_off";
-                            target.entity_id = "light.${room}_lights";
-                          };
-                        }
-                      ];
+                      optional (cfg'.automatedToggle.offDelay != null) {
+                        delay.seconds = cfg'.automatedToggle.offDelay;
+                      }
+                      # Do not turn off the lights if the user is sleeping and trigger was luminence
+                      # change. Useful for rooms that rely on solar power gen for luminence
+                      # detection.
+                      ++ optional roomCfg.sleepTracking.enable {
+                        condition = "not";
+                        conditions = singleton {
+                          condition = "and";
+                          conditions = triggeredByLuminence true ++ isSleeping true;
+                        };
+                      }
+                      ++ singleton {
+                        "if" = singleton {
+                          condition = "or";
+                          conditions = [
+                            {
+                              condition = "and";
+                              conditions = cfg'.automatedToggle.noPresenceConditions;
+                            }
+                            {
+                              condition = "and";
+                              conditions = triggeredByLuminence true ++ luminenceCondition true;
+                            }
+                          ];
+                        };
+                        "then" = singleton {
+                          action = "light.turn_off";
+                          target.entity_id = "light.${room}_lights";
+                        };
+                      };
                   };
               }
               {
-                # This automated disabled automated light toggling if the
-                # lights are "manually" turned off. We treat anything trigger
-                # that was not an automation as "manual". This way turning
-                # lights off to sleep will keep them off regardless of
-                # presence/lumination until an automation like wake up lighting
-                # turns them back on.
+                # This automation disables automated light toggling if the lights are
+                # "manually" turned off. We treat any trigger that was not an automation as
+                # "manual". This way lights can be forced off even when the room has a presence
+                # sensor.
                 alias = "${formattedRoomName} Automated Lights Toggle";
                 mode = "single";
                 triggers = singleton {
@@ -830,9 +827,8 @@ in
               }
             ];
 
-            input_boolean."${room}_automated_lights_toggle" = {
-              name = "${formattedRoomName} Automated Lights Toggle";
-            };
+            input_boolean."${room}_automated_lights_toggle".name =
+              "${formattedRoomName} Automated Lights Toggle";
           })
         ])
       ) cfg.rooms

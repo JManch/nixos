@@ -171,8 +171,6 @@ mkIf cfg.enable {
             "1024,0,1024,445,994,411,981,309,951,262,860,252,752,249,749,305,811,313,810,408,661,496,537,492,282,456,0,453,0,0"
           ];
 
-          # Only alert for cats on this camera
-          review.alerts.labels = [ "cat" ];
           objects.filters.car.mask = [ "1024,576,0,576,0,306,1024,316" ];
         };
       };

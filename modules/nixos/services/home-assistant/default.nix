@@ -36,7 +36,6 @@ let
     ;
   inherit (config.${ns}.device) ipAddress;
   inherit (config.age.secrets) everythingPresenceVars mqttHassPassword mqttFaikinPassword;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   cfg = config.${ns}.services.hass;
   cameras = attrNames config.services.frigate.settings.cameras;
 in
@@ -68,6 +67,11 @@ in
       postgresql.enable
       "Home Assistant requires postgresql to be enabled"
     ];
+
+    warnings = optional cfg.everythingPresenceContainer ''
+      Home Assistant Everything Presence container is enabled; it should only
+      be used temporarily.
+    '';
 
     ${ns}.services = {
       hass.enableInternal = true;

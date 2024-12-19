@@ -12,8 +12,8 @@ let
     mkOption
     types
     concatStringsSep
-    concatMapStrings
     optional
+    optionals
     ;
   inherit (config.${ns}.desktop) hyprland;
   inherit (osConfig'.${ns}.device) primaryMonitor;
@@ -62,15 +62,9 @@ in
       default = [ ];
       description = ''
         List of game window classes that will be automatically moved to the
-        gaming workspace and have tearing enabled. To disable tearing for a
-        specific game add it to tearingExcludedClasses.
+        gaming workspace and have tearing enabled. To exclude a game from
+        tearing add it to tearingExcludedClasses or tearingExcludedTitles.
       '';
-    };
-
-    gameRegex = mkOption {
-      type = types.str;
-      readOnly = true;
-      apply = _: "^(${concatStringsSep "|" config.${ns}.programs.gaming.gameClasses})$";
     };
 
     tearingExcludedClasses = mkOption {
@@ -88,23 +82,6 @@ in
         Regex list of titles of games that should be excluded from tearing.
       '';
     };
-
-    tearingRegex = mkOption {
-      type = types.str;
-      readOnly = true;
-      apply =
-        let
-          inherit (config.${ns}.programs.gaming) tearingExcludedClasses tearingExcludedTitles gameClasses;
-          tearingClassRegex = concatStringsSep "|" gameClasses;
-          excludeRegex = list: concatMapStrings (x: "(?!${x}$)") list;
-        in
-        _:
-        "class:^${excludeRegex tearingExcludedClasses}(${tearingClassRegex})$, title:^${excludeRegex tearingExcludedTitles}(.*)$";
-      description = ''
-        The complete regex expression for tearing that matches all game classes
-        and excludes all excluded tearing classes and titles.
-      '';
-    };
   };
 
   config = mkIf (osGaming.enable or false) {
@@ -116,11 +93,20 @@ in
     desktop.hyprland.settings =
       let
         inherit (hyprland) modKey namedWorkspaceIDs;
+        concatRegex = regexes: "^(${concatStringsSep "|" regexes})$";
+        gameClassRegex = concatRegex cfg.gameClasses;
       in
       {
-        windowrulev2 = [
-          "workspace ${namedWorkspaceIDs.GAME}, class:${cfg.gameRegex}"
-        ] ++ optional hyprland.tearing "immediate, ${cfg.tearingRegex}";
+        windowrulev2 =
+          [
+            "workspace ${namedWorkspaceIDs.GAME}, class:${gameClassRegex}"
+          ]
+          ++ optionals hyprland.tearing [
+            "tag +tear_game, class:${gameClassRegex}"
+            "tag -tear_game, tag:tear_game*, class:${concatRegex cfg.tearingExcludedClasses}"
+            "tag -tear_game, tag:tear_game*, title:${concatRegex cfg.tearingExcludedTitles}"
+            "immediate, tag:tear_game"
+          ];
 
         bind = [
           "${modKey}, G, workspace, ${namedWorkspaceIDs.GAME}"

@@ -1324,11 +1324,11 @@
     },
     "nixpkgs-broadcast-box": {
       "locked": {
-        "lastModified": 1732546556,
-        "narHash": "sha256-JKowcry47Ea+rkpuZ48D8OCjuZM8EbnHjcMrUZG77dk=",
+        "lastModified": 1734661077,
+        "narHash": "sha256-P0+jPkR8oYiT1NLf9AuRBJk4ZXcwgrbDSA2qX/0gcRI=",
         "owner": "JManch",
         "repo": "nixpkgs",
-        "rev": "936ab3371e5739ef460e0088a85d1f76d128cbf4",
+        "rev": "e2a2e3ec68a137df55e440e23ede5cb07c073ead",
         "type": "github"
       },
       "original": {

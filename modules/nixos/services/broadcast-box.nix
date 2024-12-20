@@ -38,7 +38,7 @@ in
       openFirewall = true;
       web = {
         inherit (cfg) port;
-        address = optionalString cfg.proxy "127.0.0.1";
+        host = optionalString cfg.proxy "127.0.0.1";
         openFirewall = true;
       };
       settings = {
@@ -47,11 +47,7 @@ in
       };
     };
 
-    systemd.services.broadcast-box = {
-      after = mkForce [ "network-online.target" ];
-      wants = mkForce [ "network-online.target" ];
-      wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
-    };
+    systemd.services.broadcast-box.wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
 
     # Playback for remote clients sometimes breaks until service is restarted
     systemd.services.broadcast-box-restart = {

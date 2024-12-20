@@ -47,7 +47,7 @@ mkIf (cfg.enable && desktopEnabled) {
 
           corner_radius = cornerRadius;
           width = builtins.floor (primaryMonitor.width * 0.14);
-          height = builtins.floor (primaryMonitor.height * 0.25);
+          height = "(0, ${toString (builtins.floor (primaryMonitor.height * 0.25))})";
           offset =
             let
               offset = (gapSize * 2) + borderWidth;

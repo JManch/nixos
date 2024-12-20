@@ -106,23 +106,33 @@ mkIf cfg.enable {
         workspaceMatch = "workspace:${namedWorkspaceIDs.TWITCH}";
       in
       [
-        # Rules for chatterino window on twitch workspace
+        "tag +twitch_remove, ${workspaceMatch}"
+
+        # Chatterino window opened on twitch workspace
+        "tag -twitch_remove, tag:twitch_remove, class:^(com\\.chatterino\\.)$"
         "float, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
         "move ${
           toString (100 - chatterinoPercentage)
         }% 0%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
         "size ${toString chatterinoPercentage}% 100%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
 
-        # Rules for firefox window opened on twitch workspace
+        # Firefox window opened on twitch workspace
+        "tag -twitch_remove, tag:twitch_remove, class:^(firefox)$"
         "float, ${workspaceMatch}, class:^(firefox)$"
         "move 0% 0%, ${workspaceMatch}, class:^(firefox)$"
         "size ${toString (100 - chatterinoPercentage)}% 100%, ${workspaceMatch}, class:^(firefox)$"
 
         # Rules for mpv twitch streams opened on twitch workspace or other workspaces
+        "tag -twitch_remove, tag:twitch_remove, class:^(mpv)$, title:^(twitch\\.tv.*)$"
         "workspace ${namedWorkspaceIDs.TWITCH} silent, class:^(mpv)$, title:^(twitch\\.tv.*)$"
         "float, class:^(mpv)$, title:^(twitch\\.tv.*)$"
         "move 0% 0%, class:^(mpv)$, title:^(twitch\\.tv.*)$"
         "size ${toString (100 - chatterinoPercentage)}% 100%, class:^(mpv)$, title:^(twitch\\.tv.*)$"
+
+        # Move any non-twitch windows opened on the twitch workspace into a new
+        # empty workspace
+        "workspace emptym, tag:twitch_remove"
+        "tag -twitch_remove, tag:twitch_remove"
       ];
   };
 

@@ -56,12 +56,13 @@ let
     hasAttr
     mapAttrs
     attrNames
+    concatMapStringsSep
+    flatten
     removePrefix
     substring
     mkMerge
     ;
   inherit (config.${ns}.services) dns-stack;
-  inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (lib.${ns}) asserts;
   interfaces = config.${ns}.services.wireguard;
 in
@@ -113,6 +114,7 @@ in
         wg-quick.interfaces."wg-${interface}" =
           let
             iptables = getExe' pkgs.iptables "iptables";
+            resolvectl = getExe' pkgs.systemd "resolvectl";
           in
           {
             # Unlike the allowedIPs setting, the subnet mask here (/24) doesn't
@@ -144,6 +146,17 @@ in
             preUp = mkIf cfg.dns.host ''
               ${iptables} -t nat -A PREROUTING -i wg-${interface} -p udp --dport 53 -j REDIRECT --to-port ${toString cfg.dns.port}
               ${iptables} -t nat -A PREROUTING -i wg-${interface} -p tcp --dport 53 -j REDIRECT --to-port ${toString cfg.dns.port}
+            '';
+
+            # In order for custom DNS domain routing rules to work we have to
+            # add the domains with a custom command instead of using the
+            # wg-quick config because wg-quick uses `resolveconf -x` which
+            # adds an unwanted ~. domain routing rule.
+            postUp = mkIf (cfg.dns.enable && (cfg.dns.domains != { }) && config.services.resolved.enable) ''
+              ${resolvectl} default-route wg-${interface} false
+              ${resolvectl} domain wg-${interface} ${
+                concatMapStringsSep " " (domain: "\"~${domain}\"") (attrNames cfg.dns.domains)
+              }
             '';
 
             postDown = mkIf cfg.dns.host ''
@@ -180,10 +193,12 @@ in
             settings = dns-stack.dnsmasqConfig // {
               port = cfg.dns.port;
 
-              address = [
-                "/${fqDomain}/${cfg.address}"
-                "/${fqDomain}/"
-              ];
+              address = flatten (
+                mapAttrsToList (domain: address: [
+                  "/${domain}/${address}"
+                  "/${domain}/" # respond with NXDOMAIN for ipv6
+                ]) cfg.dns.domains
+              );
 
               host-record = mapAttrsToList (
                 address: hostname: "${hostname}.${interface},${address}"

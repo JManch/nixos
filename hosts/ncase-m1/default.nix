@@ -4,6 +4,9 @@
   username,
   ...
 }:
+let
+  inherit (inputs.nix-resources.secrets) tomFqDomain;
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -154,8 +157,9 @@
         address = "10.0.0.2";
         subnet = 24;
         dns = {
-          enable = false;
+          enable = true;
           address = "10.0.0.7";
+          domains.${tomFqDomain} = "";
         };
       };
 

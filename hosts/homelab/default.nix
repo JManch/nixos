@@ -7,6 +7,7 @@
 }:
 let
   inherit (config.${lib.ns}.services) wireguard;
+  inherit (inputs.nix-resources.secrets) fqDomain tomFqDomain;
   ncaseM1IPAddress = self.nixosConfigurations.ncase-m1.config.${lib.ns}.device.ipAddress;
 in
 {
@@ -140,6 +141,10 @@ in
         subnet = 24;
         dns = {
           host = true;
+          domains = {
+            ${fqDomain} = "10.0.0.7";
+            ${tomFqDomain} = "10.0.0.9";
+          };
           port = 13233;
         };
       };

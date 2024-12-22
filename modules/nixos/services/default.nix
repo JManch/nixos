@@ -92,6 +92,26 @@ in
             enable = mkEnableOption "a custom DNS server for the VPN";
             host = mkEnableOption "hosting the custom DNS server on this host";
 
+            domains = mkOption {
+              type = with types; attrsOf str;
+              default = { };
+              example = {
+                "example.com" = "10.0.0.4";
+              };
+              description = ''
+                Attribute set of domains mapped to addresses. If systemd
+                resolved is used the DNS server associated with this VPN will
+                not longer be the default route. Instead, the configured
+                domains will be added as DNS routing rules (in this case the
+                address does not matter). This means that only DNS requests to
+                these domains will be routed through the custom DNS server
+                configured for the VPN.
+
+                If `dns.host` is enabled, DNS redirect rules mapping domains to
+                their addresses will be added to the DNS server.
+              '';
+            };
+
             address = mkOption {
               type = types.str;
               default = null;

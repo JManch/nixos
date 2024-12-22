@@ -24,11 +24,6 @@ in
 mkIf (cfg.enable && desktopEnabled) {
   services.dunst = {
     enable = true;
-    package =
-      (import (fetchTarball {
-        url = "https://github.com/NixOS/nixpkgs/archive/203bd5972e9a136ba8b18da87b8c53dec280d8c4.tar.gz";
-        sha256 = "sha256:0jmq54wr2xbw9y72zcw9ahahccy4m3g1rw51n9pyim9wy0kg6860";
-      }) { inherit (pkgs) system; }).dunst;
 
     settings = {
       global =

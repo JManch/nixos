@@ -80,10 +80,6 @@
 
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
-    hyprland.inputs.aquamarine.follows = "aquamarine";
-
-    aquamarine.url = "github:hyprwm/aquamarine";
-    aquamarine.inputs.nixpkgs.follows = "nixpkgs";
 
     hyprland-plugins.url = "github:hyprwm/hyprland-plugins";
     hyprland-plugins.inputs.hyprland.follows = "hyprland";

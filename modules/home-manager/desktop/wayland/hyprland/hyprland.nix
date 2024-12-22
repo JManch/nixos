@@ -141,8 +141,6 @@ mkIf (isHyprland config) {
     plugins = optionals cfg.plugins.enable (with flakePkgs args "hyprland-plugins"; [ hyprexpo ]);
 
     settings = {
-      exec-once = mkOrder 2000 [ "uwsm finalize" ];
-
       monitor =
         (map (m: if !m.enabled then "${m.name},disable" else getMonitorHyprlandCfgStr m) monitors)
         ++ [

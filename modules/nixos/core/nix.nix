@@ -363,15 +363,6 @@ in
     overlays = [
       (final: prev: {
         inherit (selfPkgs) xdg-terminal-exec;
-        uwsm = prev.uwsm.overrideAttrs {
-          version = "git";
-          src = prev.fetchFromGitHub {
-            owner = "Vladimir-csp";
-            repo = "uwsm";
-            rev = "5fafff9a1e0464b46a528193c07f36a791d912b6";
-            hash = "sha256-yjKKDizL0Ibne1oUn18h21XBfpGYdMFyD/wdSPQA/Zs=";
-          };
-        };
       })
     ];
     config.allowUnfree = true;

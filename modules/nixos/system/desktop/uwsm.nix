@@ -23,6 +23,20 @@ mkMerge [
       (cfg.displayManager == "uwsm" -> config.programs.uwsm.enable)
       "Using UWSM as a display manager requires it to be enabled"
     ];
+
+    nixpkgs.overlays = [
+      (final: prev: {
+        uwsm = prev.uwsm.overrideAttrs {
+          version = "git";
+          src = final.fetchFromGitHub {
+            owner = "Vladimir-csp";
+            repo = "uwsm";
+            rev = "23d26470608505d8a24941a63097b454c894da85";
+            hash = "sha256-F9UXN2rkzetE5Tsd6bc/JDC8rOu5MS8CCtVJ3nXwQR8=";
+          };
+        };
+      })
+    ];
   }
 
   (mkIf (cfg.enable && config.programs.uwsm.enable) {

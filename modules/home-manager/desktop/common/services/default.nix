@@ -160,14 +160,11 @@ in
         '';
       };
 
-      dependencyUnit = mkOption {
+      wallpaperUnit = mkOption {
         type = types.str;
-        default = "graphical-session.target";
         example = "swww.service";
         description = ''
-          The dependency unit for the set-wallpaper service.
-          graphical-session.target will always work but using the specific
-          wallpaper setter service may provide less delay.
+          Unit of the wallpaper managager.
         '';
       };
 

@@ -93,10 +93,9 @@ mkIf (cfg.setWallpaperCmd != null && desktopEnabled) (mkMerge [
       Unit = {
         Description = "Set the desktop wallpaper";
         X-SwitchMethod = "keep-old";
-        PartOf = [ cfg.dependencyUnit ];
-        Requisite = [ cfg.dependencyUnit ];
+        Requisite = [ cfg.wallpaperUnit ];
         After =
-          [ cfg.dependencyUnit ]
+          [ cfg.wallpaperUnit ]
           ++ optional cfg.randomise.enable "randomise-wallpaper.service"
           ++ optional darkman.enable "darkman.service";
       };
@@ -106,7 +105,7 @@ mkIf (cfg.setWallpaperCmd != null && desktopEnabled) (mkMerge [
         ExecStart = getExe setWallpaper;
       };
 
-      Install.WantedBy = optional (!(darkman.enable && cfg.randomise.enable)) "graphical-session.target";
+      Install.WantedBy = [ cfg.wallpaperUnit ];
     };
   }
 

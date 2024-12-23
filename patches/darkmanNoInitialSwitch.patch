@@ -1,0 +1,19 @@
+diff --git a/service.go b/service.go
+index 5ee8590..16b84e7 100644
+--- a/service.go
++++ b/service.go
+@@ -38,8 +38,12 @@ func NewService(initialMode Mode) Service {
+ func (service *Service) AddListener(listener func(Mode) error) {
+ 	*service.listeners = append(*service.listeners, listener)
+ 	// Apply once with the initial mode.
+-	if err := listener(service.currentMode); err != nil {
+-		fmt.Println("error applying initial mode:", err)
++	// Only apply once if initial mode is LIGHT as we theme all our applications
++	// for dark mode by default
++	if service.currentMode == LIGHT {
++		if err := listener(service.currentMode); err != nil {
++			fmt.Println("error applying initial mode:", err)
++		}
+ 	}
+ }
+ 

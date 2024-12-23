@@ -24,7 +24,7 @@ in
 mkIf (cfg.enable && isWayland) {
   ${ns}.desktop.services.wallpaper = {
     setWallpaperCmd = "${getExe pkgs.swww} img ${transition}";
-    dependencyUnit = "swww.service";
+    wallpaperUnit = "swww.service";
   };
 
   systemd.user.services.swww = {

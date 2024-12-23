@@ -231,11 +231,11 @@ in
         )
         "Monitor numbers must be sequential and start from 1"
         (
-          (vpnNamespace == null)
-          -> (all (x: x == false) (mapAttrsToList (_: v: v.vpnConfinement.enable) config.systemd.services))
+          vpnNamespace == null
+          -> all (x: x == false) (mapAttrsToList (_: v: v.vpnConfinement.enable) config.systemd.services)
         )
         "Services on this host have VPN confinement enabled but no VPN namespace is set"
-        ((vpnNamespace != null) -> (config.vpnNamespaces.${vpnNamespace}.enable or false))
+        (vpnNamespace != null -> config.vpnNamespaces.${vpnNamespace}.enable or false)
         "The VPN namespace '${vpnNamespace}' is not enabled or does not exist"
       ];
     };

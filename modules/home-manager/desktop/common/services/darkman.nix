@@ -35,7 +35,7 @@ let
 in
 mkIf (cfg.enable && desktopEnabled) {
   assertions = lib.${ns}.asserts [
-    ((cfg.switchMethod == "hass") -> hassIntegration.enable)
+    (cfg.switchMethod == "hass" -> hassIntegration.enable)
     "Darkman 'hass' switch mode requires the device to have hass integration enabled"
   ];
 

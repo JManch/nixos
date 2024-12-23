@@ -7,7 +7,7 @@
 
 - Single-command deployment with Disko and NixOS Anywhere
 - Fully modular configuration utilising NixOS module options
-- Tmpfs root file system with opt-in persistence, no stateful cruft
+- Tmpfs root file system with opt-in persistence—no stateful cruft
 - Persistent ZFS file system with full-disk encryption and compression
 - Passwordless disk decryption with Secure Boot and TPM
 - Declarative base-16 color scheme config with light/dark theme switching
@@ -46,7 +46,7 @@ regressions.
 
 ## Secret Management
 
-Secrets are managed using Agenix and are stored in a separate, private, repo. A
+Secrets are managed using Agenix and are stored in a separate private repo. A
 private repo was required for storing personal packages and some slightly
 sensitive configuration (not sensitive enough to require encryption).
 Therefore, it was decided that secrets might as well be placed in the private

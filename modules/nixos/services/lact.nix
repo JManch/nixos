@@ -133,7 +133,8 @@ mkIf cfg.enable {
         '';
     in
     {
-      # Just change the power profile to 3D_FULL_SCREEN by default
+      # Default gamemode behaviour is to just change the power profile to
+      # 3D_FULL_SCREEN
       default = {
         start = ''
           id=$(${getId})
@@ -163,7 +164,7 @@ mkIf cfg.enable {
       # Use the high_perf profile for higher power cap of 257. In unigine
       # superposition 4k optimised gives an 8% FPS increase (122fps -> 132fps).
       # Max core clock speeds go 2000MHz -> 2200Mhz. Thermals are a fair bit
-      # worse though, ~200rpm fan increase.
+      # worse though, with a ~200rpm fan increase.
       high_perf = {
         includeDefaultProfile = true;
         start = "${setPowerCap 257}";

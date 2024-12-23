@@ -98,7 +98,7 @@ in
         "A private key secret for Wireguard VPN interface '${interface}' is missing"
         (cfg.dns.host -> dns-stack.enable)
         "The DNS stack must be enabled on this host to allow VPN DNS hosting"
-        (cfg.routerPeer -> (cfg.routerAllowedIPs != [ ]))
+        (cfg.routerPeer -> cfg.routerAllowedIPs != [ ])
         ''
           The `routerAllowedIPs` list for Wireguard VPN interface ${interface}
           must not be empty if `routerPeer` is enabled
@@ -117,13 +117,10 @@ in
             resolvectl = getExe' pkgs.systemd "resolvectl";
           in
           {
-            # Unlike the allowedIPs setting, the subnet mask here (/24) doesn't
-            # represent a group of 256 IP addresses, it represents the network
-            # mask for the interface. Since the subnet mask is 255.255.255.0, it
-            # tells the interface that other devices on the network will have IP
-            # addresses in that range. It is used for routing to determine if a
-            # destination IP address is on the same network and if it can be directly
-            # communicated with rather than going through the default gateway.
+            # Unlike the allowedIPs setting, the subnet mask here represents
+            # the network mask for the interface. It tells the interface that
+            # other devices on the network will have IP addresses in this
+            # subnet.
             address = [ "${cfg.address}/${toString cfg.subnet}" ];
             listenPort = cfg.listenPort;
             autostart = cfg.autoStart;

@@ -92,30 +92,26 @@ in
         (lib.${ns}.flakePkgs args "nix-resources").berkeley-mono-nerdfont
       }/share/fonts/truetype/NerdFonts/BerkeleyMonoNerdFont-Regular.ttf";
 
-      colors =
-        let
-          colors = config.home-manager.config.colorScheme.palette;
-        in
-        {
-          background = "#${colors.base00}";
-          foreground = "#${colors.base05}";
-          color0 = "#${colors.base03}";
-          color1 = "#${colors.base08}";
-          color2 = "#${colors.base0B}";
-          color3 = "#${colors.base0A}";
-          color4 = "#${colors.base0D}";
-          color5 = "#${colors.base0E}";
-          color6 = "#${colors.base0C}";
-          color7 = "#${colors.base04}";
-          color8 = "#${colors.base03}";
-          color9 = "#${colors.base08}";
-          color10 = "#${colors.base0B}";
-          color11 = "#${colors.base0A}";
-          color12 = "#${colors.base0D}";
-          color13 = "#${colors.base0E}";
-          color14 = "#${colors.base0C}";
-          color15 = "#${colors.base03}";
-        };
+      colors = with config.home-manager.config.colorScheme.palette; {
+        background = "#${base00}";
+        foreground = "#${base05}";
+        color0 = "#${base03}";
+        color1 = "#${base08}";
+        color2 = "#${base0B}";
+        color3 = "#${base0A}";
+        color4 = "#${base0D}";
+        color5 = "#${base0E}";
+        color6 = "#${base0C}";
+        color7 = "#${base04}";
+        color8 = "#${base03}";
+        color9 = "#${base08}";
+        color10 = "#${base0B}";
+        color11 = "#${base0A}";
+        color12 = "#${base0D}";
+        color13 = "#${base0E}";
+        color14 = "#${base0C}";
+        color15 = "#${base03}";
+      };
     };
 
     home-manager = {

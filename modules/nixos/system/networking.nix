@@ -33,7 +33,7 @@ in
   assertions = lib.${ns}.asserts [
     (cfg.wiredInterface != null)
     "Wired networking interface must be set"
-    ((cfg.staticIPAddress != null) -> (cfg.defaultGateway != null))
+    (cfg.staticIPAddress != null -> cfg.defaultGateway != null)
     "Default gateway must be set when using a static IPV4 address"
     (vlanIds != [ ] -> cfg.useNetworkd)
     "VLAN config only works with networkd"

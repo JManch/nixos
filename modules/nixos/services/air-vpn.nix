@@ -37,11 +37,9 @@ in
         configFile = airVpnConfig.path;
       };
 
-      programs.zsh = {
-        shellAliases = {
-          air-vpn-up = "sudo systemctl start wg-quick-air-vpn";
-          air-vpn-down = "sudo systemctl stop wg-quick-air-vpn";
-        };
+      programs.zsh.shellAliases = {
+        air-vpn-up = "sudo systemctl start wg-quick-air-vpn";
+        air-vpn-down = "sudo systemctl stop wg-quick-air-vpn";
       };
     })
 

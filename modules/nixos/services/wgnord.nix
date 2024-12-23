@@ -18,6 +18,7 @@ let
   inherit (config.${ns}.system.networking) wiredInterface defaultGateway resolved;
   cfg = config.${ns}.services.wgnord;
   ip = getExe' pkgs.iproute2 "ip";
+
   wgnord = pkgs.wgnord.overrideAttrs (old: {
     src = old.src.overrideAttrs {
       patches = (old.patches or [ ]) ++ [
@@ -28,8 +29,8 @@ let
 
   generateConfig = pkgs.writeShellScript "wgnord-generate-config" ''
     umask 0077
-    # Wgnord is patched so all it does is generate a config file
-    mkdir -p /etc/wireguard
+    [ -d /etc/wireguard ] && chmod 700 /etc/wireguard || mkdir /etc/wireguard
+    # Wgnord is patched to only generate a config file
     ${getExe wgnord} connect ${cfg.country} "$(<${config.age.secrets.nordToken.path})" "${template}" "/etc/wireguard/wgnord.conf"
   '';
 
@@ -70,7 +71,7 @@ in
 
     (mkIf cfg.enable {
       assertions = asserts [
-        ((cfg.excludeSubnets != [ ]) -> (defaultGateway != null))
+        (cfg.excludeSubnets != [ ] -> defaultGateway != null)
         "Default gateway must be set to use wgnord subnet exclusion"
         resolved.enable
         "Wg-quick Nord VPN requires systemd resolved to be enabled"
@@ -83,11 +84,9 @@ in
 
       systemd.services.wg-quick-wgnord.preStart = generateConfig.outPath;
 
-      programs.zsh = {
-        shellAliases = {
-          wgnord-up = "sudo systemctl start wg-quick-wgnord";
-          wgnord-down = "sudo systemctl stop wg-quick-wgnord";
-        };
+      programs.zsh.shellAliases = {
+        wgnord-up = "sudo systemctl start wg-quick-wgnord";
+        wgnord-down = "sudo systemctl stop wg-quick-wgnord";
       };
     })
 
@@ -95,9 +94,7 @@ in
       vpnNamespaces.wgnord = {
         enable = true;
         wireguardConfigFile = "/etc/wireguard/wgnord.conf";
-        accessibleFrom = [
-          "127.0.0.1"
-        ];
+        accessibleFrom = [ "127.0.0.1" ];
       };
 
       systemd.services.wgnord.serviceConfig.ExecStartPre = generateConfig;

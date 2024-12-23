@@ -23,9 +23,9 @@ let
 in
 mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
   assertions = lib.${ns}.asserts [
-    (cfg.runInRam -> (impermanence.enable or false))
+    (cfg.runInRam -> impermanence.enable or false)
     "Firefox run in RAM option can only be used on hosts with impermanence enabled"
-    (cfg.hideToolbar -> (!pkgs.hostPlatform.isDarwin))
+    (cfg.hideToolbar -> !pkgs.hostPlatform.isDarwin)
     "Hide toolbar does not currently work on darwin because of how we hardcode the userChrome.css path to avoid IFD"
   ];
 
@@ -317,13 +317,14 @@ mkIf (cfg.enable && (osConfig'.${ns}.system.desktop.enable or true)) {
       "${modKey}SHIFT, Backspace, exec, app2unit firefox"
     ];
 
-  ${ns}.desktop.hyprland.eventScripts.windowtitlev2 = singleton (pkgs.writeShellScript "hypr-bitwarden-windowtitlev2" ''
-    if [[ $2 == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
-      hyprctl --batch "\
-        dispatch setfloating address:0x$1; \
-        dispatch resizewindowpixel exact 20% 50%, address:0x$1; \
-        dispatch centerwindow; \
-      "
-    fi
-  '').outPath;
+  ${ns}.desktop.hyprland.eventScripts.windowtitlev2 =
+    singleton (pkgs.writeShellScript "hypr-bitwarden-windowtitlev2" ''
+      if [[ $2 == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
+        hyprctl --batch "\
+          dispatch setfloating address:0x$1; \
+          dispatch resizewindowpixel exact 20% 50%, address:0x$1; \
+          dispatch centerwindow; \
+        "
+      fi
+    '').outPath;
 }

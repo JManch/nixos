@@ -26,7 +26,7 @@
   # To use a local flake as an input set url to "git+file://<PATH>"
 
   # When locking a flake to a rev, it's important to manually run `nix flake
-  # update <input>` otherwise the inputs of the locked flake will not be
+  # update <input>`; otherwise, the inputs of the locked flake will not be
   # updated https://github.com/NixOS/nix/issues/7860
   inputs = {
     # Critical inputs that provide imported NixOS modules or overlays. Ideally

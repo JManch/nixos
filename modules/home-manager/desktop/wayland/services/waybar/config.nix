@@ -276,7 +276,11 @@ mkIf (cfg.enable && isWayland) {
 
   systemd.user.services.waybar = {
     Unit.After = mkForce [ "graphical-session.target" ];
-    Service.Slice = [ "app-graphical.slice" ];
+    Unit.X-Restart-Triggers = mkForce [ ];
+    Service = {
+      Slice = [ "app-graphical.slice" ];
+      ExecReload = mkForce [ ];
+    };
   };
 
   darkman.switchApps.waybar = {

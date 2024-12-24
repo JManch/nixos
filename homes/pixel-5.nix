@@ -1,8 +1,6 @@
 { lib, ... }:
 {
   ${lib.ns} = {
-    core.standalone = true;
-
     shell = {
       enable = true;
       promptColor = "green";

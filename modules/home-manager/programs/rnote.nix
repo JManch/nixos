@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
@@ -13,7 +13,7 @@ in
 mkIf cfg.enable {
   home.packages = [ pkgs.rnote ];
 
-  dconf.settings = mkIf (osConfig'.${ns}.system.impermanence.enable or false) {
+  dconf.settings = mkIf (osConfig.${ns}.system.impermanence.enable or false) {
     "com/github/flxzt/rnote" = {
       active-fill-color = mkTuple [
         0.0

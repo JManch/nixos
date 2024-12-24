@@ -3,14 +3,14 @@
   pkgs,
   config,
   selfPkgs,
-  osConfig',
+  osConfig,
   ...
 }:
 let
   inherit (lib) ns mkIf getExe;
   inherit (config.${ns}) desktop;
 in
-lib.mkIf (osConfig'.${ns}.programs.gaming.steam.enable or false) {
+lib.mkIf (osConfig.${ns}.programs.gaming.steam.enable or false) {
   # Native Linux version setup:
   # - Add non-steam game pointing to .local/share/Steam/steamapps/common/BeamNG.drive/BinLinux/BeamNG.drive.x64
   # - Set compatibilty tool to steam linux runtime 3.0

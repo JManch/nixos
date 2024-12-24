@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
@@ -14,10 +14,10 @@ in
 mkIf cfg.enable {
   programs.btop = {
     enable = true;
-    package = mkIf (osConfig' != null) (
+    package = mkIf (osConfig != null) (
       pkgs.btop.override (
         let
-          inherit (osConfig'.${ns}.device) gpu;
+          inherit (osConfig.${ns}.device) gpu;
         in
         {
           cudaSupport = gpu.type == "nvidia";

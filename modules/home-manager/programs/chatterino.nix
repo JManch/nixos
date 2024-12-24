@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
@@ -18,7 +18,7 @@ let
   inherit (config.${ns}.desktop.hyprland) namedWorkspaceIDs;
   cfg = config.${ns}.programs.chatterino;
   desktopCfg = config.${ns}.desktop;
-  secondMonitor = lib.${ns}.getMonitorByNumber osConfig' 2;
+  secondMonitor = lib.${ns}.getMonitorByNumber osConfig 2;
   chatterinoPercentage = 17.5;
 
   # Wrap with twitch auth token config

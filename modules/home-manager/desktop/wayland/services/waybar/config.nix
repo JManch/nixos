@@ -3,7 +3,7 @@
   pkgs,
   config,
   hostname,
-  osConfig',
+  osConfig,
   isWayland,
   ...
 }:
@@ -25,15 +25,15 @@ let
   inherit (lib.${ns}) addPatches getMonitorByName;
   inherit (config.${ns}) desktop;
   inherit (desktop.services) hypridle;
-  inherit (osConfig'.${ns}.device) gpu monitors;
+  inherit (osConfig.${ns}.device) gpu monitors;
   cfg = desktop.services.waybar;
   isHyprland = lib.${ns}.isHyprland config;
   colors = config.colorScheme.palette;
   gapSize = toString desktop.style.gapSize;
 
-  audio = osConfig'.${ns}.system.audio;
-  wgnord = osConfig'.${ns}.services.wgnord;
-  gamemode = osConfig'.${ns}.programs.gaming.gamemode;
+  audio = osConfig.${ns}.system.audio;
+  wgnord = osConfig.${ns}.services.wgnord;
+  gamemode = osConfig.${ns}.programs.gaming.gamemode;
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
 
   systemctl = getExe' pkgs.systemd "systemctl";
@@ -50,7 +50,7 @@ let
             if m.mirror == null then
               toString m.number
             else
-              toString (getMonitorByName osConfig' m.mirror).number
+              toString (getMonitorByName osConfig m.mirror).number
           }'"
         ) monitors
       )}

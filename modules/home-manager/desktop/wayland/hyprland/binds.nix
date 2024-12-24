@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   vmVariant,
   ...
 }@args:
@@ -19,8 +19,8 @@ let
     concatMapStringsSep
     ;
   inherit (lib.${ns}) isHyprland flakePkgs getMonitorHyprlandCfgStr;
-  inherit (osConfig'.${ns}.system) audio;
-  inherit (osConfig'.${ns}.device) monitors;
+  inherit (osConfig.${ns}.system) audio;
+  inherit (osConfig.${ns}.device) monitors;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.${ns}.desktop;
   mod = cfg.modKey;

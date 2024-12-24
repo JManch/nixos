@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
@@ -16,10 +16,10 @@ let
     getExe
     getExe'
     ;
-  inherit (osConfig'.${ns}.device) monitors;
+  inherit (osConfig.${ns}.device) monitors;
   cfg = desktopCfg.hyprland;
   desktopCfg = config.${ns}.desktop;
-  isGammaCustom = any (m: m.gamma != 1.0) osConfig'.${ns}.device.monitors;
+  isGammaCustom = any (m: m.gamma != 1.0) osConfig.${ns}.device.monitors;
 
   monitorGammaConditionals =
     (concatMap (

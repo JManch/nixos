@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
@@ -13,12 +13,12 @@ let
     mkForce
     getExe'
     ;
-  inherit (osConfig'.${ns}.system) audio;
+  inherit (osConfig.${ns}.system) audio;
   cfg = config.${ns}.services.easyeffects;
 in
 mkIf (cfg.enable && (audio.enable or true)) {
   assertions = lib.${ns}.asserts [
-    (osConfig'.programs.dconf.enable or true)
+    (osConfig.programs.dconf.enable or true)
     "Easyeffects requires dconf to be enabled"
   ];
 

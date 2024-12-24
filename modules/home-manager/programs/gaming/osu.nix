@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
@@ -13,7 +13,7 @@ let
     escapeShellArg
     ;
   inherit (lib.${ns}) isHyprland getMonitorHyprlandCfgStr;
-  inherit (osConfig'.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.device) primaryMonitor;
   cfg = config.${ns}.programs.gaming.osu;
   hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
 in

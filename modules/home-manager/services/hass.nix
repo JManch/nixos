@@ -3,7 +3,7 @@
   pkgs,
   config,
   hostname,
-  osConfig',
+  osConfig,
   ...
 }:
 let
@@ -15,7 +15,7 @@ let
     optionalString
     toLower
     ;
-  inherit (osConfig'.${ns}.device) hassIntegration;
+  inherit (osConfig.${ns}.device) hassIntegration;
   inherit (config.age.secrets) hassToken;
   systemctl = getExe' pkgs.systemd "systemctl";
 
@@ -38,7 +38,7 @@ let
       endpoint = "webhook/${toLower hostname}-active";
     });
 in
-mkIf (osConfig'.${ns}.device.hassIntegration.enable or false) {
+mkIf (osConfig.${ns}.device.hassIntegration.enable or false) {
   ${ns} = {
     services.hass.curlCommand = curlCommand;
 

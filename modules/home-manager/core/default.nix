@@ -2,7 +2,6 @@
   lib,
   config,
   osConfig,
-  osConfig',
   ...
 }:
 let
@@ -10,14 +9,12 @@ let
     ns
     mkIf
     optionalString
-    types
     mkEnableOption
     optional
-    mkOption
     ;
   inherit (lib.${ns}) scanPaths upperFirstChar;
   inherit (config.${ns}.desktop.xdg) lowercaseUserDirs;
-  impermanence = osConfig'.${ns}.system.impermanence or null;
+  impermanence = osConfig.${ns}.system.impermanence or null;
   cfg = config.${ns}.core;
 in
 {
@@ -26,21 +23,9 @@ in
   options.${ns}.core = {
     configManager = mkEnableOption "this host as a NixOS config manager";
     backupFiles = mkEnableOption "backing up of ~/files";
-
-    standalone = mkOption {
-      type = types.bool;
-      default = false;
-      description = ''
-        Whether this home-manager config is deployed alongside a NixOS config
-        or is standalone. Standalone configurations can be deployed on
-        non-NixOS hosts.
-      '';
-    };
   };
 
   config = {
-    _module.args.osConfig' = if cfg.standalone then null else osConfig;
-
     persistence.directories =
       (map (xdgDir: if !lowercaseUserDirs then upperFirstChar xdgDir else xdgDir) [
         "downloads"
@@ -52,7 +37,7 @@ in
         "files"
         "games"
         ".cache/nix"
-        ".local/share/systemd" # needed for persistent user timers to work properly
+        ".local/share/systemd" # needed for persistent systemd user timers
       ]
       ++ optional cfg.configManager ".config/nixos";
 

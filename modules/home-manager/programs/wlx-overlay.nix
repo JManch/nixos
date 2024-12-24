@@ -1,13 +1,13 @@
 {
   lib,
   pkgs,
-  osConfig',
+  osConfig,
   ...
 }:
 let
   inherit (lib) ns mkIf getExe;
 in
-mkIf (osConfig'.${ns}.hardware.valve-index.enable or false) {
+mkIf (osConfig.${ns}.hardware.valve-index.enable or false) {
   home.packages = [ pkgs.wlx-overlay-s ];
 
   systemd.user.services.wlx-overlay-s = {

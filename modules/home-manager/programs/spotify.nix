@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
@@ -59,7 +59,7 @@ let
       '';
   };
 in
-mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
+mkIf (cfg.enable && (osConfig.${ns}.system.audio.enable or true)) {
   home.packages = [
     pkgs.spotify
     (hiPrio (

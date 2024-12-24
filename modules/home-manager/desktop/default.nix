@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }@args:
 let
@@ -33,7 +33,7 @@ in
     enable = mkEnableOption "home-manager desktop modules";
 
     xdg.lowercaseUserDirs = mkEnableOption "lowercase user dirs" // {
-      default = (osConfig'.${ns}.system.desktop.desktopEnvironment or false) == null;
+      default = (osConfig.${ns}.system.desktop.desktopEnvironment or false) == null;
     };
 
     windowManager = mkOption {
@@ -49,13 +49,13 @@ in
         cfg.enable
         && (
           (elem cfg.windowManager waylandWindowManagers)
-          || (elem osConfig'.${ns}.system.desktop.desktopEnvironment waylandDesktopEnvironments)
+          || (elem osConfig.${ns}.system.desktop.desktopEnvironment waylandDesktopEnvironments)
         );
     };
 
     style = {
       customTheme = mkEnableOption "custom GTK theme derived from base16 colorscheme" // {
-        default = osConfig'.${ns}.system.desktop.desktopEnvironment == null;
+        default = osConfig.${ns}.system.desktop.desktopEnvironment == null;
       };
 
       font = {
@@ -76,7 +76,7 @@ in
 
       cursor = {
         enable = mkEnableOption "custom cursor theme" // {
-          default = osConfig'.${ns}.system.desktop.desktopEnvironment == null;
+          default = osConfig.${ns}.system.desktop.desktopEnvironment == null;
         };
 
         package = mkPackageOption pkgs "bibata-cursors" { };
@@ -117,17 +117,17 @@ in
   config =
     let
       cfg = config.${ns}.desktop;
-      osDesktop = osConfig'.${ns}.system.desktop;
+      osDesktop = osConfig.${ns}.system.desktop;
     in
     {
       assertions = mkIf cfg.enable (asserts [
-        (osConfig' != null)
+        (osConfig != null)
         "Desktop modules are not supported on standalone home-manager deployments"
         osDesktop.enable
         "You cannot enable home-manager desktop if NixOS desktop is not enabled"
         (cfg.windowManager != null -> osDesktop.desktopEnvironment == null)
         "You cannot use a desktop environment with a window manager"
-        (cfg.windowManager != null -> length osConfig'.${ns}.device.monitors != 0)
+        (cfg.windowManager != null -> length osConfig.${ns}.device.monitors != 0)
         "Device monitors must be configured to use a window manager"
       ]);
 

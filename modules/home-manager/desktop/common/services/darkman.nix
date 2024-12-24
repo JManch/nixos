@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   vmVariant,
   desktopEnabled,
   ...
@@ -27,7 +27,7 @@ let
     listToAttrs
     ;
   inherit (config.${ns}) desktop;
-  inherit (osConfig'.${ns}.device) hassIntegration;
+  inherit (osConfig.${ns}.device) hassIntegration;
   inherit (config.${ns}.services.hass) curlCommand;
   inherit (config.xdg) dataHome;
   inherit (config.services) darkman;

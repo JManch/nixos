@@ -2,14 +2,14 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
   inherit (lib) ns mkIf;
   inherit (config.${ns}.desktop.style) cornerRadius;
   cfg = config.${ns}.programs.gaming.mangohud;
-  device = osConfig'.${ns}.device or null;
+  device = osConfig.${ns}.device or null;
   colors = config.colorScheme.palette;
 in
 mkIf cfg.enable {

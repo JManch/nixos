@@ -2,14 +2,14 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
   inherit (lib) ns mkIf getExe;
   cfg = config.${ns}.programs.cava;
 in
-mkIf (cfg.enable && (osConfig'.${ns}.system.audio.enable or true)) {
+mkIf (cfg.enable && (osConfig.${ns}.system.audio.enable or true)) {
   programs.cava = {
     enable = true;
 

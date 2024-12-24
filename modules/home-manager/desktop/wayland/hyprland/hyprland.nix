@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   vmVariant,
   ...
 }@args:
@@ -30,7 +30,7 @@ let
     asserts
     getMonitorHyprlandCfgStr
     ;
-  inherit (osConfig'.${ns}.device) monitors primaryMonitor;
+  inherit (osConfig.${ns}.device) monitors primaryMonitor;
   inherit (desktopCfg.style) gapSize borderWidth;
 
   cfg = desktopCfg.hyprland;
@@ -56,7 +56,7 @@ let
 in
 mkIf (isHyprland config) {
   assertions = asserts [
-    (!(osConfig'.xdg.portal.enable or false))
+    (!(osConfig.xdg.portal.enable or false))
     "The os xdg portal must be disabled when using Hyprland as it is configured using home-manager"
   ];
 
@@ -126,7 +126,7 @@ mkIf (isHyprland config) {
       HYPRCURSOR_THEME=${cfg.hyprcursor.name}
       HYPRCURSOR_SIZE=${toString config.${ns}.desktop.style.cursor.size}
     ''
-    + optionalString (osConfig'.${ns}.device.gpu.type == "nvidia") ''
+    + optionalString (osConfig.${ns}.device.gpu.type == "nvidia") ''
       LIBVA_DRIVER_NAME=nvidia
       GBM_BACKEND=nvidia-drm
       __GLX_VENDOR_LIBRARY_NAME=nvidia

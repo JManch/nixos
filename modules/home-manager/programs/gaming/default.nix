@@ -1,7 +1,7 @@
 {
   lib,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
@@ -16,9 +16,9 @@ let
     optionals
     ;
   inherit (config.${ns}.desktop) hyprland;
-  inherit (osConfig'.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.device) primaryMonitor;
   cfg = config.${ns}.programs.gaming;
-  osGaming = osConfig'.${ns}.programs.gaming or null;
+  osGaming = osConfig.${ns}.programs.gaming or null;
 in
 {
   imports = lib.${ns}.scanPaths ./.;

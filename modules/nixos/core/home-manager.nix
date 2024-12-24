@@ -43,7 +43,6 @@ in
         (mkIf (username != adminUsername) {
           ${adminUsername} = {
             ${ns} = {
-              core.standalone = true;
               shell.enable = true;
               shell.promptColor = "purple";
               programs.git.enable = true;

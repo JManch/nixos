@@ -1,18 +1,18 @@
 {
   lib,
   pkgs,
-  osConfig',
+  osConfig,
   vmVariant,
   desktopEnabled,
   ...
 }:
 let
   inherit (lib) ns mkIf mkForce;
-  udisks = osConfig'.${ns}.services.udisks;
+  udisks = osConfig.${ns}.services.udisks;
 in
 mkIf (desktopEnabled && udisks.enable && !vmVariant) {
   assertions = lib.${ns}.asserts [
-    (osConfig'.${ns}.system.desktop.desktopEnvironment == null)
+    (osConfig.${ns}.system.desktop.desktopEnvironment == null)
     "udiskie should not need to be enabled with a desktop environment"
   ];
 

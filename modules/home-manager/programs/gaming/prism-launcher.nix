@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   ...
 }:
 let
@@ -14,7 +14,7 @@ mkIf cfg.enable {
 
   ${ns}.programs.gaming.gameClasses = [ "Minecraft.*" ];
 
-  firewall.interfaces = mkIf (lib.${ns}.wgInterfaceEnabled "friends" osConfig') {
+  firewall.interfaces = mkIf (lib.${ns}.wgInterfaceEnabled "friends" osConfig) {
     wg-friends.allowedTCPPorts = [ 25565 ];
   };
 

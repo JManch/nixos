@@ -2,13 +2,13 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   isWayland,
   ...
 }:
 let
   inherit (lib) ns mkIf getExe';
-  inherit (osConfig'.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.device) primaryMonitor;
   cfg = desktopCfg.programs.swaylock;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;

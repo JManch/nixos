@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   desktopEnabled,
   ...
 }:
@@ -15,7 +15,7 @@ let
     ;
   inherit (config.${ns}) desktop;
   inherit (config.${ns}.colorScheme) light;
-  inherit (osConfig'.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.device) primaryMonitor;
   cfg = desktop.services.dunst;
   colors = config.colorScheme.palette;
   systemctl = getExe' pkgs.systemd "systemctl";

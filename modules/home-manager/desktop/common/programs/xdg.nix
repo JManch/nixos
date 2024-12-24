@@ -2,7 +2,7 @@
   lib,
   pkgs,
   config,
-  osConfig',
+  osConfig,
   desktopEnabled,
   ...
 }:
@@ -41,7 +41,7 @@ mkIf desktopEnabled {
       extraConfig.XDG_SCREENSHOTS_DIR = "${home}/pictures/screenshots";
     };
 
-  xdg.mimeApps.enable = osConfig'.${ns}.system.desktop.desktopEnvironment == null;
+  xdg.mimeApps.enable = osConfig.${ns}.system.desktop.desktopEnvironment == null;
 
   desktop.hyprland.settings.windowrulev2 = [
     # Float the file picker

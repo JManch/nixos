@@ -1,5 +1,3 @@
-<h1 align="center">JManch/nixos</h1>
-
 ![blank-workspace](https://github.com/JManch/nixos/assets/61563764/88951964-f6aa-48b6-889b-48fa1a7d3e00)
 ![light-dark-split](https://github.com/JManch/nixos/assets/61563764/aa32d9df-42f8-4d39-a02b-653b40d03f4f)
 

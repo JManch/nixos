@@ -45,7 +45,7 @@ let
         round_volume() {
           multiple=''${increment#-}
           add_half=$(bc <<< "scale=10; ($1 + $multiple/2)")
-          rounded="$(bc <<< "($add_half / $multiple) * $multiple")"
+          rounded=$(bc <<< "($add_half / $multiple) * $multiple")
           bc <<< "scale=2; $rounded / 100"
         }
 

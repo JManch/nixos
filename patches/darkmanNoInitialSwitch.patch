@@ -1,19 +1,28 @@
 diff --git a/service.go b/service.go
-index 5ee8590..16b84e7 100644
+index 5ee8590..8066ca1 100644
 --- a/service.go
 +++ b/service.go
-@@ -38,8 +38,12 @@ func NewService(initialMode Mode) Service {
+@@ -38,15 +38,20 @@ func NewService(initialMode Mode) Service {
  func (service *Service) AddListener(listener func(Mode) error) {
  	*service.listeners = append(*service.listeners, listener)
  	// Apply once with the initial mode.
 -	if err := listener(service.currentMode); err != nil {
 -		fmt.Println("error applying initial mode:", err)
-+	// Only apply once if initial mode is LIGHT as we theme all our applications
++	// Patch: only apply once if initial mode is LIGHT as we theme all our applications
 +	// for dark mode by default
-+	if service.currentMode == LIGHT {
++	if service.currentMode == LIGHT || service.currentMode == NULL {
 +		if err := listener(service.currentMode); err != nil {
 +			fmt.Println("error applying initial mode:", err)
 +		}
  	}
  }
  
+ // Change the current mode (and run all callbacks).
+ func (service *Service) ChangeMode(mode Mode) {
+ 	log.Printf("Wanted mode is: %v mode.\n", mode)
+-	if mode == service.currentMode {
++	// Patch: also skip null -> dark transitions as we theme for dark mode by default
++	if mode == service.currentMode || (service.currentMode == NULL && mode == DARK) {
+ 		log.Println("No transition necessary")
+ 		return
+ 	}

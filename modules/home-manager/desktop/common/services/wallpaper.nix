@@ -26,20 +26,41 @@ let
     text = # bash
       ''
         randomise=${boolToString cfg.randomise.enable};
-        if [ "$randomise" = true ]; then
-          darkman=${boolToString darkman.enable};
-          if [ "$darkman" = true ]; then
-            theme=$(darkman get)
-            random_wallpaper_cache="${wallpaperCache}/$theme-wallpaper"
-          else
-            random_wallpaper_cache="${wallpaperCache}/wallpaper"
+        darkman=${boolToString darkman.enable};
+        darkman_hass=${boolToString (darkman.switchMethod == "hass")};
+        random_wallpaper_cache="${wallpaperCache}/wallpaper"
+
+        if [ "$darkman" = true ]; then
+          theme=$(darkman get)
+          # The darkman hass switch method may take some time to update
+          # so need to wait
+          if [ "$darkman_hass" = true ]; then
+            attempt=0
+            while [ "$theme" = "null" ]; do
+              if (( attempt >= 10 )); then
+                echo "Darkman hass did not update in time. Defaulting to dark theme"
+                break
+              fi
+              echo "Waiting for darkman hass update..."
+              sleep 0.5
+              theme=$(darkman get)
+              ((attempt++))
+            done
           fi
 
-          # If the cache file doesn't exist we need to randomise
+          # If darkman is in manual mode the theme on boot will be null so
+          # default to dark theme. Also covers hass timeout scenario.
+          if [ "$theme" = "null" ]; then
+            theme="dark"
+          fi
+
+          random_wallpaper_cache="${wallpaperCache}/$theme-wallpaper"
+        fi
+
+        if [ "$randomise" = true ]; then
           if [ ! -f "$random_wallpaper_cache" ]; then
             ${getExe randomiseWallpaper};
           fi
-
           wallpaper=$(<"$random_wallpaper_cache")
 
           # Cached wallpaper paths might be invalid after garbage collection
@@ -47,9 +68,16 @@ let
             ${getExe randomiseWallpaper};
             wallpaper=$(<"$random_wallpaper_cache")
           fi
+        elif [ "$darkman" = true ]; then
+          if [ "$theme" = "dark" ]; then
+            wallpaper="${cfg.defaults.dark}"
+          else
+            wallpaper="${cfg.defaults.light}"
+          fi
         else
-          wallpaper="${cfg.default}"
+          wallpaper="${cfg.defaults.default}"
         fi
+
         ${cfg.setWallpaperCmd} "$wallpaper"
       '';
   };
@@ -114,11 +142,9 @@ mkIf (cfg.setWallpaperCmd != null && desktopEnabled) (mkMerge [
 
     programs.zsh.shellAliases.randomise-wallpaper = "systemctl start --user randomise-wallpaper";
 
-    darkman.switchScripts.wallpaper =
-      _: # bash
-      ''
-        systemctl start --user set-wallpaper
-      '';
+    darkman.switchScripts.wallpaper = _: ''
+      systemctl start --user set-wallpaper
+    '';
 
     systemd.user = {
       services.randomise-wallpaper = {

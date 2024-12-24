@@ -13,6 +13,7 @@ let
     types
     mkAliasOptionModule
     ;
+  cfg = config.${ns}.desktop.services;
 in
 {
   imports = lib.${ns}.scanPaths ./. ++ [
@@ -152,12 +153,32 @@ in
     };
 
     wallpaper = {
-      default = mkOption {
-        type = types.package;
-        default = inputs.nix-resources.packages.${pkgs.system}.wallpapers.rx7;
-        description = ''
-          The default wallpaper to use if randomise is false.
-        '';
+      defaults = {
+        default = mkOption {
+          type = types.package;
+          default = inputs.nix-resources.packages.${pkgs.system}.wallpapers.rx7;
+          description = ''
+            The default wallpaper to use if randomise is disabled.
+          '';
+        };
+
+        dark = mkOption {
+          type = types.package;
+          default = cfg.wallpaper.defaults.default;
+          description = ''
+            The dark theme wallpaper to use if randomise is disabled and
+            darkman is enabled.
+          '';
+        };
+
+        light = mkOption {
+          type = types.package;
+          default = cfg.wallpaper.defaults.default;
+          description = ''
+            The light theme wallpaper to use if randomise is disabled and
+            darkman is enabled.
+          '';
+        };
       };
 
       wallpaperUnit = mkOption {

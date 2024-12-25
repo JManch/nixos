@@ -90,7 +90,7 @@ in
               fi
 
               echo "Waiting for PipeWire to initialise..."
-              ((attempt++))
+              attempt=$((attempt + 1))
               sleep 2
             done
 

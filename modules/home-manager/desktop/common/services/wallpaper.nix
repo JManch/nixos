@@ -44,7 +44,7 @@ let
               echo "Waiting for darkman hass update..."
               sleep 0.5
               theme=$(darkman get)
-              ((attempt++))
+              attempt=$((attempt + 1))
             done
           fi
 

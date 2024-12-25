@@ -37,9 +37,7 @@ mkIf desktopEnabled {
   gtk = {
     enable = true;
 
-    # If darkman is enabled the theme will be applied using gsettings in the
-    # switch script
-    theme = mkIf (cfg.style.customTheme && !darkman.enable) {
+    theme = mkIf cfg.style.customTheme {
       name = colorScheme.dark.slug;
       package = darkTheme;
     };

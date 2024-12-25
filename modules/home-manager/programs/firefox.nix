@@ -312,9 +312,9 @@ mkIf (cfg.enable && (osConfig.${ns}.system.desktop.enable or true)) {
       inherit (config.${ns}.desktop.hyprland) modKey;
     in
     [
-      "${modKey}, Backspace, exec, app2unit firefox"
+      "${modKey}, Backspace, exec, app2unit firefox.desktop"
       "${modKey}SHIFT, Backspace, workspace, emptym"
-      "${modKey}SHIFT, Backspace, exec, app2unit firefox"
+      "${modKey}SHIFT, Backspace, exec, app2unit firefox.desktop"
     ];
 
   ${ns}.desktop.hyprland.eventScripts.windowtitlev2 =

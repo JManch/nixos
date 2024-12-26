@@ -98,9 +98,7 @@ mkIf cfg.enable {
         # because firefox doesn't respect it. Instead we have to assume
         # that the TWITCH workspace is actively focused.
         app2unit com.chatterino.chatterino.desktop &
-        # FIX: Use the desktop action once
-        # https://github.com/Vladimir-csp/app2unit/issues/1 is resolved
-        app2unit -- firefox --new-window https://www.twitch.tv/directory
+        app2unit firefox.desktop:new-window https://www.twitch.tv/directory
       ''}"
     ];
     windowrulev2 =

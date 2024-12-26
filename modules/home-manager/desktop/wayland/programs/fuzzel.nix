@@ -86,9 +86,7 @@ mkIf (cfg.enable && isWayland) {
       inherit (desktopCfg.hyprland) modKey;
     in
     {
-      bindr = [
-        "${modKey}, ${modKey}_L, exec, pkill fuzzel || fuzzel"
-      ];
+      bindr = [ "${modKey}, ${modKey}_L, exec, pkill fuzzel || fuzzel" ];
       layerrule = [ "animation slide, launcher" ];
     };
 }

@@ -15,6 +15,7 @@ in
     matlab.enable = mkEnableOption "Matlab";
     wireshark.enable = mkEnableOption "Wireshark";
     adb.enable = mkEnableOption "Android Debug Bridge";
+    flatpak.enable = mkEnableOption "Flatpak";
 
     wine = {
       enable = mkEnableOption "Wine";

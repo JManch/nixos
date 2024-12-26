@@ -68,6 +68,8 @@
     nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
     nixpkgs-xr.inputs.treefmt-nix.follows = "";
 
+    nix-flatpak.url = "github:gmodena/nix-flatpak";
+
     # Inputs that provide imported home-manager modules
 
     nix-colors.url = "github:misterio77/nix-colors";

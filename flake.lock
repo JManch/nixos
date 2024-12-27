@@ -663,11 +663,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1734907157,
-        "narHash": "sha256-sF3Wot4jIemoSo0YigdHyoR5JMaXgKja+mPJGoXXk/k=",
+        "lastModified": 1735209119,
+        "narHash": "sha256-zarY0tzIHyWcaImbIJOYRbBbHdLRdNDkRfOmzPVapRk=",
         "owner": "hyprwm",
         "repo": "Hyprland",
-        "rev": "5f7ad767dbf0bac9ddd6bf6c825fb9ed7921308a",
+        "rev": "e75e2cdac79417ffdbbbe903f72668953483a4e7",
         "type": "github"
       },
       "original": {
@@ -693,11 +693,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1734887159,
-        "narHash": "sha256-boPq+l4/D/Q+MvDqAI79fCdp/3Dit57YBuPbXa1cjW0=",
+        "lastModified": 1735209374,
+        "narHash": "sha256-V/AE7QfPzfIPW5jC+DaBv5H+Vds0eA02Jkx/+VFhRT4=",
         "owner": "hyprwm",
         "repo": "hyprland-plugins",
-        "rev": "859b9cd371b4e1bf1043cedc8ab6c514e13ab358",
+        "rev": "616e7ef0aca905b9b4012d2bedbb9225d51040bf",
         "type": "github"
       },
       "original": {
@@ -858,11 +858,11 @@
         "systems": "systems_5"
       },
       "locked": {
-        "lastModified": 1734880160,
-        "narHash": "sha256-jHgf9RWtwhz78bQuN8wpojafpywWumEG8g8My1UT91s=",
+        "lastModified": 1735227791,
+        "narHash": "sha256-BkXJ/KqbqR5W/4dN+i36NaMk8PS/BqMTymVrtTO7v2U=",
         "owner": "hyprwm",
         "repo": "hyprlock",
-        "rev": "5361dc40dacf898bc3666b79f81201b88adcc7ab",
+        "rev": "181294c4d87a663c0a60740ff546a91e8b5aa610",
         "type": "github"
       },
       "original": {
@@ -1142,11 +1142,11 @@
     "neovim-config": {
       "flake": false,
       "locked": {
-        "lastModified": 1734905145,
-        "narHash": "sha256-X8mtneWGIBYZQrxnegXlw0Xs2qHD1ZlHMfx7tF87MlA=",
+        "lastModified": 1735275025,
+        "narHash": "sha256-ywJ5AEnzMpr0jhH4dIo8eRvSrMfp4uHFwCU0B/loLTk=",
         "owner": "JManch",
         "repo": "nvim",
-        "rev": "8836d89dc7dff127f2b0fb51430fe4a647ff9873",
+        "rev": "fdfb83b9352c94c3fa3ec18938cabb92c51ec95b",
         "type": "github"
       },
       "original": {
@@ -1308,11 +1308,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1735005851,
-        "narHash": "sha256-BNv+7gjWjaqU86LRA/XhMEEw4wos4deHBFG235rF+RM=",
+        "lastModified": 1735277472,
+        "narHash": "sha256-gVP+IaUWEC/gu2Ux2rEVaZ/J0UXlQrDGiphXj2FDsaM=",
         "ref": "refs/heads/main",
-        "rev": "3c0a3d9ae660832f20f82df15370d0be984884c9",
-        "revCount": 228,
+        "rev": "953a4c6de0a6b53178472634426ea8320d90c5db",
+        "revCount": 229,
         "type": "git",
         "url": "ssh://git@github.com/JManch/nix-resources"
       },

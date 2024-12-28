@@ -88,7 +88,7 @@ mkIf cfg.enable {
       ''
         # Disables alacritty opacity when launching nvim
         nvim() {
-          if [[ -z "$DISPLAY" ]]; then
+          if [ -z "$DISPLAY" ] || [ "$TERM" != "alacritty" ]; then
             command nvim "$@"
           else
             alacritty msg config window.opacity=1; command nvim "$@"; alacritty msg config --reset

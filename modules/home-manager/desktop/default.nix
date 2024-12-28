@@ -9,6 +9,7 @@ let
   inherit (lib)
     ns
     mkIf
+    mkMerge
     mkOption
     mkPackageOption
     length
@@ -34,6 +35,17 @@ in
 
     xdg.lowercaseUserDirs = mkEnableOption "lowercase user dirs" // {
       default = (osConfig.${ns}.system.desktop.desktopEnvironment or false) == null;
+    };
+
+    terminal = mkOption {
+      type = with types; nullOr str;
+      default = null;
+      example = "Alacritty";
+      description = ''
+        XDG desktop ID of the default terminal to use with xdg-terminal-exec.
+        The terminal should have its desktop entry modified to comply with the
+        xdg-terminal-exec spec.
+      '';
     };
 
     windowManager = mkOption {
@@ -119,23 +131,33 @@ in
       cfg = config.${ns}.desktop;
       osDesktop = osConfig.${ns}.system.desktop;
     in
-    {
-      assertions = mkIf cfg.enable (asserts [
-        (osConfig != null)
-        "Desktop modules are not supported on standalone home-manager deployments"
-        osDesktop.enable
-        "You cannot enable home-manager desktop if NixOS desktop is not enabled"
-        (cfg.windowManager != null -> osDesktop.desktopEnvironment == null)
-        "You cannot use a desktop environment with a window manager"
-        (cfg.windowManager != null -> length osConfig.${ns}.device.monitors != 0)
-        "Device monitors must be configured to use a window manager"
-      ]);
+    mkMerge [
+      {
+        _module.args = {
+          inherit (cfg) isWayland;
+          desktopEnabled = cfg.enable;
+        };
+      }
 
-      home.packages = [ pkgs.xdg-terminal-exec ];
+      (mkIf cfg.enable {
+        assertions = asserts [
+          (osConfig != null)
+          "Desktop modules are not supported on standalone home-manager deployments"
+          (cfg.terminal != null)
+          "A default desktop terminal must be set"
+          osDesktop.enable
+          "You cannot enable home-manager desktop if NixOS desktop is not enabled"
+          (cfg.windowManager != null -> osDesktop.desktopEnvironment == null)
+          "You cannot use a desktop environment with a window manager"
+          (cfg.windowManager != null -> length osConfig.${ns}.device.monitors != 0)
+          "Device monitors must be configured to use a window manager"
+        ];
 
-      _module.args = {
-        inherit (cfg) isWayland;
-        desktopEnabled = cfg.enable;
-      };
-    };
+        home.packages = [ pkgs.xdg-terminal-exec ];
+
+        xdg.configFile."xdg-terminals.list".text = ''
+          ${cfg.terminal}.desktop
+        '';
+      })
+    ];
 }

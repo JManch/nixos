@@ -10,6 +10,7 @@
 
     desktop = {
       enable = true;
+      terminal = "Alacritty";
       windowManager = "hyprland";
       xdg.lowercaseUserDirs = true;
 

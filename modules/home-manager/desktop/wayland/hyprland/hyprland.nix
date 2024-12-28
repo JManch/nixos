@@ -10,7 +10,6 @@ let
   inherit (lib)
     ns
     mkIf
-    mkOrder
     mkVMOverride
     getExe
     getExe'

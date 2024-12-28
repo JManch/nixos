@@ -14,8 +14,6 @@ let
   inherit (config.${ns}) desktop;
   cfg = config.${ns}.programs.alacritty;
   colors = config.colorScheme.palette;
-  normalFontSize = 12;
-  largeFontSize = 17;
 in
 mkIf cfg.enable {
   programs.alacritty = {
@@ -37,7 +35,7 @@ mkIf cfg.enable {
       };
 
       font = {
-        size = normalFontSize;
+        size = 12;
         normal = {
           family = desktop.style.font.family;
           style = "Regular";
@@ -120,12 +118,7 @@ mkIf cfg.enable {
     };
   };
 
-  programs.zsh.shellAliases = {
-    alacritty-large-font = "alacritty msg config font.size=${toString largeFontSize}";
-    alacritty-normal-font = "alacritty msg config font.size=${toString normalFontSize}";
-  };
-
-  desktop.hyprland.binds = [
+  desktop.hyprland.binds = mkIf (desktop.terminal == "Alacritty") [
     "${desktop.hyprland.modKey}, Return, exec, app2unit Alacritty.desktop"
     "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
     "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit Alacritty.desktop"

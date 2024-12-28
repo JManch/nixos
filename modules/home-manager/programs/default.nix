@@ -45,6 +45,7 @@ in
     rnote.enable = mkEnableOption "Rnote";
     jellyfin-media-player.enable = mkEnableOption "Jellyfin Media Player";
     davinci-resolve.enable = mkEnableOption "Davinci Resolve";
+    ghostty.enable = mkEnableOption "Ghostty";
 
     firefox = {
       enable = mkEnableOption "Firefox";

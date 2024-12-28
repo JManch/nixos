@@ -409,10 +409,12 @@ in
         substituters = [
           "https://nix-community.cachix.org"
           "https://nix-on-droid.cachix.org"
+          "https://ghostty.cachix.org"
         ];
         trusted-public-keys = [
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU="
+          "ghostty.cachix.org-1:QB389yTa6gTyneehvqG58y0WnHjQOqgnA+wBnpWWxns="
         ];
         build-dir = mkIf impermanence.enable "/var/nix-tmp";
       };

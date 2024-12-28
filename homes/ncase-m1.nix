@@ -51,6 +51,7 @@
 
     programs = {
       alacritty.enable = true;
+      ghostty.enable = true;
       btop.enable = true;
       cava.enable = true;
       torBrowser.enable = true;

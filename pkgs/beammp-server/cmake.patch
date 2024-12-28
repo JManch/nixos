@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index c51779d..6f0bdd8 100644
+index 43a71af..3a692fd 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -4,8 +4,6 @@ if (WIN32)
@@ -19,7 +19,7 @@ index c51779d..6f0bdd8 100644
  
  # below are options which should be changed
  
-@@ -95,12 +92,12 @@ set(PRJ_LIBRARIES
+@@ -99,12 +96,12 @@ set(PRJ_LIBRARIES
      Threads::Threads
      commandline_static
      toml11::toml11
@@ -33,10 +33,12 @@ index c51779d..6f0bdd8 100644
  )
  
  # add dependency find_package calls and similar here
-@@ -113,6 +110,7 @@ find_package(libzip CONFIG REQUIRED)
+@@ -116,7 +113,8 @@ find_package(httplib CONFIG REQUIRED)
+ find_package(libzip CONFIG REQUIRED)
  find_package(RapidJSON CONFIG REQUIRED)
  find_package(sol2 CONFIG REQUIRED)
- find_package(toml11 CONFIG REQUIRED)
+-add_subdirectory("deps/toml11")
++find_package(toml11 CONFIG REQUIRED)
 +find_package(ZLIB)
  
  include_directories(include)

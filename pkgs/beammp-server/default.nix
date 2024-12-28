@@ -18,13 +18,13 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "beammp-server";
-  version = "3.4.1";
+  version = "3.7.2";
 
   src = fetchFromGitHub {
     owner = "BeamMP";
     repo = "BeamMP-Server";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-dAo/HxFjXHi8F0dd9CGmyOWtWCwnKf4aKJl8A7ZzLAQ=";
+    hash = "sha256-xp0XTzG9HGiPXNTnG+OM2cgLYG049hYdEj4YYlVIse4=";
     fetchSubmodules = true;
   };
 

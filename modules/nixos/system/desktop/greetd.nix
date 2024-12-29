@@ -14,6 +14,18 @@ let
   cfg = config.${ns}.system.desktop;
 in
 mkIf (cfg.enable && (cfg.displayManager == "greetd")) {
+  assertions = lib.${ns}.asserts [
+    (!config.programs.uwsm.enable)
+    ''
+      UWSM does not work well with greetd. Exiting the session with `loginctl
+      terminate-*` causes display output to break until cycling between TTYs. I
+      think it has something to do with opening the greeter user session before
+      the graphical session has fully stopped.
+
+      Instead just set "uwsm" as the display manager.
+    ''
+  ];
+
   # WARN: Ever since https://github.com/linux-pam/linux-pam/pull/784 there
   # is a delay after entering the username during login. Because I use a
   # strong hashing algorithm it's quite noticeable.
@@ -32,18 +44,6 @@ mkIf (cfg.enable && (cfg.displayManager == "greetd")) {
         --asterisks
       '';
     };
-  };
-
-  # These settings ensure that boot logs won't get spammed over greetd
-  # https://github.com/apognu/tuigreet/issues/68#issuecomment-1586359960
-  systemd.services.greetd.serviceConfig = {
-    Type = "idle";
-    StandardInput = "tty";
-    StandardOutput = "tty";
-    StandardError = "journal";
-    TTYReset = true;
-    TTYVHangup = true;
-    TTYVTDisallocate = true;
   };
 
   persistence.directories = singleton {

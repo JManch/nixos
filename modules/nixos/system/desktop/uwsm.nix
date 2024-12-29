@@ -3,23 +3,27 @@
   pkgs,
   config,
   selfPkgs,
+  username,
   ...
 }:
 let
   inherit (lib)
     ns
     mkIf
+    hasInfix
     mkMerge
     mkOrder
     getExe'
+    replaceStrings
     optionalString
     ;
+  inherit (lib.${ns}) asserts;
   inherit (cfg.uwsm) defaultDesktop;
   cfg = config.${ns}.system.desktop;
 in
 mkMerge [
   {
-    assertions = lib.${ns}.asserts [
+    assertions = asserts [
       (cfg.displayManager == "uwsm" -> config.programs.uwsm.enable)
       "Using UWSM as a display manager requires it to be enabled"
     ];
@@ -31,8 +35,8 @@ mkMerge [
           src = final.fetchFromGitHub {
             owner = "Vladimir-csp";
             repo = "uwsm";
-            rev = "23d26470608505d8a24941a63097b454c894da85";
-            hash = "sha256-F9UXN2rkzetE5Tsd6bc/JDC8rOu5MS8CCtVJ3nXwQR8=";
+            rev = "ec9a72cd00726c7333663c9324df13f420094fd1";
+            hash = "sha256-JqF3v00M+HOQzNWbMq4/6GfoVA4OwrONEvXLVLr0vec=";
           };
         };
       })
@@ -40,6 +44,17 @@ mkMerge [
   }
 
   (mkIf (cfg.enable && config.programs.uwsm.enable) {
+    assertions = asserts [
+      # Seems ok to nest UWSM start calls by using a UWSM desktop entry but we
+      # should prefer to avoid it
+      # https://github.com/NixOS/nixpkgs/pull/355416#issuecomment-2481432259
+      (defaultDesktop != null -> !hasInfix "uwsm" defaultDesktop)
+      ''
+        The UWSM default desktop entry should not be a UWSM variant. Use the
+        default non-UWSM desktop entry instead.
+      ''
+    ];
+
     environment = {
       systemPackages = [ selfPkgs.app2unit ];
       sessionVariables.APP2UNIT_SLICES = "a=app-graphical.slice b=background-graphical.slice s=session-graphical.slice";
@@ -55,8 +70,30 @@ mkMerge [
       ];
     };
 
-    # Info on launching a uwsm desktop entry with uwsm start:
-    # https://github.com/NixOS/nixpkgs/pull/355416#issuecomment-2481432259
+    services.getty = {
+      # Automatically populate with primary user whilst still prompting for
+      # password
+      loginOptions = username;
+      extraArgs = [
+        "--skip-login"
+        "--noclear"
+      ];
+    };
+
+    # Do not clear the TTY
+    systemd.services."getty@".serviceConfig.TTYVTDisallocate = "no";
+
+    # Remove excess new lines and use normal green instead of bright
+    environment.etc.issue.source = pkgs.writeText "issue" ''
+      [0;32m${replaceStrings [ "<<< " " >>>" ] [ "" "" ] config.services.getty.greetingLine}[0m
+    '';
+
+    security.loginDefs.settings = {
+      # Disable timeout as with --skip-login the default timeout of 60 seconds
+      # causes it to repeatedly timeout indefinitely
+      LOGIN_TIMEOUT = 0;
+    };
+
     programs.zsh.interactiveShellInit =
       let
         select = defaultDesktop == null;
@@ -66,7 +103,7 @@ mkMerge [
           # bash
           ''
             if uwsm check may-start ${optionalString select "&& uwsm select"}; then
-              exec systemd-cat -t uwsm-start uwsm start ${if select then "default" else defaultDesktop}
+              exec uwsm start -S ${if select then "default" else "-- ${defaultDesktop}"} >/dev/null
             fi
           ''
       );

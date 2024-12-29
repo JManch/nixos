@@ -10,6 +10,7 @@ let
     mkIf
     types
     mkEnableOption
+    literalExpression
     genAttrs
     mkOption
     elem
@@ -28,7 +29,7 @@ in
     uwsm.defaultDesktop = mkOption {
       type = with types; nullOr str;
       default = null;
-      example = "hyprland-uwsm.desktop";
+      example = literalExpression "${pkgs.hyprland}/share/wayland-sessions/hyprland.desktop";
       description = ''
         If set, UWSM will automatically launch the set desktop without
         prompting for selection.

@@ -62,7 +62,7 @@ mkIf cfg.enable {
               70: 0.5
               75: 0.6
               80: 0.65
-              90: 1
+              90: 0.75
           pmfw_options:
             acoustic_limit: 3300
             acoustic_target: 2000

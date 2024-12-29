@@ -14,7 +14,6 @@ let
     getExe
     getExe'
     concatMapStringsSep
-    escapeShellArg
     concatMap
     imap
     attrNames
@@ -24,34 +23,15 @@ let
     ;
   inherit (lib.${ns})
     flakePkgs
-    addPatches
     isHyprland
     asserts
     getMonitorHyprlandCfgStr
     ;
   inherit (osConfig.${ns}.device) monitors primaryMonitor;
   inherit (desktopCfg.style) gapSize borderWidth;
-
   cfg = desktopCfg.hyprland;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
-
-  hyprlandPkgs = flakePkgs args "hyprland";
-
-  # Patch makes the togglespecialworkspace dispatcher always toggle instead
-  # of moving the open special workspace to the active monitor
-  hyprlandPkg = addPatches hyprlandPkgs.hyprland [
-    ../../../../../patches/hyprlandSpecialWorkspaceToggle.patch
-    ../../../../../patches/hyprlandResizeParamsFloats.patch
-    # Potential fix for https://github.com/hyprwm/Hyprland/issues/6820
-    ../../../../../patches/hyprlandSpecialWorkspaceFullscreen.patch
-    # Fixes center and size/move window rules using the active monitor instead
-    # of the monitor that the window is on
-    ../../../../../patches/hyprlandWindowRuleMonitor.patch
-    # Makes exact resizeparams in dispatchers relative to the window's current
-    # monitor instead of the last active monitor
-    ../../../../../patches/hyprlandBetterResizeArgs.patch
-  ];
 in
 mkIf (isHyprland config) {
   assertions = asserts [
@@ -113,11 +93,11 @@ mkIf (isHyprland config) {
 
   xdg.portal = {
     enable = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-      hyprlandPkgs.xdg-desktop-portal-hyprland
+    configPackages = [ pkgs.hyprland ];
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gtk
+      xdg-desktop-portal-hyprland
     ];
-    configPackages = [ hyprlandPkg ];
   };
 
   xdg.configFile."uwsm/env-hyprland".text =
@@ -136,7 +116,6 @@ mkIf (isHyprland config) {
   wayland.windowManager.hyprland = {
     enable = true;
     systemd.enable = false; # we use UWSM instead
-    package = hyprlandPkg;
     plugins = optionals cfg.plugins.enable (with flakePkgs args "hyprland-plugins"; [ hyprexpo ]);
 
     settings = {
@@ -291,7 +270,7 @@ mkIf (isHyprland config) {
   darkman.switchApps.hyprland =
     let
       inherit (config.${ns}.colorScheme) colorMap dark;
-      hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
+      hyprctl = getExe' pkgs.hyprland "hyprctl";
       mapDarkColor = base: colorMap.${base} // { light = dark.palette.${base}; };
     in
     {
@@ -329,9 +308,9 @@ mkIf (isHyprland config) {
       ExecStart = getExe (
         pkgs.writeShellApplication {
           name = "hypr-socket-listener";
-          runtimeInputs = [
-            hyprlandPkg
-            pkgs.socat
+          runtimeInputs = with pkgs; [
+            hyprland
+            socat
           ];
           text =
             # bash

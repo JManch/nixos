@@ -1,4 +1,9 @@
-{ lib, config, ... }@args:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}@args:
 let
   inherit (lib)
     ns
@@ -12,11 +17,10 @@ let
     nameValuePair
     imap0
     listToAttrs
-    escapeShellArg
     ;
   inherit (lib.${ns}) scanPaths flakePkgs;
   cfg = config.${ns}.desktop.hyprland;
-  hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
+  hyprctl = getExe' pkgs.hyprland "hyprctl";
 in
 {
   imports = scanPaths ./. ++ [

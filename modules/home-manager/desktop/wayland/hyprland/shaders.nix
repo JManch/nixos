@@ -77,7 +77,7 @@ mkIf (lib.${ns}.isHyprland config) {
 
   wayland.windowManager.hyprland.settings =
     let
-      hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
+      hyprctl = getExe' pkgs.hyprland "hyprctl";
       jaq = getExe pkgs.jaq;
       toggleShader =
         pkgs.writeShellScript "hypr-toggle-shader" # bash

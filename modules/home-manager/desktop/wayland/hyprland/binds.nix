@@ -15,7 +15,6 @@ let
     getExe'
     flatten
     concatMap
-    escapeShellArg
     concatMapStringsSep
     ;
   inherit (lib.${ns}) isHyprland flakePkgs getMonitorHyprlandCfgStr;
@@ -32,7 +31,7 @@ let
   wpctl = getExe' pkgs.wireplumber "wpctl";
   grimblast = getExe (flakePkgs args "grimblast").grimblast;
   notifySend = getExe pkgs.libnotify;
-  hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
+  hyprctl = getExe' pkgs.hyprland "hyprctl";
   loginctl = getExe' pkgs.systemd "loginctl";
   disableShadersCommand = command: "${cfg.disableShaders}; ${command}; ${cfg.enableShaders}";
 

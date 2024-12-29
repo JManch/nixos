@@ -19,7 +19,6 @@ let
     concatLines
     singleton
     sort
-    escapeShellArg
     concatMapStringsSep
     ;
   inherit (lib.${ns}) addPatches getMonitorByName;
@@ -37,7 +36,7 @@ let
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
 
   systemctl = getExe' pkgs.systemd "systemctl";
-  hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
+  hyprctl = getExe' pkgs.hyprland "hyprctl";
   jaq = getExe pkgs.jaq;
 
   monitorNameToNumMap = # bash
@@ -47,10 +46,7 @@ let
         map (
           m:
           "waybar_monitor_name_to_num[${m.name}]='${
-            if m.mirror == null then
-              toString m.number
-            else
-              toString (getMonitorByName osConfig m.mirror).number
+            if m.mirror == null then toString m.number else toString (getMonitorByName osConfig m.mirror).number
           }'"
         ) monitors
       )}

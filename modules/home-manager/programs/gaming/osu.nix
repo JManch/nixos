@@ -6,16 +6,11 @@
   ...
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    getExe'
-    escapeShellArg
-    ;
+  inherit (lib) ns mkIf getExe';
   inherit (lib.${ns}) isHyprland getMonitorHyprlandCfgStr;
   inherit (osConfig.${ns}.device) primaryMonitor;
   cfg = config.${ns}.programs.gaming.osu;
-  hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
+  hyprctl = getExe' pkgs.hyprland "hyprctl";
 in
 mkIf cfg.enable {
   home.packages = [

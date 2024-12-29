@@ -14,7 +14,6 @@ let
     optional
     getExe
     getExe'
-    escapeShellArg
     singleton
     ;
   inherit (lib.${ns}) asserts isHyprland;
@@ -55,7 +54,7 @@ mkIf (cfg.enable && isWayland) {
 
   ${ns}.desktop.programs.locking.postLockScript =
     let
-      hyprctl = escapeShellArg (getExe' config.wayland.windowManager.hyprland.package "hyprctl");
+      hyprctl = getExe' pkgs.hyprland "hyprctl";
       jaq = getExe pkgs.jaq;
     in
     mkIf (isHyprland config)

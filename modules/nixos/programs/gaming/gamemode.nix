@@ -146,7 +146,7 @@ mkIf cfg.enable {
       let
         inherit (config.hm.${ns}.desktop) hyprland;
         inherit (config.${ns}.device) primaryMonitor;
-        hyprctl = escapeShellArg (getExe' config.programs.hyprland.package "hyprctl");
+        hyprctl = getExe' pkgs.hyprland "hyprctl";
 
         # Remap the killactive key to use the shift modifier
         killActiveRebind = isStart: ''

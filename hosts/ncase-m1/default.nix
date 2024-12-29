@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   inputs,
   username,
   ...
@@ -189,7 +190,8 @@ in
       desktop = {
         enable = true;
         desktopEnvironment = null;
-        displayManager = "greetd";
+        displayManager = "uwsm";
+        uwsm.defaultDesktop = "${pkgs.hyprland}/share/wayland-sessions/hyprland.desktop";
       };
 
       networking = {

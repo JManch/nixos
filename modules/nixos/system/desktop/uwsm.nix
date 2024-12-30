@@ -17,6 +17,7 @@ let
     replaceStrings
     optionalString
     ;
+  inherit (config.${ns}.core) homeManager;
   inherit (lib.${ns}) asserts;
   inherit (cfg.uwsm) defaultDesktop;
   cfg = config.${ns}.system.desktop;
@@ -94,7 +95,7 @@ mkMerge [
       LOGIN_TIMEOUT = 0;
     };
 
-    programs.zsh.interactiveShellInit =
+    environment.loginShellInit =
       let
         select = defaultDesktop == null;
       in
@@ -102,7 +103,24 @@ mkMerge [
         mkOrder 2000
           # bash
           ''
-            if uwsm check may-start ${optionalString select "&& uwsm select"}; then
+            if uwsm check may-start -q ${optionalString select "&& uwsm select"}; then
+              # Home Manager sets session variables in ~/zshenv and sets
+              # __HM_SESS_VARS_SOURCED to ensure that variables are only set once. The
+              # problem with this is that ~/zshenv runs before we start UWSM in
+              # /etc/zprofile. Therefore if the same variable is set in
+              # environment.systemVariables and home.sessionVariables, UWSM will override
+              # the home variable with the system variable and, because of
+              # __HM_SESS_VARS_SOURCED, the home-manager variable will never be set again. We
+              # want home variables to have higher precendence than system variables so the
+              # fix is to unset __HM_SESS_VARS_SOURCED before launching UWSM. This way Home
+              # Manager variables will be set in every new shell our user makes which is
+              # in-line with the behaviour of launching UWSM with a display manager like
+              # greetd.
+
+              # We could also solve the problem by launching UWSM in /etc/zshenv
+              # (environment.shellInit) but it's not really what zshenv is meant for and
+              # running uwsm check in every single shell does not seem ideal.
+              ${optionalString homeManager.enable "unset __HM_SESS_VARS_SOURCED"}
               exec uwsm start -S ${if select then "default" else "-- ${defaultDesktop}"} >/dev/null
             fi
           ''

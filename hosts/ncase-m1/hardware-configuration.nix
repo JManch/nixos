@@ -54,6 +54,8 @@
   # https://wiki.archlinux.org/title/Power_management/Suspend_and_hibernate#PC_will_not_wake_from_sleep_on_A520I_and_B550I_motherboards
   services.udev.extraRules = ''
     KERNEL=="0000:00:01.1", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{vendor}=="0x1022", ATTR{device}=="0x1483", ATTR{power/wakeup}="disabled"
+    # Disable wakeup from keyboard press and mouse movement
+    KERNEL=="0000:02:00.0", SUBSYSTEM=="pci", DRIVER=="xhci_hcd", ATTR{vendor}=="0x1022", ATTR{device}=="0x43ee", ATTR{power/wakeup}="disabled"
   '';
 
   boot = {

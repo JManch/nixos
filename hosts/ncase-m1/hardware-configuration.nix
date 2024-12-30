@@ -49,6 +49,13 @@
   networking.hostId = "625ec505";
   hardware.cpu.amd.updateMicrocode = true;
 
+  # Fix for motherboard-specific suspend issue
+  # https://wiki.archlinux.org/title/Power_management/Wakeup_triggers#Gigabyte_motherboards
+  # https://wiki.archlinux.org/title/Power_management/Suspend_and_hibernate#PC_will_not_wake_from_sleep_on_A520I_and_B550I_motherboards
+  services.udev.extraRules = ''
+    KERNEL=="0000:00:01.1", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{vendor}=="0x1022", ATTR{device}=="0x1483", ATTR{power/wakeup}="disabled"
+  '';
+
   boot = {
     initrd.availableKernelModules = [
       "nvme"

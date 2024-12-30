@@ -18,11 +18,12 @@ mkMerge [
       "File server requires Caddy to be enabled"
     ];
 
-    users.users.${username}.extraGroups = [ "file-server" ];
     users.groups.file-server = { };
+    users.users.${username}.extraGroups = [ "file-server" ];
+    systemd.services.caddy.serviceConfig.SupplementaryGroups = [ "file-server" ];
 
     systemd.tmpfiles.rules = [
-      "d /srv/file-server 0775 root file-server - -"
+      "d /srv/file-server 0770 root file-server - -"
     ];
 
     ${ns}.services.caddy.virtualHosts.files = {

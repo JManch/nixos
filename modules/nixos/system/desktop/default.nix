@@ -12,12 +12,12 @@ let
     mkEnableOption
     literalExpression
     genAttrs
+    getExe'
     mkOption
     elem
     ;
   inherit (lib.${ns}) scanPaths waylandWindowManagers waylandDesktopEnvironments;
   inherit (config.${ns}.core) homeManager;
-  inherit (config.${ns}.system.desktop) isWayland;
   cfg = config.${ns}.system.desktop;
 in
 {
@@ -104,7 +104,7 @@ in
     hardware.graphics.enable = true;
 
     # Enables wayland for all apps that support it
-    environment.sessionVariables.NIXOS_OZONE_WL = mkIf isWayland "1";
+    environment.sessionVariables.NIXOS_OZONE_WL = mkIf cfg.isWayland "1";
 
     # Some apps like vscode needs this
     services.gnome.gnome-keyring.enable = true;
@@ -131,5 +131,11 @@ in
           unitConfig.DefaultDependencies = false;
         })
     );
+
+    # Locking here instead of in the idle daemon (e.g. hypridle) is more robust
+    powerManagement.powerDownCommands = mkIf (cfg.desktopEnvironment == null) ''
+      ${getExe' pkgs.systemd "loginctl"} lock-sessions
+      sleep 3 # give lock screen time to open
+    '';
   };
 }

@@ -1,9 +1,4 @@
-{
-  lib,
-  pkgs,
-  config,
-  ...
-}@args:
+{ lib, config, ... }@args:
 let
   inherit (lib)
     ns
@@ -23,8 +18,10 @@ mkMerge [
         hyprlandPkgs = flakePkgs args "hyprland";
       in
       [
-        (_: _: {
-          inherit (hyprlandPkgs) xdg-desktop-portal-hyprland;
+        (final: _: {
+          xdg-desktop-portal-hyprland = hyprlandPkgs.xdg-desktop-portal-hyprland.override {
+            inherit (final) hyprland;
+          };
           hyprland = hyprlandPkgs.hyprland.overrideAttrs (old: {
             # Remove the "+" and "=" chars from version because it gets used in the
             # package path and has to be escaped in shell scripts due to SC2276

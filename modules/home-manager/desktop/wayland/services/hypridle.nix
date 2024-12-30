@@ -66,8 +66,10 @@ mkIf (cfg.enable && isWayland) {
           # If the display is on, wait screenOffTime seconds then turn off
           # display. Then wait the full lock time before checking again.
           if ${hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" >/dev/null 2>&1; then
+            cursor_pos=$(${hyprctl} cursorpos)
             sleep ${toString cfg.screenOffTime}
             if [ ! -e "$lockfile" ]; then exit 1; fi
+            if [ "$cursor_pos" != "$(${hyprctl} cursorpos)" ]; then continue; fi
             ${hyprctl} dispatch dpms off
           fi
           # give screens time to turn off and prolong next countdown

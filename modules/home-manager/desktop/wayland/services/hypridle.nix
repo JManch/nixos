@@ -3,6 +3,7 @@
   pkgs,
   inputs,
   config,
+  vmVariant,
   isWayland,
   ...
 }:
@@ -61,7 +62,7 @@ mkIf (cfg.enable && isWayland) {
       hyprctl = getExe' pkgs.hyprland "hyprctl";
       jaq = getExe pkgs.jaq;
     in
-    mkIf (isHyprland config)
+    mkIf (isHyprland config && !vmVariant)
       # bash
       ''
         # Turn off the display after locking. I've found that doing this in the

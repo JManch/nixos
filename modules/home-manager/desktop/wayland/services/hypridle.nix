@@ -40,6 +40,10 @@ mkIf (cfg.enable && isWayland) {
           timeout = cfg.lockTime;
           on-timeout = "${getExe' pkgs.systemd "loginctl"} lock-session";
         })
+        ++ optional (cfg.suspendTime != null) {
+          timeout = cfg.suspendTime;
+          on-timeout = "${getExe' pkgs.systemd "systemctl"} suspend";
+        }
         ++ optional cfg.debug {
           timeout = 5;
           on-timeout = "${getExe pkgs.libnotify} 'Hypridle' 'Idle timeout triggered'";

@@ -53,6 +53,12 @@ in
         description = "Idle seconds to lock screen";
       };
 
+      suspendTime = mkOption {
+        type = with types; nullOr int;
+        default = null;
+        description = "Idle seconds to suspend";
+      };
+
       screenOffTime = mkOption {
         type = types.int;
         default = 30;

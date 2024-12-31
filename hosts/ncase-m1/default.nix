@@ -112,7 +112,7 @@ in
     programs = {
       wine.enable = true;
       winbox.enable = true;
-      matlab.enable = true;
+      matlab.enable = false;
       wireshark.enable = true;
       adb.enable = true;
 

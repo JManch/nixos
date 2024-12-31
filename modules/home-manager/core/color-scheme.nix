@@ -47,7 +47,8 @@ let
     genAttrs
     attrNames
     ;
-  inherit (config.${ns}.colorScheme) light dark;
+  inherit (cfg) light dark;
+  cfg = config.${ns}.colorScheme;
 in
 {
   imports = [ inputs.nix-colors.homeManagerModules.default ];
@@ -102,6 +103,6 @@ in
   };
 
   config = {
-    colorScheme = config.${ns}.colorScheme.dark;
+    colorScheme = cfg.dark;
   };
 }

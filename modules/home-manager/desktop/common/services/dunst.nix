@@ -110,7 +110,7 @@ mkIf (cfg.enable && desktopEnabled) {
 
   systemd.user.services.dunst = {
     Unit.After = mkForce [ "graphical-session.target" ];
-    Service.Slice = [ "background-graphical.slice" ];
+    Service.Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";
   };
 
   desktop.hyprland.settings.layerrule = [

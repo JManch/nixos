@@ -57,7 +57,7 @@ mkIf (osConfig.${ns}.device.hassIntegration.enable or false) {
     };
 
     Service = {
-      Slice = [ "background-graphical.slice" ];
+      Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";
       ExecStart = pkgs.writeShellScript "hass-active-heartbeat" ''
         while true
         do

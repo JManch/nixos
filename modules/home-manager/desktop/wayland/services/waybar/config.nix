@@ -21,7 +21,7 @@ let
     sort
     concatMapStringsSep
     ;
-  inherit (lib.${ns}) addPatches getMonitorByName;
+  inherit (lib.${ns}) addPatches sliceSuffix getMonitorByName;
   inherit (config.${ns}) desktop;
   inherit (desktop.services) hypridle;
   inherit (osConfig.${ns}.device) gpu monitors;
@@ -274,7 +274,7 @@ mkIf (cfg.enable && isWayland) {
     Unit.After = mkForce [ "graphical-session.target" ];
     Unit.X-Restart-Triggers = mkForce [ ];
     Service = {
-      Slice = [ "app-graphical.slice" ];
+      Slice = "app${sliceSuffix osConfig}.slice";
       ExecReload = mkForce [ ];
     };
   };

@@ -1,13 +1,15 @@
 { lib, config, ... }:
 let
-  cfg = config.${lib.ns}.hardware.tablet;
+  inherit (lib) ns mkIf;
+  cfg = config.${ns}.hardware.tablet;
 in
-lib.mkIf cfg.enable {
+mkIf cfg.enable {
   hardware.opentabletdriver.enable = true;
 
-  systemd.user.services.opentabletdriver.after = [ "graphical-session.target" ];
+  systemd.user.services.opentabletdriver = {
+    after = [ "graphical-session.target" ];
+    serviceConfig.Slice = "background${lib.${ns}.sliceSuffix config}.slice";
+  };
 
-  persistenceHome.directories = [
-    ".config/OpenTabletDriver"
-  ];
+  persistenceHome.directories = [ ".config/OpenTabletDriver" ];
 }

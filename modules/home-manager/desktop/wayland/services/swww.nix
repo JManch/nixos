@@ -36,7 +36,7 @@ mkIf (cfg.enable && isWayland) {
     };
 
     Service = {
-      Slice = [ "background-graphical.slice" ];
+      Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";
       ExecStart = "${getExe' pkgs.swww "swww-daemon"} --quiet --no-cache";
     };
 

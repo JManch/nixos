@@ -3,6 +3,7 @@
   pkgs,
   inputs,
   config,
+  osConfig,
   vmVariant,
   isWayland,
   ...
@@ -17,7 +18,7 @@ let
     getExe'
     singleton
     ;
-  inherit (lib.${ns}) asserts isHyprland;
+  inherit (lib.${ns}) asserts isHyprland sliceSuffix;
   inherit (config.${ns}.desktop.programs) locking;
   cfg = config.${ns}.desktop.services.hypridle;
 in
@@ -54,7 +55,7 @@ mkIf (cfg.enable && isWayland) {
 
   systemd.user.services.hypridle = {
     Unit.After = mkForce [ "graphical-session.target" ];
-    Service.Slice = [ "background-graphical.slice" ];
+    Service.Slice = "background${sliceSuffix osConfig}.slice";
   };
 
   ${ns}.desktop.programs.locking.postLockScript =

@@ -26,6 +26,7 @@ let
     optionalAttrs
     listToAttrs
     ;
+  inherit (lib.${ns}) asserts addPatches sliceSuffix;
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.device) hassIntegration;
   inherit (config.${ns}.services.hass) curlCommand;
@@ -34,14 +35,14 @@ let
   cfg = desktop.services.darkman;
 in
 mkIf (cfg.enable && desktopEnabled) {
-  assertions = lib.${ns}.asserts [
+  assertions = asserts [
     (cfg.switchMethod == "hass" -> hassIntegration.enable)
     "Darkman 'hass' switch mode requires the device to have hass integration enabled"
   ];
 
   services.darkman = {
     enable = true;
-    package = lib.${ns}.addPatches pkgs.darkman [
+    package = addPatches pkgs.darkman [
       ../../../../../patches/darkmanNoInitialSwitch.patch
     ];
     darkModeScripts = mapAttrs (_: v: v "dark") cfg.switchScripts;
@@ -59,7 +60,7 @@ mkIf (cfg.enable && desktopEnabled) {
 
   systemd.user.services.darkman = {
     Unit.After = [ "graphical-session.target" ];
-    Service.Slice = mkForce [ "background-graphical.slice" ];
+    Service.Slice = mkForce "background${sliceSuffix osConfig}.slice";
   };
 
   # Remove the "Toggle darkman" desktop entry
@@ -88,7 +89,7 @@ mkIf (cfg.enable && desktopEnabled) {
     };
 
     Service = {
-      Slice = [ "background-graphical.slice" ];
+      Slice = "background${sliceSuffix osConfig}.slice";
       ExecStart = getExe (
         pkgs.writeShellApplication {
           name = "darkman-luminence-switcher";

@@ -16,7 +16,12 @@ let
     mkOption
     elem
     ;
-  inherit (lib.${ns}) scanPaths waylandWindowManagers waylandDesktopEnvironments;
+  inherit (lib.${ns})
+    scanPaths
+    waylandWindowManagers
+    waylandDesktopEnvironments
+    sliceSuffix
+    ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
 in
@@ -137,5 +142,22 @@ in
       ${getExe' pkgs.systemd "loginctl"} lock-sessions
       sleep 3 # give lock screen time to open
     '';
+
+    # Fix the session slice for home-manager services. I don't think it's
+    # possible to do drop-in overrides like this with home-manager.
+    systemd.user.services =
+      genAttrs
+        [
+          "at-spi-dbus-bus"
+          "xdg-desktop-portal-gtk"
+          "xdg-desktop-portal-hyprland"
+          "xdg-desktop-portal"
+          "xdg-document-portal"
+          "xdg-permission-store"
+        ]
+        (_: {
+          overrideStrategy = "asDropin";
+          serviceConfig.Slice = "session${sliceSuffix config}.slice";
+        });
   };
 }

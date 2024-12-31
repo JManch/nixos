@@ -11,8 +11,6 @@ let
     ns
     mkIf
     getExe'
-    hiPrio
-    optionals
     optionalString
     ;
   inherit (config.${ns}) colorScheme;
@@ -29,20 +27,10 @@ let
   lightTheme = gtkThemeFromScheme { scheme = colorScheme.light; };
 in
 mkIf desktopEnabled {
-  home.packages =
-    [
-      (hiPrio (
-        pkgs.runCommand "xdg-desktop-portal-gtk-session-slice" { } ''
-          install -Dm644 ${pkgs.xdg-desktop-portal-gtk}/share/systemd/user/xdg-desktop-portal-gtk.service -t $out/share/systemd/user
-          echo "Slice=session.slice" >> $out/share/systemd/user/xdg-desktop-portal-gtk.service
-          chmod 444 $out/share/systemd/user/xdg-desktop-portal-gtk.service
-        ''
-      ))
-    ]
-    ++ optionals customTheme [
-      darkTheme
-      lightTheme
-    ];
+  home.packages = mkIf customTheme [
+    darkTheme
+    lightTheme
+  ];
 
   gtk = {
     enable = true;

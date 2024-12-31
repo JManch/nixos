@@ -7,7 +7,12 @@ let
     mkForce
     replaceStrings
     ;
-  inherit (lib.${ns}) asserts isHyprland flakePkgs;
+  inherit (lib.${ns})
+    asserts
+    sliceSuffix
+    isHyprland
+    flakePkgs
+    ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
 in
@@ -68,5 +73,6 @@ mkMerge [
     # https://discourse.nixos.org/t/how-to-enable-upstream-systemd-user-services-declaratively/7649/9
     systemd.packages = [ (flakePkgs args "hyprpolkitagent").default ];
     systemd.user.services.hyprpolkitagent.wantedBy = [ "graphical-session.target" ];
+    systemd.user.services.hyprpolkitagent.serviceConfig.Slice = "session${sliceSuffix config}.slice";
   })
 ]

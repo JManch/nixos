@@ -279,5 +279,12 @@ in
           config.home-manager.users.${config.${ns}.core.username or ""}.${ns} or config.${ns} or null;
       in
       (modules.desktop.enable or false) && modules.desktop.windowManager == "hyprland";
+
+    sliceSuffix =
+      config:
+      assert
+        (!config ? home.stateVersion)
+        || throw "Slice suffix should be passed osConfig not Home Manager config";
+      optionalString (config.programs.uwsm.enable or false) "-graphical";
   };
 }

@@ -28,6 +28,6 @@ mkIf (desktopEnabled && udisks.enable && !vmVariant) {
 
   systemd.user.services.udiskie = {
     Unit.After = mkForce [ "graphical-session.target" ];
-    Service.Slice = [ "background-graphical.slice" ];
+    Service.Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";
   };
 }

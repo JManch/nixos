@@ -2,11 +2,13 @@
   lib,
   pkgs,
   config,
+  osConfig,
   selfPkgs,
   ...
 }:
 let
   inherit (lib) ns mkIf getExe;
+  inherit (lib.${ns}) isHyprland sliceSuffix;
   inherit (config.${ns}.desktop.hyprland) modKey namedWorkspaceIDs;
   cfg = config.${ns}.programs.multiviewerF1;
 
@@ -314,7 +316,7 @@ mkIf cfg.enable {
     ];
   };
 
-  systemd.user.services.hyprland-multiviewer-tiler = mkIf (lib.${ns}.isHyprland config) {
+  systemd.user.services.hyprland-multiviewer-tiler = mkIf (isHyprland config) {
     Unit = {
       Description = "Hyprland Multiviewer F1 Tiler";
       After = "graphical-session.target";
@@ -322,7 +324,7 @@ mkIf cfg.enable {
     };
 
     Service = {
-      Slice = [ "app-graphical.slice" ];
+      Slice = "app${sliceSuffix osConfig}.slice";
       Environment = [ "PYTHONUNBUFFERED=1" ];
       ExecStart = hyprlandMultiviewerTiler;
       ExecStopPost = pkgs.writeShellScript "hyprland-multiviewer-tiling-exec-stop-post" ''

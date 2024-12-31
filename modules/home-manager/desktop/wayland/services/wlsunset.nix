@@ -10,6 +10,7 @@
   lib,
   pkgs,
   config,
+  osConfig,
   isWayland,
   ...
 }:
@@ -28,7 +29,7 @@ mkIf (cfg.enable && isWayland) {
       After = [ "graphical-session.target" ];
     };
 
-    Service.Slice = [ "background-graphical.slice" ];
+    Service.Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";
     Service.ExecStart =
       let
         args = "-t 4000 -T 6500";

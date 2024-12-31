@@ -23,6 +23,7 @@ let
     ;
   inherit (lib.${ns})
     flakePkgs
+    sliceSuffix
     isHyprland
     asserts
     getMonitorHyprlandCfgStr
@@ -303,7 +304,7 @@ mkIf (isHyprland config) {
 
     Service = {
       Type = "exec";
-      Slice = [ "background-graphical.slice" ];
+      Slice = "background${sliceSuffix osConfig}.slice";
       Restart = "always";
       ExecStart = getExe (
         pkgs.writeShellApplication {

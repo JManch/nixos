@@ -15,6 +15,7 @@ let
     singleton
     optionalString
     ;
+  inherit (lib.${ns}) asserts sliceSuffix;
   inherit (config.${ns}.programs) mpv;
   inherit (config.${ns}) desktop;
   inherit (config.home) homeDirectory;
@@ -22,7 +23,7 @@ let
   cfg = config.${ns}.programs.firefox;
 in
 mkIf (cfg.enable && (osConfig.${ns}.system.desktop.enable or true)) {
-  assertions = lib.${ns}.asserts [
+  assertions = asserts [
     (cfg.runInRam -> impermanence.enable or false)
     "Firefox run in RAM option can only be used on hosts with impermanence enabled"
     (cfg.hideToolbar -> !pkgs.hostPlatform.isDarwin)
@@ -225,7 +226,7 @@ mkIf (cfg.enable && (osConfig.${ns}.system.desktop.enable or true)) {
 
         Service = {
           Type = "oneshot";
-          Slice = [ "app-graphical.slice" ];
+          Slice = "app${sliceSuffix osConfig}.slice";
           ExecStart =
             (pkgs.writeShellScript "firefox-persist-init" # bash
               ''
@@ -257,7 +258,7 @@ mkIf (cfg.enable && (osConfig.${ns}.system.desktop.enable or true)) {
 
         Service = {
           Type = "oneshot";
-          Slice = [ "background-graphical.slice" ];
+          Slice = "background${sliceSuffix osConfig}.slice";
           CPUSchedulingPolicy = "idle";
           IOSchedulingClass = "idle";
           ExecStart =

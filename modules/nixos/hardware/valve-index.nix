@@ -20,6 +20,7 @@ let
     getExe'
     singleton
     ;
+  inherit (lib.${ns}) asserts sliceSuffix;
   inherit (config.${ns}.core) homeManager;
   inherit (config.${ns}.device) primaryMonitor gpu;
   inherit (config.${ns}.hardware) bluetooth;
@@ -31,7 +32,7 @@ let
   lighthouse = getExe pkgs.lighthouse-steamvr;
 in
 mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
+  assertions = asserts [
     homeManager.enable
     "Valve Index requires home manager to be enabled"
     gamemode.enable
@@ -159,7 +160,7 @@ mkIf cfg.enable {
       requires = [ "valve-index.service" ];
       after = [ "valve-index.service" ];
       serviceConfig = {
-        Slice = [ "app-graphical.slice" ];
+        Slice = "app${sliceSuffix config}.slice";
 
         ExecStartPre = "-${pkgs.writeShellScript "monado-exec-start-pre" ''
           ln -sf "$XDG_CONFIG_HOME/openvr/openvrpaths.vrpath" ${openvrPaths}

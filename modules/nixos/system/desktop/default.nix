@@ -9,6 +9,7 @@ let
     ns
     mkIf
     types
+    mkForce
     mkEnableOption
     literalExpression
     genAttrs
@@ -157,6 +158,17 @@ in
         ]
         (_: {
           overrideStrategy = "asDropin";
+          # You'd expect service overrides to only set what you've defined but
+          # confusingly Nixpkgs sets the service's PATH by default in an
+          # undocumented way. This overrides the PATH set in the systemd user
+          # environment and breaks our portal services.
+          # https://github.com/NixOS/nixpkgs/blame/18bcb1ef6e5397826e4bfae8ae95f1f88bf59f4f/nixos/lib/systemd-lib.nix#L512
+
+          # For system services this isn't an issue since `systemctl
+          # show-environment` is basically empty anyway. For user services
+          # however, this is a nasty pitfall. Note: this only affects overrides
+          # of units provided in packages; not those declared with Nix.
+          path = mkForce [ ];
           serviceConfig.Slice = "session${sliceSuffix config}.slice";
         });
   };

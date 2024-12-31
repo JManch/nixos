@@ -13,6 +13,7 @@ let
     hasInfix
     mkMerge
     mkOrder
+    mkForce
     getExe'
     replaceStrings
     optionalString
@@ -64,7 +65,7 @@ mkMerge [
 
     systemd.user.services.fumon = {
       wantedBy = [ "graphical-session.target" ];
-      path = [ pkgs.libnotify ];
+      path = mkForce [ ]; # reason explained in desktop/default.nix
       serviceConfig.ExecStart = [
         "" # to replace original ExecStart
         (getExe' config.programs.uwsm.package "fumon")

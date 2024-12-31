@@ -143,7 +143,7 @@ mkMerge [
       wants = [ "network-online.target" ];
       wantedBy = mkForce [ ];
       requires = [ "nss-lookup.target" ];
-      startAt = "hourly";
+      startAt = if cfg.server.enable then "*-*-* *:00:00" else "*-*-* *:05:00";
 
       script =
         mkBefore

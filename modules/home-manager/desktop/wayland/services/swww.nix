@@ -37,7 +37,7 @@ mkIf (cfg.enable && isWayland) {
 
     Service = {
       Slice = [ "background-graphical.slice" ];
-      ExecStart = "${getExe' pkgs.swww "swww-daemon"} --no-cache";
+      ExecStart = "${getExe' pkgs.swww "swww-daemon"} --quiet --no-cache";
     };
 
     Install.WantedBy = [ "graphical-session.target" ];

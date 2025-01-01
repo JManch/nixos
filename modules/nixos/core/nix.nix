@@ -348,9 +348,6 @@ in
   boot.binfmt.emulatedSystems = cfg.builder.emulatedSystems;
   services.getty.helpLine = mkForce "";
 
-  # Useful for finding the exact config that built a generation
-  environment.etc.current-flake.source = ../../..;
-
   # Include flake git rev in system label
   system.nixos.label = concatStringsSep "-" (
     (sort (x: y: x < y) config.system.nixos.tags)

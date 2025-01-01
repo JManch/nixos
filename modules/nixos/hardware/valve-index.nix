@@ -96,6 +96,9 @@ mkIf cfg.enable {
     ];
   };
 
+  # Proton version optimised for VRChat
+  programs.steam.extraCompatPackages = [ pkgs.proton-ge-rtsp-bin ];
+
   services.monado = {
     enable = true;
     forceDefaultRuntime = true;
@@ -163,7 +166,8 @@ mkIf cfg.enable {
         Slice = "app${sliceSuffix config}.slice";
 
         ExecStartPre = "-${pkgs.writeShellScript "monado-exec-start-pre" ''
-          ln -sf "$XDG_CONFIG_HOME/openvr/openvrpaths.vrpath" ${openvrPaths}
+          mkdir -p "$XDG_CONFIG_HOME/openvr"
+          ln -sf ${openvrPaths} "$XDG_CONFIG_HOME/openvr/openvrpaths.vrpath"
 
           if [ ! -f "/tmp/disable-lighthouse-control" ]; then
             ${lighthouse} --state on

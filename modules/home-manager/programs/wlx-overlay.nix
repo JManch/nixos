@@ -10,9 +10,9 @@ in
 mkIf (osConfig.${ns}.hardware.valve-index.enable or false) {
   home.packages = [ pkgs.wlx-overlay-s ];
 
-  systemd.user.services.wlx-overlay-s = {
+  systemd.user.services.wlx-overlay-s-openxr = {
     Unit = {
-      Description = "Lightweight OpenXR/OpenVR overlay for Wayland and X11 desktops";
+      Description = "WLX Overlay S OpenXR";
       After = [ "monado.service" ];
       BindsTo = [ "monado.service" ];
       Requires = [
@@ -20,8 +20,25 @@ mkIf (osConfig.${ns}.hardware.valve-index.enable or false) {
         "graphical-session.target"
       ];
     };
-    Service.ExecStart = "${getExe pkgs.wlx-overlay-s} --show";
+
+    Service = {
+      Slice = "app${lib.${ns}.sliceSuffix osConfig}.slice";
+      ExecStart = "${getExe pkgs.wlx-overlay-s} --show";
+    };
+
     Install.WantedBy = [ "monado.service" ];
+  };
+
+  systemd.user.services.wlx-overlay-s-openvr = {
+    Unit = {
+      Description = "WLX Overlay S OpenVR";
+      Requires = [ "graphical-session.target" ];
+    };
+
+    Service = {
+      Slice = "app${lib.${ns}.sliceSuffix osConfig}.slice";
+      ExecStart = "${getExe pkgs.wlx-overlay-s} --openvr --show";
+    };
   };
 
   persistence.directories = [ ".config/wlxoverlay" ];

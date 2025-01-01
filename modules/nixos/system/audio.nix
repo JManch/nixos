@@ -57,9 +57,12 @@ in
         };
       };
 
-      # Do not start pipewire user sockets or services for non-system users.
-      # This prevents pipewire unnecessarily starting for the greeter user
-      # during login.
+      # On Nix systemd user services are enabled for all users by default.
+      # Pretty much all of the units in /etc/systemd/user/*.wants/* should have
+      # ConditionUser !@system since these services should never be ran as
+      # root. Services that wants graphical-session.target shouldn't need this
+      # since root shouldn't start graphical sessions.
+      # https://github.com/NixOS/nixpkgs/issues/21460
       systemd.user = {
         sockets = {
           pipewire.unitConfig.ConditionUser = "!@system";

@@ -780,7 +780,7 @@ in
                             }
                             {
                               condition = "and";
-                              conditions = triggeredByLuminence true ++ luminenceCondition true;
+                              conditions = triggeredByLuminence true ++ luminenceCondition false;
                             }
                           ];
                         };

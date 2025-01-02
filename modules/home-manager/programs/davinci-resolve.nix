@@ -19,10 +19,8 @@ in
     ];
 
     desktop.hyprland.settings.windowrulev2 = [
-      "tag +davinci_resize, floating:1, class:^(resolve)$"
-      "tag -davinci_resize, tag:davinci_resize*, title:^(resolve|Message)$"
-      "size 40% 40%, tag:davinci_resize"
-      "center, tag:davinci_resize"
+      "size 40% 40%, floating:1, class:^(resolve)$, title:negative:^(resolve|Message)$"
+      "center, floating:1, class:^(resolve)$, title:negative:^(resolve|Message)$"
     ];
   };
 }

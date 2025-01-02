@@ -12,12 +12,21 @@ mkIf (osConfig.${ns}.hardware.valve-index.enable or false) {
 
   systemd.user.services.wlx-overlay-s-openxr = {
     Unit = {
-      Description = "WLX Overlay S OpenXR";
-      After = [ "monado.service" ];
-      BindsTo = [ "monado.service" ];
-      Requires = [
-        "monado.socket"
+      Description = "OpenXR Overlay";
+      After = [
         "graphical-session.target"
+        "monado.service"
+      ];
+
+      PartOf = [
+        "monado.service"
+        "graphical-session.target"
+      ];
+
+      Requisite = [
+        "graphical-session.target"
+        "monado.service"
+        "monado.socket"
       ];
     };
 
@@ -31,8 +40,10 @@ mkIf (osConfig.${ns}.hardware.valve-index.enable or false) {
 
   systemd.user.services.wlx-overlay-s-openvr = {
     Unit = {
-      Description = "WLX Overlay S OpenVR";
-      Requires = [ "graphical-session.target" ];
+      Description = "OpenVR Overlay";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+      Requisite = [ "graphical-session.target" ];
     };
 
     Service = {

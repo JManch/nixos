@@ -104,7 +104,7 @@ mkMerge [
         mkOrder 2000
           # bash
           ''
-            if uwsm check may-start -q ${optionalString select "&& uwsm select"}; then
+            if test -z $SSH_TTY && uwsm check may-start -q ${optionalString select "&& uwsm select"}; then
               # Home Manager sets session variables in ~/zshenv and sets
               # __HM_SESS_VARS_SOURCED to ensure that variables are only set once. The
               # problem with this is that ~/zshenv runs before we start UWSM in

@@ -35,6 +35,7 @@
         dunst.enable = true;
         wlsunset.enable = true;
         hypridle.enable = true;
+        wayvnc.enable = true;
 
         wallpaper = {
           randomise.enable = true;

@@ -158,7 +158,17 @@ in
       customComponents =
         [
           pkgs.home-assistant-custom-components.waste_collection_schedule
-          pkgs.home-assistant-custom-components.adaptive_lighting
+          (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs (
+            final: _: {
+              version = "1.25.0";
+              src = pkgs.fetchFromGitHub {
+                owner = "basnijholt";
+                repo = "adaptive-lighting";
+                rev = "refs/tags/v${final.version}";
+                hash = "sha256-ykliUi/gnJB9hMNI72RCofcGzS7799lVTAXZyrho/Ng=";
+              };
+            }
+          ))
           (
             (pkgs.home-assistant-custom-components.miele.override {
               pymiele = pkgs.python3Packages.pymiele.overrideAttrs {

@@ -172,10 +172,25 @@ in
                       description = "Entity ID of luminence sensor";
                     };
 
-                    threshold = mkOption {
-                      type = types.float;
-                      default = 2.0;
-                      description = "Luminence threshold for turning on lights";
+                    threshold = {
+                      lower = mkOption {
+                        type = types.float;
+                        description = ''
+                          Luminence threshold below which lights will turn on.
+                          If a luminence sensor is used there should be a gap
+                          between the thresholds to avoid on/off loops. The
+                          lower threshold is used to determine whether lights
+                          should turn on. Upper threshold is just used for
+                          triggers.
+                        '';
+                      };
+
+                      upper = mkOption {
+                        type = types.float;
+                        description = ''
+                          Luminence threshold above which lights will turn off.
+                        '';
+                      };
                     };
                   };
 
@@ -674,162 +689,172 @@ in
               };
           })
 
-          (mkIf cfg'.automatedToggle.enable {
-            automation = [
-              {
-                alias = "${formattedRoomName} Lights Toggle";
-                trace.stored_traces = 5;
-                mode = "queued";
-                triggers = [
-                  {
-                    platform = "numeric_state";
-                    entity_id = [ "sensor.${cfg'.automatedToggle.luminence.sensor}" ];
-                    above = cfg'.automatedToggle.luminence.threshold;
-                    id = "luminence";
-                  }
-                  {
-                    platform = "numeric_state";
-                    entity_id = [ "sensor.${cfg'.automatedToggle.luminence.sensor}" ];
-                    below = cfg'.automatedToggle.luminence.threshold;
-                    id = "luminence";
-                  }
-                ] ++ cfg'.automatedToggle.presenceTriggers;
-                conditions = singleton {
-                  condition = "state";
-                  entity_id = "input_boolean.${room}_automated_lights_toggle";
-                  state = "on";
-                };
-                actions =
-                  let
-                    luminenceCondition =
-                      below:
-                      singleton {
-                        condition = "numeric_state";
-                        entity_id = "sensor.${cfg'.automatedToggle.luminence.sensor}";
-                        below = mkIf below cfg'.automatedToggle.luminence.threshold;
-                        above = mkIf (!below) cfg'.automatedToggle.luminence.threshold;
-                      };
+          (
+            let
+              inherit (cfg'.automatedToggle)
+                luminence
+                noPresenceConditions
+                presenceConditions
+                presenceTriggers
+                ;
+            in
+            mkIf cfg'.automatedToggle.enable {
+              automation = [
+                {
+                  alias = "${formattedRoomName} Lights Toggle";
+                  trace.stored_traces = 5;
+                  mode = "queued";
+                  triggers = [
+                    {
+                      platform = "numeric_state";
+                      entity_id = [ "sensor.${luminence.sensor}" ];
+                      above = luminence.threshold.upper;
+                      id = "luminence";
+                    }
+                    {
+                      platform = "numeric_state";
+                      entity_id = [ "sensor.${luminence.sensor}" ];
+                      below = luminence.threshold.lower;
+                      id = "luminence";
+                    }
+                  ] ++ presenceTriggers;
+                  conditions = singleton {
+                    condition = "state";
+                    entity_id = "input_boolean.${room}_automated_lights_toggle";
+                    state = "on";
+                  };
+                  actions =
+                    let
+                      luminenceCondition =
+                        below:
+                        singleton {
+                          condition = "numeric_state";
+                          entity_id = "sensor.${luminence.sensor}";
+                          below = mkIf below luminence.threshold.lower;
+                          above = mkIf (!below) luminence.threshold.lower;
+                        };
 
-                    triggeredByLuminence =
-                      yes:
-                      singleton (
-                        if yes then
-                          {
-                            condition = "trigger";
-                            id = [ "luminence" ];
-                          }
-                        else
-                          {
-                            condition = "not";
-                            conditions = singleton {
+                      triggeredByLuminence =
+                        yes:
+                        singleton (
+                          if yes then
+                            {
                               condition = "trigger";
                               id = [ "luminence" ];
-                            };
-                          }
-                      );
-
-                    timeToWake = "(${wakeUpTimestamp} - (now().timestamp() | round(0)))";
-                    isSleeping =
-                      yes:
-                      singleton {
-                        condition = "template";
-                        value_template = "{{ ${wakeUpTimestamp} != 0 and ${
-                          if yes then
-                            # 30 minute grace period after wake-up to account for lie-ins
-                            "${timeToWake} <= ${sleepDuration}*60*60 or ${timeToWake} >= 23.5*60*60"
+                            }
                           else
-                            "${timeToWake} > ${sleepDuration}*60*60"
-                        } }}";
-                      };
-                  in
-                  singleton {
-                    "if" =
-                      cfg'.automatedToggle.presenceConditions
-                      ++ luminenceCondition true
-                      # If the room has sleep tracking we can add an additional check to ensure that
-                      # lights do not turn on whilst sleeping even if presence conditions are met
-                      ++ optional roomCfg.sleepTracking.enable {
-                        condition = "or";
-                        conditions = triggeredByLuminence false ++ isSleeping false;
-                      };
-                    "then" = singleton {
-                      action = "light.turn_on";
-                      target.entity_id = "light.${room}_lights";
-                    };
-                    "else" =
-                      optional (cfg'.automatedToggle.offDelay != null) {
-                        delay.seconds = cfg'.automatedToggle.offDelay;
-                      }
-                      # Do not turn off the lights if the user is sleeping and trigger was luminence
-                      # change. Useful for rooms that rely on solar power gen for luminence
-                      # detection.
-                      ++ optional roomCfg.sleepTracking.enable {
-                        condition = "not";
-                        conditions = singleton {
-                          condition = "and";
-                          conditions = triggeredByLuminence true ++ isSleeping true;
-                        };
-                      }
-                      ++ singleton {
-                        "if" = singleton {
-                          condition = "or";
-                          conditions = [
                             {
-                              condition = "and";
-                              conditions = cfg'.automatedToggle.noPresenceConditions;
+                              condition = "not";
+                              conditions = singleton {
+                                condition = "trigger";
+                                id = [ "luminence" ];
+                              };
                             }
-                            {
-                              condition = "and";
-                              conditions = triggeredByLuminence true ++ luminenceCondition false;
-                            }
-                          ];
-                        };
-                        "then" = singleton {
-                          action = "light.turn_off";
-                          target.entity_id = "light.${room}_lights";
-                        };
-                      };
-                  };
-              }
-              {
-                # This automation disables automated light toggling if the lights are
-                # "manually" turned off. We treat any trigger that was not an automation as
-                # "manual". This way lights can be forced off even when the room has a presence
-                # sensor.
-                alias = "${formattedRoomName} Automated Lights Toggle";
-                mode = "single";
-                triggers = singleton {
-                  platform = "state";
-                  entity_id = [ "light.${room}_lights" ];
-                  from = null;
-                };
-                actions = singleton {
-                  "if" = [
-                    {
-                      condition = "state";
-                      entity_id = "light.${room}_lights";
-                      state = "off";
-                    }
-                    {
-                      condition = "template";
-                      value_template = "{{ trigger.to_state.context.parent_id == none }}";
-                    }
-                  ];
-                  "then" = singleton {
-                    action = "input_boolean.turn_off";
-                    target.entity_id = "input_boolean.${room}_automated_lights_toggle";
-                  };
-                  "else" = singleton {
-                    action = "input_boolean.turn_on";
-                    target.entity_id = "input_boolean.${room}_automated_lights_toggle";
-                  };
-                };
-              }
-            ];
+                        );
 
-            input_boolean."${room}_automated_lights_toggle".name =
-              "${formattedRoomName} Automated Lights Toggle";
-          })
+                      timeToWake = "(${wakeUpTimestamp} - (now().timestamp() | round(0)))";
+                      isSleeping =
+                        yes:
+                        singleton {
+                          condition = "template";
+                          value_template = "{{ ${wakeUpTimestamp} != 0 and ${
+                            if yes then
+                              # 30 minute grace period after wake-up to account for lie-ins
+                              "${timeToWake} <= ${sleepDuration}*60*60 or ${timeToWake} >= 23.5*60*60"
+                            else
+                              "${timeToWake} > ${sleepDuration}*60*60"
+                          } }}";
+                        };
+                    in
+                    singleton {
+                      "if" =
+                        presenceConditions
+                        ++ luminenceCondition true
+                        # If the room has sleep tracking we can add an additional check to ensure that
+                        # lights do not turn on whilst sleeping even if presence conditions are met
+                        ++ optional roomCfg.sleepTracking.enable {
+                          condition = "or";
+                          conditions = triggeredByLuminence false ++ isSleeping false;
+                        };
+                      "then" = singleton {
+                        action = "light.turn_on";
+                        target.entity_id = "light.${room}_lights";
+                      };
+                      "else" =
+                        optional (cfg'.automatedToggle.offDelay != null) {
+                          delay.seconds = cfg'.automatedToggle.offDelay;
+                        }
+                        # Do not turn off the lights if the user is sleeping and trigger was luminence
+                        # change. Useful for rooms that rely on solar power gen for luminence
+                        # detection.
+                        ++ optional roomCfg.sleepTracking.enable {
+                          condition = "not";
+                          conditions = singleton {
+                            condition = "and";
+                            conditions = triggeredByLuminence true ++ isSleeping true;
+                          };
+                        }
+                        ++ singleton {
+                          "if" = singleton {
+                            condition = "or";
+                            conditions = [
+                              {
+                                condition = "and";
+                                conditions = noPresenceConditions;
+                              }
+                              {
+                                condition = "and";
+                                conditions = triggeredByLuminence true ++ luminenceCondition false;
+                              }
+                            ];
+                          };
+                          "then" = singleton {
+                            action = "light.turn_off";
+                            target.entity_id = "light.${room}_lights";
+                          };
+                        };
+                    };
+                }
+                {
+                  # This automation disables automated light toggling if the lights are
+                  # "manually" turned off. We treat any trigger that was not an automation as
+                  # "manual". This way lights can be forced off even when the room has a presence
+                  # sensor.
+                  alias = "${formattedRoomName} Automated Lights Toggle";
+                  mode = "single";
+                  triggers = singleton {
+                    platform = "state";
+                    entity_id = [ "light.${room}_lights" ];
+                    from = null;
+                  };
+                  actions = singleton {
+                    "if" = [
+                      {
+                        condition = "state";
+                        entity_id = "light.${room}_lights";
+                        state = "off";
+                      }
+                      {
+                        condition = "template";
+                        value_template = "{{ trigger.to_state.context.parent_id == none }}";
+                      }
+                    ];
+                    "then" = singleton {
+                      action = "input_boolean.turn_off";
+                      target.entity_id = "input_boolean.${room}_automated_lights_toggle";
+                    };
+                    "else" = singleton {
+                      action = "input_boolean.turn_on";
+                      target.entity_id = "input_boolean.${room}_automated_lights_toggle";
+                    };
+                  };
+                }
+              ];
+
+              input_boolean."${room}_automated_lights_toggle".name =
+                "${formattedRoomName} Automated Lights Toggle";
+            }
+          )
         ])
       ) cfg.rooms
     );

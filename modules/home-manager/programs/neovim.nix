@@ -10,14 +10,13 @@ let
     ns
     mkIf
     optionalString
+    hiPrio
     optional
     ;
   inherit (config.${ns}.desktop.services) darkman;
   cfg = config.${ns}.programs.neovim;
 in
 mkIf cfg.enable {
-  home.packages = optional cfg.neovide.enable pkgs.neovide;
-
   programs.neovim = {
     enable = true;
     # Until https://github.com/neovim/neovim/pull/30747 gets into a stable
@@ -65,6 +64,16 @@ mkIf cfg.enable {
       "${lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}"
     ];
   };
+
+  home.packages = [
+    (hiPrio (
+      pkgs.runCommand "neovim-desktop-rename" { } ''
+        mkdir -p $out/share/applications
+        substitute ${pkgs.neovim}/share/applications/nvim.desktop $out/share/applications/nvim.desktop \
+          --replace-fail "Name=Neovim wrapper" "Name=Neovim"
+      ''
+    ))
+  ] ++ optional cfg.neovide.enable pkgs.neovide;
 
   xdg.configFile."nvim".source = inputs.neovim-config.outPath;
 

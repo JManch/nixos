@@ -43,6 +43,7 @@ in
         nurl # tool for generating nix fetcher calls from urls
         file
         jaq
+        man-pages
       ])
       ++ [ selfPkgs.microfetch ];
 

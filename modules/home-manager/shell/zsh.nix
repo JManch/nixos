@@ -45,6 +45,12 @@ mkIf cfg.enable {
       reload = "exec zsh";
     };
 
+    envExtra = # bash
+      ''
+        # Fix for `nix develop` making our default shell bash
+        export SHELL=/run/current-system/sw/bin/zsh
+      '';
+
     initExtraFirst = # bash
       ''
         function zvm_config() {

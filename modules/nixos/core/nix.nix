@@ -354,6 +354,9 @@ in
     ++ [ "${config.system.nixos.version}-${self.sourceInfo.shortRev or "dirty"}" ]
   );
 
+  # Useful for finding the exact config that built a generation
+  environment.etc.current-flake.source = self;
+
   # Nice explanation of overlays: https://archive.is/f8goR
   # How to override python packages:
   # https://nixos.org/manual/nixpkgs/unstable/#how-to-override-a-python-package-using-overlays

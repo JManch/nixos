@@ -12,6 +12,7 @@ let
     mkOption
     types
     escapeShellArg
+    optionalString
     ;
   cfg = config.${ns}.desktop.programs;
 in
@@ -29,6 +30,15 @@ in
         type = types.package;
         default = null;
         description = "The package to use for locking";
+      };
+
+      immediateFlag = mkOption {
+        type = with types; nullOr str;
+        default = null;
+        description = ''
+          Flag for immediate locking (meaning skipping the grace period). Leave
+          null if unsupported.
+        '';
       };
 
       preLockScript = mkOption {
@@ -69,8 +79,18 @@ in
               touch "$lockfile"
               trap 'rm -f "$lockfile"' EXIT
 
+              lockArgs=()
+              ${optionalString (cfg.locking.immediateFlag != null) # bash
+                ''
+                  if [ -e /tmp/lock-immediately ]; then
+                    lockArgs+=(${cfg.locking.immediateFlag})
+                    rm -f /tmp/lock-immediately || true
+                  fi
+                ''
+              }
+
               ${cfg.locking.preLockScript}
-              ${escapeShellArg (getExe cfg.locking.package)} &
+              ${escapeShellArg (getExe cfg.locking.package)} "''${lockArgs[@]}" &
               LOCKER_PID=$!
               ${cfg.locking.postLockScript}
               wait $LOCKER_PID

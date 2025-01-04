@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  username,
   ...
 }:
 let
@@ -139,10 +140,15 @@ in
     );
 
     # Locking here instead of in the idle daemon (e.g. hypridle) is more robust
-    powerManagement.powerDownCommands = mkIf (cfg.desktopEnvironment == null) ''
-      ${getExe' pkgs.systemd "loginctl"} lock-sessions
-      sleep 3 # give lock screen time to open
-    '';
+    powerManagement.powerDownCommands =
+      mkIf (cfg.desktopEnvironment == null) # bash
+        ''
+          # If our locker supports it, ignore the grace period and lock the screen
+          # immediately to avoid accidentally unlocking in the sleep seconds.
+          install -m644 -o ${username} -g users /dev/null /tmp/lock-immediately
+          ${getExe' pkgs.systemd "loginctl"} lock-sessions
+          sleep 3 # give lock screen time to open
+        '';
 
     # Fix the session slice for home-manager services. I don't think it's
     # possible to do drop-in overrides like this with home-manager.

@@ -1105,5 +1105,10 @@ in
     # keep running rather than stopping and starting with each ssh session on
     # servers
     users.users.${username}.linger = config.${ns}.device.type == "server";
+
+    programs.zsh.shellAliases = {
+      sys = "systemctl";
+      sysu = "systemctl --user";
+    };
   };
 }

@@ -86,7 +86,7 @@ mkMerge [
     systemd.services."getty@".serviceConfig.TTYVTDisallocate = "no";
 
     # Remove excess new lines and use normal green instead of bright
-    environment.etc.issue.source = pkgs.writeText "issue" ''
+    environment.etc.issue.text = ''
       [0;32m${replaceStrings [ "<<< " " >>>" ] [ "" "" ] config.services.getty.greetingLine}[0m
     '';
 

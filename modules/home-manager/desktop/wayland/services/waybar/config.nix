@@ -210,6 +210,7 @@ mkIf (cfg.enable && isWayland) {
 
         "custom/poweroff" = {
           format = "⏻";
+          on-click = "${systemctl} suspend";
           on-click-middle = "${systemctl} poweroff";
           tooltip = false;
         };

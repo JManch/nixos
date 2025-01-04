@@ -17,6 +17,7 @@ let
     mapAttrsToList
     ;
   inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.system) desktop;
   cfg = config.${ns}.system.audio;
   wpctl = getExe' pkgs.wireplumber "wpctl";
   pactl = getExe' pkgs.pulseaudio "pactl";
@@ -33,7 +34,7 @@ in
 {
   config = mkMerge [
     (mkIf cfg.enable {
-      userPackages = [ pkgs.pavucontrol ];
+      userPackages = mkIf desktop.enable [ pkgs.pavucontrol ];
       hardware.pulseaudio.enable = mkForce false;
       ${ns}.system.audio.scripts.toggleMic = toggleMic.outPath;
 
@@ -75,7 +76,7 @@ in
         };
       };
 
-      systemd.user.services.setup-pipewire-devices = {
+      systemd.user.services.setup-pipewire-devices = mkIf desktop.enable {
         description = "Setup source and sink devices on login";
         after = [ "wireplumber.service" ];
         wants = [ "wireplumber.service" ];

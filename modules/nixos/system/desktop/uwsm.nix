@@ -1,6 +1,5 @@
 {
   lib,
-  pkgs,
   config,
   selfPkgs,
   username,
@@ -26,7 +25,7 @@ in
 mkMerge [
   {
     assertions = asserts [
-      (cfg.displayManager == "uwsm" -> config.programs.uwsm.enable)
+      (cfg.displayManager.name == "uwsm" -> config.programs.uwsm.enable)
       "Using UWSM as a display manager requires it to be enabled"
     ];
 
@@ -72,15 +71,22 @@ mkMerge [
       ];
     };
 
-    services.getty = {
-      # Automatically populate with primary user whilst still prompting for
-      # password
-      loginOptions = username;
-      extraArgs = [
-        "--skip-login"
-        "--noclear"
-      ];
-    };
+    services.getty = mkMerge [
+      (mkIf (!cfg.displayManager.autoLogin) {
+        # Automatically populate with primary user whilst still prompting for
+        # password
+        loginOptions = username;
+        extraArgs = [
+          "--skip-login"
+          "--noclear"
+        ];
+      })
+
+      (mkIf cfg.displayManager.autoLogin {
+        autologinUser = username;
+        autologinOnce = true;
+      })
+    ];
 
     # Do not clear the TTY
     systemd.services."getty@".serviceConfig.TTYVTDisallocate = "no";
@@ -100,7 +106,7 @@ mkMerge [
       let
         select = defaultDesktop == null;
       in
-      mkIf (cfg.displayManager == "uwsm") (
+      mkIf (cfg.displayManager.name == "uwsm") (
         mkOrder 2000
           # bash
           ''

@@ -9,6 +9,7 @@ let
   inherit (lib)
     ns
     mkIf
+    mkMerge
     types
     mkForce
     mkEnableOption
@@ -52,17 +53,26 @@ in
       '';
     };
 
-    displayManager = mkOption {
-      type =
-        with types;
-        nullOr (enum [
-          "greetd"
-          "uwsm"
-        ]);
-      default = null;
-      description = ''
-        The display manager to use. If null, will be nothing or whatever the
-        desktop environment uses.
+    displayManager = {
+      name = mkOption {
+        type =
+          with types;
+          nullOr (enum [
+            "greetd"
+            "uwsm"
+          ]);
+        default = null;
+        description = ''
+          The display manager to use. If null, will be nothing or whatever the
+          desktop environment uses.
+        '';
+      };
+
+      autoLogin = mkEnableOption ''
+        auto graphical session login. Graphical session will lock with
+        screensaver immediately. Auto login is not at all secure and should
+        be used in combination with full disk encryption that does not
+        auto-unlock with TPM.
       '';
     };
 
@@ -152,8 +162,8 @@ in
 
     # Fix the session slice for home-manager services. I don't think it's
     # possible to do drop-in overrides like this with home-manager.
-    systemd.user.services =
-      genAttrs
+    systemd.user.services = mkMerge [
+      (genAttrs
         [
           "at-spi-dbus-bus"
           "xdg-desktop-portal-gtk"
@@ -176,6 +186,31 @@ in
           # of units provided in packages; not those declared with Nix.
           path = mkForce [ ];
           serviceConfig.Slice = "session${sliceSuffix config}.slice";
-        });
+        })
+      )
+
+      (mkIf cfg.displayManager.autoLogin {
+        boot-graphical-session-lock = {
+          description = "Lock graphical session on boot";
+          after = [
+            "graphical-session.target"
+            # For proper ordering lock services here must use type=BusName and
+            # BusName=org.freedesktop.ScreenSaver
+            "hypridle.service"
+          ];
+
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = pkgs.writeShellScript "lock-graphical-session" ''
+              touch /tmp/lock-immediately
+              loginctl lock-session
+            '';
+          };
+
+          wantedBy = [ "graphical-session.target" ];
+        };
+      })
+    ];
   };
 }

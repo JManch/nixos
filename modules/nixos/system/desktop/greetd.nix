@@ -13,7 +13,7 @@ let
     ;
   cfg = config.${ns}.system.desktop;
 in
-mkIf (cfg.enable && (cfg.displayManager == "greetd")) {
+mkIf (cfg.enable && (cfg.displayManager.name == "greetd")) {
   assertions = lib.${ns}.asserts [
     (!config.programs.uwsm.enable)
     ''
@@ -24,6 +24,8 @@ mkIf (cfg.enable && (cfg.displayManager == "greetd")) {
 
       Instead just set "uwsm" as the display manager.
     ''
+    (!cfg.displayManager.autoLogin)
+    "Greetd does not support auto login (just haven't tried configuring it)"
   ];
 
   # WARN: Ever since https://github.com/linux-pam/linux-pam/pull/784 there

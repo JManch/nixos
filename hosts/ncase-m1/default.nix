@@ -190,7 +190,7 @@ in
       desktop = {
         enable = true;
         desktopEnvironment = null;
-        displayManager = "uwsm";
+        displayManager.name = "uwsm";
         uwsm.defaultDesktop = "${pkgs.hyprland}/share/wayland-sessions/hyprland.desktop";
       };
 

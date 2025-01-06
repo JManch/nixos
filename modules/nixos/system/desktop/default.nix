@@ -194,7 +194,7 @@ in
           description = "Lock graphical session on boot";
           after = [
             "graphical-session.target"
-            # For proper ordering lock services here must use type=BusName and
+            # For proper ordering lock services here must use Type=dbus and
             # BusName=org.freedesktop.ScreenSaver
             "hypridle.service"
           ];

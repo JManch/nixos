@@ -56,7 +56,7 @@ mkIf (cfg.enable && isWayland) {
   systemd.user.services.hypridle = {
     Unit.After = mkForce [ "graphical-session.target" ];
     Service = {
-      Type = "BusName";
+      Type = "dbus";
       BusName = "org.freedesktop.ScreenSaver";
       Slice = "background${sliceSuffix osConfig}.slice";
     };

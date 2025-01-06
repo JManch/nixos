@@ -55,16 +55,6 @@ let
         fi
       '';
 
-  toggleSwallowing =
-    pkgs.writeShellScript "hypr-toggle-swallowing" # bash
-      ''
-        new_value=$(($(${hyprctl} getoption -j misc:enable_swallow | ${jaq} -r '.int') ^ 1))
-        ${hyprctl} keyword misc:enable_swallow $new_value
-        message=$([[ $new_value == "1" ]] && echo "Window swallowing enabled" || echo "Window swallowing disabled")
-        ${notifySend} --urgency=low -t 2000 -h \
-          'string:x-canonical-private-synchronous:hypr-swallow' 'Hyprland' "$message"
-      '';
-
   # Same as `fullscreen, 1` except will not do anything if active workspace
   # contains a single non-fullscreen tiled window
   toggleFullscreen =
@@ -233,9 +223,8 @@ mkIf (isHyprland config) {
         "${mod}, Z, pin, active"
         "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
         "${modShift}, R, exec, ${make16By9}"
-        "${mod}, A, exec, ${toggleSwallowing}"
-        "${modShift}, T, exec, ${scaleTabletToWindow}"
-        "${modShiftCtrl}, T, exec, ${toggleGaps}"
+        "${mod}, A, exec, ${scaleTabletToWindow}"
+        "${modShift}, A, exec, ${toggleGaps}"
         "${mod}, Space, exec, touch /tmp/lock-immediately && ${loginctl} lock-session"
         "${modShiftCtrl}, V, exec, ${syncClipboard}"
 

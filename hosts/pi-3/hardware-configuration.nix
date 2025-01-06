@@ -9,5 +9,13 @@
     package = pkgs.ubootRaspberryPi3_64bit;
   };
 
+  # Enable audio support
+  hardware.raspberry-pi.config.all = {
+    base-dt-params.audio = {
+      enable = true;
+      value = "on";
+    };
+  };
+
   system.stateVersion = "24.05";
 }

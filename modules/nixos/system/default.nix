@@ -181,6 +181,7 @@ in
     audio = {
       enable = mkEnableOption "Pipewire audio";
       extraAudioTools = mkEnableOption "extra audio tools including Easyeffects and Helvum";
+      inputNoiseSuppression = mkEnableOption "input noise suppression source";
 
       alsaDeviceAliases = mkOption {
         type = with types; attrsOf str;

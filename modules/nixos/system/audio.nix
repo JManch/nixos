@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  username,
   ...
 }:
 let
@@ -18,6 +19,7 @@ let
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.${ns}.system) desktop;
+  inherit (config.${ns}.hardware) raspberryPi;
   cfg = config.${ns}.system.audio;
   wpctl = getExe' pkgs.wireplumber "wpctl";
   pactl = getExe' pkgs.pulseaudio "pactl";
@@ -55,6 +57,39 @@ in
             };
             actions.update-props."node.description" = new;
           }) cfg.alsaDeviceAliases;
+        };
+
+        extraConfig.pipewire."99-input-denoising.conf" = mkIf cfg.inputNoiseSuppression {
+          "context.modules" = singleton {
+            name = "libpipewire-module-filter-chain";
+            args = {
+              "node.description" = "Noise Canceling source";
+              "media.name" = "Noise Canceling source";
+              "filter.graph" = {
+                nodes = singleton {
+                  type = "ladspa";
+                  name = "rnnoise";
+                  plugin = "${pkgs.rnnoise-plugin}/lib/ladspa/librnnoise_ladspa.so";
+                  label = "noise_suppressor_mono";
+                  control = {
+                    "VAD Threshold (%)" = 50.0;
+                    "VAD Grace Period (ms)" = 200;
+                    "Retroactive VAD Grace (ms)" = 0;
+                  };
+                };
+              };
+              "capture.props" = {
+                "node.name" = "capture.rnnoise_source";
+                "node.passive" = true;
+                "audio.rate" = 48000;
+              };
+              "playback.props" = {
+                "node.name" = "rnnoise_source";
+                "media.class" = "Audio/Source";
+                "audio.rate" = 48000;
+              };
+            };
+          };
         };
       };
 
@@ -134,6 +169,13 @@ in
           "center, class:^(org.pulseaudio.pavucontrol)$"
         ];
       };
+    })
+
+    (mkIf raspberryPi.enable {
+      # Don't know why but rtkit doesn't seem to work on raspberry pis so need
+      # to add user to audio group for permissions
+      security.rtkit.enable = mkForce false;
+      users.users.${username}.extraGroups = [ "audio" ];
     })
 
     (mkIf (cfg.enable && cfg.extraAudioTools) {

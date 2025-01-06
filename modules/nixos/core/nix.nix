@@ -30,7 +30,12 @@ let
     concatStringsSep
     toUpper
     ;
-  inherit (lib.${ns}) flakePkgs sshAddQuiet upperFirstChar;
+  inherit (lib.${ns})
+    addPatches
+    flakePkgs
+    sshAddQuiet
+    upperFirstChar
+    ;
   inherit (config.${ns}.system) impermanence;
   inherit (config.age.secrets) notifVars;
   cfg = config.${ns}.core;
@@ -364,6 +369,11 @@ in
     overlays = [
       (final: prev: {
         inherit (selfPkgs) xdg-terminal-exec;
+        rnnoise-plugin = addPatches prev.rnnoise-plugin (
+          optional (
+            !final.stdenv.buildPlatform.canExecute final.stdenv.hostPlatform
+          ) ../../../patches/rnnoisePluginCross.patch
+        );
       })
     ];
     config.allowUnfree = true;

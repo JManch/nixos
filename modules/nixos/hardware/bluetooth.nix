@@ -5,13 +5,25 @@
   ...
 }:
 let
-  inherit (lib) ns mkIf hiPrio;
+  inherit (lib)
+    ns
+    mkIf
+    mkForce
+    hiPrio
+    ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.hardware.bluetooth;
 in
 mkIf cfg.enable {
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
+
+  systemd.user.services.blueman-applet = {
+    path = mkForce [ ];
+    after = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    serviceConfig.Slice = "session${lib.${ns}.sliceSuffix config}.slice";
+  };
 
   environment.systemPackages = [
     (hiPrio (

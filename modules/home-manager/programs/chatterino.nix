@@ -122,8 +122,8 @@ mkIf cfg.enable {
           ];
           text = ''
             cmds=""
-            windows=$(hyprctl clients -j | jaq -r '((.[] | select(.workspace.name == "TWITCH")) | "\(.address),\(.class),\(.title)")')
-            while IFS=',' read -r address class title; do
+            windows=$(hyprctl clients -j | jaq -r '((.[] | select(.workspace.name == "TWITCH")) | "\(.address),\(.class),\(.title),\(.alwaysOnTop)")')
+            while IFS=',' read -r address class title alwaysontop; do
               if [ "$class" = "firefox" ] || [ "$class" = "mpv" ]; then
                 cmds+="dispatch movewindowpixel exact 0% 0%, address:$address;"
                 cmds+="dispatch resizewindowpixel exact ${
@@ -135,6 +135,9 @@ mkIf cfg.enable {
                     cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 60%, address:$address;"
                     cmds+="dispatch movewindowpixel exact ${firefoxPercentage}% 20%, address:$address;"
                   ''}
+                  if [ "$alwaysontop" = "${if theaterMode then "true" else "false"}" ]; then
+                    cmds+="dispatch togglealwaysontop address:$address;"
+                  fi
                   cmds+="dispatch alterzorder ${if theaterMode then "bottom" else "top"}, address:$address;"
                 else
                   cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 100%, address:$address;"
@@ -173,6 +176,7 @@ mkIf cfg.enable {
           "move ${firefoxPercentage}% 0%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
           "size ${chatterinoPercentage}% 100%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
           "xray 0, class:^(com\\.chatterino\\.)$"
+          "alwaysontop, class:^(com\\.chatterino\\.)$, title:^(Chatterino - Overlay)$"
 
           # Firefox window opened on twitch workspace
           "tag -twitch_remove, tag:twitch_remove, class:^(firefox)$"

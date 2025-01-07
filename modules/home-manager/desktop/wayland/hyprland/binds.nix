@@ -55,6 +55,19 @@ let
         fi
       '';
 
+  toggleAlwaysOnTop =
+    pkgs.writeShellScript "hypr-toggle-always-on-top" # bash
+      ''
+        ${hyprctl} dispatch togglealwaysontop active
+        if [ $(${hyprctl} activewindow -j | ${jaq} -r '.alwaysOnTop') = "true" ]; then
+          message="enabled"
+        else
+          message="disabled"
+        fi
+        ${notifySend} --urgency=low -t 2000 -h \
+          'string:x-canonical-private-synchronous:hypr-always-on-top' 'Hyprland' "Always on top $message"
+      '';
+
   # Same as `fullscreen, 1` except will not do anything if active workspace
   # contains a single non-fullscreen tiled window
   toggleFullscreen =
@@ -220,7 +233,8 @@ mkIf (isHyprland config) {
         "${mod}, C, exec, ${toggleFloating}"
         "${mod}, E, exec, ${toggleFullscreen}"
         "${modShift}, E, fullscreen, 0"
-        "${mod}, Z, pin, active"
+        "${mod}, Z, exec, ${toggleAlwaysOnTop}"
+        "${mod}Shift, Z, pin, active"
         "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
         "${modShift}, R, exec, ${make16By9}"
         "${mod}, A, exec, ${scaleTabletToWindow}"

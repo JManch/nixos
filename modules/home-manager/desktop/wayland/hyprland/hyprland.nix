@@ -306,6 +306,7 @@ mkIf (isHyprland config) {
       Type = "exec";
       Slice = "background${sliceSuffix osConfig}.slice";
       Restart = "always";
+      RestartSec = 30;
       ExecStart = getExe (
         pkgs.writeShellApplication {
           name = "hypr-socket-listener";

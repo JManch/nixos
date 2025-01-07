@@ -45,6 +45,9 @@ mkMerge [
               # Makes exact resizeparams in dispatchers relative to the window's current
               # monitor instead of the last active monitor
               ../../../../patches/hyprlandBetterResizeArgs.patch
+              # Add always on top window rule and dispatching which is pinning
+              # but just for workspace that the window is on
+              ../../../../patches/hyprlandAlwaysOnTop.patch
             ];
           });
         })

@@ -65,6 +65,8 @@ mkMerge [
       "Hyprland requires Home Manager to be enabled"
     ];
 
+    ${ns}.system.desktop.uwsm.desktopNames = [ "Hyprland" ];
+
     programs.hyprland = {
       enable = true;
       withUWSM = true;

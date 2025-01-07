@@ -19,7 +19,7 @@ let
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (lib.${ns}) asserts;
-  inherit (cfg.uwsm) defaultDesktop;
+  inherit (cfg.uwsm) defaultDesktop desktopNames;
   cfg = config.${ns}.system.desktop;
 in
 mkMerge [
@@ -132,5 +132,28 @@ mkMerge [
             fi
           ''
       );
+
+    # Electron apps core dump on exit with the default KillMode control-group.
+    # This causes compositor exit to get delayed as it waits for the SIGKILL
+    # timeout to be reached.
+    systemd.user.units = mkMerge (
+      map (desktop: {
+        "app-${desktop}-spotify-.scope" = {
+          overrideStrategy = "asDropin";
+          text = ''
+            [Scope]
+            KillMode=mixed
+          '';
+        };
+
+        "app-${desktop}-vesktop-.scope" = {
+          overrideStrategy = "asDropin";
+          text = ''
+            [Scope]
+            KillMode=mixed
+          '';
+        };
+      }) desktopNames
+    );
   })
 ]

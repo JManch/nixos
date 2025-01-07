@@ -9,9 +9,7 @@ let
   inherit (lib)
     ns
     mkIf
-    mkMerge
     types
-    mkForce
     mkEnableOption
     literalExpression
     genAttrs
@@ -34,14 +32,26 @@ in
   options.${ns}.system.desktop = {
     enable = mkEnableOption "desktop functionality";
 
-    uwsm.defaultDesktop = mkOption {
-      type = with types; nullOr str;
-      default = null;
-      example = literalExpression "${pkgs.hyprland}/share/wayland-sessions/hyprland.desktop";
-      description = ''
-        If set, UWSM will automatically launch the set desktop without
-        prompting for selection.
-      '';
+    uwsm = {
+      defaultDesktop = mkOption {
+        type = with types; nullOr str;
+        default = null;
+        example = literalExpression "${pkgs.hyprland}/share/wayland-sessions/hyprland.desktop";
+        description = ''
+          If set, UWSM will automatically launch the set desktop without
+          prompting for selection.
+        '';
+      };
+
+      desktopNames = mkOption {
+        type = with types; listOf str;
+        internal = true;
+        default = [ ];
+        description = ''
+          List of desktop names to create drop-in overrides for. Should be the
+          exact case-sensitive name used in the .desktop file.
+        '';
+      };
     };
 
     suspend.enable = mkOption {
@@ -162,55 +172,60 @@ in
 
     # Fix the session slice for home-manager services. I don't think it's
     # possible to do drop-in overrides like this with home-manager.
-    systemd.user.services = mkMerge [
-      (genAttrs
+
+    # You'd expect service overrides with `systemd.user.services` to only set
+    # what you've defined but confusingly Nixpkgs sets the service's PATH by
+    # default in an undocumented way. This overrides the PATH set in the
+    # systemd user environment and breaks our portal services.
+    # https://github.com/NixOS/nixpkgs/blame/18bcb1ef6e5397826e4bfae8ae95f1f88bf59f4f/nixos/lib/systemd-lib.nix#L512
+
+    # For system services this isn't an issue since `systemctl
+    # show-environment` is basically empty anyway. For user services
+    # however, this is a nasty pitfall. Note: this only affects overrides
+    # of units provided in packages; not those declared with Nix.
+
+    # We workaround this by instead defining plain unit files containing just
+    # the set text. Setting `systemd.user.services.<name>.paths = mkForce []`
+    # also works (it still adds extra Environment= vars however).
+    systemd.user.units =
+      genAttrs
         [
-          "at-spi-dbus-bus"
-          "xdg-desktop-portal-gtk"
-          "xdg-desktop-portal-hyprland"
-          "xdg-desktop-portal"
-          "xdg-document-portal"
-          "xdg-permission-store"
+          "at-spi-dbus-bus.service"
+          "xdg-desktop-portal-gtk.service"
+          "xdg-desktop-portal-hyprland.service"
+          "xdg-desktop-portal.service"
+          "xdg-document-portal.service"
+          "xdg-permission-store.service"
         ]
         (_: {
           overrideStrategy = "asDropin";
-          # You'd expect service overrides to only set what you've defined but
-          # confusingly Nixpkgs sets the service's PATH by default in an
-          # undocumented way. This overrides the PATH set in the systemd user
-          # environment and breaks our portal services.
-          # https://github.com/NixOS/nixpkgs/blame/18bcb1ef6e5397826e4bfae8ae95f1f88bf59f4f/nixos/lib/systemd-lib.nix#L512
+          text = ''
+            [Service]
+            Slice=session${sliceSuffix config}.slice
+          '';
+        });
 
-          # For system services this isn't an issue since `systemctl
-          # show-environment` is basically empty anyway. For user services
-          # however, this is a nasty pitfall. Note: this only affects overrides
-          # of units provided in packages; not those declared with Nix.
-          path = mkForce [ ];
-          serviceConfig.Slice = "session${sliceSuffix config}.slice";
-        })
-      )
+    systemd.user.services = mkIf cfg.displayManager.autoLogin {
+      boot-graphical-session-lock = {
+        description = "Lock graphical session on boot";
+        after = [
+          "graphical-session.target"
+          # For proper ordering lock services here must use Type=dbus and
+          # BusName=org.freedesktop.ScreenSaver
+          "hypridle.service"
+        ];
 
-      (mkIf cfg.displayManager.autoLogin {
-        boot-graphical-session-lock = {
-          description = "Lock graphical session on boot";
-          after = [
-            "graphical-session.target"
-            # For proper ordering lock services here must use Type=dbus and
-            # BusName=org.freedesktop.ScreenSaver
-            "hypridle.service"
-          ];
-
-          serviceConfig = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-            ExecStart = pkgs.writeShellScript "lock-graphical-session" ''
-              touch /tmp/lock-immediately
-              loginctl lock-session
-            '';
-          };
-
-          wantedBy = [ "graphical-session.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = pkgs.writeShellScript "lock-graphical-session" ''
+            touch /tmp/lock-immediately
+            loginctl lock-session
+          '';
         };
-      })
-    ];
+
+        wantedBy = [ "graphical-session.target" ];
+      };
+    };
   };
 }

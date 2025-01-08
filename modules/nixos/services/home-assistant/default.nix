@@ -196,33 +196,30 @@ in
         ]
         ++ optional frigate.enable (
           let
-            hass-web-proxy-lib = pkgs.python3Packages.buildPythonPackage rec {
+            hass-web-proxy-lib = pkgs.python3Packages.buildPythonPackage {
               pname = "hass-web-proxy-lib";
               version = "0.0.7";
 
-              src = pkgs.python3Packages.fetchPypi {
-                inherit version;
-                pname = "hass_web_proxy_lib";
-                hash = "sha256-bhz71tNOpZ+4tSlndS+UbC3w2WW5+dAMtpk7TnnFpuQ=";
+              src = pkgs.fetchFromGitHub {
+                owner = "dermotduffy";
+                repo = "hass-web-proxy-lib";
+                rev = "f96dfdec6e24275dc83b462a3471d89509f3d42a";
+                sha256 = "sha256-RJ7XUkgutgnbwZnmV7jtt+Hit7ZM/08hNZWTTEARlNc=";
               };
 
-              doCheck = false;
               pyproject = true;
-              build-system = [ pkgs.python3Packages.setuptools ];
+              build-system = [ pkgs.python3Packages.poetry-core ];
             };
           in
           pkgs.home-assistant-custom-components.frigate.overridePythonAttrs {
-            version = "5.5.1";
+            version = "5.7.0";
             src = pkgs.fetchFromGitHub {
               owner = "blakeblackshear";
               repo = "frigate-hass-integration";
-              rev = "v5.5.1";
-              hash = "sha256-B5rh4iyIC/I9E9PH8q3u5gO3iLj4CskcyxWoXSId7/Y=";
+              rev = "v5.7.0";
+              hash = "sha256-P5Q4bElxsfc0tGQitSnN0Wknij+4MpHKJk8d3BygOV4=";
             };
-            postPatch = ''
-              substituteInPlace requirements.txt custom_components/frigate/manifest.json \
-                --replace-fail 'hass-web-proxy-lib==0.0.7' 'hass-web-proxy-lib'
-            '';
+
             dependencies = [
               pkgs.python3Packages.pytz
               hass-web-proxy-lib

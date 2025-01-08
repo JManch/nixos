@@ -132,8 +132,8 @@ mkIf cfg.enable {
               elif [ "$class" = "com.chatterino." ]; then
                 if [[ "$title" == *"Overlay"* ]]; then
                   ${optionalString (!theaterMode) ''
-                    cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 60%, address:$address;"
-                    cmds+="dispatch movewindowpixel exact ${firefoxPercentage}% 20%, address:$address;"
+                    cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 40%, address:$address;"
+                    cmds+="dispatch movewindowpixel exact ${firefoxPercentage}% 0%, address:$address;"
                   ''}
                   if [ "$alwaysontop" = "${if theaterMode then "true" else "false"}" ]; then
                     cmds+="dispatch togglealwaysontop address:$address;"

@@ -185,8 +185,8 @@ in
               src = pkgs.fetchFromGitHub {
                 owner = "astrandb";
                 repo = "miele";
-                rev = "refs/tags/v2024.11.1";
-                hash = "sha256-fM/ARQ4wJt2/vIVsdWpAur/YWPvBH5fOPYqiaz4DxzU=";
+                rev = "refs/tags/v2025.1.0";
+                hash = "sha256-6E4aOWxI1RlULXGEN6TwYptlIS50gEawmgTAxvaixvs=";
               };
             }
           )

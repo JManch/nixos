@@ -9,6 +9,7 @@ mkIf cfg.enable {
   systemd.user.services.opentabletdriver = {
     after = [ "graphical-session.target" ];
     serviceConfig.Slice = "background${lib.${ns}.sliceSuffix config}.slice";
+    serviceConfig.SuccessExitStatus = 143;
   };
 
   persistenceHome.directories = [ ".config/OpenTabletDriver" ];

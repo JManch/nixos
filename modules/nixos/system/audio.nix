@@ -37,7 +37,7 @@ in
   config = mkMerge [
     (mkIf cfg.enable {
       userPackages = mkIf desktop.enable [ pkgs.pavucontrol ];
-      hardware.pulseaudio.enable = mkForce false;
+      services.pulseaudio.enable = mkForce false;
       ${ns}.system.audio.scripts.toggleMic = toggleMic.outPath;
 
       # Make pipewire realtime-capable

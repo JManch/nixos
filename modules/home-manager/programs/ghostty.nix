@@ -3,12 +3,11 @@
   pkgs,
   config,
   ...
-}@args:
+}:
 let
   inherit (lib) ns mkIf hiPrio;
   inherit (config.${ns}) desktop colorScheme;
   cfg = config.${ns}.programs.ghostty;
-  ghostty = (lib.${ns}.flakePkgs args "ghostty").default;
   desktopId = "com.mitchellh.ghostty";
 
   mkTheme =
@@ -33,13 +32,13 @@ let
 in
 mkIf cfg.enable {
   home.packages = [
-    ghostty
+    pkgs.ghostty
     # Modify the desktop entry to comply with the xdg-terminal-exec spec
     # https://gitlab.freedesktop.org/terminal-wg/specifications/-/merge_requests/3
     (hiPrio (
       pkgs.runCommand "ghostty-desktop-modify" { } ''
         mkdir -p $out/share/applications
-        substitute ${ghostty}/share/applications/${desktopId}.desktop $out/share/applications/${desktopId}.desktop \
+        substitute ${pkgs.ghostty}/share/applications/${desktopId}.desktop $out/share/applications/${desktopId}.desktop \
           --replace-fail "Type=Application" "Type=Application
         X-TerminalArgAppId=--class
         X-TerminalArgDir=--working-directory
@@ -69,14 +68,6 @@ mkIf cfg.enable {
 
   xdg.configFile."ghostty/themes/base16-dark".text = mkTheme "dark";
   xdg.configFile."ghostty/themes/base16-light".text = mkTheme "light";
-
-  # darkman.switchApps.alacritty = {
-  #   paths = [ ".config/alacritty/alacritty.toml" ];
-  #   extraReplacements = singleton {
-  #     dark = "opacity = 0.7";
-  #     light = "opacity = 1";
-  #   };
-  # };
 
   desktop.hyprland.binds = mkIf (desktop.terminal == desktopId) [
     "${desktop.hyprland.modKey}, Return, exec, app2unit ${desktopId}.desktop"

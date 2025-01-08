@@ -107,9 +107,6 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
-    ghostty.url = "github:ghostty-org/ghostty";
-    ghostty.inputs.nixpkgs-unstable.follows = "nixpkgs";
-
     # Locked to avoid broken auto formatting
     neovim.url = "github:nix-community/neovim-nightly-overlay?rev=973f6526dd30053a7ef98017272207af00bd615b";
     neovim.inputs.nixpkgs.follows = "nixpkgs";

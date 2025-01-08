@@ -431,11 +431,6 @@ in
         };
       };
 
-      port = mkOption {
-        type = types.port;
-        default = 5000;
-      };
-
       rtspAddress = mkOption {
         type = types.functionTo types.str;
         default = _: "";

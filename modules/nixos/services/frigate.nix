@@ -18,6 +18,7 @@ let
   inherit (config.${ns}.services) hass mosquitto caddy;
   inherit (config.age.secrets) cctvVars mqttFrigatePassword;
   cfg = config.${ns}.services.frigate;
+  port = 5000;
 in
 mkIf cfg.enable {
   assertions = asserts [
@@ -49,7 +50,7 @@ mkIf cfg.enable {
       };
 
       caddy.virtualHosts.cctv.extraConfig = ''
-        reverse_proxy http://127.0.0.1:${toString cfg.port}
+        reverse_proxy http://127.0.0.1:${toString port}
       '';
 
       caddy.virtualHosts.go2rtc.extraConfig = ''
@@ -308,11 +309,6 @@ mkIf cfg.enable {
     allowedUDPPorts = [ cfg.webrtc.port ];
   };
 
-  services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = singleton {
-    addr = "127.0.0.1";
-    port = cfg.port;
-  };
-
   persistence.directories = singleton {
     directory = "/var/lib/frigate";
     user = "frigate";
@@ -335,13 +331,13 @@ mkIf cfg.enable {
     };
 
     services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = mkVMOverride (singleton {
+      inherit port;
       addr = "0.0.0.0";
-      port = cfg.port;
     });
 
     # NOTE: I can't get the WebRTC stream to work from the VM
     networking.firewall.allowedTCPPorts = [
-      cfg.port
+      port
       1984
       8554
     ];

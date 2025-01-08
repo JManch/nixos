@@ -8,6 +8,7 @@ let
   inherit (lib)
     ns
     mkIf
+    mkForce
     mkVMOverride
     optionalString
     optional
@@ -307,6 +308,45 @@ mkIf cfg.enable {
   networking.firewall = mkIf cfg.webrtc.enable {
     allowedTCPPorts = [ cfg.webrtc.port ];
     allowedUDPPorts = [ cfg.webrtc.port ];
+  };
+
+  services.nginx.virtualHosts.${config.services.frigate.hostname} = {
+    listen = singleton {
+      addr = "127.0.0.1";
+      port = port;
+    };
+
+    extraConfig = mkForce ''
+      # vod settings
+      vod_base_url "";
+      vod_segments_base_url "";
+      vod_mode mapped;
+      vod_max_mapping_response_size 1m;
+      vod_upstream_location /api;
+      vod_align_segments_to_key_frames on;
+      vod_manifest_segment_durations_mode accurate;
+      vod_ignore_edit_list on;
+      vod_segment_duration 10000;
+      vod_hls_mpegts_align_frames off;
+      vod_hls_mpegts_interleave_frames on;
+
+      # file handle caching / aio
+      open_file_cache max=1000 inactive=5m;
+      open_file_cache_valid 2m;
+      open_file_cache_min_uses 1;
+      open_file_cache_errors on;
+      aio on;
+
+      # https://github.com/kaltura/nginx-vod-module#vod_open_file_thread_pool
+      vod_open_file_thread_pool default;
+
+      # vod caches
+      vod_metadata_cache metadata_cache 512m;
+      vod_mapping_cache mapping_cache 5m 10m;
+
+      # gzip manifest
+      gzip_types application/vnd.apple.mpegurl;
+    '';
   };
 
   persistence.directories = singleton {

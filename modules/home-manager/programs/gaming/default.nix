@@ -105,7 +105,7 @@ in
             "tag +tear_game, class:${gameClassRegex}"
             "tag -tear_game, tag:tear_game*, class:${concatRegex cfg.tearingExcludedClasses}"
             "tag -tear_game, tag:tear_game*, title:${concatRegex cfg.tearingExcludedTitles}"
-            "immediate, tag:tear_game"
+            "prop immediate, tag:tear_game"
           ];
 
         bind = [

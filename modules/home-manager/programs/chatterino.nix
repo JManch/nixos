@@ -175,7 +175,7 @@ mkIf cfg.enable {
           "float, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
           "move ${firefoxPercentage}% 0%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
           "size ${chatterinoPercentage}% 100%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
-          "xray 0, class:^(com\\.chatterino\\.)$"
+          "prop xray 0, class:^(com\\.chatterino\\.)$"
           "alwaysontop, class:^(com\\.chatterino\\.)$, title:^(Chatterino - Overlay)$"
 
           # Firefox window opened on twitch workspace

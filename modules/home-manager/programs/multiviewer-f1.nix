@@ -310,9 +310,9 @@ mkIf cfg.enable {
       "float, class:^(MultiViewer for F1)$"
       "workspace ${namedWorkspaceIDs.F1}, class:^(MultiViewer for F1)$"
 
-      "xray 0, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
-      "noblur, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
-      "noborder, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+      "prop xray 0, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+      "prop noblur, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+      "prop noborder, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
     ];
   };
 

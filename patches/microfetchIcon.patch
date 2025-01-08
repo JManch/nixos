@@ -1,29 +1,29 @@
 diff --git a/src/main.rs b/src/main.rs
-index 5cb9904..aeaef08 100644
+index 3eee7a0..4100ed4 100644
 --- a/src/main.rs
 +++ b/src/main.rs
-@@ -70,14 +70,15 @@ fn print_system_info(fields: &Fields) {
+@@ -72,15 +72,15 @@ fn print_system_info(fields: &Fields) {
+     let blue = COLORS.blue;
+     let reset = COLORS.reset;
+     let system_info = format!("
+-    {cyan}     ▟█▖    {blue}▝█▙ ▗█▛          {user_info} ~{reset}
+-    {cyan}  ▗▄▄▟██▄▄▄▄▄{blue}▝█▙█▛  {cyan}▖        {cyan}  {blue}System{reset}        {os_name}
+-    {cyan}  ▀▀▀▀▀▀▀▀▀▀▀▘{blue}▝██  {cyan}▟█▖       {cyan}  {blue}Kernel{reset}        {kernel_version}
+-    {blue}     ▟█▛       {blue}▝█▘{cyan}▟█▛        {cyan}  {blue}Shell{reset}         {shell}
+-    {blue}▟█████▛          {cyan}▟█████▛     {cyan}  {blue}Uptime{reset}        {uptime}
+-    {blue}   ▟█▛{cyan}▗█▖       {cyan}▟█▛          {cyan}  {blue}Desktop{reset}       {desktop}
+-    {blue}  ▝█▛  {cyan}██▖{blue}▗▄▄▄▄▄▄▄▄▄▄▄       {cyan}󰍛  {blue}Memory{reset}        {memory_usage}
+-    {blue}   ▝  {cyan}▟█▜█▖{blue}▀▀▀▀▀██▛▀▀▘       {cyan}󱥎  {blue}Storage (/){reset}   {storage}
+-    {cyan}     ▟█▘ ▜█▖    {blue}▝█▛          {cyan}  {blue}Colors{reset}        {colors}");
++ {cyan}    ▟█▖   {blue}▝█▙ ▗█▛       {user_info} ~{reset}
++ {cyan}  ▗▄▟██▄▄▄▄{blue}▝█▙█▛  {cyan}▖     {cyan}  {blue}System{reset}        {os_name}
++ {cyan}  ▀▀▀▀▀▀▀▀▀▘{blue}▝██  {cyan}▟█▖    {cyan}  {blue}Kernel{reset}        {kernel_version}
++ {blue}    ▟█▛      {blue}▝█▘{cyan}▟█▛     {cyan}  {blue}Shell{reset}         {shell}
++ {blue}▟████▛         {cyan}▟████▛   {cyan}  {blue}Uptime{reset}        {uptime}
++ {blue}  ▟█▛{cyan}▗█▖      {cyan}▟█▛       {cyan}  {blue}Desktop{reset}       {desktop}
++ {blue} ▝█▛  {cyan}██▖{blue}▗▄▄▄▄▄▄▄▄▄     {cyan}󰍛  {blue}Memory{reset}        {memory_usage}
++ {blue}  ▝  {cyan}▟█▜█▖{blue}▀▀▀▀██▛▀▘     {cyan}󱥎  {blue}Storage (/){reset}   {storage}
++ {cyan}    ▟█▘ ▜█▖   {blue}▝█▛       {cyan}  {blue}Colors{reset}        {colors}");
  
-     let _ = std::io::stdout().write_all(format!(
-         "
-- {CYAN}     ▟█▖    {BLUE}▝█▙ ▗█▛          {user_info} ~{RESET}
-- {CYAN}  ▗▄▄▟██▄▄▄▄▄{BLUE}▝█▙█▛  {CYAN}▖        {CYAN}  {BLUE}System{RESET}        {os_name}
-- {CYAN}  ▀▀▀▀▀▀▀▀▀▀▀▘{BLUE}▝██  {CYAN}▟█▖       {CYAN}  {BLUE}Kernel{RESET}        {kernel_version}
-- {BLUE}     ▟█▛       {BLUE}▝█▘{CYAN}▟█▛        {CYAN}  {BLUE}Shell{RESET}         {shell}
-- {BLUE}▟█████▛          {CYAN}▟█████▛     {CYAN}  {BLUE}Uptime{RESET}        {uptime}
-- {BLUE}   ▟█▛{CYAN}▗█▖       {CYAN}▟█▛          {CYAN}  {BLUE}Desktop{RESET}       {desktop}
-- {BLUE}  ▝█▛  {CYAN}██▖{BLUE}▗▄▄▄▄▄▄▄▄▄▄▄       {CYAN}󰍛  {BLUE}Memory{RESET}        {memory_usage}
-- {BLUE}   ▝  {CYAN}▟█▜█▖{BLUE}▀▀▀▀▀██▛▀▀▘       {CYAN}󱥎  {BLUE}Storage (/){RESET}   {storage}
-- {CYAN}     ▟█▘ ▜█▖    {BLUE}▝█▛          {CYAN}  {BLUE}Colors{RESET}        {colors}
-+ {CYAN}    ▟█▖   {BLUE}▝█▙ ▗█▛       {user_info} ~{RESET}
-+ {CYAN}  ▗▄▟██▄▄▄▄{BLUE}▝█▙█▛  {CYAN}▖     {CYAN}  {BLUE}System{RESET}        {os_name}
-+ {CYAN}  ▀▀▀▀▀▀▀▀▀▘{BLUE}▝██  {CYAN}▟█▖    {CYAN}  {BLUE}Kernel{RESET}        {kernel_version}
-+ {BLUE}    ▟█▛      {BLUE}▝█▘{CYAN}▟█▛     {CYAN}  {BLUE}Shell{RESET}         {shell}
-+ {BLUE}▟████▛         {CYAN}▟████▛   {CYAN}  {BLUE}Uptime{RESET}        {uptime}
-+ {BLUE}  ▟█▛{CYAN}▗█▖      {CYAN}▟█▛       {CYAN}  {BLUE}Desktop{RESET}       {desktop}
-+ {BLUE} ▝█▛  {CYAN}██▖{BLUE}▗▄▄▄▄▄▄▄▄▄     {CYAN}󰍛  {BLUE}Memory{RESET}        {memory_usage}
-+ {BLUE}  ▝  {CYAN}▟█▜█▖{BLUE}▀▀▀▀██▛▀▘     {CYAN}󱥎  {BLUE}Storage (/){RESET}   {storage}
-+ {CYAN}    ▟█▘ ▜█▖   {BLUE}▝█▛       {CYAN}  {BLUE}Colors{RESET}        {colors}
-+
- ").as_bytes());
- }
+     std::io::stdout()
+         .lock()

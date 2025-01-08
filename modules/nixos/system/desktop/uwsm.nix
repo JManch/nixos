@@ -92,10 +92,7 @@ mkMerge [
         # Automatically populate with primary user whilst still prompting for
         # password
         loginOptions = username;
-        extraArgs = [
-          "--skip-login"
-          "--noclear"
-        ];
+        extraArgs = [ "--skip-login" ];
       })
 
       (mkIf desktop.displayManager.autoLogin {
@@ -104,8 +101,9 @@ mkMerge [
       })
     ];
 
-    # Do not clear the TTY
-    systemd.services."getty@".serviceConfig.TTYVTDisallocate = "no";
+    # Would like to disable clearing the TTY but it sometimes causes the issue
+    # message to printed over the login prompt
+    # systemd.services."getty@".serviceConfig.TTYVTDisallocate = "no";
 
     # Remove excess new lines and use normal green instead of bright
     environment.etc.issue.text = ''

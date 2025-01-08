@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   config,
   selfPkgs,
   username,
@@ -13,19 +14,23 @@ let
     mkMerge
     mkOrder
     mkForce
+    genAttrs
     getExe'
     replaceStrings
+    foldl'
+    concatMapAttrs
     optionalString
+    concatMapStringsSep
     ;
+  inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.core) homeManager;
-  inherit (lib.${ns}) asserts;
-  inherit (cfg.uwsm) defaultDesktop desktopNames;
-  cfg = config.${ns}.system.desktop;
+  inherit (lib.${ns}) asserts addPatches;
+  cfg = config.${ns}.system.desktop.uwsm;
 in
 mkMerge [
   {
     assertions = asserts [
-      (cfg.displayManager.name == "uwsm" -> config.programs.uwsm.enable)
+      (desktop.displayManager.name == "uwsm" -> config.programs.uwsm.enable)
       "Using UWSM as a display manager requires it to be enabled"
     ];
 
@@ -40,16 +45,27 @@ mkMerge [
             hash = "sha256-JqF3v00M+HOQzNWbMq4/6GfoVA4OwrONEvXLVLr0vec=";
           };
         };
+
+        app2unit = addPatches selfPkgs.app2unit [
+          (final.substitute {
+            src = ../../../../patches/app2unitServiceApps.patch;
+            substitutions = [
+              "--replace-fail"
+              "@SERVICE_APPS@"
+              (concatMapStringsSep " " (app: ''"${app}.desktop"'') cfg.serviceApps)
+            ];
+          })
+        ];
       })
     ];
   }
 
-  (mkIf (cfg.enable && config.programs.uwsm.enable) {
+  (mkIf (desktop.enable && config.programs.uwsm.enable) {
     assertions = asserts [
       # Seems ok to nest UWSM start calls by using a UWSM desktop entry but we
       # should prefer to avoid it
       # https://github.com/NixOS/nixpkgs/pull/355416#issuecomment-2481432259
-      (defaultDesktop != null -> !hasInfix "uwsm" defaultDesktop)
+      (cfg.defaultDesktop != null -> !hasInfix "uwsm" cfg.defaultDesktop)
       ''
         The UWSM default desktop entry should not be a UWSM variant. Use the
         default non-UWSM desktop entry instead.
@@ -57,7 +73,7 @@ mkMerge [
     ];
 
     environment = {
-      systemPackages = [ selfPkgs.app2unit ];
+      systemPackages = [ pkgs.app2unit ];
       sessionVariables.APP2UNIT_SLICES = "a=app-graphical.slice b=background-graphical.slice s=session-graphical.slice";
       sessionVariables.APP2UNIT_TYPE = "scope";
     };
@@ -72,7 +88,7 @@ mkMerge [
     };
 
     services.getty = mkMerge [
-      (mkIf (!cfg.displayManager.autoLogin) {
+      (mkIf (!desktop.displayManager.autoLogin) {
         # Automatically populate with primary user whilst still prompting for
         # password
         loginOptions = username;
@@ -82,7 +98,7 @@ mkMerge [
         ];
       })
 
-      (mkIf cfg.displayManager.autoLogin {
+      (mkIf desktop.displayManager.autoLogin {
         autologinUser = username;
         autologinOnce = true;
       })
@@ -104,9 +120,9 @@ mkMerge [
 
     environment.loginShellInit =
       let
-        select = defaultDesktop == null;
+        select = cfg.defaultDesktop == null;
       in
-      mkIf (cfg.displayManager.name == "uwsm") (
+      mkIf (desktop.displayManager.name == "uwsm") (
         mkOrder 2000
           # bash
           ''
@@ -128,32 +144,31 @@ mkMerge [
               # (environment.shellInit) but it's not really what zshenv is meant for and
               # running uwsm check in every single shell does not seem ideal.
               ${optionalString homeManager.enable "unset __HM_SESS_VARS_SOURCED"}
-              exec uwsm start -S ${if select then "default" else "-- ${defaultDesktop}"} >/dev/null
+              exec uwsm start -S ${if select then "default" else "-- ${cfg.defaultDesktop}"} >/dev/null
             fi
           ''
       );
 
-    # Electron apps core dump on exit with the default KillMode control-group.
-    # This causes compositor exit to get delayed as it waits for the SIGKILL
-    # timeout to be reached.
-    systemd.user.units = mkMerge (
-      map (desktop: {
-        "app-${desktop}-spotify-.scope" = {
-          overrideStrategy = "asDropin";
-          text = ''
-            [Scope]
-            KillMode=mixed
-          '';
-        };
+    systemd.user.units = concatMapAttrs (
+      unitName: text:
+      foldl' (
+        acc: desktop:
+        acc
+        // {
+          "app-${desktop}-${unitName}" = {
+            inherit text;
+            overrideStrategy = "asDropin";
+          };
+        }
+      ) { } cfg.desktopNames
+    ) cfg.appUnitOverrides;
 
-        "app-${desktop}-vesktop-.scope" = {
-          overrideStrategy = "asDropin";
-          text = ''
-            [Scope]
-            KillMode=mixed
-          '';
-        };
-      }) desktopNames
-    );
+    # Electron apps core dump on exit with the default KillMode control-group.
+    # This causes compositor exit to get delayed so just aggressively kill
+    # these apps with Killmode mixed.
+    ${ns}.system.desktop.uwsm.appUnitOverrides = genAttrs [ "spotify-.scope" "vesktop-.scope" ] (_: ''
+      [Scope]
+      KillMode=mixed
+    '');
   })
 ]

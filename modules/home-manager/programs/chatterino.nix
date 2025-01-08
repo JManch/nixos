@@ -92,7 +92,7 @@ mkIf cfg.enable {
             hyprland
             jaq
           ])
-          ++ [ selfPkgs.app2unit ];
+          ++ [ pkgs.app2unit ];
         text = ''
           # Check if a special workspace is focused and, if so, close it
           # (ideally hyprland would close the special workspace if the

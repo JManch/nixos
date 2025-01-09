@@ -19,7 +19,7 @@
       ];
 
       nixOnDroidConfigurations = lib.listToAttrs [
-        (mkDroidHost "pixel-5")
+        (mkDroidHost "pixel-9")
       ];
     };
 

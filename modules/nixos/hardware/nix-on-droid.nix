@@ -1,5 +1,6 @@
 # Install steps:
-# - install private github key and host key into ~/.ssh
+# - check uid and gid with `id nix-on-droid` and update in config if necessary
+# - install private github key and host key into ~/.ssh (grant file permissions to access storage)
 # - nix shell nixpkgs#gitMinimal nixpkgs#openssh
 # - nix-on-droid switch --flake github:JManch/nixos#<hostname>
 {

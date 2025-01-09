@@ -1,8 +1,8 @@
 { lib, ... }:
 {
   ${lib.ns}.nix-on-droid = {
-    uid = 10405;
-    gid = 10405;
+    uid = 10187;
+    gid = 10187;
     ssh.server = {
       enable = true;
       authorizedKeys = [

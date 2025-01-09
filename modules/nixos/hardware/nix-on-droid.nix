@@ -124,6 +124,7 @@ in
           ns
           inputs
           self
+          selfPkgs
           username
           hostname
           ;

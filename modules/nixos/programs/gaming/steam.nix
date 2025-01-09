@@ -104,8 +104,6 @@ mkIf cfg.enable {
             pid_main=$(get_pid "steam -srt-logger-opened")
             pid_helper=$(get_pid "./steamwebhelper -nocrashdialog -lang=en_US")
 
-            echo "found pids $pid_main and $pid_helper"
-
             if [ -z "$pid_main" ] || [ -z "$pid_helper" ]; then
               echo "Could not find required Steam PIDs, aborting"
               exit 1

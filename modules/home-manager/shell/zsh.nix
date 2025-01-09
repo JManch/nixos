@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  osConfig,
   ...
 }:
 let
@@ -45,11 +46,12 @@ mkIf cfg.enable {
       reload = "exec zsh";
     };
 
-    envExtra = # bash
-      ''
-        # Fix for `nix develop` making our default shell bash
-        export SHELL=/run/current-system/sw/bin/zsh
-      '';
+    envExtra =
+      mkIf (osConfig != null) # bash
+        ''
+          # Fix for `nix develop` making our default shell bash
+          export SHELL=/run/current-system/sw/bin/zsh
+        '';
 
     initExtraFirst = # bash
       ''

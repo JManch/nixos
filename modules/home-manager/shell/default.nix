@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  osConfig,
   selfPkgs,
   ...
 }:
@@ -10,6 +11,7 @@ let
     ns
     mkEnableOption
     mkOption
+    optional
     types
     mkIf
     ;
@@ -45,7 +47,7 @@ in
         jaq
         man-pages
       ])
-      ++ [ selfPkgs.microfetch ];
+      ++ optional (osConfig != null) selfPkgs.microfetch;
 
     home.sessionVariables.COLORTERM = "truecolor";
   };

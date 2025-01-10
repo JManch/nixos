@@ -18,13 +18,26 @@ let
     types
     mkOption
     getExe
+    mkMerge
     getExe'
     optional
     mkEnableOption
     ;
   inherit (config.user) home;
   cfg = config.${ns}.nix-on-droid;
-  sshdConf = "${home}/.config/sshd_config";
+
+  sshdConf = pkgs.writeText "sshd-config" ''
+    HostKey ${home}/.ssh/ssh_host_ed25519_key
+    Port 8022
+    AllowUsers nix-on-droid
+    PasswordAuthentication No
+    KbdInteractiveAuthentication No
+    Subsystem sftp ${pkgs.openssh}/libexec/sftp-server
+  '';
+
+  hmConfig = {
+    programs.zsh.shellAliases.phone-storage = "cd /storage/emulated/0";
+  };
 in
 {
   options.${ns}.nix-on-droid = {
@@ -77,8 +90,6 @@ in
         ${lib.concatMapStringsSep "\n" (
           key: "$DRY_RUN_CMD echo \"${key}\" >> \"${home}/.ssh/authorized_keys\""
         ) cfg.ssh.server.authorizedKeys}
-        $DRY_RUN_CMD rm $VERBOSE_ARG -f "${sshdConf}"
-        $DRY_RUN_CMD echo -e "HostKey ${home}/.ssh/ssh_host_ed25519_key\nPort 8022\nAllowUsers nix-on-droid\nPasswordAuthentication No\nKbdInteractiveAuthentication No\n" > "${sshdConf}"
       '';
     };
 
@@ -118,7 +129,10 @@ in
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
-      config = ../../../homes/${hostname}.nix;
+      config = mkMerge [
+        (import ../../../homes/${hostname}.nix)
+        hmConfig
+      ];
       sharedModules = [ ../../../modules/home-manager ];
       extraSpecialArgs = {
         inherit (args)

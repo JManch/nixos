@@ -240,7 +240,7 @@ let
           # Inputs and with relative file paths to check for changes in.
           # Separate multiple file paths with spaces.
           declare -A input_file_pairs=(
-            ["nixpkgs"]="nixos/modules/tasks/filesystems/zfs.nix nixos/modules/programs/wayland/hyprland.nix nixos/modules/programs/wayland/uwsm.nix nixos/modules/services/desktops/flatpak.nix"
+            ["nixpkgs"]="nixos/modules/tasks/filesystems/zfs.nix nixos/modules/programs/wayland/hyprland.nix nixos/modules/programs/wayland/uwsm.nix nixos/modules/services/desktops/flatpak.nix nixos/modules/services/video/frigate.nix"
           )
 
           input_exists_in_lockfiles() {

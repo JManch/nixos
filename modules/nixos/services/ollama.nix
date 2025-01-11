@@ -5,7 +5,13 @@
   ...
 }:
 let
-  inherit (lib) ns mkIf genAttrs;
+  inherit (lib)
+    ns
+    mkIf
+    genAttrs
+    mkForce
+    optional
+    ;
   cfg = config.${ns}.services.ollama;
 in
 mkIf cfg.enable {
@@ -29,6 +35,12 @@ mkIf cfg.enable {
       "qwen2.5:32b-instruct-q3_K_M"
       "mistral-small:22b-instruct-2409-q5_1"
     ];
+  };
+
+  systemd.services = {
+    ollama.wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
+    ollama-model-loader.wantedBy = mkForce [ "ollama.service" ];
+    open-webui.wantedBy = mkForce [ "ollama.service" ];
   };
 
   services.open-webui = {

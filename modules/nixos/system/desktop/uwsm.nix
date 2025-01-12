@@ -125,25 +125,36 @@ mkMerge [
           # bash
           ''
             if test -z $SSH_TTY && uwsm check may-start -q ${optionalString select "&& uwsm select"}; then
-              # Home Manager sets session variables in ~/zshenv and sets
-              # __HM_SESS_VARS_SOURCED to ensure that variables are only set once. The
-              # problem with this is that ~/zshenv runs before we start UWSM in
-              # /etc/zprofile. Therefore if the same variable is set in
-              # environment.systemVariables and home.sessionVariables, UWSM will override
-              # the home variable with the system variable and, because of
-              # __HM_SESS_VARS_SOURCED, the home-manager variable will never be set again. We
-              # want home variables to have higher precendence than system variables so the
-              # fix is to unset __HM_SESS_VARS_SOURCED before launching UWSM. This way Home
-              # Manager variables will be set in every new shell our user makes which is
-              # in-line with the behaviour of launching UWSM with a display manager like
-              # greetd.
-
-              # We could also solve the problem by launching UWSM in /etc/zshenv
-              # (environment.shellInit) but it's not really what zshenv is meant for and
-              # running uwsm check in every single shell does not seem ideal.
-              ${optionalString homeManager.enable "unset __HM_SESS_VARS_SOURCED"}
               exec uwsm start -S ${if select then "default" else "-- ${cfg.defaultDesktop}"} >/dev/null
             fi
+
+            # This is needed to ensure that home-manager variables (home.sessionVariables)
+            # have precendence over system variables (environment.systemVariables).
+
+            # Explanation:
+            # 1. /etc/zshenv sourced -- doesn't do anything important
+            # 2. ~/.zshenv sourced
+            # Home Manager sources /etc/profiles/per-user/username/etc/profile.d/hm-session-vars.sh
+            # which exports all home.sessionVariables and sets EDITOR=nvim. It also sets
+            # __HM_SESS_VARS_SOURCED so child shells will not run this again.
+            # 3. /etc/zprofile sourced
+            # UWSM starts the compositor and saves the login session variables to $XDG_RUNTIME_DIR/uwsm/env_login
+            # 4. UWSM pre-loader service runs
+            # First it loads the same session variables that existed in the login shell by
+            # reading the env_login file. So at this point EDITOR=nvim which is what we
+            # want. However the pre-loader then sources /etc/profile which is where NixOS
+            # exports all system environment variables. This overrides our Home Manager
+            # EDITOR variable to EDITOR=nano.
+            # 5. The UWSM pre-loader populates the systemd user environment with exported
+            # variables and system variables have precendence over home manager variables.
+
+            # The fix is to source home-manager variables again AFTER NixOS exports the
+            # system variables in /etc/profile. __HM_SESS_VARS_SOURCED isn't an issue here
+            # because the UWSM pre-loader does not export the variables it loads from
+            # env_login.
+            ${optionalString homeManager.enable ''
+              . "/etc/profiles/per-user/${username}/etc/profile.d/hm-session-vars.sh"
+            ''}
           ''
       );
 

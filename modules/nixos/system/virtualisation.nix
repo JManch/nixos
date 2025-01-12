@@ -210,7 +210,10 @@ in
               # Useful resource explaining qemu display device options:
               # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/#virtio-gpu-pci
               "-device virtio-vga-gl"
-              "-display gtk,show-menubar=off,zoom-to-fit=off,gl=on"
+              # FIX: Something regressed TTY resolution with the GTK display
+              # type between qemu 9.1.2 and 9.2.0. Using SDL till it's fixed.
+              # "-display gtk,show-menubar=off,zoom-to-fit=off,gl=on"
+              "-display sdl,gl=on"
               # Alternative method using spice that should enable clipboard
               # sharing once wayland support gets added:
               # https://gitlab.freedesktop.org/spice/linux/vd_agent/-/issues/26

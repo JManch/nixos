@@ -9,24 +9,25 @@ let
     ns
     mkIf
     getExe'
+    optional
     singleton
     ;
   cfg = config.${ns}.system.desktop;
 in
 mkIf (cfg.enable && (cfg.displayManager.name == "greetd")) {
   assertions = lib.${ns}.asserts [
-    (!config.programs.uwsm.enable)
-    ''
-      UWSM does not work well with greetd. Exiting the session with `loginctl
-      terminate-*` causes display output to break until cycling between TTYs. I
-      think it has something to do with opening the greeter user session before
-      the graphical session has fully stopped.
-
-      Instead just set "uwsm" as the display manager.
-    ''
     (!cfg.displayManager.autoLogin)
     "Greetd does not support auto login (just haven't tried configuring it)"
   ];
+
+  warnings = optional config.programs.uwsm.enable ''
+    UWSM does not work well with greetd. Exiting the session with `loginctl
+    terminate-*` causes display output to break until cycling between TTYs. I
+    think it has something to do with opening the greeter user session before
+    the graphical session has fully stopped.
+
+    Instead just set "uwsm" as the display manager.
+  '';
 
   # WARN: Ever since https://github.com/linux-pam/linux-pam/pull/784 there
   # is a delay after entering the username during login. Because I use a

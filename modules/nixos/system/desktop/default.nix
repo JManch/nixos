@@ -2,7 +2,6 @@
   lib,
   pkgs,
   config,
-  username,
   ...
 }:
 let
@@ -25,6 +24,12 @@ let
     ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
+  lockScript =
+    args:
+    if (homeManager.enable && config.hm.${ns}.desktop.enable) then
+      "${config.hm.${ns}.desktop.programs.locking.lockScript} ${args}"
+    else
+      "${getExe' pkgs.systemd "loginctl"} lock-session";
 in
 {
   imports = scanPaths ./.;
@@ -183,12 +188,23 @@ in
     powerManagement.powerDownCommands =
       mkIf (cfg.desktopEnvironment == null) # bash
         ''
-          # If our locker supports it, ignore the grace period and lock the screen
-          # immediately to avoid accidentally unlocking in the sleep seconds.
-          install -m644 -o ${username} -g users /dev/null /tmp/lock-immediately
-          ${getExe' pkgs.systemd "loginctl"} lock-sessions
-          sleep 3 # give lock screen time to open
+          ${lockScript "--immediate --nodpms"}
+          sleep 5 # give lock screen time to open
         '';
+
+    systemd.user.services.boot-graphical-session-lock = mkIf cfg.displayManager.autoLogin {
+      description = "Lock graphical session on boot";
+      after = [ "graphical-session.target" ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStartPre = "${getExe' pkgs.coreutils "sleep"} 3";
+        ExecStart = lockScript "--immediate";
+      };
+
+      wantedBy = [ "graphical-session.target" ];
+    };
 
     # Fix the session slice for home-manager services. I don't think it's
     # possible to do drop-in overrides like this with home-manager.
@@ -224,28 +240,5 @@ in
             Slice=session${sliceSuffix config}.slice
           '';
         });
-
-    systemd.user.services = mkIf cfg.displayManager.autoLogin {
-      boot-graphical-session-lock = {
-        description = "Lock graphical session on boot";
-        after = [
-          "graphical-session.target"
-          # For proper ordering lock services here must use Type=dbus and
-          # BusName=org.freedesktop.ScreenSaver
-          "hypridle.service"
-        ];
-
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          ExecStart = pkgs.writeShellScript "lock-graphical-session" ''
-            touch /tmp/lock-immediately
-            loginctl lock-session
-          '';
-        };
-
-        wantedBy = [ "graphical-session.target" ];
-      };
-    };
   };
 }

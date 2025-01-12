@@ -69,8 +69,28 @@ in
               coreutils
               procps
             ];
+            excludeShellChecks = [ "SC2034" ];
             text = ''
-              # Exit if locking is currently running
+              immediate=""
+              nodpms=""
+              while [ $# -gt 0 ]; do
+                case "$1" in
+                  --immediate)
+                    immediate=true
+                    shift
+                    ;;
+                  --nodpms)
+                    nodpms=true
+                    shift
+                    ;;
+                  *)
+                    echo "Unknown option: $1"
+                    exit 1
+                    ;;
+                esac
+              done
+
+              # Exit if locker is already running
               pgrep -x ${builtins.baseNameOf (getExe cfg.locking.package)} && exit 1
 
               # Create a unique lock file so forked processes can track if precisely
@@ -82,9 +102,8 @@ in
               lockArgs=()
               ${optionalString (cfg.locking.immediateFlag != null) # bash
                 ''
-                  if [ -e /tmp/lock-immediately ]; then
+                  if [ -n "$immediate" ]; then
                     lockArgs+=(${cfg.locking.immediateFlag})
-                    rm -f /tmp/lock-immediately || true
                   fi
                 ''
               }

@@ -20,8 +20,8 @@ let
   inherit (lib.${ns}) isHyprland flakePkgs getMonitorHyprlandCfgStr;
   inherit (osConfig.${ns}.system) audio;
   inherit (osConfig.${ns}.device) monitors;
-  cfg = desktopCfg.hyprland;
-  desktopCfg = config.${ns}.desktop;
+  inherit (config.${ns}.desktop.programs) locking;
+  cfg = config.${ns}.desktop.hyprland;
   mod = cfg.modKey;
   modShift = "${cfg.modKey}SHIFT";
   modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
@@ -239,7 +239,7 @@ mkIf (isHyprland config) {
         "${modShift}, R, exec, ${make16By9}"
         "${mod}, A, exec, ${scaleTabletToWindow}"
         "${modShift}, A, exec, ${toggleGaps}"
-        "${mod}, Space, exec, touch /tmp/lock-immediately && ${loginctl} lock-session"
+        "${mod}, Space, exec, ${locking.lockScript} --immediate"
         "${modShiftCtrl}, V, exec, ${syncClipboard}"
 
         # Movement

@@ -21,6 +21,8 @@ let
   inherit (lib.${ns}) asserts isHyprland sliceSuffix;
   inherit (config.${ns}.desktop.programs) locking;
   cfg = config.${ns}.desktop.services.hypridle;
+  loginctl = getExe' pkgs.systemd "loginctl";
+  systemctl = getExe' pkgs.systemd "systemctl";
 in
 mkIf (cfg.enable && isWayland) {
   assertions = asserts [
@@ -40,11 +42,11 @@ mkIf (cfg.enable && isWayland) {
       listener =
         (singleton {
           timeout = cfg.lockTime;
-          on-timeout = "${getExe' pkgs.systemd "loginctl"} lock-session";
+          on-timeout = "${loginctl} lock-session";
         })
         ++ optional (cfg.suspendTime != null) {
           timeout = cfg.suspendTime;
-          on-timeout = "${getExe' pkgs.systemd "systemctl"} suspend";
+          on-timeout = "${systemctl} suspend";
         }
         ++ optional cfg.debug {
           timeout = 5;
@@ -72,7 +74,7 @@ mkIf (cfg.enable && isWayland) {
       ''
         # Turn off the display after locking. I've found that doing this in the
         # lock script is more reliable than adding another listener.
-        while true; do
+        while [ -z "$nodpms" ]; do
           # If the display is on, wait screenOffTime seconds then turn off
           # display. Then wait the full lock time before checking again.
           if ${hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" >/dev/null 2>&1; then

@@ -113,7 +113,7 @@ in
         interfaces = [ "wg-friends" ];
         allowedAddresses = [
           "${ncaseM1IPAddress}/32"
-          "10.20.20.19/32" # pixel 5
+          "10.20.20.33/32" # pixel 9
         ] ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };
 

@@ -46,20 +46,14 @@ mkMerge [
     # Mirror: https://archive.is/wwZaP
 
     boot.loader.systemd-boot = {
-      extraFiles."EFI/edk2-shell/shellx64.efi" = pkgs.edk2-uefi-shell.efi;
+      edk2-uefi-shell.enable = fsAlias == null;
 
-      extraEntries = {
-        "windows.conf" = mkIf (fsAlias != null) ''
-          title     Windows
-          efi       /EFI/edk2-shell/shellx64.efi
-          options   -nointerrupt -noconsolein -noconsoleout windows.nsh
-        '';
-
-        "edk2-shell.conf" = mkIf (fsAlias == null) ''
-          title edk2-shell
-          efi /EFI/edk2-shell/shellx64.efi
-        '';
-      };
+      extraEntries."windows.conf" = mkIf (fsAlias != null) ''
+        title     Windows
+        sort-key  0
+        efi       /EFI/edk2-shell/shellx64.efi
+        options   -nointerrupt -nomap -noversion windows.nsh
+      '';
 
       extraFiles."windows.nsh" = mkIf (fsAlias != null) (
         pkgs.writeText "windows.nsh" ''

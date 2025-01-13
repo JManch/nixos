@@ -41,6 +41,7 @@ mkIf cfg.enable {
     ollama.wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
     ollama-model-loader.wantedBy = mkForce [ "ollama.service" ];
     open-webui.wantedBy = mkForce [ "ollama.service" ];
+    open-webui.partOf = [ "ollama.service" ];
   };
 
   services.open-webui = {

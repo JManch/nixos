@@ -127,7 +127,7 @@ mkIf cfg.enable {
       in
       ''
         [Service]
-        ExecStop=${getExe steamKiller} %n
+        ExecStop=-${getExe steamKiller} %n
       '';
   };
 

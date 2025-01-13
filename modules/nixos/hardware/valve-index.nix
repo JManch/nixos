@@ -190,7 +190,7 @@ mkIf cfg.enable {
         # Using defaults from envision lighthouse profile:
         # https://gitlab.com/gabmus/envision/-/blob/main/src/profiles/lighthouse.rs
 
-        XRT_COMPOSITOR_SCALE_PERCENTAGE = "140"; # global super sampling
+        XRT_COMPOSITOR_SCALE_PERCENTAGE = "180"; # super sampling of monado runtime
         XRT_COMPOSITOR_COMPUTE = "1";
         # These two enable a window that contains debug info and a mirror view
         # which monado calls a "peek window"
@@ -199,6 +199,7 @@ mkIf cfg.enable {
         # Description I can't find the source of: Set to 1 to unlimit the
         # compositor refresh from a power of two of your HMD refresh, typically
         # provides a large performance boost
+        # https://gitlab.freedesktop.org/monado/monado/-/merge_requests/2293
         U_PACING_APP_USE_MIN_FRAME_PERIOD = "1";
 
         # Display modes:
@@ -211,12 +212,15 @@ mkIf cfg.enable {
         # Use SteamVR tracking (requires calibration with SteamVR)
         STEAMVR_LH_ENABLE = "true";
 
-        # Application launch envs:
-        # SURVIVE_ envs are no longer needed
+        # Application launch vars:
+        # SURVIVE_ vars are no longer needed
         # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc for Steam applications
 
-        # Per-app supersampling applied after global XRT_COMPOSITOR_SCALE_PERCENTAGE.
-        # I think super sampling with global gives higher quality.
+        # Modifies super sampling of the game. Multiplied by
+        # XRT_COMPOSITOR_SCALE_PERCENTAGE so if XRT_COMPOSITOR_SCALE_PERCENTAGE
+        # is 300 and OXR_VIEWPORT_SCALE_PERCENTAGE is 33, the game will render
+        # at 100% and the monado runtime (wlx-s-overlay etc..) will render at
+        # 300%
         # OXR_VIEWPORT_SCALE_PERCENTAGE=100
 
         # If using Lact on an AMD GPU can set GAMEMODE_CUSTOM_ARGS=vr when using

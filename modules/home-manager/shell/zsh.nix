@@ -69,7 +69,7 @@ mkIf cfg.enable {
         }
 
         function jump_start_of_line() {
-          zvm_navigation_handler ^
+          zvm_navigation_handler '^'
         }
 
         function zvm_after_lazy_keybindings() {

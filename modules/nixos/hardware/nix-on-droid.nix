@@ -21,6 +21,9 @@ let
     mkMerge
     getExe'
     optional
+    optionalString
+    attrNames
+    concatLines
     mkEnableOption
     ;
   inherit (config.user) home;
@@ -37,6 +40,25 @@ let
 
   hmConfig = {
     programs.zsh.shellAliases.phone-storage = "cd /storage/emulated/0";
+
+    home.file.".ssh/authorized_keys".text = mkIf cfg.ssh.server.enable (
+      concatLines cfg.ssh.server.authorizedKeys
+    );
+
+    home.file.".ssh/known_hosts" = {
+      force = true;
+      text = ''
+        github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+        ${concatLines (
+          map (
+            host:
+            optionalString (
+              host != hostname
+            ) "${host},${host}.lan ${builtins.readFile ../../../hosts/${host}/ssh_host_ed25519_key.pub}"
+          ) (attrNames (args.self.nixosConfigurations // args.self.nixOnDroidConfigurations))
+        )}
+      '';
+    };
   };
 in
 {
@@ -82,16 +104,6 @@ in
           ${getExe' pkgs.openssh "sshd"} -f "${sshdConf}" -D
         ''
       );
-
-    build.activation = mkIf cfg.ssh.server.enable {
-      sshd-setup = ''
-        $DRY_RUN_CMD mkdir $VERBOSE_ARG -p "${home}/.ssh"
-        $DRY_RUN_CMD rm $VERBOSE_ARG -f "${home}/.ssh/authorized_keys"
-        ${lib.concatMapStringsSep "\n" (
-          key: "$DRY_RUN_CMD echo \"${key}\" >> \"${home}/.ssh/authorized_keys\""
-        ) cfg.ssh.server.authorizedKeys}
-      '';
-    };
 
     user = {
       uid = cfg.uid;

@@ -24,12 +24,7 @@ let
     ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
-  lockScript =
-    args:
-    if (homeManager.enable && config.hm.${ns}.desktop.enable) then
-      "${config.hm.${ns}.desktop.programs.locking.lockScript} ${args}"
-    else
-      "${getExe' pkgs.systemd "loginctl"} lock-session";
+  loginctl = getExe' pkgs.systemd "loginctl";
 in
 {
   imports = scanPaths ./.;
@@ -188,7 +183,7 @@ in
     powerManagement.powerDownCommands =
       mkIf (cfg.desktopEnvironment == null) # bash
         ''
-          ${lockScript "--immediate --nodpms"}
+          ${loginctl} lock-sessions
           sleep 5 # give lock screen time to open
         '';
 
@@ -200,7 +195,7 @@ in
         Type = "oneshot";
         RemainAfterExit = true;
         ExecStartPre = "${getExe' pkgs.coreutils "sleep"} 3";
-        ExecStart = lockScript "--immediate";
+        ExecStart = "${loginctl} lock-session";
       };
 
       wantedBy = [ "graphical-session.target" ];

@@ -21,7 +21,6 @@ let
   inherit (lib.${ns}) asserts isHyprland sliceSuffix;
   inherit (config.${ns}.desktop.programs) locking;
   cfg = config.${ns}.desktop.services.hypridle;
-  loginctl = getExe' pkgs.systemd "loginctl";
   systemctl = getExe' pkgs.systemd "systemctl";
 in
 mkIf (cfg.enable && isWayland) {
@@ -35,14 +34,15 @@ mkIf (cfg.enable && isWayland) {
     package = inputs.hypridle.packages.${pkgs.system}.default;
     settings = {
       general = {
-        lock_cmd = locking.lockScript;
+        # Cmd triggered by `loginctl lock-session`
+        lock_cmd = "${locking.lockScript} --immediate";
         ignore_dbus_inhibit = false;
       };
 
       listener =
         (singleton {
           timeout = cfg.lockTime;
-          on-timeout = "${loginctl} lock-session";
+          on-timeout = locking.lockScript;
         })
         ++ optional (cfg.suspendTime != null) {
           timeout = cfg.suspendTime;

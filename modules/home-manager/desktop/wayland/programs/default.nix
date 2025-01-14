@@ -44,19 +44,22 @@ in
       preLockScript = mkOption {
         type = types.lines;
         default = "";
-        description = "Bash script run before locking";
+        apply = pkgs.writeShellScript "pre-lock-script";
+        description = "Bash script to run before locking";
       };
 
       postLockScript = mkOption {
         type = types.lines;
         default = "";
-        description = "Bash script run after locking";
+        apply = pkgs.writeShellScript "post-lock-script";
+        description = "Bash script to run after locking";
       };
 
       postUnlockScript = mkOption {
         type = types.lines;
         default = "";
-        description = "Bash script run after locking";
+        apply = pkgs.writeShellScript "post-unlock-script";
+        description = "Bash script to run after locking";
       };
 
       lockScript = mkOption {
@@ -108,12 +111,12 @@ in
                 ''
               }
 
-              ${cfg.locking.preLockScript}
+              ${cfg.locking.preLockScript} || true
               ${escapeShellArg (getExe cfg.locking.package)} "''${lockArgs[@]}" &
-              LOCKER_PID=$!
-              ${cfg.locking.postLockScript}
-              wait $LOCKER_PID
-              ${cfg.locking.postUnlockScript}
+              locker_pid=$!
+              ${cfg.locking.postLockScript} || true
+              wait $locker_pid
+              ${cfg.locking.postUnlockScript} || true
             '';
           }
         );

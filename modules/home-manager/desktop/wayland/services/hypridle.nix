@@ -74,7 +74,7 @@ mkIf (cfg.enable && isWayland) {
       ''
         # Turn off the display after locking. I've found that doing this in the
         # lock script is more reliable than adding another listener.
-        while [ -z "$nodpms" ]; do
+        while true; do
           # If the display is on, wait screenOffTime seconds then turn off
           # display. Then wait the full lock time before checking again.
           if ${hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" >/dev/null 2>&1; then

@@ -72,18 +72,16 @@ in
               coreutils
               procps
             ];
-            excludeShellChecks = [ "SC2034" ];
+            excludeShellChecks = [
+              "SC2034"
+              "SC1091"
+            ];
             text = ''
               immediate=""
-              nodpms=""
               while [ $# -gt 0 ]; do
                 case "$1" in
                   --immediate)
                     immediate=true
-                    shift
-                    ;;
-                  --nodpms)
-                    nodpms=true
                     shift
                     ;;
                   *)
@@ -111,12 +109,13 @@ in
                 ''
               }
 
-              ${cfg.locking.preLockScript} || true
+              # source so that scripts inherit lockfile variable
+              source ${cfg.locking.preLockScript} || true
               ${escapeShellArg (getExe cfg.locking.package)} "''${lockArgs[@]}" &
               locker_pid=$!
-              ${cfg.locking.postLockScript} || true
+              source ${cfg.locking.postLockScript} || true
               wait $locker_pid
-              ${cfg.locking.postUnlockScript} || true
+              source ${cfg.locking.postUnlockScript} || true
             '';
           }
         );

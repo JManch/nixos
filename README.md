@@ -3,6 +3,7 @@
 
 ## Overview
 
+- Hyprland desktop environment integrated with systemd using UWSM
 - Single-command deployment with Disko and NixOS Anywhere
 - Fully modular configuration utilising NixOS module options
 - Tmpfs root file system with opt-in persistence—no stateful cruft

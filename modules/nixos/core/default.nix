@@ -92,7 +92,13 @@ in
   config = {
     programs.zsh.enable = true;
     environment.defaultPackages = [ ];
-    environment.systemPackages = [ pkgs.gitMinimal ];
+
+    environment.systemPackages = with pkgs; [
+      gitMinimal
+      fd
+      tree
+      rsync
+    ];
 
     _module.args = {
       inherit (config.${ns}.core) adminUsername;

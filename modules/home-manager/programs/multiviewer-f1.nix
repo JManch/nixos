@@ -319,8 +319,8 @@ mkIf cfg.enable {
   systemd.user.services.hyprland-multiviewer-tiler = mkIf (isHyprland config) {
     Unit = {
       Description = "Hyprland Multiviewer F1 Tiler";
-      After = "graphical-session.target";
-      PartOf = "graphical-session.target";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
     };
 
     Service = {

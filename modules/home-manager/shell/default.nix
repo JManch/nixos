@@ -35,6 +35,7 @@ in
       (with pkgs; [
         unzip
         zip
+        p7zip
         tree
         wget
         fd
@@ -46,6 +47,7 @@ in
         file
         jaq
         man-pages
+        rsync
       ])
       ++ optional (osConfig != null) selfPkgs.microfetch;
 

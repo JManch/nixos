@@ -6,13 +6,13 @@
 buildHomeAssistantComponent rec {
   owner = "dolezsa";
   domain = "thermal_comfort";
-  version = "2.2.3";
+  version = "2.2.4";
 
   src = fetchFromGitHub {
     inherit owner;
     repo = domain;
     rev = "refs/tags/${version}";
-    hash = "sha256-x/3xy7lwKTM6LUL1xnT/u2H5p18zBD8NsLXTjw1WmuY=";
+    hash = "sha256-YpXHek8IFFOv4ojKvlF9g8iAffCBUtmk+Ahj3DsT0PM=";
   };
 
   dontBuild = true;

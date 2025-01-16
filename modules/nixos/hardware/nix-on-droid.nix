@@ -5,6 +5,7 @@
 # - nix-on-droid switch --flake github:JManch/nixos#<hostname>
 {
   lib,
+  self,
   pkgs,
   config,
   inputs,
@@ -55,7 +56,7 @@ let
             optionalString (
               host != hostname
             ) "${host},${host}.lan ${builtins.readFile ../../../hosts/${host}/ssh_host_ed25519_key.pub}"
-          ) (attrNames (args.self.nixosConfigurations // args.self.nixOnDroidConfigurations))
+          ) (attrNames (self.nixosConfigurations // self.nixOnDroidConfigurations))
         )}
       '';
     };
@@ -108,13 +109,13 @@ in
     user = {
       uid = cfg.uid;
       gid = cfg.gid;
-      shell = "${getExe pkgs.zsh}";
+      shell = getExe pkgs.zsh;
     };
 
     terminal = {
-      font = "${
+      font =
         (lib.${ns}.flakePkgs args "nix-resources").berkeley-mono-nerdfont
-      }/share/fonts/truetype/NerdFonts/BerkeleyMonoNerdFont-Regular.ttf";
+        + "/share/fonts/truetype/NerdFonts/BerkeleyMonoNerdFont-Regular.ttf";
 
       colors = with config.home-manager.config.colorScheme.palette; {
         background = "#${base00}";

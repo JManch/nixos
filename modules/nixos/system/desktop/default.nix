@@ -12,6 +12,8 @@ let
     mkEnableOption
     literalExpression
     genAttrs
+    optionals
+    optionalAttrs
     getExe'
     mkOption
     elem
@@ -24,6 +26,7 @@ let
     ;
   inherit (config.${ns}.core) homeManager;
   cfg = config.${ns}.system.desktop;
+  homeUwsm = config.hm.${ns}.desktop.uwsm;
   loginctl = getExe' pkgs.systemd "loginctl";
 in
 {
@@ -56,6 +59,7 @@ in
       serviceApps = mkOption {
         type = with types; listOf str;
         default = [ ];
+        apply = v: (optionals homeManager.enable homeUwsm.serviceApps) ++ v;
         description = ''
           List of application desktop entry IDs that should be started in
           services instead of scopes. Useful for applications where we want to
@@ -66,6 +70,7 @@ in
       appUnitOverrides = mkOption {
         type = types.attrs;
         default = { };
+        apply = v: (optionalAttrs homeManager.enable homeUwsm.appUnitOverrides) // v;
         description = ''
           Attribute set of unit overrides. Attribute name should be the unit
           name without the app-''${desktop} prefix. Attribute value should be

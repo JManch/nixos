@@ -184,6 +184,11 @@ mkIf (cfg.enable && (osConfig.${ns}.system.audio.enable or true)) {
       ];
     };
 
+  ${ns}.desktop.uwsm.appUnitOverrides."spotify-.scope" = ''
+    [Scope]
+    KillMode=mixed
+  '';
+
   persistence.directories = [
     ".config/spotify"
     ".cache/spotify"

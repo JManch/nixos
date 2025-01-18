@@ -14,7 +14,6 @@ let
     mkMerge
     mkOrder
     mkForce
-    genAttrs
     getExe'
     replaceStrings
     foldl'
@@ -171,15 +170,5 @@ mkMerge [
         }
       ) { } cfg.desktopNames
     ) cfg.appUnitOverrides;
-
-    # Electron apps core dump on exit with the default KillMode control-group.
-    # This causes compositor exit to get delayed so just aggressively kill
-    # these apps with Killmode mixed.
-    ${ns}.system.desktop.uwsm.appUnitOverrides =
-      genAttrs [ "spotify-.scope" "vesktop-.scope" "discord-.scope" ]
-        (_: ''
-          [Scope]
-          KillMode=mixed
-        '');
   })
 ]

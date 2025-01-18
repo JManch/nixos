@@ -179,34 +179,21 @@ in
               };
             }
           ))
-          (
-            (pkgs.home-assistant-custom-components.miele.override {
-              pymiele = pkgs.python3Packages.pymiele.overrideAttrs {
-                version = "0.2.0";
-                src = pkgs.fetchPypi {
-                  pname = "pymiele";
-                  version = "0.2.0";
-                  hash = "sha256-/iUpbvD77MURTltnStm47PEqXnfVuHf4m3+h9V2cn68=";
-                };
-                propagatedBuildsInputs = [ pkgs.python3Packages.aiohttp ];
-              };
-            }).overrideAttrs
-            {
-              src = pkgs.fetchFromGitHub {
-                owner = "astrandb";
-                repo = "miele";
-                rev = "refs/tags/v2025.1.0";
-                hash = "sha256-6E4aOWxI1RlULXGEN6TwYptlIS50gEawmgTAxvaixvs=";
-              };
-            }
-          )
+          (pkgs.home-assistant-custom-components.miele.overrideAttrs {
+            src = pkgs.fetchFromGitHub {
+              owner = "astrandb";
+              repo = "miele";
+              rev = "refs/tags/v2025.1.0";
+              hash = "sha256-6E4aOWxI1RlULXGEN6TwYptlIS50gEawmgTAxvaixvs=";
+            };
+          })
           selfPkgs.heatmiser
           selfPkgs.thermal-comfort
           selfPkgs.daikin-onecta
         ]
         ++ optional frigate.enable (
           let
-            hass-web-proxy-lib = pkgs.python3Packages.buildPythonPackage {
+            hass-web-proxy-lib = pkgs.python313Packages.buildPythonPackage {
               pname = "hass-web-proxy-lib";
               version = "0.0.7";
 
@@ -218,7 +205,7 @@ in
               };
 
               pyproject = true;
-              build-system = [ pkgs.python3Packages.poetry-core ];
+              build-system = [ pkgs.python313Packages.poetry-core ];
             };
           in
           pkgs.home-assistant-custom-components.frigate.overridePythonAttrs {
@@ -231,7 +218,7 @@ in
             };
 
             dependencies = [
-              pkgs.python3Packages.pytz
+              pkgs.python313Packages.pytz
               hass-web-proxy-lib
             ];
           }

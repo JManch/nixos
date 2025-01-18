@@ -103,7 +103,7 @@ mkIf (cfg.enable && desktopEnabled) {
     };
   };
 
-  ${ns}.desktop.programs.locking = {
+  ${ns}.desktop.programs.locker = {
     preLockScript = "${dunstctl} set-paused true";
     postUnlockScript = "${dunstctl} set-paused false";
   };

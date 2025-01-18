@@ -15,7 +15,7 @@ let
   isHyprland = lib.${ns}.isHyprland config;
 in
 mkIf (cfg.enable && isWayland) {
-  ${ns}.desktop.programs.locking = {
+  ${ns}.desktop.programs.locker = {
     package = config.programs.swaylock.package;
 
     # Temporarily disable hyprland shader so that screenshot doesn't get shader

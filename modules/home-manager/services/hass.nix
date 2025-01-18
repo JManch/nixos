@@ -43,7 +43,7 @@ mkIf (osConfig.${ns}.device.hassIntegration.enable or false) {
     services.hass.curlCommand = curlCommand;
 
     # Update the active state when locking
-    desktop.programs.locking = {
+    desktop.programs.locker = {
       postLockScript = "${systemctl} stop --user hass-active-heartbeat";
       postUnlockScript = "${systemctl} start --user hass-active-heartbeat";
     };

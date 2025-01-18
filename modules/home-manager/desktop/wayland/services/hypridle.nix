@@ -19,13 +19,13 @@ let
     singleton
     ;
   inherit (lib.${ns}) asserts isHyprland sliceSuffix;
-  inherit (config.${ns}.desktop.programs) locking;
+  inherit (config.${ns}.desktop.programs) locker;
   cfg = config.${ns}.desktop.services.hypridle;
   systemctl = getExe' pkgs.systemd "systemctl";
 in
 mkIf (cfg.enable && isWayland) {
   assertions = asserts [
-    (locking.package != null)
+    (locker.package != null)
     "Hypridle requires a locker to be enabled"
   ];
 
@@ -35,14 +35,14 @@ mkIf (cfg.enable && isWayland) {
     settings = {
       general = {
         # Cmd triggered by `loginctl lock-session`
-        lock_cmd = "${locking.lockScript} --immediate";
+        lock_cmd = "${locker.lockScript} --immediate";
         ignore_dbus_inhibit = false;
       };
 
       listener =
         (singleton {
           timeout = cfg.lockTime;
-          on-timeout = locking.lockScript;
+          on-timeout = locker.lockScript;
         })
         ++ optional (cfg.suspendTime != null) {
           timeout = cfg.suspendTime;
@@ -64,7 +64,7 @@ mkIf (cfg.enable && isWayland) {
     };
   };
 
-  ${ns}.desktop.programs.locking.postLockScript =
+  ${ns}.desktop.programs.locker.postLockScript =
     let
       hyprctl = getExe' pkgs.hyprland "hyprctl";
       jaq = getExe pkgs.jaq;
@@ -77,10 +77,9 @@ mkIf (cfg.enable && isWayland) {
         while true; do
           # If the display is on, wait screenOffTime seconds then turn off
           # display. Then wait the full lock time before checking again.
-          if ${hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" >/dev/null 2>&1; then
+          if ${hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" &>/dev/null; then
             cursor_pos=$(${hyprctl} cursorpos)
             sleep ${toString cfg.screenOffTime}
-            if [ ! -e "$lockfile" ]; then exit 1; fi
             if [ "$cursor_pos" != "$(${hyprctl} cursorpos)" ]; then continue; fi
             ${hyprctl} dispatch dpms off
           fi

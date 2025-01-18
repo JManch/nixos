@@ -143,7 +143,7 @@ in
       };
 
       hm = mkIf homeManager.enable {
-        ${ns}.desktop.programs.locking = {
+        ${ns}.desktop.programs.locker = {
           preLockScript = ''
             ${pactl} get-sink-mute @DEFAULT_SINK@ > /tmp/lock-mute-sink
             ${pactl} get-source-mute @DEFAULT_SOURCE@ > /tmp/lock-mute-source

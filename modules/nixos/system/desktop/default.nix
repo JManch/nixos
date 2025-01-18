@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  username,
   ...
 }:
 let
@@ -25,9 +26,11 @@ let
     sliceSuffix
     ;
   inherit (config.${ns}.core) homeManager;
+  inherit (config.hm.${ns}.desktop.programs) locker;
   cfg = config.${ns}.system.desktop;
   homeUwsm = config.hm.${ns}.desktop.uwsm;
   loginctl = getExe' pkgs.systemd "loginctl";
+  systemd-run = getExe' pkgs.systemd "systemd-run";
 in
 {
   imports = scanPaths ./.;
@@ -188,7 +191,12 @@ in
     powerManagement.powerDownCommands =
       mkIf (cfg.desktopEnvironment == null) # bash
         ''
-          ${loginctl} lock-sessions
+          ${
+            if homeManager.enable && (locker.package != null) then
+              "${systemd-run} --user --machine ${username}@.host ${locker.lockScript} --immediate"
+            else
+              "${loginctl} lock-sessions"
+          }
           sleep 5 # give lock screen time to open
         '';
 
@@ -200,7 +208,11 @@ in
         Type = "oneshot";
         RemainAfterExit = true;
         ExecStartPre = "${getExe' pkgs.coreutils "sleep"} 3";
-        ExecStart = "${loginctl} lock-session";
+        ExecStart =
+          if homeManager.enable && (locker.package != null) then
+            "${locker.lockScript} --immediate"
+          else
+            "${loginctl} lock-sessions";
       };
 
       wantedBy = [ "graphical-session.target" ];

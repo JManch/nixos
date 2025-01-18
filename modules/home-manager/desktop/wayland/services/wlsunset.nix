@@ -58,5 +58,5 @@ mkIf (cfg.enable && isWayland) {
   };
 
   # wlsunset sometimes doesn't work after DPMS, restarting fixes it
-  ${ns}.desktop.programs.locking.postUnlockScript = "systemctl restart --user wlsunset";
+  ${ns}.desktop.programs.locker.postUnlockScript = "systemctl restart --user wlsunset";
 }

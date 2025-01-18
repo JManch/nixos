@@ -13,7 +13,7 @@ let
   colors = config.colorScheme.palette;
 in
 mkIf (cfg.enable && isWayland) {
-  ${ns}.desktop.programs.locking = {
+  ${ns}.desktop.programs.locker = {
     package = config.programs.hyprlock.package;
     immediateFlag = "--immediate";
   };

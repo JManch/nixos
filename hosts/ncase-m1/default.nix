@@ -99,7 +99,7 @@ in
       fileSystem = {
         type = "zfs";
         zfs.trim = true;
-        zfs.unstable = true;
+        zfs.unstable = false;
         zfs.encryption.passphraseCred = inputs.nix-resources.secrets.zfsPassphrases.ncase-m1;
       };
 

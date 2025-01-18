@@ -495,16 +495,22 @@ in
         # Because one of our flake inputs is a private repo temporarily copy host ssh
         # keys so root uses them to authenticate with github
         serviceConfig.ExecStart = mkForce (pkgs.writeShellScript "nixos-upgrade-ssh-auth" ''
+          set -e
           # Copy host ssh keys to /root/.ssh
           # Abort if /root.ssh exists
           if [ -d /root/.ssh ]; then
             echo "Aborting because root has ssh keys for some reason"
             exit 1
           fi
+
           mkdir -p /root/.ssh
           cp /etc/ssh/ssh_host_ed25519_key /root/.ssh/id_ed25519
+          cleanup() {
+            rm -rf "/root/.ssh"
+          }
+          trap cleanup EXIT
+
           ${config.systemd.services.nixos-upgrade.script}
-          rm -rf /root/.ssh
         '').outPath;
       };
     }

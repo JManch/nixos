@@ -14,4 +14,6 @@ stdenvNoCC.mkDerivation {
   };
 
   installPhase = "install -Dm755 app2unit -t $out/bin";
+
+  meta.mainProgram = "app2unit";
 }

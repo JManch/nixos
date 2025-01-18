@@ -3,7 +3,7 @@
   pkgs,
   config,
   osConfig,
-  isWayland,
+  desktopEnabled,
   ...
 }:
 let
@@ -21,7 +21,7 @@ let
     in
     "--transition-bezier .43,1.19,1,.4 --transition-type center --transition-duration 1 --transition-fps ${refreshRate}";
 in
-mkIf (cfg.enable && isWayland) {
+mkIf (cfg.enable && desktopEnabled) {
   ${ns}.desktop.services.wallpaper = {
     setWallpaperCmd = "${getExe pkgs.swww} img ${transition}";
     wallpaperUnit = "swww.service";

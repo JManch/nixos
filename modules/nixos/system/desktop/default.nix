@@ -17,18 +17,16 @@ let
     optionalAttrs
     getExe'
     mkOption
-    elem
     ;
   inherit (lib.${ns})
     scanPaths
-    waylandWindowManagers
-    waylandDesktopEnvironments
     sliceSuffix
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.hm.${ns}.desktop.programs) locker;
   cfg = config.${ns}.system.desktop;
-  homeUwsm = config.hm.${ns}.desktop.uwsm;
+  homeDesktop = config.hm.${ns}.desktop;
+  homeUwsm = homeDesktop.uwsm;
   loginctl = getExe' pkgs.systemd "loginctl";
   systemd-run = getExe' pkgs.systemd "systemd-run";
 in
@@ -138,19 +136,6 @@ in
         description = "Number of Gnome workspaces to create";
       };
     };
-
-    isWayland = mkOption {
-      type = types.bool;
-      readOnly = true;
-      default =
-        (
-          if config.${ns}.core.homeManager.enable then
-            (elem config.hm.${ns}.desktop.windowManager waylandWindowManagers)
-          else
-            false
-        )
-        || (elem cfg.desktopEnvironment waylandDesktopEnvironments);
-    };
   };
 
   config = mkIf cfg.enable {
@@ -159,7 +144,7 @@ in
     hardware.graphics.enable = true;
 
     # Enables wayland for all apps that support it
-    environment.sessionVariables.NIXOS_OZONE_WL = mkIf cfg.isWayland "1";
+    environment.sessionVariables.NIXOS_OZONE_WL = 1;
 
     # Some apps like vscode needs this
     services.gnome.gnome-keyring.enable = true;
@@ -192,7 +177,7 @@ in
       mkIf (cfg.desktopEnvironment == null) # bash
         ''
           ${
-            if homeManager.enable && (locker.package != null) then
+            if homeManager.enable && homeDesktop.enable && (locker.package != null) then
               "${systemd-run} --user --machine ${username}@.host ${locker.lockScript} --immediate"
             else
               "${loginctl} lock-sessions"
@@ -209,7 +194,7 @@ in
         RemainAfterExit = true;
         ExecStartPre = "${getExe' pkgs.coreutils "sleep"} 3";
         ExecStart =
-          if homeManager.enable && (locker.package != null) then
+          if homeManager.enable && homeDesktop.enable && (locker.package != null) then
             "${locker.lockScript} --immediate"
           else
             "${loginctl} lock-sessions";

@@ -13,7 +13,6 @@ let
     getExe
     getExe'
     ;
-  inherit (config.${ns}.desktop) isWayland;
   cfg = config.${ns}.programs.spotify;
 
   spotify-player =
@@ -102,7 +101,7 @@ mkIf (cfg.enable && (osConfig.${ns}.system.audio.enable or true)) {
         default_device = "spotify-player"
 
         [copy_command]
-        command = "${if isWayland then getExe' pkgs.wl-clipboard "wl-copy" else getExe pkgs.xclip}"
+        command = "${getExe' pkgs.wl-clipboard "wl-copy"}"
 
         [notify_format]
         summary = "{track}"

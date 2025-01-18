@@ -3,7 +3,7 @@
   pkgs,
   config,
   osConfig,
-  isWayland,
+  desktopEnabled,
   ...
 }:
 let
@@ -14,7 +14,7 @@ let
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
 in
-mkIf (cfg.enable && isWayland) {
+mkIf (cfg.enable && desktopEnabled) {
   programs.fuzzel = {
     enable = true;
 

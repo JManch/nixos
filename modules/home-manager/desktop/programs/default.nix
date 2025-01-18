@@ -18,7 +18,7 @@ in
 
     locker = {
       package = mkOption {
-        type = types.package;
+        type = with types; nullOr package;
         default = null;
         description = "The package to use for locking";
       };

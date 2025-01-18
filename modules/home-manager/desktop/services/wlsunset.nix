@@ -11,7 +11,7 @@
   pkgs,
   config,
   osConfig,
-  isWayland,
+  desktopEnabled,
   ...
 }:
 let
@@ -20,7 +20,7 @@ let
   latitude = "50.8";
   longitude = "-0.1";
 in
-mkIf (cfg.enable && isWayland) {
+mkIf (cfg.enable && desktopEnabled) {
   # We don't use the home-manager module because it's missing options
   systemd.user.services.wlsunset = {
     Unit = {

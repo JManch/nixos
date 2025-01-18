@@ -6,13 +6,12 @@
 }:
 let
   inherit (lib) ns mkIf;
-  inherit (config.${ns}.desktop) isWayland;
   cfg = config.${ns}.programs.anki;
 in
 mkIf cfg.enable {
   home = {
     packages = [ pkgs.anki-bin ];
-    sessionVariables = mkIf isWayland { ANKI_WAYLAND = 1; };
+    sessionVariables.ANKI_WAYLAND = 1;
   };
 
   backups.anki.paths = [ ".local/share/Anki2" ];

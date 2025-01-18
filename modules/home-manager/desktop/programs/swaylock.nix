@@ -3,7 +3,7 @@
   pkgs,
   config,
   osConfig,
-  isWayland,
+  desktopEnabled,
   ...
 }:
 let
@@ -14,7 +14,7 @@ let
   colors = config.colorScheme.palette;
   isHyprland = lib.${ns}.isHyprland config;
 in
-mkIf (cfg.enable && isWayland) {
+mkIf (cfg.enable && desktopEnabled) {
   ${ns}.desktop.programs.locker = {
     package = config.programs.swaylock.package;
 
@@ -80,7 +80,5 @@ mkIf (cfg.enable && isWayland) {
     };
   };
 
-  darkman.switchApps.swaylock = {
-    paths = [ ".config/swaylock/config" ];
-  };
+  darkman.switchApps.swaylock.paths = [ ".config/swaylock/config" ];
 }

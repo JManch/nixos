@@ -5,7 +5,7 @@
   config,
   osConfig,
   vmVariant,
-  isWayland,
+  desktopEnabled,
   ...
 }:
 let
@@ -23,7 +23,7 @@ let
   cfg = config.${ns}.desktop.services.hypridle;
   systemctl = getExe' pkgs.systemd "systemctl";
 in
-mkIf (cfg.enable && isWayland) {
+mkIf (cfg.enable && desktopEnabled) {
   assertions = asserts [
     (locker.package != null)
     "Hypridle requires a locker to be enabled"

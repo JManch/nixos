@@ -13,7 +13,6 @@ let
     mkOption
     mkPackageOption
     length
-    elem
     types
     literalExpression
     mkEnableOption
@@ -22,10 +21,7 @@ let
     scanPaths
     asserts
     flakePkgs
-    waylandWindowManagers
-    waylandDesktopEnvironments
     ;
-  cfg = config.${ns}.desktop;
 in
 {
   imports = scanPaths ./.;
@@ -52,17 +48,6 @@ in
       type = types.nullOr (types.enum [ "hyprland" ]);
       default = null;
       description = "Window manager to use";
-    };
-
-    isWayland = mkOption {
-      type = types.bool;
-      readOnly = true;
-      default =
-        cfg.enable
-        && (
-          (elem cfg.windowManager waylandWindowManagers)
-          || (elem osConfig.${ns}.system.desktop.desktopEnvironment waylandDesktopEnvironments)
-        );
     };
 
     style = {
@@ -133,10 +118,7 @@ in
     in
     mkMerge [
       {
-        _module.args = {
-          inherit (cfg) isWayland;
-          desktopEnabled = cfg.enable;
-        };
+        _module.args.desktopEnabled = cfg.enable;
       }
 
       (mkIf cfg.enable {
@@ -153,7 +135,10 @@ in
           "Device monitors must be configured to use a window manager"
         ];
 
-        home.packages = [ pkgs.xdg-terminal-exec ];
+        home.packages = with pkgs; [
+          xdg-terminal-exec
+          wl-clipboard
+        ];
 
         xdg.configFile."xdg-terminals.list".text = ''
           ${cfg.terminal}.desktop

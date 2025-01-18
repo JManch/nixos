@@ -4,7 +4,7 @@
   config,
   hostname,
   osConfig,
-  isWayland,
+  desktopEnabled,
   ...
 }:
 let
@@ -52,7 +52,7 @@ let
       )}
     '';
 in
-mkIf (cfg.enable && isWayland) {
+mkIf (cfg.enable && desktopEnabled) {
   programs.waybar = {
     enable = true;
     systemd.enable = true;
@@ -69,9 +69,9 @@ mkIf (cfg.enable && isWayland) {
     # custom module signal functionality that I don't use.
     package =
       (addPatches pkgs.waybar [
-        ../../../../../../patches/waybarDisableReload.patch
+        ../../../../../patches/waybarDisableReload.patch
         (pkgs.substituteAll {
-          src = ../../../../../../patches/waybarSignalToggle.patch;
+          src = ../../../../../patches/waybarSignalToggle.patch;
           sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
             sort (a: b: a.number < b.number) monitors
           );

@@ -1,7 +1,7 @@
 {
   lib,
   config,
-  isWayland,
+  desktopEnabled,
   ...
 }:
 let
@@ -10,7 +10,7 @@ let
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
 in
-mkIf (cfg.enable && isWayland) {
+mkIf (cfg.enable && desktopEnabled) {
   programs.waybar.style =
     let
       inherit (desktopCfg.style)

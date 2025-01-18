@@ -43,7 +43,7 @@ mkIf (cfg.enable && desktopEnabled) {
   services.darkman = {
     enable = true;
     package = addPatches pkgs.darkman [
-      ../../../../../patches/darkmanNoInitialSwitch.patch
+      ../../../../patches/darkmanNoInitialSwitch.patch
     ];
     darkModeScripts = mapAttrs (_: v: v "dark") cfg.switchScripts;
     lightModeScripts = mapAttrs (_: v: v "light") cfg.switchScripts;

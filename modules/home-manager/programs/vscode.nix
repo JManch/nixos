@@ -7,7 +7,6 @@
 let
   inherit (lib) ns mkIf;
   inherit (config.${ns}) desktop;
-  inherit (desktop) isWayland;
   cfg = config.${ns}.programs.vscode;
 in
 mkIf cfg.enable {
@@ -26,7 +25,7 @@ mkIf cfg.enable {
 
     userSettings = {
       # Prevents wayland crash on launch
-      "window.titleBarStyle" = mkIf isWayland "custom";
+      "window.titleBarStyle" = "custom";
       "window.menuBarVisibility" = "toggle";
       "editor.fontFamily" = desktop.style.font.family;
       "git.autofetch" = true;

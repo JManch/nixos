@@ -6,7 +6,7 @@
 }:
 let
   inherit (lib) ns mkIf;
-  inherit (config.${ns}.system.desktop) isWayland suspend;
+  inherit (config.${ns}.system.desktop) suspend;
 in
 mkIf (config.${ns}.device.gpu.type == "nvidia") {
   hardware.graphics = {
@@ -22,7 +22,7 @@ mkIf (config.${ns}.device.gpu.type == "nvidia") {
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     open = true;
-    nvidiaSettings = !isWayland;
+    nvidiaSettings = false; # does not work on wayland
     powerManagement.enable = suspend.enable;
   };
 

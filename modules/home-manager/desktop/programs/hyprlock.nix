@@ -3,7 +3,7 @@
   pkgs,
   inputs,
   config,
-  isWayland,
+  desktopEnabled,
   ...
 }:
 let
@@ -12,7 +12,7 @@ let
   cfg = config.${ns}.desktop.programs.hyprlock;
   colors = config.colorScheme.palette;
 in
-mkIf (cfg.enable && isWayland) {
+mkIf (cfg.enable && desktopEnabled) {
   ${ns}.desktop.programs.locker = {
     package = config.programs.hyprlock.package;
     immediateFlag = "--immediate";

@@ -202,10 +202,6 @@ in
       (hasAttr interface (osConfig.${ns}.services.wireguard or { }))
       && (osConfig.${ns}.services.wireguard.${interface}.enable);
 
-    waylandWindowManagers = [ "hyprland" ];
-
-    waylandDesktopEnvironments = [ "gnome" ];
-
     hardeningBaseline =
       config: overrides:
       {

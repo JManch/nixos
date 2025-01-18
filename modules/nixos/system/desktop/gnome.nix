@@ -10,6 +10,7 @@ let
     ns
     mkIf
     mkForce
+    mkDefault
     foldl'
     genList
     optionalAttrs
@@ -51,6 +52,8 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
   home-manager.sharedModules = [ inputs.gnome-keybinds.homeManagerModules.default ];
 
   hm = mkIf homeManager.enable {
+    ${ns}.desktop.terminal = mkDefault "org.gnome.Terminal";
+
     dconf.settings =
       let
         inherit (inputs.home-manager.lib.hm.gvariant) mkUint32 mkDouble;

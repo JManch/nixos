@@ -20,7 +20,7 @@ let
     foldl'
     concatMapAttrs
     optionalString
-    concatMapStringsSep
+    concatStringsSep
     ;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.core) homeManager;
@@ -52,7 +52,7 @@ mkMerge [
             substitutions = [
               "--replace-fail"
               "@SERVICE_APPS@"
-              (concatMapStringsSep " " (app: ''"${app}.desktop"'') cfg.serviceApps)
+              (concatStringsSep " " cfg.serviceApps)
             ];
           })
         ];

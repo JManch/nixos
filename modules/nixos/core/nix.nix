@@ -186,6 +186,7 @@ let
     pkgs.writeShellApplication {
       name = "host-rebuild-${cmd}";
       runtimeInputs = with pkgs; [
+        nix
         nixos-rebuild
         openssh
         nvd
@@ -202,7 +203,7 @@ let
 
               remote_system=$(ssh "${adminUsername}@$hostname.lan" readlink /run/current-system)
               nixos_system=$(readlink "$remote_builds/result")
-              nix-copy-closure --from "$hostname.lan" "$remote_system"
+              nix copy --from "ssh://$hostname.lan" "$remote_system"
               nvd --color always diff "$remote_system" "$nixos_system"
             ''
           else

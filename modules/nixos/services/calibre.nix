@@ -38,6 +38,7 @@ mkIf cfg.enable {
   };
 
   systemd.services.calibre-web.serviceConfig = hardeningBaseline config {
+    StateDirectory = "calibre-web";
     DynamicUser = false;
     RestrictAddressFamilies = [
       "AF_UNIX"

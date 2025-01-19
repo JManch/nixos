@@ -369,13 +369,6 @@ in
     overlays = [
       (final: prev: {
         inherit (selfPkgs) xdg-terminal-exec;
-        inherit
-          (import (fetchTarball {
-            url = "https://github.com/NixOS/nixpkgs/archive/f57b567f5de8b76c66acd7892a1c506c2474de86.tar.gz";
-            sha256 = "sha256:0s40vzjmwa67piscn8qr5qchvsx2kxpnx2jkvgj72mki7m7lmlrv";
-          }) { inherit (pkgs) system; })
-          chatterino7
-          ;
         rnnoise-plugin = addPatches prev.rnnoise-plugin (
           optional (
             !final.stdenv.buildPlatform.canExecute final.stdenv.hostPlatform

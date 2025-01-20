@@ -11,6 +11,7 @@ let
     mkEnableOption
     mkOption
     types
+    optional
     mapAttrsToList
     all
     allUnique
@@ -111,7 +112,8 @@ in
       resolved.enable = mkEnableOption "Resolved";
 
       wiredInterface = mkOption {
-        type = types.str;
+        type = with types; nullOr str;
+        default = null;
         example = "enp5s0";
         description = ''
           Wired network interface of the device. Be careful to use the main
@@ -156,7 +158,7 @@ in
 
         defaultInterfaces = mkOption {
           type = types.listOf types.str;
-          default = [ cfg.networking.wiredInterface ];
+          default = optional (cfg.networking.wiredInterface != null) cfg.networking.wiredInterface;
           example = [
             "eno1"
             "wlp6s0"

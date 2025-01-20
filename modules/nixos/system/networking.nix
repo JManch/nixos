@@ -31,8 +31,6 @@ let
 in
 {
   assertions = lib.${ns}.asserts [
-    (cfg.wiredInterface != null)
-    "Wired networking interface must be set"
     (cfg.staticIPAddress != null -> cfg.defaultGateway != null)
     "Default gateway must be set when using a static IPV4 address"
     (vlanIds != [ ] -> cfg.useNetworkd)
@@ -51,7 +49,7 @@ in
     networks = mkIf (!inputs.vmInstall.value) (
       {
         # TODO: Might want to bond wired and wireless networks
-        "10-wired" = {
+        "10-wired" = mkIf (cfg.wiredInterface != null) {
           matchConfig.Name = cfg.wiredInterface;
 
           networkConfig = {
@@ -177,16 +175,17 @@ in
     };
   };
 
-  programs.zsh.shellAliases =
-    let
-      ip = getExe' pkgs.iproute2 "ip";
-    in
-    {
-      "wifi-up" = "sudo ${rfkill} unblock wifi";
-      "wifi-down" = "sudo ${rfkill} block wifi";
-      "ethernet-up" = "sudo ${ip} link set ${cfg.wiredInterface} up";
-      "ethernet-down" = "sudo ${ip} link set ${cfg.wiredInterface} down";
-    };
+  programs.zsh.shellAliases = mkMerge [
+    (mkIf cfg.wireless.enable {
+      wifi-up = "sudo ${rfkill} unblock wifi";
+      wifi-down = "sudo ${rfkill} block wifi";
+    })
+
+    (mkIf (cfg.wiredInterface != null) {
+      ethernet-up = "sudo ${ip} link set ${cfg.wiredInterface} up";
+      ethernet-down = "sudo ${ip} link set ${cfg.wiredInterface} down";
+    })
+  ];
 
   boot = {
     kernelModules = optional cfg.tcpOptimisations "tcp_bbr";

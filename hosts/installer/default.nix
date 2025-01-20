@@ -1,3 +1,7 @@
+# Connecting to wifi:
+# List wireless interfaces with `iwconfig`
+# Generate a wpa supplicant config with `wpa_passphrase SSID | sudo tee /etc/wpa_supplicant.conf`
+# Run `sudo wpa_supplicant -c /etc/wpa_supplicant.conf -i <interface>` (-B to run in background)
 {
   lib,
   pkgs,
@@ -7,7 +11,7 @@
   ...
 }:
 let
-  inherit (lib) ns concatStringsSep;
+  inherit (lib) ns;
   installScript = pkgs.writeShellApplication {
     name = "install-local";
 

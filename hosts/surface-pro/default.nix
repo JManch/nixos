@@ -18,11 +18,12 @@
 
       monitors = [
         {
-          name = "DP-1"; # FIX:
+          name = "eDP-1";
           number = 1;
           refreshRate = 60.0;
           width = 2736;
           height = 1824;
+          scale = 1.5;
           position.x = 0;
           position.y = 0;
           workspaces = builtins.genList (i: (i * 2) + 1) 25;

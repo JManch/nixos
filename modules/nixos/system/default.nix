@@ -141,6 +141,10 @@ in
       wireless = {
         enable = mkEnableOption "wireless";
 
+        onlyWpa2 = mkEnableOption ''
+          only configuring WPA2 networks for devices that do not support WPA3
+        '';
+
         interface = mkOption {
           type = types.str;
           example = "wlp6s0";

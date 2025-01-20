@@ -27,6 +27,7 @@ let
   cfg = config.${ns}.system.networking;
   homeFirewall = config.hm.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
+  ip = getExe' pkgs.iproute2 "ip";
   vlanIds = attrNames cfg.vlans;
 in
 {
@@ -135,8 +136,13 @@ in
 
         # Inspect the generated file at /run/wpa_supplicant/wpa_supplicant.conf
         # Manually reload config with `wpa_cli -i <wireless_interface> reconfigure`
-        Mikrotik = {
+        Mikrotik = mkIf (!cfg.wireless.onlyWpa2) {
           pskRaw = "ext:MIKROTIK";
+          priority = 3;
+        };
+
+        Mikrotik_Guest = mkIf cfg.wireless.onlyWpa2 {
+          pskRaw = "ext:MIKROTIK_GUEST";
           priority = 3;
         };
 

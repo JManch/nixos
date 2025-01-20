@@ -205,7 +205,7 @@ in
       };
 
       setWallpaperCmd = mkOption {
-        type = types.nullOr types.str;
+        type = with types; nullOr str;
         default = null;
         description = ''
           Command for setting the wallpaper. Must accept the wallpaper image path appended as an argument.
@@ -217,7 +217,7 @@ in
       enable = mkEnableOption "Waybar";
 
       audioDeviceIcons = mkOption {
-        type = types.attrsOf types.str;
+        type = with types; attrsOf str;
         default = { };
         description = ''
           Attribute set mapping audio devices to icons. Use pamixer --list-sinks to get device names.
@@ -225,7 +225,7 @@ in
       };
 
       autoHideWorkspaces = mkOption {
-        type = types.listOf types.str;
+        type = with types; listOf str;
         default = [ ];
         description = ''
           List of workspace names that, when activated, cause the bar to

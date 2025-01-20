@@ -17,7 +17,6 @@ let
     mkForce
     getExe
     concatLines
-    singleton
     sort
     concatMapStringsSep
     ;
@@ -330,28 +329,32 @@ mkIf (cfg.enable && desktopEnabled) {
     in
     {
       # Update bar auto toggle when active workspace changes
-      eventScripts.workspace = singleton (pkgs.writeShellScript "hypr-waybar-auto-toggle-workspace" ''
-        ${updateMonitorBar}
-        workspace_name="$1"
-        focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
-        update_monitor_bar "$focused_monitor" "$workspace_name"
-      '').outPath;
+      eventScripts.workspace =
+        optional (cfg.autoHideWorkspaces != [ ])
+          (pkgs.writeShellScript "hypr-waybar-auto-toggle-workspace" ''
+            ${updateMonitorBar}
+            workspace_name="$1"
+            focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
+            update_monitor_bar "$focused_monitor" "$workspace_name"
+          '').outPath;
 
       # Update bar auto toggle when workspace is moved between monitors
-      eventScripts.moveworkspace = singleton (pkgs.writeShellScript "hypr-waybar-auto-toggle-moveworkspace" ''
-        ${updateMonitorBar}
-        workspace_name="$1"
-        monitor_name="$2"
-        waybar_update_monitor_bar "$monitor_name" "$workspace_name"
+      eventScripts.moveworkspace =
+        optional (cfg.autoHideWorkspaces != [ ])
+          (pkgs.writeShellScript "hypr-waybar-auto-toggle-moveworkspace" ''
+            ${updateMonitorBar}
+            workspace_name="$1"
+            monitor_name="$2"
+            waybar_update_monitor_bar "$monitor_name" "$workspace_name"
 
-        # unhide/hide the bar on the monitor where this workspace came
-        # from through all monitors and update the bar based on their
-        # active workspace.
-        active_workspaces=$(${hyprctl} monitors -j | ${jaq} -r ".[] | select((.disabled == false) and (.name != \"$monitor_name\")) | \"\(.name) \(.activeWorkspace.name)\"")
-        while IFS= read -r line; do
-          read -r monitor_name workspace_name <<< "$line"
-          update_monitor_bar "$monitor_name" "$workspace_name"
-        done <<< "$active_workspaces"
-      '').outPath;
+            # unhide/hide the bar on the monitor where this workspace came
+            # from through all monitors and update the bar based on their
+            # active workspace.
+            active_workspaces=$(${hyprctl} monitors -j | ${jaq} -r ".[] | select((.disabled == false) and (.name != \"$monitor_name\")) | \"\(.name) \(.activeWorkspace.name)\"")
+            while IFS= read -r line; do
+              read -r monitor_name workspace_name <<< "$line"
+              update_monitor_bar "$monitor_name" "$workspace_name"
+            done <<< "$active_workspaces"
+          '').outPath;
     };
 }

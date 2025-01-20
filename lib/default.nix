@@ -178,7 +178,7 @@ in
 
     getMonitorHyprlandCfgStr =
       m:
-      "${m.name},${toString m.width}x${toString m.height}@${toString m.refreshRate},${toString m.position.x}x${toString m.position.y},1,transform,${toString m.transform}${
+      "${m.name},${toString m.width}x${toString m.height}@${toString m.refreshRate},${toString m.position.x}x${toString m.position.y},${toString m.scale},transform,${toString m.transform}${
         optionalString (m.mirror != null) ",mirror,${m.mirror}"
       }";
 

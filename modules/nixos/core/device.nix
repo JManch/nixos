@@ -42,6 +42,11 @@ let
         example = 1440;
       };
 
+      scale = mkOption {
+        type = types.float;
+        default = 1.0;
+      };
+
       refreshRate = mkOption {
         type = types.float;
         default = 60.0;

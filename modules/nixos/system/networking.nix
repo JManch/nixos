@@ -141,7 +141,7 @@ in
           priority = 3;
         };
 
-        Mikrotik_Guest = mkIf cfg.wireless.onlyWpa2 {
+        Mikrotik-Guest = mkIf cfg.wireless.onlyWpa2 {
           pskRaw = "ext:MIKROTIK_GUEST";
           priority = 3;
         };

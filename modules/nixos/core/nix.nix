@@ -375,6 +375,14 @@ in
             !final.stdenv.buildPlatform.canExecute final.stdenv.hostPlatform
           ) ../../../patches/rnnoisePluginCross.patch
         );
+        # Not sure if it's a bug but wpa_supplicant matches substrings of the
+        # requested secret from the ext password file. So if you have:
+        # a = password123
+        # abc = secret123
+        # Requesting secret "abc" will return password123
+        wpa_supplicant = addPatches prev.wpa_supplicant [
+          ../../../patches/wpaSupplicantExtPasswordFix.patch
+        ];
       })
     ];
     config.allowUnfree = true;

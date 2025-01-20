@@ -38,18 +38,6 @@ let
       ${lib.${ns}.exitTrapBuilder}
 
       hostname=$1
-      hosts=(${concatStringsSep " " (builtins.attrNames self.nixosConfigurations)})
-      match=0
-      for host in "''${hosts[@]}"; do
-        if [[ $host = "$hostname" ]]; then
-          match=1
-          break
-        fi
-      done
-      if [[ $match = 0 ]]; then
-        echo "Error: Host '$hostname' does not exist" >&2
-        exit 1
-      fi
 
       flake="/root/nixos"
       if [ ! -d "$flake" ]; then
@@ -271,7 +259,8 @@ in
           extraHostNames = [ "${host}.lan" ];
         }) self.nixosConfigurations)
         // {
-          "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+          "github.com".publicKey =
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
         };
     };
 

@@ -110,6 +110,8 @@ in
       assertions = lib.${ns}.asserts [
         (vmVariant || (hasAttr "/persist" config.fileSystems))
         "A /persist file system must be defined for impermanence"
+        (vmVariant || (hasAttr "/nix" config.fileSystems))
+        "A /nix file system must be defined for impermanence"
       ];
 
       adminPackages = [

@@ -16,6 +16,7 @@
         (mkHost "homelab" "joshua" "x86_64-linux")
         (mkHost "msi" "lauren" "x86_64-linux")
         (mkHost "pi-3" "joshua" "aarch64-linux")
+        (mkHost "surface-pro" "joshua" "x86_64-linux")
       ];
 
       nixOnDroidConfigurations = lib.listToAttrs [
@@ -69,6 +70,8 @@
     nixpkgs-xr.inputs.treefmt-nix.follows = "";
 
     nix-flatpak.url = "github:gmodena/nix-flatpak";
+
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
 
     # Inputs that provide imported home-manager modules
 

@@ -23,14 +23,16 @@ mkIf (cfg.enable && desktopEnabled) {
         launch-prefix = mkIf uwsm.enable "app2unit --fuzzel-compat --";
         terminal = "xdg-terminal-exec";
 
-        font = "${desktopCfg.style.font.family}:size=18";
+        font = "${desktopCfg.style.font.family}:size=${
+          toString (builtins.ceil (primaryMonitor.height * 0.0125))
+        }";
         lines = 5;
         width = 30;
         horizontal-pad = 20;
         vertical-pad = 12;
         inner-pad = 5;
         anchor = "bottom";
-        y-margin = builtins.floor (primaryMonitor.height * 0.43);
+        y-margin = builtins.floor ((primaryMonitor.height / primaryMonitor.scale) * 0.43);
 
         tabs = 4;
         prompt = "\"\"";

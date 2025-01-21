@@ -9,6 +9,7 @@
     device = {
       type = "laptop";
       memory = 1024 * 8;
+      backlight = "intel_backlight";
 
       cpu = {
         name = "i5 7300U";

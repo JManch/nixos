@@ -184,6 +184,15 @@ in
           config.${ns}.device.monitors;
     };
 
+    backlight = mkOption {
+      type = with types; nullOr str;
+      default = null;
+      example = "intel_backlight";
+      description = ''
+        Name of the backlight device the directory /sys/class/backlight.
+      '';
+    };
+
     ipAddress = mkOption {
       type = types.nullOr types.str;
       default = null;

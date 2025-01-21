@@ -23,7 +23,7 @@ let
   inherit (lib.${ns}) addPatches sliceSuffix getMonitorByName;
   inherit (config.${ns}) desktop;
   inherit (desktop.services) hypridle;
-  inherit (osConfig.${ns}.device) gpu monitors;
+  inherit (osConfig.${ns}.device) gpu monitors backlight;
   cfg = desktop.services.waybar;
   isHyprland = lib.${ns}.isHyprland config;
   colors = config.colorScheme.palette;
@@ -37,6 +37,7 @@ let
   systemctl = getExe' pkgs.systemd "systemctl";
   hyprctl = getExe' pkgs.hyprland "hyprctl";
   jaq = getExe pkgs.jaq;
+  brightnessctl = getExe pkgs.brightnessctl;
 
   monitorNameToNumMap = # bash
     ''
@@ -147,6 +148,19 @@ mkIf (cfg.enable && desktopEnabled) {
             on-scroll-up = "shift_up";
             on-scroll-down = "shift_down";
           };
+        };
+
+        backlight = mkIf (backlight != null) {
+          device = backlight;
+          format = "<span color='#${colors.base04}'>{icon}</span> {percent}%";
+          format-icons = [
+            "󰃞"
+            "󰃟"
+            "󰃠"
+          ];
+          on-scroll-up = "${brightnessctl} set +1%";
+          on-scroll-down = "${brightnessctl} set 1%-";
+          tooltip = false;
         };
 
         pulseaudio = mkIf audio.enable {
@@ -260,6 +274,7 @@ mkIf (cfg.enable && desktopEnabled) {
           ++ optional gpuModuleEnabled "custom/gpu"
           ++ optional gamemode.enable "gamemode"
           ++ [ "memory" ]
+          ++ optional (backlight != null) "backlight"
           ++ optional audio.enable "pulseaudio"
           ++ [
             "tray"

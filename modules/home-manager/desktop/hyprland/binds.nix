@@ -19,7 +19,7 @@ let
     ;
   inherit (lib.${ns}) isHyprland flakePkgs getMonitorHyprlandCfgStr;
   inherit (osConfig.${ns}.system) audio;
-  inherit (osConfig.${ns}.device) monitors;
+  inherit (osConfig.${ns}.device) monitors backlight;
   inherit (config.${ns}.desktop.programs) locker;
   cfg = config.${ns}.desktop.hyprland;
   mod = cfg.modKey;
@@ -29,6 +29,7 @@ let
   jaq = getExe pkgs.jaq;
   bc = getExe' pkgs.bc "bc";
   wpctl = getExe' pkgs.wireplumber "wpctl";
+  brightnessctl = getExe pkgs.brightnessctl;
   grimblast = getExe (flakePkgs args "grimblast").grimblast;
   notifySend = getExe pkgs.libnotify;
   hyprctl = getExe' pkgs.hyprland "hyprctl";
@@ -317,7 +318,13 @@ mkIf (isHyprland config) {
         ", XF86AudioMute, exec, ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle"
         "${modShift}, XF86AudioRaiseVolume, exec, ${modifyFocusedWindowVolume} 5%+"
         "${modShift}, XF86AudioLowerVolume, exec, ${modifyFocusedWindowVolume} 5%-"
-      ]);
+      ])
+      ++ (optionals (backlight != null)) [
+        ", XF86MonBrightnessUp, exec, ${brightnessctl} set +5%"
+        ", XF86MonBrightnessDown, exec, ${brightnessctl} set 5%-"
+        "${modShift}, XF86MonBrightnessUp, exec, ${brightnessctl} set +1%"
+        "${modShift}, XF86MonBrightnessDown, exec, ${brightnessctl} set 1%-"
+      ];
 
     settings.bindm = [
       "${mod}, mouse:272, movewindow"

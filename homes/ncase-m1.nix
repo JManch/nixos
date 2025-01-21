@@ -15,7 +15,7 @@
       xdg.lowercaseUserDirs = true;
 
       hyprland = {
-        plugins.enable = false;
+        plugins = false;
         tearing = true;
         # Causes artifacting https://github.com/hyprwm/Hyprland/issues/6994
         directScanout = false;

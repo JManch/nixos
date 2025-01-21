@@ -117,7 +117,7 @@ mkIf (isHyprland config) {
   wayland.windowManager.hyprland = {
     enable = true;
     systemd.enable = false; # we use UWSM instead
-    plugins = optionals cfg.plugins.enable (with flakePkgs args "hyprland-plugins"; [ hyprexpo ]);
+    plugins = optionals cfg.plugins (with flakePkgs args "hyprland-plugins"; [ hyprexpo ]);
 
     settings = {
       monitor =
@@ -257,7 +257,7 @@ mkIf (isHyprland config) {
       # https://github.com/hyprwm/Hyprland/issues/6543
       windowrulev2 = [ "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0" ];
 
-      plugin = mkIf cfg.plugins.enable {
+      plugin = mkIf cfg.plugins {
         hyprexpo = {
           columns = 3;
           gap_size = 0;

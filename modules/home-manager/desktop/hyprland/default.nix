@@ -57,7 +57,7 @@ in
   options.${ns}.desktop.hyprland = {
     logging = mkEnableOption "logging";
     tearing = mkEnableOption "enable tearing";
-    plugins.enable = mkEnableOption "plugins";
+    plugins = mkEnableOption "plugins";
     directScanout = mkEnableOption ''
       enable direct scanout. Direct scanout reduces input lag for fullscreen
       applications however might cause graphical glitches.
@@ -88,7 +88,7 @@ in
     animations = mkOption {
       type = types.bool;
       default = true;
-      description = "Whether to enable blur";
+      description = "Whether to enable animations";
     };
 
     modKey = mkOption {

@@ -311,7 +311,7 @@ mkIf (isHyprland config) {
           ]
         ) 10
       ))
-      ++ (optionals cfg.plugins.enable [
+      ++ (optionals cfg.plugins [
         "${mod}, Escape, hyprexpo:expo, toggle"
       ])
       ++ (optionals audio.enable [

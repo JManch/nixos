@@ -57,6 +57,8 @@ mkIf (cfg.enable && desktopEnabled) {
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  # wlsunset sometimes doesn't work after DPMS, restarting fixes it
-  ${ns}.desktop.programs.locker.postUnlockScript = "systemctl restart --user wlsunset";
+  # On some devices wlsunset sometimes doesn't work after DPMS, restarting
+  # fixes it
+  ${ns}.desktop.programs.locker.postUnlockScript =
+    mkIf cfg.restartAfterDPMS "systemctl restart --user wlsunset";
 }

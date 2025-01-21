@@ -236,6 +236,8 @@ in
 
     wlsunset = {
       enable = mkEnableOption "wlsunset";
+      restartAfterDPMS = mkEnableOption "restarting after DPMS";
+
       transition = mkEnableOption ''
         gradually transitioning the screen temperature until sunset instead of
         suddenly switching at the set time. Warning: this tends to cause

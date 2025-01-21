@@ -33,9 +33,13 @@
       services = {
         waybar.enable = true;
         dunst.enable = true;
-        wlsunset.enable = true;
         hypridle.enable = true;
         wayvnc.enable = true;
+
+        wlsunset = {
+          enable = true;
+          restartAfterDPMS = true;
+        };
 
         wallpaper = {
           randomise.enable = true;

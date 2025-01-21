@@ -11,6 +11,18 @@ lib.mkIf cfg.enable {
     extraConfig = {
       init.defaultBranch = "main";
       gpg.format = "ssh";
+      sendemail = {
+        # Protonmail is bad for sending git patches so use gmail for this.
+        # Remember to use correct email in commit author attribute.
+
+        # To setup in a repo:
+        # `git config user.email <gmail_email>`
+        # `git config user.smptuser <gmail_email>`
+        # `git config sendemail.smtpPass <gmail_smtp_pass>`
+        smtpserver = "smtp.gmail.com";
+        smtpencryption = "tls";
+        smtpserverport = 587;
+      };
     };
 
     signing = {

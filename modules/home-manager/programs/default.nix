@@ -54,6 +54,12 @@ in
       };
       hideToolbar = mkEnableOption "automatic toolbar hiding";
       runInRam = mkEnableOption "running Firefox in RAM";
+
+      uiScale = mkOption {
+        type = types.float;
+        default = -1.0;
+        description = "UI scaling factor";
+      };
     };
 
     taskwarrior = {

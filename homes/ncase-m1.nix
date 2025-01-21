@@ -86,6 +86,7 @@
         enable = true;
         hideToolbar = true;
         runInRam = true;
+        uiScale = 0.9;
       };
 
       taskwarrior = {

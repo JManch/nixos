@@ -93,7 +93,7 @@ mkIf (cfg.enable && (osConfig.${ns}.system.desktop.enable or true)) {
           "toolkit.scrollbox.verticalScrollDistance" = 2;
 
           # UI
-          "layout.css.devPixelsPerPx" = 0.9;
+          "layout.css.devPixelsPerPx" = cfg.uiScale;
           "browser.compactmode.show" = true;
           "browser.uidensity" = 1;
           "browser.urlbar.suggest.engines" = false;

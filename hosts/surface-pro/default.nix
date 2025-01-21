@@ -41,6 +41,12 @@
         type = "ext4";
         ext4.trim = true;
       };
+
+      keyd = {
+        enable = true;
+        swapCapsControl = true;
+        swapAltMeta = true;
+      };
     };
 
     system = {

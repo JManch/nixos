@@ -169,6 +169,12 @@ in
         };
       };
     };
+
+    keyd = {
+      enable = mkEnableOption "keyd";
+      swapCapsControl = mkEnableOption "swapping caps lock and left control";
+      swapAltMeta = mkEnableOption "swapping left alt and left meta";
+    };
   };
 
   config = {

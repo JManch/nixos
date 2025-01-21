@@ -32,6 +32,7 @@
         hypridle.enable = true;
         wayvnc.enable = false;
         darkman.enable = true;
+        wluma.enable = true;
 
         wallpaper = {
           randomise.enable = true;

@@ -30,6 +30,7 @@ in
 
   options.${ns}.desktop.services = {
     wayvnc.enable = mkEnableOption "WayVNC";
+    wluma.enable = mkEnableOption "wluma";
 
     darkman = {
       enable = mkEnableOption "Darkman";

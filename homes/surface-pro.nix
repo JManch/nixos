@@ -11,6 +11,7 @@
 
       hyprland = {
         animations = false;
+        blur = false;
       };
 
       programs = {
@@ -26,7 +27,7 @@
         hypridle.enable = true;
         wayvnc.enable = false;
         darkman.enable = true;
-        wluma.enable = true;
+        wluma.enable = false;
         hyprpaper.enable = true;
 
         wallpaper = {
@@ -44,11 +45,11 @@
       neovim.enable = true;
       spotify.enable = true;
       discord.enable = true;
+      chatterino.enable = true;
 
       firefox = {
         enable = true;
         hideToolbar = true;
-        runInRam = true;
       };
     };
   };

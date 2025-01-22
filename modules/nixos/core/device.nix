@@ -193,6 +193,15 @@ in
       '';
     };
 
+    battery = mkOption {
+      type = with types; nullOr str;
+      default = null;
+      example = "BAT1";
+      description = ''
+        Name of the battery device the directory /sys/class/power_supply.
+      '';
+    };
+
     ipAddress = mkOption {
       type = types.nullOr types.str;
       default = null;

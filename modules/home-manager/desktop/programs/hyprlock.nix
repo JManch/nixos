@@ -3,14 +3,17 @@
   pkgs,
   inputs,
   config,
+  osConfig,
   desktopEnabled,
   ...
 }:
 let
   inherit (lib) ns mkIf singleton;
   inherit (config.${ns}) desktop;
+  inherit (osConfig.${ns}.device) primaryMonitor;
   cfg = config.${ns}.desktop.programs.hyprlock;
   colors = config.colorScheme.palette;
+  labelHeight = toString (builtins.ceil (0.035 * primaryMonitor.height * primaryMonitor.scale));
 in
 mkIf (cfg.enable && desktopEnabled) {
   ${ns}.desktop.programs.locker = {
@@ -38,16 +41,18 @@ mkIf (cfg.enable && desktopEnabled) {
         monitor = "";
         text = "$TIME";
         color = "0xff${colors.base07}";
-        font_size = 120;
+        font_size = builtins.ceil (0.046875 * primaryMonitor.width * primaryMonitor.scale);
         font_family = desktop.style.font.family;
-        position = "0, 60";
+        position = "0, ${labelHeight}";
         halign = "center";
         valign = "center";
       };
 
       input-field = singleton {
         monitor = "";
-        size = "447, 60";
+        size = "${
+          toString (builtins.ceil (0.175 * primaryMonitor.width * primaryMonitor.scale))
+        }, ${labelHeight}";
         fade_on_empty = false;
         outline_thickness = 3;
         dots_size = 0.2;
@@ -61,8 +66,8 @@ mkIf (cfg.enable && desktopEnabled) {
         placeholder_text = "<span foreground=\"##${colors.base03}\">Password...</span>";
         fail_text = "<span foreground=\"##${colors.base08}\">Incorrect password</span>";
         hide_input = false;
-        position = "0, -60";
-        rounding = 10;
+        position = "0, -${labelHeight}";
+        rounding = desktop.style.cornerRadius;
         halign = "center";
         valign = "center";
       };

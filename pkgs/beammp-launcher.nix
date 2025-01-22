@@ -11,13 +11,13 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "beammp-launcher";
-  version = "2.3.2";
+  version = "2.4.0";
 
   src = fetchFromGitHub {
     owner = "BeamMP";
     repo = "BeamMP-Launcher";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-1oaTw6fNiDxhhgkqpAAocKtxvRd2RR2MM55NDWjZ1TA=";
+    hash = "sha256-ZSwmX1y8LjWzoJn5ATvvLRf9zOEi+8ERvWuZulV7knI=";
     fetchSubmodules = true;
   };
 

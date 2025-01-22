@@ -197,5 +197,6 @@ mkIf cfg.enable {
         ];
     };
 
+  backups.chatterino.paths = [ ".local/share/chatterino/Settings" ];
   persistence.directories = [ ".local/share/chatterino/Settings" ];
 }

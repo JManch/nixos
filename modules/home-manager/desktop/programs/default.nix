@@ -12,7 +12,6 @@ in
 
   options.${ns}.desktop.programs = {
     fuzzel.enable = mkEnableOption "Fuzzel";
-    swww.enable = mkEnableOption "Swww";
     swaylock.enable = mkEnableOption "Swaylock";
     hyprlock.enable = mkEnableOption "Hyprlock";
 

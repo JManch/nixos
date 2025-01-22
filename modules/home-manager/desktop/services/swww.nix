@@ -13,7 +13,7 @@ let
     getExe
     getExe'
     ;
-  cfg = config.${ns}.desktop.programs.swww;
+  cfg = config.${ns}.desktop.services.swww;
   transition =
     let
       inherit (osConfig.${ns}.device) primaryMonitor;
@@ -23,15 +23,16 @@ let
 in
 mkIf (cfg.enable && desktopEnabled) {
   ${ns}.desktop.services.wallpaper = {
-    setWallpaperCmd = "${getExe pkgs.swww} img ${transition}";
     wallpaperUnit = "swww.service";
+    setWallpaperScript = "${getExe pkgs.swww} img ${transition} \"$1\"";
   };
 
   systemd.user.services.swww = {
     Unit = {
-      Description = "Animated wallpaper daemon";
+      Description = "Swww Wallpaper Daemon";
       Before = [ "set-wallpaper.service" ];
       PartOf = [ "graphical-session.target" ];
+      Requires = [ "graphical-session.target" ];
       After = [ "graphical-session.target" ];
     };
 

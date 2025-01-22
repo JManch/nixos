@@ -31,6 +31,8 @@ in
   options.${ns}.desktop.services = {
     wayvnc.enable = mkEnableOption "WayVNC";
     wluma.enable = mkEnableOption "wluma";
+    swww.enable = mkEnableOption "Swww";
+    hyprpaper.enable = mkEnableOption "Hyprpaper";
 
     darkman = {
       enable = mkEnableOption "Darkman";
@@ -199,17 +201,20 @@ in
           type = types.str;
           default = "weekly";
           description = ''
-            How often to randomly select a new wallpaper. Format is for the systemd timer OnCalendar option.
+            How often to randomly select a new wallpaper. Format is for the
+            systemd timer OnCalendar option.
           '';
           example = "monthly";
         };
       };
 
-      setWallpaperCmd = mkOption {
+      setWallpaperScript = mkOption {
         type = with types; nullOr str;
         default = null;
+        apply = v: if v != null then pkgs.writeShellScript "set-wallpaper" v else null;
         description = ''
-          Command for setting the wallpaper. Must accept the wallpaper image path appended as an argument.
+          Command for setting the wallpaper. First argument passed to the
+          script will be a path to the wallpaper img.
         '';
       };
     };

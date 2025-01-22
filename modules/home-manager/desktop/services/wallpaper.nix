@@ -78,7 +78,7 @@ let
           wallpaper="${cfg.defaults.default}"
         fi
 
-        ${cfg.setWallpaperCmd} "$wallpaper"
+        exec ${cfg.setWallpaperScript} "$wallpaper"
       '';
   };
 
@@ -115,7 +115,7 @@ let
       '';
   };
 in
-mkIf (cfg.setWallpaperCmd != null && desktopEnabled) (mkMerge [
+mkIf (cfg.setWallpaperScript != null && desktopEnabled) (mkMerge [
   {
     systemd.user.services.set-wallpaper = {
       Unit = {
@@ -130,6 +130,7 @@ mkIf (cfg.setWallpaperCmd != null && desktopEnabled) (mkMerge [
 
       Service = {
         Type = "oneshot";
+        ExecStartPre = "${lib.getExe' pkgs.coreutils "sleep"} 2";
         ExecStart = getExe setWallpaper;
       };
 

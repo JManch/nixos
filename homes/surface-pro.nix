@@ -17,7 +17,6 @@
         swaylock.enable = false;
         hyprlock.enable = true;
         fuzzel.enable = true;
-        swww.enable = true;
       };
 
       services = {
@@ -28,6 +27,7 @@
         wayvnc.enable = false;
         darkman.enable = true;
         wluma.enable = true;
+        hyprpaper.enable = true;
 
         wallpaper = {
           randomise.enable = true;

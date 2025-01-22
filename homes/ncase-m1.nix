@@ -27,7 +27,6 @@
         swaylock.enable = false;
         hyprlock.enable = true;
         fuzzel.enable = true;
-        swww.enable = true;
       };
 
       services = {
@@ -35,6 +34,7 @@
         dunst.enable = true;
         hypridle.enable = true;
         wayvnc.enable = true;
+        swww.enable = true;
 
         wlsunset = {
           enable = true;

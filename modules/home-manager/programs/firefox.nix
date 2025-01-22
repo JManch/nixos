@@ -297,6 +297,7 @@ mkIf (cfg.enable && (osConfig.${ns}.system.desktop.enable or true)) {
 
   backups.firefox = mkIf cfg.backup {
     paths = [ ".mozilla" ];
+    exclude = [ ".cache" ];
     restore = mkIf cfg.runInRam {
       preRestoreScript = "systemctl stop --user firefox-persist-init";
       postRestoreScript = "systemctl start --user firefox-persist-init";

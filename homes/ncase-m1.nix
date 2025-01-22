@@ -84,6 +84,7 @@
 
       firefox = {
         enable = true;
+        backup = true;
         hideToolbar = true;
         runInRam = true;
         uiScale = 0.9;

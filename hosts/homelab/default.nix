@@ -1,14 +1,14 @@
 {
   lib,
-  self,
   config,
   inputs,
   ...
-}:
+}@args:
 let
-  inherit (config.${lib.ns}.services) wireguard;
+  inherit (lib) ns;
+  inherit (lib.${ns}) hostIp;
+  inherit (config.${ns}.services) wireguard;
   inherit (inputs.nix-resources.secrets) fqDomain tomFqDomain;
-  ncaseM1IPAddress = self.nixosConfigurations.ncase-m1.config.${lib.ns}.device.ipAddress;
 in
 {
   imports = [
@@ -79,6 +79,7 @@ in
           "192.168.100.0/24"
           "10.20.20.0/24"
           "10.0.0.2/32" # NCASE-M1 on friends VPN
+          "${hostIp "surface-pro" args}/32" # Surface pro on guest network cause no WPA3 support
         ];
         goAccessExcludeIPRanges = [
           "192.168.89.2"
@@ -112,7 +113,8 @@ in
         proxy = true;
         interfaces = [ "wg-friends" ];
         allowedAddresses = [
-          "${ncaseM1IPAddress}/32"
+          "${hostIp "ncase-m1" args}/32"
+          "${hostIp "surface-pro" args}/32"
           "10.20.20.33/32" # pixel 9
         ] ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };
@@ -172,7 +174,8 @@ in
       file-server = {
         enable = true;
         allowedAddresses = [
-          "${ncaseM1IPAddress}/32"
+          "${hostIp "ncase-m1" args}/32"
+          "${hostIp "surface-pro" args}/32"
         ] ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };
 

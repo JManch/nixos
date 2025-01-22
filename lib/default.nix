@@ -124,6 +124,9 @@ in
         patches = (oldAttrs.patches or [ ]) ++ patches;
       });
 
+    hostIp =
+      hostname: args: args.self.nixosConfigurations.${hostname}.config.${args.lib.ns}.device.ipAddress;
+
     upperFirstChar =
       string:
       let

@@ -78,6 +78,7 @@ mkMerge [
     };
 
     systemd.user.services.fumon = {
+      enable = cfg.fumon.enable;
       wantedBy = [ "graphical-session.target" ];
       path = mkForce [ ]; # reason explained in desktop/default.nix
       serviceConfig.ExecStart = [

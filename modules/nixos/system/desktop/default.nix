@@ -22,6 +22,7 @@ let
     scanPaths
     sliceSuffix
     ;
+  inherit (config.${ns}) device;
   inherit (config.${ns}.core) homeManager;
   inherit (config.hm.${ns}.desktop.programs) locker;
   cfg = config.${ns}.system.desktop;
@@ -76,6 +77,16 @@ in
           Attribute set of unit overrides. Attribute name should be the unit
           name without the app-''${desktop} prefix. Attribute value should be
           the multiline unit string.
+        '';
+      };
+
+      fumon.enable = mkOption {
+        type = types.bool;
+        default = device.type != "laptop";
+        description = ''
+          Whether to enable Fumon service monitor. Warning: can cause CPU
+          spikes when launching units so probably best to disable on low
+          powered devices and laptops.
         '';
       };
     };

@@ -14,11 +14,10 @@ mkIf cfg.enable {
           leftcontrol = "capslock";
         })
 
-        (mkIf cfg.swapAltMeta)
-        {
+        (mkIf cfg.swapAltMeta {
           leftmeta = "layer(alt)";
           leftalt = "layer(meta)";
-        }
+        })
       ];
     };
   };

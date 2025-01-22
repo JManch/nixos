@@ -174,6 +174,13 @@ in
       enable = mkEnableOption "keyd";
       swapCapsControl = mkEnableOption "swapping caps lock and left control";
       swapAltMeta = mkEnableOption "swapping left alt and left meta";
+
+      excludedDevices = mkOption {
+        type = with types; listOf str;
+        default = [ ];
+        example = [ "04fe:0021:5b3ab73a" ];
+        description = "List of devices to exclude from keyd";
+      };
     };
   };
 

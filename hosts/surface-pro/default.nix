@@ -46,6 +46,9 @@
         enable = true;
         swapCapsControl = true;
         swapAltMeta = true;
+        excludedDevices = [
+          "04fe:0021:5b3ab73a" # HHKB
+        ];
       };
     };
 

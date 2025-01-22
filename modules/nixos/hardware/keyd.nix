@@ -7,7 +7,7 @@ mkIf cfg.enable {
   services.keyd = {
     enable = true;
     keyboards.main = {
-      ids = [ "*" ];
+      ids = [ "*" ] ++ map (d: "-${d}") cfg.excludedDevices;
       settings.main = mkMerge [
         (mkIf cfg.swapCapsControl {
           capslock = "layer(control)";

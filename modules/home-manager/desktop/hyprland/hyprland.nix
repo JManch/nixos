@@ -31,6 +31,7 @@ let
   inherit (osConfig.${ns}.device) monitors primaryMonitor;
   inherit (desktopCfg.style) gapSize borderWidth;
   cfg = desktopCfg.hyprland;
+  deviceType = osConfig.${ns}.device.type;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
 in
@@ -154,7 +155,7 @@ mkIf (isHyprland config) {
       input = {
         follow_mouse = 1;
         mouse_refocus = true;
-        accel_profile = "flat";
+        accel_profile = mkIf (deviceType != "laptop") "flat";
         sensitivity = 0;
 
         kb_layout = "us";
@@ -165,7 +166,14 @@ mkIf (isHyprland config) {
           output = "current";
           transform = 1;
         };
+
+        touchpad = {
+          natural_scroll = true;
+          scroll_factor = 0.2;
+        };
       };
+
+      gestures.workspace_swipe = true;
 
       cursor = {
         inactive_timeout = 0;

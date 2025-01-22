@@ -8,8 +8,10 @@
   ${lib.ns} = {
     device = {
       type = "laptop";
+      ipAddress = "10.30.30.29";
       memory = 1024 * 8;
       backlight = "intel_backlight";
+      battery = "BAT1";
 
       cpu = {
         name = "i5 7300U";

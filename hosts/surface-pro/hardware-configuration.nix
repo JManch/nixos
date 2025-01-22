@@ -16,5 +16,18 @@
     ];
   };
 
+  systemd.sleep.extraConfig = ''
+    HibernateDelaySec=30m
+    SuspendState=mem
+  '';
+
+  services.logind = {
+    powerKey = "suspend-then-hibernate";
+    powerKeyLongPress = "poweroff";
+    lidSwitch = "suspend-then-hibernate";
+  };
+
+  services.tlp.enable = true;
+
   system.stateVersion = "24.11";
 }

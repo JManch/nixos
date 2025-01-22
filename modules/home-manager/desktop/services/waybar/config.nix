@@ -23,7 +23,12 @@ let
   inherit (lib.${ns}) addPatches sliceSuffix getMonitorByName;
   inherit (config.${ns}) desktop;
   inherit (desktop.services) hypridle;
-  inherit (osConfig.${ns}.device) gpu monitors backlight;
+  inherit (osConfig.${ns}.device)
+    gpu
+    monitors
+    backlight
+    battery
+    ;
   cfg = desktop.services.waybar;
   isHyprland = lib.${ns}.isHyprland config;
   colors = config.colorScheme.palette;
@@ -203,6 +208,28 @@ mkIf (cfg.enable && desktopEnabled) {
           tooltip = false;
         };
 
+        battery = mkIf (battery != null) {
+          format = "<span color='#${colors.base04}'>{icon}</span> {capacity}%";
+          format-charging = "<span color='#${colors.base04}'>󰂄</span> {capacity}%";
+          format-icons = [
+            "󰁺"
+            "󰁻"
+            "󰁼"
+            "󰁽"
+            "󰁾"
+            "󰁿"
+            "󰂀"
+            "󰂁"
+            "󰂂"
+            "󰁹"
+          ];
+          states = {
+            warning = 25;
+            critical = 15;
+          };
+          tooltip = false;
+        };
+
         memory = {
           interval = 30;
           format = "<span color='#${colors.base04}'></span> {used:0.1f}GiB";
@@ -276,6 +303,7 @@ mkIf (cfg.enable && desktopEnabled) {
           ++ [ "memory" ]
           ++ optional (backlight != null) "backlight"
           ++ optional audio.enable "pulseaudio"
+          ++ optional (battery != null) "battery"
           ++ [
             "tray"
             "custom/poweroff"

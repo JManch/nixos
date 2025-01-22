@@ -120,5 +120,13 @@ mkIf (cfg.enable && desktopEnabled) {
       #custom-vpn {
           margin-right: 3px;
       }
+
+      #battery.warning {
+          background: @orange;
+      }
+
+      #battery.critical {
+          background: @red;
+      }
     '';
 }

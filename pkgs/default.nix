@@ -16,6 +16,7 @@ in
   daikin-onecta = pkgs.home-assistant.python.pkgs.callPackage ./daikin-onecta.nix { };
   multiviewer-for-f1 = callPackage ./multiviewer-for-f1.nix { };
   hyprpy = pkgs.python3Packages.callPackage ./hyprpy.nix { };
+  soularr = pkgs.python3Packages.callPackage ./soularr.nix { };
   formulaone-card = callPackage ./formulaone-card.nix { };
   app2unit = callPackage ./app2unit.nix { };
   microfetch = lib.${lib.ns}.addPatches pkgs.microfetch [ ../patches/microfetchIcon.patch ];

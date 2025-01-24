@@ -1,12 +1,11 @@
 {
   lib,
+  cfg,
   pkgs,
   inputs,
   config,
   osConfig,
   vmVariant,
-  desktopEnabled,
-  ...
 }:
 let
   inherit (lib)
@@ -17,17 +16,41 @@ let
     getExe
     getExe'
     singleton
+    mkEnableOption
+    mkOption
+    types
     ;
-  inherit (lib.${ns}) asserts isHyprland sliceSuffix;
+  inherit (lib.${ns}) isHyprland sliceSuffix;
   inherit (config.${ns}.desktop.programs) locker;
-  cfg = config.${ns}.desktop.services.hypridle;
   systemctl = getExe' pkgs.systemd "systemctl";
 in
-mkIf (cfg.enable && desktopEnabled) {
-  assertions = asserts [
+{
+  asserts = [
     (locker.package != null)
-    "Hypridle requires a locker to be enabled"
+    "Hypridle requires a locker to be set"
   ];
+
+  opts = {
+    debug = mkEnableOption "a low timeout idle notification for debugging";
+
+    lockTime = mkOption {
+      type = types.int;
+      default = 3 * 60;
+      description = "Idle seconds to lock screen";
+    };
+
+    suspendTime = mkOption {
+      type = with types; nullOr int;
+      default = null;
+      description = "Idle seconds to suspend";
+    };
+
+    screenOffTime = mkOption {
+      type = types.int;
+      default = 30;
+      description = "Seconds to turn off screen after locking";
+    };
+  };
 
   services.hypridle = {
     enable = true;
@@ -64,7 +87,7 @@ mkIf (cfg.enable && desktopEnabled) {
     };
   };
 
-  ${ns}.desktop.programs.locker.postLockScript =
+  nsConfig.desktop.programs.locker.postLockScript =
     let
       hyprctl = getExe' pkgs.hyprland "hyprctl";
       jaq = getExe pkgs.jaq;

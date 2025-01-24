@@ -4,12 +4,10 @@
   config,
   hostname,
   osConfig,
-  ...
 }:
 let
   inherit (lib)
     ns
-    mkIf
     getExe
     getExe'
     optionalString
@@ -38,15 +36,25 @@ let
       endpoint = "webhook/${toLower hostname}-active";
     });
 in
-mkIf (osConfig.${ns}.device.hassIntegration.enable or false) {
-  ${ns} = {
-    services.hass.curlCommand = curlCommand;
+{
+  enableOpt = false;
+  conditions = "osConfigStrict.device.hassIntegration";
 
-    # Update the active state when locking
-    desktop.programs.locker = {
-      postLockScript = "${systemctl} stop --user hass-active-heartbeat";
-      postUnlockScript = "${systemctl} start --user hass-active-heartbeat";
+  opts.curlCommand =
+    with lib;
+    mkOption {
+      type = types.functionTo types.str;
+      readOnly = true;
+      default = curlCommand;
+      description = ''
+        Function for generating a curl command to query the hass API
+      '';
     };
+
+  # Update the active state when locking
+  nsConfig.desktop.programs.locker = {
+    postLockScript = "${systemctl} stop --user hass-active-heartbeat";
+    postUnlockScript = "${systemctl} start --user hass-active-heartbeat";
   };
 
   systemd.user.services.hass-active-heartbeat = {

@@ -137,20 +137,24 @@ mkIf cfg.enable {
   ];
 
   hm = mkIf homeManager.enable {
-    ${ns}.programs.gaming = {
-      gameClasses = [
-        "steam_app_.*"
-        "cs2"
-        "factorio"
-        "hl2_linux"
-      ];
+    ${ns} = {
+      programs.desktop.gaming = {
+        gameClasses = [
+          "steam_app_.*"
+          "cs2"
+          "factorio"
+          "hl2_linux"
+        ];
 
-      tearingExcludedClasses =
-        map (game: "steam_app_" + toString steamAppIDs.${game}) [
-          "Red Dead Redemption 2" # half-vsync without tearing is preferrable
-          "Noita" # tearing lags cursor
-        ]
-        ++ [ "factorio" ];
+        tearingExcludedClasses =
+          map (game: "steam_app_" + toString steamAppIDs.${game}) [
+            "Red Dead Redemption 2" # half-vsync without tearing is preferrable
+            "Noita" # tearing lags cursor
+          ]
+          ++ [ "factorio" ];
+      };
+
+      persistence.directories = [ ".factorio" ];
     };
 
     # Fix slow steam client downloads https://redd.it/16e1l4h
@@ -179,7 +183,5 @@ mkIf cfg.enable {
       "size 360 700, class:^(steam)$, title:^(Friends List)$"
       "center, class:^(steam)$, title:^(Friends List)$"
     ];
-
-    persistence.directories = [ ".factorio" ];
   };
 }

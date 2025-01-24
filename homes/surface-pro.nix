@@ -1,8 +1,6 @@
 { lib, ... }:
 {
   ${lib.ns} = {
-    shell.enable = true;
-
     desktop = {
       enable = true;
       terminal = "Alacritty";
@@ -38,18 +36,24 @@
     };
 
     programs = {
-      alacritty.enable = true;
-      btop.enable = true;
-      cava.enable = true;
-      git.enable = true;
-      neovim.enable = true;
-      spotify.enable = true;
-      discord.enable = true;
-      chatterino.enable = true;
-
-      firefox = {
+      shell = {
         enable = true;
-        hideToolbar = true;
+        btop.enable = true;
+        cava.enable = true;
+        git.enable = true;
+        neovim.enable = true;
+      };
+
+      desktop = {
+        alacritty.enable = true;
+        spotify.enable = true;
+        discord.enable = true;
+        chatterino.enable = true;
+
+        firefox = {
+          enable = true;
+          hideToolbar = true;
+        };
       };
     };
   };

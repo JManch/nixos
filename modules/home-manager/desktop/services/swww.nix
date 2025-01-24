@@ -1,19 +1,10 @@
 {
   lib,
   pkgs,
-  config,
   osConfig,
-  desktopEnabled,
-  ...
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    getExe
-    getExe'
-    ;
-  cfg = config.${ns}.desktop.services.swww;
+  inherit (lib) ns getExe getExe';
   transition =
     let
       inherit (osConfig.${ns}.device) primaryMonitor;
@@ -21,8 +12,8 @@ let
     in
     "--transition-bezier .43,1.19,1,.4 --transition-type center --transition-duration 1 --transition-fps ${refreshRate}";
 in
-mkIf (cfg.enable && desktopEnabled) {
-  ${ns}.desktop.services.wallpaper = {
+{
+  categoryConfig.wallpaper = {
     wallpaperUnit = "swww.service";
     setWallpaperScript = "${getExe pkgs.swww} img ${transition} \"$1\"";
   };

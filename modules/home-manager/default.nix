@@ -1,4 +1,9 @@
-{ lib, ... }:
+{ lib, ... }@args:
 {
-  imports = lib.${lib.ns}.scanPaths ./.;
+  imports = (
+    lib.${lib.ns}.importCategories {
+      inherit args;
+      rootDir = ./.;
+    }
+  );
 }

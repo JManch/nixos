@@ -1,19 +1,15 @@
 {
   lib,
   pkgs,
-  config,
   osConfig,
-  desktopEnabled,
-  ...
 }:
 let
-  inherit (lib) ns mkIf getExe;
-  inherit (lib.${ns}) asserts sliceSuffix;
+  inherit (lib) ns getExe;
+  inherit (lib.${ns}) sliceSuffix;
   inherit (osConfig.${ns}.device) primaryMonitor backlight;
-  cfg = config.${ns}.desktop.services.wluma;
 in
-mkIf (cfg.enable && desktopEnabled) {
-  assertions = asserts [
+{
+  asserts = [
     (backlight != null)
     "wluma requires the device to have a backlight"
   ];
@@ -44,5 +40,5 @@ mkIf (cfg.enable && desktopEnabled) {
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  persistence.directories = [ ".local/share/wluma" ];
+  nsConfig.persistence.directories = [ ".local/share/wluma" ];
 }

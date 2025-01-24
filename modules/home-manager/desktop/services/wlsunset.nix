@@ -11,8 +11,6 @@
   pkgs,
   config,
   osConfig,
-  desktopEnabled,
-  ...
 }:
 let
   inherit (lib) ns mkIf getExe;
@@ -20,7 +18,17 @@ let
   latitude = "50.8";
   longitude = "-0.1";
 in
-mkIf (cfg.enable && desktopEnabled) {
+{
+  opts = with lib; {
+    restartAfterDPMS = mkEnableOption "restarting after DPMS";
+
+    transition = mkEnableOption ''
+      gradually transitioning the screen temperature until sunset instead of
+      suddenly switching at the set time. Warning: this tends to cause
+      stuttering and artifacting as the transition is happening.
+    '';
+  };
+
   # We don't use the home-manager module because it's missing options
   systemd.user.services.wlsunset = {
     Unit = {
@@ -59,6 +67,6 @@ mkIf (cfg.enable && desktopEnabled) {
 
   # On some devices wlsunset sometimes doesn't work after DPMS, restarting
   # fixes it
-  ${ns}.desktop.programs.locker.postUnlockScript =
+  nsConfig.desktop.programs.locker.postUnlockScript =
     mkIf cfg.restartAfterDPMS "systemctl restart --user wlsunset";
 }

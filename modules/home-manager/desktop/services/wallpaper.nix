@@ -1,21 +1,23 @@
 {
   lib,
+  cfg,
+  args,
   pkgs,
   config,
-  desktopEnabled,
-  ...
-}@args:
+  inputs,
+}:
 let
   inherit (lib)
     ns
     mkIf
-    mkMerge
     boolToString
+    mkEnableOption
     optional
     getExe
+    mkOption
+    types
     ;
   inherit (config.${ns}.desktop.services) darkman;
-  cfg = config.${ns}.desktop.services.wallpaper;
   wallpaperCache = "${config.xdg.cacheHome}/wallpaper";
   wallpapers =
     type: "${(lib.${ns}.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers"}/wallpapers";
@@ -115,8 +117,73 @@ let
       '';
   };
 in
-mkIf (cfg.setWallpaperScript != null && desktopEnabled) (mkMerge [
+[
   {
+    enableOpt = false;
+    conditions = [ (cfg.setWallpaperScript != null) ];
+
+    opts = {
+      defaults = {
+        default = mkOption {
+          type = types.package;
+          default = inputs.nix-resources.packages.${pkgs.system}.wallpapers.rx7;
+          description = ''
+            The default wallpaper to use if randomise is disabled.
+          '';
+        };
+
+        dark = mkOption {
+          type = types.package;
+          default = cfg.defaults.default;
+          description = ''
+            The dark theme wallpaper to use if randomise is disabled and
+            darkman is enabled.
+          '';
+        };
+
+        light = mkOption {
+          type = types.package;
+          default = cfg.defaults.default;
+          description = ''
+            The light theme wallpaper to use if randomise is disabled and
+            darkman is enabled.
+          '';
+        };
+      };
+
+      wallpaperUnit = mkOption {
+        type = types.str;
+        example = "swww.service";
+        description = ''
+          Unit of the wallpaper managager.
+        '';
+      };
+
+      randomise = {
+        enable = mkEnableOption "random wallpaper selection";
+
+        frequency = mkOption {
+          type = types.str;
+          default = "weekly";
+          description = ''
+            How often to randomly select a new wallpaper. Format is for the
+            systemd timer OnCalendar option.
+          '';
+          example = "monthly";
+        };
+      };
+
+      setWallpaperScript = mkOption {
+        type = with types; nullOr str;
+        default = null;
+        apply = v: if v != null then pkgs.writeShellScript "set-wallpaper" v else null;
+        description = ''
+          Command for setting the wallpaper. First argument passed to the
+          script will be a path to the wallpaper img.
+        '';
+      };
+    };
+
     systemd.user.services.set-wallpaper = {
       Unit = {
         Description = "Set the desktop wallpaper";
@@ -139,7 +206,7 @@ mkIf (cfg.setWallpaperScript != null && desktopEnabled) (mkMerge [
   }
 
   (mkIf cfg.randomise.enable {
-    persistence.directories = [ ".cache/wallpaper" ];
+    ${ns}.persistence.directories = [ ".cache/wallpaper" ];
 
     programs.zsh.shellAliases.randomise-wallpaper = "systemctl start --user randomise-wallpaper";
 
@@ -177,4 +244,4 @@ mkIf (cfg.setWallpaperScript != null && desktopEnabled) (mkMerge [
       };
     };
   })
-])
+]

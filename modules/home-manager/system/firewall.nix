@@ -19,7 +19,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-{ lib, ... }:
+{ lib }:
 let
   inherit (lib) mkOption types;
 
@@ -81,7 +81,8 @@ let
   };
 in
 {
-  options.firewall = {
+  enableOpt = false;
+  nsOpts.firewall = {
     interfaces = mkOption {
       default = { };
       type = with types; attrsOf (submodule [ { options = commonOptions; } ]);

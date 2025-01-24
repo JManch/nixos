@@ -6,8 +6,6 @@
       backupFiles = true;
     };
 
-    shell.enable = true;
-
     desktop = {
       enable = true;
       terminal = "Alacritty";
@@ -35,11 +33,7 @@
         hypridle.enable = true;
         wayvnc.enable = true;
         swww.enable = true;
-
-        wlsunset = {
-          enable = true;
-          restartAfterDPMS = true;
-        };
+        wlsunset.enable = true;
 
         wallpaper = {
           randomise.enable = true;
@@ -55,54 +49,61 @@
     };
 
     programs = {
-      alacritty.enable = true;
-      ghostty.enable = true;
-      btop.enable = true;
-      cava.enable = true;
-      torBrowser.enable = true;
-      git.enable = true;
-      neovim.enable = true;
-      spotify.enable = true;
-      fastfetch.enable = true;
-      discord.enable = true;
-      obs.enable = true;
-      vscode.enable = true;
-      mpv.enable = true;
-      mpv.jellyfinShim.enable = true;
-      chatterino.enable = true;
-      images.enable = true;
-      anki.enable = true;
-      zathura.enable = true;
-      qbittorrent.enable = true;
-      filenDesktop.enable = true;
-      multiviewerF1.enable = true;
-      chromium.enable = true;
-      foliate.enable = true;
-      rnote.enable = true;
-      jellyfin-media-player.enable = true;
-      davinci-resolve.enable = false;
-
-      firefox = {
+      shell = {
         enable = true;
-        backup = true;
-        hideToolbar = true;
-        runInRam = true;
-        uiScale = 0.9;
+        btop.enable = true;
+        cava.enable = true;
+        git.enable = true;
+        fastfetch.enable = true;
+        neovim.enable = true;
+
+        taskwarrior = {
+          enable = true;
+          primaryClient = true;
+        };
       };
 
-      taskwarrior = {
-        enable = true;
-        primaryClient = true;
-      };
+      desktop = {
+        alacritty.enable = true;
+        ghostty.enable = true;
+        torBrowser.enable = true;
+        spotify.enable = true;
+        discord.enable = true;
+        obs.enable = true;
+        vscode.enable = true;
+        mpv.enable = true;
+        mpv.jellyfinShim.enable = true;
+        chatterino.enable = true;
+        images.enable = true;
+        anki.enable = true;
+        zathura.enable = true;
+        qbittorrent.enable = true;
+        filenDesktop.enable = true;
+        multiviewerF1.enable = true;
+        chromium.enable = true;
+        foliate.enable = true;
+        rnote.enable = true;
+        jellyfinMediaPlayer.enable = true;
+        davinciResolve.enable = false;
 
-      gaming = {
-        mangohud.enable = true;
-        r2modman.enable = true;
-        bottles.enable = true;
-        prism-launcher.enable = true;
-        mint.enable = false; # broken package
-        ryujinx.enable = true;
-        osu.enable = true;
+        firefox = {
+          enable = true;
+          backup = true;
+          hideToolbar = true;
+          runInRam = true;
+          uiScale = 0.9;
+        };
+
+        gaming = {
+          mangohud.enable = true;
+          r2modman.enable = true;
+          bottles.enable = true;
+          prismLauncher.enable = true;
+          mint.enable = false; # broken package
+          ryujinx.enable = true;
+          osu.enable = true;
+          beamng.enable = true;
+        };
       };
     };
 

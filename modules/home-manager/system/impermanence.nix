@@ -1,11 +1,10 @@
-{ lib, ... }:
+{ lib }:
 let
   inherit (lib) mkOption types;
 in
 {
-  # Custom persistence options for home-manager so that we can set the NixOS
-  # persistence config from home-manager
-  options.persistence = {
+  enableOpt = false;
+  nsOpts.persistence = {
     directories = mkOption {
       type = with types; listOf (coercedTo str (d: { directory = d; }) attrs);
       default = [ ];

@@ -25,7 +25,7 @@ let
   inherit (config.${ns}.core) homeManager;
   inherit (config.${ns}.system) desktop;
   cfg = config.${ns}.system.networking;
-  homeFirewall = config.hm.firewall;
+  homeFirewall = config.hm.${ns}.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
   ip = getExe' pkgs.iproute2 "ip";
   vlanIds = attrNames cfg.vlans;

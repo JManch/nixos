@@ -17,23 +17,22 @@
       };
     };
 
-    programs = {
+    programs.desktop = {
       firefox.enable = false;
       firefox.backup = false;
       anki.enable = true;
       rnote.enable = true;
       multiviewerF1.enable = true;
-      cava.enable = true;
-      jellyfin-media-player.enable = true;
+      jellyfinMediaPlayer.enable = true;
 
       gaming = {
         mangohud.enable = true;
-        prism-launcher.enable = true;
+        prismLauncher.enable = true;
       };
     };
-  };
 
-  backups.documents.paths = [ "Documents" ];
+    backups.documents.paths = [ "Documents" ];
+  };
 
   home.stateVersion = "24.05";
 }

@@ -3,18 +3,15 @@
   pkgs,
   config,
   osConfig,
-  desktopEnabled,
-  ...
 }:
 let
   inherit (lib) ns mkIf;
   inherit (osConfig.${ns}.device) primaryMonitor;
   inherit (osConfig.programs) uwsm;
-  cfg = desktopCfg.programs.fuzzel;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
 in
-mkIf (cfg.enable && desktopEnabled) {
+{
   programs.fuzzel = {
     enable = true;
 
@@ -71,7 +68,7 @@ mkIf (cfg.enable && desktopEnabled) {
 
   darkman.switchApps.fuzzel =
     let
-      inherit (config.${ns}.colorScheme) dark light;
+      inherit (config.${ns}.core.colorScheme) dark light;
     in
     {
       paths = [ ".config/fuzzel/fuzzel.ini" ];

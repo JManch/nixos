@@ -1,11 +1,12 @@
 {
   lib,
+  cfg,
+  args,
   pkgs,
   config,
   osConfig,
   vmVariant,
-  ...
-}@args:
+}:
 let
   inherit (lib)
     ns
@@ -24,32 +25,27 @@ let
   inherit (lib.${ns})
     flakePkgs
     sliceSuffix
-    isHyprland
-    asserts
     getMonitorHyprlandCfgStr
     ;
   inherit (osConfig.${ns}.device) monitors primaryMonitor;
   inherit (desktopCfg.style) gapSize borderWidth;
-  cfg = desktopCfg.hyprland;
   deviceType = osConfig.${ns}.device.type;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
 in
-mkIf (isHyprland config) {
-  assertions = asserts [
-    (!(osConfig.xdg.portal.enable or false))
+{
+  asserts = [
+    (!osConfig.xdg.portal.enable)
     "The os xdg portal must be disabled when using Hyprland as it is configured using home-manager"
   ];
 
-  ${ns}.desktop = {
-    # Optimise for performance in VM variant
-    hyprland = mkIf vmVariant (mkVMOverride {
-      tearing = false;
-      directScanout = false;
-      blur = false;
-      animations = false;
-    });
-  };
+  # Optimise for performance in VM variant
+  categoryConfig = mkIf vmVariant (mkVMOverride {
+    tearing = false;
+    directScanout = false;
+    blur = false;
+    animations = false;
+  });
 
   home.packages =
     [ (flakePkgs args "grimblast").grimblast ]
@@ -278,7 +274,7 @@ mkIf (isHyprland config) {
 
   darkman.switchApps.hyprland =
     let
-      inherit (config.${ns}.colorScheme) colorMap dark;
+      inherit (config.${ns}.core.colorScheme) colorMap dark;
       hyprctl = getExe' pkgs.hyprland "hyprctl";
       mapDarkColor = base: colorMap.${base} // { light = dark.palette.${base}; };
     in

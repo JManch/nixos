@@ -35,25 +35,23 @@
 # base0F: "#E6BA7E"
 {
   lib,
-  config,
+  cfg,
   inputs,
-  ...
 }:
 let
   inherit (lib)
-    ns
     types
     mkOption
     genAttrs
     attrNames
     ;
   inherit (cfg) light dark;
-  cfg = config.${ns}.colorScheme;
 in
 {
+  enableOpt = false;
   imports = [ inputs.nix-colors.homeManagerModules.default ];
 
-  options.${ns}.colorScheme = {
+  opts = {
     dark = mkOption {
       type = types.attrs;
       default = inputs.nix-colors.colorSchemes.ayu-mirage;
@@ -102,7 +100,5 @@ in
     };
   };
 
-  config = {
-    colorScheme = cfg.dark;
-  };
+  colorScheme = dark;
 }

@@ -1,11 +1,11 @@
 {
   lib,
+  cfg,
   pkgs,
+  self,
   config,
   hostname,
   osConfig,
-  desktopEnabled,
-  ...
 }:
 let
   inherit (lib)
@@ -29,7 +29,6 @@ let
     backlight
     battery
     ;
-  cfg = desktop.services.waybar;
   isHyprland = lib.${ns}.isHyprland config;
   colors = config.colorScheme.palette;
   gapSize = toString desktop.style.gapSize;
@@ -57,7 +56,7 @@ let
       )}
     '';
 in
-mkIf (cfg.enable && desktopEnabled) {
+{
   programs.waybar = {
     enable = true;
     systemd.enable = true;
@@ -74,9 +73,9 @@ mkIf (cfg.enable && desktopEnabled) {
     # custom module signal functionality that I don't use.
     package =
       (addPatches pkgs.waybar [
-        ../../../../../patches/waybarDisableReload.patch
+        "waybarDisableReload.patch"
         (pkgs.substituteAll {
-          src = ../../../../../patches/waybarSignalToggle.patch;
+          src = "${self}/patches/waybarSignalToggle.patch";
           sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
             sort (a: b: a.number < b.number) monitors
           );

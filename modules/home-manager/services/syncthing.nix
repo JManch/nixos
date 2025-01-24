@@ -1,15 +1,26 @@
 {
   lib,
+  cfg,
   config,
   vmVariant,
-  ...
 }:
 let
-  inherit (lib) ns mkIf optional;
+  inherit (lib) optional;
   inherit (config.home) username;
-  cfg = config.${ns}.services.syncthing;
 in
-mkIf (cfg.enable && !vmVariant) {
+{
+  conditions = [ (!vmVariant) ];
+
+  opts = with lib; {
+    exposeWebGUI = mkEnableOption "exposing the web GUI";
+
+    port = mkOption {
+      type = types.port;
+      default = 8384;
+      description = "Web GUI listening port";
+    };
+  };
+
   services.syncthing = {
     enable = true;
     extraOptions = [
@@ -27,11 +38,13 @@ mkIf (cfg.enable && !vmVariant) {
     };
   };
 
-  firewall.allowedTCPPorts = [ 22000 ] ++ optional cfg.exposeWebGUI cfg.port;
-  firewall.allowedUDPPorts = [
-    22000
-    21027
-  ];
+  nsConfig = {
+    firewall.allowedTCPPorts = [ 22000 ] ++ optional cfg.exposeWebGUI cfg.port;
+    firewall.allowedUDPPorts = [
+      22000
+      21027
+    ];
 
-  persistence.directories = [ ".config/syncthing" ];
+    persistence.directories = [ ".config/syncthing" ];
+  };
 }

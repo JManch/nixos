@@ -1,27 +1,32 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   osConfig,
-  desktopEnabled,
-  ...
 }:
 let
   inherit (lib)
     ns
-    mkIf
     getExe'
     mkForce
+    mkOption
+    types
     ;
   inherit (config.${ns}) desktop;
-  inherit (config.${ns}.colorScheme) light;
+  inherit (config.${ns}.core.colorScheme) light;
   inherit (osConfig.${ns}.device) primaryMonitor;
-  cfg = desktop.services.dunst;
   colors = config.colorScheme.palette;
   systemctl = getExe' pkgs.systemd "systemctl";
   dunstctl = getExe' config.services.dunst.package "dunstctl";
 in
-mkIf (cfg.enable && desktopEnabled) {
+{
+  opts.monitorNumber = mkOption {
+    type = types.int;
+    default = 1;
+    description = "The monitor number to display notifications on";
+  };
+
   services.dunst = {
     enable = true;
 
@@ -103,7 +108,7 @@ mkIf (cfg.enable && desktopEnabled) {
     };
   };
 
-  ${ns}.desktop.programs.locker = {
+  nsConfig.desktop.programs.locker = {
     preLockScript = "${dunstctl} set-paused true";
     postUnlockScript = "${dunstctl} set-paused false";
   };

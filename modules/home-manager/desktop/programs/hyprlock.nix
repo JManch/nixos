@@ -4,19 +4,16 @@
   inputs,
   config,
   osConfig,
-  desktopEnabled,
-  ...
 }:
 let
-  inherit (lib) ns mkIf singleton;
+  inherit (lib) ns singleton;
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.device) primaryMonitor;
-  cfg = config.${ns}.desktop.programs.hyprlock;
   colors = config.colorScheme.palette;
   labelHeight = toString (builtins.ceil (0.035 * primaryMonitor.height * primaryMonitor.scale));
 in
-mkIf (cfg.enable && desktopEnabled) {
-  ${ns}.desktop.programs.locker = {
+{
+  categoryConfig.locker = {
     package = config.programs.hyprlock.package;
     immediateFlag = "--immediate";
   };

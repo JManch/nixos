@@ -1,10 +1,6 @@
+{ pkgs }:
 {
-  lib,
-  pkgs,
-  desktopEnabled,
-  ...
-}:
-lib.mkIf desktopEnabled {
+  enableOpt = false;
   home.packages = [ pkgs.nautilus ];
 
   desktop.hyprland.settings.windowrulev2 = [

@@ -3,8 +3,6 @@
   pkgs,
   config,
   inputs,
-  desktopEnabled,
-  ...
 }:
 let
   inherit (lib)
@@ -13,10 +11,10 @@ let
     getExe'
     optionalString
     ;
-  inherit (config.${ns}) colorScheme;
-  inherit (cfg.style) cursor customTheme;
+  inherit (config.${ns}.core) colorScheme;
+  inherit (config.${ns}) desktop;
+  inherit (desktop.style) cursor customTheme;
   inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) gtkThemeFromScheme;
-  cfg = config.${ns}.desktop;
 
   # Rather than generating a custom gtk.css file from our base16 colorscheme
   # like stylix does, we generate patched versions of Materia. This is because
@@ -26,7 +24,9 @@ let
   darkTheme = gtkThemeFromScheme { scheme = colorScheme.dark; };
   lightTheme = gtkThemeFromScheme { scheme = colorScheme.light; };
 in
-mkIf desktopEnabled {
+{
+  enableOpt = false;
+
   home.packages = mkIf customTheme [
     darkTheme
     lightTheme

@@ -3,15 +3,15 @@
   pkgs,
   config,
   osConfig,
-  desktopEnabled,
-  ...
 }:
 let
-  inherit (lib) ns mkIf optionalAttrs;
+  inherit (lib) ns optionalAttrs;
   cfg = config.${ns}.desktop.xdg;
   home = config.home.homeDirectory;
 in
-mkIf desktopEnabled {
+{
+  enableOpt = false;
+
   # Many applications need this for xdg-open url opening however packages
   # rarely include is as a dependency for some reason
   home.packages = [ pkgs.xdg-utils ];

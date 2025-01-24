@@ -1,19 +1,12 @@
-{
-  lib,
-  config,
-  desktopEnabled,
-  ...
-}:
+{ lib, config }:
 let
-  inherit (lib) ns mkIf;
-  cfg = desktopCfg.services.waybar;
-  desktopCfg = config.${ns}.desktop;
+  inherit (config.${lib.ns}) desktop;
   colors = config.colorScheme.palette;
 in
-mkIf (cfg.enable && desktopEnabled) {
+{
   programs.waybar.style =
     let
-      inherit (desktopCfg.style)
+      inherit (desktop.style)
         cornerRadius
         borderWidth
         font

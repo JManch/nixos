@@ -3,8 +3,6 @@
   pkgs,
   config,
   osConfig,
-  desktopEnabled,
-  ...
 }:
 let
   inherit (lib)
@@ -15,9 +13,8 @@ let
     ;
   inherit (lib.${ns}) sliceSuffix isHyprland;
   inherit (osConfig.${ns}.device) primaryMonitor;
-  cfg = config.${ns}.desktop.services.wayvnc;
 in
-mkIf (cfg.enable && desktopEnabled) {
+{
   home.packages = [ pkgs.wayvnc ];
 
   systemd.user.services.wayvnc = {

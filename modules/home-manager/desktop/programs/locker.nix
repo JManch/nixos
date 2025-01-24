@@ -1,29 +1,74 @@
 {
   lib,
+  cfg,
   pkgs,
-  config,
   osConfig,
-  ...
 }:
 let
   inherit (lib)
-    ns
-    mkIf
     getExe
     optionalString
     escapeShellArg
+    mkOption
+    types
     ;
-  cfg = config.${ns}.desktop.programs.locker;
   # https://discourse.nixos.org/t/not-allowed-to-refer-to-a-store-path-error/5226
   lockerName = builtins.unsafeDiscardStringContext (builtins.baseNameOf (getExe cfg.package));
 in
-mkIf (cfg.package != null) {
-  assertions = lib.${ns}.asserts [
+{
+  enableOpt = false;
+  conditions = [ (cfg.package != null) ];
+
+  asserts = [
     osConfig.programs.uwsm.enable
     "Locker requires UWSM to be enabled"
   ];
 
-  ${ns}.desktop = {
+  opts = {
+    package = mkOption {
+      type = with types; nullOr package;
+      default = null;
+      description = "The package to use for locking";
+    };
+
+    immediateFlag = mkOption {
+      type = with types; nullOr str;
+      default = null;
+      description = ''
+        Flag for immediate locking (meaning skipping the grace period). Leave
+        null if unsupported.
+      '';
+    };
+
+    preLockScript = mkOption {
+      type = types.lines;
+      default = "";
+      apply = pkgs.writeShellScript "pre-lock-script";
+      description = "Bash script to run before locking";
+    };
+
+    postLockScript = mkOption {
+      type = types.lines;
+      default = "";
+      apply = pkgs.writeShellScript "post-lock-script";
+      description = "Bash script to run after locking";
+    };
+
+    postUnlockScript = mkOption {
+      type = types.lines;
+      default = "";
+      apply = pkgs.writeShellScript "post-unlock-script";
+      description = "Bash script to run after locking";
+    };
+
+    lockScript = mkOption {
+      type = types.str;
+      readOnly = true;
+      description = "Script that locks the screen";
+    };
+  };
+
+  nsConfig.desktop = {
     programs.locker.lockScript =
       (pkgs.writeShellScript "lock-script" # bash
         ''

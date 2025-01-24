@@ -121,7 +121,9 @@ in
     addPatches =
       pkg: patches:
       pkg.overrideAttrs (oldAttrs: {
-        patches = (oldAttrs.patches or [ ]) ++ patches;
+        patches =
+          # FIX: Once I've migrated all addPatches usuage don't allow abs paths
+          (oldAttrs.patches or [ ]) ++ (map (p: if hasPrefix "/" p then p else "${../patches}/${p}") patches);
       });
 
     hostIp =

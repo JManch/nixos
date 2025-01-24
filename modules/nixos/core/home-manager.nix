@@ -42,12 +42,12 @@ in
         { ${username} = import ../../../homes/${hostname}.nix; }
         (mkIf (username != adminUsername) {
           ${adminUsername} = {
-            ${ns} = {
-              shell.enable = true;
-              shell.promptColor = "purple";
-              programs.git.enable = true;
-              programs.neovim.enable = true;
-              programs.btop.enable = true;
+            ${ns}.programs.shell = {
+              enable = true;
+              promptColor = "purple";
+              git.enable = true;
+              neovim.enable = true;
+              btop.enable = true;
             };
             home.stateVersion = config.hm.home.stateVersion;
           };
@@ -61,7 +61,6 @@ in
         inherit (args)
           self
           selfPkgs
-          ns
           ;
       };
     };

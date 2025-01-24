@@ -1,23 +1,15 @@
 {
   lib,
   pkgs,
-  config,
+  args,
   osConfig,
-  desktopEnabled,
-  ...
-}@args:
+}:
 let
-  inherit (lib)
-    ns
-    mkIf
-    getExe
-    getExe'
-    ;
-  cfg = config.${ns}.desktop.services.hyprpaper;
+  inherit (lib) ns getExe getExe';
   hyprctl = getExe' pkgs.hyprland "hyprctl";
 in
-mkIf (cfg.enable && desktopEnabled) {
-  ${ns}.desktop.services.wallpaper = {
+{
+  categoryConfig.wallpaper = {
     wallpaperUnit = "hyprpaper.service";
     setWallpaperScript = ''
       ${hyprctl} hyprpaper preload "$1"

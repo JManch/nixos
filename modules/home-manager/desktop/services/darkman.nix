@@ -1,11 +1,10 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   osConfig,
   vmVariant,
-  desktopEnabled,
-  ...
 }:
 let
   inherit (lib)
@@ -25,26 +24,149 @@ let
     mkVMOverride
     optionalAttrs
     listToAttrs
+    mkOption
+    types
+    mkAliasOptionModule
     ;
-  inherit (lib.${ns}) asserts addPatches sliceSuffix;
+  inherit (lib.${ns}) addPatches sliceSuffix;
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.device) hassIntegration;
   inherit (config.${ns}.services.hass) curlCommand;
   inherit (config.xdg) dataHome;
   inherit (config.services) darkman;
-  cfg = desktop.services.darkman;
 in
-mkIf (cfg.enable && desktopEnabled) {
-  assertions = asserts [
+{
+  asserts = [
     (cfg.switchMethod == "hass" -> hassIntegration.enable)
     "Darkman 'hass' switch mode requires the device to have hass integration enabled"
   ];
 
+  imports = [
+    (mkAliasOptionModule
+      [ "darkman" ]
+      [
+        ns
+        "desktop"
+        "services"
+        "darkman"
+      ]
+    )
+  ];
+
+  opts = {
+    switchMethod = mkOption {
+      type = types.enum [
+        "manual"
+        "coordinates"
+        "hass"
+      ];
+      default = "coordinates";
+      description = ''
+        Manual means the theme will not switch automatically. Coordinates
+        uses the configured longitude and latitude to switch at sunrise and
+        sunset. Hass uses a home assistant brightness entity to select the
+        theme.
+      '';
+    };
+
+    hassEntity = mkOption {
+      type = types.str;
+      description = ''
+        Hass binary_sensor entity to determine dark mode toggle
+      '';
+    };
+
+    switchScripts = mkOption {
+      type = types.attrsOf (types.functionTo types.lines);
+      default = { };
+      description = ''
+        Attribute set of functions that accept a string "dark" or "light"
+        and provide a script for making the theme switch.
+      '';
+    };
+
+    switchApps = mkOption {
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            paths = mkOption {
+              type = with types; listOf str;
+              default = [ ];
+              example = [
+                "waybar/config"
+                "waybar/style.css"
+              ];
+              description = ''
+                List of paths relative to $HOME that point to files managed
+                by home-manager that contain hex colors we want to switch
+              '';
+            };
+
+            format = mkOption {
+              type = with types; functionTo str;
+              default = c: c;
+              example = c: "#${c}";
+              description = ''
+                Function to apply a custom color format. For example, if the
+                configuration file expects colors to be prefixed with #.
+              '';
+            };
+
+            reloadScript = mkOption {
+              type = types.lines;
+              default = "";
+              description = "Bash script to execute when switching colorschemes";
+            };
+
+            colorOverrides = mkOption {
+              type = types.attrs;
+              default = { };
+              example = {
+                base00 = {
+                  dark = config.${ns}.core.colorScheme.dark.palette.base00;
+                  light = config.${ns}.core.colorScheme.light.palette.base02;
+                };
+              };
+              description = ''
+                Attribute set of base colors with dark and light variants that will
+                override the default base color map.
+              '';
+            };
+
+            extraReplacements = mkOption {
+              type = with types; listOf attrs;
+              default = [ ];
+              example = [
+                {
+                  dark = "opacity = 0.7";
+                  light = "opacity = 1";
+                }
+              ];
+              description = ''
+                List of additional replacements that are not related to base
+                colors. Cyclic replacements will not work.
+              '';
+            };
+          };
+        }
+      );
+      default = { };
+      example = {
+        waybar.paths = [
+          "waybar/config"
+          "waybar/style.css"
+        ];
+      };
+      description = ''
+        Attribute set of applications that should have color scheme switching
+        applied to them.
+      '';
+    };
+  };
+
   services.darkman = {
     enable = true;
-    package = addPatches pkgs.darkman [
-      ../../../../patches/darkmanNoInitialSwitch.patch
-    ];
+    package = addPatches pkgs.darkman [ "darkmanNoInitialSwitch.patch" ];
     darkModeScripts = mapAttrs (_: v: v "dark") cfg.switchScripts;
     lightModeScripts = mapAttrs (_: v: v "light") cfg.switchScripts;
 
@@ -184,7 +306,7 @@ mkIf (cfg.enable && desktopEnabled) {
   home.activation =
     let
       inherit (lib.hm.dag) entryAfter;
-      inherit (config.${ns}.colorScheme) colorMap;
+      inherit (config.${ns}.core.colorScheme) colorMap;
     in
     mapAttrs' (
       switchApp: switchConfig:
@@ -252,7 +374,7 @@ mkIf (cfg.enable && desktopEnabled) {
 
   # Create a switch script for this app that swaps our out of store
   # symlink config file with the new theme and executes the reload script
-  ${ns}.desktop.services.darkman = {
+  categoryConfig.darkman = {
     switchScripts = mapAttrs (_: switchConfig: theme: ''
       ${concatMapStringsSep "\n" (path: ''
         cp "${dataHome}/darkman/variants/${path}.${theme}" "${dataHome}/darkman/variants/${path}"

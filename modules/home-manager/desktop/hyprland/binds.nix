@@ -1,11 +1,12 @@
 {
   lib,
+  cfg,
+  args,
   pkgs,
   config,
   osConfig,
   vmVariant,
-  ...
-}@args:
+}:
 let
   inherit (lib)
     ns
@@ -17,11 +18,10 @@ let
     concatMap
     concatMapStringsSep
     ;
-  inherit (lib.${ns}) isHyprland flakePkgs getMonitorHyprlandCfgStr;
+  inherit (lib.${ns}) flakePkgs getMonitorHyprlandCfgStr;
   inherit (osConfig.${ns}.system) audio;
   inherit (osConfig.${ns}.device) monitors backlight;
   inherit (config.${ns}.desktop.programs) locker;
-  cfg = config.${ns}.desktop.hyprland;
   mod = cfg.modKey;
   modShift = "${cfg.modKey}SHIFT";
   modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
@@ -221,9 +221,9 @@ let
       -h 'string:x-canonical-private-synchronous:pipewire-window-volume' "''${name^} - $media" "Volume ''${percentage%.*}%"
   '';
 in
-mkIf (isHyprland config) {
+{
   # Force secondaryModKey VM variant because binds are repeated on host
-  ${ns}.desktop.hyprland.modKey = mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);
+  categoryConfig.modKey = mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);
 
   wayland.windowManager.hyprland = {
     settings.bind =

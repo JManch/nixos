@@ -1,9 +1,9 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   osConfig,
-  ...
 }:
 let
   inherit (lib)
@@ -11,14 +11,11 @@ let
     mkIf
     concatMap
     concatLines
-    escapeShellArg
     any
     getExe
     getExe'
     ;
   inherit (osConfig.${ns}.device) monitors;
-  cfg = desktopCfg.hyprland;
-  desktopCfg = config.${ns}.desktop;
   isGammaCustom = any (m: m.gamma != 1.0) osConfig.${ns}.device.monitors;
 
   monitorGammaConditionals =
@@ -71,9 +68,11 @@ let
       blankShader;
 
 in
-mkIf (lib.${ns}.isHyprland config) {
-  xdg.configFile."hypr/shaders/monitorGamma.frag".text = gammaShader;
-  xdg.configFile."hypr/shaders/blank.frag".text = blankShader;
+{
+  xdg.configFile = {
+    "hypr/shaders/monitorGamma.frag".text = gammaShader;
+    "hypr/shaders/blank.frag".text = blankShader;
+  };
 
   wayland.windowManager.hyprland.settings =
     let

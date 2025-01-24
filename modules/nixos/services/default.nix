@@ -825,7 +825,7 @@ in
               ;
             inherit (config.${ns}.core) homeManager;
             inherit (config.${ns}.system) impermanence;
-            homeBackups = optionalAttrs homeManager.enable config.hm.backups;
+            homeBackups = optionalAttrs homeManager.enable config.hm.${ns}.backups;
           in
           mapAttrs (
             name: value:

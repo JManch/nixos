@@ -143,7 +143,7 @@ in
           enabled = cfg.blur;
           size = 2;
           passes = 3;
-          xray = true;
+          xray = false;
           special = true;
         };
       };

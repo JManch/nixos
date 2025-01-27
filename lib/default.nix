@@ -26,7 +26,7 @@ let
 in
 {
   inherit ns;
-  ${ns} = {
+  ${ns} = (import ./moduleSystem.nix lib ns) // {
     flakeUtils = self: {
       forEachSystem = lib.${ns}.forEachSystem self [
         "x86_64-linux"
@@ -128,11 +128,7 @@ in
       hostname: args: args.self.nixosConfigurations.${hostname}.config.${args.lib.ns}.device.ipAddress;
 
     upperFirstChar =
-      string:
-      let
-        chars = stringToCharacters string;
-      in
-      concatStrings ([ (toUpper (head chars)) ] ++ (tail chars));
+      string: concatStrings (imap0 (i: c: if i == 0 then toUpper c else c) (stringToCharacters string));
 
     # Adding multiple EXIT traps in a bash script is a pain because they
     # overwrite each other. This makes that easier.

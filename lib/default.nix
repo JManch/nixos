@@ -10,7 +10,6 @@ let
     head
     findFirst
     optionalString
-    tail
     concatStrings
     toUpper
     mod
@@ -26,7 +25,7 @@ let
 in
 {
   inherit ns;
-  ${ns} = (import ./moduleSystem.nix lib ns) // {
+  ${ns} = (import ./module-system.nix lib ns) // {
     flakeUtils = self: {
       forEachSystem = lib.${ns}.forEachSystem self [
         "x86_64-linux"
@@ -122,8 +121,10 @@ in
       pkg: patches:
       pkg.overrideAttrs (oldAttrs: {
         patches =
-          # FIX: Once I've migrated all addPatches usuage don't allow abs paths
-          (oldAttrs.patches or [ ]) ++ (map (p: if hasPrefix "/" p then p else "${../patches}/${p}") patches);
+          # FIX: Once I've migrated all addPatches usage don't allow abs paths
+          # WARN: It's import to concat the paths here instead of using string
+          # interpolation. Explanation in module-system.nix
+          (oldAttrs.patches or [ ]) ++ (map (p: if hasPrefix "/" p then p else ../patches + "/${p}") patches);
       });
 
     hostIp =

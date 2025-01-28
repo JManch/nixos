@@ -75,7 +75,7 @@ in
       (addPatches pkgs.waybar [
         "waybarDisableReload.patch"
         (pkgs.substituteAll {
-          src = "${self}/patches/waybarSignalToggle.patch";
+          src = ../../../../../patches/waybarSignalToggle.patch;
           sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
             sort (a: b: a.number < b.number) monitors
           );

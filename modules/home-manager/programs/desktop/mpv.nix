@@ -36,6 +36,7 @@ in
     scripts = [
       pkgs.mpvScripts.thumbfast
       pkgs.mpvScripts.sponsorblock-minimal
+      pkgs.mpvScripts.mpris
       selfPkgs.modernx
     ];
 

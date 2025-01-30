@@ -14,7 +14,6 @@ let
     getExe
     getExe'
     hiPrio
-    escapeShellArg
     boolToString
     mapAttrsToList
     optionalString

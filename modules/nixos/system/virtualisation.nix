@@ -189,7 +189,8 @@ in
             scrutiny.collector.enable = mkVMOverride false;
             wgnord.enable = mkVMOverride false;
             fail2ban.enable = mkVMOverride false;
-            torrent-stack.enable = mkVMOverride false;
+            torrent-stack.video.enable = mkVMOverride false;
+            torrent-stack.music.enable = mkVMOverride false;
             zigbee2mqtt.enable = mkVMOverride false;
             minecraft-server.enable = mkVMOverride false;
             mikrotik-backup.enable = mkVMOverride false;

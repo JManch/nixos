@@ -595,7 +595,9 @@ in
     };
 
     torrent-stack = {
-      enable = mkEnableOption "Torrent stack using arr services";
+      video.enable = mkEnableOption "Video torrent stack";
+      music.enable = mkEnableOption "Music torrent stack";
+
       mediaDir = mkOption {
         type = types.str;
         default = "/data/media";
@@ -1062,16 +1064,6 @@ in
           List of additional interfaces for the Satisfactory server to be
           exposed on
         '';
-      };
-    };
-
-    slskd = {
-      enable = mkEnableOption "Soulseek file sharing";
-
-      port = mkOption {
-        type = types.port;
-        default = 5030;
-        description = "Port for the slskd web interface to listen on";
       };
     };
 

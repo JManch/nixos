@@ -56,7 +56,15 @@ mkMerge [
     users.users.jellyfin.uid = uid;
     users.groups.jellyfin.gid = gid;
 
-    systemd.services.jellyfin.wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
+    systemd.services.jellyfin = {
+      serviceConfig = {
+        StateDirectory = "jellyfin";
+        CacheDirectory = "jellyfin";
+        StateDirectoryMode = "0700";
+        ProtectSystem = "strict";
+      };
+      wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
+    };
 
     systemd.mounts = mapAttrsToList (target: source: {
       what = (optionalString impermanence.enable "/persist") + source;
@@ -136,8 +144,8 @@ mkMerge [
 
   (mkIf cfg.jellyseerr.enable {
     assertions = asserts [
-      (cfg.enable && torrent-stack.enable)
-      "Jellyseerr requires Jellyfin and the Torrent stack to be enabled"
+      (cfg.enable && torrent-stack.video.enable)
+      "Jellyseerr requires Jellyfin and the video torrent stack to be enabled"
     ];
 
     users.groups.jellyseerr = { };
@@ -153,12 +161,11 @@ mkMerge [
     };
 
     systemd.services.jellyseerr = {
-      # Jellyfin scan runs every 5 mins and pollutes the journal
+      # Jellyseer scan runs every 5 mins and pollutes the journal
       environment.LOG_LEVEL = "warning";
       serviceConfig = {
         User = "jellyseerr";
         Group = "jellyseerr";
-        SupplementaryGroups = [ "media" ];
       };
     };
 

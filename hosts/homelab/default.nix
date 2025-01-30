@@ -88,7 +88,8 @@ in
       };
 
       torrent-stack = {
-        enable = true;
+        video.enable = true;
+        music.enable = true;
         mediaDir = "/media";
       };
 

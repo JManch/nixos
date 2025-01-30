@@ -68,6 +68,7 @@
         ghostty.enable = true;
         torBrowser.enable = true;
         spotify.enable = true;
+        feishin.enable = true;
         discord.enable = true;
         obs.enable = true;
         vscode.enable = true;

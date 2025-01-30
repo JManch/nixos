@@ -11,6 +11,7 @@ let
   inherit (lib)
     ns
     mkIf
+    mkForce
     mkVMOverride
     getExe
     getExe'
@@ -90,12 +91,12 @@ in
     '';
 
   xdg.portal = {
-    enable = true;
-    configPackages = [ pkgs.hyprland ];
+    enable = mkForce true;
     extraPortals = with pkgs; [
-      xdg-desktop-portal-gtk
       xdg-desktop-portal-hyprland
+      xdg-desktop-portal-gtk
     ];
+    configPackages = [ pkgs.hyprland ];
   };
 
   xdg.configFile."uwsm/env-hyprland".text =
@@ -115,6 +116,8 @@ in
     enable = true;
     systemd.enable = false; # we use UWSM instead
     plugins = optionals cfg.plugins (with flakePkgs args "hyprland-plugins"; [ hyprexpo ]);
+    package = null;
+    portalPackage = null; # we configure the portal ourselves above
 
     settings = {
       monitor =

@@ -316,8 +316,8 @@ in
       ])
       ++ (optionals audio.enable [
         ", XF86AudioMute, exec, ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle"
-        "${modShift}, XF86AudioRaiseVolume, exec, ${modifyFocusedWindowVolume} 5%+"
-        "${modShift}, XF86AudioLowerVolume, exec, ${modifyFocusedWindowVolume} 5%-"
+        "${modShiftCtrl}, XF86AudioRaiseVolume, exec, ${modifyFocusedWindowVolume} 5%+"
+        "${modShiftCtrl}, XF86AudioLowerVolume, exec, ${modifyFocusedWindowVolume} 5%-"
       ])
       ++ (optionals (backlight != null)) [
         ", XF86MonBrightnessUp, exec, ${brightnessctl} set +5%"

@@ -15,45 +15,6 @@ let
   spotify-player =
     (lib.${ns}.addPatches pkgs.spotify-player [ "spotifyPlayerNotifs.patch" ]).override
       { withDaemon = false; };
-
-  modifySpotifyVolume = pkgs.writeShellApplication {
-    name = "modify-spotify-volume";
-    runtimeInputs = with pkgs; [
-      jaq
-      pipewire
-      libnotify
-      gawk
-      bc
-    ];
-    text = # bash
-      ''
-        # WARN: Unfortunately getting the node ID of a specific application is
-        # tricky https://gitlab.freedesktop.org/pipewire/wireplumber/-/issues/395
-        spotify_id=$(pw-dump | jaq -r 'first(.[] | select((.type == "PipeWire:Interface:Node") and (.info?.props?["application.name"]? == "spotify"))) | .id')
-        increment=$1
-
-        if [ -z "$spotify_id" ]; then
-          notify-send --urgency=critical -t 2000 \
-            -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' 'Application not running'
-          exit 1
-        fi
-
-        round_volume() {
-          multiple=''${increment#-}
-          add_half=$(bc <<< "scale=10; ($1 + $multiple/2)")
-          rounded=$(bc <<< "($add_half / $multiple) * $multiple")
-          bc <<< "scale=2; $rounded / 100"
-        }
-
-        current_vol=$(wpctl get-volume "$spotify_id" | awk '{print $2 * 100}')
-        new_vol=$(round_volume $((current_vol + increment)))
-
-        wpctl set-volume -l 1.0 "$spotify_id" "$new_vol"
-        actual_vol=$(wpctl get-volume "$spotify_id" | awk '{print $2 * 100}')
-        notify-send --urgency=low -t 2000 \
-          -h 'string:x-canonical-private-synchronous:spotify-player-volume' 'Spotify' "Volume ''${actual_vol%.*}%"
-      '';
-  };
 in
 {
   conditions = [ "osConfig.system.audio" ];
@@ -69,8 +30,6 @@ in
     ))
     spotify-player
   ];
-
-  services.playerctld.enable = true;
 
   xdg.configFile = {
     "spotify-player/app.toml".text = # toml
@@ -152,37 +111,21 @@ in
 
   desktop.hyprland.settings =
     let
-      inherit (config.${ns}.desktop.hyprland) modKey;
       colors = config.colorScheme.palette;
-      playerctl = lib.getExe pkgs.playerctl;
     in
     {
       windowrulev2 = [
         "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
         "workspace special:social silent, title:^(Spotify( Premium)?)$"
       ];
-
-      bindr = [
-        "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause --player spotify_player,spotify"
-        "${modKey}SHIFT, ${modKey}_R, exec, ${playerctl} play-pause --ignore-player spotify_player,spotify"
-      ];
-
-      bind = [
-        "${modKey}, Period, exec, ${playerctl} next --player spotify_player,spotify"
-        "${modKey}, Comma, exec, ${playerctl} previous --player spotify_player,spotify"
-        ", XF86AudioNext, exec, ${playerctl} next"
-        ", XF86AudioPrev, exec, ${playerctl} previous"
-        ", XF86AudioPlay, exec, ${playerctl} play"
-        ", XF86AudioPause, exec, ${playerctl} pause"
-      ];
-
-      binde = [
-        "${modKey}, XF86AudioRaiseVolume, exec, ${getExe modifySpotifyVolume} 5"
-        "${modKey}, XF86AudioLowerVolume, exec, ${getExe modifySpotifyVolume} -5"
-      ];
     };
 
   nsConfig = {
+    desktop.services.playerctl.musicPlayers = [
+      "spotify_player"
+      "spotify"
+    ];
+
     desktop.uwsm.appUnitOverrides."spotify-.scope" = ''
       [Scope]
       KillMode=mixed

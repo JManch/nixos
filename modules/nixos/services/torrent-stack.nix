@@ -538,7 +538,7 @@ mkMerge [
           download_dir = ${mediaDir}/slskd/downloads
 
           [Search Settings]
-          allowed_filetypes = flac 16/44.1,mp3 320,mp3
+          allowed_filetypes = flac 16/44.1,mp3 320,flac,mp3
           album_prepend_artist = True
         '';
       in

@@ -2,7 +2,6 @@
   lib,
   cfg,
   pkgs,
-  self,
   config,
   hostname,
   osConfig,

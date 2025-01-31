@@ -526,6 +526,8 @@ mkMerge [
 
     systemd.services.soularr =
       let
+        # WARN: The example config in soularr's README does not contain the
+        # default values for all options
         config = pkgs.writeText "soularr-config" ''
           [Lidarr]
           api_key = $LIDARR_API_KEY
@@ -536,10 +538,16 @@ mkMerge [
           api_key = ${slskdApiKey}
           host_url = http://${vpnNamespaceAddress}:${toString ports.slskd}
           download_dir = ${mediaDir}/slskd/downloads
+          delete_searches = false
 
           [Search Settings]
           allowed_filetypes = flac 16/44.1,mp3 320,flac,mp3
           album_prepend_artist = True
+          remove_wanted_on_failure = False
+          search_type = all
+          # Causes too many searches but disabling breaks multi-disc albums so
+          # need to manually fetch those
+          search_for_tracks = False
         '';
       in
       {

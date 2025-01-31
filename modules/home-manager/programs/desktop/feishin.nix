@@ -28,7 +28,14 @@ in
   ];
 
   nsConfig = {
-    desktop.services.playerctl.musicPlayers = lib.mkBefore [ "Feishin" ];
+    desktop = {
+      services.playerctl.musicPlayers = lib.mkBefore [ "Feishin" ];
+      uwsm.appUnitOverrides."feishin-.scope" = ''
+        [Scope]
+        KillMode=mixed
+      '';
+    };
+
     persistence.directories = [ ".config/feishin" ];
   };
 }

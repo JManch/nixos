@@ -54,6 +54,8 @@ mkMerge [
     assertions = asserts [
       caddy.enable
       "Torrent stack requires Caddy to be enabled"
+      (cfg.mediaDir != "" && cfg.mediaDir != "/")
+      "Torrent stack media dir must not be empty or root"
       (head (stringToCharacters cfg.mediaDir) == "/")
       "Torrent stack media dir must be an absolute path"
       (!hasPrefix "/persist" cfg.mediaDir)
@@ -558,7 +560,13 @@ mkMerge [
         # Might want to run this every hour or so. For now I'm fine with
         # manually starting the service.
         description = "Soularr";
-        preStart = "${getExe pkgs.envsubst} -i ${config} -o /var/lib/soularr/config.ini";
+        preStart = ''
+          ${getExe pkgs.envsubst} -i ${config} -o /var/lib/soularr/config.ini
+          # systemd protects us from running multiple instances
+          rm --force /var/lib/soularr/.soularr.lock
+          mkdir -p "${mediaDir}/slskd/complete"
+          mv --verbose --force "${mediaDir}/slskd/downloads"/* "${mediaDir}/slskd/complete"
+        '';
 
         serviceConfig = hardeningBaseline config {
           EnvironmentFile = soularrVars.path;

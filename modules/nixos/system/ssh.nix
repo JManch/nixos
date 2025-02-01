@@ -56,6 +56,9 @@ in
     startAgent = cfg.agent.enable;
     agentTimeout = "1h";
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
+    extraConfig = mkIf cfg.agent.enable ''
+      AddKeysToAgent yes
+    '';
 
     knownHosts =
       (mapAttrs (host: _: {

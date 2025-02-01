@@ -548,6 +548,10 @@ mkMerge [
           # Causes too many searches but disabling breaks multi-disc albums so
           # need to manually fetch those
           search_for_tracks = False
+
+          [Logging]
+          level = INFO
+          format = %(message)s
         '';
       in
       {

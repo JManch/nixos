@@ -585,6 +585,8 @@ mkMerge [
         };
       };
 
+    environment.shellAliases.soularr-fetch = "sudo systemctl start soularr && journalctl -u soularr -f";
+
     # Allow prowlarr to access lidarr over the VPN bridge
     networking.firewall.interfaces."${vpnNamespace}-br".allowedTCPPorts = [
       ports.lidarr

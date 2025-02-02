@@ -452,7 +452,7 @@ mkMerge [
     };
 
     systemd.tmpfiles.rules = [
-      "d ${mediaDir}/slskd 0755 root media - -"
+      "d ${mediaDir}/slskd 0775 root media - -"
       "d ${mediaDir}/slskd/downloads 0775 root media - -"
       "d ${mediaDir}/slskd/incomplete 0775 root media - -"
     ];

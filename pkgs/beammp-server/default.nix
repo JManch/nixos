@@ -8,7 +8,7 @@
   openssl,
   doctest,
   zlib,
-  boost,
+  boost186,
   httplib,
   libzip,
   rapidjson,
@@ -35,7 +35,7 @@ stdenv.mkDerivation (finalAttrs: {
     fmt
     openssl
     doctest
-    boost
+    boost186
     httplib
     libzip
     rapidjson

@@ -112,8 +112,7 @@ in
 
     # We use an unorthodox pkgs reference here because pkgs will not be in the
     # first layer of arguments if it is not explicitly added to the module
-    # parameters. This is annoying because the LSP complains about pkgs being an
-    # unused argument when it actually is used. This method avoids that.
+    # parameters.
     flakePkgs =
       args: flake: args.inputs.${flake}.packages.${args.options._module.args.value.pkgs.system};
 

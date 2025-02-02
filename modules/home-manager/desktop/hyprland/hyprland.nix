@@ -101,15 +101,15 @@ in
 
   xdg.configFile."uwsm/env-hyprland".text =
     optionalString (cfg.hyprcursor.package != null) ''
-      HYPRCURSOR_THEME=${cfg.hyprcursor.name}
-      HYPRCURSOR_SIZE=${toString config.${ns}.desktop.style.cursor.size}
+      export HYPRCURSOR_THEME=${cfg.hyprcursor.name}
+      export HYPRCURSOR_SIZE=${toString config.${ns}.desktop.style.cursor.size}
     ''
     + optionalString (osConfig.${ns}.device.gpu.type == "nvidia") ''
-      LIBVA_DRIVER_NAME=nvidia
-      GBM_BACKEND=nvidia-drm
-      __GLX_VENDOR_LIBRARY_NAME=nvidia
-      __GL_GSYNC_ALLOWED=0
-      __GL_VRR_ALLOWED=0
+      export LIBVA_DRIVER_NAME=nvidia
+      export GBM_BACKEND=nvidia-drm
+      export __GLX_VENDOR_LIBRARY_NAME=nvidia
+      export __GL_GSYNC_ALLOWED=0
+      export __GL_VRR_ALLOWED=0
     '';
 
   wayland.windowManager.hyprland = {

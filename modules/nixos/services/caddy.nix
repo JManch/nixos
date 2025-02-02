@@ -106,7 +106,7 @@ mkMerge [
 
       package = pkgs.caddy.withPlugins {
         plugins = [ "github.com/caddy-dns/porkbun@v0.2.1" ];
-        hash = "sha256-5rfdWHT2ah5THFKjcSoN+aTLhnjQYbNFQxQTfXB439I=";
+        hash = "sha256-vqCVWJyKbU7V/lmiBiOK0C64+13YOzd9TnUgqIZgwp8=";
       };
 
       enableReload = false;

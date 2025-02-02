@@ -1,8 +1,8 @@
 diff --git a/src/main.rs b/src/main.rs
-index 3eee7a0..4100ed4 100644
+index 05024df..cf3ea3f 100644
 --- a/src/main.rs
 +++ b/src/main.rs
-@@ -72,15 +72,15 @@ fn print_system_info(fields: &Fields) {
+@@ -69,15 +69,15 @@ fn print_system_info(fields: &Fields) {
      let blue = COLORS.blue;
      let reset = COLORS.reset;
      let system_info = format!("
@@ -12,7 +12,7 @@ index 3eee7a0..4100ed4 100644
 -    {blue}     ▟█▛       {blue}▝█▘{cyan}▟█▛        {cyan}  {blue}Shell{reset}         {shell}
 -    {blue}▟█████▛          {cyan}▟█████▛     {cyan}  {blue}Uptime{reset}        {uptime}
 -    {blue}   ▟█▛{cyan}▗█▖       {cyan}▟█▛          {cyan}  {blue}Desktop{reset}       {desktop}
--    {blue}  ▝█▛  {cyan}██▖{blue}▗▄▄▄▄▄▄▄▄▄▄▄       {cyan}󰍛  {blue}Memory{reset}        {memory_usage}
+-    {blue}  ▝█▛  {cyan}██▖{blue}▗▄▄▄▄▄▄▄▄▄▄▄       {cyan}  {blue}Memory{reset}        {memory_usage}
 -    {blue}   ▝  {cyan}▟█▜█▖{blue}▀▀▀▀▀██▛▀▀▘       {cyan}󱥎  {blue}Storage (/){reset}   {storage}
 -    {cyan}     ▟█▘ ▜█▖    {blue}▝█▛          {cyan}  {blue}Colors{reset}        {colors}");
 + {cyan}    ▟█▖   {blue}▝█▙ ▗█▛       {user_info} ~{reset}
@@ -21,7 +21,7 @@ index 3eee7a0..4100ed4 100644
 + {blue}    ▟█▛      {blue}▝█▘{cyan}▟█▛     {cyan}  {blue}Shell{reset}         {shell}
 + {blue}▟████▛         {cyan}▟████▛   {cyan}  {blue}Uptime{reset}        {uptime}
 + {blue}  ▟█▛{cyan}▗█▖      {cyan}▟█▛       {cyan}  {blue}Desktop{reset}       {desktop}
-+ {blue} ▝█▛  {cyan}██▖{blue}▗▄▄▄▄▄▄▄▄▄     {cyan}󰍛  {blue}Memory{reset}        {memory_usage}
++ {blue} ▝█▛  {cyan}██▖{blue}▗▄▄▄▄▄▄▄▄▄     {cyan}  {blue}Memory{reset}        {memory_usage}
 + {blue}  ▝  {cyan}▟█▜█▖{blue}▀▀▀▀██▛▀▘     {cyan}󱥎  {blue}Storage (/){reset}   {storage}
 + {cyan}    ▟█▘ ▜█▖   {blue}▝█▛       {cyan}  {blue}Colors{reset}        {colors}");
  

@@ -83,8 +83,7 @@
 
     # Inputs that provide packages
 
-    # To avoid blank window issues on git. Noticeable when toggling chatterino layout.
-    hyprland.url = "github:hyprwm/Hyprland?rev=c7086f936a06abebcc863c35f634760ca1ee90c0";
+    hyprland.url = "github:hyprwm/Hyprland";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
 
     hyprland-plugins.url = "github:hyprwm/hyprland-plugins";

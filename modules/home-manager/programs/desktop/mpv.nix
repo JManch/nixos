@@ -40,23 +40,21 @@ in
       selfPkgs.modernx
     ];
 
-    scriptOpts = {
-      modernx = {
-        scalewindowed = 1;
-        scalefullscreen = 1;
-        fadeduration = 150;
-        hidetimeout = 5000;
-        donttimeoutonpause = true;
-        OSCfadealpha = 75;
-        showtitle = true;
-        showinfo = true;
-        windowcontrols = false;
-        volumecontrol = true;
-        compactmode = false;
-        bottomhover = false;
-        showontop = false;
-        raisesubswithosc = false;
-      };
+    scriptOpts.modernx = {
+      scalewindowed = 1;
+      scalefullscreen = 1;
+      fadeduration = 150;
+      hidetimeout = 5000;
+      donttimeoutonpause = true;
+      OSCfadealpha = 75;
+      showtitle = true;
+      showinfo = true;
+      windowcontrols = false;
+      volumecontrol = true;
+      compactmode = false;
+      bottomhover = false;
+      showontop = false;
+      raisesubswithosc = false;
     };
 
     config = {
@@ -121,9 +119,7 @@ in
       }
     '';
 
-  desktop.hyprland.settings.windowrulev2 = [
-    "workspace emptym, class:^(mpv)$"
-  ];
+  desktop.hyprland.settings.windowrulev2 = [ "workspace emptym, class:^(mpv)$" ];
 
   nsConfig.persistence.directories = optional cfg.jellyfinShim.enable ".config/jellyfin-mpv-shim";
 }

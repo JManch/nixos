@@ -169,6 +169,15 @@ in
         default = true;
       };
 
+      plugins = mkOption {
+        type = with types; listOf package;
+        default = [ ];
+        description = ''
+          List of plugin packages to install. All directories in the package
+          outpath will be symlinked to the Jellyfin plugin folder.
+        '';
+      };
+
       reverseProxy = {
         enable = mkEnableOption "Jellyfin Caddy virtual host";
 

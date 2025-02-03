@@ -4,11 +4,17 @@
 # every couple of seconds (presumably to update the cast progress bar?). With
 # multiple clients watching this can easily throttle the web server and make
 # Jellyfin unusable.
-{ lib, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   inherit (lib)
     ns
     mkIf
+    getExe
     mkMerge
     optional
     mkForce
@@ -21,6 +27,7 @@ let
     length
     hasPrefix
     splitString
+    concatLines
     all
     ;
   inherit (lib.${ns}) asserts;
@@ -57,6 +64,17 @@ mkMerge [
     users.groups.jellyfin.gid = gid;
 
     systemd.services.jellyfin = {
+      preStart =
+        mkIf (cfg.plugins != [ ]) # bash
+          ''
+            mkdir -p /var/lib/jellyfin/plugins
+            ${getExe pkgs.fd} --base-directory /var/lib/jellyfin/plugins --exclude configurations --max-depth 1 --type dir --exec rm -r
+            ${concatLines (
+              # Jellyfin needs write access to create meta.json
+              map (plugin: ''cp --no-preserve=mode -r ${plugin}/* /var/lib/jellyfin/plugins '') cfg.plugins
+            )}
+          '';
+
       serviceConfig = {
         StateDirectory = "jellyfin";
         CacheDirectory = "jellyfin";

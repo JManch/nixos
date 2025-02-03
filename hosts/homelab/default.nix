@@ -2,6 +2,7 @@
   lib,
   config,
   inputs,
+  selfPkgs,
   ...
 }@args:
 let
@@ -203,6 +204,7 @@ in
         autoStart = true;
         reverseProxy.enable = true;
         jellyseerr.enable = true;
+        plugins = [ selfPkgs.jellyfin-plugin-listenbrainz ];
 
         # Google TV on guest VLAN
         reverseProxy.extraAllowedAddresses = with wireguard.friends; [

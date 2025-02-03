@@ -21,5 +21,6 @@ in
   app2unit = callPackage ./app2unit.nix { };
   microfetch = lib.${lib.ns}.addPatches pkgs.microfetch [ ../patches/microfetchIcon.patch ];
   xdg-terminal-exec = callPackage ./xdg-terminal-exec.nix { };
+  jellyfin-plugin-listenbrainz = callPackage ./jellyfin-plugin-listenbrainz { };
 }
 // import ./installers.nix lib self

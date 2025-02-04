@@ -100,7 +100,7 @@
           r2modman.enable = true;
           bottles.enable = true;
           prismLauncher.enable = true;
-          mint.enable = false; # broken package
+          mint.enable = true;
           ryujinx.enable = true;
           osu.enable = true;
           beamng.enable = true;

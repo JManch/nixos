@@ -104,8 +104,7 @@
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";
 
-    mint.url = "github:JManch/mint";
-    mint.inputs.nixpkgs.follows = "nixpkgs";
+    mint.url = "github:trumank/mint";
 
     broadcast-box.url = "github:JManch/broadcast-box";
     broadcast-box.inputs.nixpkgs.follows = "nixpkgs";

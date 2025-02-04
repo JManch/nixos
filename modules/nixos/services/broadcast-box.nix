@@ -16,6 +16,8 @@ let
     getExe'
     ;
   inherit (config.${ns}.services) caddy;
+  inherit (inputs.nix-resources.secrets) fqDomain;
+  inherit (config.age.secrets) broadcastBoxDiscordVars;
   cfg = config.${ns}.services.broadcast-box;
 in
 {
@@ -45,10 +47,22 @@ in
       settings = {
         UDP_MUX_PORT = cfg.udpMuxPort;
         DISABLE_STATUS = false;
+        STREAM_HOST_URL = "https://stream.${fqDomain}/"; # for discord fork
       };
     };
 
-    systemd.services.broadcast-box.wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
+    # User is just for accessing the secret
+    users.users.broadcast-box = {
+      isSystemUser = true;
+      group = "broadcast-box";
+    };
+    users.groups.broadcast-box = { };
+
+    systemd.services.broadcast-box = {
+      serviceConfig.User = "broadcast-box";
+      serviceConfig.EnvironmentFile = broadcastBoxDiscordVars.path;
+      wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
+    };
 
     # Playback for remote clients sometimes breaks until service is restarted
     systemd.services.broadcast-box-restart = {

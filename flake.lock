@@ -82,15 +82,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1737374142,
-        "narHash": "sha256-d+QSyGkh9dQWQDdBesHJjdRIPWlVa28kwiLUu+L9Zh8=",
+        "lastModified": 1738701861,
+        "narHash": "sha256-GkhZFuq0+kPY8Vk609QRRv3dVFL6b8Lak5ggp5MMPuA=",
         "owner": "JManch",
         "repo": "broadcast-box",
-        "rev": "3408ede599776b7eece3381464500f8f3b88e9dc",
+        "rev": "6e9035d6ea16deae6e7b82d68aa2eed85bb1aa44",
         "type": "github"
       },
       "original": {
         "owner": "JManch",
+        "ref": "discord",
         "repo": "broadcast-box",
         "type": "github"
       }
@@ -1453,11 +1454,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1738245438,
-        "narHash": "sha256-5B3L840xenyqbODDPjQ6lUK90GDucn+JuRJE6y/+BgM=",
+        "lastModified": 1738687827,
+        "narHash": "sha256-eFc0pdZcpbDwytanSm64+CmTi1p2r3SWT5AHnXuQcaY=",
         "ref": "refs/heads/main",
-        "rev": "15c20ad75e07a97fba10314a67034af47216ceff",
-        "revCount": 247,
+        "rev": "d1e4c9489961275bc5ebccde9544cce4e5c78cf6",
+        "revCount": 248,
         "type": "git",
         "url": "ssh://git@github.com/JManch/nix-resources"
       },

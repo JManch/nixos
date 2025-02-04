@@ -106,7 +106,7 @@
 
     mint.url = "github:trumank/mint";
 
-    broadcast-box.url = "github:JManch/broadcast-box";
+    broadcast-box.url = "github:JManch/broadcast-box/discord";
     broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-index-database.url = "github:nix-community/nix-index-database";

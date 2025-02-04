@@ -230,7 +230,7 @@ in
       [
         # General
         "${modShiftCtrl}, Q, exec, ${loginctl} terminate-session \"$XDG_SESSION_ID\""
-        "${mod}, ${cfg.killActiveKey}, killactive,"
+        "${mod}, ${cfg.killActiveKey}, killactive"
         "${mod}, C, exec, ${toggleFloating}"
         "${mod}, E, exec, ${toggleFullscreen}"
         "${modShift}, E, fullscreen, 0"

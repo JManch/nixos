@@ -566,7 +566,7 @@ mkMerge [
           rm --force /var/lib/soularr/.soularr.lock
           mkdir -p "${mediaDir}/slskd/complete"
           rm --recursive --force "${mediaDir}/slskd/complete/failed_imports"
-          mv --verbose --force "${mediaDir}/slskd/downloads"/* "${mediaDir}/slskd/complete"
+          mv --verbose --force "${mediaDir}/slskd/downloads"/* "${mediaDir}/slskd/complete" || true
         '';
 
         serviceConfig = hardeningBaseline config {

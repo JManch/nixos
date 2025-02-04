@@ -29,12 +29,7 @@ mkIf cfg.enable {
     acceleration = "rocm";
     # Since my 7900xt isn't "offically" supported by rocm I need this
     rocmOverrideGfx = "11.0.0";
-    loadModels = [
-      "llama3.2"
-      "qwen2.5-coder:32b-instruct-q3_K_M"
-      "qwen2.5:32b-instruct-q3_K_M"
-      "mistral-small:22b-instruct-2409-q5_1"
-    ];
+    loadModels = [ "deepseek-r1:14b-qwen-distill-q4_K_M" ];
   };
 
   systemd.services = {

@@ -28,7 +28,7 @@ in
 
       output = {
         channels = "mono";
-        alacritty_sync = 1;
+        synchronized_sync = 1;
       };
 
       color =

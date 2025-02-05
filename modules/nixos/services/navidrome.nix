@@ -62,10 +62,18 @@ mkIf cfg.enable {
     };
   };
 
-  persistence.directories = singleton {
-    directory = "/var/lib/navidrome";
-    user = "navidrome";
-    group = "navidrome";
-    mode = "0700";
-  };
+  persistence.directories = [
+    {
+      directory = "/var/lib/navidrome";
+      user = "navidrome";
+      group = "navidrome";
+      mode = "0700";
+    }
+    {
+      directory = "/var/backup/navidrome";
+      user = "navidrome";
+      group = "navidrome";
+      mode = "0700";
+    }
+  ];
 }

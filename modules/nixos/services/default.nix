@@ -1093,6 +1093,15 @@ in
         description = "List of address to give access to the file server";
       };
     };
+
+    navidrome = {
+      enable = mkEnableOption "Navidrome";
+
+      musicDir = mkOption {
+        type = types.str;
+        description = "Absolute path to music library";
+      };
+    };
   };
 
   config = {

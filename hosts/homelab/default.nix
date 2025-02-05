@@ -213,6 +213,11 @@ in
         ];
       };
 
+      navidrome = {
+        enable = true;
+        musicDir = "/media/music";
+      };
+
       beammp-server = {
         enable = true;
         autoStart = false;

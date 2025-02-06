@@ -28,9 +28,6 @@ mkIf cfg.enable {
       MusicFolder = (optionalString impermanence.enable "/persist") + cfg.musicDir;
       ScanSchedule = 0; # would rather manually trigger scans
       EnableInsightsCollector = false;
-      # We want to be able to override album cover art by providing a
-      # cover.jpg. For this to work we must ignore the track art.
-      EnableMediaFileCoverArt = false;
       ListenBrainz.Enabled = true;
 
       Backup = {

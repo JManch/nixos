@@ -3,7 +3,6 @@
   pkgs,
   config,
   inputs,
-  selfPkgs,
   username,
   ...
 }:
@@ -24,9 +23,9 @@ let
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (config.${ns}.services) caddy;
   inherit (config.${ns}.system) impermanence;
-  inherit (inputs.nix-resources.secrets) qBittorrentPort soulseekPort slskdApiKey;
+  inherit (inputs.nix-resources.secrets) qBittorrentPort soulseekPort;
   inherit (config.${ns}.device) vpnNamespace;
-  inherit (config.age.secrets) recyclarrSecrets slskdVars soularrVars;
+  inherit (config.age.secrets) recyclarrSecrets slskdVars;
   cfg = config.${ns}.services.torrent-stack;
   mediaDir = (optionalString impermanence.enable "/persist") + cfg.mediaDir;
   vpnNamespaceAddress = config.vpnNamespaces.${vpnNamespace}.namespaceAddress;
@@ -46,7 +45,6 @@ let
     radarr = 7878;
     prowlarr = 9696;
     slskd = 5030;
-    lidarr = 8686;
   };
 in
 mkMerge [
@@ -63,7 +61,7 @@ mkMerge [
     ];
 
     systemd.tmpfiles.rules = [
-      "d ${mediaDir} 0750 root media - -"
+      "d ${mediaDir} 0770 root media - -"
       # Torrents are downloaded and seeded here. They are hardlinked by the
       # relevant arr service to a media dir.
       "d ${mediaDir}/torrents 0775 root media - -"
@@ -430,6 +428,114 @@ mkMerge [
   })
 
   (mkIf cfg.music.enable {
+    # Import new music with `beet import --timid --from-scratch /path/to/music`
+
+    # WARN: When importing to replace an existing import, the "Remove old"
+    # option does not remove the cover file so that has to be done manually
+    # first to avoid a duplicate cover being added.
+
+    # When picking a release prefer digital releases as they have the best
+    # cover on musicbrainz
+
+    # To change the musicbrainz release of an album first re-import with `beet
+    # import --timid --library <query>` (use -s to target a single track) then
+    # choose the correct musicbrainz release. For some reason not all metadata
+    # gets updated after this so run `beet mbsync <query>`.
+    environment.systemPackages = singleton (
+      pkgs.symlinkJoin {
+        name = "beets-wrapped-config";
+        paths = singleton (
+          pkgs.beets.override {
+            pluginOverrides = {
+              replaygain.enable = true;
+              autobpm.enable = true;
+              fetchart.enable = true;
+              embedart.enable = true;
+              lyrics.enable = true;
+              mbsync.enable = true;
+              missing.enable = true;
+              permissions.enable = true;
+              unimported.enable = true;
+            };
+          }
+        );
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        postBuild =
+          let
+            config = (pkgs.formats.yaml { }).generate "beets-config.yaml" {
+              directory = "${mediaDir}/music";
+              library = "${mediaDir}/music/library.db";
+              plugins = [
+                "replaygain"
+                "autobpm"
+                "fetchart"
+                "embedart"
+                "lyrics"
+                "mbsync" # provides command to fetch latest metadata from musicbrainz
+                "missing"
+                "permissions"
+                "unimported"
+              ];
+
+              incremental = false; # creates unwanted state.pickel file
+              autobpm.auto = true;
+              lyrics.auto = true;
+              asciify_paths = true;
+
+              fetchart = {
+                auto = true;
+                sources = [
+                  "filesystem"
+                  { coverart = "release"; }
+                  { coverart = "releasegroup"; }
+                  "itunes"
+                  "albumart"
+                ];
+              };
+
+              match = {
+                # Always prefer digital releases
+                max_rec.media = "medium";
+                preferred.media = [ "Digital Media" ];
+                ignored_media = [
+                  "12\" Vinyl"
+                  "Vinyl"
+                ];
+              };
+
+              # some release groups have lots of CD/vinyls
+              musicbrainz.searchlimit = 20;
+
+              embedart = {
+                auto = true;
+                maxwidth = 600; # shrink album covers to a sensible size when embedding
+                minwidth = 1000;
+              };
+
+              # some files may be owned by slskd:slskd
+              permissions = {
+                file = 666;
+                dir = 777;
+              };
+
+              import = {
+                write = true;
+                move = true;
+              };
+
+              replaygain = {
+                auto = true;
+                backend = "ffmpeg";
+                overwrite = true;
+              };
+            };
+          in
+          ''
+            wrapProgram $out/bin/beet --add-flags "--config=${config}"
+          '';
+      }
+    );
+
     services.slskd = {
       enable = true;
       domain = null;
@@ -439,14 +545,11 @@ mkMerge [
         soulseek.listen_port = soulseekPort;
         directories.downloads = "${mediaDir}/slskd/downloads";
         directories.incomplete = "${mediaDir}/slskd/incomplete";
-        shares.directories = [ "${mediaDir}/music" ];
         flags.no_config_watch = true;
-        web.authentication.api_keys.soularr = {
-          # SLSKD_API_KEY doesn't work and slskd doesn't have a way to load
-          # config secrets from environment variables. I can't be bothered to
-          # do config env var injection.
-          key = slskdApiKey;
-          cidr = "${vpnNamespaceAddress}/24";
+
+        shares = {
+          directories = [ "${mediaDir}/music" ];
+          filters = [ "^library\.db$" ];
         };
       };
     };
@@ -486,131 +589,15 @@ mkMerge [
       };
     };
 
-    users.groups.lidarr = { };
-    users.users.lidarr = {
-      group = "lidarr";
-      isSystemUser = true;
-    };
-
-    systemd.services.lidarr = {
-      description = "Lidarr";
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
-
-      serviceConfig = hardeningBaseline config {
-        DynamicUser = false;
-        User = "lidarr";
-        Group = "lidarr";
-        SupplementaryGroups = [ "media" ];
-        ExecStart = "${getExe pkgs.lidarr} -nobrowser -data=/var/lib/lidarr";
-        Restart = "on-failure";
-        StateDirectory = "lidarr";
-        StateDirectoryMode = "750";
-        UMask = "0022";
-        ReadWritePaths = [
-          "${mediaDir}/music"
-          "${mediaDir}/torrents/music"
-          "${mediaDir}/slskd"
-        ];
-        MemoryDenyWriteExecute = false;
-        SystemCallFilter = [
-          "@system-service"
-          "~@privileged"
-        ];
-      };
-    };
-
-    users.groups.soularr = { };
-    users.users.soularr = {
-      group = "soularr";
-      isSystemUser = true;
-    };
-
-    systemd.services.soularr =
-      let
-        # WARN: The example config in soularr's README does not contain the
-        # default values for all options
-        config = pkgs.writeText "soularr-config" ''
-          [Lidarr]
-          api_key = $LIDARR_API_KEY
-          host_url = http://localhost:${toString ports.lidarr}
-          download_dir = ${mediaDir}/slskd/downloads
-
-          [Slskd]
-          api_key = ${slskdApiKey}
-          host_url = http://${vpnNamespaceAddress}:${toString ports.slskd}
-          download_dir = ${mediaDir}/slskd/downloads
-          delete_searches = false
-
-          [Search Settings]
-          allowed_filetypes = flac 16/44.1,mp3 320,flac,mp3
-          album_prepend_artist = True
-          remove_wanted_on_failure = False
-          search_type = all
-          # Causes too many searches but disabling breaks multi-disc albums so
-          # need to manually fetch those
-          search_for_tracks = False
-
-          [Logging]
-          level = INFO
-          format = %(message)s
-        '';
-      in
-      {
-        # Might want to run this every hour or so. For now I'm fine with
-        # manually starting the service.
-        description = "Soularr";
-        preStart = ''
-          ${getExe pkgs.envsubst} -i ${config} -o /var/lib/soularr/config.ini
-          # systemd protects us from running multiple instances
-          rm --force /var/lib/soularr/.soularr.lock
-          mkdir -p "${mediaDir}/slskd/complete"
-          rm --recursive --force "${mediaDir}/slskd/complete/failed_imports"
-          mv --verbose --force "${mediaDir}/slskd/downloads"/* "${mediaDir}/slskd/complete" || true
-        '';
-
-        serviceConfig = hardeningBaseline config {
-          EnvironmentFile = soularrVars.path;
-          StateDirectory = "soularr";
-          StateDirectoryMode = "0750";
-          UMask = "0000";
-          User = "soularr";
-          Group = "soularr";
-          SupplementaryGroups = [ "media" ];
-          ReadWritePaths = [ "${mediaDir}/slskd" ];
-          ExecStart = "${getExe selfPkgs.soularr} --config-dir /var/lib/soularr";
-          SystemCallFilter = [
-            "@system-service"
-            "~@privileged"
-          ];
-        };
-      };
-
-    environment.shellAliases.soularr-fetch = "sudo systemctl start soularr && journalctl -u soularr -f";
-
-    # Allow prowlarr to access lidarr over the VPN bridge
-    networking.firewall.interfaces."${vpnNamespace}-br".allowedTCPPorts = [
-      ports.lidarr
-    ];
-
     ${ns}.services.caddy.virtualHosts = {
       slskd.extraConfig = "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.slskd}";
-      lidarr.extraConfig = "reverse_proxy http://127.0.0.1:${toString ports.lidarr}";
     };
-
-    backups.lidarr = mkArrBackup "lidarr";
 
     persistence.directories = [
       {
         directory = "/var/lib/slskd";
         user = "slskd";
         group = "slskd";
-        mode = "0750";
-      }
-      {
-        directory = "/var/lib/lidarr";
-        user = "lidarr";
-        group = "lidarr";
         mode = "0750";
       }
     ];

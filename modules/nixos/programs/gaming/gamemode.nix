@@ -68,7 +68,7 @@ let
           IFS=',' read -r -a profiles <<< "$(<"$profiles_file")"
           ${optionalString (mode == "stop") "rm \"$profiles_file\""}
         else
-          notify-send --urgency=critical -t 5000 \
+          notify-send -e --urgency=critical -t 5000 \
             'GameMode' '${upperFirstChar mode} script args file missing'
           exit 1
         fi
@@ -108,7 +108,7 @@ let
             if (( ''${#profiles[@]} )); then
               message="$message with profile(s) $(IFS=', '; echo "''${profiles[*]}")"
             fi
-            notify-send --urgency=critical -t 5000 'GameMode' "$message"
+            notify-send -e --urgency=critical -t 5000 'GameMode' "$message"
           ''
         }
       '';

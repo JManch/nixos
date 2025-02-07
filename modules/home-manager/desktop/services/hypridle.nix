@@ -119,10 +119,10 @@ in
       toggleHypridle = pkgs.writeShellScript "hypridle-toggle" ''
         ${systemctl} is-active --quiet --user hypridle && {
           ${systemctl} stop --quiet --user hypridle
-          ${notifySend} --urgency=low -t 2000 'Hypridle' 'Service disabled'
+          ${notifySend} -e --urgency=low -t 2000 'Hypridle' 'Service disabled'
         } || {
           ${systemctl} start --quiet --user hypridle
-          ${notifySend} --urgency=low -t 2000 'Hypridle' 'Service enabled'
+          ${notifySend} -e --urgency=low -t 2000 'Hypridle' 'Service enabled'
         }
       '';
     in

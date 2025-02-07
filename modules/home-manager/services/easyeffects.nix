@@ -31,10 +31,10 @@ in
           ''
             ${systemctl} is-active --quiet --user easyeffects && {
               ${systemctl} stop --user easyeffects
-              ${notifySend} --urgency=low -t 3000 'Easyeffects disabled'
+              ${notifySend} -e --urgency=low -t 3000 'Easyeffects disabled'
             } || {
               ${systemctl} start --user easyeffects
-              ${notifySend} --urgency=low -t 3000 'Easyeffects enabled'
+              ${notifySend} -e --urgency=low -t 3000 'Easyeffects enabled'
             }
           '';
       };

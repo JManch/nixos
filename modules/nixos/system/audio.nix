@@ -29,7 +29,7 @@ let
     ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle
     status=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@)
     message=$([[ "$status" == *MUTED* ]] && echo "Muted" || echo "Unmuted")
-    ${notifySend} -u critical -t 2000 \
+    ${notifySend} -e -u critical -t 2000 \
       -h 'string:x-canonical-private-synchronous:microphone-toggle' 'Microphone' "$message"
   '';
 in

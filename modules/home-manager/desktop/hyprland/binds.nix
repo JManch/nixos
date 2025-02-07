@@ -42,7 +42,7 @@ let
         new_value=$(($(${hyprctl} getoption -j dwindle:no_gaps_when_only | ${jaq} -r '.int') ^ 1))
         ${hyprctl} keyword dwindle:no_gaps_when_only $new_value
         message=$([[ $new_value == "1" ]] && echo "Dwindle gaps disabled" || echo "Dwindle gaps enabled")
-        ${notifySend} --urgency=low -t 2000 -h \
+        ${notifySend} -e --urgency=low -t 2000 -h \
           'string:x-canonical-private-synchronous:hypr-dwindle-gaps' 'Hyprland' "$message"
       '';
 
@@ -65,7 +65,7 @@ let
         else
           message="disabled"
         fi
-        ${notifySend} --urgency=low -t 2000 -h \
+        ${notifySend} -e --urgency=low -t 2000 -h \
           'string:x-canonical-private-synchronous:hypr-always-on-top' 'Hyprland' "Always on top $message"
       '';
 
@@ -113,7 +113,7 @@ let
           "
           message="Gaps disabled"
         fi
-        ${notifySend} --urgency=low -t 2000 -h \
+        ${notifySend} -e --urgency=low -t 2000 -h \
           'string:x-canonical-private-synchronous:hypr-toggle-gaps' 'Hyprland' "$message"
       '';
 
@@ -155,7 +155,7 @@ let
           keyword input:tablet:absolute_region_position true; \
           keyword input:tablet:region_position $region_pos_x $region_pos_y \
         "
-        ${notifySend} --urgency=low -t 2000 -h \
+        ${notifySend} -e --urgency=low -t 2000 -h \
           'string:x-canonical-private-synchronous:hypr-scale-tablet' 'Hyprland' 'Scaled tablet to active window'
       '';
 
@@ -170,8 +170,8 @@ let
       ''
         set -o pipefail
         echo -n "$(${getExe' pkgs.wl-clipboard "wl-paste"} -n)" | ${getExe pkgs.xclip} -selection clipboard && \
-          ${notifySend} --urgency=low -t 2000 'Hyprland' 'Synced Wayland clipboard with X11' || \
-          ${notifySend} --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
+          ${notifySend} -e --urgency=low -t 2000 'Hyprland' 'Synced Wayland clipboard with X11' || \
+          ${notifySend} -e --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
       '';
 
   copyScreenshotText =
@@ -184,9 +184,9 @@ let
         ${cfg.enableShaders}
         if [ $exit -eq 0 ]; then
           echo "$text" | ${getExe' pkgs.wl-clipboard "wl-copy"}
-          ${notifySend} -t 5000 -a Grimblast "Text Copied" "$text"
+          ${notifySend} -e -t 5000 -a Grimblast "Text Copied" "$text"
         else
-          ${notifySend} --urgency=critical -t 5000 "Screenshot" "Failed to copy text"
+          ${notifySend} -e --urgency=critical -t 5000 "Screenshot" "Failed to copy text"
         fi
       '';
 
@@ -204,7 +204,7 @@ let
     node=$(${getExe' pkgs.pipewire "pw-dump"} | ${jaq} -r \
       "[.[] | select((.type == \"PipeWire:Interface:Node\") and (.info?.props?[\"application.process.id\"]? == "$pid"))] | sort_by(if .info?.state? == \"running\" then 0 else 1 end) | first")
     if [ "$node" == "null" ]; then
-      ${notifySend} --urgency=critical -t 2000 \
+      ${notifySend} -e --urgency=critical -t 2000 \
         'Pipewire' "Active window does not have an interface node"
       exit 1
     fi
@@ -217,7 +217,7 @@ let
     output=$(${wpctl} get-volume "$id")
     volume=''${output#Volume: }
     percentage="$(echo "$volume * 100" | ${bc})"
-    ${notifySend} --urgency=low -t 2000 \
+    ${notifySend} -e --urgency=low -t 2000 \
       -h 'string:x-canonical-private-synchronous:pipewire-window-volume' "''${name^} - $media" "Volume ''${percentage%.*}%"
   '';
 in

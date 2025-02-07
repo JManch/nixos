@@ -64,7 +64,7 @@ in
               --set MESA_SHADER_CACHE_DIR "${homeDirectory}/.mozilla/.cache" \
               ${optionalString cfg.runInRam ''
                 --run "${systemctl} is-active --quiet --user firefox-persist-init \
-                              || { ${notifySend} -u critical -t 3000 'Firefox' 'Initial sync has not yet finished'; exit 0; }"''}
+                              || { ${notifySend} -e -u critical -t 3000 'Firefox' 'Initial sync has not yet finished'; exit 0; }"''}
           '';
       });
 

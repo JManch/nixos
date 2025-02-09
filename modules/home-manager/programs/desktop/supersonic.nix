@@ -7,9 +7,11 @@
       src = pkgs.fetchFromGitHub {
         owner = "JManch";
         repo = "supersonic";
-        rev = "7458a890711c765fcf1f09aac65806c4afda9cce";
-        hash = "sha256-x4pD5N29XjrltF4c89lk3KMTC0Zf+PCjpGJJ4lK5Ndk=";
+        rev = "4e619c08f89b0560639a137bcda0c944dc30198e";
+        hash = "sha256-2gtFWBL25LQIACap7JYtFJc1ShuhUg6oSwW7dlEKYqQ=";
       };
+
+      patches = [ ../../../../patches/supersonicLargeVolumeSlider.patch ];
 
       vendorHash = "sha256-Y1oWiQUwL6TGtHs9CfksEzjaAYb9rFEewyN3Pvv7i0Q=";
     })

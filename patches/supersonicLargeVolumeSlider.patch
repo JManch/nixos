@@ -1,0 +1,13 @@
+diff --git a/ui/widgets/auxcontrols.go b/ui/widgets/auxcontrols.go
+index 1074a19..a692d79 100644
+--- a/ui/widgets/auxcontrols.go
++++ b/ui/widgets/auxcontrols.go
+@@ -152,7 +152,7 @@ func NewVolumeControl(initialVol int) *VolumeControl {
+ 	v.icon = NewIconButton(theme.VolumeUpIcon(), v.toggleMute)
+ 	v.icon.SetToolTip(lang.L("Mute"))
+ 	v.icon.IconSize = IconButtonSizeSmaller
+-	v.slider = NewVolumeSlider(100)
++	v.slider = NewVolumeSlider(150)
+ 	v.lastVol = initialVol
+ 	v.slider.Step = 1
+ 	v.slider.Orientation = widget.Horizontal

@@ -134,7 +134,7 @@ in
         resize_on_border = true;
         hover_icon_on_border = false;
         "col.active_border" = "0xff${colors.base0D}";
-        "col.inactive_border" = "0xff${colors.base00}";
+        "col.inactive_border" = "0x00${colors.base0D}";
         allow_tearing = cfg.tearing;
       };
 

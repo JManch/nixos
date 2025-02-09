@@ -14,6 +14,9 @@
       "usb_storage"
       "sd_mod"
     ];
+
+    # https://github.com/linux-surface/linux-surface/issues/1060
+    blacklistedKernelModules = [ "surface_gpe" ];
   };
 
   # suspend-then-hibernate is broken. For some reason after HibernateDelaySec

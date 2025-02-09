@@ -199,7 +199,14 @@ in
         defaultGateway = "192.168.88.1";
         tcpOptimisations = true;
         resolved.enable = true;
-        firewall.enable = true;
+
+        firewall = {
+          enable = true;
+          defaultInterfaces = [
+            "eno1"
+            "wlp6s0"
+          ];
+        };
 
         wireless = {
           enable = true;

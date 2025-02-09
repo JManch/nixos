@@ -118,6 +118,7 @@ in
           "${hostIp "ncase-m1" args}/32"
           "${hostIp "surface-pro" args}/32"
           "10.20.20.33/32" # pixel 9
+          "10.20.20.11/32" # ncase-m1 wireless
         ] ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };
 

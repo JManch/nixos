@@ -548,8 +548,15 @@ mkMerge [
         flags.no_config_watch = true;
 
         shares = {
-          directories = [ "${mediaDir}/music" ];
-          filters = [ "^library\.db$" ];
+          directories = [
+            "${mediaDir}/music"
+            "!${mediaDir}/music/playlists"
+          ];
+          filters = [
+            "^library\.db$"
+            "\.nsp$"
+            "\.m3u$"
+          ];
         };
       };
     };

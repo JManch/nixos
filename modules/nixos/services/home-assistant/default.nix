@@ -209,12 +209,12 @@ in
             };
           in
           pkgs.home-assistant-custom-components.frigate.overridePythonAttrs {
-            version = "5.7.0";
+            version = "5.8.0";
             src = pkgs.fetchFromGitHub {
               owner = "blakeblackshear";
               repo = "frigate-hass-integration";
-              rev = "v5.7.0";
-              hash = "sha256-P5Q4bElxsfc0tGQitSnN0Wknij+4MpHKJk8d3BygOV4=";
+              rev = "v5.8.0";
+              hash = "sha256-sQgi3F44eT/iL3cE9YuKyjJmE4nZM+OcwirUyl3maGo=";
             };
 
             dependencies = [

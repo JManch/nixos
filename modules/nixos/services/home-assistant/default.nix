@@ -183,8 +183,8 @@ in
             src = pkgs.fetchFromGitHub {
               owner = "astrandb";
               repo = "miele";
-              rev = "refs/tags/v2025.1.0";
-              hash = "sha256-6E4aOWxI1RlULXGEN6TwYptlIS50gEawmgTAxvaixvs=";
+              rev = "refs/tags/v2025.1.1";
+              hash = "sha256-TShy2q3gKqTgRU3u4Wp7zQjzhEogqUVip8EkH8XIYw8=";
             };
           })
           selfPkgs.heatmiser

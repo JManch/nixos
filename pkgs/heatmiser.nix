@@ -74,13 +74,13 @@ in
 buildHomeAssistantComponent rec {
   owner = "MindrustUK";
   domain = "heatmiserneo";
-  version = "3.0.0";
+  version = "3.1.0-beta.8";
 
   src = fetchFromGitHub {
     inherit owner;
     repo = "heatmiser-for-home-assistant";
     rev = "refs/tags/v${version}";
-    hash = "sha256-/fer2V3rPALZ/Me7QiPItxZj4dKus+/ArzYrIindz4c=";
+    hash = "sha256-nH3UPmXYd44pi5CBf24JMWivoMzUHJfE7DwV83xQt5U=";
   };
 
   propagatedBuildInputs = [ neohubapi ];

@@ -55,6 +55,4 @@ mkIf (cfg.enable && (cfg.displayManager.name == "greetd")) {
     group = "greeter";
     mode = "0755";
   };
-
-  persistenceHome.directories = [ ".local/share/keyrings" ];
 }

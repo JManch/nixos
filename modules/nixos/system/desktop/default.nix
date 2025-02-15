@@ -17,6 +17,7 @@ let
     optionalAttrs
     getExe'
     mkOption
+    singleton
     ;
   inherit (lib.${ns})
     scanPaths
@@ -157,8 +158,15 @@ in
     # Enables wayland for all apps that support it
     environment.sessionVariables.NIXOS_OZONE_WL = 1;
 
-    # Some apps like vscode needs this
+    # Some apps like vscode need the keyring for saving credentials.
+    # WARN: May need to manually create a "login" keyring for this to work
+    # correctly. Seahorse is an easy way to do this. To enable automatic
+    # keyring unlock on login use the same password as our user.
     services.gnome.gnome-keyring.enable = true;
+    persistenceHome.directories = singleton {
+      directory = ".local/share/keyrings";
+      mode = "0700";
+    };
 
     # Necessary for xdg-portal home-manager module to work with useUserPackages enabled
     # https://github.com/nix-community/home-manager/pull/5184

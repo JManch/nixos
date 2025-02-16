@@ -90,6 +90,8 @@ mkMerge [
       environment = {
         QBT_PROFILE = "/var/lib/qbittorrent-nox";
         QBT_WEBUI_PORT = toString ports.qbittorrent;
+        QBT_TORRENTING_PORT = toString qBittorrentPort;
+        QBT_CONFIRM_LEGAL_NOTICE = "1";
       };
 
       vpnConfinement = {
@@ -116,6 +118,17 @@ mkMerge [
           "AF_INET"
           "AF_INET6"
           "AF_NETLINK"
+        ];
+
+        # Make file system inaccessible
+        TemporaryFileSystem = "/";
+        BindReadOnlyPaths = [
+          builtins.storeDir
+          "/etc/ssl/certs"
+        ];
+        BindPaths = [
+          "/var/lib/qbittorrent-nox"
+          "${mediaDir}/torrents"
         ];
       };
 
@@ -498,6 +511,7 @@ mkMerge [
                 max_rec.media = "medium";
                 preferred.media = [ "Digital Media" ];
                 ignored_media = [
+                  # Vinyl usually has bad cover art on musicbrainz
                   "12\" Vinyl"
                   "Vinyl"
                 ];
@@ -576,6 +590,18 @@ mkMerge [
         SupplementaryGroups = [ "media" ];
         # Same reason as qbittorrent
         UMask = "0000";
+
+        # Make file system inaccessible
+        TemporaryFileSystem = "/";
+        BindReadOnlyPaths = [
+          builtins.storeDir
+          "${mediaDir}/music"
+          "/run/agenix/slskdVars"
+        ];
+        BindPaths = [
+          "/var/lib/slskd"
+          "${mediaDir}/slskd"
+        ];
       };
       # slskd creates an inotify watch for every directory in the nix store.
       # This breaks jellyfin and probably a bunch of other stuff

@@ -35,13 +35,13 @@ mkMerge [
 
     nixpkgs.overlays = [
       (final: prev: {
-        uwsm = prev.uwsm.overrideAttrs {
-          version = "git";
+        uwsm = prev.uwsm.overrideAttrs rec {
+          version = "0.21.0";
           src = final.fetchFromGitHub {
             owner = "Vladimir-csp";
             repo = "uwsm";
-            rev = "ec9a72cd00726c7333663c9324df13f420094fd1";
-            hash = "sha256-JqF3v00M+HOQzNWbMq4/6GfoVA4OwrONEvXLVLr0vec=";
+            rev = "refs/tags/v${version}";
+            hash = "sha256-fGyLhQcf/sTZ78nqRLRBQ16C16z3xHRjfaL+1RtOS+c=";
           };
         };
 
@@ -125,7 +125,7 @@ mkMerge [
           # bash
           ''
             if test -z $SSH_TTY && uwsm check may-start -q ${optionalString select "&& uwsm select"}; then
-              exec uwsm start -S ${if select then "default" else "-- ${cfg.defaultDesktop}"} >/dev/null
+              exec uwsm start ${if select then "default" else "-- ${cfg.defaultDesktop}"} >/dev/null
             fi
 
             # This is needed to ensure that home-manager variables (home.sessionVariables)

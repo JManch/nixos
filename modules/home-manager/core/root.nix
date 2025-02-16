@@ -49,6 +49,7 @@ in
           [
             "${absPath}/files/repos"
             "${absPath}/files/software"
+            "*.qcow2"
           ];
       };
     };

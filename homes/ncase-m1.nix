@@ -87,6 +87,7 @@
         rnote.enable = true;
         jellyfinMediaPlayer.enable = true;
         davinciResolve.enable = false;
+        music.enable = true;
 
         firefox = {
           enable = true;

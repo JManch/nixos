@@ -546,6 +546,9 @@ mkMerge [
         directories.downloads = "${mediaDir}/slskd/downloads";
         directories.incomplete = "${mediaDir}/slskd/incomplete";
         flags.no_config_watch = true;
+        retention.search = 4320; # retain completed searches for 3 days
+        global.upload.speed_limit = 100000;
+        global.download.speed_limit = 100000;
 
         shares = {
           directories = [
@@ -571,7 +574,7 @@ mkMerge [
       serviceConfig = {
         StateDirectoryMode = "750";
         SupplementaryGroups = [ "media" ];
-        # Same reason as qbittorrent but for soularr
+        # Same reason as qbittorrent
         UMask = "0000";
       };
       # slskd creates an inotify watch for every directory in the nix store.
@@ -600,13 +603,11 @@ mkMerge [
       slskd.extraConfig = "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.slskd}";
     };
 
-    persistence.directories = [
-      {
-        directory = "/var/lib/slskd";
-        user = "slskd";
-        group = "slskd";
-        mode = "0750";
-      }
-    ];
+    persistence.directories = singleton {
+      directory = "/var/lib/slskd";
+      user = "slskd";
+      group = "slskd";
+      mode = "0750";
+    };
   })
 ]

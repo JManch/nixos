@@ -384,9 +384,7 @@ in
           backup = "/var/backup/postgresql/hass.sql";
         in
         {
-          preRestoreScript = ''
-            sudo systemctl stop home-assistant
-          '';
+          preRestoreScript = "sudo systemctl stop home-assistant";
 
           postRestoreScript = ''
             sudo -u postgres ${pg_restore} -U postgres --dbname postgres --clean --create ${backup}

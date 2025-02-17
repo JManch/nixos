@@ -32,9 +32,12 @@ let
 
   mkArrBackup = service: {
     paths = [ "/var/lib/${service}/Backups" ];
-    restore.pathOwnership."/var/lib/${service}" = {
-      user = service;
-      group = service;
+    restore = {
+      preRestoreScript = "sudo systemctl stop ${service}";
+      pathOwnership."/var/lib/${service}" = {
+        user = service;
+        group = service;
+      };
     };
   };
 
@@ -205,6 +208,7 @@ mkMerge [
 
         restore = {
           removeExisting = false;
+          preRestoreScript = "sudo systemctl stop qbittorrent-nox";
           pathOwnership."/var/lib/qbittorrent-nox" = {
             user = "qbittorrent-nox";
             group = "qbittorrent-nox";
@@ -617,9 +621,8 @@ mkMerge [
       };
     };
 
-    ${ns}.services.caddy.virtualHosts = {
-      slskd.extraConfig = "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.slskd}";
-    };
+    ${ns}.services.caddy.virtualHosts.slskd.extraConfig =
+      "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.slskd}";
 
     persistence.directories = singleton {
       directory = "/var/lib/slskd";

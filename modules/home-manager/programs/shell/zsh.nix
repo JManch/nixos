@@ -110,14 +110,9 @@ in
       '';
   };
 
-  nsConfig = {
-    # Backup zsh history
-    backups.zsh.paths = [ ".local/state/zsh" ];
-
-    persistence.directories = [
-      ".config/zsh" # for zcompdump
-      ".local/state/zsh"
-      ".cache/zsh"
-    ];
-  };
+  nsConfig.persistence.directories = [
+    ".config/zsh" # for zcompdump
+    ".local/state/zsh"
+    ".cache/zsh"
+  ];
 }

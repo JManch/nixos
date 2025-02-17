@@ -51,6 +51,7 @@
     programs = {
       shell = {
         enable = true;
+        atuin.enable = true;
         btop.enable = true;
         cava.enable = true;
         git.enable = true;

@@ -2,6 +2,7 @@
 {
   ${lib.ns}.programs.shell = {
     enable = true;
+    atuin.enable = true;
     promptColor = "blue";
     btop.enable = true;
     git.enable = true;

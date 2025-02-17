@@ -1,6 +1,28 @@
 # How to fix database collation warnings: https://dba.stackexchange.com/a/330184
 
-# State version upgrade procedure:
+# Sometimes after adding a new user/database with ensureUsers and ensureDatabases this error happens:
+# Relevant github issue: https://github.com/NixOS/nixpkgs/issues/318777
+
+# postgres[1153065]: [1153065] ERROR:  template database "template1" has a collation version mismatch
+# postgres[1153065]: [1153065] DETAIL:  The template database was created using collation version 2.39, but the operating system provides version 2.40.
+# postgres[1153065]: [1153065] HINT:  Rebuild all objects in the template database that use the default collation and run ALTER DATABASE template1 REFRESH COLLATION VERSION, or build PostgreSQL with the right library version.
+
+# And the postgres service fails to start. The fix is to temporarily disable ensureUsers and ensureDatabases with
+
+# services.postgresql.ensureDatabases = lib.mkForce [ ];
+# services.postgresql.ensureUsers = lib.mkForce [ ];
+
+# Then once postgresql has successfully started run `sudo -u postgres psql` and run these commands:
+
+# \c template1
+# REINDEX DATABASE template1;
+# REINDEX SYSTEM template1;
+# ALTER DATABASE template1 REFRESH COLLATION VERSION;
+#
+# Now the ensureDatabase and ensureUsers overrides can be removed and
+# postgresql should successfully start and create the new database and user
+
+# State version upgrade procedure for a given database:
 
 # WARN: When upgrading postgresql to a new major version, make sure to use the
 # pq_dump and pq_restore binaries from the version you're upgrading to.

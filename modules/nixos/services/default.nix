@@ -1102,6 +1102,16 @@ in
         description = "Absolute path to music library";
       };
     };
+
+    atuin-server = {
+      enable = mkEnableOption "Atuin server";
+
+      port = mkOption {
+        type = types.port;
+        default = 8888;
+        description = "Port for the Atuin server to listen on";
+      };
+    };
   };
 
   config = {

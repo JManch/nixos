@@ -56,6 +56,7 @@ in
       acme.enable = true;
       taskchampion-server.enable = true;
       air-vpn.confinement.enable = true;
+      atuin-server.enable = true;
 
       calibre = {
         enable = true;

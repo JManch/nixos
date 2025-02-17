@@ -7,13 +7,13 @@
       src = pkgs.fetchFromGitHub {
         owner = "JManch";
         repo = "supersonic";
-        rev = "3a3774f5b64844984b7140ea28c298e961533cfa";
-        hash = "sha256-ftvraAsYyUULp9Nh5vGtvy6ilAN1K6tAIAd5hRu0Xq0=";
+        rev = "4e619c08f89b0560639a137bcda0c944dc30198e";
+        hash = "sha256-2gtFWBL25LQIACap7JYtFJc1ShuhUg6oSwW7dlEKYqQ=";
       };
 
       patches = [ ../../../../patches/supersonicLargeVolumeSlider.patch ];
 
-      vendorHash = "sha256-VEu8pNWpGAFQdf12r0vUE8EQJ2EF+T/tHzgYwVRW4Z0=";
+      vendorHash = "sha256-Y1oWiQUwL6TGtHs9CfksEzjaAYb9rFEewyN3Pvv7i0Q=";
 
       desktopItems = lib.singleton (
         pkgs.makeDesktopItem {

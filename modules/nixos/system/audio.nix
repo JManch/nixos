@@ -50,14 +50,37 @@ in
         pulse.enable = true;
         wireplumber.enable = true;
 
-        wireplumber.extraConfig = mkIf (cfg.alsaDeviceAliases != { }) {
-          "99-alsa-device-aliases"."monitor.alsa.rules" = mapAttrsToList (old: new: {
-            matches = singleton {
-              "node.name" = old;
+        wireplumber.extraConfig = mkMerge [
+          {
+            "99-disable-restore-props"."stream.rules" = singleton {
+              matches = [
+                # A lot of different applications fall under the "mpv" audio application so
+                # always having the audio level get restored can be pretty annoying. Also we
+                # should prefer adjusting soft volume over ao-volume.
+                { "application.name" = "mpv"; }
+                # Some Music apps (e.g. Spotify) adjust application audio level whilst others
+                # (e.g. supersonic) adjust the soft audio level inside MPV. We want the
+                # application audio level of apps like supersonic to always stay at 100 rather
+                # than syncing with apps like Spotify. Doesn't seem to have any downsides since
+                # Spotify remembers its own audio level.
+                { "media.role" = "Music"; }
+                # Would rather have Movie apps restore their own volume instead of grouping
+                { "media.role" = "Movie"; }
+              ];
+              # https://pipewire.pages.freedesktop.org/wireplumber/daemon/configuration/settings.html
+              actions.update-props."state.restore-props" = false;
             };
-            actions.update-props."node.description" = new;
-          }) cfg.alsaDeviceAliases;
-        };
+          }
+
+          (mkIf (cfg.alsaDeviceAliases != { }) {
+            "99-alsa-device-aliases"."monitor.alsa.rules" = mapAttrsToList (old: new: {
+              matches = singleton {
+                "node.name" = old;
+              };
+              actions.update-props."node.description" = new;
+            }) cfg.alsaDeviceAliases;
+          })
+        ];
 
         extraConfig.pipewire."99-input-denoising.conf" = mkIf cfg.inputNoiseSuppression {
           "context.modules" = singleton {

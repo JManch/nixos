@@ -25,10 +25,7 @@ in
 {
   opts = {
     backup = mkEnableOption "Firefox backup";
-    hideToolbar = mkEnableOption ''
-      automatic toolbar hiding and as well as hiding tabs in the toolbar.
-      Intended to be used with the 'Sidebery' extension'
-    '';
+    hideToolbar = mkEnableOption "automatic toolbar hiding";
     runInRam = mkEnableOption "running Firefox in RAM";
 
     uiScale = lib.mkOption {
@@ -191,7 +188,6 @@ in
     pkgs.runCommand "firefox-auto-hide-toolbar-css" { buildInputs = [ pkgs.gnused ]; } ''
       cat ${font} > $out
       cat ${src}/chrome/autohide_toolbox.css >> $out
-      cat ${src}/chrome/hide_tabs_toolbar_v2.css >> $out
       # Preferred activation distance
       sed 's/^  --uc-toolbox-rotation:.*/  --uc-toolbox-rotation: 70deg;/' -i $out
       # Without this replacement the tab bar has a black background

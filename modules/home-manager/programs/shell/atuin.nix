@@ -47,11 +47,11 @@ in
       sync_address = cfg.syncAddress;
       sync_frequency = "10m";
       enter_accept = false;
-      keymap_mode = "vim-insert";
       inline_height = 15;
       show_preview = false;
       show_help = false;
       show_tabs = false;
+      scroll_exits = false;
 
       # WARN: The daemon service must be manually restarted after logging in
       # otherwise stuff is encrypted with the wrong key
@@ -90,10 +90,30 @@ in
     Install.WantedBy = [ "default.target" ];
   };
 
-  # Disable zsh history
-  programs.zsh.initExtra = ''
-    unset HISTFILE
-  '';
+  programs.zsh.initExtra = # bash
+    ''
+      # Disable zsh history
+      unset HISTFILE
+
+      # Function to toggle history saving
+      incognito() {
+        if [[ $1 = disable ]] || [[ $1 == d ]]; then
+          unset ATUIN_INCOGNITO
+          add-zsh-hook precmd _atuin_precmd
+          add-zsh-hook preexec _atuin_preexec
+        else
+          export ATUIN_INCOGNITO=" "
+          add-zsh-hook -d precmd _atuin_precmd
+          add-zsh-hook -d preexec _atuin_preexec
+        fi
+      }
+    '';
+
+  # https://github.com/starship/starship/issues/5410 would make this easier
+  programs.starship.settings.env_var.ATUIN_INCOGNITO = {
+    default = "";
+    format = "$env_value";
+  };
 
   nsConfig.persistence.directories = [ ".local/share/atuin" ];
 }

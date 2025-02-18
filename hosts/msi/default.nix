@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, inputs, ... }:
 {
   imports = [
     ./disko.nix
@@ -48,7 +48,7 @@
         type = "zfs";
         tmpfsTmp = true;
         zfs.trim = true;
-        zfs.encryption.passphraseCred = "DHzAexF2RZGcSwvqCLwg/iAAAAABAAAADAAAABAAAAC16pMdY9oxIerp+s0AAAAAgAAAAAAAAAAEACMA0AAAACAAAAAAfgAg4k2dsjF+wZuYCEqT6S2Zz+EMbx5/anyDHmQA0b39wnEAEAmwSRPdAugtok+xmWBxESTiPDbO3+lhsMjO6gxDzY6D0wVA7yYGm07S4ItovBfJmhqgogNQnHU6OeP7YRCZG9Uiv2FR6IsxScXV+O9zoaOAYdGE8NHHPFwLVgBOAAgACwAABBIAICOggjc/UCURP3ANnxcEjAQGuMkf9R6UX+qSLkbyanxlABAAIACrd9GrmOizSNxJUSEGb5W4qxfBbhad5l7pjQlHTHfaI6CCNz9QJRE/cA2fFwSMBAa4yR/1HpRf6pIuRvJqfGUAAAAAc9UPthPU99J82DLI9jq+roZxKkk/py9z1SwOO+8OSot43Wst4a/5bIJ3K6yKTHfSwvF1gWIHUcgJ6PykdFkugwtPo5nwSId+53skhNkP3ef/EtiPMxdSJSrPJESmiHJWbpCJEG5DeaWJWjZYzCl2LH77RTZafQgEqTySAdKdR2/IckigvDW/dUsSeodKYLkA";
+        zfs.encryption.passphraseCred = inputs.nix-resources.secrets.zfsPassphrases.msi;
       };
 
       printing.client = {

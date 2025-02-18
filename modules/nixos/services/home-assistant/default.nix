@@ -243,7 +243,7 @@ in
           # the recorder. Note that recorder data is deleted after 10 days
           # (long-term data is managed seperately). This postgresql command is
           # useful for finding entities taking up db space. Run `\c hass` in
-          # pgsql then:
+          # psql then:
           # SELECT
           #   states_meta.entity_id, states.metadata_id,
           #   COUNT(*) AS cnt

@@ -96,6 +96,8 @@ in
       asserts [
         (config.age.secrets."wg-${interface}-key" != null)
         "A private key secret for Wireguard VPN interface '${interface}' is missing"
+        (cfg.routerPeer -> config.age.secrets."wg-${interface}-router-psk" != null)
+        "A pre shared key for Wireguard VPN interface '${interface}' router peer is missing"
         (cfg.dns.host -> dns-stack.enable)
         "The DNS stack must be enabled on this host to allow VPN DNS hosting"
         (cfg.routerPeer -> cfg.routerAllowedIPs != [ ])
@@ -131,6 +133,9 @@ in
               cfg.peers
               ++ optional cfg.routerPeer {
                 publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
+                presharedKeyFile = mkIf (
+                  config.age.secrets ? "wg-${interface}-router-psk"
+                ) config.age.secrets."wg-${interface}-router-psk".path;
                 allowedIPs = cfg.routerAllowedIPs;
                 endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:13232";
                 persistentKeepalive = mkIf (cfg.listenPort == null) 25;

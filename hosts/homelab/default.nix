@@ -242,4 +242,6 @@ in
       };
     };
   };
+
+  adminPackages = [ selfPkgs.filen-cli ];
 }

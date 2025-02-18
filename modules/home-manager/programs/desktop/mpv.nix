@@ -70,6 +70,7 @@ in
       # General
       save-position-on-quit = false;
       osc = "no"; # we use modernx osc
+      volume = 50;
 
       # Subs
       sub-font = config.${ns}.desktop.style.font.family;

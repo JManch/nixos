@@ -83,7 +83,6 @@ in
 
     Service = {
       Slice = "background.slice";
-      Environment = [ "ATUIN_LOG=info" ];
       ExecStart = "${getExe pkgs.atuin} daemon";
     };
 

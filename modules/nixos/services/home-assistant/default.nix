@@ -174,19 +174,22 @@ in
               src = pkgs.fetchFromGitHub {
                 owner = "basnijholt";
                 repo = "adaptive-lighting";
-                rev = "refs/tags/v${final.version}";
+                tag = "v${final.version}";
                 hash = "sha256-ykliUi/gnJB9hMNI72RCofcGzS7799lVTAXZyrho/Ng=";
               };
             }
           ))
-          (pkgs.home-assistant-custom-components.miele.overrideAttrs {
-            src = pkgs.fetchFromGitHub {
-              owner = "astrandb";
-              repo = "miele";
-              rev = "refs/tags/v2025.1.1";
-              hash = "sha256-TShy2q3gKqTgRU3u4Wp7zQjzhEogqUVip8EkH8XIYw8=";
-            };
-          })
+          (pkgs.home-assistant-custom-components.miele.overrideAttrs (
+            final: _: {
+              version = "2025.1.1";
+              src = pkgs.fetchFromGitHub {
+                owner = "astrandb";
+                repo = "miele";
+                tag = "v${final.version}";
+                hash = "sha256-TShy2q3gKqTgRU3u4Wp7zQjzhEogqUVip8EkH8XIYw8=";
+              };
+            }
+          ))
           selfPkgs.heatmiser
           selfPkgs.thermal-comfort
           selfPkgs.daikin-onecta

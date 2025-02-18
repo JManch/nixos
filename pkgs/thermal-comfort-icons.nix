@@ -11,7 +11,7 @@ stdenvNoCC.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "rautesamtr";
     repo = "thermal_comfort_icons";
-    rev = "refs/tags/${version}";
+    tag = version;
     sha256 = "sha256-owyG70muKxVsIOGxj4CvjLtOLRuzfNsSuUxh15V94l8=";
   };
 

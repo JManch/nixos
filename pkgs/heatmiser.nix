@@ -79,7 +79,7 @@ buildHomeAssistantComponent rec {
   src = fetchFromGitHub {
     inherit owner;
     repo = "heatmiser-for-home-assistant";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-nH3UPmXYd44pi5CBf24JMWivoMzUHJfE7DwV83xQt5U=";
   };
 

@@ -12,7 +12,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     repo = "hyprpy";
     owner = "ulinja";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-xnvoiHxDxYVwR1ZrKRGWB5oManaJSP/2sDsQ7KLRpmE=";
   };
 

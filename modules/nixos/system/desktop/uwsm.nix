@@ -40,7 +40,7 @@ mkMerge [
           src = final.fetchFromGitHub {
             owner = "Vladimir-csp";
             repo = "uwsm";
-            rev = "refs/tags/v${version}";
+            tag = "v${version}";
             hash = "sha256-fGyLhQcf/sTZ78nqRLRBQ16C16z3xHRjfaL+1RtOS+c=";
           };
         };

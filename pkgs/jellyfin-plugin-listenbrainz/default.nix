@@ -10,7 +10,7 @@ buildDotnetModule (finalAttrs: {
   src = fetchFromGitHub {
     owner = "lyarenei";
     repo = "jellyfin-plugin-listenbrainz";
-    rev = "refs/tags/${finalAttrs.version}";
+    tag = finalAttrs.version;
     hash = "sha256-r6oKrFac/g0Nc7wc66LvIJVXKBvGa8UMILiXFMi2VXg=";
   };
 

@@ -16,7 +16,7 @@ let
     src = fetchFromGitHub {
       owner = "bigoulours";
       repo = "slskd-python-api";
-      rev = "refs/tags/v${version}";
+      tag = "v${version}";
       hash = "sha256-Kyzbd8y92VFzjIp9xVbhkK9rHA/6KCCJh7kNS/MtixI=";
     };
 

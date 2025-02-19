@@ -110,21 +110,4 @@ in
           sleep ${toString cfg.lockTime}
         done &
       '';
-
-  wayland.windowManager.hyprland.settings.bind =
-    let
-      inherit (config.${ns}.desktop.hyprland) modKey;
-      systemctl = getExe' pkgs.systemd "systemctl";
-      notifySend = getExe pkgs.libnotify;
-      toggleHypridle = pkgs.writeShellScript "hypridle-toggle" ''
-        ${systemctl} is-active --quiet --user hypridle && {
-          ${systemctl} stop --quiet --user hypridle
-          ${notifySend} -e --urgency=low -t 2000 'Hypridle' 'Service disabled'
-        } || {
-          ${systemctl} start --quiet --user hypridle
-          ${notifySend} -e --urgency=low -t 2000 'Hypridle' 'Service enabled'
-        }
-      '';
-    in
-    [ "${modKey}, U, exec, ${toggleHypridle}" ];
 }

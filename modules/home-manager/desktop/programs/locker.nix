@@ -2,10 +2,12 @@
   lib,
   cfg,
   pkgs,
+  config,
   osConfig,
 }:
 let
   inherit (lib)
+    ns
     getExe
     optionalString
     escapeShellArg
@@ -112,4 +114,25 @@ in
       '';
     };
   };
+
+  systemd.user.services.inhibit-lock = {
+    Unit.Description = "Inhibit Lock";
+    Service.ExecStart = "systemd-inhibit --who='Inhibit Lock' --what=idle --why='User request' sleep infinity";
+  };
+
+  wayland.windowManager.hyprland.settings.bind =
+    let
+      inherit (config.${ns}.desktop.hyprland) modKey;
+      notifySend = getExe pkgs.libnotify;
+      toggleLockInhibit = pkgs.writeShellScript "toggle-lock-inhibit" ''
+        systemctl is-active --quiet --user inhibit-lock && {
+          systemctl stop --quiet --user inhibit-lock
+          ${notifySend} -e --urgency=low -t 2000 'Locker' 'Locking uninhibited'
+        } || {
+          systemctl start --quiet --user inhibit-lock
+          ${notifySend} -e --urgency=low -t 2000 'Locker' 'Locking inhibited'
+        }
+      '';
+    in
+    [ "${modKey}, U, exec, ${toggleLockInhibit}" ];
 }

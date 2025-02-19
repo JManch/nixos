@@ -23,5 +23,6 @@ in
   xdg-terminal-exec = callPackage ./xdg-terminal-exec.nix { };
   jellyfin-plugin-listenbrainz = callPackage ./jellyfin-plugin-listenbrainz { };
   filen-cli = callPackage ./filen-cli.nix { };
+  bootstrap-kit = callPackage ./bootstrap-kit.nix { };
 }
 // import ./installers.nix lib self

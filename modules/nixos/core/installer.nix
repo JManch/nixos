@@ -1,6 +1,7 @@
 {
   lib,
   pkgs,
+  selfPkgs,
   adminUsername,
   ...
 }:
@@ -10,9 +11,9 @@ let
 
   setupSdImage = pkgs.writeShellApplication {
     name = "setup-sd-image";
-    runtimeInputs = with pkgs; [
-      parted
-      age
+    runtimeInputs = [
+      pkgs.parted
+      selfPkgs.bootstrap-kit
     ];
     text = # bash
       ''
@@ -66,14 +67,13 @@ let
         mkdir -p $rootDir
         mount -o loop,offset="$offset" -t ext4 "$tmpdir"/*.img "$rootDir"
 
-        echo "### Decrypting ssh-bootstrap-kit ###"
-        temp_keys=$(mktemp -d)
+        echo "### Decrypting bootstrap-kit ###"
+        bootstrap_kit=$(mktemp -d)
         clean_up_keys() {
-          rm -rf "$temp_keys"
+          rm -rf "$bootstrap_kit"
         }
         add_exit_trap clean_up_keys
-        kit_path="${../../../hosts/ssh-bootstrap-kit}"
-        age -d "$kit_path" | tar -xf - -C "$temp_keys"
+        bootstrap-kit decrypt "$bootstrap_kit"
 
         echo "### Installing keys ###"
         install -d -m755 "$rootDir/etc/ssh" "$rootDir/home"
@@ -81,19 +81,19 @@ let
         install -d -m700 "$rootDir/home/$username/.ssh" "$rootDir/home/${adminUsername}/.ssh"
 
         # Host keys
-        mv "$temp_keys/$hostname"/* "$rootDir/etc/ssh"
+        mv "$bootstrap_kit/$hostname"/* "$rootDir/etc/ssh"
 
         # User keys
-        if [ -d "$temp_keys/$username" ]; then
-          mv "$temp_keys/$username"/* "$rootDir/home/$username/.ssh"
+        if [ -d "$bootstrap_kit/$username" ]; then
+          mv "$bootstrap_kit/$username"/* "$rootDir/home/$username/.ssh"
         fi
 
         # Admin user keys
-        if [[ -d "$temp_keys/${adminUsername}" && -n "$(ls -A "$temp_keys/${adminUsername}")" ]]; then
-          mv "$temp_keys/${adminUsername}"/* "$rootDir/home/${adminUsername}/.ssh"
+        if [[ -d "$bootstrap_kit/${adminUsername}" && -n "$(ls -A "$bootstrap_kit/${adminUsername}")" ]]; then
+          mv "$bootstrap_kit/${adminUsername}"/* "$rootDir/home/${adminUsername}/.ssh"
         fi
 
-        rm -rf "$temp_keys"
+        rm -rf "$bootstrap_kit"
         # user:users
         chown -R 1000:100 "$rootDir/home/$username"
 

@@ -3,6 +3,7 @@
   pkgs,
   config,
   inputs,
+  selfPkgs,
   username,
   adminUsername,
   ...
@@ -27,14 +28,16 @@ let
 
   runVMScript = pkgs.writeShellApplication {
     name = "run-vm";
-    runtimeInputs = with pkgs; [
-      gnugrep
-      gnused
-      gnutar
-      age
-      openssh
-      xdg-terminal-exec
-    ];
+    runtimeInputs =
+      (with pkgs; [
+        gnugrep
+        gnused
+        gnutar
+        age
+        openssh
+        xdg-terminal-exec
+      ])
+      ++ [ selfPkgs.bootstrap-kit ];
     text = # bash
       ''
         no_secrets=false
@@ -73,13 +76,11 @@ let
         printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
 
         if [[ "$no_secrets" = false && ! -e "/home/${adminUsername}/$hostname.qcow2" ]]; then
-          tmp=$(mktemp -d)
+          bootstrap_kit=$(mktemp -d)
           # shellcheck disable=SC2016
-          add_exit_trap 'rm -rf $tmp'
+          add_exit_trap 'sudo rm -rf $bootstrap_kit'
 
-          # Decrypt the relevant secrets from kit
-          kit_path="${../../../hosts/ssh-bootstrap-kit}"
-          age -d "$kit_path" | tar -xf - --strip-components=1 -C "$tmp" "$hostname"
+          sudo bootstrap-kit decrypt "$bootstrap_kit"
 
           # Copy keys to VM
           printf "Copying SSH keys to VM...\nNOTE: Secret decryption will not work on the first VM launch"
@@ -87,10 +88,10 @@ let
           if [ "$impermanence" = "true" ]; then
             rootDir="persist"
           fi
-          (scp -P 50022 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-            -o LogLevel=QUIET -o ConnectionAttempts=30 \
-            "$tmp/ssh_host_ed25519_key" "$tmp/ssh_host_ed25519_key.pub" \
-            root@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$tmp") &
+          (sudo scp -P 50022 -i /home/${username}/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null -o LogLevel=QUIET -o ConnectionAttempts=30 \
+            "$bootstrap_kit/$hostname/ssh_host_ed25519_key" "$bootstrap_kit/$hostname/ssh_host_ed25519_key.pub" \
+            root@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$bootstrap_kit") &
         fi
 
         # For non-graphical VMs, launch VM and start ssh session in new

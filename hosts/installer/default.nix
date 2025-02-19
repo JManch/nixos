@@ -7,6 +7,8 @@
   pkgs,
   self,
   base,
+  username,
+  selfPkgs,
   modulesPath,
   ...
 }:
@@ -16,7 +18,7 @@ let
     name = "install-host";
 
     runtimeInputs = with pkgs; [
-      age
+      selfPkgs.bootstrap-kit
       disko
       gitMinimal
       # The upstream package hardcodes the database path but we want to be able
@@ -48,19 +50,21 @@ let
         git clone https://github.com/JManch/nixos "$flake"
       fi
 
-      temp_keys=$(mktemp -d)
+      bootstrap_kit=$(mktemp -d)
       ssh_dir="/root/.ssh"
       clean_up_keys() {
-        rm -rf "$temp_keys"
+        rm -rf "$bootstrap_kit"
         rm -rf "$ssh_dir"
       }
       add_exit_trap clean_up_keys
-      echo "### Decrypting ssh-bootstrap-kit ###"
-      age -d "$flake/hosts/ssh-bootstrap-kit" | tar -xf - -C "$temp_keys"
+
+      echo "### Decrypting bootstrap-kit ###"
+      bootstrap-kit decrypt "$bootstrap_kit"
+
       rm -rf "$ssh_dir"
       mkdir -p "$ssh_dir"
-      cp "$temp_keys/joshua/id_ed25519" "$ssh_dir"
-      cp "$temp_keys/joshua/id_ed25519.pub" "$ssh_dir"
+      cp "$bootstrap_kit/${username}/id_ed25519" "$ssh_dir"
+      cp "$bootstrap_kit/${username}/id_ed25519.pub" "$ssh_dir"
 
       vmInstall=false
       read -p "Are you installing this host in a virtual machine? (y/N): " -n 1 -r
@@ -129,19 +133,19 @@ let
         install -d -m700 "$rootDir/home/$username/.ssh" "$rootDir/home/$admin_username/.ssh"
 
         # Host keys
-        mv "$temp_keys/$hostname"/* "$rootDir/etc/ssh"
+        mv "$bootstrap_kit/$hostname"/* "$rootDir/etc/ssh"
 
         # User keys
-        if [ -d "$temp_keys/$username" ]; then
-          mv "$temp_keys/$username"/* "$rootDir/home/$username/.ssh"
+        if [ -d "$bootstrap_kit/$username" ]; then
+          mv "$bootstrap_kit/$username"/* "$rootDir/home/$username/.ssh"
         fi
 
         # Admin user keys
-        if [[ -d "$temp_keys/$admin_username" && -n "$(ls -A "$temp_keys/$admin_username")" ]]; then
-          mv "$temp_keys/$admin_username"/* "$rootDir/home/$admin_username/.ssh"
+        if [[ -d "$bootstrap_kit/$admin_username" && -n "$(ls -A "$bootstrap_kit/$admin_username")" ]]; then
+          mv "$bootstrap_kit/$admin_username"/* "$rootDir/home/$admin_username/.ssh"
         fi
 
-        rm -rf "$temp_keys"
+        rm -rf "$bootstrap_kit"
         # user:users
         chown -R 1000:100 "$rootDir/home/$username"
 

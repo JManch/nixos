@@ -3,29 +3,45 @@
   pkgs,
   config,
   inputs,
+  selfPkgs,
   ...
 }:
 let
   inherit (inputs) agenix nix-resources;
   inherit (config.${lib.ns}.system) impermanence;
-  scriptInputs =
-    (with pkgs; [
-      age
-      findutils
-      gnutar
-    ])
-    ++ [ agenix.packages.${pkgs.system}.agenix ];
+  scriptInputs = [
+    pkgs.findutils
+    selfPkgs.bootstrap-kit
+    agenix.packages.${pkgs.system}.agenix
+  ];
 
-  decryptKit = # bash
+  setup = # bash
     ''
-      temp=$(mktemp -d)
+      if [[ $(id -u) != 0 ]]; then
+         echo "agenix script must be run as root" >&2
+         exit 1
+      fi
+
+      if [[ $PWD != */nix-resources/secrets ]]; then
+         echo "agenix script must be run in secrets dir of nix-resources" >&2
+         exit 1
+      fi
+
+      bootstrap_kit=$(mktemp -d)
       cleanup() {
-        rm -rf "$temp"
+        rm -rf "$bootstrap_kit"
       }
       trap cleanup EXIT
 
-      kit_path="${../../../hosts/ssh-bootstrap-kit}"
-      age -d "$kit_path" | tar -xf - -C "$temp"
+      bootstrap-kit decrypt "$bootstrap_kit"
+
+      keys=""
+      # shellcheck disable=SC2044
+      for file in $(find "$bootstrap_kit" -type f ! -name "*.pub"); do
+        keys+=" -i $file"
+      done
+
+      export EDITOR=nano
     '';
 
   editSecretScript = pkgs.writeShellApplication {
@@ -33,20 +49,15 @@ let
     runtimeInputs = scriptInputs;
     text = # bash
       ''
-        if [ "$#" -ne 1 ]; then
-          echo "Usage: agenix-edit <file_path>"
+        if [[ $# -ne 1 ]]; then
+          echo "Usage: agenix-edit <file_path>" >&2
           exit 1
         fi
 
-        ${decryptKit}
-
-        keys=""
-        # shellcheck disable=SC2044
-        for file in $(find "$temp" -type f ! -name "*.pub"); do
-          keys+=" -i $file"
-        done
+        ${setup}
 
         eval agenix -e "$1" "$keys"
+        chown 1000:100 ./*
       '';
   };
 
@@ -55,15 +66,9 @@ let
     runtimeInputs = scriptInputs;
     text = # bash
       ''
-        ${decryptKit}
-
-        keys=""
-        # shellcheck disable=SC2044
-        for file in $(find "$temp" -type f ! -name "*.pub"); do
-          keys+=" -i $file"
-        done
-
+        ${setup}
         eval agenix -r "$keys"
+        chown 1000:100 ./*
       '';
   };
 in
@@ -74,6 +79,7 @@ in
   ];
 
   adminPackages = [
+    selfPkgs.bootstrap-kit
     agenix.packages.${pkgs.system}.default
     editSecretScript
     rekeySecretScript

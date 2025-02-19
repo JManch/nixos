@@ -34,9 +34,7 @@ SSH keys for secret deployment. All that's required is a master password.
 Everything, including secrets, will be installed.
 
 Run `build-iso` to get a custom install ISO. The ISO authenticates my SSH key
-for remote installs and provides an install script for installing locally.
-- Local: `install-local <hostname>` inside the ISO
-- Remote: `install-remote <hostname> <ip_address>`
+ and provides the install script `install-host <hostname>`.
 
 The configuration also supports running a VM-variant of any host using `run-vm
 <hostname>`. This enables easy debugging/testing of host configurations. It's

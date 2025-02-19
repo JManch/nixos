@@ -13,7 +13,7 @@
 let
   inherit (lib) ns;
   installScript = pkgs.writeShellApplication {
-    name = "install-local";
+    name = "install-host";
 
     runtimeInputs = with pkgs; [
       age
@@ -36,7 +36,7 @@ let
       fi
 
       if [ "$#" -ne 1 ]; then
-        echo "Usage: install-local <hostname>"
+        echo "Usage: install-host <hostname>"
         exit 1
       fi
       ${lib.${ns}.exitTrapBuilder}

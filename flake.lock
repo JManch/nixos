@@ -82,11 +82,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1738701861,
-        "narHash": "sha256-GkhZFuq0+kPY8Vk609QRRv3dVFL6b8Lak5ggp5MMPuA=",
+        "lastModified": 1740069553,
+        "narHash": "sha256-fdgAQSC+MDaCbSobQvcJs2eni+ZdaW+g4SL6Uu9e4Zs=",
         "owner": "JManch",
         "repo": "broadcast-box",
-        "rev": "6e9035d6ea16deae6e7b82d68aa2eed85bb1aa44",
+        "rev": "2dd00d0655f7fe79c08f88ae395df711e71956ff",
         "type": "github"
       },
       "original": {
@@ -338,11 +338,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1717050755,
-        "narHash": "sha256-C9IEHABulv2zEDFA+Bf0E1nmfN4y6MIUe5eM2RCrDC0=",
+        "lastModified": 1733668782,
+        "narHash": "sha256-tPsqU00FhgdFr0JiQUiBMgPVbl1jbPCY5gbFiJycL3I=",
         "owner": "nix-community",
         "repo": "gomod2nix",
-        "rev": "31b6d2e40b36456e792cd6cf50d5a8ddd2fa59a1",
+        "rev": "514283ec89c39ad0079ff2f3b1437404e4cba608",
         "type": "github"
       },
       "original": {

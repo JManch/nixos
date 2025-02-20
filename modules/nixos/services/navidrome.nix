@@ -5,11 +5,10 @@ let
     mkIf
     optionalString
     hasPrefix
-    singleton
     ;
   inherit (config.${ns}.services) caddy;
   inherit (config.${ns}.system) impermanence;
-  inherit (config.age.secrets) navidromeSpotifyVars;
+  inherit (config.age.secrets) navidromeVars;
   cfg = config.${ns}.services.navidrome;
 in
 mkIf cfg.enable {
@@ -29,6 +28,7 @@ mkIf cfg.enable {
       ScanSchedule = 0; # would rather manually trigger scans
       EnableInsightsCollector = false;
       ListenBrainz.Enabled = true;
+      LastFM.Enabled = true;
 
       Backup = {
         Path = "/var/backup/navidrome";
@@ -40,7 +40,7 @@ mkIf cfg.enable {
 
   systemd.services.navidrome.serviceConfig = {
     BindPaths = [ "/var/backup/navidrome" ];
-    EnvironmentFile = navidromeSpotifyVars.path;
+    EnvironmentFile = navidromeVars.path;
   };
 
   ${ns}.services.caddy.virtualHosts.navidrome.extraConfig = ''

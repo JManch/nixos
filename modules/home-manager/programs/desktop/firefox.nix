@@ -114,6 +114,7 @@ in
           "browser.newtabpage.activity-stream.feeds.system.topstories" = false;
           "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts" = false;
           "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.searchEngines" = "";
+          "media.videocontrols.picture-in-picture.video-toggle-enabled" = false;
 
           # QOL
           "signon.rememberSignons" = false;

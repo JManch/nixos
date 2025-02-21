@@ -3,7 +3,6 @@
   cfg,
   pkgs,
   config,
-  selfPkgs,
 }:
 let
   inherit (lib)
@@ -34,28 +33,22 @@ in
     enable = true;
 
     scripts = [
+      (pkgs.stdenvNoCC.mkDerivation {
+        pname = "thumbfast-vanilla-osc";
+        version = "0-unstable-2025-02-21";
+        src = pkgs.fetchFromGitHub {
+          owner = "po5";
+          repo = "thumbfast";
+          rev = "9d78edc167553ccea6290832982d0bc15838b4ac";
+          hash = "sha256-AG3w5B8lBcSXV4cbvX3nQ9hri/895xDbTsdaqF+RL64=";
+        };
+        installPhase = "install -m644 player/lua/osc.lua -Dt $out/share/mpv/scripts";
+        passthru.scriptName = "osc.lua";
+      })
       pkgs.mpvScripts.thumbfast
       pkgs.mpvScripts.sponsorblock-minimal
       pkgs.mpvScripts.mpris
-      selfPkgs.modernx
     ];
-
-    scriptOpts.modernx = {
-      scalewindowed = 1;
-      scalefullscreen = 1;
-      fadeduration = 150;
-      hidetimeout = 5000;
-      donttimeoutonpause = true;
-      OSCfadealpha = 75;
-      showtitle = true;
-      showinfo = true;
-      windowcontrols = false;
-      volumecontrol = true;
-      compactmode = false;
-      bottomhover = false;
-      showontop = false;
-      raisesubswithosc = false;
-    };
 
     config = {
       # Quality
@@ -69,14 +62,13 @@ in
 
       # General
       save-position-on-quit = false;
-      osc = "no"; # we use modernx osc
       volume = 50;
 
       # Subs
       sub-font = config.${ns}.desktop.style.font.family;
-      sub-font-size = 20;
-      sub-border-size = 1.5;
-      sub-pos = 95;
+      sub-scale = 0.7;
+      sub-font-size = 38;
+      sub-pos = 97;
       sub-auto = "fuzzy";
 
       # Screenshots

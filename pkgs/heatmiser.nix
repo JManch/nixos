@@ -56,11 +56,11 @@ let
 
   neohubapi = buildPythonPackage rec {
     pname = "neohubapi";
-    version = "2.5";
+    version = "2.7";
 
     src = fetchPypi {
       inherit pname version;
-      hash = "sha256-pXBwAPbEFlp20nqJ408zMakwkyNrRoSTpwnJ5trRNwM=";
+      hash = "sha256-+EUHoJ62YKRBBfIL7xvwtWq1P4xdYq1f50QmLsrWZRQ=";
     };
 
     propagatedBuildInputs = [
@@ -74,13 +74,13 @@ in
 buildHomeAssistantComponent rec {
   owner = "MindrustUK";
   domain = "heatmiserneo";
-  version = "3.1.0-beta.8";
+  version = "3.1.0-beta.11";
 
   src = fetchFromGitHub {
     inherit owner;
     repo = "heatmiser-for-home-assistant";
     tag = "v${version}";
-    hash = "sha256-nH3UPmXYd44pi5CBf24JMWivoMzUHJfE7DwV83xQt5U=";
+    hash = "sha256-qx5gq0LL2bhkTzewkU47V+ikrpQYet2lS9hgLwbJHP4=";
   };
 
   propagatedBuildInputs = [ neohubapi ];

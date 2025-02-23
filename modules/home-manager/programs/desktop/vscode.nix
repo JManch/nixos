@@ -19,7 +19,7 @@ in
     # use VSCode as my main editor though so not a big deal.
     package = pkgs.vscode.fhsWithPackages (ps: with ps; [ gdb ]);
 
-    userSettings = {
+    profiles.default.userSettings = {
       # Prevents wayland crash on launch
       "window.titleBarStyle" = "custom";
       "window.menuBarVisibility" = "toggle";

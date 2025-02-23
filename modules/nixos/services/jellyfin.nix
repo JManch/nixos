@@ -174,18 +174,6 @@ mkMerge [
 
     services.jellyseerr = {
       enable = jellyfin.enable;
-
-      package = pkgs.jellyseerr.overrideAttrs (
-        old:
-        # https://github.com/NixOS/nixpkgs/pull/380532
-        assert lib.assertMsg (!old ? postBuild) "Remove the jellyseerr override";
-        {
-          postBuild = ''
-            find node_modules -xtype l -delete
-          '';
-        }
-      );
-
       openFirewall = false;
       port = cfg.jellyseerr.port;
     };

@@ -36,12 +36,12 @@ mkMerge [
     nixpkgs.overlays = [
       (final: prev: {
         uwsm = prev.uwsm.overrideAttrs rec {
-          version = "0.21.0";
+          version = "0.21.1";
           src = final.fetchFromGitHub {
             owner = "Vladimir-csp";
             repo = "uwsm";
             tag = "v${version}";
-            hash = "sha256-fGyLhQcf/sTZ78nqRLRBQ16C16z3xHRjfaL+1RtOS+c=";
+            hash = "sha256-12x3IUfo+sl/9XQ2rqifit4P76JGozSA0JLnpwtU8vM=";
           };
         };
 

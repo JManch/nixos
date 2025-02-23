@@ -16,7 +16,6 @@ in
   # the first toggle, after which it hides and never shows again.
   programs.mangohud = {
     enable = true;
-    package = lib.${ns}.addPatches pkgs.mangohud [ "mangoHud.diff" ];
 
     settings = {
       # Performance

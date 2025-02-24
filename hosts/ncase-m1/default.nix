@@ -113,8 +113,12 @@ in
       wine.enable = true;
       winbox.enable = true;
       matlab.enable = false;
-      wireshark.enable = true;
       adb.enable = true;
+
+      wireshark = {
+        enable = true;
+        graphical = true;
+      };
 
       gaming = {
         enable = true;

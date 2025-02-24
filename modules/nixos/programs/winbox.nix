@@ -1,14 +1,5 @@
+{ pkgs, categoryCfg }:
 {
-  lib,
-  pkgs,
-  config,
-  ...
-}:
-let
-  inherit (lib) ns mkIf;
-  cfg = config.${ns}.programs.winbox;
-in
-mkIf cfg.enable {
   # New native linux version
   userPackages = [ pkgs.winbox4 ];
 
@@ -16,7 +7,7 @@ mkIf cfg.enable {
   # directory tends to fix it
   programs.winbox = {
     enable = true;
-    package = pkgs.winbox.override { wine = config.${ns}.programs.wine.package; };
+    package = pkgs.winbox.override { wine = categoryCfg.wine.package; };
     openFirewall = true;
   };
 

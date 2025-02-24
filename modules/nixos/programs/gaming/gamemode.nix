@@ -1,14 +1,16 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   username,
-  ...
 }:
 let
   inherit (lib)
     ns
-    mkIf
+    mkOption
+    mkEnableOption
+    types
     all
     hasAttr
     getExe
@@ -20,13 +22,11 @@ let
     concatLines
     ;
   inherit (lib.${ns})
-    asserts
     upperFirstChar
     getMonitorHyprlandCfgStr
     isHyprland
     ;
   inherit (config.${ns}.system) desktop;
-  cfg = config.${ns}.programs.gaming.gamemode;
   profiles = (config.hm.${ns}.programs.gaming.gamemode.profiles or { }) // cfg.profiles;
 
   gamemodeWrapped = pkgs.symlinkJoin {
@@ -115,8 +115,43 @@ let
     };
 
 in
-mkIf cfg.enable {
-  assertions = asserts [
+{
+  opts = {
+    wrappedPackage = mkOption {
+      type = types.package;
+      readOnly = true;
+      default = gamemodeWrapped;
+      description = "Wrapped gamemode package with profile functionality";
+    };
+
+    profiles = mkOption {
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            includeDefaultProfile = mkEnableOption "the default profile scripts in this profile";
+
+            start = mkOption {
+              type = types.lines;
+              default = "";
+            };
+
+            stop = mkOption {
+              type = types.lines;
+              default = "";
+            };
+          };
+        }
+      );
+      default = { };
+      description = ''
+        Attribute set of Gamemode profiles with start/stop bash scripts.
+        Gamemode profiles can be enabled by setting the GAMEMODE_PROFILES
+        environment variable to a comma separated list of profile names.
+      '';
+    };
+  };
+
+  asserts = [
     (all (v: v == false) (
       mapAttrsToList (
         profile: _: hasAttr profile (config.hm.${ns}.programs.gaming.gamemode.profiles or { })
@@ -139,39 +174,36 @@ mkIf cfg.enable {
   # enables the VR profile on our GPU.
   environment.systemPackages = [ (hiPrio gamemodeWrapped) ];
 
-  ${ns}.programs.gaming.gamemode = {
-    wrappedPackage = gamemodeWrapped;
-    profiles.default =
-      let
-        inherit (config.hm.${ns}.desktop) hyprland;
-        inherit (config.${ns}.device) primaryMonitor;
-        hyprctl = getExe' pkgs.hyprland "hyprctl";
+  ${ns}.programs.gaming.gamemode.profiles.default =
+    let
+      inherit (config.hm.${ns}.desktop) hyprland;
+      inherit (config.${ns}.device) primaryMonitor;
+      hyprctl = getExe' pkgs.hyprland "hyprctl";
 
-        # Remap the killactive key to use the shift modifier
-        killActiveRebind = isStart: ''
-          keyword unbind ${hyprland.modKey}${optionalString (!isStart) "SHIFTCONTROL"}, W; \
-          keyword bind ${hyprland.modKey}${optionalString isStart "SHIFTCONTROL"}, W, killactive'';
-      in
-      {
-        start = optionalString (isHyprland config) ''
-          ${hyprctl} --instance 0 --batch "\
-            keyword monitor ${
-              getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
-            }; \
-            ${killActiveRebind true}; \
-            keyword decoration:blur:enabled false; \
-          "
-        '';
+      # Remap the killactive key to use the shift modifier
+      killActiveRebind = isStart: ''
+        keyword unbind ${hyprland.modKey}${optionalString (!isStart) "SHIFTCONTROL"}, W; \
+        keyword bind ${hyprland.modKey}${optionalString isStart "SHIFTCONTROL"}, W, killactive'';
+    in
+    {
+      start = optionalString (isHyprland config) ''
+        ${hyprctl} --instance 0 --batch "\
+          keyword monitor ${
+            getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
+          }; \
+          ${killActiveRebind true}; \
+          keyword decoration:blur:enabled false; \
+        "
+      '';
 
-        stop = optionalString (isHyprland config) ''
-          ${hyprctl} --instance 0 --batch "\
-            keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
-            ${killActiveRebind false}; \
-            keyword decoration:blur:enabled ${boolToString hyprland.blur}; \
-          "
-        '';
-      };
-  };
+      stop = optionalString (isHyprland config) ''
+        ${hyprctl} --instance 0 --batch "\
+          keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
+          ${killActiveRebind false}; \
+          keyword decoration:blur:enabled ${boolToString hyprland.blur}; \
+        "
+      '';
+    };
 
   programs.gamemode = {
     enable = true;

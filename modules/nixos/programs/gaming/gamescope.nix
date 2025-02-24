@@ -1,9 +1,4 @@
-{ lib, config, ... }:
-let
-  inherit (lib) ns mkIf;
-  cfg = config.${ns}.programs.gaming.gamescope;
-in
-mkIf cfg.enable {
+{
   programs.gamescope = {
     enable = true;
     # Would like to enable this but it causes gamescope to stop working in lutris and steam

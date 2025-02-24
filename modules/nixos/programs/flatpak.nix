@@ -3,22 +3,15 @@
   pkgs,
   config,
   inputs,
-  ...
 }:
 let
-  inherit (lib)
-    mkIf
-    mkMerge
-    ns
-    singleton
-    ;
+  inherit (lib) mkIf ns singleton;
   inherit (config.${ns}.core) homeManager;
-  cfg = config.${ns}.programs.flatpak;
 in
-mkMerge [
-  { home-manager.sharedModules = [ inputs.nix-flatpak.homeManagerModules.nix-flatpak ]; }
+[
+  {
+    guardType = "first";
 
-  (mkIf cfg.enable {
     hm = mkIf homeManager.enable {
       services.flatpak = {
         enable = true;
@@ -96,5 +89,7 @@ mkMerge [
     };
 
     users.groups.flatpak = { };
-  })
+  }
+
+  { home-manager.sharedModules = [ inputs.nix-flatpak.homeManagerModules.nix-flatpak ]; }
 ]

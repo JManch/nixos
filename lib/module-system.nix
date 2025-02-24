@@ -30,6 +30,7 @@ let
     intersectAttrs
     pathExists
     optional
+    optionals
     zipAttrsWithNames
     isBool
     isFunction
@@ -201,8 +202,6 @@ let
     # rather than creating option ${ns}.programs.desktop.alacritty.fontSize it
     # would create ${ns}.programs.desktop.fontSize.
     noChildren = false;
-
-    exclude = [ ];
   };
 
   mergeDefaultOpts =
@@ -231,7 +230,7 @@ in
             ];
 
             category = mkCategory {
-              inherit args categoryOpts;
+              inherit args categoryOpts exclude;
               dir = categoryDir;
               categoryPath = newCategoryPath;
             };
@@ -264,6 +263,7 @@ in
       dir,
       categoryPath,
       categoryOpts,
+      exclude,
     }:
     let
       rootModule =
@@ -343,7 +343,7 @@ in
                     type == "regular"
                     && (path != "root.nix")
                     && hasSuffix ".nix" path
-                    && !elem path rootModule.categoryOpts.exclude
+                    && !elem (concatStringsSep "/" (categoryPath ++ [ path ])) exclude
                   ) (builtins.readDir dir)
                 )
               )
@@ -525,19 +525,22 @@ in
 
                 first = (
                   mkMerge (
-                    [
-                      (mkIf primarySetEnabled (
-                        if (isAttrs strippedConfig) then
-                          strippedConfig
-                        else if (isList strippedConfig) then
-                          head strippedConfig
-                        else
-                          throw "Stripped config has unexpected type ${builtins.typeOf strippedConfig}"
-                      ))
-
-                      (mkIf primarySetEnabled extraConfig)
-                    ]
-                    ++ optional (isList strippedConfig) (tail strippedConfig)
+                    singleton (
+                      mkIf primarySetEnabled (
+                        mkMerge (
+                          singleton (
+                            if (isAttrs strippedConfig) then
+                              strippedConfig
+                            else if (isList strippedConfig) then
+                              head strippedConfig
+                            else
+                              throw "Stripped config has unexpected type ${builtins.typeOf strippedConfig}"
+                          )
+                          ++ extraConfig
+                        )
+                      )
+                    )
+                    ++ optionals (isList strippedConfig) (tail strippedConfig)
                   )
                 );
 

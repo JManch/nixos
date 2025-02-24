@@ -1,8 +1,8 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
-  ...
 }:
 let
   inherit (lib)
@@ -12,10 +12,10 @@ let
     mapAttrs'
     nameValuePair
     singleton
+    mkEnableOption
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.hm.xdg) dataHome;
-  cfg = config.${ns}.programs.gaming.steam;
 
   steamAppIDs = {
     "BeamNG.drive" = 284160;
@@ -26,7 +26,7 @@ let
     BONELAB = 1592190;
   };
 in
-mkIf cfg.enable {
+{
   # -- Common steam launch commands --
   # Standard  : mangohud gamemoderun %command%
   # FPS Limit : MANGOHUD_CONFIG=read_cfg,fps_limit=200 mangohud gamemoderun %command%
@@ -62,6 +62,8 @@ mkIf cfg.enable {
   # 3 after content manager has already launched. I suspect it's a hyprland bug
   # but needs further investigation.
 
+  opts.lanTransfer = mkEnableOption "opening port for Steam LAN game transfer";
+
   userPackages = [ pkgs.steam-run ];
 
   programs.steam = {
@@ -81,7 +83,7 @@ mkIf cfg.enable {
   # Steam doesn't close cleanly when SIGTERM is sent to the main process so we
   # have to send SIGTERM to a specific child process and wait for the
   # steamwebhelper which likes to hang around.
-  ${ns}.system.desktop.uwsm = {
+  nsConfig.system.desktop.uwsm = {
     serviceApps = [ "steam" ];
     appUnitOverrides."steam@.service" =
       let

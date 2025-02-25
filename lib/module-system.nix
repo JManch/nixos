@@ -39,6 +39,7 @@ let
     assertMsg
     concatStrings
     imap0
+    hasAttr
     ;
   inherit (lib.${ns})
     upperFirstChar
@@ -223,6 +224,7 @@ in
     {
       args,
       rootDir,
+      isHomeManager ? false,
       categoryPath ? [ ],
       categoryOpts ? defaultCategoryOpts,
       exclude ? [ ], # list of paths relative to the rootDir
@@ -237,13 +239,18 @@ in
             ];
 
             category = mkCategory {
-              inherit args categoryOpts exclude;
+              inherit
+                args
+                categoryOpts
+                isHomeManager
+                exclude
+                ;
               dir = categoryDir;
               categoryPath = newCategoryPath;
             };
           in
           (importCategories {
-            inherit args exclude;
+            inherit args isHomeManager exclude;
             inherit (category) categoryOpts;
             rootDir = categoryDir;
             categoryPath = newCategoryPath;
@@ -270,6 +277,7 @@ in
     {
       args,
       dir,
+      isHomeManager,
       categoryPath,
       categoryOpts,
       exclude,
@@ -278,7 +286,7 @@ in
       rootModule =
         if pathExists (dir + "/root.nix") then
           mkModule {
-            inherit args categoryPath;
+            inherit args categoryPath isHomeManager;
             categoryOpts' = categoryOpts;
             name = "root";
             moduleBody = import (dir + "/root.nix");
@@ -297,7 +305,7 @@ in
           (
             modulePath:
             mkModule {
-              inherit args categoryPath;
+              inherit args categoryPath isHomeManager;
               inherit (modulePath) name;
               categoryOpts' = rootModule.categoryOpts;
               moduleBody = import modulePath.path;
@@ -365,13 +373,13 @@ in
     {
       args,
       categoryPath,
+      isHomeManager,
       name,
       moduleBody,
       categoryOpts',
     }:
     let
       isRoot = name == "root";
-      isHomeManager = args.config ? home.stateVersion;
       moduleOptionName = concatStrings (
         imap0 (i: s: if i == 0 then s else upperFirstChar s) (splitString "-" name)
       );
@@ -426,11 +434,9 @@ in
         else
           throw "configRaw has unexpected type ${builtins.typeOf configRaw}";
 
-      throwMsg = ''
-        ${
-          if isHomeManager then "Home Manager module" else "NixOS module"
-        } '${name}' in category '${categoryPathString}'
-      '';
+      throwMsg = "${
+        if isHomeManager then "Home Manager module" else "NixOS module"
+      } '${name}' in category '${categoryPathString}'";
 
       conditionsResult = all (
         condition:
@@ -498,14 +504,9 @@ in
           options.${ns} =
             let
               options' =
-                (optionalAttrs
-                  (
-                    (!isRoot && moduleOpts.enableOpt && !categoryOpts.noChildren) || (isRoot && categoryOpts.enableOpt)
-                  )
-                  {
-                    enable = mkEnableOption name;
-                  }
-                )
+                (optionalAttrs (
+                  (!isRoot && moduleOpts.enableOpt && !categoryOpts.noChildren) || (isRoot && categoryOpts.enableOpt)
+                ) { enable = mkEnableOption name; })
                 // moduleOpts.opts;
             in
             moduleOpts.nsOpts
@@ -561,7 +562,7 @@ in
                     assertIncompat =
                       option:
                       assertMsg (
-                        moduleOpts.guardType == "custom" -> moduleOpts.${option} == defaultModuleOpts.${option}
+                        moduleOpts.guardType == "custom" -> !hasAttr option setModuleOpts
                       ) "${throwMsg} uses `${option}` which is not compatible with `guardType` 'custom'";
                   in
                   assert assertIncompat "asserts";

@@ -19,7 +19,10 @@
 # unrelated), the problem re-appeared and I can't find a way to fix it. I'm
 # just going to consider the ethernet port broken and just use a USB 3.0 to
 # ethernet adapter.
+{ modulesPath, ... }:
 {
+  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+
   networking.hostId = "8d4ed64c";
   hardware.cpu.amd.updateMicrocode = true;
 

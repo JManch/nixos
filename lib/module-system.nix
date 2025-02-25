@@ -77,8 +77,8 @@ let
     #
     # When set to `true`, a boolean enable option will be created under the
     # module's namespace. The module's config will only be enabled if the
-    # created enable option is set to `true`. This option has no effect in root
-    # modules.
+    # created enable option is set to `true`. This option has a different
+    # meaning in root modules.
     #
     # Would create `${ns}.programs.desktop.gaming.mangohud.enable`
     enableOpt = true;
@@ -202,6 +202,13 @@ let
     # rather than creating option ${ns}.programs.desktop.alacritty.fontSize it
     # would create ${ns}.programs.desktop.fontSize.
     noChildren = false;
+
+    # List of file names or directories in the current category to not import.
+    # Does not use paths relative to the root import dir like importCategories
+    # exclude does.
+    #
+    # e.g. exclude = [ "raspberry-pi.nix" "special" ];
+    exclude = [ ];
   };
 
   mergeDefaultOpts =
@@ -218,7 +225,7 @@ in
       rootDir,
       categoryPath ? [ ],
       categoryOpts ? defaultCategoryOpts,
-      exclude ? [ ],
+      exclude ? [ ], # list of paths relative to the rootDir
     }:
     flatten (
       map
@@ -246,11 +253,13 @@ in
         (
           map (dir: rootDir + "/${dir}") (
             attrNames (
+              let
+                allExcludes =
+                  exclude ++ (map (c: concatStringsSep "/" (categoryPath ++ [ c ])) categoryOpts.exclude);
+              in
               filterAttrs (
                 path: type:
-                type == "directory"
-                && path != "disable" # special case for debugging
-                && !elem (concatStringsSep "/" (categoryPath ++ [ path ])) exclude
+                type == "directory" && !elem (concatStringsSep "/" (categoryPath ++ [ path ])) allExcludes
               ) (builtins.readDir rootDir)
             )
           )
@@ -344,6 +353,7 @@ in
                     && (path != "root.nix")
                     && hasSuffix ".nix" path
                     && !elem (concatStringsSep "/" (categoryPath ++ [ path ])) exclude
+                    && !elem path rootModule.categoryOpts.exclude
                   ) (builtins.readDir dir)
                 )
               )
@@ -382,7 +392,7 @@ in
       configPrimarySet =
         if configPrimarySetRaw ? _type then
           assert assertMsg (configPrimarySetRaw._type == "if") "The primary config set cannot use mkMerge";
-          configPrimarySetRaw.contents
+          configPrimarySetRaw.content
         else
           configPrimarySetRaw;
 

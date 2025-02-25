@@ -1,43 +1,64 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
-  ...
 }:
 let
   inherit (lib)
     ns
     mkIf
-    mkMerge
     mkForce
     mkBefore
     singleton
     getExe'
+    replaceStrings
+    mkOption
+    mkEnableOption
+    types
     ;
   inherit (config.${ns}.services) caddy;
-  cfg = config.${ns}.hardware.printing;
 
-  dcp9015cdwlpr = pkgs.dcp9020cdwlpr.overrideAttrs (oldAttrs: rec {
-    pname = "dcp9015cdw-lpr";
-    version = "1.1.3";
-    src = pkgs.fetchurl {
-      url = "https://download.brother.com/welcome/dlf102113/dcp9015cdwlpr-${version}-0.i386.deb";
-      sha256 = "sha256-ySywvrQ51dBMwnKP6IgDW06u560us2K+5ls1gSJB1+c=";
-    };
-    installPhase = lib.replaceStrings [ "dcp9020cdw" ] [ "dcp9015cdw" ] oldAttrs.installPhase;
-  });
+  dcp9015cdwlpr = pkgs.dcp9020cdwlpr.overrideAttrs (
+    final: prev: {
+      pname = "dcp9015cdw-lpr";
+      version = "1.1.3";
+      src = pkgs.fetchurl {
+        url = "https://download.brother.com/welcome/dlf102113/dcp9015cdwlpr-${final.version}-0.i386.deb";
+        sha256 = "sha256-ySywvrQ51dBMwnKP6IgDW06u560us2K+5ls1gSJB1+c=";
+      };
+      installPhase = replaceStrings [ "dcp9020cdw" ] [ "dcp9015cdw" ] prev.installPhase;
+    }
+  );
 
-  dcp9015cdw-cupswrapper = pkgs.dcp9020cdw-cupswrapper.overrideAttrs (oldAttrs: rec {
-    pname = "dcp9015cdw-cupswrapper";
-    version = "1.1.4";
-    src = pkgs.fetchurl {
-      url = "https://download.brother.com/welcome/dlf102114/dcp9015cdwcupswrapper-${version}-0.i386.deb";
-      sha256 = "sha256-QUSILXzr2M+huvgXUc1UPpM/C/QoNo5PFUuy3via3EA=";
-    };
-    installPhase = lib.replaceStrings [ "dcp9020cdw" ] [ "dcp9015cdw" ] oldAttrs.installPhase;
-  });
+  dcp9015cdw-cupswrapper = pkgs.dcp9020cdw-cupswrapper.overrideAttrs (
+    final: prev: {
+      pname = "dcp9015cdw-cupswrapper";
+      version = "1.1.4";
+      src = pkgs.fetchurl {
+        url = "https://download.brother.com/welcome/dlf102114/dcp9015cdwcupswrapper-${final.version}-0.i386.deb";
+        sha256 = "sha256-QUSILXzr2M+huvgXUc1UPpM/C/QoNo5PFUuy3via3EA=";
+      };
+      installPhase = replaceStrings [ "dcp9020cdw" ] [ "dcp9015cdw" ] prev.installPhase;
+    }
+  );
 in
-mkMerge [
+[
+  {
+    guardType = "custom";
+
+    opts = {
+      server.enable = mkEnableOption "printing server";
+      client = {
+        enable = mkEnableOption "printing client";
+        serverAddress = mkOption {
+          type = types.str;
+          description = "Address of the cups server to print from";
+        };
+      };
+    };
+  }
+
   (mkIf cfg.client.enable {
     services.printing.enable = true;
 

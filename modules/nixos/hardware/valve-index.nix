@@ -6,11 +6,11 @@
 # - Some games are broken with Monado so require suffering with SteamVR
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
   username,
-  ...
 }:
 let
   inherit (lib)
@@ -19,20 +19,42 @@ let
     getExe
     getExe'
     singleton
+    mkOption
+    types
     ;
-  inherit (lib.${ns}) asserts sliceSuffix;
   inherit (config.${ns}.core) homeManager;
   inherit (config.${ns}.device) primaryMonitor gpu;
   inherit (config.${ns}.hardware) bluetooth;
   inherit (config.${ns}.system) audio;
   inherit (config.${ns}.programs.gaming) gamemode;
   inherit (config.${ns}.services) lact;
-  cfg = config.${ns}.hardware.valve-index;
   systemctl = getExe' pkgs.systemd "systemctl";
   lighthouse = getExe pkgs.lighthouse-steamvr;
 in
-mkIf cfg.enable {
-  assertions = asserts [
+{
+  opts.audio = {
+    card = mkOption {
+      type = types.str;
+      description = "Name of the Index audio card from `pact list cards`";
+    };
+
+    profile = mkOption {
+      type = types.str;
+      description = "Name of the Index audio profile from `pactl list cards`";
+    };
+
+    source = mkOption {
+      type = types.str;
+      description = "Name of the Index source device from `pactl list short sources`";
+    };
+
+    sink = mkOption {
+      type = types.str;
+      description = "Name of the Index sink device from `pactl list short sinks`";
+    };
+  };
+
+  asserts = [
     homeManager.enable
     "Valve Index requires home manager to be enabled"
     gamemode.enable
@@ -98,7 +120,7 @@ mkIf cfg.enable {
     })
   ];
 
-  ${ns} = {
+  nsConfig = {
     system.audio.alsaDeviceAliases = {
       ${cfg.audio.source} = "Valve Index";
       ${cfg.audio.sink} = "Valve Index";
@@ -182,7 +204,7 @@ mkIf cfg.enable {
       requires = [ "valve-index.service" ];
       after = [ "valve-index.service" ];
       serviceConfig = {
-        Slice = "app${sliceSuffix config}.slice";
+        Slice = "app${lib.${ns}.sliceSuffix config}.slice";
 
         ExecStartPre = "-${pkgs.writeShellScript "monado-exec-start-pre" ''
           mkdir -p "$XDG_CONFIG_HOME/openvr"

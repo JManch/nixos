@@ -4,7 +4,6 @@
     [
       ./core
       ./system
-      ./hardware
       ./services
     ]
     ++ (lib.${lib.ns}.importCategories {
@@ -13,7 +12,6 @@
       exclude = [
         "core"
         "system"
-        "hardware"
         "services"
       ];
     });

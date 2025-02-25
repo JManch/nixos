@@ -1,17 +1,19 @@
-{ lib, config, ... }:
-let
-  inherit (lib)
-    ns
-    mkIf
-    mkAfter
-    ;
-  cfg = config.${ns}.hardware.raspberryPi;
-in
-mkIf cfg.enable {
+{
+  lib,
+  cfg,
+  inputs,
+  ...
+}:
+{
+  imports = with inputs.raspberry-pi-nix.nixosModules; [
+    raspberry-pi
+    sd-image
+  ];
+
   # I'm not sure why raspberry-pi-nix overlays this. Their overlay breaks cross
   # compilation and booting (by removing the bigger kernel patch). Using the
   # nixpkgs version fixes both problems.
-  nixpkgs.overlays = mkAfter [
+  nixpkgs.overlays = lib.mkAfter [
     (_: _: {
       uboot-rpi-arm64 = cfg.uboot.package;
     })

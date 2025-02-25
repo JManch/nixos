@@ -2,7 +2,6 @@
   lib,
   pkgs,
   config,
-  ...
 }:
 let
   inherit (lib)
@@ -12,9 +11,8 @@ let
     hiPrio
     ;
   inherit (config.${ns}.core) homeManager;
-  cfg = config.${ns}.hardware.bluetooth;
 in
-mkIf cfg.enable {
+{
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 

@@ -86,7 +86,7 @@ in
       fanatec.enable = true;
       tablet.enable = true;
 
-      valve-index = {
+      valveIndex = {
         enable = true;
         audio = {
           card = "alsa_card.pci-0000_09_00.1";

@@ -1,14 +1,10 @@
-{ lib, config, ... }:
-let
-  inherit (lib) ns mkIf;
-  cfg = config.${ns}.hardware.tablet;
-in
-mkIf cfg.enable {
+{ lib, config }:
+{
   hardware.opentabletdriver.enable = true;
 
   systemd.user.services.opentabletdriver = {
     after = [ "graphical-session.target" ];
-    serviceConfig.Slice = "background${lib.${ns}.sliceSuffix config}.slice";
+    serviceConfig.Slice = "background${lib.${lib.ns}.sliceSuffix config}.slice";
     serviceConfig.SuccessExitStatus = 143;
   };
 

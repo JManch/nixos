@@ -9,10 +9,10 @@
 # - config.system.build.mountScript (useful for rescues)
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
-  ...
 }:
 let
   inherit (lib)
@@ -27,18 +27,103 @@ let
     getExe
     getExe'
     mkForce
-    mkMerge
     listToAttrs
     singleton
     optionalString
     replaceStrings
+    mkEnableOption
+    mkOption
+    types
+    mapAttrsToList
+    hasAttr
+    any
+    attrValues
     ;
   inherit (config.${ns}.system) impermanence;
   inherit (config.${ns}.hardware) raspberryPi;
-  cfg = config.${ns}.hardware.fileSystem;
 in
-mkMerge [
+[
   {
+    guardType = "custom";
+    enableOpt = false;
+
+    opts = {
+      tmpfsTmp = mkEnableOption "tmp on tmpfs";
+      extendedLoaderTimeout = mkEnableOption ''
+        an extended loader timeout of 30 seconds. Useful for switching to old
+        generations on headless machines.
+      '';
+
+      type = mkOption {
+        type = types.enum [
+          "zfs"
+          "ext4"
+          "sd-image"
+        ];
+        default = null;
+        description = "The type of filesystem on this host";
+      };
+
+      ext4.trim = removeAttrs (mkEnableOption "ext4 automatic trimming") [ "default" ];
+
+      zfs = {
+        unstable = mkEnableOption "unstable ZFS";
+        trim = removeAttrs (mkEnableOption "ZFS automatic trimming") [ "default" ];
+
+        encryption = {
+          enable = mkOption {
+            type = types.bool;
+            readOnly = true;
+            # Check for any pool datasets with encryption enable or child
+            # datasets with encryption enabled
+            default = any (v: v == true) (
+              mapAttrsToList (
+                _: pool:
+                (hasAttr "encryption" pool.rootFsOptions)
+                || (any (dataset: hasAttr "encryption" dataset.options) (attrValues pool.datasets))
+              ) config.disko.devices.zpool
+            );
+            description = ''
+              Whether the file system uses ZFS disk encryption. Derived from disko
+              config.
+            '';
+          };
+
+          passphraseCred = mkOption {
+            type = with types; nullOr lines;
+            default = null;
+            description = ''
+              Encrypted ZFS passphrase credential generated with
+              `systemd-ask-password -n | systemd-creds encrypt --with-key=tpm2
+              --name=zfs-passphrase -p - -`
+            '';
+          };
+        };
+      };
+
+      swap =
+        let
+          inherit (config.${ns}.device) memory;
+        in
+        {
+          enable = mkEnableOption "swap" // {
+            default = cfg.type != "zfs" && cfg.type != "sd-image" && memory <= 4 * 1024;
+          };
+
+          size = mkOption {
+            type = types.int;
+            default =
+              if memory <= 2 * 1024 then
+                memory * 2
+              else if memory <= 8 * 1024 then
+                memory
+              else
+                1024 * 4;
+            description = "Size of swap file in megabytes";
+          };
+        };
+    };
+
     assertions = lib.${ns}.asserts [
       (cfg.type != null)
       "Filesystem type must be set"

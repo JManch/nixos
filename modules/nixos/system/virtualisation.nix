@@ -165,7 +165,7 @@ in
           hardware = {
             bluetooth.enable = mkVMOverride false;
             printing.client.enable = mkVMOverride false;
-            valve-index.enable = mkVMOverride false;
+            valveIndex.enable = mkVMOverride false;
           };
 
           system = {

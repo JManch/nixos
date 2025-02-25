@@ -1,8 +1,8 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
-  ...
 }:
 let
   inherit (lib)
@@ -11,11 +11,25 @@ let
     hiPrio
     mkBefore
     optional
+    mkOption
+    types
     ;
-  cfg = config.${ns}.hardware.graphics.amd;
+  inherit (config.${ns}.device) gpu;
   davinciResolve = config.hm.${ns}.programs.davinci-resolve.enable or false;
 in
-mkIf (config.${ns}.device.gpu.type == "amd") {
+{
+  enableOpt = false;
+  conditions = [ (gpu.type == "amd") ];
+
+  opts.kernelPatches = mkOption {
+    type = with types; listOf path;
+    default = [ ];
+    description = ''
+      List of patches to apply to the amdgpu kernel module. Waiting for this
+      to get implemented upstream https://github.com/NixOS/nixpkgs/pull/321663.
+    '';
+  };
+
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
 
   # Copied from https://github.com/Atemu/nixos-config/blob/7beb94aec277fb4cbf31360bdbd0a3e9e635a619/modules/amdgpu/module.nix

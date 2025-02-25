@@ -1,13 +1,5 @@
+{ config, inputs }:
 {
-  lib,
-  config,
-  inputs,
-  ...
-}:
-let
-  cfg = config.${lib.ns}.hardware.fanatec;
-in
-lib.mkIf cfg.enable {
   boot = {
     kernelModules = [ "hid-fanatec" ];
     extraModulePackages = [

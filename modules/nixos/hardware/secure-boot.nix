@@ -3,17 +3,10 @@
   pkgs,
   config,
   inputs,
-  ...
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    mkForce
-    optionalString
-    ;
-  inherit (config.${ns}.system) impermanence;
-  cfg = config.${ns}.hardware.secureBoot;
+  inherit (lib) mkForce optionalString;
+  inherit (config.${lib.ns}.system) impermanence;
 in
 {
   # Requires manual initial setup
@@ -27,20 +20,17 @@ in
   # Boot into bios: Enable secure boot in "Setup Mode".
   # Boot 2: Enroll our keys as instructed in the docs.
   # Done
+  adminPackages = [ pkgs.sbctl ];
 
-  config = mkIf cfg.enable {
-    adminPackages = [ pkgs.sbctl ];
+  # NOTE: Lanzaboote replaces systemd-boot with it's own systemd-boot which
+  # is configured here. Lanzaboote inherits most config from the standard
+  # systemd-boot configuration.
+  boot.loader.systemd-boot.enable = mkForce false;
 
-    # NOTE: Lanzaboote replaces systemd-boot with it's own systemd-boot which
-    # is configured here. Lanzaboote inherits most config from the standard
-    # systemd-boot configuration.
-    boot.loader.systemd-boot.enable = mkForce false;
-
-    boot.lanzaboote = {
-      enable = true;
-      pkiBundle = "${optionalString impermanence.enable "/persist"}/etc/secureboot";
-    };
-
-    persistence.directories = [ "/etc/secureboot" ];
+  boot.lanzaboote = {
+    enable = true;
+    pkiBundle = "${optionalString impermanence.enable "/persist"}/etc/secureboot";
   };
+
+  persistence.directories = [ "/etc/secureboot" ];
 }

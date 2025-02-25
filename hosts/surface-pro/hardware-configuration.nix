@@ -1,6 +1,9 @@
-{ inputs, ... }:
+{ inputs, modulesPath, ... }:
 {
-  imports = [ inputs.nixos-hardware.nixosModules.microsoft-surface-pro-intel ];
+  imports = [
+    (modulesPath + "/installer/scan/not-detected.nix")
+    inputs.nixos-hardware.nixosModules.microsoft-surface-pro-intel
+  ];
 
   networking.hostId = "06e74829";
   hardware.cpu.intel.updateMicrocode = true;

@@ -44,8 +44,15 @@
 # WARN: Save and reboot again at this stage before setting admin password
 
 #   Administrator Password: **********************
-{ lib, pkgs, ... }:
 {
+  lib,
+  pkgs,
+  modulesPath,
+  ...
+}:
+{
+  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+
   networking.hostId = "625ec505";
   hardware.cpu.amd.updateMicrocode = true;
 

@@ -1,5 +1,12 @@
-{ lib, config, ... }:
 {
+  lib,
+  config,
+  modulesPath,
+  ...
+}:
+{
+  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+
   networking.hostId = "de08204b";
 
   boot = {

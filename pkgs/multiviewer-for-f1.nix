@@ -5,14 +5,13 @@
   libudev0-shim,
   libglvnd,
   icoutils,
-  ...
 }:
 multiviewer-for-f1.overrideAttrs rec {
-  version = "1.36.2";
+  version = "1.38.1";
 
   src = fetchurl {
-    url = "https://releases.multiviewer.app/download/203624820/multiviewer-for-f1_${version}_amd64.deb";
-    hash = "sha256-b9Sx5Zcn+zQ9yFwrosHp1bTENByhBUU3VJfZA2HPoPU=";
+    url = "https://releases.multiviewer.app/download/232635194/multiviewer-for-f1_${version}_amd64.deb";
+    hash = "sha256-3UgpjQdZYr48MPoqgHci6Yvo+jxK7oa3THl/JuL8tRo=";
   };
 
   # Add libglvnd to library path for hardware acceleration

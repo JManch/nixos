@@ -30,7 +30,7 @@ let
     ;
   inherit (lib.${ns}) addPatches sliceSuffix;
   inherit (config.${ns}) desktop;
-  inherit (osConfig.${ns}.device) hassIntegration;
+  inherit (osConfig.${ns}.core.device) hassIntegration;
   inherit (config.${ns}.services.hass) curlCommand;
   inherit (config.xdg) dataHome;
   inherit (config.services) darkman;

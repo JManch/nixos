@@ -22,12 +22,12 @@ let
     mkOption
     types
     ;
-  inherit (config.${ns}.core) homeManager;
-  inherit (config.${ns}.device) primaryMonitor gpu;
+  inherit (config.${ns}.core) device homeManager;
   inherit (config.${ns}.hardware) bluetooth;
   inherit (config.${ns}.system) audio;
   inherit (config.${ns}.programs.gaming) gamemode;
   inherit (config.${ns}.services) lact;
+  inherit (device) primaryMonitor gpu;
   systemctl = getExe' pkgs.systemd "systemctl";
   lighthouse = getExe pkgs.lighthouse-steamvr;
 in

@@ -3,11 +3,9 @@
   pkgs,
   selfPkgs,
   adminUsername,
-  ...
 }:
 let
   inherit (lib) ns getExe;
-  inherit (lib.${ns}) exitTrapBuilder;
 
   setupSdImage = pkgs.writeShellApplication {
     name = "setup-sd-image";
@@ -26,7 +24,7 @@ let
           echo "Usage: setup-sd-image <hostname> <result_path>"
           exit 1
         fi
-        ${exitTrapBuilder}
+        ${lib.${ns}.exitTrapBuilder}
 
         hostname="$1"
         result="$2"
@@ -149,6 +147,8 @@ let
 
 in
 {
+  enableOpt = false;
+
   adminPackages = [
     setupSdImage
     buildInstaller

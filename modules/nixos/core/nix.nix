@@ -1,14 +1,15 @@
 {
   lib,
+  cfg,
   pkgs,
   self,
+  args,
   config,
   inputs,
   selfPkgs,
   hostname,
   adminUsername,
-  ...
-}@args:
+}:
 let
   inherit (lib)
     ns
@@ -16,6 +17,7 @@ let
     mkMerge
     mapAttrs
     filterAttrs
+    types
     isType
     optional
     mapAttrsToList
@@ -28,6 +30,8 @@ let
     mkForce
     singleton
     concatStringsSep
+    mkEnableOption
+    mkOption
     toUpper
     ;
   inherit (lib.${ns})
@@ -38,7 +42,6 @@ let
     ;
   inherit (config.${ns}.system) impermanence;
   inherit (config.age.secrets) notifVars;
-  cfg = config.${ns}.core;
   configDir = "/home/${adminUsername}/.config/nixos";
 
   rebuildCmds = [
@@ -348,6 +351,29 @@ let
   );
 in
 {
+  enableOpt = false;
+
+  opts = {
+    autoUpgrade = mkEnableOption "auto upgrade";
+
+    builder = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Whether this host is a high-performance nix builder";
+      };
+
+      emulatedSystems = mkOption {
+        type = with types; listOf str;
+        default = [ ];
+        description = ''
+          List of systems to support for emulated compilation. Requires a
+          reboot to take effect.
+        '';
+      };
+    };
+  };
+
   adminPackages =
     [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts ++ droidRebuildScripts ++ flakeUpdate;
   persistenceAdminHome.directories = [ ".remote-builds" ];

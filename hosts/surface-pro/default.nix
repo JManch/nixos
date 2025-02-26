@@ -6,35 +6,37 @@
   ];
 
   ${lib.ns} = {
-    device = {
-      type = "laptop";
-      ipAddress = "10.30.30.29";
-      memory = 1024 * 8;
-      backlight = "intel_backlight";
-      battery = "BAT1";
+    core = {
+      homeManager.enable = true;
 
-      cpu = {
-        name = "i5 7300U";
-        type = "intel";
-        cores = 4;
+      device = {
+        type = "laptop";
+        ipAddress = "10.30.30.29";
+        memory = 1024 * 8;
+        backlight = "intel_backlight";
+        battery = "BAT1";
+
+        cpu = {
+          name = "i5 7300U";
+          type = "intel";
+          cores = 4;
+        };
+
+        monitors = [
+          {
+            name = "eDP-1";
+            number = 1;
+            refreshRate = 60.0;
+            width = 2736;
+            height = 1824;
+            scale = 1.5;
+            position.x = 0;
+            position.y = 0;
+            workspaces = builtins.genList (i: (i * 2) + 1) 25;
+          }
+        ];
       };
-
-      monitors = [
-        {
-          name = "eDP-1";
-          number = 1;
-          refreshRate = 60.0;
-          width = 2736;
-          height = 1824;
-          scale = 1.5;
-          position.x = 0;
-          position.y = 0;
-          workspaces = builtins.genList (i: (i * 2) + 1) 25;
-        }
-      ];
     };
-
-    core.homeManager.enable = true;
 
     hardware = {
       bluetooth.enable = true;

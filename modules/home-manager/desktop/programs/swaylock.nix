@@ -6,7 +6,7 @@
 }:
 let
   inherit (lib) ns mkIf getExe';
-  inherit (osConfig.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.core.device) primaryMonitor;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
   isHyprland = lib.${ns}.isHyprland config;

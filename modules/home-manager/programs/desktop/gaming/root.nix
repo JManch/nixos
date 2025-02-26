@@ -15,7 +15,7 @@ let
     optionals
     ;
   inherit (config.${ns}.desktop) hyprland;
-  inherit (osConfig.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.core.device) primaryMonitor;
   osGaming = osConfig.${ns}.programs.gaming or null;
 in
 {

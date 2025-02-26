@@ -31,6 +31,7 @@ let
   inherit (lib.${ns}) addPatches asserts hardeningBaseline;
   inherit (inputs.nix-resources.secrets) oldFqDomain fqDomain;
   inherit (config.${ns}.system.virtualisation) vmVariant;
+  inherit (config.${ns}.core) device;
   cfg = config.${ns}.services.dns-stack;
 
   # Declares hostnames for all devices on my local network
@@ -41,15 +42,15 @@ let
     }
     //
       # Add all hosts that have a static local address
-      mapAttrs' (host: v: nameValuePair v.config.${ns}.device.ipAddress host) (
-        filterAttrs (host: v: v.config.${ns}.device.ipAddress != null) self.nixosConfigurations
+      mapAttrs' (host: v: nameValuePair v.config.${ns}.core.device.ipAddress host) (
+        filterAttrs (host: v: v.config.${ns}.core.device.ipAddress != null) self.nixosConfigurations
       );
 in
 mkIf cfg.enable {
   assertions = asserts [
-    (config.${ns}.device.type == "server")
+    (device.type == "server")
     "DNS stack can only be used on server devices"
-    (config.${ns}.device.ipAddress != null)
+    (device.ipAddress != null)
     "The DNS stack requires the device to have a static IP address set"
     (cfg.routerAddress != "")
     "The DNS stack requires the device to have a router IP address set"
@@ -209,7 +210,7 @@ mkIf cfg.enable {
         address = [
           # Point reverse proxy traffic to the device to avoid need for hairpin
           # NAT
-          "/${fqDomain}/${config.${ns}.device.ipAddress}"
+          "/${fqDomain}/${config.${ns}.core.device.ipAddress}"
           # Return NXDOMAIN for AAAA requests. Otherwise AAAA requests resolve to
           # the public DDNS CNAME response which resolves to public IP.
           "/${fqDomain}/"

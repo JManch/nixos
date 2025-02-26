@@ -53,7 +53,7 @@ let
     healthCheckResticRemoteCopy
     ;
   cfg = config.${ns}.services.restic;
-  isServer = (config.${ns}.device.type == "server");
+  isServer = (config.${ns}.core.device.type == "server");
   resticExe = getExe pkgs.restic;
   homeBackups = optionalAttrs homeManager.enable config.hm.${ns}.backups;
   vmInstall = inputs.vmInstall.value;

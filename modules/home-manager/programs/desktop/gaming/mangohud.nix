@@ -1,13 +1,12 @@
 {
   lib,
-  pkgs,
   config,
   osConfig,
 }:
 let
   inherit (lib) ns mkIf;
   inherit (config.colorScheme) palette;
-  device = osConfig.${ns}.device or null;
+  device = osConfig.${ns}.core.device or null;
 in
 {
   # WARN: For some reason mangohud toggle does not work in gamescope with the

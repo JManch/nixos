@@ -2,7 +2,6 @@
 {
   imports =
     [
-      ./core
       ./system
       ./services
     ]
@@ -10,7 +9,6 @@
       inherit args;
       rootDir = ./.;
       exclude = [
-        "core"
         "system"
         "services"
       ];

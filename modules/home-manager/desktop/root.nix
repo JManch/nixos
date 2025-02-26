@@ -113,7 +113,7 @@ in
     "You cannot enable home-manager desktop if NixOS desktop is not enabled"
     (cfg.windowManager != null -> osDesktop.desktopEnvironment == null)
     "You cannot use a desktop environment with a window manager"
-    (cfg.windowManager != null -> length osConfig.${ns}.device.monitors != 0)
+    (cfg.windowManager != null -> length osConfig.${ns}.core.device.monitors != 0)
     "Device monitors must be configured to use a window manager"
   ];
 

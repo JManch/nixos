@@ -1,8 +1,8 @@
 {
   lib,
+  cfg,
   config,
   inputs,
-  ...
 }:
 let
   inherit (lib)
@@ -11,7 +11,15 @@ let
     mkOption
     types
     findFirst
+    sort
+    zipListsWith
+    init
+    mapAttrsToList
+    tail
+    head
+    all
     ;
+  inherit (cfg) monitors vpnNamespace;
   inherit (inputs.nix-resources.secrets) fqDomain;
 
   monitorSubmodule = {
@@ -54,7 +62,7 @@ let
 
       gamingRefreshRate = mkOption {
         type = types.float;
-        default = config.${ns}.device.primaryMonitor.refreshRate;
+        default = config.${ns}.core.device.primaryMonitor.refreshRate;
         description = ''
           Higher refresh rate to use during gaming and any other scenario where
           smoothness is preferred. Only affects the primary monitor.
@@ -102,7 +110,9 @@ let
   };
 in
 {
-  options.${ns}.device = {
+  enableOpt = false;
+
+  opts = {
     type = mkOption {
       type = types.enum [
         "laptop"
@@ -178,10 +188,9 @@ in
     primaryMonitor = mkOption {
       type = types.submodule monitorSubmodule;
       readOnly = true;
-      default =
-        findFirst (m: m.number == 1)
-          (throw "Attempted to access primary monitors but monitors have not been configured")
-          config.${ns}.device.monitors;
+      default = findFirst (
+        m: m.number == 1
+      ) (throw "Attempted to access primary monitors but monitors have not been configured") cfg.monitors;
     };
 
     backlight = mkOption {
@@ -230,36 +239,21 @@ in
     };
   };
 
-  config =
-    let
-      inherit (lib)
-        sort
-        zipListsWith
-        init
-        mapAttrsToList
-        tail
-        head
-        all
-        ;
-      inherit (config.${ns}.device) monitors vpnNamespace;
-    in
-    {
-      assertions = lib.${ns}.asserts [
-        (
-          let
-            sorted = sort (a: b: a < b) (map (m: m.number) monitors);
-            diff = zipListsWith (a: b: b - a) (init sorted) (tail sorted);
-          in
-          (monitors == [ ]) || ((all (a: a == 1) diff) && ((head sorted) == 1))
-        )
-        "Monitor numbers must be sequential and start from 1"
-        (
-          vpnNamespace == null
-          -> all (x: x == false) (mapAttrsToList (_: v: v.vpnConfinement.enable) config.systemd.services)
-        )
-        "Services on this host have VPN confinement enabled but no VPN namespace is set"
-        (vpnNamespace != null -> config.vpnNamespaces.${vpnNamespace}.enable or false)
-        "The VPN namespace '${vpnNamespace}' is not enabled or does not exist"
-      ];
-    };
+  asserts = [
+    (
+      let
+        sorted = sort (a: b: a < b) (map (m: m.number) monitors);
+        diff = zipListsWith (a: b: b - a) (init sorted) (tail sorted);
+      in
+      (monitors == [ ]) || ((all (a: a == 1) diff) && ((head sorted) == 1))
+    )
+    "Monitor numbers must be sequential and start from 1"
+    (
+      vpnNamespace == null
+      -> all (x: x == false) (mapAttrsToList (_: v: v.vpnConfinement.enable) config.systemd.services)
+    )
+    "Services on this host have VPN confinement enabled but no VPN namespace is set"
+    (vpnNamespace != null -> config.vpnNamespaces.${vpnNamespace}.enable or false)
+    "The VPN namespace '${toString vpnNamespace}' is not enabled or does not exist"
+  ];
 }

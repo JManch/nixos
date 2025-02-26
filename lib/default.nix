@@ -125,7 +125,8 @@ in
       });
 
     hostIp =
-      hostname: args: args.self.nixosConfigurations.${hostname}.config.${args.lib.ns}.device.ipAddress;
+      hostname: args:
+      args.self.nixosConfigurations.${hostname}.config.${args.lib.ns}.core.device.ipAddress;
 
     upperFirstChar =
       string: concatStrings (imap0 (i: c: if i == 0 then toUpper c else c) (stringToCharacters string));
@@ -164,14 +165,14 @@ in
     getMonitorByNumber =
       osConfig: number:
       let
-        inherit (osConfig.${ns}.device) monitors;
+        inherit (osConfig.${ns}.core.device) monitors;
       in
       findFirst (m: m.number == number) (head monitors) monitors;
 
     getMonitorByName =
       osConfig: name:
       let
-        inherit (osConfig.${ns}.device) monitors;
+        inherit (osConfig.${ns}.core.device) monitors;
       in
       findFirst (m: m.name == name) (head monitors) monitors;
 
@@ -271,7 +272,7 @@ in
       config:
       let
         modules =
-          config.home-manager.users.${config.${ns}.core.username or ""}.${ns} or config.${ns} or null;
+          config.home-manager.users.${config.${ns}.core.users.username or ""}.${ns} or config.${ns} or null;
       in
       (modules.desktop.enable or false) && modules.desktop.windowManager == "hyprland";
 

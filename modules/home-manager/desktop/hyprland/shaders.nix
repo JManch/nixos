@@ -15,8 +15,8 @@ let
     getExe
     getExe'
     ;
-  inherit (osConfig.${ns}.device) monitors;
-  isGammaCustom = any (m: m.gamma != 1.0) osConfig.${ns}.device.monitors;
+  inherit (osConfig.${ns}.core.device) monitors;
+  isGammaCustom = any (m: m.gamma != 1.0) monitors;
 
   monitorGammaConditionals =
     (concatMap (

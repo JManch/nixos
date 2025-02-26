@@ -177,7 +177,7 @@ in
   ${ns}.programs.gaming.gamemode.profiles.default =
     let
       inherit (config.hm.${ns}.desktop) hyprland;
-      inherit (config.${ns}.device) primaryMonitor;
+      inherit (config.${ns}.core.device) primaryMonitor;
       hyprctl = getExe' pkgs.hyprland "hyprctl";
 
       # Remap the killactive key to use the shift modifier

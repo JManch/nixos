@@ -126,7 +126,7 @@ in
       enable = true;
       userControlled.enable = true;
       secretsFile = config.age.secrets.wirelessNetworks.path;
-      scanOnLowSignal = config.${ns}.device.type == "laptop";
+      scanOnLowSignal = config.${ns}.core.device.type == "laptop";
       allowAuxiliaryImperativeNetworks = true;
 
       networks = {

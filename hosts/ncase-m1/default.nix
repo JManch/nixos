@@ -15,69 +15,72 @@ in
   ];
 
   ${lib.ns} = {
-    device = {
-      type = "desktop";
-      ipAddress = "192.168.88.254";
-      memory = 1024 * 64;
-      hassIntegration.enable = true;
-
-      cpu = {
-        name = "R7 3700x";
-        type = "amd";
-        cores = 16;
-      };
-
-      gpu = {
-        name = "RX 7900XT";
-        type = "amd";
-        hwmonId = 2;
-      };
-
-      monitors = [
-        {
-          # DP-1 is rightmost port, furthest from HDMI
-          # Use DP-3 (port next to HDMI) for VR headset
-          name = "DP-1";
-          number = 1;
-          refreshRate = 144.0;
-          gamingRefreshRate = 165.0;
-          gamma = 0.75;
-          width = 2560;
-          height = 1440;
-          position.x = 2560;
-          position.y = 0;
-          workspaces = builtins.genList (i: (i * 2) + 1) 25;
-        }
-        {
-          name = "HDMI-A-1";
-          number = 2;
-          refreshRate = 59.951;
-          width = 2560;
-          height = 1440;
-          position.x = 0;
-          position.y = 0;
-          workspaces = builtins.genList (i: (i * 2) + 2) 25;
-        }
-        {
-          # Enabled on-demand for sim racing
-          enabled = false;
-          name = "DP-2";
-          mirror = "DP-1";
-          number = 3;
-          refreshRate = 59.951;
-          width = 2560;
-          height = 1440;
-          position.x = -2560;
-          position.y = 0;
-          transform = 2;
-        }
-      ];
-    };
-
     core = {
       homeManager.enable = true;
-      builder.enable = true;
-      builder.emulatedSystems = [ "aarch64-linux" ];
+
+      device = {
+        type = "desktop";
+        ipAddress = "192.168.88.254";
+        memory = 1024 * 64;
+        hassIntegration.enable = true;
+
+        cpu = {
+          name = "R7 3700x";
+          type = "amd";
+          cores = 16;
+        };
+
+        gpu = {
+          name = "RX 7900XT";
+          type = "amd";
+          hwmonId = 2;
+        };
+
+        monitors = [
+          {
+            # DP-1 is rightmost port, furthest from HDMI
+            # Use DP-3 (port next to HDMI) for VR headset
+            name = "DP-1";
+            number = 1;
+            refreshRate = 144.0;
+            gamingRefreshRate = 165.0;
+            gamma = 0.75;
+            width = 2560;
+            height = 1440;
+            position.x = 2560;
+            position.y = 0;
+            workspaces = builtins.genList (i: (i * 2) + 1) 25;
+          }
+          {
+            name = "HDMI-A-1";
+            number = 2;
+            refreshRate = 59.951;
+            width = 2560;
+            height = 1440;
+            position.x = 0;
+            position.y = 0;
+            workspaces = builtins.genList (i: (i * 2) + 2) 25;
+          }
+          {
+            # Enabled on-demand for sim racing
+            enabled = false;
+            name = "DP-2";
+            mirror = "DP-1";
+            number = 3;
+            refreshRate = 59.951;
+            width = 2560;
+            height = 1440;
+            position.x = -2560;
+            position.y = 0;
+            transform = 2;
+          }
+        ];
+      };
+
+      nix.builder = {
+        enable = true;
+        emulatedSystems = [ "aarch64-linux" ];
+      };
     };
 
     hardware = {

@@ -14,7 +14,7 @@ let
     replaceStrings
     concatMapStrings
     ;
-  inherit (config.${ns}.device) gpu;
+  inherit (config.${ns}.core.device) gpu;
   cfg = config.${ns}.services.lact;
 
   # I haven't worked out why yet but sometimes my GPU's PCIE address changes

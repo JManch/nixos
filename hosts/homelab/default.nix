@@ -18,16 +18,18 @@ in
   ];
 
   ${lib.ns} = {
-    core.homeManager.enable = true;
+    core = {
+      homeManager.enable = true;
 
-    device = {
-      type = "server";
-      cpu.type = "amd";
-      cpu.cores = 4;
-      memory = 1024 * 8;
-      gpu.type = null;
-      ipAddress = "192.168.89.2";
-      vpnNamespace = "air-vpn";
+      device = {
+        type = "server";
+        cpu.type = "amd";
+        cpu.cores = 4;
+        memory = 1024 * 8;
+        gpu.type = null;
+        ipAddress = "192.168.89.2";
+        vpnNamespace = "air-vpn";
+      };
     };
 
     hardware = {

@@ -17,7 +17,7 @@ let
     mod
     ;
   inherit (config.hm.${ns}.desktop) hyprland;
-  inherit (config.${ns}.device)
+  inherit (config.${ns}.core.device)
     monitors
     cpu
     memory

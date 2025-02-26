@@ -15,7 +15,7 @@ let
     ;
   inherit (config.${ns}) desktop;
   inherit (config.${ns}.core.colorScheme) light;
-  inherit (osConfig.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.core.device) primaryMonitor;
   colors = config.colorScheme.palette;
   systemctl = getExe' pkgs.systemd "systemctl";
   dunstctl = getExe' config.services.dunst.package "dunstctl";

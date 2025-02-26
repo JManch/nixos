@@ -7,8 +7,8 @@ let
   inherit (lib) ns getExe getExe';
   transition =
     let
-      inherit (osConfig.${ns}.device) primaryMonitor;
-      refreshRate = toString (builtins.floor primaryMonitor.refreshRate);
+      inherit (osConfig.${ns}.core) device;
+      refreshRate = toString (builtins.floor device.primaryMonitor.refreshRate);
     in
     "--transition-bezier .43,1.19,1,.4 --transition-type center --transition-duration 1 --transition-fps ${refreshRate}";
 in

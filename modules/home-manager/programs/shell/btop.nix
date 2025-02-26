@@ -15,7 +15,7 @@ in
     package = mkIf (osConfig != null) (
       pkgs.btop.override (
         let
-          inherit (osConfig.${ns}.device) gpu;
+          inherit (osConfig.${ns}.core.device) gpu;
         in
         {
           cudaSupport = gpu.type == "nvidia";

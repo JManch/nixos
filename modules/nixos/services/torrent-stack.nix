@@ -23,12 +23,12 @@ let
   inherit (lib.${ns}) asserts hardeningBaseline;
   inherit (config.${ns}.services) caddy;
   inherit (config.${ns}.system) impermanence;
+  inherit (config.${ns}.core) device;
   inherit (inputs.nix-resources.secrets) qBittorrentPort soulseekPort;
-  inherit (config.${ns}.device) vpnNamespace;
   inherit (config.age.secrets) recyclarrSecrets slskdVars;
   cfg = config.${ns}.services.torrent-stack;
   mediaDir = (optionalString impermanence.enable "/persist") + cfg.mediaDir;
-  vpnNamespaceAddress = config.vpnNamespaces.${vpnNamespace}.namespaceAddress;
+  vpnNamespaceAddress = config.vpnNamespaces.${device.vpnNamespace}.namespaceAddress;
 
   mkArrBackup = service: {
     paths = [ "/var/lib/${service}/Backups" ];
@@ -99,7 +99,7 @@ mkMerge [
 
       vpnConfinement = {
         enable = true;
-        inherit vpnNamespace;
+        inherit (device) vpnNamespace;
       };
 
       serviceConfig = hardeningBaseline config {
@@ -152,7 +152,7 @@ mkMerge [
 
       vpnConfinement = {
         enable = true;
-        inherit vpnNamespace;
+        inherit (device) vpnNamespace;
       };
 
       serviceConfig = hardeningBaseline config {
@@ -171,7 +171,7 @@ mkMerge [
       };
     };
 
-    vpnNamespaces.${vpnNamespace} = {
+    vpnNamespaces.${device.vpnNamespace} = {
       portMappings =
         map
           (port: {
@@ -399,7 +399,7 @@ mkMerge [
     # WARN: This allows prowlarr to access sonarr and radarr over the VPN bridge
     # interface. Note that the VPN service must be restarted for these firewall
     # rules to take effect.
-    networking.firewall.interfaces."${vpnNamespace}-br".allowedTCPPorts = [
+    networking.firewall.interfaces."${device.vpnNamespace}-br".allowedTCPPorts = [
       ports.sonarr
       ports.radarr
     ];
@@ -604,12 +604,12 @@ mkMerge [
       # https://github.com/slskd/slskd/issues/1050
       environment.DOTNET_USE_POLLING_FILE_WATCHER = "1";
       vpnConfinement = {
-        inherit vpnNamespace;
+        inherit (device) vpnNamespace;
         enable = true;
       };
     };
 
-    vpnNamespaces.${vpnNamespace} = {
+    vpnNamespaces.${device.vpnNamespace} = {
       portMappings = singleton {
         from = ports.slskd;
         to = ports.slskd;

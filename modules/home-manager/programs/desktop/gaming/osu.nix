@@ -7,7 +7,7 @@
 let
   inherit (lib) ns mkIf getExe';
   inherit (lib.${ns}) isHyprland getMonitorHyprlandCfgStr;
-  inherit (osConfig.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.core.device) primaryMonitor;
   hyprctl = getExe' pkgs.hyprland "hyprctl";
 in
 {

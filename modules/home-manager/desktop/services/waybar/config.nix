@@ -21,9 +21,8 @@ let
     ;
   inherit (lib.${ns}) addPatches sliceSuffix getMonitorByName;
   inherit (config.${ns}) desktop;
-  inherit (desktop.services) hypridle;
   inherit (desktop.programs) locker;
-  inherit (osConfig.${ns}.device)
+  inherit (osConfig.${ns}.core.device)
     gpu
     monitors
     backlight

@@ -84,7 +84,7 @@ in
           # Firefox only support VAAPI acceleration. This is natively supported
           # by AMD cards but NVIDIA cards need a translation library to go from
           # VDPAU to VAAPI.
-          "media.ffmpeg.vaapi.enabled" = ((osConfig.${ns}.device.gpu.type or true) != null);
+          "media.ffmpeg.vaapi.enabled" = ((osConfig.${ns}.core.device.gpu.type or true) != null);
 
           # Scrolling
           "mousewheel.default.delta_multiplier_x" = 99;

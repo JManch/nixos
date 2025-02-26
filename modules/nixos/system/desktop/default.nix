@@ -23,8 +23,7 @@ let
     scanPaths
     sliceSuffix
     ;
-  inherit (config.${ns}) device;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) device homeManager;
   inherit (config.hm.${ns}.desktop.programs) locker;
   cfg = config.${ns}.system.desktop;
   homeDesktop = config.hm.${ns}.desktop;

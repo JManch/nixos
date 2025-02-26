@@ -15,7 +15,7 @@ let
     singleton
     ;
   inherit (lib.${ns}) asserts hardeningBaseline;
-  inherit (config.${ns}.device) ipAddress;
+  inherit (config.${ns}.core.device) ipAddress;
   inherit (config.${ns}.services) hass mosquitto caddy;
   inherit (config.age.secrets) cctvVars mqttFrigatePassword;
   cfg = config.${ns}.services.frigate;

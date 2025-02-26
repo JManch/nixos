@@ -1,16 +1,69 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   username,
   adminUsername,
-  ...
 }:
 let
-  inherit (lib) ns optional;
-  inherit (config.${ns}.core) priviledgedUser;
+  inherit (lib)
+    mkOption
+    types
+    ns
+    optional
+    mkAliasOptionModule
+    ;
 in
 {
+  enableOpt = false;
+
+  imports = [
+    (mkAliasOptionModule
+      [ "userPackages" ]
+      [
+        "users"
+        "users"
+        username
+        "packages"
+      ]
+    )
+
+    (mkAliasOptionModule
+      [ "adminPackages" ]
+      [
+        "users"
+        "users"
+        adminUsername
+        "packages"
+      ]
+    )
+  ];
+
+  opts = {
+    username = mkOption {
+      type = types.str;
+      readOnly = true;
+      default = username;
+      description = "The username of the primary user of the nixosConfiguration";
+    };
+
+    adminUsername = mkOption {
+      type = types.str;
+      readOnly = true;
+      default = "joshua";
+      description = "The username of the admin user that exists on all hosts";
+    };
+
+    priviledgedUser = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Whether the host's primary user is part of the wheel group
+      '';
+    };
+  };
+
   users = {
     mutableUsers = false;
     defaultUserShell = pkgs.zsh;
@@ -20,7 +73,7 @@ in
           isNormalUser = true;
           description = lib.${ns}.upperFirstChar username; # displayed in GDM
           hashedPasswordFile = config.age.secrets."${username}Passwd".path;
-          extraGroups = optional priviledgedUser "wheel";
+          extraGroups = optional cfg.priviledgedUser "wheel";
         };
       }
       // lib.optionalAttrs (username != adminUsername) {

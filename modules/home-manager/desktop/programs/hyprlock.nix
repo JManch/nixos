@@ -8,7 +8,7 @@
 let
   inherit (lib) ns singleton;
   inherit (config.${ns}) desktop;
-  inherit (osConfig.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.core.device) primaryMonitor;
   colors = config.colorScheme.palette;
   labelHeight = toString (builtins.ceil (0.035 * primaryMonitor.height * primaryMonitor.scale));
 in

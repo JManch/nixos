@@ -20,7 +20,7 @@ let
     ;
   inherit (lib.${ns}) flakePkgs getMonitorHyprlandCfgStr;
   inherit (osConfig.${ns}.system) audio;
-  inherit (osConfig.${ns}.device) monitors backlight;
+  inherit (osConfig.${ns}.core.device) monitors backlight;
   inherit (config.${ns}.desktop.programs) locker;
   mod = cfg.modKey;
   modShift = "${cfg.modKey}SHIFT";

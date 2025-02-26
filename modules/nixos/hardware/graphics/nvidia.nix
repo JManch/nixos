@@ -5,7 +5,7 @@
 }:
 let
   inherit (lib) ns mkIf;
-  inherit (config.${ns}.device) gpu;
+  inherit (config.${ns}.core.device) gpu;
   inherit (config.${ns}.system) desktop;
 in
 {

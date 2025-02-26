@@ -1,21 +1,25 @@
 {
   lib,
+  args,
   inputs,
   config,
   username,
   hostname,
   adminUsername,
-  ...
-}@args:
+}:
 let
-  inherit (lib) ns mkIf mkMerge;
+  inherit (lib)
+    ns
+    mkIf
+    mkMerge
+    mkAliasOptionModule
+    ;
   inherit (config.${ns}.system.virtualisation) vmVariant;
-  cfg = config.${ns}.core.homeManager;
 in
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-    (lib.mkAliasOptionModule
+    (mkAliasOptionModule
       [ "hm" ]
       [
         "home-manager"
@@ -23,7 +27,7 @@ in
         username
       ]
     )
-    (lib.mkAliasOptionModule
+    (mkAliasOptionModule
       [ "hmAdmin" ]
       [
         "home-manager"
@@ -33,36 +37,31 @@ in
     )
   ];
 
-  config = mkIf cfg.enable {
-    home-manager = {
-      useGlobalPkgs = true;
-      useUserPackages = true;
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
 
-      users = mkMerge [
-        { ${username} = import ../../../homes/${hostname}.nix; }
-        (mkIf (username != adminUsername) {
-          ${adminUsername} = {
-            ${ns}.programs.shell = {
-              enable = true;
-              promptColor = "purple";
-              git.enable = true;
-              neovim.enable = true;
-              btop.enable = true;
-            };
-            home.stateVersion = config.hm.home.stateVersion;
+    users = mkMerge [
+      { ${username} = import ../../../homes/${hostname}.nix; }
+      (mkIf (username != adminUsername) {
+        ${adminUsername} = {
+          ${ns}.programs.shell = {
+            enable = true;
+            promptColor = "purple";
+            git.enable = true;
+            neovim.enable = true;
+            btop.enable = true;
           };
-        })
-      ];
+          home.stateVersion = config.hm.home.stateVersion;
+        };
+      })
+    ];
 
-      sharedModules = [ ../../home-manager ];
+    sharedModules = [ ../../home-manager ];
 
-      extraSpecialArgs = {
-        inherit inputs hostname vmVariant;
-        inherit (args)
-          self
-          selfPkgs
-          ;
-      };
+    extraSpecialArgs = {
+      inherit inputs hostname vmVariant;
+      inherit (args) self selfPkgs;
     };
   };
 }

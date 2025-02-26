@@ -6,7 +6,7 @@
 }:
 let
   inherit (lib) ns mkIf;
-  inherit (osConfig.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.core.device) primaryMonitor;
   inherit (osConfig.programs) uwsm;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;

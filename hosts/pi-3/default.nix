@@ -37,18 +37,21 @@ in
   };
 
   ${lib.ns} = {
-    core.homeManager.enable = false;
     hardware.fileSystem.type = "sd-image";
 
-    device = {
-      type = "server";
-      ipAddress = "10.20.20.28";
-      memory = 1024;
+    core = {
+      homeManager.enable = false;
 
-      cpu = {
-        name = "Cortex-A53";
-        type = "arm";
-        cores = "4";
+      device = {
+        type = "server";
+        ipAddress = "10.20.20.28";
+        memory = 1024;
+
+        cpu = {
+          name = "Cortex-A53";
+          type = "arm";
+          cores = "4";
+        };
       };
     };
 

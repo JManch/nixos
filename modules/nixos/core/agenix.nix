@@ -4,7 +4,6 @@
   config,
   inputs,
   selfPkgs,
-  ...
 }:
 let
   inherit (inputs) agenix nix-resources;
@@ -77,6 +76,8 @@ in
     agenix.nixosModules.default
     nix-resources.nixosModules.secrets
   ];
+
+  enableOpt = false;
 
   adminPackages = [
     selfPkgs.bootstrap-kit

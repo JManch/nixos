@@ -6,7 +6,7 @@
 let
   inherit (lib) ns getExe;
   inherit (lib.${ns}) sliceSuffix;
-  inherit (osConfig.${ns}.device) primaryMonitor backlight;
+  inherit (osConfig.${ns}.core.device) primaryMonitor backlight;
 in
 {
   asserts = [

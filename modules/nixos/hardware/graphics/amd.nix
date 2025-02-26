@@ -14,8 +14,8 @@ let
     mkOption
     types
     ;
-  inherit (config.${ns}.device) gpu;
-  davinciResolve = config.hm.${ns}.programs.davinci-resolve.enable or false;
+  inherit (config.${ns}.core.device) gpu;
+  davinciResolve = config.hm.${ns}.programs.desktop.davinciResolve.enable or false;
 in
 {
   enableOpt = false;

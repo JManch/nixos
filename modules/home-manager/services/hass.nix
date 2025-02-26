@@ -13,7 +13,7 @@ let
     optionalString
     toLower
     ;
-  inherit (osConfig.${ns}.device) hassIntegration;
+  inherit (osConfig.${ns}.core.device) hassIntegration;
   inherit (config.age.secrets) hassToken;
   systemctl = getExe' pkgs.systemd "systemctl";
 
@@ -38,7 +38,7 @@ let
 in
 {
   enableOpt = false;
-  conditions = "osConfigStrict.device.hassIntegration";
+  conditions = "osConfigStrict.core.device.hassIntegration";
 
   opts.curlCommand =
     with lib;

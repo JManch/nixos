@@ -79,7 +79,7 @@ in
     assertions = lib.${ns}.asserts [
       caddy.enable
       "Printing server requires Caddy to be enabled"
-      (config.${ns}.device.type == "server")
+      (config.${ns}.core.device.type == "server")
       "Printing server can only be run on servers on secure local networks"
     ];
 

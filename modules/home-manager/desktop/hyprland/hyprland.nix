@@ -28,9 +28,9 @@ let
     sliceSuffix
     getMonitorHyprlandCfgStr
     ;
-  inherit (osConfig.${ns}.device) monitors primaryMonitor;
+  inherit (osConfig.${ns}.core.device) monitors primaryMonitor;
   inherit (desktopCfg.style) gapSize borderWidth;
-  deviceType = osConfig.${ns}.device.type;
+  deviceType = osConfig.${ns}.core.device.type;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
 in
@@ -104,7 +104,7 @@ in
       export HYPRCURSOR_THEME=${cfg.hyprcursor.name}
       export HYPRCURSOR_SIZE=${toString config.${ns}.desktop.style.cursor.size}
     ''
-    + optionalString (osConfig.${ns}.device.gpu.type == "nvidia") ''
+    + optionalString (osConfig.${ns}.core.device.gpu.type == "nvidia") ''
       export LIBVA_DRIVER_NAME=nvidia
       export GBM_BACKEND=nvidia-drm
       export __GLX_VENDOR_LIBRARY_NAME=nvidia

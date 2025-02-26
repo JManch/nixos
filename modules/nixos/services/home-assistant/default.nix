@@ -34,7 +34,7 @@ let
     caddy
     postgresql
     ;
-  inherit (config.${ns}.device) ipAddress;
+  inherit (config.${ns}.core) device;
   inherit (config.age.secrets) everythingPresenceVars mqttHassPassword mqttFaikinPassword;
   cfg = config.${ns}.services.hass;
   cameras = attrNames config.services.frigate.settings.cameras;
@@ -405,7 +405,7 @@ in
         {
           image = "everythingsmarthome/everything-presence-mmwave-configurator:1.1.1";
           ports = [ "8099:8099" ];
-          environment.HA_URL = "http://${ipAddress}:8123";
+          environment.HA_URL = "http://${device.ipAddress}:8123";
           environmentFiles = [ everythingPresenceVars.path ];
         };
 

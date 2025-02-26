@@ -12,7 +12,7 @@ let
     getExe'
     ;
   inherit (lib.${ns}) sliceSuffix isHyprland;
-  inherit (osConfig.${ns}.device) primaryMonitor;
+  inherit (osConfig.${ns}.core.device) primaryMonitor;
 in
 {
   home.packages = [ pkgs.wayvnc ];

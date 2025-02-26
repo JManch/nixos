@@ -103,7 +103,7 @@ in
 
       swap =
         let
-          inherit (config.${ns}.device) memory;
+          inherit (config.${ns}.core.device) memory;
         in
         {
           enable = mkEnableOption "swap" // {

@@ -115,6 +115,9 @@
     recyclarr-templates.url = "github:recyclarr/config-templates";
     recyclarr-templates.flake = false;
 
+    xdg-override.url = "github:koiuo/xdg-override";
+    xdg-override.inputs.nixpkgs.follows = "nixpkgs";
+
     # Personal inputs
 
     firstBoot.url = "github:JManch/false";

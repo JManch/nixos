@@ -2,11 +2,17 @@
   lib,
   pkgs,
   config,
+  inputs,
   osConfig,
   selfPkgs,
 }:
 let
-  inherit (lib) ns mkIf getExe;
+  inherit (lib)
+    ns
+    mkIf
+    getExe
+    singleton
+    ;
   inherit (lib.${ns}) isHyprland sliceSuffix;
   inherit (config.${ns}.desktop.hyprland) modKey namedWorkspaceIDs;
 
@@ -290,7 +296,16 @@ let
       '';
 in
 {
-  home.packages = [ selfPkgs.multiviewer-for-f1 ];
+  # F1TV dropped Firefox support so the only working sign-in method is with the
+  # multiviewer companion extension in chromium
+  home.packages = singleton (
+    inputs.xdg-override.lib.wrapPackage {
+      nameMatch = singleton {
+        case = "^https?://";
+        command = getExe pkgs.chromium;
+      };
+    } selfPkgs.multiviewer-for-f1
+  );
 
   nsConfig = {
     desktop.services.waybar.autoHideWorkspaces = [ "F1" ];

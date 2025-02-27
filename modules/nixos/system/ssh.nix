@@ -1,11 +1,11 @@
 {
   lib,
+  cfg,
   self,
   config,
   username,
   hostname,
   adminUsername,
-  ...
 }:
 let
   inherit (lib)
@@ -14,11 +14,20 @@ let
     mapAttrs
     optional
     singleton
+    mkEnableOption
     ;
   inherit (config.${ns}.system) virtualisation;
-  cfg = config.${ns}.system.ssh;
 in
 {
+  enableOpt = false;
+
+  opts = {
+    server.enable = mkEnableOption "SSH server";
+    agent.enable = mkEnableOption "SSH authentication agent" // {
+      default = username == adminUsername;
+    };
+  };
+
   services.openssh = mkIf cfg.server.enable {
     enable = true;
     ports = [ 22 ];

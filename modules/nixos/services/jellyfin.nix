@@ -35,16 +35,8 @@ let
   inherit (config.${ns}.services) caddy torrent-stack;
   inherit (config.services) jellyfin;
   cfg = config.${ns}.services.jellyfin;
-  uid = 1500;
-  gid = 1500;
 in
 mkMerge [
-  {
-    ${ns}.system.reservedIDs.jellyfin = {
-      inherit uid gid;
-    };
-  }
-
   (mkIf cfg.enable {
     assertions = asserts [
       (all (n: n != "") (attrNames cfg.mediaDirs))
@@ -59,9 +51,6 @@ mkMerge [
       enable = true;
       openFirewall = cfg.openFirewall;
     };
-
-    users.users.jellyfin.uid = uid;
-    users.groups.jellyfin.gid = gid;
 
     systemd.services.jellyfin = {
       preStart =

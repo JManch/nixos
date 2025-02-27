@@ -1,22 +1,37 @@
-{ lib, config, ... }@args:
+{
+  lib,
+  args,
+  config,
+}:
 let
-  inherit (lib)
-    ns
-    mkIf
-    mkMerge
-    mkForce
-    replaceStrings
-    ;
-  inherit (lib.${ns})
-    asserts
-    sliceSuffix
-    isHyprland
-    flakePkgs
-    ;
-  inherit (config.${ns}.core) homeManager;
-  cfg = config.${ns}.system.desktop;
+  inherit (lib) ns mkForce replaceStrings;
+  inherit (lib.${ns}) isHyprland sliceSuffix flakePkgs;
 in
-mkMerge [
+[
+  {
+    guardType = "first";
+    enableOpt = false;
+    conditions = [ (isHyprland config) ];
+
+    nsConfig.system.desktop.uwsm.desktopNames = [ "Hyprland" ];
+
+    programs.hyprland = {
+      enable = true;
+      withUWSM = true;
+    };
+
+    # We configure xdg-portal with home-manager
+    xdg.portal.enable = mkForce false;
+
+    # https://discourse.nixos.org/t/how-to-enable-upstream-systemd-user-services-declaratively/7649/9
+    systemd.packages = [ (flakePkgs args "hyprpolkitagent").default ];
+    systemd.user.services.hyprpolkitagent = {
+      path = mkForce [ ]; # reason explained in desktop/default.nix
+      serviceConfig.Slice = "session${sliceSuffix config}.slice";
+      wantedBy = [ "graphical-session.target" ];
+    };
+  }
+
   {
     nixpkgs.overlays =
       let
@@ -58,29 +73,4 @@ mkMerge [
       trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
     };
   }
-
-  (mkIf (cfg.enable && isHyprland config) {
-    assertions = asserts [
-      homeManager.enable
-      "Hyprland requires Home Manager to be enabled"
-    ];
-
-    ${ns}.system.desktop.uwsm.desktopNames = [ "Hyprland" ];
-
-    programs.hyprland = {
-      enable = true;
-      withUWSM = true;
-    };
-
-    # We configure xdg-portal with home-manager
-    xdg.portal.enable = mkForce false;
-
-    # https://discourse.nixos.org/t/how-to-enable-upstream-systemd-user-services-declaratively/7649/9
-    systemd.packages = [ (flakePkgs args "hyprpolkitagent").default ];
-    systemd.user.services.hyprpolkitagent = {
-      path = mkForce [ ]; # reason explained in desktop/default.nix
-      serviceConfig.Slice = "session${sliceSuffix config}.slice";
-      wantedBy = [ "graphical-session.target" ];
-    };
-  })
 ]

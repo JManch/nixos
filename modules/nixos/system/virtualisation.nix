@@ -1,30 +1,32 @@
 {
   lib,
+  cfg,
   pkgs,
+  args,
   config,
   inputs,
   selfPkgs,
   username,
   adminUsername,
-  ...
-}@args:
+}:
 let
   inherit (lib)
     ns
     mkIf
-    mkMerge
     mkVMOverride
     mod
+    mkEnableOption
+    mkOption
+    types
     ;
-  inherit (config.hm.${ns}.desktop) hyprland;
   inherit (config.${ns}.core.device)
     monitors
     cpu
     memory
     primaryMonitor
     ;
+  inherit (config.hm.${ns}.desktop) hyprland;
   inherit (config.${ns}.core) homeManager;
-  cfg = config.${ns}.system.virtualisation;
 
   runVMScript = pkgs.writeShellApplication {
     name = "run-vm";
@@ -112,235 +114,276 @@ let
       '';
   };
 in
-{
-  config = mkMerge [
-    {
-      # The vmInstall input flake indicates whether or not we are installing
-      # the host in a virtual machine. This is NOT the same as a vmVariant.
-      # Matches options in modules/profiles/qemu_guest.nix as conditional
-      # imports are not possible.
-      boot = mkIf inputs.vmInstall.value {
-        initrd.availableKernelModules = mkVMOverride [
-          "ahci"
-          "xhci_pci"
-          "virtio_pci"
-          "sr_mod"
-          "virtio_blk"
-          "virtio_net"
-          "virtio_mmio"
-          "virtio_scsi"
-          "9p"
-          "9pnet_virtio"
-        ];
-        kernelModules = mkVMOverride [
-          "kvm-amd"
-          "virtio_balloon"
-          "virtio_console"
-          "virtio_rng"
-        ];
-        kernelParams = mkVMOverride [ ];
+[
+  {
+    enableOpt = false;
+
+    opts = {
+      libvirt.enable = mkEnableOption "libvirt virtualisation";
+
+      vmVariant = mkOption {
+        type = types.bool;
+        internal = true;
+        default = false;
       };
 
-      # We configure the vmVariant regardless of whether or not the host has
-      # virtualisation enabled because it should be possible to create a VM of any host
-      virtualisation.vmVariant = {
-        ${ns} = {
-          device = {
-            monitors = mkIf (monitors != [ ]) (mkVMOverride [
-              {
-                name = "Virtual-1";
-                number = 1;
-                refreshRate = 60.0;
-                width = 2048;
-                height = 1152;
-                position.x = 0;
-                position.y = 0;
-                workspaces = builtins.genList (i: i + 1) 9;
-              }
-            ]);
-            gpu.type = mkVMOverride null;
-            hassIntegration.enable = mkVMOverride false;
-          };
+      mappedTCPPorts = mkOption {
+        type = with types; listOf (attrsOf port);
+        default = [ ];
+        example = [
+          {
+            vmPort = 8999;
+            hostPort = 9003;
+          }
+        ];
+        description = ''
+          Map TCP ports from VM to host. Forceful alternative to opening the
+          firewall as it does not attempt to avoid clashes by mapping port into
+          50000-65000 range.
+        '';
+      };
 
-          hardware = {
-            bluetooth.enable = mkVMOverride false;
-            printing.client.enable = mkVMOverride false;
-            valveIndex.enable = mkVMOverride false;
-          };
+      mappedUDPPorts = mkOption {
+        type = with types; listOf (attrsOf port);
+        default = [ ];
+        example = [
+          {
+            vmPort = 8999;
+            hostPort = 9003;
+          }
+        ];
+        description = ''
+          Map UDP ports from VM to host. Forceful alternative to opening the
+          firewall as it does not attempt to avoid clashes by mapping port into
+          50000-65000 range.
+        '';
+      };
+    };
 
-          system = {
-            audio.enable = mkVMOverride false;
-            virtualisation.libvirt.enable = mkVMOverride false;
-            virtualisation.vmVariant = true;
+    # The vmInstall input flake indicates whether or not we are installing
+    # the host in a virtual machine. This is NOT the same as a vmVariant.
+    # Matches options in modules/profiles/qemu_guest.nix.
+    boot = mkIf inputs.vmInstall.value {
+      initrd.availableKernelModules = mkVMOverride [
+        "ahci"
+        "xhci_pci"
+        "virtio_pci"
+        "sr_mod"
+        "virtio_blk"
+        "virtio_net"
+        "virtio_mmio"
+        "virtio_scsi"
+        "9p"
+        "9pnet_virtio"
+      ];
+      kernelModules = mkVMOverride [
+        "kvm-amd"
+        "virtio_balloon"
+        "virtio_console"
+        "virtio_rng"
+      ];
+      kernelParams = mkVMOverride [ ];
+    };
 
-            networking = {
-              wiredInterface = mkVMOverride "eth0";
-              staticIPAddress = mkVMOverride null;
-              defaultGateway = mkVMOverride null;
-              tcpOptimisations = mkVMOverride false;
-              wireless.enable = mkVMOverride false;
-              firewall.enable = mkVMOverride false;
-            };
-          };
+    # We configure the vmVariant regardless of whether or not the host has
+    # virtualisation enabled because it should be possible to create a VM of any host
+    virtualisation.vmVariant = {
+      ${ns} = {
+        device = {
+          monitors = mkIf (monitors != [ ]) (mkVMOverride [
+            {
+              name = "Virtual-1";
+              number = 1;
+              refreshRate = 60.0;
+              width = 2048;
+              height = 1152;
+              position.x = 0;
+              position.y = 0;
+              workspaces = builtins.genList (i: i + 1) 9;
+            }
+          ]);
+          gpu.type = mkVMOverride null;
+          hassIntegration.enable = mkVMOverride false;
+        };
 
-          services = {
-            lact.enable = mkVMOverride false;
-            nfs.client.enable = mkVMOverride false;
-            nfs.server.enable = mkVMOverride false;
-            scrutiny.collector.enable = mkVMOverride false;
-            wgnord.enable = mkVMOverride false;
-            fail2ban.enable = mkVMOverride false;
-            torrent-stack.video.enable = mkVMOverride false;
-            torrent-stack.music.enable = mkVMOverride false;
-            zigbee2mqtt.enable = mkVMOverride false;
-            minecraft-server.enable = mkVMOverride false;
-            mikrotik-backup.enable = mkVMOverride false;
-            index-checker.enable = mkVMOverride false;
-            ollama.enable = mkVMOverride false;
+        hardware = {
+          bluetooth.enable = mkVMOverride false;
+          printing.client.enable = mkVMOverride false;
+          valveIndex.enable = mkVMOverride false;
+        };
+
+        system = {
+          audio.enable = mkVMOverride false;
+          virtualisation.libvirt.enable = mkVMOverride false;
+          virtualisation.vmVariant = true;
+
+          networking = {
+            wiredInterface = mkVMOverride "eth0";
+            staticIPAddress = mkVMOverride null;
+            defaultGateway = mkVMOverride null;
+            tcpOptimisations = mkVMOverride false;
+            wireless.enable = mkVMOverride false;
+            firewall.enable = mkVMOverride false;
           };
         };
 
-        virtualisation =
-          let
-            inherit (config.${ns}.system) desktop;
-          in
-          {
-            graphics = desktop.enable;
-            diskSize = 8192;
-
-            qemu.options = mkIf desktop.enable [
-              # Useful resource explaining qemu display device options:
-              # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/#virtio-gpu-pci
-              "-device virtio-vga-gl"
-              # FIX: Something regressed TTY resolution with the GTK display
-              # type between qemu 9.1.2 and 9.2.0. Using SDL till it's fixed.
-              # "-display gtk,show-menubar=off,zoom-to-fit=off,gl=on"
-              "-display sdl,gl=on"
-              # Alternative method using spice that should enable clipboard
-              # sharing once wayland support gets added:
-              # https://gitlab.freedesktop.org/spice/linux/vd_agent/-/issues/26
-              # WARN: This needs the virt-viewer package installed and maybe spice?
-              # Also needs services.spice-vdagentd enabled in the vmVariant
-
-              # "-spice unix=on,disable-ticketing=on"
-              # "-display spice-app,gl=on"
-              # "-device virtio-vga-gl"
-              # "-device virtio-serial-pci -chardev spicevmc,id=vdagent,debug=0,name=vdagent"
-              # "-device virtserialport,chardev=vdagent,name=com.redhat.spice.0"
-            ];
-
-            # Forward all TCP and UDP ports that are opened in the firewall on
-            # the default interfaces. Should make the majority of the VMs
-            # services accessible from host
-            forwardPorts =
-              let
-                # It's important to use firewall rules from the vmVariant here
-                inherit (config.virtualisation.vmVariant.networking.firewall) allowedTCPPorts allowedUDPPorts;
-                inherit (config.virtualisation.vmVariant.${ns}.system.virtualisation)
-                  mappedTCPPorts
-                  mappedUDPPorts
-                  ;
-
-                forward = proto: mapped: port: {
-                  from = "host";
-                  # If not mapped, attempt to map host port to a unique value between 50000-65000
-                  host = {
-                    port = if mapped then port.hostPort else (mod port 15001) + 50000;
-                    address = "127.0.0.1";
-                  };
-                  guest.port = if mapped then port.vmPort else port;
-                  proto = proto;
-                };
-              in
-              map (forward "tcp" false) allowedTCPPorts
-              ++ map (forward "udp" false) allowedUDPPorts
-              ++ map (forward "tcp" true) mappedTCPPorts
-              ++ map (forward "udp" true) mappedUDPPorts;
-          };
-
-        programs.zsh.shellAliases.p = "sudo systemctl poweroff";
+        services = {
+          lact.enable = mkVMOverride false;
+          nfs.client.enable = mkVMOverride false;
+          nfs.server.enable = mkVMOverride false;
+          scrutiny.collector.enable = mkVMOverride false;
+          wgnord.enable = mkVMOverride false;
+          fail2ban.enable = mkVMOverride false;
+          torrent-stack.video.enable = mkVMOverride false;
+          torrent-stack.music.enable = mkVMOverride false;
+          zigbee2mqtt.enable = mkVMOverride false;
+          minecraft-server.enable = mkVMOverride false;
+          mikrotik-backup.enable = mkVMOverride false;
+          index-checker.enable = mkVMOverride false;
+          ollama.enable = mkVMOverride false;
+        };
       };
 
-      hm = mkIf homeManager.enable {
-        desktop.hyprland.settings =
-          let
-            inherit (hyprland) modKey namedWorkspaceIDs;
-          in
-          {
-            bind = [
-              "${modKey}, V, workspace, ${namedWorkspaceIDs.VM}"
-              "${modKey}SHIFT, V, movetoworkspace, ${namedWorkspaceIDs.VM}"
-            ];
-
-            windowrulev2 = [
-              "workspace ${namedWorkspaceIDs.VM} silent, class:^(\\.?qemu.*|aquamarine|\\.virt-manager-wrapped)$"
-              "float, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-              "size 80% 80%, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-              "center, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-              "keepaspectratio, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-            ];
-          };
-
-        ${ns}.desktop.hyprland.namedWorkspaces.VM = "monitor:${primaryMonitor.name}";
-      };
-
-      adminPackages = [ runVMScript ];
-    }
-
-    (mkIf cfg.libvirt.enable {
-      programs.virt-manager.enable = true;
-      users.users.${username}.extraGroups = [ "libvirtd" ];
-
-      environment.sessionVariables =
+      virtualisation =
         let
-          memoryStr = toString (if (memory / 4) >= 4096 then 4096 else builtins.floor (memory / 4));
-          cores = toString (if (cpu.cores / 2) >= 8 then 8 else builtins.floor (cpu.cores / 2));
+          inherit (config.${ns}.system) desktop;
         in
         {
-          QEMU_OPTS = "-m ${memoryStr} -smp ${cores}";
+          graphics = desktop.enable;
+          diskSize = 8192;
+
+          qemu.options = mkIf desktop.enable [
+            # Useful resource explaining qemu display device options:
+            # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/#virtio-gpu-pci
+            "-device virtio-vga-gl"
+            # FIX: Something regressed TTY resolution with the GTK display
+            # type between qemu 9.1.2 and 9.2.0. Using SDL till it's fixed.
+            # "-display gtk,show-menubar=off,zoom-to-fit=off,gl=on"
+            "-display sdl,gl=on"
+            # Alternative method using spice that should enable clipboard
+            # sharing once wayland support gets added:
+            # https://gitlab.freedesktop.org/spice/linux/vd_agent/-/issues/26
+            # WARN: This needs the virt-viewer package installed and maybe spice?
+            # Also needs services.spice-vdagentd enabled in the vmVariant
+
+            # "-spice unix=on,disable-ticketing=on"
+            # "-display spice-app,gl=on"
+            # "-device virtio-vga-gl"
+            # "-device virtio-serial-pci -chardev spicevmc,id=vdagent,debug=0,name=vdagent"
+            # "-device virtserialport,chardev=vdagent,name=com.redhat.spice.0"
+          ];
+
+          # Forward all TCP and UDP ports that are opened in the firewall on
+          # the default interfaces. Should make the majority of the VMs
+          # services accessible from host
+          forwardPorts =
+            let
+              # It's important to use firewall rules from the vmVariant here
+              inherit (config.virtualisation.vmVariant.networking.firewall) allowedTCPPorts allowedUDPPorts;
+              inherit (config.virtualisation.vmVariant.${ns}.system.virtualisation)
+                mappedTCPPorts
+                mappedUDPPorts
+                ;
+
+              forward = proto: mapped: port: {
+                from = "host";
+                # If not mapped, attempt to map host port to a unique value between 50000-65000
+                host = {
+                  port = if mapped then port.hostPort else (mod port 15001) + 50000;
+                  address = "127.0.0.1";
+                };
+                guest.port = if mapped then port.vmPort else port;
+                proto = proto;
+              };
+            in
+            map (forward "tcp" false) allowedTCPPorts
+            ++ map (forward "udp" false) allowedUDPPorts
+            ++ map (forward "tcp" true) mappedTCPPorts
+            ++ map (forward "udp" true) mappedUDPPorts;
         };
 
-      hm = mkIf homeManager.enable {
-        dconf.settings = {
-          "org/virt-manager/virt-manager/connections" = {
-            autoconnect = [ "qemu:///system" ];
-            uris = [ "qemu:///system" ];
-          };
+      programs.zsh.shellAliases.p = "sudo systemctl poweroff";
+    };
+
+    hm = mkIf homeManager.enable {
+      desktop.hyprland.settings =
+        let
+          inherit (hyprland) modKey namedWorkspaceIDs;
+        in
+        {
+          bind = [
+            "${modKey}, V, workspace, ${namedWorkspaceIDs.VM}"
+            "${modKey}SHIFT, V, movetoworkspace, ${namedWorkspaceIDs.VM}"
+          ];
+
+          windowrulev2 = [
+            "workspace ${namedWorkspaceIDs.VM} silent, class:^(\\.?qemu.*|aquamarine|\\.virt-manager-wrapped)$"
+            "float, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+            "size 80% 80%, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+            "center, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+            "keepaspectratio, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+          ];
+        };
+
+      ${ns}.desktop.hyprland.namedWorkspaces.VM = "monitor:${primaryMonitor.name}";
+    };
+
+    adminPackages = [ runVMScript ];
+  }
+
+  (mkIf cfg.libvirt.enable {
+    programs.virt-manager.enable = true;
+    users.users.${username}.extraGroups = [ "libvirtd" ];
+
+    environment.sessionVariables =
+      let
+        memoryStr = toString (if (memory / 4) >= 4096 then 4096 else builtins.floor (memory / 4));
+        cores = toString (if (cpu.cores / 2) >= 8 then 8 else builtins.floor (cpu.cores / 2));
+      in
+      {
+        QEMU_OPTS = "-m ${memoryStr} -smp ${cores}";
+      };
+
+    hm = mkIf homeManager.enable {
+      dconf.settings = {
+        "org/virt-manager/virt-manager/connections" = {
+          autoconnect = [ "qemu:///system" ];
+          uris = [ "qemu:///system" ];
         };
       };
+    };
 
-      virtualisation.libvirtd = {
-        enable = true;
-        onBoot = "ignore";
-        onShutdown = "shutdown";
-      };
+    virtualisation.libvirtd = {
+      enable = true;
+      onBoot = "ignore";
+      onShutdown = "shutdown";
+    };
 
-      programs.zsh.interactiveShellInit = # bash
-        ''
-          ssh-vm() {
-            ${lib.${ns}.sshAddQuiet args}
-            echo "Attempting SSH connection to VM..."; 
-            # Extra connection attempts as VM may be starting up
-            ssh \
-              -o "StrictHostKeyChecking=no" \
-              -o "UserKnownHostsFile=/dev/null" \
-              -o "LogLevel=QUIET" \
-              -o "ConnectionAttempts=30" \
-              ${adminUsername}@127.0.0.1 -p 50022;
-          }
-        '';
+    programs.zsh.interactiveShellInit = # bash
+      ''
+        ssh-vm() {
+          ${lib.${ns}.sshAddQuiet args}
+          echo "Attempting SSH connection to VM..."; 
+          # Extra connection attempts as VM may be starting up
+          ssh \
+            -o "StrictHostKeyChecking=no" \
+            -o "UserKnownHostsFile=/dev/null" \
+            -o "LogLevel=QUIET" \
+            -o "ConnectionAttempts=30" \
+            ${adminUsername}@127.0.0.1 -p 50022;
+        }
+      '';
 
-      systemd.tmpfiles.rules = [
-        "d /tmp/tmp-vms 0777 root root - -"
-      ];
+    systemd.tmpfiles.rules = [
+      "d /tmp/tmp-vms 0777 root root - -"
+    ];
 
-      persistence.directories = [ "/var/lib/libvirt" ];
-    })
+    persistence.directories = [ "/var/lib/libvirt" ];
+  })
 
-    (mkIf (config.virtualisation.oci-containers.containers != { }) {
-      virtualisation.oci-containers.backend = "podman";
+  (mkIf (config.virtualisation.oci-containers.containers != { }) {
+    virtualisation.oci-containers.backend = "podman";
 
-      persistence.directories = [ "/var/lib/containers" ];
-    })
-  ];
-}
+    persistence.directories = [ "/var/lib/containers" ];
+  })
+]

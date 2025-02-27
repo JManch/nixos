@@ -1,18 +1,17 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
   username,
   adminUsername,
-  ...
 }:
 let
   inherit (lib)
     ns
     mkIf
     mkForce
-    mkMerge
     getExe
     mkAliasOptionModule
     concatStringsSep
@@ -22,7 +21,6 @@ let
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.${ns}.system.virtualisation) vmVariant;
-  cfg = config.${ns}.system.impermanence;
   homePersistence = config.hm.${ns}.persistence;
   fd = getExe pkgs.fd;
 
@@ -69,92 +67,92 @@ let
         "''${@:1}"
     '';
 in
-{
-  imports = [
-    inputs.impermanence.nixosModules.impermanence
+[
+  {
+    guardType = "first";
 
-    (mkAliasOptionModule
-      [ "persistence" ]
-      [
-        "environment"
-        "persistence"
-        "/persist"
-      ]
-    )
+    imports = [
+      inputs.impermanence.nixosModules.impermanence
 
-    (mkAliasOptionModule
-      [ "persistenceHome" ]
-      [
-        "environment"
-        "persistence"
-        "/persist"
-        "users"
-        username
-      ]
-    )
+      (mkAliasOptionModule
+        [ "persistence" ]
+        [
+          "environment"
+          "persistence"
+          "/persist"
+        ]
+      )
 
-    (mkAliasOptionModule
-      [ "persistenceAdminHome" ]
-      [
-        "environment"
-        "persistence"
-        "/persist"
-        "users"
-        adminUsername
-      ]
-    )
-  ];
+      (mkAliasOptionModule
+        [ "persistenceHome" ]
+        [
+          "environment"
+          "persistence"
+          "/persist"
+          "users"
+          username
+        ]
+      )
 
-  config = mkMerge [
-    (mkIf cfg.enable {
-      assertions = lib.${ns}.asserts [
-        (vmVariant || (hasAttr "/persist" config.fileSystems))
-        "A /persist file system must be defined for impermanence"
-        (vmVariant || (hasAttr "/nix" config.fileSystems))
-        "A /nix file system must be defined for impermanence"
+      (mkAliasOptionModule
+        [ "persistenceAdminHome" ]
+        [
+          "environment"
+          "persistence"
+          "/persist"
+          "users"
+          adminUsername
+        ]
+      )
+    ];
+
+    asserts = [
+      (vmVariant || (hasAttr "/persist" config.fileSystems))
+      "A /persist file system must be defined for impermanence"
+      (vmVariant || (hasAttr "/nix" config.fileSystems))
+      "A /nix file system must be defined for impermanence"
+    ];
+
+    adminPackages = [
+      ephemeralFinder
+      bloatFinder
+    ];
+
+    fileSystems."/persist".neededForBoot = true;
+
+    persistence = {
+      hideMounts = true;
+
+      directories = [
+        "/srv"
+        "/var/log"
+        "/var/tmp"
+        "/var/lib/systemd"
+        "/var/lib/nixos"
+        "/var/db/sudo/lectured"
+        # WARN: Systemd services that use DynamicUser without defining a
+        # static User and Group cannot be persisted as it's impossible to
+        # preallocated the correct UID/GID. It should be possible to work
+        # around this by declaratively creating a user and group for the
+        # service and using them for User and Group in the service's exec
+        # config.
       ];
 
-      adminPackages = [
-        ephemeralFinder
-        bloatFinder
+      files = [
+        "/etc/machine-id"
+        "/etc/adjtime"
       ];
 
-      fileSystems."/persist".neededForBoot = true;
+      users.${username} = mkIf homeManager.enable homePersistence;
+    };
+  }
 
-      persistence = {
-        hideMounts = true;
-
-        directories = [
-          "/srv"
-          "/var/log"
-          "/var/tmp"
-          "/var/lib/systemd"
-          "/var/lib/nixos"
-          "/var/db/sudo/lectured"
-          # WARN: Systemd services that use DynamicUser without defining a
-          # static User and Group cannot be persisted as it's impossible to
-          # preallocated the correct UID/GID. It should be possible to work
-          # around this by declaratively creating a user and group for the
-          # service and using them for User and Group in the service's exec
-          # config.
-        ];
-
-        files = [
-          "/etc/machine-id"
-          "/etc/adjtime"
-        ];
-
-        users.${username} = mkIf homeManager.enable homePersistence;
-      };
-    })
-
-    (mkIf (!cfg.enable) {
-      persistence = {
-        enable = false;
-        directories = mkForce [ ];
-        files = mkForce [ ];
-        users.${username} = mkForce { };
-      };
-    })
-  ];
-}
+  (mkIf (!cfg.enable) {
+    persistence = {
+      enable = false;
+      directories = mkForce [ ];
+      files = mkForce [ ];
+      users.${username} = mkForce { };
+    };
+  })
+]

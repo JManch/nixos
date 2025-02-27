@@ -1,21 +1,36 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
-  ...
 }:
 let
   inherit (lib)
     ns
     mkIf
-    mkMerge
+    mkEnableOption
+    mkOption
+    types
     optional
     ;
   inherit (config.${ns}.hardware) secureBoot;
   inherit (cfg.bootEntry) fsAlias;
-  cfg = config.${ns}.system.windows;
 in
-mkMerge [
+[
+  {
+    guardType = "custom";
+
+    opts.bootEntry = {
+      enable = mkEnableOption "Windows systemd-boot boot entry";
+
+      fsAlias = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "The fs alias of the windows partition";
+      };
+    };
+  }
+
   (mkIf cfg.enable {
     # Enable mounting windows ntfs drive
     boot.supportedFilesystems.ntfs = true;
@@ -45,6 +60,7 @@ mkMerge [
     # https://forum.endeavouros.com/t/tutorial-add-a-systemd-boot-loader-menu-entry-for-a-windows-installation-using-a-separate-esp-partition/37431
     # Mirror: https://archive.is/wwZaP
 
+    # TODO: Config this with new boot.loader.systemd-boot.windows options
     boot.loader.systemd-boot = {
       edk2-uefi-shell.enable = fsAlias == null;
 

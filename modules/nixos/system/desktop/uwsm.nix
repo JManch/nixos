@@ -1,10 +1,11 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   selfPkgs,
   username,
-  ...
+  categoryCfg,
 }:
 let
   inherit (lib)
@@ -20,47 +21,77 @@ let
     concatMapAttrs
     optionalString
     concatStringsSep
+    mkOption
+    literalExpression
+    types
+    optionals
+    optionalAttrs
     ;
-  inherit (config.${ns}.system) desktop;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) device homeManager;
   inherit (lib.${ns}) asserts addPatches;
-  cfg = config.${ns}.system.desktop.uwsm;
+  homeUwsm = config.hm.${ns}.desktop.uwsm;
 in
-mkMerge [
+[
   {
-    assertions = asserts [
-      (desktop.displayManager.name == "uwsm" -> config.programs.uwsm.enable)
-      "Using UWSM as a display manager requires it to be enabled"
-    ];
+    guardType = "first";
+    enableOpt = false;
+    conditions = [ config.programs.uwsm.enable ];
 
-    nixpkgs.overlays = [
-      (final: prev: {
-        uwsm = prev.uwsm.overrideAttrs rec {
-          version = "0.21.1";
-          src = final.fetchFromGitHub {
-            owner = "Vladimir-csp";
-            repo = "uwsm";
-            tag = "v${version}";
-            hash = "sha256-12x3IUfo+sl/9XQ2rqifit4P76JGozSA0JLnpwtU8vM=";
-          };
-        };
+    opts = {
+      defaultDesktop = mkOption {
+        type = with types; nullOr str;
+        default = null;
+        example = literalExpression "${pkgs.hyprland}/share/wayland-sessions/hyprland.desktop";
+        description = ''
+          If set, UWSM will automatically launch the set desktop without
+          prompting for selection.
+        '';
+      };
 
-        app2unit = addPatches selfPkgs.app2unit [
-          (final.substitute {
-            src = ../../../../patches/app2unitServiceApps.patch;
-            substitutions = [
-              "--replace-fail"
-              "@SERVICE_APPS@"
-              (concatStringsSep " " cfg.serviceApps)
-            ];
-          })
-        ];
-      })
-    ];
-  }
+      desktopNames = mkOption {
+        type = with types; listOf str;
+        internal = true;
+        default = [ ];
+        description = ''
+          List of desktop names to create drop-in overrides for. Should be the
+          exact case-sensitive name used in the .desktop file.
+        '';
+      };
 
-  (mkIf (desktop.enable && config.programs.uwsm.enable) {
-    assertions = asserts [
+      serviceApps = mkOption {
+        type = with types; listOf str;
+        default = [ ];
+        apply = v: (optionals homeManager.enable homeUwsm.serviceApps) ++ v;
+        description = ''
+          List of application desktop entry IDs that should be started in
+          services instead of scopes. Useful for applications where we want to
+          define custom shutdown behaviour.
+        '';
+      };
+
+      appUnitOverrides = mkOption {
+        type = types.attrs;
+        default = { };
+        apply = v: (optionalAttrs homeManager.enable homeUwsm.appUnitOverrides) // v;
+        description = ''
+          Attribute set of unit overrides. Attribute name should be the unit
+          name without the app-''${desktop} prefix. Attribute value should be
+          the multiline unit string.
+        '';
+      };
+
+      fumon.enable = mkOption {
+        type = types.bool;
+        default = device.type != "laptop";
+        description = ''
+          Whether to enable Fumon service monitor. Warning: can cause CPU
+          spikes when launching units so probably best to disable on low
+          powered devices and laptops.
+        '';
+      };
+    };
+
+    asserts = [
       # Seems ok to nest UWSM start calls by using a UWSM desktop entry but we
       # should prefer to avoid it
       # https://github.com/NixOS/nixpkgs/pull/355416#issuecomment-2481432259
@@ -88,14 +119,14 @@ mkMerge [
     };
 
     services.getty = mkMerge [
-      (mkIf (!desktop.displayManager.autoLogin) {
+      (mkIf (!categoryCfg.displayManager.autoLogin) {
         # Automatically populate with primary user whilst still prompting for
         # password
         loginOptions = username;
         extraArgs = [ "--skip-login" ];
       })
 
-      (mkIf desktop.displayManager.autoLogin {
+      (mkIf categoryCfg.displayManager.autoLogin {
         autologinUser = username;
         autologinOnce = true;
       })
@@ -120,7 +151,7 @@ mkMerge [
       let
         select = cfg.defaultDesktop == null;
       in
-      mkIf (desktop.displayManager.name == "uwsm") (
+      mkIf (categoryCfg.displayManager.name == "uwsm") (
         mkOrder 2000
           # bash
           ''
@@ -171,5 +202,37 @@ mkMerge [
         }
       ) { } cfg.desktopNames
     ) cfg.appUnitOverrides;
-  })
+  }
+
+  {
+    assertions = asserts [
+      (categoryCfg.displayManager.name == "uwsm" -> config.programs.uwsm.enable)
+      "Using UWSM as a display manager requires it to be enabled"
+    ];
+
+    nixpkgs.overlays = [
+      (final: prev: {
+        uwsm = prev.uwsm.overrideAttrs rec {
+          version = "0.21.1";
+          src = final.fetchFromGitHub {
+            owner = "Vladimir-csp";
+            repo = "uwsm";
+            tag = "v${version}";
+            hash = "sha256-12x3IUfo+sl/9XQ2rqifit4P76JGozSA0JLnpwtU8vM=";
+          };
+        };
+
+        app2unit = addPatches selfPkgs.app2unit [
+          (final.substitute {
+            src = ../../../../patches/app2unitServiceApps.patch;
+            substitutions = [
+              "--replace-fail"
+              "@SERVICE_APPS@"
+              (concatStringsSep " " cfg.serviceApps)
+            ];
+          })
+        ];
+      })
+    ];
+  }
 ]

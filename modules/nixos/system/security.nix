@@ -1,10 +1,12 @@
-{ lib, config, ... }:
+{ lib, config }:
 let
   inherit (lib) ns mkIf;
   inherit (config.hm.programs) swaylock hyprlock;
   inherit (config.${ns}.core) homeManager;
 in
 {
+  enableOpt = false;
+
   security.sudo.extraConfig = ''
     Defaults lecture=never
     Defaults pwfeedback

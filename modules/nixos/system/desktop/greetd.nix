@@ -2,21 +2,16 @@
   lib,
   pkgs,
   config,
-  ...
+  categoryCfg,
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    getExe'
-    optional
-    singleton
-    ;
-  cfg = config.${ns}.system.desktop;
+  inherit (lib) getExe' optional singleton;
 in
-mkIf (cfg.enable && (cfg.displayManager.name == "greetd")) {
-  assertions = lib.${ns}.asserts [
-    (!cfg.displayManager.autoLogin)
+{
+  conditions = [ (categoryCfg.displayManager.name == "greetd") ];
+
+  asserts = [
+    (!categoryCfg.displayManager.autoLogin)
     "Greetd does not support auto login (just haven't tried configuring it)"
   ];
 

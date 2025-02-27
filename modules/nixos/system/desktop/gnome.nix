@@ -1,9 +1,10 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
-  ...
+  categoryCfg,
 }:
 let
   inherit (lib)
@@ -14,9 +15,11 @@ let
     foldl'
     genList
     optionalAttrs
+    mkEnableOption
+    mkOption
+    types
     ;
   inherit (config.${ns}.core) homeManager;
-  cfg = config.${ns}.system.desktop;
   extensions = with pkgs.gnomeExtensions; [
     appindicator
     night-theme-switcher
@@ -24,11 +27,24 @@ let
     alphabetical-app-grid
   ];
 in
-mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
+{
+  enableOpt = false;
+  conditions = [ (categoryCfg.desktopEnvironment == "gnome") ];
+
+  opts = {
+    advancedBinds = mkEnableOption "advanced binds";
+
+    workspaceCount = mkOption {
+      type = types.ints.between 1 10;
+      default = 4;
+      description = "Number of Gnome workspaces to create";
+    };
+  };
+
   services.xserver = {
     enable = true;
     displayManager.gdm.enable = true;
-    displayManager.gdm.autoSuspend = cfg.suspend.enable;
+    displayManager.gdm.autoSuspend = categoryCfg.suspend.enable;
     desktopManager.gnome.enable = true;
   };
 
@@ -84,7 +100,7 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
 
         "org/gnome/settings-daemon/plugins/power" = {
           power-button-action = "interactive";
-          sleep-inactive-ac-type = if cfg.suspend.enable then "suspend" else "nothing";
+          sleep-inactive-ac-type = if categoryCfg.suspend.enable then "suspend" else "nothing";
           sleep-inactive-ac-timeout = 1200;
         };
 
@@ -140,7 +156,7 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
               "switch-to-application-${w}" = [ ];
               "open-new-window-application-${w}" = [ ];
             }
-          ) cfg.gnome.workspaceCount
+          ) cfg.workspaceCount
         );
       in
       workspaceBinds
@@ -160,7 +176,7 @@ mkIf (cfg.enable && cfg.desktopEnvironment == "gnome") {
         mic-mute = "<Super>m";
         toggle-message-tray = [ ];
       }
-      // optionalAttrs cfg.gnome.advancedBinds {
+      // optionalAttrs cfg.advancedBinds {
         toggle-maximized = "<Super>e";
         toggle-fullscreen = "<Shift><Super>e";
         close = "<Super>w";

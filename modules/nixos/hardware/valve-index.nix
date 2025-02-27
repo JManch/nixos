@@ -22,11 +22,8 @@ let
     mkOption
     types
     ;
-  inherit (config.${ns}.core) device homeManager;
-  inherit (config.${ns}.hardware) bluetooth;
+  inherit (config.${ns}.core) device;
   inherit (config.${ns}.system) audio;
-  inherit (config.${ns}.programs.gaming) gamemode;
-  inherit (config.${ns}.services) lact;
   inherit (device) primaryMonitor gpu;
   systemctl = getExe' pkgs.systemd "systemctl";
   lighthouse = getExe pkgs.lighthouse-steamvr;
@@ -54,19 +51,17 @@ in
     };
   };
 
+  requirements = [
+    "core.homeManager"
+    "programs.gaming.gamemode"
+    "system.audio"
+    "services.lact"
+    "hardware.bluetooth"
+  ];
+
   asserts = [
-    homeManager.enable
-    "Valve Index requires home manager to be enabled"
-    gamemode.enable
-    "Valve Index requires gamemode to be enabled"
-    audio.enable
-    "Valve Index requires audio to be enabled"
     (audio.defaultSource != null && audio.defaultSink != null)
     "Valve Index requires the default sink and source devices to be set"
-    lact.enable
-    "Valve Index requires lact to be enabled"
-    bluetooth.enable
-    "Valve Index requires bluetooth to be enabled"
   ];
 
   nixpkgs.overlays = [

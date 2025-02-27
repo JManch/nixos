@@ -1,10 +1,10 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
   hostname,
-  ...
 }:
 let
   inherit (lib)
@@ -21,17 +21,106 @@ let
     hiPrio
     length
     getExe'
+    mkEnableOption
+    mkOption
+    types
     ;
   inherit (config.${ns}.core) homeManager;
   inherit (config.${ns}.system) desktop;
-  cfg = config.${ns}.system.networking;
   homeFirewall = config.hm.${ns}.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
   ip = getExe' pkgs.iproute2 "ip";
   vlanIds = attrNames cfg.vlans;
 in
 {
-  assertions = lib.${ns}.asserts [
+  enableOpt = false;
+
+  opts = {
+    useNetworkd =
+      mkEnableOption ''
+        Whether to enable systemd-networkd network configuration.
+      ''
+      // {
+        default = true;
+      };
+
+    tcpOptimisations = mkEnableOption "TCP optimisations";
+    resolved.enable = mkEnableOption "Resolved";
+
+    wiredInterface = mkOption {
+      type = with types; nullOr str;
+      default = null;
+      example = "enp5s0";
+      description = ''
+        Wired network interface of the device. Be careful to use the main
+        interface name displayed in `ip a`, NOT the altname.
+      '';
+    };
+
+    staticIPAddress = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+        Disable DHCP and assign the device a static IPV4 address. Remember to
+        include the network's subnet mask.
+      '';
+    };
+
+    defaultGateway = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+        Default gateway of the device's primary local network.
+      '';
+    };
+
+    wireless = {
+      enable = mkEnableOption "wireless";
+
+      onlyWpa2 = mkEnableOption ''
+        only configuring WPA2 networks for devices that do not support WPA3
+      '';
+
+      interface = mkOption {
+        type = types.str;
+        example = "wlp6s0";
+      };
+
+      disableOnBoot = mkEnableOption ''
+        disabling of wireless on boot. Use `rfkill unblock wifi` to manually enable.
+      '';
+    };
+
+    firewall = {
+      enable = mkEnableOption "Firewall" // {
+        default = true;
+      };
+
+      defaultInterfaces = mkOption {
+        type = types.listOf types.str;
+        default = optional (cfg.wiredInterface != null) cfg.wiredInterface;
+        example = [
+          "eno1"
+          "wlp6s0"
+        ];
+        description = ''
+          List of interfaces to which default firewall rules should be applied.
+        '';
+      };
+    };
+
+    vlans = mkOption {
+      type = types.attrsOf types.attrs;
+      default = { };
+      description = ''
+        Attribute set where the keys are VLAN IDs and the values are the
+        VLAN's network config. The VLANs will the added to the primary
+        interface.
+      '';
+    };
+  };
+
+  asserts = [
     (cfg.staticIPAddress != null -> cfg.defaultGateway != null)
     "Default gateway must be set when using a static IPV4 address"
     (vlanIds != [ ] -> cfg.useNetworkd)

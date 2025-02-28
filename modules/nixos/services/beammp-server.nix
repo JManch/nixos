@@ -1,10 +1,10 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   selfPkgs,
   hostname,
-  ...
 }:
 let
   inherit (lib)
@@ -16,8 +16,7 @@ let
     toUpper
     getExe
     ;
-  cfg = config.${ns}.services.beammp-server;
-  configFile = (pkgs.formats.toml { }).generate "ServerConfig.toml" settings;
+  configFile = pkgs.writers.writeTOML "ServerConfig.toml" settings;
   authenticationKeyFile = config.age.secrets.beammpAuthKey.path;
 
   # The map can be changed by editing ServerConfig.toml. The chosen map will
@@ -63,7 +62,31 @@ let
     };
   };
 in
-mkIf cfg.enable {
+{
+  opts = with lib; {
+    openFirewall = mkEnableOption "opening the firewall";
+
+    autoStart = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Whether to enable BeamMP Server autostart";
+    };
+
+    port = mkOption {
+      type = types.port;
+      default = 30814;
+      description = "Port for the BeamMP Server to listen on";
+    };
+
+    interfaces = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        List of additional interfaces for BeamMP Server to be exposed on.
+      '';
+    };
+  };
+
   users.users.beammp = {
     group = "beammp";
     isSystemUser = true;

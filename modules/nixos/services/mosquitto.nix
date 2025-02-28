@@ -1,27 +1,48 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
-  ...
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    mkMerge
-    singleton
-    ;
+  inherit (lib) mkIf singleton;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  cfg = config.${ns}.services.mosquitto;
 in
-mkMerge [
-  (mkIf cfg.explorer.enable { environment.systemPackages = [ pkgs.mqtt-explorer ]; })
-  (mkIf cfg.enable {
-    assertions = lib.${ns}.asserts [
-      config.${ns}.services.acme.enable
-      "Mosquitto requires ACME to be enabled"
-    ];
+[
+  {
+    guardType = "first";
+    requirements = [ "services.acme" ];
+
+    opts = with lib; {
+      explorer.enable = mkEnableOption "MQTT Explorer";
+
+      users = mkOption {
+        type = types.attrs;
+        default = { };
+        example = literalExpression ''
+          {
+            frigate = {
+              acl = [ "readwrite #" ];
+              hashedPasswordFile = mqttFrigatePassword.path;
+            };
+          }
+        '';
+      };
+
+      tlsUsers = mkOption {
+        type = types.attrs;
+        default = { };
+        example = literalExpression ''
+          {
+            frigate = {
+              acl = [ "readwrite #" ];
+              hashedPasswordFile = mqttFrigatePassword.path;
+            };
+          }
+        '';
+      };
+    };
 
     services.mosquitto = {
       enable = true;
@@ -64,5 +85,7 @@ mkMerge [
       group = "mosquitto";
       mode = "0700";
     };
-  })
+  }
+
+  (mkIf cfg.explorer.enable { environment.systemPackages = [ pkgs.mqtt-explorer ]; })
 ]

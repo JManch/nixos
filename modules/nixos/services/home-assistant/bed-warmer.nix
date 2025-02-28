@@ -1,7 +1,6 @@
-{ lib, config, ... }:
+{ lib, cfg }:
 let
   inherit (lib)
-    ns
     mkIf
     mkMerge
     types
@@ -11,10 +10,9 @@ let
     mapAttrsToList
     singleton
     ;
-  cfg = config.${ns}.services.hass;
 in
 {
-  options.${ns}.services.hass.rooms = mkOption {
+  opts.rooms = mkOption {
     type = types.attrsOf (
       types.submodule (
         { name, config, ... }:
@@ -68,7 +66,7 @@ in
     );
   };
 
-  config.services.home-assistant.config = mkMerge (
+  services.home-assistant.config = mkMerge (
     mapAttrsToList (
       room: roomCfg:
       let

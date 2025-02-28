@@ -2,12 +2,8 @@
   lib,
   pkgs,
   config,
-  ...
 }:
 let
-  inherit (lib) ns mkIf getExe;
-  cfg = config.${ns}.services.index-checker;
-
   pythonScript =
     pkgs.writers.writePython3 "index-checker"
       { libraries = [ pkgs.python3Packages.google-search-results ]; } # python
@@ -31,7 +27,7 @@ let
             exit(0)
       '';
 in
-mkIf cfg.enable {
+{
   systemd.services.index-checker = {
     description = "Google site indexed checker";
     after = [ "network-online.target" ];
@@ -42,7 +38,7 @@ mkIf cfg.enable {
     serviceConfig = {
       EnvironmentFile = config.age.secrets.indexCheckerVars.path;
       StateDirectory = "index-checker";
-      ExecStart = getExe (
+      ExecStart = lib.getExe (
         pkgs.writeShellApplication {
           name = "index-checker";
           runtimeInputs = with pkgs; [

@@ -1,10 +1,5 @@
-{ lib, config, ... }:
-let
-  inherit (lib) ns mkIf singleton;
-  inherit (config.age.secrets) acmePorkbunVars;
-  cfg = config.${ns}.services.acme;
-in
-mkIf cfg.enable {
+{ lib, config }:
+{
   security.acme = {
     acceptTerms = true;
     defaults = {
@@ -13,7 +8,7 @@ mkIf cfg.enable {
       # Because our local resolver redirects queries for our domain we have to
       # manually specify a public resolver otherwise DNS challenge fails
       dnsResolver = "1.1.1.1:53";
-      environmentFile = acmePorkbunVars.path;
+      environmentFile = config.age.secrets.acmePorkbunVars.path;
     };
   };
 
@@ -25,7 +20,7 @@ mkIf cfg.enable {
     };
   };
 
-  persistence.directories = singleton {
+  persistence.directories = lib.singleton {
     directory = "/var/lib/acme";
     user = "acme";
     group = "acme";

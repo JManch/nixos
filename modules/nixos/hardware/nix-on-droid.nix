@@ -26,6 +26,7 @@ let
     attrNames
     concatLines
     mkEnableOption
+    setDefaultModuleLocation
     ;
   inherit (config.user) home;
   cfg = config.${ns}.nix-on-droid;
@@ -143,7 +144,7 @@ in
       useGlobalPkgs = true;
       useUserPackages = true;
       config = mkMerge [
-        (import ../../../homes/${hostname}.nix)
+        (setDefaultModuleLocation ../../../homes/${hostname}.nix (import ../../../homes/${hostname}.nix))
         hmConfig
       ];
       sharedModules = [ ../../../modules/home-manager ];

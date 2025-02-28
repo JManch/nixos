@@ -1,21 +1,16 @@
 {
   lib,
   pkgs,
-  config,
   hostname,
-  ...
 }:
 let
-  inherit (lib) ns mkIf singleton;
-  inherit (config.${ns}.services) caddy;
-  cfg = config.${ns}.services.unifi;
+  inherit (lib) ns singleton;
 in
-mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
+{
+  requirements = [ "services.caddy" ];
+  asserts = [
     (hostname == "homelab")
     "Unifi is only intended to work on host 'homelab'"
-    caddy.enable
-    "Frigate requires Caddy to be enabled"
   ];
 
   # WARN: Firmware version 6.6.65 seems to have a bug that causes my APs to

@@ -20,7 +20,7 @@ let
     optionalString
     mapAttrsToList
     ;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.hardware) raspberryPi;
   wpctl = getExe' pkgs.wireplumber "wpctl";
@@ -201,7 +201,7 @@ in
       wantedBy = [ "default.target" ];
     };
 
-    hm = mkIf homeManager.enable {
+    hm = mkIf home-manager.enable {
       ${ns}.desktop.programs.locker = {
         preLockScript = ''
           ${pactl} get-sink-mute @DEFAULT_SINK@ > /tmp/lock-mute-sink

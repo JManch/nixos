@@ -3,19 +3,16 @@
   pkgs,
   config,
   inputs,
-  ...
 }:
 let
   inherit (lib)
     ns
     mkIf
-    mkMerge
     getExe
     getExe'
     concatMapStringsSep
     ;
-  inherit (lib.${ns}) asserts;
-  inherit (config.${ns}.system.networking) wiredInterface defaultGateway resolved;
+  inherit (config.${ns}.system.networking) wiredInterface defaultGateway;
   cfg = config.${ns}.services.wgnord;
   ip = getExe' pkgs.iproute2 "ip";
 
@@ -58,46 +55,56 @@ let
     PersistentKeepalive = 25
   '';
 in
-{
-  imports = [ inputs.vpn-confinement.nixosModules.default ];
+[
+  {
+    guardType = "first";
+    imports = [ inputs.vpn-confinement.nixosModules.default ];
+    requirements = [ "system.networking.resolved" ];
 
-  config = mkMerge [
-    (mkIf (cfg.enable || cfg.confinement.enable) {
-      assertions = asserts [
-        (config.age.secrets.nordToken != null)
-        "The Nord token secret is required for wgnord VPN"
-      ];
-    })
+    opts = with lib; {
+      confinement.enable = mkEnableOption "Confinement Wireguard NordVPN";
 
-    (mkIf cfg.enable {
-      assertions = asserts [
-        (cfg.excludeSubnets != [ ] -> defaultGateway != null)
-        "Default gateway must be set to use wgnord subnet exclusion"
-        resolved.enable
-        "Wg-quick Nord VPN requires systemd resolved to be enabled"
-      ];
-
-      networking.wg-quick.interfaces.wgnord = {
-        autostart = false;
-        configFile = "/etc/wireguard/wgnord.conf";
+      excludeSubnets = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          List of subnets to exclude from being routed through the VPN. Does
+          not apply to the confinement VPN.
+        '';
       };
 
-      systemd.services.wg-quick-wgnord.preStart = generateConfig.outPath;
-
-      programs.zsh.shellAliases = {
-        wgnord-up = "sudo systemctl start wg-quick-wgnord";
-        wgnord-down = "sudo systemctl stop wg-quick-wgnord";
+      country = mkOption {
+        type = types.str;
+        default = "Switzerland";
+        description = "The country to VPN to";
       };
-    })
+    };
 
-    (mkIf cfg.confinement.enable {
-      vpnNamespaces.wgnord = {
-        enable = true;
-        wireguardConfigFile = "/etc/wireguard/wgnord.conf";
-        accessibleFrom = [ "127.0.0.1" ];
-      };
+    asserts = [
+      (cfg.excludeSubnets != [ ] -> defaultGateway != null)
+      "Default gateway must be set to use wgnord subnet exclusion"
+    ];
 
-      systemd.services.wgnord.serviceConfig.ExecStartPre = generateConfig;
-    })
-  ];
-}
+    networking.wg-quick.interfaces.wgnord = {
+      autostart = false;
+      configFile = "/etc/wireguard/wgnord.conf";
+    };
+
+    systemd.services.wg-quick-wgnord.preStart = generateConfig.outPath;
+
+    programs.zsh.shellAliases = {
+      wgnord-up = "sudo systemctl start wg-quick-wgnord";
+      wgnord-down = "sudo systemctl stop wg-quick-wgnord";
+    };
+  }
+
+  (mkIf cfg.confinement.enable {
+    vpnNamespaces.wgnord = {
+      enable = true;
+      wireguardConfigFile = "/etc/wireguard/wgnord.conf";
+      accessibleFrom = [ "127.0.0.1" ];
+    };
+
+    systemd.services.wgnord.serviceConfig.ExecStartPre = generateConfig;
+  })
+]

@@ -1,14 +1,13 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
-  ...
 }:
 let
   inherit (lib)
     ns
-    mkIf
     getExe
     getExe'
     mkForce
@@ -16,9 +15,8 @@ let
     optional
     mkMerge
     ;
-  inherit (config.${ns}.system.virtualisation) vmVariant;
+  inherit (config.${ns}.system) virtualisation;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.${ns}.services) caddy fail2ban;
   inherit (config.age.secrets)
     notifVars
     rcloneConfig
@@ -27,7 +25,6 @@ let
     vaultwardenPublicBackupKey
     healthCheckVaultwarden
     ;
-  cfg = config.${ns}.services.vaultwarden;
 
   restoreScript = pkgs.writeShellApplication {
     name = "vaultwarden-restore-backup";
@@ -98,13 +95,29 @@ let
       '';
   };
 in
-mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
-    caddy.enable
-    "Vaultwarden requires Caddy to be enabled"
-    fail2ban.enable
-    "Vaultwarden requires Fail2ban to be enabled"
+{
+  requirements = [
+    "services.caddy"
+    "services.fail2ban"
   ];
+
+  opts = with lib; {
+    adminInterface = mkEnableOption "admin interface. Keep disabled and enable when needed.";
+
+    port = mkOption {
+      type = types.port;
+      default = 8222;
+    };
+
+    extraAllowedAddresses = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        List of address to give access to Vaultwarden in addition to the
+        trusted list.
+      '';
+    };
+  };
 
   services.vaultwarden = {
     enable = true;
@@ -131,15 +144,13 @@ mkIf cfg.enable {
   };
 
   # Upstream has good systemd hardening
-  systemd.services.vaultwarden.serviceConfig = {
-    EnvironmentFile =
-      (optional (!vmVariant) vaultwardenSMTPVars.path)
-      ++ (optional (!cfg.adminInterface) (
-        pkgs.writeText "vaultwarden-disable-admin" ''
-          ADMIN_TOKEN=""
-        ''
-      ));
-  };
+  systemd.services.vaultwarden.serviceConfig.EnvironmentFile =
+    (optional (!virtualisation.vmVariant) vaultwardenSMTPVars.path)
+    ++ (optional (!cfg.adminInterface) (
+      pkgs.writeText "vaultwarden-disable-admin" ''
+        ADMIN_TOKEN=""
+      ''
+    ));
 
   # Run backup twice a day
   systemd.timers.backup-vaultwarden.timerConfig.OnCalendar = "08,20:00";
@@ -295,7 +306,7 @@ mkIf cfg.enable {
   # Unfortunately the bitwarden app does not support TLS client authentication
   # https://github.com/bitwarden/mobile/issues/582
   # https://github.com/bitwarden/mobile/pull/2629
-  ${ns}.services.caddy.virtualHosts.vaultwarden = {
+  nsConfig.services.caddy.virtualHosts.vaultwarden = {
     inherit (cfg) extraAllowedAddresses;
     extraConfig = ''
       reverse_proxy http://127.0.0.1:${toString cfg.port} {

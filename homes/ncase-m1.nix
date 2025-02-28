@@ -67,7 +67,7 @@
       desktop = {
         alacritty.enable = true;
         ghostty.enable = true;
-        torBrowser.enable = true;
+        tor-browser.enable = true;
         spotify.enable = true;
         feishin.enable = false;
         supersonic.enable = true;
@@ -81,13 +81,13 @@
         anki.enable = true;
         zathura.enable = true;
         qbittorrent.enable = true;
-        filenDesktop.enable = true;
-        multiviewerF1.enable = true;
+        filen-desktop.enable = true;
+        multiviewer-f1.enable = true;
         chromium.enable = true;
         foliate.enable = true;
         rnote.enable = true;
-        jellyfinMediaPlayer.enable = true;
-        davinciResolve.enable = false;
+        jellyfin-media-player.enable = true;
+        davinci-resolve.enable = false;
         music.enable = true;
 
         firefox = {
@@ -102,7 +102,7 @@
           mangohud.enable = true;
           r2modman.enable = true;
           bottles.enable = true;
-          prismLauncher.enable = true;
+          prism-launcher.enable = true;
           mint.enable = true;
           ryujinx.enable = true;
           osu.enable = true;

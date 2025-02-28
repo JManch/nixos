@@ -25,7 +25,7 @@ let
     mkOption
     types
     ;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system) desktop;
   homeFirewall = config.hm.${ns}.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
@@ -201,7 +201,7 @@ in
         enable = cfg.firewall.enable;
         defaultInterfaces = cfg.firewall.defaultInterfaces;
       }
-      // (optionalAttrs homeManager.enable {
+      // (optionalAttrs home-manager.enable {
         inherit (homeFirewall)
           allowedTCPPorts
           allowedTCPPortRanges

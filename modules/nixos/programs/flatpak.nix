@@ -6,13 +6,13 @@
 }:
 let
   inherit (lib) mkIf ns singleton;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) home-manager;
 in
 [
   {
     guardType = "first";
 
-    hm = mkIf homeManager.enable {
+    hm = mkIf home-manager.enable {
       services.flatpak = {
         enable = true;
         uninstallUnmanaged = true;

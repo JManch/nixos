@@ -1,16 +1,22 @@
-{ lib, config, ... }:
+{
+  lib,
+  cfg,
+  config,
+}:
 let
-  inherit (lib) ns mkIf getExe';
-  inherit (config.${ns}.services) caddy postgresql;
-  cfg = config.${ns}.services.atuin-server;
+  inherit (lib) mkOption types getExe';
 in
-mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
-    caddy.enable
-    "Atuin requires Caddy to be enabled"
-    postgresql.enable
-    "Atuin requires postgresql to be enabled"
+{
+  requirements = [
+    "services.caddy"
+    "services.postgresql"
   ];
+
+  opts.port = mkOption {
+    type = types.port;
+    default = 8888;
+    description = "Port for the Atuin server to listen on";
+  };
 
   services.atuin = {
     enable = true;
@@ -43,6 +49,6 @@ mkIf cfg.enable {
     after = [ "postgresqlBackup-atuin.service" ];
   };
 
-  ${ns}.services.caddy.virtualHosts.atuin.extraConfig =
+  nsConfig.services.caddy.virtualHosts.atuin.extraConfig =
     "reverse_proxy http://127.0.0.1:${toString cfg.port}";
 }

@@ -3,19 +3,16 @@
   pkgs,
   config,
   hostname,
-  ...
 }:
 let
   inherit (lib)
     ns
-    mkIf
     getExe'
     getExe
     replaceStrings
     concatMapStrings
     ;
   inherit (config.${ns}.core.device) gpu;
-  cfg = config.${ns}.services.lact;
 
   # I haven't worked out why yet but sometimes my GPU's PCIE address changes
   # and causes the LACT config to not load. It only seems to switch between
@@ -28,8 +25,8 @@ let
 
 in
 # This module is specifically for 7900XT on NCASE-M1 host
-mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
+{
+  asserts = [
     (hostname == "ncase-m1")
     "Lact is only intended to work on host 'ncase-m1'"
     (gpu.type == "amd")
@@ -103,7 +100,7 @@ mkIf cfg.enable {
       '') gpuIds}
     '';
 
-  ${ns}.programs.gaming.gamemode.profiles =
+  nsConfig.programs.gaming.gamemode.profiles =
     let
       ncat = getExe' pkgs.nmap "ncat";
       jaq = getExe pkgs.jaq;

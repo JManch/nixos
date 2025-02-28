@@ -11,7 +11,7 @@ let
     getExe'
     optionalString
     ;
-  inherit (config.${ns}.core) colorScheme;
+  inherit (config.${ns}.core) color-scheme;
   inherit (config.${ns}) desktop;
   inherit (desktop.style) cursor customTheme;
   inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) gtkThemeFromScheme;
@@ -21,8 +21,8 @@ let
   # using gtk.css does not allow hot-reloading when switching between light and
   # dark theme variants.
   # https://github.com/danth/stylix/blob/963e77a3a4fc2be670d5a9a6cbeb249b8a43808a/modules/gtk/gtk.mustache#L3
-  darkTheme = gtkThemeFromScheme { scheme = colorScheme.dark; };
-  lightTheme = gtkThemeFromScheme { scheme = colorScheme.light; };
+  darkTheme = gtkThemeFromScheme { scheme = color-scheme.dark; };
+  lightTheme = gtkThemeFromScheme { scheme = color-scheme.light; };
 in
 {
   enableOpt = false;
@@ -36,7 +36,7 @@ in
     enable = true;
 
     theme = mkIf customTheme {
-      name = colorScheme.dark.slug;
+      name = color-scheme.dark.slug;
       # We do not set the package here because it causes home manager to
       # generate a gtk-4.0/gtk.css file. Unfortunately this results in broken
       # GTK 4 theming that does not respond to light/dark theme switches
@@ -59,7 +59,7 @@ in
     theme: # bash
     ''
       export XDG_DATA_DIRS=${schemas}/share/gsettings-schemas/${schemas.name}
-      ${optionalString customTheme "${gsettings} set org.gnome.desktop.interface gtk-theme ${colorScheme.${theme}.slug}"}
+      ${optionalString customTheme "${gsettings} set org.gnome.desktop.interface gtk-theme ${color-scheme.${theme}.slug}"}
       ${gsettings} set org.gnome.desktop.interface color-scheme prefer-${theme}
     '';
 

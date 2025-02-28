@@ -1,5 +1,5 @@
 # https://jinja.palletsprojects.com/en/3.1.x/templates/
-{ lib, config, ... }:
+{ lib, config }:
 let
   inherit (lib)
     ns
@@ -7,10 +7,9 @@ let
     attrNames
     singleton
     ;
-  cfg = config.${ns}.services.hass;
   cameras = attrNames config.services.frigate.settings.cameras;
 in
-mkIf cfg.enableInternal {
+{
   services.home-assistant.config = {
     recorder.exclude.entities = [ "sensor.powerwall_battery_remaining_time" ];
 

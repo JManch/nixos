@@ -16,7 +16,7 @@ in
 
   ${lib.ns} = {
     core = {
-      homeManager.enable = true;
+      home-manager.enable = true;
 
       device = {
         type = "desktop";
@@ -84,12 +84,12 @@ in
     };
 
     hardware = {
-      secureBoot.enable = true;
+      secure-boot.enable = true;
       bluetooth.enable = true;
       fanatec.enable = true;
       tablet.enable = true;
 
-      valveIndex = {
+      valve-index = {
         enable = true;
         audio = {
           card = "alsa_card.pci-0000_09_00.1";
@@ -99,7 +99,7 @@ in
         };
       };
 
-      fileSystem = {
+      file-system = {
         type = "zfs";
         zfs.trim = true;
         zfs.unstable = false;

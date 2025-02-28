@@ -1,16 +1,15 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
   username,
-  ...
 }:
 let
   inherit (lib)
     ns
     mkIf
-    mkMerge
     getExe
     getExe'
     head
@@ -26,7 +25,6 @@ let
   inherit (config.${ns}.core) device;
   inherit (inputs.nix-resources.secrets) qBittorrentPort soulseekPort;
   inherit (config.age.secrets) recyclarrSecrets slskdVars;
-  cfg = config.${ns}.services.torrent-stack;
   mediaDir = (optionalString impermanence.enable "/persist") + cfg.mediaDir;
   vpnNamespaceAddress = config.vpnNamespaces.${device.vpnNamespace}.namespaceAddress;
 
@@ -50,7 +48,26 @@ let
     slskd = 5030;
   };
 in
-mkMerge [
+[
+  {
+    enableOpt = false;
+    guardType = "custom";
+
+    opts = with lib; {
+      video.enable = mkEnableOption "Video torrent stack";
+      music.enable = mkEnableOption "Music torrent stack";
+
+      mediaDir = mkOption {
+        type = types.str;
+        default = "/data/media";
+        description = ''
+          Absolute path to directory where torrent downloads and media library
+          will be stored.
+        '';
+      };
+    };
+  }
+
   (mkIf (cfg.video.enable || cfg.music.enable) {
     assertions = asserts [
       caddy.enable

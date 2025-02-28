@@ -1,12 +1,12 @@
 {
   lib,
+  cfg,
   pkgs,
   self,
   config,
   inputs,
   hostname,
   username,
-  ...
 }:
 let
   inherit (lib)
@@ -36,11 +36,15 @@ let
     mkAfter
     optionalString
     singleton
+    mkOption
+    mkEnableOption
+    mkAliasOptionModule
+    types
     ;
   inherit (lib.${ns}) asserts upperFirstChar;
   inherit (config.${ns}.services) caddy;
-  inherit (config.${ns}.core) homeManager;
-  inherit (config.${ns}.system.virtualisation) vmVariant;
+  inherit (config.${ns}.core) home-manager;
+  inherit (config.${ns}.system) impermanence virtualisation;
   inherit (caddy) trustedAddresses;
   inherit (cfg) backups;
   inherit (config.age.secrets)
@@ -52,10 +56,9 @@ let
     notifVars
     healthCheckResticRemoteCopy
     ;
-  cfg = config.${ns}.services.restic;
   isServer = (config.${ns}.core.device.type == "server");
   resticExe = getExe pkgs.restic;
-  homeBackups = optionalAttrs homeManager.enable config.hm.${ns}.backups;
+  homeBackups = optionalAttrs home-manager.enable config.hm.${ns}.backups;
   vmInstall = inputs.vmInstall.value;
 
   backupTimerConfig = {
@@ -231,9 +234,165 @@ let
       '';
   };
 in
-mkMerge [
+[
+  {
+    guardType = "custom";
+
+    imports = singleton (
+      mkAliasOptionModule
+        [ "backups" ]
+        [
+          ns
+          "services"
+          "restic"
+          "backups"
+        ]
+    );
+
+    opts = {
+      runMaintenance = mkEnableOption "repo maintenance after performing backups" // {
+        default = true;
+      };
+
+      backups = mkOption {
+        type = types.attrsOf (
+          types.submodule {
+            freeformType = types.attrsOf types.anything;
+            options = {
+              preBackupScript = mkOption {
+                type = types.lines;
+                default = "";
+                description = "Script to run before backing up";
+              };
+
+              postBackupScript = mkOption {
+                type = types.lines;
+                default = "";
+                description = "Script to run after backing up";
+              };
+
+              restore = {
+                pathOwnership = mkOption {
+                  type = types.attrsOf (
+                    types.submodule {
+                      options = {
+                        user = mkOption {
+                          type = types.nullOr types.str;
+                          default = null;
+                          description = ''
+                            User to set restored files to. If null, user will not
+                            be changed. Useful for modules that do not have static
+                            IDs https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix.
+                          '';
+                        };
+
+                        group = mkOption {
+                          type = types.nullOr types.str;
+                          default = null;
+                          description = ''
+                            Group to set restored files to. If null, group will not
+                            be changed.
+                          '';
+                        };
+                      };
+                    }
+                  );
+                  default = { };
+                  description = ''
+                    Attribute for assigning ownership user and group for each
+                    backup path.
+                  '';
+                };
+
+                removeExisting = mkOption {
+                  type = types.bool;
+                  default = true;
+                  description = ''
+                    Whether to delete all files and directories in the backup
+                    paths before restoring backup.
+                  '';
+                };
+
+                preRestoreScript = mkOption {
+                  type = types.lines;
+                  default = "";
+                  description = "Script to run before restoring the backup";
+                };
+
+                postRestoreScript = mkOption {
+                  type = types.lines;
+                  default = "";
+                  description = "Script to run after restoring the backup";
+                };
+              };
+
+            };
+          }
+        );
+        default = { };
+        apply =
+          # Modify the backup paths and ownership paths to include persistence
+          # path if impermanence is enabled and merge with home manager backups
+
+          # WARN: Exclude and include paths are not prefixed with persistence
+          # to allow non-absolute patterns, be careful with those
+          backups:
+          mapAttrs (
+            name: value:
+            value
+            // {
+              paths = map (path: "${optionalString impermanence.enable "/persist"}${path}") value.paths;
+              restore = value.restore // {
+                pathOwnership = mapAttrs' (
+                  path: value: nameValuePair "${optionalString impermanence.enable "/persist"}${path}" value
+                ) value.restore.pathOwnership;
+              };
+            }
+          ) (backups // homeBackups);
+        description = ''
+          Attribute set of Restic backups matching the upstream module backups
+          options.
+        '';
+      };
+
+      backupSchedule = mkOption {
+        type = types.str;
+        default = "*-*-* 05:30:00";
+        description = "Backup service default OnCalendar schedule";
+      };
+
+      server = {
+        enable = mkEnableOption "Restic REST server";
+
+        dataDir = mkOption {
+          type = types.str;
+          description = "Directory where the restic repository is stored";
+          default = "/var/backup/restic";
+        };
+
+        remoteCopySchedule = mkOption {
+          type = types.str;
+          default = "*-*-* 05:30:00";
+          description = "OnCalendar schedule when local repo is copied to cloud";
+        };
+
+        remoteMaintenanceSchedule = mkOption {
+          type = types.str;
+          default = "Sun *-*-* 06:00:00";
+          description = "OnCalendar schedule to perform maintenance on remote repo";
+        };
+
+        port = mkOption {
+          type = types.port;
+          default = 8090;
+          description = "Port for the Restic server to listen on";
+        };
+      };
+    };
+  }
+
   # To allow testing backup restores in the VM
-  (mkIf (cfg.enable || cfg.server.enable || (cfg.enable && vmVariant)) {
+  (mkIf (cfg.enable || cfg.server.enable || (cfg.enable && virtualisation.vmVariant)) {
     adminPackages = [
       pkgs.restic
       restoreScript
@@ -274,7 +433,7 @@ mkMerge [
     # Restore tool: https://github.com/viltgroup/bucket-restore
   })
 
-  (mkIf (cfg.enable && !vmVariant && !vmInstall) {
+  (mkIf (cfg.enable && !virtualisation.vmVariant && !vmInstall) {
     assertions = asserts [
       (all (v: v == true) (
         mapAttrsToList (
@@ -412,7 +571,7 @@ mkMerge [
     };
   })
 
-  (mkIf (cfg.server.enable && !vmVariant && !vmInstall) {
+  (mkIf (cfg.server.enable && !virtualisation.vmVariant && !vmInstall) {
     assertions = asserts [
       caddy.enable
       "Restic server requires Caddy to be enabled"

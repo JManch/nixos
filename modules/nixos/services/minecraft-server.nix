@@ -1,13 +1,12 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
-  ...
 }:
 let
   inherit (lib)
-    ns
     mkIf
     mkMerge
     escapeShellArg
@@ -21,12 +20,15 @@ let
     getExe
     mkForce
     singleton
+    mkOption
+    attrNames
+    types
     ;
   inherit (config.services.minecraft-server) dataDir;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  cfg = config.${ns}.services.minecraft-server;
   serverPackage = pkgs.papermcServers.papermc-1_20_4;
   pluginEnabled = p: elem p cfg.plugins;
+  jsonFormat = pkgs.formats.json { };
 
   availablePlugins =
     (import ../../../pkgs/minecraft-plugins { inherit lib pkgs; }).minecraft-plugins
@@ -37,7 +39,88 @@ let
     sha256 = "sha256-rU+Lg9EQGlSiXT5TQ7A7TITSwLRT5RpsbE3JdFDtot8=";
   };
 in
-mkIf cfg.enable {
+{
+  opts = {
+    mshConfig = mkOption {
+      type = jsonFormat.type;
+      apply = jsonFormat.generate "msh-config.json";
+      description = "Minecraft server hibernation config";
+    };
+
+    memory = mkOption {
+      type = types.int;
+      default = 4000;
+      description = "Memory allocation in megabytes for the Minecraft server";
+    };
+
+    interfaces = mkOption {
+      type = with types; listOf str;
+      default = [ ];
+      description = ''
+        List of additional interfaces for the Minecraft server to be
+        exposed on.
+      '';
+    };
+
+    extraAllowedAddresses = mkOption {
+      type = with types; listOf str;
+      default = [ ];
+      description = ''
+        List of address to give access to virtual hosts in addition to the
+        trusted list.
+      '';
+    };
+
+    port = mkOption {
+      type = types.port;
+      default = 25565;
+      description = ''
+        The actual server listens on `port - 1` and the server hibernator
+        listens on this port.
+      '';
+    };
+
+    plugins = mkOption {
+      type = types.listOf (types.enum (attrNames availablePlugins));
+      default = [ ];
+      description = "List of plugin packages to install on the server";
+    };
+
+    files = mkOption {
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            value = mkOption {
+              type = types.nullOr types.lines;
+              default = null;
+              description = "Lines of text to copy into target config file";
+            };
+
+            diff = mkOption {
+              type = types.nullOr types.lines;
+              default = null;
+              description = ''
+                Diff file to be applied to reference config file. Use diff -u
+                to generate diff.
+              '';
+            };
+
+            reference = mkOption {
+              type = types.nullOr types.pathInStore;
+              default = null;
+              description = "Reference config file that diff is applied to";
+            };
+          };
+        }
+      );
+      default = { };
+      description = ''
+        Attribute set where keys are paths to files relative to the dataDir
+        and values are files contents"
+      '';
+    };
+  };
+
   services.minecraft-server = {
     enable = true;
     openFirewall = false;
@@ -78,7 +161,7 @@ mkIf cfg.enable {
     };
   };
 
-  ${ns}.services = {
+  nsConfig.services = {
     minecraft-server = {
       mshConfig = {
         Server = {
@@ -316,7 +399,7 @@ mkIf cfg.enable {
 
       preBackupScript = pkgs.writeShellApplication {
         name = "minecraft-server-pre-backup";
-        runtimeInputs = with pkgs; [ coreutils ];
+        runtimeInputs = [ pkgs.coreutils ];
         text = # bash
           ''
             if [ ! -p "/run/minecraft-server.stdin" ]; then exit 0; fi
@@ -349,7 +432,7 @@ mkIf cfg.enable {
 
       postBackupScript = pkgs.writeShellApplication {
         name = "minecraft-server-post-backup";
-        runtimeInputs = with pkgs; [ coreutils ];
+        runtimeInputs = [ pkgs.coreutils ];
         text = # bash
           ''
             ${functions}
@@ -376,9 +459,7 @@ mkIf cfg.enable {
       postBackupScript = getExe postBackupScript;
 
       restore = {
-        preRestoreScript = ''
-          sudo systemctl stop minecraft-server
-        '';
+        preRestoreScript = "sudo systemctl stop minecraft-server";
         pathOwnership."/var/lib/minecraft" = {
           user = "minecraft";
           group = "minecraft";

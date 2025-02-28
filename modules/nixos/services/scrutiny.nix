@@ -1,16 +1,15 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
   hostname,
-  ...
 }:
 let
   inherit (lib)
     ns
     mkIf
-    mkMerge
     toUpper
     mkForce
     getExe'
@@ -20,10 +19,31 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy;
   inherit (config.age.secrets) scrutinyVars;
-  cfg = config.${ns}.services.scrutiny;
   influx = getExe' pkgs.influxdb2 "influx";
 in
-mkMerge [
+[
+  {
+    enableOpt = false;
+    guardType = "custom";
+
+    opts = with lib; {
+      collector.enable = mkEnableOption ''
+        the Scrutiny collector service. The collector service sends data to the
+        web server and can run on any machine that can access the web server.
+      '';
+
+      server = {
+        enable = mkEnableOption "hosting the Scrutiny web server";
+
+        port = mkOption {
+          type = types.port;
+          default = 8085;
+          description = "Listen port of the web server";
+        };
+      };
+    };
+  }
+
   (mkIf cfg.collector.enable {
     services.scrutiny.collector = {
       enable = cfg.collector.enable;

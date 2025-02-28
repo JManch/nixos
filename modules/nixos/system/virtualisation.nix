@@ -26,7 +26,7 @@ let
     primaryMonitor
     ;
   inherit (config.hm.${ns}.desktop) hyprland;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) home-manager;
 
   runVMScript = pkgs.writeShellApplication {
     name = "run-vm";
@@ -100,7 +100,7 @@ let
         # terminal windows
         if grep -q -- "-nographic" "$runscript"; then
           ${
-            if config.${ns}.system.desktop.enable && homeManager.enable then # bash
+            if config.${ns}.system.desktop.enable && home-manager.enable then # bash
               ''
                 xdg-terminal-exec "zsh" "-i" "-c" "ssh-vm; zsh -i" &
                 xdg-terminal-exec --app-id=qemu -e "$runscript"
@@ -209,7 +209,7 @@ in
         hardware = {
           bluetooth.enable = mkVMOverride false;
           printing.client.enable = mkVMOverride false;
-          valveIndex.enable = mkVMOverride false;
+          valve-index.enable = mkVMOverride false;
         };
 
         system = {
@@ -305,7 +305,7 @@ in
       programs.zsh.shellAliases.p = "sudo systemctl poweroff";
     };
 
-    hm = mkIf homeManager.enable {
+    hm = mkIf home-manager.enable {
       desktop.hyprland.settings =
         let
           inherit (hyprland) modKey namedWorkspaceIDs;
@@ -344,7 +344,7 @@ in
         QEMU_OPTS = "-m ${memoryStr} -smp ${cores}";
       };
 
-    hm = mkIf homeManager.enable {
+    hm = mkIf home-manager.enable {
       dconf.settings = {
         "org/virt-manager/virt-manager/connections" = {
           autoconnect = [ "qemu:///system" ];

@@ -16,7 +16,7 @@ let
     singleton
     mkEnableOption
     ;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) home-manager;
   inherit (config.hm.${ns}.desktop.programs) locker;
   homeDesktop = config.hm.${ns}.desktop;
   loginctl = getExe' pkgs.systemd "loginctl";
@@ -95,7 +95,7 @@ in
   # https://github.com/nix-community/home-manager/pull/5184
   # NOTE: When https://github.com/nix-community/home-manager/pull/2548 gets
   # merged this may no longer be needed
-  environment.pathsToLink = mkIf homeManager.enable [
+  environment.pathsToLink = mkIf home-manager.enable [
     "/share/xdg-desktop-portal"
     "/share/applications"
   ];
@@ -119,7 +119,7 @@ in
     mkIf (cfg.desktopEnvironment == null) # bash
       ''
         ${
-          if homeManager.enable && homeDesktop.enable && (locker.package != null) then
+          if home-manager.enable && homeDesktop.enable && (locker.package != null) then
             "${systemd-run} --user --machine ${username}@.host ${locker.lockScript} --immediate"
           else
             "${loginctl} lock-sessions"
@@ -136,7 +136,7 @@ in
       RemainAfterExit = true;
       ExecStartPre = "${getExe' pkgs.coreutils "sleep"} 3";
       ExecStart =
-        if homeManager.enable && homeDesktop.enable && (locker.package != null) then
+        if home-manager.enable && homeDesktop.enable && (locker.package != null) then
           "${locker.lockScript} --immediate"
         else
           "${loginctl} lock-sessions";

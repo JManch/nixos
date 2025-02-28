@@ -19,7 +19,7 @@ let
     stringLength
     hasAttr
     ;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system.virtualisation) vmVariant;
   homePersistence = config.hm.${ns}.persistence;
   fd = getExe pkgs.fd;
@@ -143,7 +143,7 @@ in
         "/etc/adjtime"
       ];
 
-      users.${username} = mkIf homeManager.enable homePersistence;
+      users.${username} = mkIf home-manager.enable homePersistence;
     };
   }
 

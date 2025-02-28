@@ -13,7 +13,7 @@ let
     types
     optional
     ;
-  inherit (config.${ns}.hardware) secureBoot;
+  inherit (config.${ns}.hardware) secure-boot;
   inherit (cfg.bootEntry) fsAlias;
 in
 [
@@ -42,7 +42,7 @@ in
         The Windows fs alias is not set. The Windows boot entry will NOT work
         and the insecure edk2 shell will be enabled.
       ''
-      ++ optional (secureBoot.enable && cfg.bootEntry.enable) ''
+      ++ optional (secure-boot.enable && cfg.bootEntry.enable) ''
         You have enabled secure boot and the Windows boot entry. It is not
         recommended to use both as manually signing the edk2 shell reduces
         the security of secure boot and the declarative systemd-boot config

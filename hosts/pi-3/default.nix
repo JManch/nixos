@@ -37,10 +37,10 @@ in
   };
 
   ${lib.ns} = {
-    hardware.fileSystem.type = "sd-image";
+    hardware.file-system.type = "sd-image";
 
     core = {
-      homeManager.enable = false;
+      home-manager.enable = false;
 
       device = {
         type = "server";

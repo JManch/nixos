@@ -68,7 +68,7 @@ in
 
   darkman.switchApps.fuzzel =
     let
-      inherit (config.${ns}.core.colorScheme) dark light;
+      inherit (config.${ns}.core.color-scheme) dark light;
     in
     {
       paths = [ ".config/fuzzel/fuzzel.ini" ];

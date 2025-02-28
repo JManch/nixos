@@ -1,25 +1,24 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
-  ...
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    optionalString
-    hasPrefix
-    ;
-  inherit (config.${ns}.services) caddy;
+  inherit (lib) ns optionalString hasPrefix;
   inherit (config.${ns}.system) impermanence;
   inherit (config.age.secrets) navidromeVars;
-  cfg = config.${ns}.services.navidrome;
 in
-mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
-    caddy.enable
-    "Navidrome requires Caddy to be enabled"
+{
+  opts.musicDir =
+    with lib;
+    mkOption {
+      type = types.str;
+      description = "Absolute path to music library";
+    };
+
+  requirements = [ "services.caddy" ];
+  asserts = [
     (!hasPrefix "/persist" cfg.musicDir)
     "Navidrome music dir should NOT be prefixed with /persist"
   ];
@@ -64,7 +63,7 @@ mkIf cfg.enable {
     EnvironmentFile = navidromeVars.path;
   };
 
-  ${ns}.services.caddy.virtualHosts.navidrome.extraConfig = ''
+  nsConfig.services.caddy.virtualHosts.navidrome.extraConfig = ''
     reverse_proxy http://127.0.0.1:${toString config.services.navidrome.settings.Port}
   '';
 

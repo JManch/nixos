@@ -1,19 +1,29 @@
 {
   lib,
+  cfg,
   pkgs,
-  config,
-  ...
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    genAttrs
-    singleton
-    ;
-  cfg = config.${ns}.services.factorio-server;
+  inherit (lib) genAttrs singleton;
 in
-mkIf cfg.enable {
+{
+  opts = with lib; {
+    port = mkOption {
+      type = types.port;
+      default = 34197;
+      description = "Port for the Factorio server to listen on";
+    };
+
+    interfaces = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        List of additional interfaces for the Factorio server to be exposed
+        on
+      '';
+    };
+  };
+
   services.factorio = {
     enable = true;
     package = pkgs.factorio-headless.overrideAttrs rec {

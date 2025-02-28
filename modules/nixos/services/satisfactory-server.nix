@@ -1,8 +1,8 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
-  ...
 }:
 let
   inherit (lib)
@@ -12,12 +12,31 @@ let
     singleton
     genAttrs
     ;
-  cfg = config.${ns}.services.satisfactory-server;
   steamcmd = getExe pkgs.steamPackages.steamcmd;
   steam-run = getExe pkgs.steam-run;
   dataDir = "/var/lib/satisfactory-server";
 in
-mkIf cfg.enable {
+{
+  opts = with lib; {
+    openFirewall = mkEnableOption "opening the firewall on default interfaces";
+    autoStart = mkEnableOption "automatic server start";
+
+    port = mkOption {
+      type = types.port;
+      default = 7777;
+      description = "Port for the Satisfactory server to listen on";
+    };
+
+    interfaces = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        List of additional interfaces for the Satisfactory server to be
+        exposed on
+      '';
+    };
+  };
+
   users.users.satisfactory = {
     isSystemUser = true;
     home = dataDir;

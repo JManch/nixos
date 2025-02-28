@@ -15,7 +15,7 @@ let
     types
     ;
   inherit (config.${ns}.core.device) gpu;
-  davinciResolve = config.hm.${ns}.programs.desktop.davinciResolve.enable or false;
+  davinciResolve = config.hm.${ns}.programs.desktop.davinci-resolve.enable or false;
 in
 {
   enableOpt = false;

@@ -2,12 +2,10 @@
   lib,
   config,
   inputs,
-  ...
 }:
 let
   inherit (lib)
     ns
-    mkIf
     singleton
     attrNames
     mkAfter
@@ -17,7 +15,7 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (secrets.general) devices userIds people;
   cameras = attrNames config.services.frigate.settings.cameras;
-  secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
+  secrets = inputs.nix-resources.secrets.homeAssistant { inherit lib config; };
 
   entranceNotify = singleton {
     alias = "Entrance Person Notify";
@@ -87,7 +85,9 @@ let
     };
   }) cameras;
 in
-mkIf frigate.enable {
+{
+  conditions = [ "services.frigate" ];
+
   services.home-assistant = {
     lovelaceConfig.views = mkAfter (singleton {
       title = "CCTV";

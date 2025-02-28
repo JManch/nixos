@@ -8,7 +8,7 @@
   ${lib.ns} = {
     core = {
       users.priviledgedUser = false;
-      homeManager.enable = true;
+      home-manager.enable = true;
       nix.autoUpgrade = true;
 
       device = {
@@ -42,9 +42,9 @@
     };
 
     hardware = {
-      secureBoot.enable = true;
+      secure-boot.enable = true;
 
-      fileSystem = {
+      file-system = {
         type = "zfs";
         tmpfsTmp = true;
         zfs.trim = true;

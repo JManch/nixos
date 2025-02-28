@@ -36,12 +36,11 @@
 # - rebuild-boot the host then reboot
 # - sudo -i -u postgres; pg_restore -U postgres --dbname postgres --clean --create /var/backup/...
 # - Re-enable the home-assistant target then rebuild-switch
-{ lib, config, ... }:
+{ lib, config }:
 let
   inherit (lib) ns mkIf;
-  cfg = config.${ns}.services.postgresql;
 in
-mkIf cfg.enable {
+{
   services.postgresql = {
     enable = true;
     # Version 15 enabled checkout logging by default which is quite verbose.
@@ -50,7 +49,7 @@ mkIf cfg.enable {
     # https://git.postgresql.org/gitweb/?p=postgresql.git;a=commit;h=64da07c41a8c0a680460cdafc79093736332b6cf
     settings = {
       log_checkpoints = false;
-      full_page_writes = mkIf (config.${ns}.hardware.fileSystem.type == "zfs") false;
+      full_page_writes = mkIf (config.${ns}.hardware.file-system.type == "zfs") false;
     };
   };
 

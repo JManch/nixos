@@ -6,17 +6,16 @@
 # extra statistics to the web UI for monitoring and enables DoH/3.
 {
   lib,
+  cfg,
   pkgs,
   self,
   config,
   inputs,
   selfPkgs,
-  ...
 }:
 let
   inherit (lib)
     ns
-    mkIf
     mkForce
     mapAttrs'
     mapAttrs
@@ -28,11 +27,10 @@ let
     genAttrs
     singleton
     ;
-  inherit (lib.${ns}) addPatches asserts hardeningBaseline;
+  inherit (lib.${ns}) addPatches hardeningBaseline;
   inherit (inputs.nix-resources.secrets) oldFqDomain fqDomain;
   inherit (config.${ns}.system.virtualisation) vmVariant;
   inherit (config.${ns}.core) device;
-  cfg = config.${ns}.services.dns-stack;
 
   # Declares hostnames for all devices on my local network
   homeHosts =
@@ -46,8 +44,54 @@ let
         filterAttrs (host: v: v.config.${ns}.core.device.ipAddress != null) self.nixosConfigurations
       );
 in
-mkIf cfg.enable {
-  assertions = asserts [
+{
+  opts = with lib; {
+    enableIPv6 = mkEnableOption "IPv6 DNS responses";
+    debug = mkEnableOption "verbose logs for debugging";
+
+    listenPort = mkOption {
+      type = types.port;
+      default = 53;
+      description = "Listen port for DNS requests";
+    };
+
+    ctrldListenPort = mkOption {
+      type = types.port;
+      default = 5354;
+      description = "Listen port for the internal Ctrld DNS server";
+    };
+
+    interfaces = mkOption {
+      type = with types; listOf str;
+      default = [ ];
+      description = ''
+        List of additional interfaces for dnsmasq to be exposed on.
+      '';
+    };
+
+    routerAddress = mkOption {
+      type = types.str;
+      default = null;
+      description = ''
+        Local IP address of the router that internal DDNS queries should be
+        pointed to.
+      '';
+    };
+
+    dnsmasqConfig = mkOption {
+      type = types.attrs;
+      readOnly = true;
+      description = "Dnsmasq settings";
+    };
+
+    generateDnsmasqConfig = mkOption {
+      type = types.functionTo (types.functionTo types.pathInStore);
+      readOnly = true;
+      description = "Internal function for generate dnsmasq config from attrset";
+    };
+  };
+
+  asserts = [
     (device.type == "server")
     "DNS stack can only be used on server devices"
     (device.ipAddress != null)
@@ -167,7 +211,7 @@ mkIf cfg.enable {
   };
   users.groups.dnsmasq = { };
 
-  ${ns} = {
+  nsConfig = {
     # Disable systemd-resolved to simplify DNS stack
     system.networking.resolved.enable = mkForce false;
 

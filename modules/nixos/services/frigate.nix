@@ -1,8 +1,8 @@
 {
   lib,
+  cfg,
   config,
   hostname,
-  ...
 }:
 let
   inherit (lib)
@@ -14,26 +14,61 @@ let
     optional
     singleton
     ;
-  inherit (lib.${ns}) asserts hardeningBaseline;
+  inherit (lib.${ns}) hardeningBaseline;
   inherit (config.${ns}.core.device) ipAddress;
-  inherit (config.${ns}.services) hass mosquitto caddy;
+  inherit (config.${ns}.services) home-assistant mosquitto;
   inherit (config.age.secrets) cctvVars mqttFrigatePassword;
-  cfg = config.${ns}.services.frigate;
-  port = 5000;
+  httpPort = 5000;
 in
-mkIf cfg.enable {
-  assertions = asserts [
+{
+  opts = with lib; {
+    coral = {
+      enable = mkEnableOption "Google Coral Accelerator";
+      type = mkOption {
+        type = types.enum [
+          "pci"
+          "usb"
+        ];
+        description = "Coral device type";
+      };
+    };
+
+    rtspAddress = mkOption {
+      type = types.functionTo types.str;
+      description = ''
+        Function accepting channel and subtype that returns the RTSP address string.
+      '';
+    };
+
+    nvrAddress = mkOption {
+      type = types.str;
+      description = ''
+        IP address of the NVR on the local network.
+      '';
+    };
+
+    webrtc = {
+      enable = (mkEnableOption "WebRTC streams with Go2RTC") // {
+        default = true;
+      };
+
+      port = mkOption {
+        type = types.port;
+        default = 8555;
+      };
+    };
+  };
+
+  asserts = [
     (hostname == "homelab")
     "Frigate is only intended to work on host 'homelab'"
-    caddy.enable
-    "Frigate requires Caddy to be enabled"
-    (cfg.nvrAddress != "")
-    "The Frigate service requires nvrAddress to be set"
     config.hardware.graphics.enable
     "The Frigate service requires hardware acceleration"
   ];
 
-  ${ns} = {
+  requirements = [ "services.caddy" ];
+
+  nsConfig = {
     services = {
       frigate.rtspAddress =
         {
@@ -43,7 +78,7 @@ mkIf cfg.enable {
         }:
         "rtsp://${optionalString go2rtc "$"}{FRIGATE_RTSP_USER}:${optionalString go2rtc "$"}{FRIGATE_RTSP_PASSWORD}@${cfg.nvrAddress}:554/cam/realmonitor?channel=${toString channel}&subtype=${toString subtype}";
 
-      mosquitto.users = mkIf (hass.enable && mosquitto.enable) {
+      mosquitto.users = mkIf (home-assistant.enable && mosquitto.enable) {
         frigate = {
           acl = [ "readwrite #" ];
           hashedPasswordFile = mqttFrigatePassword.path;
@@ -51,7 +86,7 @@ mkIf cfg.enable {
       };
 
       caddy.virtualHosts.cctv.extraConfig = ''
-        reverse_proxy http://127.0.0.1:${toString port}
+        reverse_proxy http://127.0.0.1:${toString httpPort}
       '';
 
       caddy.virtualHosts.go2rtc.extraConfig = ''
@@ -83,7 +118,7 @@ mkIf cfg.enable {
         };
       };
 
-      mqtt = mkIf (hass.enable && mosquitto.enable) {
+      mqtt = mkIf (home-assistant.enable && mosquitto.enable) {
         enabled = true;
         host = "127.0.0.1";
         port = 1883;
@@ -313,9 +348,12 @@ mkIf cfg.enable {
   services.nginx.virtualHosts.${config.services.frigate.hostname} = {
     listen = singleton {
       addr = "127.0.0.1";
-      port = port;
+      port = httpPort;
     };
 
+    # Needed since https://github.com/NixOS/nixpkgs/pull/370762 to make Frigate
+    # exclusive listen on port 5000. Without this override duplicate listen
+    # directives are placed in the nginx conf which is invalid.
     extraConfig = mkForce ''
       # vod settings
       vod_base_url "";
@@ -371,13 +409,13 @@ mkIf cfg.enable {
     };
 
     services.nginx.virtualHosts.${config.services.frigate.hostname}.listen = mkVMOverride (singleton {
-      inherit port;
+      inherit httpPort;
       addr = "0.0.0.0";
     });
 
     # NOTE: I can't get the WebRTC stream to work from the VM
     networking.firewall.allowedTCPPorts = [
-      port
+      httpPort
       1984
       8554
     ];

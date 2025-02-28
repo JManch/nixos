@@ -1,14 +1,7 @@
 { lib, ... }@args:
 {
-  imports =
-    [
-      ./services
-    ]
-    ++ (lib.${lib.ns}.importCategories {
-      inherit args;
-      rootDir = ./.;
-      exclude = [
-        "services"
-      ];
-    });
+  imports = lib.${lib.ns}.importCategories {
+    inherit args;
+    rootDir = ./.;
+  };
 }

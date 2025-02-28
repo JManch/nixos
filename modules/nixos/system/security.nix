@@ -2,7 +2,7 @@
 let
   inherit (lib) ns mkIf;
   inherit (config.hm.programs) swaylock hyprlock;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) home-manager;
 in
 {
   enableOpt = false;
@@ -12,7 +12,7 @@ in
     Defaults pwfeedback
   '';
 
-  security.pam.services = mkIf (homeManager.enable) {
+  security.pam.services = mkIf (home-manager.enable) {
     swaylock = mkIf swaylock.enable { };
     hyprlock = mkIf hyprlock.enable { };
   };

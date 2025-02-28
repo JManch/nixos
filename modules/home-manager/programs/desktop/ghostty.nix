@@ -11,7 +11,7 @@ let
   mkTheme =
     theme:
     let
-      inherit (core.colorScheme.${theme}) palette;
+      inherit (core.color-scheme.${theme}) palette;
     in
     ''
       palette=0=#${palette.base02}

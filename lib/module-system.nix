@@ -31,18 +31,16 @@ let
     pathExists
     optional
     optionals
+    setDefaultModuleLocation
     zipAttrsWithNames
     isBool
     isFunction
     isString
     isList
     assertMsg
-    concatStrings
-    imap0
     hasAttr
     ;
   inherit (lib.${ns})
-    upperFirstChar
     importCategories
     mkCategory
     mkModule
@@ -289,6 +287,7 @@ in
             inherit args categoryPath isHomeManager;
             categoryOpts' = categoryOpts;
             name = "root";
+            path = dir + "/root.nix";
             moduleBody = import (dir + "/root.nix");
           }
         else
@@ -303,12 +302,12 @@ in
         (optional (rootModule.module != null) rootModule.module)
         ++ (map
           (
-            modulePath:
+            moduleFile:
             mkModule {
               inherit args categoryPath isHomeManager;
-              inherit (modulePath) name;
+              inherit (moduleFile) name path;
               categoryOpts' = rootModule.categoryOpts;
-              moduleBody = import modulePath.path;
+              moduleBody = import moduleFile.path;
             }
           )
           (
@@ -372,6 +371,7 @@ in
   mkModule =
     {
       args,
+      path,
       categoryPath,
       isHomeManager,
       name,
@@ -380,14 +380,10 @@ in
     }:
     let
       isRoot = name == "root";
-      moduleOptionName = concatStrings (
-        imap0 (i: s: if i == 0 then s else upperFirstChar s) (splitString "-" name)
-      );
 
       categoryPathString = concatStringsSep "." categoryPath;
       categoryCfg = attrByPath categoryPath { } args.config.${ns};
-      cfg =
-        if isRoot || categoryOpts.noChildren then categoryCfg else categoryCfg.${moduleOptionName} or null;
+      cfg = if isRoot || categoryOpts.noChildren then categoryCfg else categoryCfg.${name} or null;
 
       extraArgs = { inherit args cfg categoryCfg; };
       moduleArgs = mapAttrs (
@@ -399,7 +395,9 @@ in
       configPrimarySetRaw = if isAttrs configRaw then configRaw else head configRaw;
       configPrimarySet =
         if configPrimarySetRaw ? _type then
-          assert assertMsg (configPrimarySetRaw._type == "if") "The primary config set cannot use mkMerge";
+          assert assertMsg (
+            configPrimarySetRaw._type == "if"
+          ) "${throwMsg} uses mkMerge in the primary config set";
           configPrimarySetRaw.content
         else
           configPrimarySetRaw;
@@ -443,9 +441,7 @@ in
         if isString condition then
           if hasPrefix "osConfig" condition then
             if !isHomeManager then
-              throw ''
-                ${throwMsg} contains a condition using 'osConfig'. This is only supported in Home Manager modules.
-              ''
+              throw "${throwMsg} contains a condition using 'osConfig'. This is only supported in Home Manager modules."
             else if args.osConfig or null == null then
               !hasPrefix "osConfigStrict" condition
             else
@@ -455,24 +451,18 @@ in
         else if isBool condition then
           condition
         else
-          throw ''
-            ${throwMsg} defines a condition with unsupported type '${builtins.typeOf condition}'.
-          ''
+          throw "${throwMsg} defines a condition with unsupported type '${builtins.typeOf condition}'."
       ) moduleOpts.conditions;
 
       requirementAssertions = map (
         requirement:
         if isString requirement then
           let
-            message = ''
-              ${throwMsg} requires '${requirement}' to be enabled
-            '';
+            message = "${throwMsg} requires '${requirement}' to be enabled.";
           in
           if hasPrefix "osConfig" requirement then
             if !isHomeManager then
-              throw ''
-                ${throwMsg} contains a requirement using 'osConfig'. This is only supported in Home Manager modules.
-              ''
+              throw "${throwMsg} contains a requirement using 'osConfig'. This is only supported in Home Manager modules."
             else if args.osConfig == null then
               {
                 assertion = !hasPrefix "osConfigStrict" requirement;
@@ -491,88 +481,90 @@ in
               inherit message;
             }
         else
-          throw ''
-            ${throwMsg} contains a requirement with unsupported type '${builtins.typeOf requirement}'.
-          ''
+          throw "${throwMsg} contains a requirement with unsupported type '${builtins.typeOf requirement}'."
       ) moduleOpts.requirements;
 
       module =
-        { ... }:
-        {
-          imports = moduleOpts.imports;
+        # This ensures that things like definitionsWithLocations and error
+        # messages give correct locations
+        setDefaultModuleLocation path (
+          { ... }:
+          {
+            imports = moduleOpts.imports;
 
-          options.${ns} =
-            let
-              options' =
-                (optionalAttrs (
-                  (!isRoot && moduleOpts.enableOpt && !categoryOpts.noChildren) || (isRoot && categoryOpts.enableOpt)
-                ) { enable = mkEnableOption name; })
-                // moduleOpts.opts;
-            in
-            moduleOpts.nsOpts
-            // (optionalAttrs (options' != { }) (
-              setAttrByPath (
-                if isRoot || categoryOpts.noChildren then categoryPath else categoryPath ++ [ moduleOptionName ]
-              ) options'
-            ));
+            options.${ns} =
+              let
+                options' =
+                  (optionalAttrs (
+                    (!isRoot && moduleOpts.enableOpt && !categoryOpts.noChildren) || (isRoot && categoryOpts.enableOpt)
+                  ) { enable = mkEnableOption name; })
+                  // moduleOpts.opts;
+              in
+              moduleOpts.nsOpts
+              // (optionalAttrs (options' != { }) (
+                setAttrByPath (
+                  if isRoot || categoryOpts.noChildren then categoryPath else categoryPath ++ [ name ]
+                ) options'
+              ));
 
-          config =
-            let
-              extraConfig =
-                singleton {
-                  assertions =
-                    requirementAssertions
-                    ++ (asserts (map (a: if isString a then "[${throwMsg}] ${a}" else a) moduleOpts.asserts));
-                }
-                ++ (optional (moduleOpts.categoryConfig != { }) (
-                  setAttrByPath ([ ns ] ++ categoryPath) moduleOpts.categoryConfig
-                ))
-                ++ (optional (moduleOpts.nsConfig != { }) (setAttrByPath [ ns ] moduleOpts.nsConfig));
+            config =
+              let
+                extraConfig =
+                  singleton {
+                    assertions =
+                      requirementAssertions
+                      ++ (asserts (map (a: if isString a then "[${throwMsg}] ${a}" else a) moduleOpts.asserts));
+                  }
+                  ++ (optional (moduleOpts.categoryConfig != { }) (
+                    setAttrByPath ([ ns ] ++ categoryPath) moduleOpts.categoryConfig
+                  ))
+                  ++ (optional (moduleOpts.nsConfig != { }) (setAttrByPath [ ns ] moduleOpts.nsConfig));
 
-              primarySetEnabled = (cfg.enable or true) && (categoryCfg.enable or true) && conditionsResult;
+                primarySetEnabled = (cfg.enable or true) && (categoryCfg.enable or true) && conditionsResult;
 
-              guardTypeImpls = {
-                full = mkIf primarySetEnabled (mkMerge (flatten [ strippedConfig ] ++ extraConfig));
+                guardTypeImpls = {
+                  full = mkIf primarySetEnabled (mkMerge (flatten [ strippedConfig ] ++ extraConfig));
 
-                first = (
-                  mkMerge (
-                    singleton (
-                      mkIf primarySetEnabled (
-                        mkMerge (
-                          singleton (
-                            if (isAttrs strippedConfig) then
-                              strippedConfig
-                            else if (isList strippedConfig) then
-                              head strippedConfig
-                            else
-                              throw "Stripped config has unexpected type ${builtins.typeOf strippedConfig}"
+                  first = (
+                    mkMerge (
+                      singleton (
+                        mkIf primarySetEnabled (
+                          mkMerge (
+                            singleton (
+                              if (isAttrs strippedConfig) then
+                                strippedConfig
+                              else if (isList strippedConfig) then
+                                head strippedConfig
+                              else
+                                throw "Stripped config has unexpected type ${builtins.typeOf strippedConfig}"
+                            )
+                            ++ extraConfig
                           )
-                          ++ extraConfig
                         )
                       )
+                      ++ optionals (isList strippedConfig) (tail strippedConfig)
                     )
-                    ++ optionals (isList strippedConfig) (tail strippedConfig)
-                  )
-                );
+                  );
 
-                # WARN: Since extraConfig is not applied when guardType is custom we must
-                # assert that module options generating this config are not used.
-                custom =
-                  let
-                    assertIncompat =
-                      option:
-                      assertMsg (
-                        moduleOpts.guardType == "custom" -> !hasAttr option setModuleOpts
-                      ) "${throwMsg} uses `${option}` which is not compatible with `guardType` 'custom'";
-                  in
-                  assert assertIncompat "asserts";
-                  assert assertIncompat "categoryConfig";
-                  assert assertIncompat "nsConfig";
-                  mkMerge (flatten [ strippedConfig ]);
-              };
-            in
-            guardTypeImpls.${moduleOpts.guardType};
-        };
+                  # WARN: Since extraConfig is not applied when guardType is custom we must
+                  # assert that module options generating this config are not used.
+                  custom =
+                    let
+                      assertIncompat =
+                        option:
+                        assertMsg (
+                          moduleOpts.guardType == "custom" -> !hasAttr option setModuleOpts
+                        ) "${throwMsg} uses `${option}` which is not compatible with `guardType` 'custom'";
+                    in
+                    assert assertIncompat "asserts";
+                    assert assertIncompat "categoryConfig";
+                    assert assertIncompat "nsConfig";
+                    mkMerge (flatten [ strippedConfig ]);
+                };
+              in
+              guardTypeImpls.${moduleOpts.guardType};
+          }
+        );
     in
     if isRoot then { inherit module categoryOpts; } else module;
 }

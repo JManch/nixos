@@ -1,24 +1,28 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   inputs,
   hostname,
-  ...
 }:
 let
-  inherit (lib) ns mkIf toUpper;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.${ns}.system) virtualisation;
-  cfg = config.${ns}.services.wallabag;
 in
-mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
-    virtualisation.containerisation.enable
-    "Wallabag requires containerised virtualisation to be enabled"
+{
+  requirements = [ "system.virtualisation.containerisation" ];
+  asserts = [
     false
     "Wallabag module is disabled because it's insecure"
   ];
+
+  opts.port =
+    with lib;
+    mkOption {
+      type = types.port;
+      default = 8088;
+      description = "Port for the Wallabag server to listen on";
+    };
 
   # For various reasons this is quite an insecure module so I think I'll
   # disable it for now and wait for things to improve upstream.
@@ -57,7 +61,7 @@ mkIf cfg.enable {
       SYMFONY__ENV__DOMAIN_NAME = "http://${hostname}.lan:${toString cfg.port}";
       SYMFONY__ENV__TWOFACTOR_SENDER = "https://wallabag.${fqDomain}";
       SYMFONY__ENV__FROM_EMAIL = "wallabag@${fqDomain}";
-      SYMFONY__ENV__SERVER_NAME = toUpper hostname;
+      SYMFONY__ENV__SERVER_NAME = lib.toUpper hostname;
     };
 
     volumes = [

@@ -19,7 +19,7 @@ in
 
   ${lib.ns} = {
     core = {
-      homeManager.enable = true;
+      home-manager.enable = true;
 
       device = {
         type = "server";
@@ -33,11 +33,11 @@ in
     };
 
     hardware = {
-      secureBoot.enable = true;
+      secure-boot.enable = true;
       graphics.hardwareAcceleration = true;
       printing.server.enable = true;
 
-      fileSystem = {
+      file-system = {
         type = "zfs";
         extendedLoaderTimeout = true;
         zfs.trim = true;
@@ -46,8 +46,8 @@ in
     };
 
     services = {
-      hass.enable = true;
-      hass.everythingPresenceContainer = false;
+      home-assistant.enable = true;
+      home-assistant.everythingPresenceContainer = false;
       postgresql.enable = true;
       unifi.enable = true;
       mosquitto.enable = true;

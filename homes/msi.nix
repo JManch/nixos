@@ -22,12 +22,12 @@
       firefox.backup = false;
       anki.enable = true;
       rnote.enable = true;
-      multiviewerF1.enable = true;
-      jellyfinMediaPlayer.enable = true;
+      multiviewer-f1.enable = true;
+      jellyfin-media-player.enable = true;
 
       gaming = {
         mangohud.enable = true;
-        prismLauncher.enable = true;
+        prism-launcher.enable = true;
       };
     };
 

@@ -14,7 +14,7 @@ let
     singleton
     mkEnableOption
     ;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) home-manager;
   inherit (config.hm.xdg) dataHome;
 
   steamAppIDs = {
@@ -138,7 +138,7 @@ in
     ".local/share/Steam"
   ];
 
-  hm = mkIf homeManager.enable {
+  hm = mkIf home-manager.enable {
     ${ns} = {
       programs.desktop.gaming = {
         gameClasses = [

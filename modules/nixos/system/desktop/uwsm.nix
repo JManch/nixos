@@ -27,7 +27,7 @@ let
     optionals
     optionalAttrs
     ;
-  inherit (config.${ns}.core) device homeManager;
+  inherit (config.${ns}.core) device home-manager;
   inherit (lib.${ns}) asserts addPatches;
   homeUwsm = config.hm.${ns}.desktop.uwsm;
 in
@@ -61,7 +61,7 @@ in
       serviceApps = mkOption {
         type = with types; listOf str;
         default = [ ];
-        apply = v: (optionals homeManager.enable homeUwsm.serviceApps) ++ v;
+        apply = v: (optionals home-manager.enable homeUwsm.serviceApps) ++ v;
         description = ''
           List of application desktop entry IDs that should be started in
           services instead of scopes. Useful for applications where we want to
@@ -72,7 +72,7 @@ in
       appUnitOverrides = mkOption {
         type = types.attrs;
         default = { };
-        apply = v: (optionalAttrs homeManager.enable homeUwsm.appUnitOverrides) // v;
+        apply = v: (optionalAttrs home-manager.enable homeUwsm.appUnitOverrides) // v;
         description = ''
           Attribute set of unit overrides. Attribute name should be the unit
           name without the app-''${desktop} prefix. Attribute value should be
@@ -183,7 +183,7 @@ in
             # system variables in /etc/profile. __HM_SESS_VARS_SOURCED isn't an issue here
             # because the UWSM pre-loader does not export the variables it loads from
             # env_login.
-            ${optionalString homeManager.enable ''
+            ${optionalString home-manager.enable ''
               . "/etc/profiles/per-user/${username}/etc/profile.d/hm-session-vars.sh"
             ''}
           ''

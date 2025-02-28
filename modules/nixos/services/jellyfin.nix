@@ -6,16 +6,15 @@
 # Jellyfin unusable.
 {
   lib,
+  cfg,
   pkgs,
   config,
-  ...
 }:
 let
   inherit (lib)
     ns
     mkIf
     getExe
-    mkMerge
     optional
     mkForce
     genAttrs
@@ -29,16 +28,90 @@ let
     splitString
     concatLines
     all
+    mkEnableOption
+    types
+    mkOption
     ;
   inherit (lib.${ns}) asserts;
   inherit (config.${ns}.system) impermanence;
   inherit (config.${ns}.services) caddy torrent-stack;
   inherit (config.services) jellyfin;
-  cfg = config.${ns}.services.jellyfin;
 in
-mkMerge [
-  (mkIf cfg.enable {
-    assertions = asserts [
+[
+  {
+    opts = {
+      openFirewall = mkEnableOption "opening the firewall";
+
+      backup = mkEnableOption "Jellyfin backups" // {
+        default = true;
+      };
+
+      autoStart = mkEnableOption "Jellyfin auto start" // {
+        default = true;
+      };
+
+      plugins = mkOption {
+        type = with types; listOf package;
+        default = [ ];
+        description = ''
+          List of plugin packages to install. All directories in the package
+          outpath will be symlinked to the Jellyfin plugin folder.
+        '';
+      };
+
+      reverseProxy = {
+        enable = mkEnableOption "Jellyfin Caddy virtual host";
+
+        address = mkOption {
+          type = types.str;
+          default = "127.0.0.1";
+          description = "IP address that reverse proxy should point to";
+        };
+
+        extraAllowedAddresses = mkOption {
+          type = with types; listOf str;
+          default = [ ];
+          description = ''
+            List of address to give access to Jellyfin in addition to the trusted
+            list.
+          '';
+        };
+      };
+
+      interfaces = mkOption {
+        type = with types; listOf str;
+        default = [ ];
+        description = ''
+          List of additional interfaces for Jellyfin to be exposed on.
+        '';
+      };
+
+      mediaDirs = mkOption {
+        type = types.attrsOf types.str;
+        default = { };
+        example = {
+          shows = "/home/joshua/videos/shows";
+          movies = "/home/joshua/videos/movies";
+        };
+        description = ''
+          Attribute set of media directories that will be bind mount to
+          /var/lib/jellyfin/media. Attribute name is target bind path relative
+          to media dir and value is absolute source dir.
+        '';
+      };
+
+      jellyseerr = {
+        enable = mkEnableOption "Jellyseerr behind a reverse proxy";
+
+        port = mkOption {
+          type = types.port;
+          default = 5055;
+          description = "Jellyseerr listening port";
+        };
+      };
+    };
+
+    asserts = [
       (all (n: n != "") (attrNames cfg.mediaDirs))
       "Jellyfin media dir target cannot be empty"
       (all (n: (length (splitString "/" n)) == 1) (attrNames cfg.mediaDirs))
@@ -133,7 +206,7 @@ mkMerge [
         mode = "0700";
       }
     ];
-  })
+  }
 
   (mkIf cfg.reverseProxy.enable {
     assertions = asserts [
@@ -162,7 +235,7 @@ mkMerge [
     };
 
     services.jellyseerr = {
-      enable = jellyfin.enable;
+      enable = true;
       openFirewall = false;
       port = cfg.jellyseerr.port;
     };

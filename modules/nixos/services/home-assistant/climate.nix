@@ -1,7 +1,6 @@
-{ lib, config, ... }:
+{ lib, cfg }:
 let
   inherit (lib)
-    ns
     types
     mkIf
     mkAfter
@@ -12,10 +11,9 @@ let
     mkEnableOption
     singleton
     ;
-  cfg = config.${ns}.services.hass;
 in
 {
-  options.${ns}.services.hass.rooms = mkOption {
+  opts.rooms = mkOption {
     type = types.attrsOf (
       types.submodule (
         { config, ... }:
@@ -122,7 +120,7 @@ in
     );
   };
 
-  config.services.home-assistant = {
+  services.home-assistant = {
     lovelaceConfig.views = mkAfter [
       {
         title = "Heating";

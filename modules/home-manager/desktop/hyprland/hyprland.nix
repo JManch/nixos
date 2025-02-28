@@ -277,7 +277,7 @@ in
 
   darkman.switchApps.hyprland =
     let
-      inherit (config.${ns}.core.colorScheme) colorMap dark;
+      inherit (config.${ns}.core.color-scheme) colorMap dark;
       hyprctl = getExe' pkgs.hyprland "hyprctl";
       mapDarkColor = base: colorMap.${base} // { light = dark.palette.${base}; };
     in

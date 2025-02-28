@@ -1,27 +1,77 @@
 {
   lib,
+  cfg,
   config,
   inputs,
-  ...
 }:
 let
   inherit (lib)
     ns
     mkIf
-    mkMerge
     optional
     singleton
     mkForce
+    mkEnableOption
+    mkOption
+    types
     ;
   inherit (lib.${ns}) asserts;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.${ns}.services) caddy mosquitto;
   inherit (config.age.secrets) zigbee2mqttYamlSecrets mqttZigbee2mqttPassword;
   inherit (config.services.zigbee2mqtt) dataDir;
-  cfg = config.${ns}.services.zigbee2mqtt;
 in
-mkMerge [
-  (mkIf cfg.enable {
+[
+  {
+    guardType = "first";
+
+    opts = {
+      mqtt = {
+        user = mkEnableOption "Zigbee2mqtt Mosquitto user";
+        tls = mkEnableOption "TLS Mosquitto user";
+
+        server = mkOption {
+          type = types.str;
+          default = "mqtt://127.0.0.1:1883";
+          description = "MQTT server address";
+        };
+      };
+
+      proxy = {
+        enable = mkEnableOption "proxying Zigbee2mqtt";
+
+        address = mkOption {
+          type = types.str;
+          default = "127.0.0.1";
+          description = "Frontend proxy address";
+        };
+
+        port = mkOption {
+          type = types.port;
+          default = cfg.zigbee2mqtt.port;
+          description = "Frontend proxy port";
+        };
+      };
+
+      port = mkOption {
+        type = types.port;
+        default = 8084;
+        description = "Port of the frontend web interface";
+      };
+
+      address = mkOption {
+        type = types.str;
+        default = "127.0.0.1";
+        description = "Address for the frontend web interface to listen on";
+      };
+
+      deviceNode = mkOption {
+        type = types.str;
+        example = "/dev/ttyUSB0";
+        description = "The device node of the zigbee adapter.";
+      };
+    };
+
     services.zigbee2mqtt = {
       enable = true;
       dataDir = "/var/lib/zigbee2mqtt";
@@ -97,7 +147,7 @@ mkMerge [
       group = "zigbee2mqtt";
       mode = "0700";
     };
-  })
+  }
 
   (mkIf cfg.proxy.enable {
     assertions = asserts [

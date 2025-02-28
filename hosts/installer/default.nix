@@ -86,7 +86,7 @@ let
       username=$(nix eval --raw "$host_config.${ns}.core.username")
       admin_username=$(nix eval --raw "$host_config.${ns}.core.adminUsername")
       impermanence=$(nix eval "$host_config.${ns}.system.impermanence.enable")
-      secure_boot=$(nix eval "$host_config.${ns}.hardware.secureBoot.enable")
+      secure_boot=$(nix eval "$host_config.${ns}.hardware.secure-boot.enable")
       has_disko=$(nix eval --impure --expr "(builtins.getFlake \"$flake\").nixosConfigurations.$hostname.config.disko.devices.disk or {} != {}")
 
       if [[ "$has_disko" = "false" ]]; then

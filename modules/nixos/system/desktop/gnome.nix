@@ -19,7 +19,7 @@ let
     mkOption
     types
     ;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) home-manager;
   extensions = with pkgs.gnomeExtensions; [
     appindicator
     night-theme-switcher
@@ -67,7 +67,7 @@ in
 
   home-manager.sharedModules = [ inputs.gnome-keybinds.homeManagerModules.default ];
 
-  hm = mkIf homeManager.enable {
+  hm = mkIf home-manager.enable {
     ${ns}.desktop.terminal = mkDefault "org.gnome.Terminal";
 
     dconf.settings =

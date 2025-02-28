@@ -52,7 +52,7 @@ in
   };
 
   requirements = [
-    "core.homeManager"
+    "core.home-manager"
     "programs.gaming.gamemode"
     "system.audio"
     "services.lact"

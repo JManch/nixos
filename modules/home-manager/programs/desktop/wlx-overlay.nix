@@ -8,7 +8,7 @@ let
 in
 {
   enableOpt = false;
-  conditions = [ "osConfigStrict.hardware.valveIndex" ];
+  conditions = [ "osConfigStrict.hardware.valve-index" ];
 
   home.packages = [ pkgs.wlx-overlay-s ];
 

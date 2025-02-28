@@ -123,8 +123,8 @@ in
               default = { };
               example = {
                 base00 = {
-                  dark = config.${ns}.core.colorScheme.dark.palette.base00;
-                  light = config.${ns}.core.colorScheme.light.palette.base02;
+                  dark = config.${ns}.core.color-scheme.dark.palette.base00;
+                  light = config.${ns}.core.color-scheme.light.palette.base02;
                 };
               };
               description = ''
@@ -306,7 +306,7 @@ in
   home.activation =
     let
       inherit (lib.hm.dag) entryAfter;
-      inherit (config.${ns}.core.colorScheme) colorMap;
+      inherit (config.${ns}.core.color-scheme) colorMap;
     in
     mapAttrs' (
       switchApp: switchConfig:

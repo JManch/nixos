@@ -1,20 +1,23 @@
 {
   lib,
+  cfg,
   config,
   inputs,
-  ...
 }:
 let
-  inherit (lib) ns mkIf singleton;
+  inherit (lib) ns singleton;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.${ns}.services) caddy;
-  cfg = config.${ns}.services.mealie;
 in
-mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
-    caddy.enable
-    "Mealie requires Caddy to be enabled"
-  ];
+{
+  requirements = [ "services.caddy" ];
+
+  opts = with lib; {
+    port = mkOption {
+      type = types.port;
+      default = 9000;
+      description = "Port for the Mealie server to listen on";
+    };
+  };
 
   services.mealie = {
     enable = true;
@@ -37,7 +40,7 @@ mkIf cfg.enable {
     Group = "mealie";
   };
 
-  ${ns}.services.caddy.virtualHosts.mealie.extraConfig = ''
+  nsConfig.services.caddy.virtualHosts.mealie.extraConfig = ''
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 

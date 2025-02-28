@@ -1,9 +1,5 @@
-{ lib, config, ... }:
-let
-  inherit (lib) ns mkIf mkForce;
-  cfg = config.${ns}.services.fail2ban;
-in
-mkIf cfg.enable {
+{ lib }:
+{
   services.fail2ban = {
     enable = true;
     maxretry = 3;
@@ -13,6 +9,6 @@ mkIf cfg.enable {
     bantime-increment.enable = true;
     # Upstream prepends ignoreips with 127.0.0.1/8 but the ignoreself option
     # (true by default) covers this for my use case
-    jails.DEFAULT.settings.ignoreip = mkForce "";
+    jails.DEFAULT.settings.ignoreip = lib.mkForce "";
   };
 }

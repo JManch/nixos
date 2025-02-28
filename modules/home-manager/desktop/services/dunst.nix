@@ -14,7 +14,7 @@ let
     types
     ;
   inherit (config.${ns}) desktop;
-  inherit (config.${ns}.core.colorScheme) light;
+  inherit (config.${ns}.core.color-scheme) light;
   inherit (osConfig.${ns}.core.device) primaryMonitor;
   colors = config.colorScheme.palette;
   systemctl = getExe' pkgs.systemd "systemctl";

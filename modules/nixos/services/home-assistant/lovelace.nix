@@ -1,13 +1,12 @@
 {
   lib,
+  cfg,
   config,
   inputs,
-  ...
 }:
 let
   inherit (lib)
     ns
-    mkIf
     optionals
     singleton
     attrNames
@@ -19,10 +18,8 @@ let
   inherit (lib.${ns}) upperFirstChar;
   inherit (config.${ns}.services) frigate;
   inherit (secrets.general) people userIds peopleList;
-  inherit (config.${ns}.services.hass) rooms;
 
-  cfg = config.${ns}.services.hass;
-  secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
+  secrets = inputs.nix-resources.secrets.homeAssistant { inherit lib config; };
   cameras = attrNames config.services.frigate.settings.cameras;
   upperPeople = mapAttrs (_: p: upperFirstChar p) people;
 
@@ -773,7 +770,7 @@ let
     ];
   };
 in
-mkIf cfg.enableInternal {
+{
   services.home-assistant.lovelaceConfig = {
     title = "Dashboard";
 
@@ -786,7 +783,7 @@ mkIf cfg.enableInternal {
         outside
       ]
       ++ mapAttrsToList (_: roomCfg: roomCfg.lovelace.dashboard) (
-        filterAttrs (_: v: v.lovelace.enable) rooms
+        filterAttrs (_: v: v.lovelace.enable) cfg.rooms
       );
   };
 }

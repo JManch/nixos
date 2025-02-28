@@ -1,13 +1,12 @@
 {
   lib,
+  cfg,
   config,
   inputs,
-  ...
 }:
 let
   inherit (lib)
     ns
-    mkIf
     imap
     optional
     singleton
@@ -16,8 +15,7 @@ let
     ;
   inherit (lib.${ns}) upperFirstChar;
   inherit (secrets.general) devices people;
-  cfg = config.${ns}.services.hass;
-  secrets = inputs.nix-resources.secrets.hass { inherit lib config; };
+  secrets = inputs.nix-resources.secrets.homeAssistant { inherit lib config; };
 
   formattedRoomName =
     room: (concatMapStringsSep " " (string: upperFirstChar string) (splitString "_" room));
@@ -304,7 +302,7 @@ let
     ];
   };
 in
-mkIf cfg.enableInternal {
+{
   services.home-assistant.config = {
     automation =
       binCollectionNotify

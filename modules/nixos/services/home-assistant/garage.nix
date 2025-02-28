@@ -1,7 +1,6 @@
-{ lib, config, ... }:
+{ lib }:
 let
-  inherit (lib) ns mkIf singleton;
-  cfg = config.${ns}.services.hass;
+  inherit (lib) singleton;
 
   # The shelly should be configured with input mode "Switch", output type
   # "Detached" and a timer that turns off the input switch after 3 seconds. The
@@ -9,7 +8,7 @@ let
   shellyId = "shellyplus1-e465b8b961a4";
   doorSeconds = 20;
 in
-mkIf cfg.enableInternal {
+{
   services.home-assistant.config = {
     mqtt = singleton {
       binary_sensor = {

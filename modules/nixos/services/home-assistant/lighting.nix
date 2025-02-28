@@ -1,7 +1,6 @@
-{ lib, config, ... }:
+{ lib, cfg }:
 let
   inherit (lib)
-    ns
     types
     mkOption
     mkIf
@@ -13,10 +12,9 @@ let
     mapAttrsToList
     mkEnableOption
     ;
-  cfg = config.${ns}.services.hass;
 in
 {
-  options.${ns}.services.hass.rooms = mkOption {
+  opts.rooms = mkOption {
     type = types.attrsOf (
       types.submodule (
         { name, config, ... }:
@@ -362,501 +360,499 @@ in
     );
   };
 
-  config = mkIf cfg.enableInternal {
-    assertions = lib.${ns}.asserts [
-      (all (x: x == true) (
-        mapAttrsToList (
-          _: roomCfg: roomCfg.lighting.wakeUpLights.enable -> roomCfg.sleepTracking.enable
-        ) cfg.rooms
-      ))
-      "Home Assistant wake up lights require sleep tracking to be enabled"
-    ];
-
-    services.home-assistant.config = mkMerge (
+  asserts = [
+    (all (x: x == true) (
       mapAttrsToList (
-        room: roomCfg:
-        let
-          inherit (roomCfg) formattedRoomName;
-          inherit (roomCfg.sleepTracking)
-            useAlarm
-            wakeUpTimestamp
-            sleepTimestamp
-            sleepDuration
-            ;
-          cfg' = roomCfg.lighting;
-        in
-        mkIf cfg'.enable (mkMerge [
-          (mkIf cfg'.wakeUpLights.enable {
-            automation =
-              singleton {
-                alias = "${formattedRoomName} Wake Up Lights";
-                trace.stored_traces = 5;
-                mode = "single";
-                trigger = singleton {
-                  platform = "template";
-                  value_template = "{{ (now().timestamp() + 60*60) | round(0) == ${wakeUpTimestamp} }}";
-                };
-                condition = singleton {
-                  condition = "state";
-                  entity_id = "input_boolean.${room}_wake_up_lights";
-                  state = "on";
-                };
-                action = singleton {
-                  action = "light.turn_on";
-                  target.entity_id = "light.${room}_lights";
-                };
-              }
-              ++ optional cfg'.adaptiveLighting.enable {
-                alias = "${formattedRoomName} Lighting Sun Times";
-                trace.stored_traces = 5;
-                mode = "single";
-                trigger =
-                  [
-                    {
-                      platform = "homeassistant";
-                      event = "start";
-                    }
-                    {
-                      platform = "state";
-                      entity_id = [ "input_number.${room}_sleep_duration" ];
-                      from = null;
-                    }
-                  ]
-                  ++ (
-                    if (!useAlarm) then
-                      singleton {
-                        platform = "state";
-                        entity_id = [ "input_datetime.${room}_wake_up_time" ];
-                        from = null;
-                      }
-                    else
-                      [
-                        {
-                          platform = "state";
-                          entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
-                          from = null;
-                        }
-                        {
-                          platform = "state";
-                          entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
-                          to = "unavailable";
-                          for.minutes = 5;
-                        }
-                      ]
-                  );
-                action =
-                  let
-                    unavailableConditions =
-                      addFor:
-                      singleton {
-                        condition = "state";
-                        entity_id = "input_number.${room}_sleep_duration";
-                        state = "unavailable";
-                      }
-                      ++ singleton (
-                        if useAlarm then
-                          {
-                            condition = "state";
-                            entity_id = "sensor.${roomCfg.deviceId}_next_alarm";
-                            state = "unavailable";
-                            # Alarm has to be unavailable for 5 minutes for it to be considered unavailable
-                            # and for adaptive lighting to be reset to default. This is because when the
-                            # alarm goes off the next alarm entity becomes unavailable for a few seconds.
-                            # This resets adaptive lighting and potentially potentially flashbangs you when
-                            # waking up.
-                            for = mkIf addFor { minutes = 5; };
-                          }
-                        else
-                          {
-                            condition = "state";
-                            entity_id = "input_datetime.${room}_wake_up_time";
-                            state = "unavailable";
-                          }
-                      );
-                  in
-                  singleton {
-                    choose = [
-                      {
-                        conditions = singleton {
-                          condition = "not";
-                          conditions = unavailableConditions false;
-                        };
-                        sequence = singleton {
-                          action = "adaptive_lighting.change_switch_settings";
-                          data = {
-                            entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
-                            use_defaults = "current";
-                            sunrise_time = "{{ ${wakeUpTimestamp} | timestamp_custom('%H:%M:%S') }}";
-                            # Set sunset 1.5 hours before sleep time so that lights
-                            # will reach minimum brightness at sleep time
-                            sunset_time = "{{ (${sleepTimestamp} - 1.5*60*60) | timestamp_custom('%H:%M:%S') }}";
-                          };
-                        };
-                      }
-                      {
-                        conditions = singleton {
-                          condition = "or";
-                          conditions = unavailableConditions true;
-                        };
-                        sequence = singleton {
-                          action = "adaptive_lighting.change_switch_settings";
-                          data = {
-                            entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
-                            use_defaults = "configuration";
-                          };
-                        };
-                      }
-                    ];
-                  };
+        _: roomCfg: roomCfg.lighting.wakeUpLights.enable -> roomCfg.sleepTracking.enable
+      ) cfg.rooms
+    ))
+    "Home Assistant wake up lights require sleep tracking to be enabled"
+  ];
+
+  services.home-assistant.config = mkMerge (
+    mapAttrsToList (
+      room: roomCfg:
+      let
+        inherit (roomCfg) formattedRoomName;
+        inherit (roomCfg.sleepTracking)
+          useAlarm
+          wakeUpTimestamp
+          sleepTimestamp
+          sleepDuration
+          ;
+        cfg' = roomCfg.lighting;
+      in
+      mkIf cfg'.enable (mkMerge [
+        (mkIf cfg'.wakeUpLights.enable {
+          automation =
+            singleton {
+              alias = "${formattedRoomName} Wake Up Lights";
+              trace.stored_traces = 5;
+              mode = "single";
+              trigger = singleton {
+                platform = "template";
+                value_template = "{{ (now().timestamp() + 60*60) | round(0) == ${wakeUpTimestamp} }}";
               };
-
-            input_boolean."${room}_wake_up_lights" = {
-              name = "${formattedRoomName} Wake Up Lights";
-              icon = "mdi:weather-sunset-up";
-            };
-          })
-
-          (mkIf cfg'.adaptiveLighting.enable {
-            adaptive_lighting = singleton {
-              name = "${formattedRoomName} Adaptive Lighting";
-              lights =
-                if cfg'.adaptiveLighting.lights == null then
-                  [ "light.${room}_lights" ]
-                else
-                  cfg'.adaptiveLighting.lights;
-              min_brightness = cfg'.adaptiveLighting.minBrightness;
-              sleep_brightness = 5;
-              sunrise_time = "07:00:00";
-              sunset_time = "22:30:00";
-              brightness_mode = "tanh";
-              brightness_mode_time_dark = 3600;
-              brightness_mode_time_light = 900;
-              take_over_control = cfg'.adaptiveLighting.takeOverControl;
-              skip_redundant_commands = true;
-              sleep_rgb_or_color_temp =
-                if (cfg'.adaptiveLighting.sleepMode.color == null) then "color_temp" else "rgb_color";
-              sleep_color_temp = mkIf (cfg'.adaptiveLighting.sleepMode.color == null) 1000;
-              sleep_rgb_color = mkIf (
-                cfg'.adaptiveLighting.sleepMode.color != null
-              ) cfg'.adaptiveLighting.sleepMode.color;
-            };
-
-            automation =
-              optional (cfg'.adaptiveLighting.sleepMode.disabledLights != [ ]) {
-                alias = "${formattedRoomName} Sleep Mode Lights Toggle";
-                trace.stored_traces = 5;
-                mode = "single";
-                trigger = [
+              condition = singleton {
+                condition = "state";
+                entity_id = "input_boolean.${room}_wake_up_lights";
+                state = "on";
+              };
+              action = singleton {
+                action = "light.turn_on";
+                target.entity_id = "light.${room}_lights";
+              };
+            }
+            ++ optional cfg'.adaptiveLighting.enable {
+              alias = "${formattedRoomName} Lighting Sun Times";
+              trace.stored_traces = 5;
+              mode = "single";
+              trigger =
+                [
+                  {
+                    platform = "homeassistant";
+                    event = "start";
+                  }
                   {
                     platform = "state";
-                    entity_id = [ "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting" ];
+                    entity_id = [ "input_number.${room}_sleep_duration" ];
                     from = null;
                   }
-                  {
-                    platform = "state";
-                    entity_id = [ "light.${room}_lights" ];
-                    to = "on";
-                    id = "lights_on";
-                  }
-                ];
-                condition = singleton {
-                  condition = "state";
-                  entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
-                  state = "on";
-                };
-                action = [
-                  { delay.seconds = 2; }
-                  {
-                    choose = [
-                      {
-                        conditions = singleton {
-                          condition = "state";
-                          entity_id = "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting";
-                          state = "on";
-                        };
-                        sequence = singleton {
-                          action = "light.turn_off";
-                          target.entity_id = cfg'.adaptiveLighting.sleepMode.disabledLights;
-                        };
-                      }
-                      {
-                        conditions = singleton {
-                          condition = "and";
-                          conditions = [
-                            {
-                              condition = "state";
-                              entity_id = "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting";
-                              state = "off";
-                            }
-                            {
-                              condition = "state";
-                              entity_id = "light.${room}_lights";
-                              state = "on";
-                            }
-                            {
-                              condition = "not";
-                              conditions = singleton {
-                                condition = "trigger";
-                                id = [ "lights_on" ];
-                              };
-                            }
-                          ];
-                        };
-                        sequence = singleton {
-                          action = "light.turn_on";
-                          target.entity_id = cfg'.adaptiveLighting.sleepMode.disabledLights;
-                        };
-                      }
-                    ];
-                  }
-                ];
-              }
-              ++ optional (cfg'.adaptiveLighting.sleepMode.automate && cfg'.wakeUpLights.enable) {
-                alias = "${formattedRoomName} Sleep Mode Toggle";
-                trace.stored_traces = 5;
-                mode = "single";
-                trigger =
-                  [
-                    {
+                ]
+                ++ (
+                  if (!useAlarm) then
+                    singleton {
                       platform = "state";
-                      entity_id = [ "binary_sensor.${roomCfg.deviceId}_is_charging" ];
-                      from = "off";
-                      to = "on";
-                    }
-                    {
-                      # 1 hour before wake-up time (1 min earlier to run before wake-up lights)
-                      platform = "template";
-                      value_template = "{{ (now().timestamp() + 61*60) | round(0) == ${wakeUpTimestamp} }}";
-                    }
-                    {
-                      # 1 hour after sleep time
-                      platform = "template";
-                      value_template = "{{ (now().timestamp() - 60*60) | round(0) == ${sleepTimestamp} }}";
-                    }
-                    {
-                      platform = "state";
-                      entity_id = [ "input_number.${room}_sleep_duration" ];
+                      entity_id = [ "input_datetime.${room}_wake_up_time" ];
                       from = null;
                     }
-                  ]
-                  ++ singleton (
-                    if useAlarm then
+                  else
+                    [
                       {
                         platform = "state";
                         entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
                         from = null;
                       }
-                    else
                       {
                         platform = "state";
-                        entity_id = [ "input_datetime.${room}_wake_up_time" ];
-                        from = null;
+                        entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
+                        to = "unavailable";
+                        for.minutes = 5;
                       }
-                  );
-                condition = singleton {
-                  condition = "state";
-                  entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
-                  state = "on";
-                };
-                action = singleton {
-                  choose =
-                    let
-                      timeToWake = "(${wakeUpTimestamp} - (now().timestamp() | round(0)))";
-                    in
-                    [
-                      {
-                        conditions = singleton {
-                          condition = "template";
-                          value_template = "{{ (${wakeUpTimestamp} != 0) and (${timeToWake} <= ((${sleepDuration} + 0.5)*60*60) + 60) and (${timeToWake} > 61*60) }}";
-                        };
-                        sequence = singleton {
-                          action = "switch.turn_on";
-                          target.entity_id = "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting";
-                        };
-                      }
-                      {
-                        conditions = singleton {
-                          condition = "template";
-                          value_template = "{{ (${wakeUpTimestamp} == 0) or (${timeToWake} > ((${sleepDuration} + 0.5)*60*60) + 60) or (${timeToWake} <= 61*60) }}";
-                        };
-                        sequence = singleton {
-                          action = "switch.turn_off";
-                          target.entity_id = "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting";
-                        };
-                      }
-                    ];
-                };
-              };
-          })
-
-          (
-            let
-              inherit (cfg'.automatedToggle)
-                luminence
-                noPresenceConditions
-                presenceConditions
-                presenceTriggers
-                ;
-            in
-            mkIf cfg'.automatedToggle.enable {
-              automation = [
-                {
-                  alias = "${formattedRoomName} Lights Toggle";
-                  trace.stored_traces = 5;
-                  mode = "queued";
-                  triggers = [
-                    {
-                      platform = "numeric_state";
-                      entity_id = [ "sensor.${luminence.sensor}" ];
-                      above = luminence.threshold.upper;
-                      id = "luminence";
-                    }
-                    {
-                      platform = "numeric_state";
-                      entity_id = [ "sensor.${luminence.sensor}" ];
-                      below = luminence.threshold.lower;
-                      id = "luminence";
-                    }
-                  ] ++ presenceTriggers;
-                  conditions = singleton {
-                    condition = "state";
-                    entity_id = "input_boolean.${room}_automated_lights_toggle";
-                    state = "on";
-                  };
-                  actions =
-                    let
-                      luminenceCondition =
-                        below:
-                        singleton {
-                          condition = "numeric_state";
-                          entity_id = "sensor.${luminence.sensor}";
-                          below = mkIf below luminence.threshold.lower;
-                          above = mkIf (!below) luminence.threshold.lower;
-                        };
-
-                      triggeredByLuminence =
-                        yes:
-                        singleton (
-                          if yes then
-                            {
-                              condition = "trigger";
-                              id = [ "luminence" ];
-                            }
-                          else
-                            {
-                              condition = "not";
-                              conditions = singleton {
-                                condition = "trigger";
-                                id = [ "luminence" ];
-                              };
-                            }
-                        );
-
-                      timeToWake = "(${wakeUpTimestamp} - (now().timestamp() | round(0)))";
-                      isSleeping =
-                        yes:
-                        singleton {
-                          condition = "template";
-                          value_template = "{{ ${wakeUpTimestamp} != 0 and ${
-                            if yes then
-                              # 30 minute grace period after wake-up to account for lie-ins
-                              "${timeToWake} <= ${sleepDuration}*60*60 or ${timeToWake} >= 23.5*60*60"
-                            else
-                              "${timeToWake} > ${sleepDuration}*60*60"
-                          } }}";
-                        };
-                    in
+                    ]
+                );
+              action =
+                let
+                  unavailableConditions =
+                    addFor:
                     singleton {
-                      "if" =
-                        presenceConditions
-                        ++ luminenceCondition true
-                        # If the room has sleep tracking we can add an additional check to ensure that
-                        # lights do not turn on whilst sleeping even if presence conditions are met
-                        ++ optional roomCfg.sleepTracking.enable {
-                          condition = "or";
-                          conditions = triggeredByLuminence false ++ isSleeping false;
-                        };
-                      "then" = singleton {
-                        action = "light.turn_on";
-                        target.entity_id = "light.${room}_lights";
+                      condition = "state";
+                      entity_id = "input_number.${room}_sleep_duration";
+                      state = "unavailable";
+                    }
+                    ++ singleton (
+                      if useAlarm then
+                        {
+                          condition = "state";
+                          entity_id = "sensor.${roomCfg.deviceId}_next_alarm";
+                          state = "unavailable";
+                          # Alarm has to be unavailable for 5 minutes for it to be considered unavailable
+                          # and for adaptive lighting to be reset to default. This is because when the
+                          # alarm goes off the next alarm entity becomes unavailable for a few seconds.
+                          # This resets adaptive lighting and potentially potentially flashbangs you when
+                          # waking up.
+                          for = mkIf addFor { minutes = 5; };
+                        }
+                      else
+                        {
+                          condition = "state";
+                          entity_id = "input_datetime.${room}_wake_up_time";
+                          state = "unavailable";
+                        }
+                    );
+                in
+                singleton {
+                  choose = [
+                    {
+                      conditions = singleton {
+                        condition = "not";
+                        conditions = unavailableConditions false;
                       };
-                      "else" =
-                        optional (cfg'.automatedToggle.offDelay != null) {
-                          delay.seconds = cfg'.automatedToggle.offDelay;
-                        }
-                        # Do not turn off the lights if the user is sleeping and trigger was luminence
-                        # change. Useful for rooms that rely on solar power gen for luminence
-                        # detection.
-                        ++ optional roomCfg.sleepTracking.enable {
-                          condition = "not";
-                          conditions = singleton {
-                            condition = "and";
-                            conditions = triggeredByLuminence true ++ isSleeping true;
-                          };
-                        }
-                        ++ singleton {
-                          "if" = singleton {
-                            condition = "or";
-                            conditions = [
-                              {
-                                condition = "and";
-                                conditions = noPresenceConditions;
-                              }
-                              {
-                                condition = "and";
-                                conditions = triggeredByLuminence true ++ luminenceCondition false;
-                              }
-                            ];
-                          };
-                          "then" = singleton {
-                            action = "light.turn_off";
-                            target.entity_id = "light.${room}_lights";
-                          };
+                      sequence = singleton {
+                        action = "adaptive_lighting.change_switch_settings";
+                        data = {
+                          entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
+                          use_defaults = "current";
+                          sunrise_time = "{{ ${wakeUpTimestamp} | timestamp_custom('%H:%M:%S') }}";
+                          # Set sunset 1.5 hours before sleep time so that lights
+                          # will reach minimum brightness at sleep time
+                          sunset_time = "{{ (${sleepTimestamp} - 1.5*60*60) | timestamp_custom('%H:%M:%S') }}";
                         };
-                    };
+                      };
+                    }
+                    {
+                      conditions = singleton {
+                        condition = "or";
+                        conditions = unavailableConditions true;
+                      };
+                      sequence = singleton {
+                        action = "adaptive_lighting.change_switch_settings";
+                        data = {
+                          entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
+                          use_defaults = "configuration";
+                        };
+                      };
+                    }
+                  ];
+                };
+            };
+
+          input_boolean."${room}_wake_up_lights" = {
+            name = "${formattedRoomName} Wake Up Lights";
+            icon = "mdi:weather-sunset-up";
+          };
+        })
+
+        (mkIf cfg'.adaptiveLighting.enable {
+          adaptive_lighting = singleton {
+            name = "${formattedRoomName} Adaptive Lighting";
+            lights =
+              if cfg'.adaptiveLighting.lights == null then
+                [ "light.${room}_lights" ]
+              else
+                cfg'.adaptiveLighting.lights;
+            min_brightness = cfg'.adaptiveLighting.minBrightness;
+            sleep_brightness = 5;
+            sunrise_time = "07:00:00";
+            sunset_time = "22:30:00";
+            brightness_mode = "tanh";
+            brightness_mode_time_dark = 3600;
+            brightness_mode_time_light = 900;
+            take_over_control = cfg'.adaptiveLighting.takeOverControl;
+            skip_redundant_commands = true;
+            sleep_rgb_or_color_temp =
+              if (cfg'.adaptiveLighting.sleepMode.color == null) then "color_temp" else "rgb_color";
+            sleep_color_temp = mkIf (cfg'.adaptiveLighting.sleepMode.color == null) 1000;
+            sleep_rgb_color = mkIf (
+              cfg'.adaptiveLighting.sleepMode.color != null
+            ) cfg'.adaptiveLighting.sleepMode.color;
+          };
+
+          automation =
+            optional (cfg'.adaptiveLighting.sleepMode.disabledLights != [ ]) {
+              alias = "${formattedRoomName} Sleep Mode Lights Toggle";
+              trace.stored_traces = 5;
+              mode = "single";
+              trigger = [
+                {
+                  platform = "state";
+                  entity_id = [ "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting" ];
+                  from = null;
                 }
                 {
-                  # This automation disables automated light toggling if the lights are
-                  # "manually" turned off. We treat any trigger that was not an automation as
-                  # "manual". This way lights can be forced off even when the room has a presence
-                  # sensor.
-                  alias = "${formattedRoomName} Automated Lights Toggle";
-                  mode = "single";
-                  triggers = singleton {
-                    platform = "state";
-                    entity_id = [ "light.${room}_lights" ];
-                    from = null;
-                  };
-                  actions = singleton {
-                    "if" = [
-                      {
-                        condition = "state";
-                        entity_id = "light.${room}_lights";
-                        state = "off";
-                      }
-                      {
-                        condition = "template";
-                        value_template = "{{ trigger.to_state.context.parent_id == none }}";
-                      }
-                    ];
-                    "then" = singleton {
-                      action = "input_boolean.turn_off";
-                      target.entity_id = "input_boolean.${room}_automated_lights_toggle";
-                    };
-                    "else" = singleton {
-                      action = "input_boolean.turn_on";
-                      target.entity_id = "input_boolean.${room}_automated_lights_toggle";
-                    };
-                  };
+                  platform = "state";
+                  entity_id = [ "light.${room}_lights" ];
+                  to = "on";
+                  id = "lights_on";
                 }
               ];
-
-              input_boolean."${room}_automated_lights_toggle".name =
-                "${formattedRoomName} Automated Lights Toggle";
+              condition = singleton {
+                condition = "state";
+                entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
+                state = "on";
+              };
+              action = [
+                { delay.seconds = 2; }
+                {
+                  choose = [
+                    {
+                      conditions = singleton {
+                        condition = "state";
+                        entity_id = "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting";
+                        state = "on";
+                      };
+                      sequence = singleton {
+                        action = "light.turn_off";
+                        target.entity_id = cfg'.adaptiveLighting.sleepMode.disabledLights;
+                      };
+                    }
+                    {
+                      conditions = singleton {
+                        condition = "and";
+                        conditions = [
+                          {
+                            condition = "state";
+                            entity_id = "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting";
+                            state = "off";
+                          }
+                          {
+                            condition = "state";
+                            entity_id = "light.${room}_lights";
+                            state = "on";
+                          }
+                          {
+                            condition = "not";
+                            conditions = singleton {
+                              condition = "trigger";
+                              id = [ "lights_on" ];
+                            };
+                          }
+                        ];
+                      };
+                      sequence = singleton {
+                        action = "light.turn_on";
+                        target.entity_id = cfg'.adaptiveLighting.sleepMode.disabledLights;
+                      };
+                    }
+                  ];
+                }
+              ];
             }
-          )
-        ])
-      ) cfg.rooms
-    );
-  };
+            ++ optional (cfg'.adaptiveLighting.sleepMode.automate && cfg'.wakeUpLights.enable) {
+              alias = "${formattedRoomName} Sleep Mode Toggle";
+              trace.stored_traces = 5;
+              mode = "single";
+              trigger =
+                [
+                  {
+                    platform = "state";
+                    entity_id = [ "binary_sensor.${roomCfg.deviceId}_is_charging" ];
+                    from = "off";
+                    to = "on";
+                  }
+                  {
+                    # 1 hour before wake-up time (1 min earlier to run before wake-up lights)
+                    platform = "template";
+                    value_template = "{{ (now().timestamp() + 61*60) | round(0) == ${wakeUpTimestamp} }}";
+                  }
+                  {
+                    # 1 hour after sleep time
+                    platform = "template";
+                    value_template = "{{ (now().timestamp() - 60*60) | round(0) == ${sleepTimestamp} }}";
+                  }
+                  {
+                    platform = "state";
+                    entity_id = [ "input_number.${room}_sleep_duration" ];
+                    from = null;
+                  }
+                ]
+                ++ singleton (
+                  if useAlarm then
+                    {
+                      platform = "state";
+                      entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
+                      from = null;
+                    }
+                  else
+                    {
+                      platform = "state";
+                      entity_id = [ "input_datetime.${room}_wake_up_time" ];
+                      from = null;
+                    }
+                );
+              condition = singleton {
+                condition = "state";
+                entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
+                state = "on";
+              };
+              action = singleton {
+                choose =
+                  let
+                    timeToWake = "(${wakeUpTimestamp} - (now().timestamp() | round(0)))";
+                  in
+                  [
+                    {
+                      conditions = singleton {
+                        condition = "template";
+                        value_template = "{{ (${wakeUpTimestamp} != 0) and (${timeToWake} <= ((${sleepDuration} + 0.5)*60*60) + 60) and (${timeToWake} > 61*60) }}";
+                      };
+                      sequence = singleton {
+                        action = "switch.turn_on";
+                        target.entity_id = "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting";
+                      };
+                    }
+                    {
+                      conditions = singleton {
+                        condition = "template";
+                        value_template = "{{ (${wakeUpTimestamp} == 0) or (${timeToWake} > ((${sleepDuration} + 0.5)*60*60) + 60) or (${timeToWake} <= 61*60) }}";
+                      };
+                      sequence = singleton {
+                        action = "switch.turn_off";
+                        target.entity_id = "switch.adaptive_lighting_sleep_mode_${room}_adaptive_lighting";
+                      };
+                    }
+                  ];
+              };
+            };
+        })
+
+        (
+          let
+            inherit (cfg'.automatedToggle)
+              luminence
+              noPresenceConditions
+              presenceConditions
+              presenceTriggers
+              ;
+          in
+          mkIf cfg'.automatedToggle.enable {
+            automation = [
+              {
+                alias = "${formattedRoomName} Lights Toggle";
+                trace.stored_traces = 5;
+                mode = "queued";
+                triggers = [
+                  {
+                    platform = "numeric_state";
+                    entity_id = [ "sensor.${luminence.sensor}" ];
+                    above = luminence.threshold.upper;
+                    id = "luminence";
+                  }
+                  {
+                    platform = "numeric_state";
+                    entity_id = [ "sensor.${luminence.sensor}" ];
+                    below = luminence.threshold.lower;
+                    id = "luminence";
+                  }
+                ] ++ presenceTriggers;
+                conditions = singleton {
+                  condition = "state";
+                  entity_id = "input_boolean.${room}_automated_lights_toggle";
+                  state = "on";
+                };
+                actions =
+                  let
+                    luminenceCondition =
+                      below:
+                      singleton {
+                        condition = "numeric_state";
+                        entity_id = "sensor.${luminence.sensor}";
+                        below = mkIf below luminence.threshold.lower;
+                        above = mkIf (!below) luminence.threshold.lower;
+                      };
+
+                    triggeredByLuminence =
+                      yes:
+                      singleton (
+                        if yes then
+                          {
+                            condition = "trigger";
+                            id = [ "luminence" ];
+                          }
+                        else
+                          {
+                            condition = "not";
+                            conditions = singleton {
+                              condition = "trigger";
+                              id = [ "luminence" ];
+                            };
+                          }
+                      );
+
+                    timeToWake = "(${wakeUpTimestamp} - (now().timestamp() | round(0)))";
+                    isSleeping =
+                      yes:
+                      singleton {
+                        condition = "template";
+                        value_template = "{{ ${wakeUpTimestamp} != 0 and ${
+                          if yes then
+                            # 30 minute grace period after wake-up to account for lie-ins
+                            "${timeToWake} <= ${sleepDuration}*60*60 or ${timeToWake} >= 23.5*60*60"
+                          else
+                            "${timeToWake} > ${sleepDuration}*60*60"
+                        } }}";
+                      };
+                  in
+                  singleton {
+                    "if" =
+                      presenceConditions
+                      ++ luminenceCondition true
+                      # If the room has sleep tracking we can add an additional check to ensure that
+                      # lights do not turn on whilst sleeping even if presence conditions are met
+                      ++ optional roomCfg.sleepTracking.enable {
+                        condition = "or";
+                        conditions = triggeredByLuminence false ++ isSleeping false;
+                      };
+                    "then" = singleton {
+                      action = "light.turn_on";
+                      target.entity_id = "light.${room}_lights";
+                    };
+                    "else" =
+                      optional (cfg'.automatedToggle.offDelay != null) {
+                        delay.seconds = cfg'.automatedToggle.offDelay;
+                      }
+                      # Do not turn off the lights if the user is sleeping and trigger was luminence
+                      # change. Useful for rooms that rely on solar power gen for luminence
+                      # detection.
+                      ++ optional roomCfg.sleepTracking.enable {
+                        condition = "not";
+                        conditions = singleton {
+                          condition = "and";
+                          conditions = triggeredByLuminence true ++ isSleeping true;
+                        };
+                      }
+                      ++ singleton {
+                        "if" = singleton {
+                          condition = "or";
+                          conditions = [
+                            {
+                              condition = "and";
+                              conditions = noPresenceConditions;
+                            }
+                            {
+                              condition = "and";
+                              conditions = triggeredByLuminence true ++ luminenceCondition false;
+                            }
+                          ];
+                        };
+                        "then" = singleton {
+                          action = "light.turn_off";
+                          target.entity_id = "light.${room}_lights";
+                        };
+                      };
+                  };
+              }
+              {
+                # This automation disables automated light toggling if the lights are
+                # "manually" turned off. We treat any trigger that was not an automation as
+                # "manual". This way lights can be forced off even when the room has a presence
+                # sensor.
+                alias = "${formattedRoomName} Automated Lights Toggle";
+                mode = "single";
+                triggers = singleton {
+                  platform = "state";
+                  entity_id = [ "light.${room}_lights" ];
+                  from = null;
+                };
+                actions = singleton {
+                  "if" = [
+                    {
+                      condition = "state";
+                      entity_id = "light.${room}_lights";
+                      state = "off";
+                    }
+                    {
+                      condition = "template";
+                      value_template = "{{ trigger.to_state.context.parent_id == none }}";
+                    }
+                  ];
+                  "then" = singleton {
+                    action = "input_boolean.turn_off";
+                    target.entity_id = "input_boolean.${room}_automated_lights_toggle";
+                  };
+                  "else" = singleton {
+                    action = "input_boolean.turn_on";
+                    target.entity_id = "input_boolean.${room}_automated_lights_toggle";
+                  };
+                };
+              }
+            ];
+
+            input_boolean."${room}_automated_lights_toggle".name =
+              "${formattedRoomName} Automated Lights Toggle";
+          }
+        )
+      ])
+    ) cfg.rooms
+  );
 }

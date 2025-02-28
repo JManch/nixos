@@ -1,21 +1,25 @@
 {
   lib,
-  config,
+  cfg,
   hostname,
-  ...
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    genAttrs
-    mkForce
-    optional
-    ;
-  cfg = config.${ns}.services.ollama;
+  inherit (lib) genAttrs mkForce optional;
 in
-mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
+{
+  opts = with lib; {
+    autoStart = mkEnableOption "autostart";
+
+    interfaces = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        List of additional interfaces for Ollama to be exposed on.
+      '';
+    };
+  };
+
+  asserts = [
     (hostname == "ncase-m1")
     "Ollama is only intended to work on host 'ncase-m1'"
   ];

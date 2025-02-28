@@ -10,7 +10,7 @@ let
     mkForce
     hiPrio
     ;
-  inherit (config.${ns}.core) homeManager;
+  inherit (config.${ns}.core) home-manager;
 in
 {
   hardware.bluetooth.enable = true;
@@ -34,7 +34,7 @@ in
     ))
   ];
 
-  hm = mkIf homeManager.enable {
+  hm = mkIf home-manager.enable {
     desktop.hyprland.settings.windowrulev2 = [
       "float, class:^(.blueman-manager-wrapped)$"
       "size 30% 30%, class:^(.blueman-manager-wrapped)$"

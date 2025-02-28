@@ -36,7 +36,7 @@ let
         fi
 
         host_config="$flake#nixosConfigurations.$hostname.config"
-        fs_type=$(nix eval --raw "$host_config.${ns}.hardware.fileSystem.type")
+        fs_type=$(nix eval --raw "$host_config.${ns}.hardware.file-system.type")
         username=$(nix eval --raw "$host_config.${ns}.core.username")
 
         if [ "$fs_type" != "sd-image" ]; then
@@ -134,7 +134,7 @@ let
       host_exists=$(nix eval --impure --expr 'with import <nixpkgs> {}; pkgs.lib.hasAttr "'"$installer"'" (builtins.getFlake "'"$flake"'").nixosConfigurations')
       if [[ $host_exists = "true" ]]; then
         host_config="$flake#nixosConfigurations.$installer.config"
-        fs_type=$(nix eval --raw "$host_config.${ns}.hardware.fileSystem.type")
+        fs_type=$(nix eval --raw "$host_config.${ns}.hardware.file-system.type")
         result=$(nix build "$flake#installer-$1" --print-out-paths)
         if [ "$fs_type" = "sd-image" ]; then
           sudo ${getExe setupSdImage} "$1" "$result"

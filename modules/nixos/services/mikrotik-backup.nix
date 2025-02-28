@@ -1,19 +1,14 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
-  ...
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    getExe
-    singleton
-    ;
+  inherit (lib) getExe singleton;
   inherit (config.age.secrets) mikrotikBackupKey;
-  cfg = config.${ns}.services.mikrotik-backup;
   backupDir = "/var/backup/mikrotik";
+
   backupScript = pkgs.writeShellApplication {
     name = "mikrotik-backup-script";
     runtimeInputs = with pkgs; [
@@ -46,11 +41,16 @@ let
       '';
   };
 in
-mkIf cfg.enable {
-  assertions = lib.${ns}.asserts [
-    config.${ns}.services.restic.enable
-    "Mikrotik backup requires Restic backups to be enabled"
-  ];
+{
+  requirements = [ "services.restic" ];
+
+  opts = with lib; {
+    routerAddress = mkOption {
+      type = types.str;
+      default = "router.lan";
+      description = "Address of the router to fetch backup files from";
+    };
+  };
 
   users.users.mikrotik-backup = {
     group = "mikrotik-backup";

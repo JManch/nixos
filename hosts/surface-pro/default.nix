@@ -7,7 +7,7 @@
 
   ${lib.ns} = {
     core = {
-      homeManager.enable = true;
+      home-manager.enable = true;
 
       device = {
         type = "laptop";
@@ -41,7 +41,7 @@
     hardware = {
       bluetooth.enable = true;
 
-      fileSystem = {
+      file-system = {
         type = "ext4";
         ext4.trim = true;
       };

@@ -1,26 +1,36 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
-  ...
 }:
 let
   inherit (lib)
     ns
-    mkIf
     mkBefore
     mkVMOverride
     getExe'
     ;
-  inherit (lib.${ns}) asserts addPatches hardeningBaseline;
-  inherit (config.${ns}.services) caddy;
-  cfg = config.${ns}.services.calibre;
+  inherit (lib.${ns}) addPatches hardeningBaseline;
 in
-mkIf cfg.enable {
-  assertions = asserts [
-    caddy.enable
-    "Calibre requires Caddy to be enabled"
-  ];
+{
+  requirements = [ "services.caddy" ];
+
+  opts = with lib; {
+    port = mkOption {
+      type = types.port;
+      default = 8083;
+    };
+
+    extraAllowedAddresses = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        List of address to give access to Jellyfin in addition to the trusted
+        list.
+      '';
+    };
+  };
 
   services.calibre-web = {
     enable = true;
@@ -49,7 +59,7 @@ mkIf cfg.enable {
     ReadWritePaths = [ "/var/lib/calibre-library" ];
   };
 
-  ${ns}.services.caddy.virtualHosts.calibre = {
+  nsConfig.services.caddy.virtualHosts.calibre = {
     inherit (cfg) extraAllowedAddresses;
     extraConfig = ''
       reverse_proxy http://127.0.0.1:${toString cfg.port}

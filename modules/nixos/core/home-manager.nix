@@ -42,7 +42,7 @@ in
     useUserPackages = true;
 
     users = mkMerge [
-      { ${username} = import ../../../homes/${hostname}.nix; }
+      { ${username} = ../../../homes/${hostname}.nix; }
       (mkIf (username != adminUsername) {
         ${adminUsername} = {
           ${ns}.programs.shell = {

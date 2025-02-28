@@ -42,7 +42,6 @@
   pkgs,
   config,
   inputs,
-  ...
 }:
 let
   inherit (lib)
@@ -61,12 +60,108 @@ let
     removePrefix
     substring
     mkMerge
+    mkEnableOption
+    mkOption
+    types
     ;
   inherit (config.${ns}.services) dns-stack;
   inherit (lib.${ns}) asserts;
   interfaces = config.${ns}.services.wireguard;
+
+  wgSubmodule = types.submodule {
+    options = {
+      enable = mkEnableOption "the wireguard interface";
+      autoStart = mkEnableOption "auto start";
+      routerPeer = mkEnableOption "my router as a peer";
+
+      address = mkOption {
+        type = types.str;
+        default = null;
+        example = "10.0.0.2/24";
+        description = "Assigned IP address for this device on the VPN along with the subnet mask";
+      };
+
+      listenPort = mkOption {
+        type = with types; nullOr port;
+        default = null;
+        example = "51820";
+        description = ''
+          Optional port for Wireguard to listen on. Useful on for static
+          clients that need a reliable VPN connection (persistent keep
+          alive can be temperamental). If set, will open the port in the
+          firewall and disable persistent keep alive. Note that this
+          client's peers must manually specify the endpoint address and
+          port.
+        '';
+      };
+
+      subnet = mkOption {
+        type = types.int;
+        default = null;
+        example = "24";
+        description = "Subnet of the wireguard network";
+      };
+
+      routerAllowedIPs = mkOption {
+        type = with types; listOf str;
+        default = [ ];
+        description = "List of allowed IPs for router peer";
+      };
+
+      peers = mkOption {
+        type = with types; listOf attrs;
+        default = [ ];
+        description = "Wireguard peers";
+      };
+
+      dns = {
+        enable = mkEnableOption "a custom DNS server for the VPN";
+        host = mkEnableOption "hosting the custom DNS server on this host";
+
+        domains = mkOption {
+          type = with types; attrsOf str;
+          default = { };
+          example = {
+            "example.com" = "10.0.0.4";
+          };
+          description = ''
+            Attribute set of domains mapped to addresses. If systemd
+            resolved is used the DNS server associated with this VPN will
+            not longer be the default route. Instead, the configured
+            domains will be added as DNS routing rules (in this case the
+            address does not matter). This means that only DNS requests to
+            these domains will be routed through the custom DNS server
+            configured for the VPN.
+
+            If `dns.host` is enabled, DNS redirect rules mapping domains to
+            their addresses will be added to the DNS server.
+          '';
+        };
+
+        address = mkOption {
+          type = types.str;
+          default = null;
+          description = "Address of the device hosting the DNS server inside the VPN";
+        };
+
+        port = mkOption {
+          type = types.nullOr types.port;
+          default = null;
+          description = "Port for the DNS server to listen on";
+        };
+      };
+    };
+  };
 in
 {
+  enableOpt = false;
+
+  opts = mkOption {
+    default = { };
+    type = types.attrsOf wgSubmodule;
+    description = "Wireguard VPN interfaces";
+  };
+
   assertions = mkMerge (
     [
       (asserts [

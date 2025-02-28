@@ -1,14 +1,11 @@
 {
   lib,
+  cfg,
   pkgs,
-  config,
-  ...
 }:
 let
   inherit (lib)
-    ns
     mkIf
-    mkMerge
     mkForce
     listToAttrs
     elem
@@ -19,10 +16,126 @@ let
     concatMap
     attrNames
     filterAttrs
+    mkEnableOption
+    mkOption
+    types
     ;
-  cfg = config.${ns}.services.nfs;
 in
-mkMerge [
+[
+  {
+    enableOpt = false;
+    guardType = "custom";
+
+    opts = {
+      server = {
+        enable = mkEnableOption "NFS server";
+
+        supportedMachines = mkOption {
+          type = with types; listOf str;
+          default = [ ];
+          description = ''
+            List of machines that this host can share NFS exports with.
+          '';
+        };
+
+        fileSystems = mkOption {
+          type = types.listOf (
+            types.submodule {
+              options = {
+                path = mkOption {
+                  type = types.str;
+                  example = "jellyfin";
+                  description = "Export path relative to /export";
+                };
+
+                clients = mkOption {
+                  type = with types; attrsOf str;
+                  example = {
+                    "homelab.lan" = "ro,no_subtree_check";
+                  };
+                  description = ''
+                    Attribute set of client machine names associated with a comma
+                    separated list of NFS export options
+                  '';
+                };
+              };
+            }
+          );
+          default = [ ];
+          example = [
+            {
+              path = "jellyfin";
+              clients = {
+                "homelab.lan" = "ro,no_subtree_check";
+                "192.168.88.254" = "ro,no_subtree_check";
+              };
+            }
+          ];
+          description = "List of local file systems that are exported by the NFS server";
+        };
+      };
+
+      client = {
+        enable = mkEnableOption "NFS client";
+
+        supportedMachines = mkOption {
+          type = with types; listOf str;
+          default = [ ];
+          description = "List of machines this host can accept NFS file systems from";
+        };
+
+        fileSystems = mkOption {
+          type = types.listOf (
+            types.submodule {
+              options = {
+                path = mkOption {
+                  type = types.str;
+                  example = "jellyfin";
+                  description = "Mount path relative to /mnt/nfs";
+                };
+
+                machine = mkOption {
+                  type = types.str;
+                  description = "NFS machine identifier according to exports(5)";
+                };
+
+                user = mkOption {
+                  type = types.str;
+                  description = "User owning the mounted directory";
+                };
+
+                group = mkOption {
+                  type = types.str;
+                  description = "Group owning the mounted directory";
+                };
+
+                options = mkOption {
+                  type = with types; listOf str;
+                  default = [
+                    "x-systemd.automount"
+                    "noauto"
+                    "x-systemd.idle-timeout=600"
+                  ];
+                  description = "List of options for the NFS file system";
+                };
+              };
+            }
+          );
+          default = [ ];
+          example = [
+            {
+              name = "jellyfin";
+              machine = "homelab.lan";
+              user = "jellyfin";
+              group = "jellyfin";
+            }
+          ];
+          description = "List of remote NFS file systems to mount";
+        };
+      };
+    };
+  }
+
   (mkIf (cfg.server.enable || cfg.client.enable) {
     environment.systemPackages = [ pkgs.nfs-utils ];
     boot.initrd.kernelModules = [ "nfs" ];

@@ -1,22 +1,32 @@
 {
   lib,
+  cfg,
   inputs,
-  config,
   username,
-  ...
 }:
 let
-  inherit (lib) ns mkIf mkMerge;
-  inherit (config.${ns}.services) caddy;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  cfg = config.${ns}.services.file-server;
 in
-mkMerge [
-  (mkIf cfg.enable {
-    assertions = lib.${ns}.asserts [
-      caddy.enable
-      "File server requires Caddy to be enabled"
-    ];
+[
+  {
+    guardType = "first";
+    requirements = [ "services.caddy" ];
+
+    opts = with lib; {
+      uploadAlias = {
+        enable = mkEnableOption "shell alias for uploading files";
+        serverAddress = mkOption {
+          type = types.str;
+          description = "File server address to use in alias";
+        };
+      };
+
+      allowedAddresses = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "List of address to give access to the file server";
+      };
+    };
 
     users.groups.file-server = { };
     users.users.${username}.extraGroups = [ "file-server" ];
@@ -26,7 +36,7 @@ mkMerge [
       "d /srv/file-server 0770 root file-server - -"
     ];
 
-    ${ns}.services.caddy.virtualHosts.files = {
+    nsConfig.services.caddy.virtualHosts.files = {
       # On my weak server file transfers are significantly faster over HTTP than
       # HTTPS
       forceHttp = false;
@@ -37,9 +47,9 @@ mkMerge [
         file_server browse
       '';
     };
-  })
+  }
 
-  (mkIf cfg.uploadAlias.enable {
+  (lib.mkIf cfg.uploadAlias.enable {
     programs.zsh.interactiveShellInit = # bash
       ''
         file-server-upload() {

@@ -88,6 +88,7 @@ in
       bluetooth.enable = true;
       fanatec.enable = true;
       tablet.enable = true;
+      scanner.enable = true;
 
       valve-index = {
         enable = true;

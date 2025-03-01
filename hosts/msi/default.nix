@@ -43,6 +43,7 @@
 
     hardware = {
       secure-boot.enable = true;
+      scanner.enable = true;
 
       file-system = {
         type = "zfs";

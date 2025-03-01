@@ -40,7 +40,6 @@ let
     hasAttr
     concatMapStringsSep
     imap
-    optionals
     zipAttrsWith
     concatLists
     unique
@@ -126,7 +125,7 @@ let
     # Configuration to be set under the root namespace.
     #
     # `ns.services = ...` would be equivalent to `${ns}.services = ...`
-    nsConfig = { };
+    ns = { };
 
     # List of string|bool conditions that must all eval to `true` to enable the
     # module. Strings are modified to be prefixed with the custom namespace and
@@ -477,7 +476,7 @@ in
                 (mkRequirementAssertions moduleOpts.requirements)
                 ++ (asserts (map (a: if isString a then "[${throwMsg}] ${a}" else a) moduleOpts.asserts));
             }
-            ++ (optional (moduleOpts.nsConfig != { }) (setAttrByPath [ ns ] moduleOpts.nsConfig))
+            ++ (optional (moduleOpts.ns != { }) (setAttrByPath [ ns ] moduleOpts.ns))
             ++ (optional (moduleOpts.categoryConfig != { }) (
               setAttrByPath ([ ns ] ++ categoryPath) moduleOpts.categoryConfig
             ));
@@ -643,7 +642,7 @@ in
                         configSet:
                         assert assertIncompat configSet "asserts";
                         assert assertIncompat configSet "categoryConfig";
-                        assert assertIncompat configSet "nsConfig";
+                        assert assertIncompat configSet "ns";
                         configSet.processedConfig
                       ) processedConfigSets
                     );

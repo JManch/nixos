@@ -13,7 +13,7 @@ in
     enableOpt = false;
     conditions = [ (isHyprland config) ];
 
-    nsConfig.system.desktop.uwsm.desktopNames = [ "Hyprland" ];
+    ns.system.desktop.uwsm.desktopNames = [ "Hyprland" ];
 
     programs.hyprland = {
       enable = true;

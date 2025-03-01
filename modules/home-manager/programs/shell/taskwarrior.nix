@@ -54,7 +54,7 @@ in
     };
   };
 
-  nsConfig.persistence.directories = [
+  ns.persistence.directories = [
     ".local/share/task"
     ".local/share/taskwarrior-tui"
   ];

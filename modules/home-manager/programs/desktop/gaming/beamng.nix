@@ -50,7 +50,7 @@ in
   # Just to create the .local/share/BeamMP dir
   xdg.dataFile."BeamMP/nix-placeholder".text = "";
 
-  nsConfig.persistence.directories = [
+  ns.persistence.directories = [
     ".local/share/BeamNG.drive"
     ".local/share/BeamMP"
   ];

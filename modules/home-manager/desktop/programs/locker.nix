@@ -70,7 +70,7 @@ in
     };
   };
 
-  nsConfig.desktop = {
+  ns.desktop = {
     programs.locker.lockScript =
       (pkgs.writeShellScript "lock-script" # bash
         ''

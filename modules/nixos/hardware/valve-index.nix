@@ -115,7 +115,7 @@ in
     })
   ];
 
-  nsConfig = {
+  ns = {
     system.audio.alsaDeviceAliases = {
       ${cfg.audio.source} = "Valve Index";
       ${cfg.audio.sink} = "Valve Index";

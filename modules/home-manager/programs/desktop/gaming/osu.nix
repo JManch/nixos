@@ -55,5 +55,5 @@ in
     };
   };
 
-  nsConfig.persistence.directories = [ ".local/share/osu" ];
+  ns.persistence.directories = [ ".local/share/osu" ];
 }

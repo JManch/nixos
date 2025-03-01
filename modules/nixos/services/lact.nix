@@ -100,7 +100,7 @@ in
       '') gpuIds}
     '';
 
-  nsConfig.programs.gaming.gamemode.profiles =
+  ns.programs.gaming.gamemode.profiles =
     let
       ncat = getExe' pkgs.nmap "ncat";
       jaq = getExe pkgs.jaq;

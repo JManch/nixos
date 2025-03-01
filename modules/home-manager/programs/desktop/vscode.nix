@@ -31,7 +31,7 @@ in
     };
   };
 
-  nsConfig.persistence.directories = [
+  ns.persistence.directories = [
     ".config/Code"
     ".vscode"
   ];

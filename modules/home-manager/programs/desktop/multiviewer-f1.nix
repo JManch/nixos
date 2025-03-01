@@ -307,7 +307,7 @@ in
     } selfPkgs.multiviewer-for-f1
   );
 
-  nsConfig = {
+  ns = {
     desktop.services.waybar.autoHideWorkspaces = [ "F1" ];
     desktop.hyprland.namedWorkspaces.F1 = "decorate:false, rounding:false, border:false";
     persistence.directories = [ ".config/MultiViewer for F1" ];

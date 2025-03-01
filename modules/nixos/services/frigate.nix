@@ -68,7 +68,7 @@ in
 
   requirements = [ "services.caddy" ];
 
-  nsConfig = {
+  ns = {
     services = {
       frigate.rtspAddress =
         {

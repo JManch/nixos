@@ -10,7 +10,7 @@ in
   home.packages = [ pkgs.prismlauncher ];
   categoryConfig.gameClasses = [ "Minecraft.*" ];
 
-  nsConfig = {
+  ns = {
     firewall.interfaces = mkIf (lib.${ns}.wgInterfaceEnabled "friends" osConfig) {
       wg-friends.allowedTCPPorts = [ 25565 ];
     };

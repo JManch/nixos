@@ -11,5 +11,5 @@
     };
   };
 
-  nsConfig.persistence.directories = [ ".cache/tealdeer" ];
+  ns.persistence.directories = [ ".cache/tealdeer" ];
 }

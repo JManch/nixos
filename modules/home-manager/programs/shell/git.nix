@@ -54,5 +54,5 @@
       '';
   };
 
-  nsConfig.persistence.files = [ ".config/lazygit/state.yml" ];
+  ns.persistence.files = [ ".config/lazygit/state.yml" ];
 }

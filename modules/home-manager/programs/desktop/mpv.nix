@@ -114,5 +114,5 @@ in
 
   desktop.hyprland.settings.windowrulev2 = [ "workspace emptym, class:^(mpv)$" ];
 
-  nsConfig.persistence.directories = optional cfg.jellyfinShim.enable ".config/jellyfin-mpv-shim";
+  ns.persistence.directories = optional cfg.jellyfinShim.enable ".config/jellyfin-mpv-shim";
 }

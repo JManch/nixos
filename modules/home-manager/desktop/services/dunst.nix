@@ -108,7 +108,7 @@ in
     };
   };
 
-  nsConfig.desktop.programs.locker = {
+  ns.desktop.programs.locker = {
     preLockScript = "${dunstctl} set-paused true";
     postUnlockScript = "${dunstctl} set-paused false";
   };

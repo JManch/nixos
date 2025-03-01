@@ -112,7 +112,7 @@ in
 
   networking.firewall.allowedUDPPorts = [ cfg.udpMuxPort ];
 
-  nsConfig.services.caddy.virtualHosts.stream = mkIf cfg.proxy {
+  ns.services.caddy.virtualHosts.stream = mkIf cfg.proxy {
     allowTrustedAddresses = false;
     extraAllowedAddresses = cfg.allowedAddresses;
     extraConfig = ''

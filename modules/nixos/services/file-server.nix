@@ -36,7 +36,7 @@ in
       "d /srv/file-server 0770 root file-server - -"
     ];
 
-    nsConfig.services.caddy.virtualHosts.files = {
+    ns.services.caddy.virtualHosts.files = {
       # On my weak server file transfers are significantly faster over HTTP than
       # HTTPS
       forceHttp = false;

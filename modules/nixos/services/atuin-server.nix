@@ -49,6 +49,6 @@ in
     after = [ "postgresqlBackup-atuin.service" ];
   };
 
-  nsConfig.services.caddy.virtualHosts.atuin.extraConfig =
+  ns.services.caddy.virtualHosts.atuin.extraConfig =
     "reverse_proxy http://127.0.0.1:${toString cfg.port}";
 }

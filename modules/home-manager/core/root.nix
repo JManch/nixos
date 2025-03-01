@@ -20,7 +20,7 @@ in
     backupFiles = mkEnableOption "backing up of ~/files";
   };
 
-  nsConfig = {
+  ns = {
     persistence.directories =
       (map (xdgDir: if !lowercaseUserDirs then lib.${ns}.upperFirstChar xdgDir else xdgDir) [
         "downloads"

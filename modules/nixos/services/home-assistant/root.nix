@@ -59,7 +59,7 @@ in
     be used temporarily.
   '';
 
-  nsConfig.services = {
+  ns.services = {
     mosquitto = {
       users = {
         hass = {

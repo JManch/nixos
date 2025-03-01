@@ -40,5 +40,5 @@ in
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  nsConfig.persistence.directories = [ ".local/share/wluma" ];
+  ns.persistence.directories = [ ".local/share/wluma" ];
 }

@@ -1,5 +1,5 @@
 { pkgs }:
 {
   home.packages = [ pkgs.chromium ];
-  nsConfig.persistence.directories = [ ".config/chromium" ];
+  ns.persistence.directories = [ ".config/chromium" ];
 }

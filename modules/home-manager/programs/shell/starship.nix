@@ -45,5 +45,5 @@ in
     };
   };
 
-  nsConfig.persistence.directories = [ ".cache/starship" ];
+  ns.persistence.directories = [ ".cache/starship" ];
 }

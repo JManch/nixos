@@ -241,7 +241,7 @@ in
     ) config.${ns}.services.caddy.virtualHosts;
   };
 
-  nsConfig.services.caddy.virtualHosts.logs.extraConfig = ''
+  ns.services.caddy.virtualHosts.logs.extraConfig = ''
     root * /var/lib/goaccess/
     file_server * browse
 

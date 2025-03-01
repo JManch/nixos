@@ -63,7 +63,7 @@ in
     EnvironmentFile = navidromeVars.path;
   };
 
-  nsConfig.services.caddy.virtualHosts.navidrome.extraConfig = ''
+  ns.services.caddy.virtualHosts.navidrome.extraConfig = ''
     reverse_proxy http://127.0.0.1:${toString config.services.navidrome.settings.Port}
   '';
 

@@ -40,7 +40,7 @@ in
     Group = "mealie";
   };
 
-  nsConfig.services.caddy.virtualHosts.mealie.extraConfig = ''
+  ns.services.caddy.virtualHosts.mealie.extraConfig = ''
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 

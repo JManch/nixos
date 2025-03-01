@@ -8,5 +8,5 @@
     "stayfocused, class:^(filen-desktop)$"
   ];
 
-  nsConfig.persistence.directories = [ ".config/filen-desktop" ];
+  ns.persistence.directories = [ ".config/filen-desktop" ];
 }

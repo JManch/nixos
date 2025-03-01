@@ -83,7 +83,7 @@ in
   # Steam doesn't close cleanly when SIGTERM is sent to the main process so we
   # have to send SIGTERM to a specific child process and wait for the
   # steamwebhelper which likes to hang around.
-  nsConfig.system.desktop.uwsm = {
+  ns.system.desktop.uwsm = {
     serviceApps = [ "steam" ];
     appUnitOverrides."steam@.service" =
       let

@@ -74,7 +74,7 @@ in
     '';
   };
 
-  nsConfig = {
+  ns = {
     desktop = {
       services.waybar.autoHideWorkspaces = [ "TWITCH" ];
       hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false, gapsin:0, gapsout:0";

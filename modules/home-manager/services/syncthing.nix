@@ -38,7 +38,7 @@ in
     };
   };
 
-  nsConfig = {
+  ns = {
     firewall.allowedTCPPorts = [ 22000 ] ++ optional cfg.exposeWebGUI cfg.port;
     firewall.allowedUDPPorts = [
       22000

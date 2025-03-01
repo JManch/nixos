@@ -9,7 +9,7 @@
     "workspace special:social silent, class:^(vesktop|discord)$, title:^(Discord.*)$"
   ];
 
-  nsConfig = {
+  ns = {
     # Electron apps core dump on exit with the default KillMode control-group.
     # This causes compositor exit to get delayed so just aggressively kill
     # these apps with Killmode mixed.

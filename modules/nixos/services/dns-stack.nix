@@ -211,7 +211,7 @@ in
   };
   users.groups.dnsmasq = { };
 
-  nsConfig = {
+  ns = {
     # Disable systemd-resolved to simplify DNS stack
     system.networking.resolved.enable = mkForce false;
 

@@ -2,7 +2,7 @@
 {
   imports = [ inputs.nix-resources.homeManagerModules.davinci-resolve-studio ];
 
-  nsConfig.persistence.directories = [
+  ns.persistence.directories = [
     ".local/share/DaVinciResolve"
     # Set this as the primary media storage
     # Also move the backup dir here Preferences->User->Project Save and Load

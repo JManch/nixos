@@ -309,7 +309,7 @@ in
     "x-scheme-handler/https" = [ "firefox.desktop" ];
   };
 
-  nsConfig = {
+  ns = {
     backups.firefox = mkIf cfg.backup {
       paths = [ ".mozilla" ];
       exclude = [ ".cache" ];

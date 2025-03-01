@@ -54,5 +54,5 @@ in
     };
   };
 
-  nsConfig.persistence.directories = [ ".config/wlxoverlay" ];
+  ns.persistence.directories = [ ".config/wlxoverlay" ];
 }

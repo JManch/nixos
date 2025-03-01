@@ -44,7 +44,7 @@
     "workspace special:social silent, initialTitle:^(Supersonic)$"
   ];
 
-  nsConfig = {
+  ns = {
     desktop.services.playerctl.musicPlayers = lib.mkBefore [ "Supersonic" ];
     persistence.directories = [
       ".config/supersonic"

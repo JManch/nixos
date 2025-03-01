@@ -120,7 +120,7 @@ in
       ];
     };
 
-  nsConfig = {
+  ns = {
     desktop.services.playerctl.musicPlayers = [
       "spotify_player"
       "spotify"

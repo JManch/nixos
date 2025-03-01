@@ -52,7 +52,7 @@ in
     };
 
   # Update the active state when locking
-  nsConfig.desktop.programs.locker = {
+  ns.desktop.programs.locker = {
     postLockScript = "${systemctl} stop --user hass-active-heartbeat";
     postUnlockScript = "${systemctl} start --user hass-active-heartbeat";
   };

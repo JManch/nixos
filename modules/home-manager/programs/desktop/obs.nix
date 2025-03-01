@@ -28,5 +28,5 @@
     ];
   };
 
-  nsConfig.persistence.directories = [ ".config/obs-studio" ];
+  ns.persistence.directories = [ ".config/obs-studio" ];
 }

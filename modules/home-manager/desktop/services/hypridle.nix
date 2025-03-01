@@ -87,7 +87,7 @@ in
     };
   };
 
-  nsConfig.desktop.programs.locker.postLockScript =
+  ns.desktop.programs.locker.postLockScript =
     let
       hyprctl = getExe' pkgs.hyprland "hyprctl";
       jaq = getExe pkgs.jaq;

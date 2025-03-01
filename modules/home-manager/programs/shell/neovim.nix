@@ -112,7 +112,7 @@ in
         nvim --server {} --remote-expr "execute('Sunset${if theme == "dark" then "Night" else "Day"}')"
     '';
 
-  nsConfig.persistence.directories = [
+  ns.persistence.directories = [
     ".cache/nvim"
     ".local/share/nvim"
     ".local/state/nvim"

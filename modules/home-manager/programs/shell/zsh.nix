@@ -110,7 +110,7 @@ in
       '';
   };
 
-  nsConfig.persistence.directories = [
+  ns.persistence.directories = [
     ".config/zsh" # for zcompdump
     ".local/state/zsh"
     ".cache/zsh"

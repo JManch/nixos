@@ -16,7 +16,7 @@ in
     categories = [ "Game" ];
   };
 
-  nsConfig = {
+  ns = {
     backups.mint.paths = [ ".config/mint" ];
     persistence.directories = [ ".config/mint" ];
   };

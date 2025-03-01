@@ -17,7 +17,7 @@
     "workspace special:social silent, class:^(feishin)$"
   ];
 
-  nsConfig = {
+  ns = {
     desktop = {
       services.playerctl.musicPlayers = lib.mkBefore [ "Feishin" ];
       uwsm.appUnitOverrides."feishin-.scope" = ''

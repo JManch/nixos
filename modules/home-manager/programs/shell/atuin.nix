@@ -114,5 +114,5 @@ in
     format = "$env_value";
   };
 
-  nsConfig.persistence.directories = [ ".local/share/atuin" ];
+  ns.persistence.directories = [ ".local/share/atuin" ];
 }

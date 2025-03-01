@@ -306,7 +306,7 @@ in
   # Unfortunately the bitwarden app does not support TLS client authentication
   # https://github.com/bitwarden/mobile/issues/582
   # https://github.com/bitwarden/mobile/pull/2629
-  nsConfig.services.caddy.virtualHosts.vaultwarden = {
+  ns.services.caddy.virtualHosts.vaultwarden = {
     inherit (cfg) extraAllowedAddresses;
     extraConfig = ''
       reverse_proxy http://127.0.0.1:${toString cfg.port} {

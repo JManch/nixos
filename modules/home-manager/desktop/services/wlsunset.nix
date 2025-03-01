@@ -67,6 +67,6 @@ in
 
   # On some devices wlsunset sometimes doesn't work after DPMS, restarting
   # fixes it
-  nsConfig.desktop.programs.locker.postUnlockScript =
+  ns.desktop.programs.locker.postUnlockScript =
     mkIf cfg.restartAfterDPMS "systemctl restart --user wlsunset";
 }

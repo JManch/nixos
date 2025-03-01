@@ -27,7 +27,7 @@ in
     StateDirectory = "taskchampion-sync-server";
   };
 
-  nsConfig.services.caddy.virtualHosts.tasks.extraConfig = ''
+  ns.services.caddy.virtualHosts.tasks.extraConfig = ''
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 

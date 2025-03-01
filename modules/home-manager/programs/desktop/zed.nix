@@ -23,5 +23,5 @@
     inlay_hints.enabled = true;
   };
 
-  nsConfig.persistence.directories = [ ".local/share/zed" ];
+  ns.persistence.directories = [ ".local/share/zed" ];
 }

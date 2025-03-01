@@ -59,7 +59,7 @@ in
     ReadWritePaths = [ "/var/lib/calibre-library" ];
   };
 
-  nsConfig.services.caddy.virtualHosts.calibre = {
+  ns.services.caddy.virtualHosts.calibre = {
     inherit (cfg) extraAllowedAddresses;
     extraConfig = ''
       reverse_proxy http://127.0.0.1:${toString cfg.port}

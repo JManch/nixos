@@ -2,7 +2,7 @@
 {
   home.packages = [ pkgs.qbittorrent ];
 
-  nsConfig.persistence.directories = [
+  ns.persistence.directories = [
     ".config/qBittorrent"
     ".local/share/qBittorrent"
   ];

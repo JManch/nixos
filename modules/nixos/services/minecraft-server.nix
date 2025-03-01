@@ -161,7 +161,7 @@ in
     };
   };
 
-  nsConfig.services = {
+  ns.services = {
     minecraft-server = {
       mshConfig = {
         Server = {

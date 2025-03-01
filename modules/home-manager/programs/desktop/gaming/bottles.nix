@@ -8,7 +8,7 @@
   };
 
   # Install bottles game prefixes to ~/games
-  nsConfig.persistence.directories = [
+  ns.persistence.directories = [
     ".local/share/bottles"
   ];
 }

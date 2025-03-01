@@ -29,6 +29,7 @@ in
   imports = [
     (mkAliasOptionModule
       [
+        ns
         "desktop"
         "hyprland"
         "binds"
@@ -44,6 +45,7 @@ in
 
     (mkAliasOptionModule
       [
+        ns
         "desktop"
         "hyprland"
         "settings"

@@ -27,7 +27,7 @@ let
     ;
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system) desktop;
-  homeFirewall = config.hm.${ns}.firewall;
+  homeFirewall = config.${ns}.hmNs.firewall;
   rfkill = getExe' pkgs.util-linux "rfkill";
   ip = getExe' pkgs.iproute2 "ip";
   vlanIds = attrNames cfg.vlans;
@@ -245,7 +245,7 @@ in
 
   services.resolved.enable = cfg.resolved.enable;
 
-  userPackages = optionals (cfg.wireless.enable && desktop.enable) [
+  ns.userPackages = optionals (cfg.wireless.enable && desktop.enable) [
     pkgs.wpa_supplicant_gui
     (hiPrio (
       pkgs.runCommand "wpa-supplicant-desktop-rename" { } ''

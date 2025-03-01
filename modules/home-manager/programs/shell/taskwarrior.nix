@@ -46,7 +46,7 @@ in
 
   home.packages = [ pkgs.taskwarrior-tui ];
 
-  darkman.switchApps.taskwarrior = {
+  ns.desktop.darkman.switchApps.taskwarrior = {
     paths = [ ".config/task/home-manager-taskrc" ];
     extraReplacements = singleton {
       dark = "dark-256";

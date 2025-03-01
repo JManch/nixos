@@ -1,7 +1,7 @@
 { pkgs, categoryCfg }:
 {
   # New native linux version
-  userPackages = [ pkgs.winbox4 ];
+  ns.userPackages = [ pkgs.winbox4 ];
 
   # NOTE: If Winbox stops working, deleting the ~/.local/share/winbox/wine
   # directory tends to fix it

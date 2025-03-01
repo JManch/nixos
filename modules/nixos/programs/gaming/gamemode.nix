@@ -27,7 +27,7 @@ let
     isHyprland
     ;
   inherit (config.${ns}.system) desktop;
-  profiles = (config.hm.${ns}.programs.gaming.gamemode.profiles or { }) // cfg.profiles;
+  profiles = (config.${ns}.hmNs.programs.gaming.gamemode.profiles or { }) // cfg.profiles;
 
   gamemodeWrapped = pkgs.symlinkJoin {
     name = "gamemode-wrapped-profiles";
@@ -154,7 +154,7 @@ in
   asserts = [
     (all (v: v == false) (
       mapAttrsToList (
-        profile: _: hasAttr profile (config.hm.${ns}.programs.gaming.gamemode.profiles or { })
+        profile: _: hasAttr profile (config.${ns}.hmNs.programs.gaming.gamemode.profiles or { })
       ) cfg.profiles
     ))
     "Home manager and NixOS must not define the same gamemode profiles"
@@ -176,7 +176,7 @@ in
 
   ns.programs.gaming.gamemode.profiles.default =
     let
-      inherit (config.hm.${ns}.desktop) hyprland;
+      inherit (config.${ns}.hmNs.desktop) hyprland;
       inherit (config.${ns}.core.device) primaryMonitor;
       hyprctl = getExe' pkgs.hyprland "hyprctl";
 

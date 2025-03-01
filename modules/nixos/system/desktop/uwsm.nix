@@ -29,7 +29,7 @@ let
     ;
   inherit (config.${ns}.core) device home-manager;
   inherit (lib.${ns}) addPatches;
-  homeUwsm = config.hm.${ns}.desktop.uwsm;
+  homeUwsm = config.${ns}.hmNs.desktop.uwsm;
 in
 [
   {

@@ -156,7 +156,7 @@ in
   systemd.timers.backup-vaultwarden.timerConfig.OnCalendar = "08,20:00";
   systemd.services.backup-vaultwarden.wantedBy = mkForce [ ];
 
-  adminPackages = [ restoreScript ];
+  ns.adminPackages = [ restoreScript ];
 
   systemd.tmpfiles.rules = [
     # Upstream module creates the /var/backup/vaultwarden dir

@@ -1,7 +1,7 @@
 { lib, config }:
 let
   inherit (lib) ns mkIf;
-  inherit (config.hm.programs) swaylock hyprlock;
+  inherit (config.${ns}.hm.programs) swaylock hyprlock;
   inherit (config.${ns}.core) home-manager;
 in
 {

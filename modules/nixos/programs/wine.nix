@@ -6,7 +6,7 @@
 {
   opts.package = lib.mkPackageOption pkgs.wineWowPackages "stable" { };
 
-  userPackages = [
+  ns.userPackages = [
     cfg.package
     pkgs.winetricks
   ];

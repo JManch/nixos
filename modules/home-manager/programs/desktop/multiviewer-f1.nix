@@ -307,28 +307,29 @@ in
     } selfPkgs.multiviewer-for-f1
   );
 
-  ns = {
-    desktop.services.waybar.autoHideWorkspaces = [ "F1" ];
-    desktop.hyprland.namedWorkspaces.F1 = "decorate:false, rounding:false, border:false";
-    persistence.directories = [ ".config/MultiViewer for F1" ];
+  ns.desktop = {
+    services.waybar.autoHideWorkspaces = [ "F1" ];
+    hyprland.namedWorkspaces.F1 = "decorate:false, rounding:false, border:false";
+
+    hyprland.settings = {
+      bind = [
+        "${modKey}, F, workspace, ${namedWorkspaceIDs.F1}"
+        "${modKey}SHIFT, F, movetoworkspace, ${namedWorkspaceIDs.F1}"
+        "${modKey}SHIFTCONTROL, F, exec, systemctl restart --user hyprland-multiviewer-tiler"
+      ];
+
+      windowrulev2 = [
+        "float, class:^(MultiViewer for F1)$"
+        "workspace ${namedWorkspaceIDs.F1}, class:^(MultiViewer for F1)$"
+
+        "prop xray 0, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+        "prop noblur, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+        "prop noborder, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+      ];
+    };
   };
 
-  desktop.hyprland.settings = {
-    bind = [
-      "${modKey}, F, workspace, ${namedWorkspaceIDs.F1}"
-      "${modKey}SHIFT, F, movetoworkspace, ${namedWorkspaceIDs.F1}"
-      "${modKey}SHIFTCONTROL, F, exec, systemctl restart --user hyprland-multiviewer-tiler"
-    ];
-
-    windowrulev2 = [
-      "float, class:^(MultiViewer for F1)$"
-      "workspace ${namedWorkspaceIDs.F1}, class:^(MultiViewer for F1)$"
-
-      "prop xray 0, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
-      "prop noblur, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
-      "prop noborder, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
-    ];
-  };
+  ns.persistence.directories = [ ".config/MultiViewer for F1" ];
 
   systemd.user.services.hyprland-multiviewer-tiler = mkIf (isHyprland config) {
     Unit = {

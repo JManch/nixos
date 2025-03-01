@@ -79,7 +79,7 @@ in
 
   enableOpt = false;
 
-  adminPackages = [
+  ns.adminPackages = [
     selfPkgs.bootstrap-kit
     agenix.packages.${pkgs.system}.default
     editSecretScript

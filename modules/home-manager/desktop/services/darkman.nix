@@ -43,7 +43,7 @@ in
 
   imports = [
     (mkAliasOptionModule
-      [ "darkman" ]
+      [ ns "desktop" "darkman" ]
       [
         ns
         "desktop"
@@ -199,7 +199,7 @@ in
     "org.freedesktop.impl.portal.Settings" = [ "darkman" ];
   };
 
-  desktop.hyprland.binds = [
+  ns.desktop.hyprland.binds = [
     "${desktop.hyprland.modKey}SHIFT, C, exec, ${getExe darkman.package} toggle"
   ];
 

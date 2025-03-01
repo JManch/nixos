@@ -13,19 +13,18 @@
     })
   ];
 
-  desktop.hyprland.settings.windowrulev2 = [
-    "workspace special:social silent, class:^(feishin)$"
-  ];
+  ns.desktop = {
+    services.playerctl.musicPlayers = lib.mkBefore [ "Feishin" ];
 
-  ns = {
-    desktop = {
-      services.playerctl.musicPlayers = lib.mkBefore [ "Feishin" ];
-      uwsm.appUnitOverrides."feishin-.scope" = ''
-        [Scope]
-        KillMode=mixed
-      '';
-    };
+    uwsm.appUnitOverrides."feishin-.scope" = ''
+      [Scope]
+      KillMode=mixed
+    '';
 
-    persistence.directories = [ ".config/feishin" ];
+    hyprland.settings.windowrulev2 = [
+      "workspace special:social silent, class:^(feishin)$"
+    ];
   };
+
+  ns.persistence.directories = [ ".config/feishin" ];
 }

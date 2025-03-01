@@ -21,7 +21,7 @@ let
     ;
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system.virtualisation) vmVariant;
-  homePersistence = config.hm.${ns}.persistence;
+  homePersistence = config.${ns}.hmNs.persistence;
   fd = getExe pkgs.fd;
 
   # Print all files in the tmpfs file system that will be lost on shutdown
@@ -115,7 +115,7 @@ in
       "A /nix file system must be defined for impermanence"
     ];
 
-    adminPackages = [
+    ns.adminPackages = [
       ephemeralFinder
       bloatFinder
     ];

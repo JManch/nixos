@@ -194,7 +194,7 @@ in
     ''
   ];
 
-  adminPackages = [ generateCerts ];
+  ns.adminPackages = [ generateCerts ];
 
   services.caddy = {
     enable = true;

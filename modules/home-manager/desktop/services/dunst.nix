@@ -96,31 +96,33 @@ in
     };
   };
 
-  darkman.switchApps.dunst = {
-    paths = [ ".config/dunst/dunstrc" ];
-    reloadScript = "${systemctl} restart --user dunst";
-
-    colorOverrides = {
-      base00 = {
-        dark = "${colors.base00}b3";
-        light = "${light.palette.base00}";
-      };
-    };
-  };
-
-  ns.desktop.programs.locker = {
-    preLockScript = "${dunstctl} set-paused true";
-    postUnlockScript = "${dunstctl} set-paused false";
-  };
-
   systemd.user.services.dunst = {
     Unit.After = mkForce [ "graphical-session.target" ];
     Service.Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";
   };
 
-  desktop.hyprland.settings.layerrule = [
-    "blur, notifications"
-    "xray 0, notifications"
-    "animation slide, notifications"
-  ];
+  ns.desktop = {
+    darkman.switchApps.dunst = {
+      paths = [ ".config/dunst/dunstrc" ];
+      reloadScript = "${systemctl} restart --user dunst";
+
+      colorOverrides = {
+        base00 = {
+          dark = "${colors.base00}b3";
+          light = "${light.palette.base00}";
+        };
+      };
+    };
+
+    programs.locker = {
+      preLockScript = "${dunstctl} set-paused true";
+      postUnlockScript = "${dunstctl} set-paused false";
+    };
+
+    hyprland.settings.layerrule = [
+      "blur, notifications"
+      "xray 0, notifications"
+      "animation slide, notifications"
+    ];
+  };
 }

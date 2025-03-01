@@ -66,7 +66,7 @@ in
     '')
   ];
 
-  darkman.switchApps.fuzzel =
+  ns.desktop.darkman.switchApps.fuzzel =
     let
       inherit (config.${ns}.core.color-scheme) dark light;
     in
@@ -80,7 +80,7 @@ in
       };
     };
 
-  desktop.hyprland.settings =
+  ns.desktop.hyprland.settings =
     let
       inherit (desktopCfg.hyprland) modKey;
     in

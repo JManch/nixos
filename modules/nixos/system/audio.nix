@@ -72,7 +72,7 @@ in
       };
     };
 
-    userPackages = mkIf desktop.enable [ pkgs.pavucontrol ];
+    ns.userPackages = mkIf desktop.enable [ pkgs.pavucontrol ];
     services.pulseaudio.enable = mkForce false;
     ns.system.audio.scripts.toggleMic = toggleMic.outPath;
 
@@ -201,32 +201,34 @@ in
       wantedBy = [ "default.target" ];
     };
 
-    hm = mkIf home-manager.enable {
-      ${ns}.desktop.programs.locker = {
-        preLockScript = ''
-          ${pactl} get-sink-mute @DEFAULT_SINK@ > /tmp/lock-mute-sink
-          ${pactl} get-source-mute @DEFAULT_SOURCE@ > /tmp/lock-mute-source
-          ${pactl} set-sink-mute @DEFAULT_SINK@ 1
-          ${pactl} set-source-mute @DEFAULT_SOURCE@ 1
-        '';
+    ns.hm = mkIf home-manager.enable {
+      ${ns}.desktop = {
+        programs.locker = {
+          preLockScript = ''
+            ${pactl} get-sink-mute @DEFAULT_SINK@ > /tmp/lock-mute-sink
+            ${pactl} get-source-mute @DEFAULT_SOURCE@ > /tmp/lock-mute-source
+            ${pactl} set-sink-mute @DEFAULT_SINK@ 1
+            ${pactl} set-source-mute @DEFAULT_SOURCE@ 1
+          '';
 
-        postUnlockScript = ''
-          if [[ -f /tmp/lock-mute-sink ]] && grep -q "no" /tmp/lock-mute-sink; then
-            ${pactl} set-sink-mute @DEFAULT_SINK@ 0
-          fi
+          postUnlockScript = ''
+            if [[ -f /tmp/lock-mute-sink ]] && grep -q "no" /tmp/lock-mute-sink; then
+              ${pactl} set-sink-mute @DEFAULT_SINK@ 0
+            fi
 
-          if [[ -f /tmp/lock-mute-source ]] && grep -q "no" /tmp/lock-mute-source; then
-            ${pactl} set-source-mute @DEFAULT_SOURCE@ 0
-          fi
-          rm -f /tmp/lock-mute-{sink,source}
-        '';
+            if [[ -f /tmp/lock-mute-source ]] && grep -q "no" /tmp/lock-mute-source; then
+              ${pactl} set-source-mute @DEFAULT_SOURCE@ 0
+            fi
+            rm -f /tmp/lock-mute-{sink,source}
+          '';
+        };
+
+        hyprland.settings.windowrulev2 = [
+          "float, class:^(org.pulseaudio.pavucontrol)$"
+          "size 50% 50%, class:^(org.pulseaudio.pavucontrol)$"
+          "center, class:^(org.pulseaudio.pavucontrol)$"
+        ];
       };
-
-      desktop.hyprland.settings.windowrulev2 = [
-        "float, class:^(org.pulseaudio.pavucontrol)$"
-        "size 50% 50%, class:^(org.pulseaudio.pavucontrol)$"
-        "center, class:^(org.pulseaudio.pavucontrol)$"
-      ];
     };
   }
 
@@ -238,7 +240,7 @@ in
   })
 
   (mkIf cfg.extraAudioTools {
-    userPackages = with pkgs; [
+    ns.userPackages = with pkgs; [
       helvum
       qpwgraph
     ];

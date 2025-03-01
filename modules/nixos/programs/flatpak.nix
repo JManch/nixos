@@ -12,7 +12,7 @@ in
   {
     guardType = "first";
 
-    hm = mkIf home-manager.enable {
+    ns.hm = mkIf home-manager.enable {
       services.flatpak = {
         enable = true;
         uninstallUnmanaged = true;

@@ -206,11 +206,11 @@ in
   }
 
   (mkIf cfg.randomise.enable {
-    ${ns}.persistence.directories = [ ".cache/wallpaper" ];
+    ns.persistence.directories = [ ".cache/wallpaper" ];
 
     programs.zsh.shellAliases.randomise-wallpaper = "systemctl start --user randomise-wallpaper";
 
-    darkman.switchScripts.wallpaper = _: ''
+    ns.desktop.darkman.switchScripts.wallpaper = _: ''
       systemctl start --user set-wallpaper
     '';
 

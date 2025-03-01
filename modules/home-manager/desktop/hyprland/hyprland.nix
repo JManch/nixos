@@ -275,7 +275,7 @@ in
     };
   };
 
-  darkman.switchApps.hyprland =
+  ns.desktop.darkman.switchApps.hyprland =
     let
       inherit (config.${ns}.core.color-scheme) colorMap dark;
       hyprctl = getExe' pkgs.hyprland "hyprctl";

@@ -109,32 +109,32 @@ in
       icon = "spotify";
     };
 
-  desktop.hyprland.settings =
-    let
-      colors = config.colorScheme.palette;
-    in
-    {
-      windowrulev2 = [
-        "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
-        "workspace special:social silent, title:^(Spotify( Premium)?)$"
-      ];
-    };
+  ns.desktop = {
+    hyprland.settings =
+      let
+        colors = config.colorScheme.palette;
+      in
+      {
+        windowrulev2 = [
+          "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
+          "workspace special:social silent, title:^(Spotify( Premium)?)$"
+        ];
+      };
 
-  ns = {
-    desktop.services.playerctl.musicPlayers = [
+    services.playerctl.musicPlayers = [
       "spotify_player"
       "spotify"
     ];
 
-    desktop.uwsm.appUnitOverrides."spotify-.scope" = ''
+    uwsm.appUnitOverrides."spotify-.scope" = ''
       [Scope]
       KillMode=mixed
     '';
-
-    persistence.directories = [
-      ".config/spotify"
-      ".cache/spotify"
-      ".cache/spotify-player"
-    ];
   };
+
+  ns.persistence.directories = [
+    ".config/spotify"
+    ".cache/spotify"
+    ".cache/spotify-player"
+  ];
 }

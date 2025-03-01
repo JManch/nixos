@@ -320,7 +320,7 @@ in
     };
   };
 
-  darkman.switchApps.waybar = {
+  ns.desktop.darkman.switchApps.waybar = {
     paths = [
       ".config/waybar/config"
       ".config/waybar/style.css"
@@ -328,30 +328,7 @@ in
     reloadScript = "${systemctl} restart --user waybar";
   };
 
-  desktop.hyprland.settings =
-    let
-      inherit (config.${ns}.desktop.hyprland) modKey;
-
-      toggleActiveMonitorBar = pkgs.writeShellScript "hypr-toggle-active-monitor-waybar" ''
-        focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
-        # Get ID of the monitor based on x pos sort
-        ${monitorNameToNumMap}
-        monitor_num=''${waybar_monitor_name_to_num[$focused_monitor]}
-        ${systemctl} kill --user --signal="SIGRTMIN+$(((2 << 3) | monitor_num))" waybar
-      '';
-    in
-    {
-      bind = [
-        # Toggle active monitor bar
-        "${modKey}, B, exec, ${toggleActiveMonitorBar}"
-        # Toggle all bars
-        "${modKey}SHIFT, B, exec, ${systemctl} kill --user --signal=SIGUSR1 waybar"
-        # Restart waybar
-        "${modKey}SHIFTCONTROL, B, exec, ${systemctl} restart --user waybar"
-      ];
-    };
-
-  ${ns}.desktop.hyprland =
+  ns.desktop.hyprland =
     let
       updateMonitorBar = # bash
         ''
@@ -369,6 +346,29 @@ in
         '';
     in
     {
+      settings =
+        let
+          inherit (config.${ns}.desktop.hyprland) modKey;
+
+          toggleActiveMonitorBar = pkgs.writeShellScript "hypr-toggle-active-monitor-waybar" ''
+            focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
+            # Get ID of the monitor based on x pos sort
+            ${monitorNameToNumMap}
+            monitor_num=''${waybar_monitor_name_to_num[$focused_monitor]}
+            ${systemctl} kill --user --signal="SIGRTMIN+$(((2 << 3) | monitor_num))" waybar
+          '';
+        in
+        {
+          bind = [
+            # Toggle active monitor bar
+            "${modKey}, B, exec, ${toggleActiveMonitorBar}"
+            # Toggle all bars
+            "${modKey}SHIFT, B, exec, ${systemctl} kill --user --signal=SIGUSR1 waybar"
+            # Restart waybar
+            "${modKey}SHIFTCONTROL, B, exec, ${systemctl} restart --user waybar"
+          ];
+        };
+
       # Update bar auto toggle when active workspace changes
       eventScripts.workspace =
         optional (cfg.autoHideWorkspaces != [ ])

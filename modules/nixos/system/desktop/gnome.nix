@@ -58,7 +58,7 @@ in
     totem
   ];
 
-  userPackages =
+  ns.userPackages =
     extensions
     ++ (with pkgs; [
       gnome-tweaks
@@ -67,7 +67,7 @@ in
 
   home-manager.sharedModules = [ inputs.gnome-keybinds.homeManagerModules.default ];
 
-  hm = mkIf home-manager.enable {
+  ns.hm = mkIf home-manager.enable {
     ${ns}.desktop.terminal = mkDefault "org.gnome.Terminal";
 
     dconf.settings =

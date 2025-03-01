@@ -20,7 +20,7 @@ in
   # Boot into bios: Enable secure boot in "Setup Mode".
   # Boot 2: Enroll our keys as instructed in the docs.
   # Done
-  adminPackages = [ pkgs.sbctl ];
+  ns.adminPackages = [ pkgs.sbctl ];
 
   # NOTE: Lanzaboote replaces systemd-boot with it's own systemd-boot which
   # is configured here. Lanzaboote inherits most config from the standard

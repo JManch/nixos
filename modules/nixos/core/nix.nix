@@ -374,7 +374,7 @@ in
     };
   };
 
-  adminPackages =
+  ns.adminPackages =
     [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts ++ droidRebuildScripts ++ flakeUpdate;
   ns.persistenceAdminHome.directories = [ ".remote-builds" ];
   boot.binfmt.emulatedSystems = cfg.builder.emulatedSystems;

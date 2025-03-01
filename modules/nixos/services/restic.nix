@@ -41,7 +41,7 @@ let
     mkAliasOptionModule
     types
     ;
-  inherit (lib.${ns}) asserts upperFirstChar;
+  inherit (lib.${ns}) upperFirstChar;
   inherit (config.${ns}.services) caddy;
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system) impermanence virtualisation;
@@ -57,7 +57,7 @@ let
     healthCheckResticRemoteCopy
     ;
   resticExe = getExe pkgs.restic;
-  homeBackups = optionalAttrs home-manager.enable config.hm.${ns}.backups;
+  homeBackups = optionalAttrs home-manager.enable config.${ns}.hmNs.backups;
   vmInstall = inputs.vmInstall.value;
 
   backupTimerConfig = {
@@ -392,7 +392,7 @@ in
 
   # To allow testing backup restores in the VM
   (mkIf (cfg.enable || cfg.server.enable || (cfg.enable && virtualisation.vmVariant)) {
-    adminPackages = [
+    ns.adminPackages = [
       pkgs.restic
       restoreScript
     ];

@@ -85,7 +85,7 @@ in
     })
   ];
 
-  userPackages = [
+  ns.userPackages = [
     pkgs.index_camera_passthrough
     (pkgs.makeDesktopItem {
       name = "monado";
@@ -278,26 +278,26 @@ in
     };
   };
 
-  hm = {
+  ns.hm = {
     ${ns}.desktop = {
-      hyprland.namedWorkspaces.VR = "monitor:${primaryMonitor.name}";
       services.waybar.audioDeviceIcons.${cfg.audio.sink} = "";
+      hyprland.namedWorkspaces.VR = "monitor:${primaryMonitor.name}";
+
+      hyprland.settings =
+        let
+          inherit (config.${ns}.hmNs.desktop.hyprland) modKey namedWorkspaceIDs;
+        in
+        {
+          bind = [
+            "${modKey}, Grave, workspace, ${namedWorkspaceIDs.VR}"
+            "${modKey}SHIFT, Grave, movetoworkspace, ${namedWorkspaceIDs.VR}"
+          ];
+
+          windowrulev2 = [
+            "workspace ${namedWorkspaceIDs.VR} silent, class:^(monado-service)$"
+            "center, class:^(monado-service)$"
+          ];
+        };
     };
-
-    desktop.hyprland.settings =
-      let
-        inherit (config.hm.${ns}.desktop.hyprland) modKey namedWorkspaceIDs;
-      in
-      {
-        bind = [
-          "${modKey}, Grave, workspace, ${namedWorkspaceIDs.VR}"
-          "${modKey}SHIFT, Grave, movetoworkspace, ${namedWorkspaceIDs.VR}"
-        ];
-
-        windowrulev2 = [
-          "workspace ${namedWorkspaceIDs.VR} silent, class:^(monado-service)$"
-          "center, class:^(monado-service)$"
-        ];
-      };
   };
 }

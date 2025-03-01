@@ -78,7 +78,7 @@ in
 
   services.playerctld.enable = true;
 
-  desktop.hyprland.settings =
+  ns.desktop.hyprland.settings =
     let
       inherit (config.${ns}.desktop.hyprland) modKey;
     in

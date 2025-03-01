@@ -17,8 +17,8 @@ let
     mkEnableOption
     ;
   inherit (config.${ns}.core) home-manager;
-  inherit (config.hm.${ns}.desktop.programs) locker;
-  homeDesktop = config.hm.${ns}.desktop;
+  inherit (config.${ns}.hmNs.desktop.programs) locker;
+  homeDesktop = config.${ns}.hmNs.desktop;
   loginctl = getExe' pkgs.systemd "loginctl";
   systemd-run = getExe' pkgs.systemd "systemd-run";
 in

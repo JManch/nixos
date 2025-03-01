@@ -105,7 +105,7 @@ in
       '';
 
   # Change theme of all active Neovim instances
-  darkman.switchScripts.neovim =
+  ns.desktop.darkman.switchScripts.neovim =
     theme: # bash
     ''
       ls "$XDG_RUNTIME_DIR"/nvim.*.0 | xargs -I {} \

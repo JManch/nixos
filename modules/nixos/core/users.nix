@@ -20,7 +20,7 @@ in
 
   imports = [
     (mkAliasOptionModule
-      [ "userPackages" ]
+      [ ns "userPackages" ]
       [
         "users"
         "users"
@@ -30,7 +30,7 @@ in
     )
 
     (mkAliasOptionModule
-      [ "adminPackages" ]
+      [ ns "adminPackages" ]
       [
         "users"
         "users"

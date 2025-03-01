@@ -40,15 +40,16 @@
     }))
   ];
 
-  desktop.hyprland.settings.windowrulev2 = [
-    "workspace special:social silent, initialTitle:^(Supersonic)$"
-  ];
+  ns.desktop = {
+    services.playerctl.musicPlayers = lib.mkBefore [ "Supersonic" ];
 
-  ns = {
-    desktop.services.playerctl.musicPlayers = lib.mkBefore [ "Supersonic" ];
-    persistence.directories = [
-      ".config/supersonic"
-      ".cache/supersonic"
+    hyprland.settings.windowrulev2 = [
+      "workspace special:social silent, initialTitle:^(Supersonic)$"
     ];
   };
+
+  ns.persistence.directories = [
+    ".config/supersonic"
+    ".cache/supersonic"
+  ];
 }

@@ -25,7 +25,7 @@ let
     memory
     primaryMonitor
     ;
-  inherit (config.hm.${ns}.desktop) hyprland;
+  inherit (config.${ns}.hmNs.desktop) hyprland;
   inherit (config.${ns}.core) home-manager;
 
   runVMScript = pkgs.writeShellApplication {
@@ -305,30 +305,32 @@ in
       programs.zsh.shellAliases.p = "sudo systemctl poweroff";
     };
 
-    hm = mkIf home-manager.enable {
-      desktop.hyprland.settings =
-        let
-          inherit (hyprland) modKey namedWorkspaceIDs;
-        in
-        {
-          bind = [
-            "${modKey}, V, workspace, ${namedWorkspaceIDs.VM}"
-            "${modKey}SHIFT, V, movetoworkspace, ${namedWorkspaceIDs.VM}"
-          ];
+    ns.hm = mkIf home-manager.enable {
+      ${ns}.desktop.hyprland = {
+        namedWorkspaces.VM = "monitor:${primaryMonitor.name}";
 
-          windowrulev2 = [
-            "workspace ${namedWorkspaceIDs.VM} silent, class:^(\\.?qemu.*|aquamarine|\\.virt-manager-wrapped)$"
-            "float, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-            "size 80% 80%, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-            "center, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-            "keepaspectratio, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-          ];
-        };
+        settings =
+          let
+            inherit (hyprland) modKey namedWorkspaceIDs;
+          in
+          {
+            bind = [
+              "${modKey}, V, workspace, ${namedWorkspaceIDs.VM}"
+              "${modKey}SHIFT, V, movetoworkspace, ${namedWorkspaceIDs.VM}"
+            ];
 
-      ${ns}.desktop.hyprland.namedWorkspaces.VM = "monitor:${primaryMonitor.name}";
+            windowrulev2 = [
+              "workspace ${namedWorkspaceIDs.VM} silent, class:^(\\.?qemu.*|aquamarine|\\.virt-manager-wrapped)$"
+              "float, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+              "size 80% 80%, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+              "center, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+              "keepaspectratio, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+            ];
+          };
+      };
     };
 
-    adminPackages = [ runVMScript ];
+    ns.adminPackages = [ runVMScript ];
   }
 
   (mkIf cfg.libvirt.enable {
@@ -344,7 +346,7 @@ in
         QEMU_OPTS = "-m ${memoryStr} -smp ${cores}";
       };
 
-    hm = mkIf home-manager.enable {
+    ns.hm = mkIf home-manager.enable {
       dconf.settings = {
         "org/virt-manager/virt-manager/connections" = {
           autoconnect = [ "qemu:///system" ];

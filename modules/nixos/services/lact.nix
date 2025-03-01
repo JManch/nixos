@@ -37,7 +37,7 @@ in
   # https://wiki.archlinux.org/title/AMDGPU#Boot_parameter
   boot.kernelParams = [ "amdgpu.ppfeaturemask=0xffffffff" ];
 
-  userPackages = [ pkgs.lact ];
+  ns.userPackages = [ pkgs.lact ];
 
   systemd.packages = [ pkgs.lact ];
   systemd.services.lactd.wantedBy = [ "multi-user.target" ];

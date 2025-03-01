@@ -15,7 +15,7 @@ let
     mkEnableOption
     ;
   inherit (config.${ns}.core) home-manager;
-  inherit (config.hm.xdg) dataHome;
+  inherit (config.${ns}.hm.xdg) dataHome;
 
   steamAppIDs = {
     "BeamNG.drive" = 284160;
@@ -64,7 +64,7 @@ in
 
   opts.lanTransfer = mkEnableOption "opening port for Steam LAN game transfer";
 
-  userPackages = [ pkgs.steam-run ];
+  ns.userPackages = [ pkgs.steam-run ];
 
   programs.steam = {
     enable = true;
@@ -138,7 +138,7 @@ in
     ".local/share/Steam"
   ];
 
-  hm = mkIf home-manager.enable {
+  ns.hm = mkIf home-manager.enable {
     ${ns} = {
       programs.desktop.gaming = {
         gameClasses = [
@@ -156,6 +156,20 @@ in
           ++ [ "factorio" ];
       };
 
+      desktop.hyprland.settings.windowrulev2 = [
+        # Main steam window
+        "workspace emptym, class:^(steam)$, title:^(Steam)$"
+
+        # Steam sign-in window
+        "noinitialfocus, class:^(steam)$, title:^(Sign in to Steam)$"
+        "workspace special:loading silent, class:^(steam)$, title:^(Sign in to Steam)$"
+
+        # Friends list
+        "float, class:^(steam)$, title:^(Friends List)$"
+        "size 360 700, class:^(steam)$, title:^(Friends List)$"
+        "center, class:^(steam)$, title:^(Friends List)$"
+      ];
+
       persistence.directories = [ ".factorio" ];
     };
 
@@ -168,22 +182,10 @@ in
     xdg.dataFile = mapAttrs' (
       gameName: appID:
       nameValuePair "Steam/steamapps/compatdata/${gameName}" {
-        source = config.hm.lib.file.mkOutOfStoreSymlink "${dataHome}/Steam/steamapps/compatdata/${toString appID}";
+        source =
+          config.${ns}.hm.lib.file.mkOutOfStoreSymlink
+            "${dataHome}/Steam/steamapps/compatdata/${toString appID}";
       }
     ) steamAppIDs;
-
-    desktop.hyprland.settings.windowrulev2 = [
-      # Main steam window
-      "workspace emptym, class:^(steam)$, title:^(Steam)$"
-
-      # Steam sign-in window
-      "noinitialfocus, class:^(steam)$, title:^(Sign in to Steam)$"
-      "workspace special:loading silent, class:^(steam)$, title:^(Sign in to Steam)$"
-
-      # Friends list
-      "float, class:^(steam)$, title:^(Friends List)$"
-      "size 360 700, class:^(steam)$, title:^(Friends List)$"
-      "center, class:^(steam)$, title:^(Friends List)$"
-    ];
   };
 }

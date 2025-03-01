@@ -17,7 +17,9 @@ in
     ./hardware-configuration.nix
   ];
 
-  ${lib.ns} = {
+  ${ns} = {
+    adminPackages = [ selfPkgs.filen-cli ];
+
     core = {
       home-manager.enable = true;
 
@@ -244,6 +246,4 @@ in
       };
     };
   };
-
-  adminPackages = [ selfPkgs.filen-cli ];
 }

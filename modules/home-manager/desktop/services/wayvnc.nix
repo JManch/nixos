@@ -66,7 +66,7 @@ in
 
   # Since VNC clients usually have a button for this key combination and we
   # don't use it for anything else
-  desktop.hyprland.binds = [
+  ns.desktop.hyprland.binds = [
     "ALTCONTROL, Delete, exec, ${getExe' pkgs.wayvnc "wayvncctl"} output-cycle"
   ];
 }

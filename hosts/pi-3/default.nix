@@ -6,6 +6,7 @@
   ...
 }:
 let
+  inherit (lib) ns;
   inherit (inputs.nix-resources.secrets) fqDomain;
 in
 {
@@ -36,7 +37,13 @@ in
       };
   };
 
-  ${lib.ns} = {
+  ${ns} = {
+    userPackages = with pkgs; [
+      pulseaudio
+      btop
+      ffmpeg
+    ];
+
     hardware.file-system.type = "sd-image";
 
     core = {
@@ -97,10 +104,4 @@ in
   networking.firewall.extraCommands = ''
     iptables -I nixos-fw -p tcp --dport 8084 ! -s 192.168.89.2 -j nixos-fw-refuse
   '';
-
-  userPackages = with pkgs; [
-    pulseaudio
-    btop
-    ffmpeg
-  ];
 }

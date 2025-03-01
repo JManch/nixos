@@ -51,7 +51,7 @@ in
     };
   };
 
-  darkman.switchScripts.gtk =
+  ns.desktop.darkman.switchScripts.gtk =
     let
       schemas = pkgs.gsettings-desktop-schemas;
       gsettings = getExe' pkgs.glib "gsettings";

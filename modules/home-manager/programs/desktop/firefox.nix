@@ -309,34 +309,32 @@ in
     "x-scheme-handler/https" = [ "firefox.desktop" ];
   };
 
-  ns = {
-    backups.firefox = mkIf cfg.backup {
-      paths = [ ".mozilla" ];
-      exclude = [ ".cache" ];
-      restore = mkIf cfg.runInRam {
-        preRestoreScript = "systemctl stop --user firefox-persist-init";
-        postRestoreScript = "systemctl start --user firefox-persist-init";
-      };
+  ns.backups.firefox = mkIf cfg.backup {
+    paths = [ ".mozilla" ];
+    exclude = [ ".cache" ];
+    restore = mkIf cfg.runInRam {
+      preRestoreScript = "systemctl stop --user firefox-persist-init";
+      postRestoreScript = "systemctl start --user firefox-persist-init";
     };
-
-    persistence.directories = mkIf (!cfg.runInRam) [
-      ".mozilla"
-      ".cache/mozilla"
-    ];
   };
 
-  desktop.hyprland.binds =
-    let
-      inherit (desktop.hyprland) modKey;
-    in
-    [
-      "${modKey}, Backspace, exec, app2unit firefox.desktop"
-      "${modKey}SHIFT, Backspace, workspace, emptym"
-      "${modKey}SHIFT, Backspace, exec, app2unit firefox.desktop"
-    ];
+  ns.persistence.directories = mkIf (!cfg.runInRam) [
+    ".mozilla"
+    ".cache/mozilla"
+  ];
 
-  ${ns}.desktop.hyprland.eventScripts.windowtitlev2 =
-    singleton (pkgs.writeShellScript "hypr-bitwarden-windowtitlev2" ''
+  ns.desktop.hyprland = {
+    binds =
+      let
+        inherit (desktop.hyprland) modKey;
+      in
+      [
+        "${modKey}, Backspace, exec, app2unit firefox.desktop"
+        "${modKey}SHIFT, Backspace, workspace, emptym"
+        "${modKey}SHIFT, Backspace, exec, app2unit firefox.desktop"
+      ];
+
+    eventScripts.windowtitlev2 = singleton (pkgs.writeShellScript "hypr-bitwarden-windowtitlev2" ''
       if [[ $2 == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
         hyprctl --batch "\
           dispatch setfloating address:0x$1; \
@@ -345,4 +343,5 @@ in
         "
       fi
     '').outPath;
+  };
 }

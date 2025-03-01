@@ -71,7 +71,7 @@ in
     theme[process_end]="#${colors.base09}"
   '';
 
-  darkman.switchApps.btop = {
+  ns.desktop.darkman.switchApps.btop = {
     paths = [ ".config/${themePath}" ];
   };
 }

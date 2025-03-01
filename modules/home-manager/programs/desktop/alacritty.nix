@@ -108,17 +108,19 @@ in
     ))
   ];
 
-  darkman.switchApps.alacritty = {
-    paths = [ ".config/alacritty/alacritty.toml" ];
-    extraReplacements = singleton {
-      dark = "opacity = 0.7";
-      light = "opacity = 1";
+  ns.desktop = {
+    darkman.switchApps.alacritty = {
+      paths = [ ".config/alacritty/alacritty.toml" ];
+      extraReplacements = singleton {
+        dark = "opacity = 0.7";
+        light = "opacity = 1";
+      };
     };
-  };
 
-  desktop.hyprland.binds = mkIf (desktop.terminal == "Alacritty") [
-    "${desktop.hyprland.modKey}, Return, exec, app2unit Alacritty.desktop"
-    "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
-    "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit Alacritty.desktop"
-  ];
+    hyprland.binds = mkIf (desktop.terminal == "Alacritty") [
+      "${desktop.hyprland.modKey}, Return, exec, app2unit Alacritty.desktop"
+      "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
+      "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit Alacritty.desktop"
+    ];
+  };
 }

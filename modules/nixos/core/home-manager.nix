@@ -20,7 +20,7 @@ in
   imports = [
     inputs.home-manager.nixosModules.home-manager
     (mkAliasOptionModule
-      [ "hm" ]
+      [ ns "hm" ]
       [
         "home-manager"
         "users"
@@ -28,7 +28,16 @@ in
       ]
     )
     (mkAliasOptionModule
-      [ "hmAdmin" ]
+      [ ns "hmNs" ]
+      [
+        "home-manager"
+        "users"
+        username
+        ns
+      ]
+    )
+    (mkAliasOptionModule
+      [ ns "hmAdmin" ]
       [
         "home-manager"
         "users"
@@ -52,7 +61,7 @@ in
             neovim.enable = true;
             btop.enable = true;
           };
-          home.stateVersion = config.hm.home.stateVersion;
+          home.stateVersion = config.${ns}.hm.home.stateVersion;
         };
       })
     ];

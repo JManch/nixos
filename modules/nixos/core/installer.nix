@@ -149,7 +149,7 @@ in
 {
   enableOpt = false;
 
-  adminPackages = [
+  ns.adminPackages = [
     setupSdImage
     buildInstaller
   ];

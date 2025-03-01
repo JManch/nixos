@@ -74,32 +74,32 @@ in
     };
   };
 
-  ${ns} = {
-    programs.desktop.gaming.gameClasses = optional osGaming.gamescope.enable "\\.?gamescope.*";
-    desktop.hyprland.namedWorkspaces.GAME = "monitor:${primaryMonitor.name}";
-  };
+  ns.programs.desktop.gaming.gameClasses = optional osGaming.gamescope.enable "\\.?gamescope.*";
 
-  desktop.hyprland.settings =
-    let
-      inherit (hyprland) modKey namedWorkspaceIDs;
-      concatRegex = regexes: "^(${concatStringsSep "|" regexes})$";
-      gameClassRegex = concatRegex cfg.gameClasses;
-    in
-    {
-      windowrulev2 =
-        [
-          "workspace ${namedWorkspaceIDs.GAME}, class:${gameClassRegex}"
-        ]
-        ++ optionals hyprland.tearing [
-          "tag +tear_game, class:${gameClassRegex}"
-          "tag -tear_game, tag:tear_game*, class:${concatRegex cfg.tearingExcludedClasses}"
-          "tag -tear_game, tag:tear_game*, title:${concatRegex cfg.tearingExcludedTitles}"
-          "prop immediate, tag:tear_game"
+  ns.desktop.hyprland = {
+    namedWorkspaces.GAME = "monitor:${primaryMonitor.name}";
+    settings =
+      let
+        inherit (hyprland) modKey namedWorkspaceIDs;
+        concatRegex = regexes: "^(${concatStringsSep "|" regexes})$";
+        gameClassRegex = concatRegex cfg.gameClasses;
+      in
+      {
+        windowrulev2 =
+          [
+            "workspace ${namedWorkspaceIDs.GAME}, class:${gameClassRegex}"
+          ]
+          ++ optionals hyprland.tearing [
+            "tag +tear_game, class:${gameClassRegex}"
+            "tag -tear_game, tag:tear_game*, class:${concatRegex cfg.tearingExcludedClasses}"
+            "tag -tear_game, tag:tear_game*, title:${concatRegex cfg.tearingExcludedTitles}"
+            "prop immediate, tag:tear_game"
+          ];
+
+        bind = [
+          "${modKey}, G, workspace, ${namedWorkspaceIDs.GAME}"
+          "${modKey}SHIFT, G, movetoworkspace, ${namedWorkspaceIDs.GAME}"
         ];
-
-      bind = [
-        "${modKey}, G, workspace, ${namedWorkspaceIDs.GAME}"
-        "${modKey}SHIFT, G, movetoworkspace, ${namedWorkspaceIDs.GAME}"
-      ];
-    };
+      };
+  };
 }

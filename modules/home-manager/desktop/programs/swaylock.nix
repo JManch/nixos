@@ -77,5 +77,5 @@ in
     };
   };
 
-  darkman.switchApps.swaylock.paths = [ ".config/swaylock/config" ];
+  ns.desktop.darkman.switchApps.swaylock.paths = [ ".config/swaylock/config" ];
 }

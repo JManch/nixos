@@ -124,7 +124,7 @@ in
         };
     };
 
-    assertions = lib.${ns}.asserts [
+    asserts = [
       (cfg.type != null)
       "Filesystem type must be set"
       (cfg.tmpfsTmp -> !config.${ns}.system.impermanence.enable)

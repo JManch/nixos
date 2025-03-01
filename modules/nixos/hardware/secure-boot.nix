@@ -32,5 +32,5 @@ in
     pkiBundle = "${optionalString impermanence.enable "/persist"}/etc/secureboot";
   };
 
-  persistence.directories = [ "/etc/secureboot" ];
+  ns.persistence.directories = [ "/etc/secureboot" ];
 }

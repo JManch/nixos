@@ -56,7 +56,6 @@ let
     notifVars
     healthCheckResticRemoteCopy
     ;
-  isServer = (config.${ns}.core.device.type == "server");
   resticExe = getExe pkgs.restic;
   homeBackups = optionalAttrs home-manager.enable config.hm.${ns}.backups;
   vmInstall = inputs.vmInstall.value;
@@ -240,7 +239,7 @@ in
 
     imports = singleton (
       mkAliasOptionModule
-        [ "backups" ]
+        [ ns "backups" ]
         [
           ns
           "services"
@@ -434,7 +433,7 @@ in
   })
 
   (mkIf (cfg.enable && !virtualisation.vmVariant && !vmInstall) {
-    assertions = asserts [
+    asserts = [
       (all (v: v == true) (
         mapAttrsToList (
           _: backup:
@@ -565,17 +564,17 @@ in
 
     # Persist maintenance service cache otherwise forget command can be very
     # expensive
-    persistence.directories = singleton {
+    ns.persistence.directories = singleton {
       directory = "/var/cache/restic-repo-maintenance";
       mode = "0700";
     };
   })
 
   (mkIf (cfg.server.enable && !virtualisation.vmVariant && !vmInstall) {
-    assertions = asserts [
-      caddy.enable
-      "Restic server requires Caddy to be enabled"
-      isServer
+    requirements = [ "services.caddy" ];
+
+    asserts = [
+      (config.${ns}.core.device.type == "server")
       "Restic server can only be enabled on server hosts"
     ];
 
@@ -703,7 +702,7 @@ in
       };
     };
 
-    ${ns}.services.caddy.virtualHosts.restic.extraConfig = ''
+    ns.services.caddy.virtualHosts.restic.extraConfig = ''
       # Because syncing involves many HTTP requests logs get very large.
       # Exclude LAN IPs from logs to circumvent this.
       @lan remote_ip ${concatStringsSep " " trustedAddresses}
@@ -711,7 +710,7 @@ in
       reverse_proxy http://127.0.0.1:${toString cfg.server.port}
     '';
 
-    persistence.directories = [
+    ns.persistence.directories = [
       {
         directory = cfg.server.dataDir;
         user = "restic";

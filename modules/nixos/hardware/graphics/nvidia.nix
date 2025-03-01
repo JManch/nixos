@@ -29,5 +29,5 @@ in
     powerManagement.enable = desktop.suspend.enable;
   };
 
-  persistenceHome.directories = [ ".cache/nvidia" ];
+  ns.persistenceHome.directories = [ ".cache/nvidia" ];
 }

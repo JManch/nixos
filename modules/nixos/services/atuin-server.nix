@@ -28,7 +28,7 @@ in
 
   services.postgresqlBackup.databases = [ "atuin" ];
 
-  backups.atuin-server = {
+  ns.backups.atuin-server = {
     paths = [ "/var/backup/postgresql/atuin.sql" ];
 
     restore =

@@ -62,7 +62,7 @@ in
     Group = "factorio";
   };
 
-  backups.factorio-server = {
+  ns.backups.factorio-server = {
     paths = [ "/var/lib/private/factorio-server" ];
     restore.pathOwnership = {
       "/var/lib/private/factorio-server" = {
@@ -72,7 +72,7 @@ in
     };
   };
 
-  persistence.directories = singleton {
+  ns.persistence.directories = singleton {
     directory = "/var/lib/private/factorio-server";
     user = "factorio";
     group = "factorio";

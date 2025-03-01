@@ -133,7 +133,7 @@ in
       '';
   };
 
-  persistenceHome.directories = [
+  ns.persistenceHome.directories = [
     ".steam"
     ".local/share/Steam"
   ];

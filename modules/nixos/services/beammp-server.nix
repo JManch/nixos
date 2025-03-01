@@ -149,7 +149,7 @@ in
     );
   };
 
-  persistence.directories = singleton {
+  ns.persistence.directories = singleton {
     directory = "/var/lib/beammp-server";
     user = "beammp";
     group = "beammp";

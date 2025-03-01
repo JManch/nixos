@@ -378,12 +378,12 @@ in
       "d /tmp/tmp-vms 0777 root root - -"
     ];
 
-    persistence.directories = [ "/var/lib/libvirt" ];
+    ns.persistence.directories = [ "/var/lib/libvirt" ];
   })
 
   (mkIf (config.virtualisation.oci-containers.containers != { }) {
     virtualisation.oci-containers.backend = "podman";
 
-    persistence.directories = [ "/var/lib/containers" ];
+    ns.persistence.directories = [ "/var/lib/containers" ];
   })
 ]

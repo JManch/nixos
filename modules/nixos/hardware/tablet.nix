@@ -8,5 +8,5 @@
     serviceConfig.SuccessExitStatus = 143;
   };
 
-  persistenceHome.directories = [ ".config/OpenTabletDriver" ];
+  ns.persistenceHome.directories = [ ".config/OpenTabletDriver" ];
 }

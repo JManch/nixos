@@ -358,7 +358,7 @@ in
 
   services.postgresqlBackup.databases = [ "hass" ];
 
-  backups.hass = {
+  ns.backups.hass = {
     paths = [
       "/var/lib/hass"
       "/var/backup/postgresql/hass.sql"
@@ -398,7 +398,7 @@ in
     8123
   ];
 
-  persistence.directories = singleton {
+  ns.persistence.directories = singleton {
     directory = "/var/lib/hass";
     user = "hass";
     group = "hass";

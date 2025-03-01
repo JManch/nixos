@@ -19,8 +19,7 @@ let
     optionalString
     singleton
     ;
-  inherit (lib.${ns}) asserts hardeningBaseline;
-  inherit (config.${ns}.services) caddy;
+  inherit (lib.${ns}) hardeningBaseline;
   inherit (config.${ns}.system) impermanence;
   inherit (config.${ns}.core) device;
   inherit (inputs.nix-resources.secrets) qBittorrentPort soulseekPort;
@@ -69,9 +68,9 @@ in
   }
 
   (mkIf (cfg.video.enable || cfg.music.enable) {
-    assertions = asserts [
-      caddy.enable
-      "Torrent stack requires Caddy to be enabled"
+    requirements = [ "services.caddy" ];
+
+    asserts = [
       (cfg.mediaDir != "" && cfg.mediaDir != "/")
       "Torrent stack media dir must not be empty or root"
       (head (stringToCharacters cfg.mediaDir) == "/")
@@ -206,14 +205,14 @@ in
       };
     };
 
-    ${ns}.services.caddy.virtualHosts = {
+    ns.services.caddy.virtualHosts = {
       torrents.extraConfig = "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.qbittorrent}";
       prowlarr.extraConfig = "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.prowlarr}";
     };
 
     systemd.services.jellyfin.serviceConfig.SupplementaryGroups = [ "media" ];
 
-    backups = {
+    ns.backups = {
       prowlarr = mkArrBackup "prowlarr";
       qbittorrent-nox = {
         paths = [ "/var/lib/qbittorrent-nox/qBittorrent/config" ];
@@ -234,7 +233,7 @@ in
       };
     };
 
-    persistence.directories = [
+    ns.persistence.directories = [
       {
         directory = "/var/lib/qbittorrent-nox";
         user = "qbittorrent-nox";
@@ -421,17 +420,17 @@ in
       ports.radarr
     ];
 
-    ${ns}.services.caddy.virtualHosts = {
+    ns.services.caddy.virtualHosts = {
       sonarr.extraConfig = "reverse_proxy http://127.0.0.1:${toString ports.sonarr}";
       radarr.extraConfig = "reverse_proxy http://127.0.0.1:${toString ports.radarr}";
     };
 
-    backups = genAttrs [
+    ns.backups = genAttrs [
       "radarr"
       "sonarr"
     ] mkArrBackup;
 
-    persistence.directories = [
+    ns.persistence.directories = [
       {
         directory = "/var/lib/sonarr";
         user = "sonarr";
@@ -638,10 +637,10 @@ in
       };
     };
 
-    ${ns}.services.caddy.virtualHosts.slskd.extraConfig =
+    ns.services.caddy.virtualHosts.slskd.extraConfig =
       "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.slskd}";
 
-    persistence.directories = singleton {
+    ns.persistence.directories = singleton {
       directory = "/var/lib/slskd";
       user = "slskd";
       group = "slskd";

@@ -74,5 +74,5 @@ in
     };
   };
 
-  persistence.directories = [ "/var/lib/index-checker" ];
+  ns.persistence.directories = [ "/var/lib/index-checker" ];
 }

@@ -15,9 +15,8 @@ let
     getExe'
     mkVMOverride
     ;
-  inherit (lib.${ns}) asserts hardeningBaseline;
+  inherit (lib.${ns}) hardeningBaseline;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.${ns}.services) caddy;
   inherit (config.age.secrets) scrutinyVars;
   influx = getExe' pkgs.influxdb2 "influx";
 in
@@ -71,10 +70,7 @@ in
   })
 
   (mkIf cfg.server.enable {
-    assertions = asserts [
-      caddy.enable
-      "Scrutiny server requires Caddy to be enabled"
-    ];
+    requirements = [ "services.caddy" ];
 
     services.scrutiny = {
       enable = true;
@@ -133,7 +129,7 @@ in
       "d /var/backup/influxdb2/scrutiny 0700 influxdb2 influxdb2 - -"
     ];
 
-    backups.scrutiny = {
+    ns.backups.scrutiny = {
       paths = [
         # Contains the sqlite DB
         "/var/lib/scrutiny"
@@ -168,11 +164,11 @@ in
       after = [ "scrutiny-influxdb2-backup.service" ];
     };
 
-    ${ns}.services.caddy.virtualHosts.disks.extraConfig = ''
+    ns.services.caddy.virtualHosts.disks.extraConfig = ''
       reverse_proxy http://127.0.0.1:${toString cfg.server.port}
     '';
 
-    persistence.directories = [
+    ns.persistence.directories = [
       {
         directory = "/var/lib/scrutiny";
         user = "scrutiny";

@@ -42,7 +42,7 @@ in
     ];
   };
 
-  persistence.directories = [
+  ns.persistence.directories = [
     "/var/lib/bluetooth"
     "/var/lib/blueman"
   ];

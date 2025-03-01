@@ -69,7 +69,7 @@ in
   # Expose wireless server for kobo ereader transfers
   networking.firewall.allowedTCPPorts = [ 9090 ];
 
-  backups.calibre = {
+  ns.backups.calibre = {
     paths = [
       "/var/lib/calibre-web"
       "/var/lib/calibre-library"
@@ -88,7 +88,7 @@ in
       };
   };
 
-  persistence.directories = [
+  ns.persistence.directories = [
     {
       directory = "/var/lib/calibre-web";
       user = "calibre-web";

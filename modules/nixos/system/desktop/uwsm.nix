@@ -28,7 +28,7 @@ let
     optionalAttrs
     ;
   inherit (config.${ns}.core) device home-manager;
-  inherit (lib.${ns}) asserts addPatches;
+  inherit (lib.${ns}) addPatches;
   homeUwsm = config.hm.${ns}.desktop.uwsm;
 in
 [
@@ -205,7 +205,7 @@ in
   }
 
   {
-    assertions = asserts [
+    asserts = [
       (categoryCfg.displayManager.name == "uwsm" -> config.programs.uwsm.enable)
       "Using UWSM as a display manager requires it to be enabled"
     ];

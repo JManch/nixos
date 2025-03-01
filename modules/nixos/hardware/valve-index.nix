@@ -115,22 +115,20 @@ in
     })
   ];
 
-  ns = {
-    system.audio.alsaDeviceAliases = {
-      ${cfg.audio.source} = "Valve Index";
-      ${cfg.audio.sink} = "Valve Index";
-    };
-
-    # Enables asynchronous reprojection in SteamVR by allowing any application
-    # to acquire high priority queues
-    # https://github.com/NixOS/nixpkgs/issues/217119#issuecomment-2434353553
-    hardware.graphics.amd.kernelPatches = mkIf (gpu.type == "amd") [
-      (pkgs.fetchpatch2 {
-        url = "https://github.com/Frogging-Family/community-patches/raw/a6a468420c0df18d51342ac6864ecd3f99f7011e/linux61-tkg/cap_sys_nice_begone.mypatch";
-        hash = "sha256-1wUIeBrUfmRSADH963Ax/kXgm9x7ea6K6hQ+bStniIY=";
-      })
-    ];
+  ns.system.audio.alsaDeviceAliases = {
+    ${cfg.audio.source} = "Valve Index";
+    ${cfg.audio.sink} = "Valve Index";
   };
+
+  # Enables asynchronous reprojection in SteamVR by allowing any application
+  # to acquire high priority queues
+  # https://github.com/NixOS/nixpkgs/issues/217119#issuecomment-2434353553
+  ns.hardware.graphics.amd.kernelPatches = mkIf (gpu.type == "amd") [
+    (pkgs.fetchpatch2 {
+      url = "https://github.com/Frogging-Family/community-patches/raw/a6a468420c0df18d51342ac6864ecd3f99f7011e/linux61-tkg/cap_sys_nice_begone.mypatch";
+      hash = "sha256-1wUIeBrUfmRSADH963Ax/kXgm9x7ea6K6hQ+bStniIY=";
+    })
+  ];
 
   # Proton version optimised for VRChat
   programs.steam.extraCompatPackages = [ pkgs.proton-ge-rtsp-bin ];

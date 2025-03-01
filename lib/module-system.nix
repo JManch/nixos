@@ -223,6 +223,7 @@ let
       conditions = true;
       noChildren = true;
       defaultOpts = true;
+      exclude = true;
     };
 
     # Options that can will be merged when defined in multiple config sets
@@ -230,7 +231,6 @@ let
       opts = true;
       nsOpts = true;
       imports = true;
-      exclude = true;
     };
 
     # Options that are just aliases and will be applied to the config set they
@@ -627,25 +627,7 @@ in
                     )
                   );
 
-                  # WARN: Since extraConfig is not applied when guardType is custom we must
-                  # assert that module options generating this config are not used.
-                  custom =
-                    let
-                      assertIncompat =
-                        configSet: option:
-                        assertMsg (
-                          configSet.moduleOpts.guardType == "custom" -> !hasAttr option configSet.setModuleOpts
-                        ) "${throwMsg} uses `${option}` which is not compatible with `guardType` 'custom'";
-                    in
-                    mkMerge (
-                      map (
-                        configSet:
-                        assert assertIncompat configSet "asserts";
-                        assert assertIncompat configSet "categoryConfig";
-                        assert assertIncompat configSet "ns";
-                        configSet.processedConfig
-                      ) processedConfigSets
-                    );
+                  custom = mkMerge (map (configSet: configSet.processedConfig) processedConfigSets);
                 };
               in
               guardTypeImpls.${primaryModuleOpts.guardType};

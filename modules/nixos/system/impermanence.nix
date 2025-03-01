@@ -51,10 +51,12 @@ let
         "home/${username}/.mozilla"
       ];
 
-      persistedFiles = map (v: substring 1 (stringLength v.filePath) v.filePath) config.persistence.files;
+      persistedFiles = map (
+        v: substring 1 (stringLength v.filePath) v.filePath
+      ) config.${ns}.persistence.files;
       persistedDirs = map (
         v: substring 1 (stringLength v.dirPath) v.dirPath
-      ) config.persistence.directories;
+      ) config.${ns}.persistence.directories;
     in
     pkgs.writeShellScriptBin "impermanence-bloat" ''
       sudo ${fd} -au --base-directory /persist --type file --type symlink \
@@ -75,7 +77,7 @@ in
       inputs.impermanence.nixosModules.impermanence
 
       (mkAliasOptionModule
-        [ "persistence" ]
+        [ ns "persistence" ]
         [
           "environment"
           "persistence"
@@ -84,7 +86,7 @@ in
       )
 
       (mkAliasOptionModule
-        [ "persistenceHome" ]
+        [ ns "persistenceHome" ]
         [
           "environment"
           "persistence"
@@ -95,7 +97,7 @@ in
       )
 
       (mkAliasOptionModule
-        [ "persistenceAdminHome" ]
+        [ ns "persistenceAdminHome" ]
         [
           "environment"
           "persistence"
@@ -120,7 +122,7 @@ in
 
     fileSystems."/persist".neededForBoot = true;
 
-    persistence = {
+    ns.persistence = {
       hideMounts = true;
 
       directories = [
@@ -148,7 +150,7 @@ in
   }
 
   (mkIf (!cfg.enable) {
-    persistence = {
+    ns.persistence = {
       enable = false;
       directories = mkForce [ ];
       files = mkForce [ ];

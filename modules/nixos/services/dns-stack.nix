@@ -211,82 +211,80 @@ in
   };
   users.groups.dnsmasq = { };
 
-  ns = {
-    # Disable systemd-resolved to simplify DNS stack
-    system.networking.resolved.enable = mkForce false;
+  # Disable systemd-resolved to simplify DNS stack
+  ns.system.networking.resolved.enable = mkForce false;
 
-    services.dns-stack = {
-      dnsmasqConfig = {
-        port = cfg.listenPort;
-        log-queries = cfg.debug || vmVariant;
+  ns.services.dns-stack = {
+    dnsmasqConfig = {
+      port = cfg.listenPort;
+      log-queries = cfg.debug || vmVariant;
 
-        # Do not read from hosts because it contains an entry that points
-        # ${hostname}.lan to ::1 and 127.0.0.2. Don't want this in responses so
-        # instead we define hosts using the dnsmasq host-record option and keep
-        # /etc/hosts for ctrld.
-        no-hosts = true;
+      # Do not read from hosts because it contains an entry that points
+      # ${hostname}.lan to ::1 and 127.0.0.2. Don't want this in responses so
+      # instead we define hosts using the dnsmasq host-record option and keep
+      # /etc/hosts for ctrld.
+      no-hosts = true;
 
-        # Never forward dns queries without a domain to upstream nameservers
-        domain-needed = true;
+      # Never forward dns queries without a domain to upstream nameservers
+      domain-needed = true;
 
-        # Do not send reverse lookups for private ip ranges upstream
-        bogus-priv = true;
+      # Do not send reverse lookups for private ip ranges upstream
+      bogus-priv = true;
 
-        # Reject addresses from upstream nameservers that are in private ranges
-        stop-dns-rebind = true;
+      # Reject addresses from upstream nameservers that are in private ranges
+      stop-dns-rebind = true;
 
-        # Allow localhost reply from blackhole nameservers
-        rebind-localhost-ok = true;
+      # Allow localhost reply from blackhole nameservers
+      rebind-localhost-ok = true;
 
-        # Do not read or poll resolv.conf, we manually configure servers
-        no-resolv = true;
-        no-poll = true;
+      # Do not read or poll resolv.conf, we manually configure servers
+      no-resolv = true;
+      no-poll = true;
 
-        # Send the entire source ip to the Ctrld DNS server. Otherwise Ctrld DNS
-        # server sees all source requests coming from localhost. Note that this
-        # disables dnsmasq caching so we instead cache with Ctrld.
-        add-subnet = "32,128";
-        filter-AAAA = !cfg.enableIPv6;
+      # Send the entire source ip to the Ctrld DNS server. Otherwise Ctrld DNS
+      # server sees all source requests coming from localhost. Note that this
+      # disables dnsmasq caching so we instead cache with Ctrld.
+      add-subnet = "32,128";
+      filter-AAAA = !cfg.enableIPv6;
 
-        # Send all queries to the Ctrld DNS server
-        server = [ "127.0.0.1#${toString cfg.ctrldListenPort}" ];
+      # Send all queries to the Ctrld DNS server
+      server = [ "127.0.0.1#${toString cfg.ctrldListenPort}" ];
 
-        address = [
-          # Point reverse proxy traffic to the device to avoid need for hairpin
-          # NAT
-          "/${fqDomain}/${config.${ns}.core.device.ipAddress}"
-          # Return NXDOMAIN for AAAA requests. Otherwise AAAA requests resolve to
-          # the public DDNS CNAME response which resolves to public IP.
-          "/${fqDomain}/"
-          # Return NXDOMAIN for old fqDomain
-          "/${oldFqDomain}/"
-        ];
+      address = [
+        # Point reverse proxy traffic to the device to avoid need for hairpin
+        # NAT
+        "/${fqDomain}/${config.${ns}.core.device.ipAddress}"
+        # Return NXDOMAIN for AAAA requests. Otherwise AAAA requests resolve to
+        # the public DDNS CNAME response which resolves to public IP.
+        "/${fqDomain}/"
+        # Return NXDOMAIN for old fqDomain
+        "/${oldFqDomain}/"
+      ];
 
-        # Host records create PTR entries as well. Using addn-hosts created
-        # duplicate entries for some reason so using this instead.
-        host-record = mapAttrsToList (address: hostname: "${hostname}.lan,${address}") homeHosts;
-      };
-
-      # Settings generation copied from nixpkgs under MIT license
-      # https://github.com/NixOS/nixpkgs/blob/4cba8b53da471aea2ab2b0c1f30a81e7c451f4b6/COPYING
-      generateDnsmasqConfig =
-        let
-          formatKeyValue =
-            name: value:
-            if value == true then
-              name
-            else if value == false then
-              "# setting `${name}` explicitly set to false"
-            else
-              lib.generators.mkKeyValueDefault { } "=" name value;
-
-          settingsFormat = pkgs.formats.keyValue {
-            mkKeyValue = formatKeyValue;
-            listsAsDuplicateKeys = true;
-          };
-        in
-        name: settings: settingsFormat.generate name settings;
+      # Host records create PTR entries as well. Using addn-hosts created
+      # duplicate entries for some reason so using this instead.
+      host-record = mapAttrsToList (address: hostname: "${hostname}.lan,${address}") homeHosts;
     };
+
+    # Settings generation copied from nixpkgs under MIT license
+    # https://github.com/NixOS/nixpkgs/blob/4cba8b53da471aea2ab2b0c1f30a81e7c451f4b6/COPYING
+    generateDnsmasqConfig =
+      let
+        formatKeyValue =
+          name: value:
+          if value == true then
+            name
+          else if value == false then
+            "# setting `${name}` explicitly set to false"
+          else
+            lib.generators.mkKeyValueDefault { } "=" name value;
+
+        settingsFormat = pkgs.formats.keyValue {
+          mkKeyValue = formatKeyValue;
+          listsAsDuplicateKeys = true;
+        };
+      in
+      name: settings: settingsFormat.generate name settings;
   };
 
   # Open DNS ports in firewall

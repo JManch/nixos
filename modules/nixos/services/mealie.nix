@@ -44,7 +44,7 @@ in
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 
-  persistence.directories = singleton {
+  ns.persistence.directories = singleton {
     directory = "/var/lib/private/mealie";
     user = "mealie";
     group = "mealie";

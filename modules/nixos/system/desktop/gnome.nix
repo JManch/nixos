@@ -49,7 +49,7 @@ in
   };
 
   # Gnome uses network manager
-  ${ns}.system.networking.useNetworkd = mkForce false;
+  ns.system.networking.useNetworkd = mkForce false;
 
   environment.gnome.excludePackages = with pkgs; [
     gnome-tour

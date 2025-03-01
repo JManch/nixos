@@ -344,7 +344,7 @@ in
     };
   };
 
-  persistence.directories =
+  ns.persistence.directories =
     let
       inherit (config.services) caddy;
     in

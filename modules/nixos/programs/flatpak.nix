@@ -35,8 +35,8 @@ in
       };
     };
 
-    persistence.directories = [ "/var/lib/flatpak" ];
-    persistenceHome.directories = [ ".local/share/flatpak" ];
+    ns.persistence.directories = [ "/var/lib/flatpak" ];
+    ns.persistenceHome.directories = [ ".local/share/flatpak" ];
 
     # We can't enable the nixpkgs module because it has an assertion for
     # config.xdg.portal.enable and we use home-manager for our portal config

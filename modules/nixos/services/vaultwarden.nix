@@ -317,7 +317,7 @@ in
     '';
   };
 
-  backups.vaultwarden = {
+  ns.backups.vaultwarden = {
     paths = [ "/var/backup/vaultwarden-archive" ];
     restore.pathOwnership = {
       "/var/backup/vaultwarden-archive" = {
@@ -352,7 +352,7 @@ in
       (mkJail "vaultwarden-admin" ''^.*Invalid admin token\. IP: <ADDR>.*$'')
     ];
 
-  persistence.directories = [
+  ns.persistence.directories = [
     {
       # WARN: This directory will change to /var/lib/vaultwarden in
       # stateVersion 24.11

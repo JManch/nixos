@@ -15,9 +15,8 @@ let
     mkOption
     types
     ;
-  inherit (lib.${ns}) asserts;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.${ns}.services) caddy mosquitto;
+  inherit (config.${ns}.services) mosquitto;
   inherit (config.age.secrets) zigbee2mqttYamlSecrets mqttZigbee2mqttPassword;
   inherit (config.services.zigbee2mqtt) dataDir;
 in
@@ -132,7 +131,7 @@ in
 
     networking.firewall.allowedTCPPorts = optional (!cfg.proxy.enable) cfg.port;
 
-    backups.zigbee2mqtt = {
+    ns.backups.zigbee2mqtt = {
       paths = [ dataDir ];
       exclude = [ "log" ];
       restore.pathOwnership.${dataDir} = {
@@ -141,7 +140,7 @@ in
       };
     };
 
-    persistence.directories = singleton {
+    ns.persistence.directories = singleton {
       directory = dataDir;
       user = "zigbee2mqtt";
       group = "zigbee2mqtt";
@@ -150,12 +149,9 @@ in
   }
 
   (mkIf cfg.proxy.enable {
-    assertions = asserts [
-      caddy.enable
-      "Zigbee2mqtt proxy requires Caddy to be enabled"
-    ];
+    requirements = [ "services.caddy" ];
 
-    ${ns}.services.caddy.virtualHosts.zigbee.extraConfig = ''
+    ns.services.caddy.virtualHosts.zigbee.extraConfig = ''
       basic_auth {
         admin $2a$14$6SspBEu6Yi82Bx3VdT4S1eshOACOuf4DdFlQrg2kYcDomTOrsF/ru
       }
@@ -164,12 +160,12 @@ in
   })
 
   (mkIf cfg.mqtt.user {
-    assertions = asserts [
+    asserts = [
       (cfg.enable -> mosquitto.enable)
       "Zigbee2mqtt MQTT user requires Mosquitto to be enabled"
     ];
 
-    ${ns}.services.mosquitto = {
+    ns.services.mosquitto = {
       users = mkIf (!cfg.mqtt.tls) {
         zigbee2mqtt = {
           acl = [ "readwrite #" ];

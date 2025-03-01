@@ -11,7 +11,7 @@
     openFirewall = true;
   };
 
-  persistenceHome.directories = [
+  ns.persistenceHome.directories = [
     ".local/share/winbox"
     ".local/share/MikroTik" # v4 directory
   ];

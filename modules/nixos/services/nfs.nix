@@ -191,7 +191,7 @@ in
 
     programs.zsh.shellAliases.nfs-reload-exports = "sudo exportfs -arv";
 
-    persistence.directories = [
+    ns.persistence.directories = [
       "/export"
       "/var/lib/nfs"
     ];

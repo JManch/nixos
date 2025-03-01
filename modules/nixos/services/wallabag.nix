@@ -11,6 +11,7 @@ let
 in
 {
   requirements = [ "system.virtualisation.containerisation" ];
+
   asserts = [
     false
     "Wallabag module is disabled because it's insecure"
@@ -81,5 +82,5 @@ in
     "d /var/lib/wallabag/images 0755 root root - -"
   ];
 
-  persistence.directories = [ { directory = "/var/lib/wallabag"; } ];
+  ns.persistence.directories = [ { directory = "/var/lib/wallabag"; } ];
 }

@@ -71,7 +71,7 @@ in
     "d /var/backup/navidrome 0700 navidrome navidrome - -"
   ];
 
-  backups.navidrome = {
+  ns.backups.navidrome = {
     paths = [ "/var/backup/navidrome" ];
     restore.pathOwnership."/var/backup/navidrome" = {
       user = "navidrome";
@@ -79,7 +79,7 @@ in
     };
   };
 
-  persistence.directories = [
+  ns.persistence.directories = [
     {
       directory = "/var/lib/navidrome";
       user = "navidrome";

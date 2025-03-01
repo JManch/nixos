@@ -86,7 +86,7 @@ in
   # correctly. Seahorse is an easy way to do this. To enable automatic
   # keyring unlock on login use the same password as our user.
   services.gnome.gnome-keyring.enable = true;
-  persistenceHome.directories = singleton {
+  ns.persistenceHome.directories = singleton {
     directory = ".local/share/keyrings";
     mode = "0700";
   };

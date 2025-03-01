@@ -12,7 +12,7 @@
     };
   };
 
-  backups.acme = {
+  ns.backups.acme = {
     paths = [ "/var/lib/acme" ];
     restore.pathOwnership."/var/lib/acme" = {
       user = "acme";
@@ -20,7 +20,7 @@
     };
   };
 
-  persistence.directories = lib.singleton {
+  ns.persistence.directories = lib.singleton {
     directory = "/var/lib/acme";
     user = "acme";
     group = "acme";

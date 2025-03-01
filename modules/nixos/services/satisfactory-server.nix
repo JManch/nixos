@@ -76,7 +76,7 @@ in
     };
   };
 
-  backups.satisfactory = {
+  ns.backups.satisfactory = {
     paths = [ "/var/lib/satisfactory-server/.config/Epic/FactoryGame/Saved/SaveGames" ];
     restore.pathOwnership."/var/lib/satisfactory-server" = {
       user = "satisfactory";
@@ -84,7 +84,7 @@ in
     };
   };
 
-  persistence.directories = singleton {
+  ns.persistence.directories = singleton {
     directory = "/var/lib/satisfactory-server";
     user = "satisfactory";
     group = "satisfactory";

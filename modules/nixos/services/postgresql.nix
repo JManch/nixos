@@ -64,7 +64,7 @@ in
     startAt = [ ];
   };
 
-  persistence.directories = [
+  ns.persistence.directories = [
     {
       directory = "/var/lib/postgresql";
       user = "postgres";

@@ -174,7 +174,7 @@ in
   # enables the VR profile on our GPU.
   environment.systemPackages = [ (hiPrio gamemodeWrapped) ];
 
-  ${ns}.programs.gaming.gamemode.profiles.default =
+  ns.programs.gaming.gamemode.profiles.default =
     let
       inherit (config.hm.${ns}.desktop) hyprland;
       inherit (config.${ns}.core.device) primaryMonitor;

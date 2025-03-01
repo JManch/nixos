@@ -79,7 +79,7 @@ in
       8883
     ];
 
-    persistence.directories = singleton {
+    ns.persistence.directories = singleton {
       directory = "/var/lib/mosquitto";
       user = "mosquitto";
       group = "mosquitto";

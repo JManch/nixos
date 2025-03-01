@@ -17,7 +17,6 @@ let
     mkEnableOption
     types
     ;
-  inherit (config.${ns}.services) caddy;
 
   dcp9015cdwlpr = pkgs.dcp9020cdwlpr.overrideAttrs (
     final: prev: {
@@ -76,12 +75,12 @@ in
   })
 
   (mkIf cfg.server.enable {
-    assertions = lib.${ns}.asserts [
-      caddy.enable
-      "Printing server requires Caddy to be enabled"
+    asserts = [
       (config.${ns}.core.device.type == "server")
       "Printing server can only be run on servers on secure local networks"
     ];
+
+    requirements = [ "services.caddy" ];
 
     services.printing = {
       enable = true;
@@ -144,7 +143,7 @@ in
       };
     };
 
-    ${ns}.services.caddy.virtualHosts.printing.extraConfig = ''
+    ns.services.caddy.virtualHosts.printing.extraConfig = ''
       reverse_proxy http://localhost:631 {
         header_up host localhost
       }

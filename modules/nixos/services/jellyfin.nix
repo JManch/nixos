@@ -32,9 +32,8 @@ let
     types
     mkOption
     ;
-  inherit (lib.${ns}) asserts;
   inherit (config.${ns}.system) impermanence;
-  inherit (config.${ns}.services) caddy torrent-stack;
+  inherit (config.${ns}.services) torrent-stack;
   inherit (config.services) jellyfin;
 in
 [
@@ -173,7 +172,7 @@ in
 
     # Jellyfin module has good default hardening
 
-    backups.jellyfin = mkIf cfg.backup {
+    ns.backups.jellyfin = mkIf cfg.backup {
       paths = [ "/var/lib/jellyfin" ];
       exclude = [
         "transcodes"
@@ -192,7 +191,7 @@ in
       };
     };
 
-    persistence.directories = [
+    ns.persistence.directories = [
       {
         directory = "/var/lib/jellyfin";
         user = jellyfin.user;
@@ -209,12 +208,9 @@ in
   }
 
   (mkIf cfg.reverseProxy.enable {
-    assertions = asserts [
-      caddy.enable
-      "Jellyfin reverse proxy requires caddy to be enabled"
-    ];
+    requirements = [ "services.caddy" ];
 
-    ${ns}.services.caddy.virtualHosts.jellyfin = {
+    ns.services.caddy.virtualHosts.jellyfin = {
       inherit (cfg.reverseProxy) extraAllowedAddresses;
       extraConfig = ''
         reverse_proxy http://${cfg.reverseProxy.address}:8096
@@ -223,7 +219,7 @@ in
   })
 
   (mkIf cfg.jellyseerr.enable {
-    assertions = asserts [
+    asserts = [
       (cfg.enable && torrent-stack.video.enable)
       "Jellyseerr requires Jellyfin and the video torrent stack to be enabled"
     ];
@@ -249,11 +245,11 @@ in
       };
     };
 
-    ${ns}.services.caddy.virtualHosts.jellyseerr.extraConfig = ''
+    ns.services.caddy.virtualHosts.jellyseerr.extraConfig = ''
       reverse_proxy http://127.0.0.1:${toString cfg.jellyseerr.port}
     '';
 
-    persistence.directories = singleton {
+    ns.persistence.directories = singleton {
       directory = "/var/lib/private/jellyseerr";
       user = "jellyseerr";
       group = "jellyseerr";

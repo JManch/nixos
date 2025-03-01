@@ -13,5 +13,5 @@
 
   environment.sessionVariables.WINEPREFIX = "$HOME/.local/share/wineprefixes/default";
 
-  persistenceHome.directories = [ ".local/share/wineprefixes" ];
+  ns.persistenceHome.directories = [ ".local/share/wineprefixes" ];
 }

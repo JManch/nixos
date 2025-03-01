@@ -3,9 +3,6 @@
   pkgs,
   hostname,
 }:
-let
-  inherit (lib) ns singleton;
-in
 {
   requirements = [ "services.caddy" ];
   asserts = [
@@ -39,7 +36,7 @@ in
 
   # Unifi module has good default systemd hardening
 
-  ${ns}.services.caddy.virtualHosts.unifi.extraConfig = ''
+  ns.services.caddy.virtualHosts.unifi.extraConfig = ''
     reverse_proxy https://127.0.0.1:8443 {
       # We have to allow insecure HTTPS because unifi forcefully enables TLS
       # with an invalid cert.
@@ -58,7 +55,7 @@ in
   ];
 
   # WARN: Auto-backups have to be configured in the UI
-  backups.unifi = {
+  ns.backups.unifi = {
     paths = [ "/var/lib/unifi/data/backup/autobackup" ];
     restore.pathOwnership."/var/lib/unifi" = {
       user = "unifi";
@@ -66,7 +63,7 @@ in
     };
   };
 
-  persistence.directories = singleton {
+  ns.persistence.directories = lib.singleton {
     directory = "/var/lib/unifi";
     user = "unifi";
     group = "unifi";

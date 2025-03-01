@@ -74,7 +74,7 @@ in
     ];
   });
 
-  persistence.directories = [
+  ns.persistence.directories = [
     {
       directory = "/var/lib/private/ollama";
       user = "ollama";

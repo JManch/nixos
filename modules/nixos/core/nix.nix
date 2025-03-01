@@ -376,7 +376,7 @@ in
 
   adminPackages =
     [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts ++ droidRebuildScripts ++ flakeUpdate;
-  persistenceAdminHome.directories = [ ".remote-builds" ];
+  ns.persistenceAdminHome.directories = [ ".remote-builds" ];
   boot.binfmt.emulatedSystems = cfg.builder.emulatedSystems;
   services.getty.helpLine = mkForce "";
 

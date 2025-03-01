@@ -74,7 +74,7 @@ in
 
     userPackages = mkIf desktop.enable [ pkgs.pavucontrol ];
     services.pulseaudio.enable = mkForce false;
-    ${ns}.system.audio.scripts.toggleMic = toggleMic.outPath;
+    ns.system.audio.scripts.toggleMic = toggleMic.outPath;
 
     # Make pipewire realtime-capable
     security.rtkit.enable = true;
@@ -243,7 +243,7 @@ in
       qpwgraph
     ];
 
-    persistenceHome.directories = [
+    ns.persistenceHome.directories = [
       ".config/rncbc.org"
       ".local/state/wireplumber"
       ".config/qpwgraph" # just for manually saved configs

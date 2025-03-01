@@ -68,31 +68,29 @@ in
 
   requirements = [ "services.caddy" ];
 
-  ns = {
-    services = {
-      frigate.rtspAddress =
-        {
-          channel,
-          subtype,
-          go2rtc ? false,
-        }:
-        "rtsp://${optionalString go2rtc "$"}{FRIGATE_RTSP_USER}:${optionalString go2rtc "$"}{FRIGATE_RTSP_PASSWORD}@${cfg.nvrAddress}:554/cam/realmonitor?channel=${toString channel}&subtype=${toString subtype}";
+  ns.services = {
+    frigate.rtspAddress =
+      {
+        channel,
+        subtype,
+        go2rtc ? false,
+      }:
+      "rtsp://${optionalString go2rtc "$"}{FRIGATE_RTSP_USER}:${optionalString go2rtc "$"}{FRIGATE_RTSP_PASSWORD}@${cfg.nvrAddress}:554/cam/realmonitor?channel=${toString channel}&subtype=${toString subtype}";
 
-      mosquitto.users = mkIf (home-assistant.enable && mosquitto.enable) {
-        frigate = {
-          acl = [ "readwrite #" ];
-          hashedPasswordFile = mqttFrigatePassword.path;
-        };
+    mosquitto.users = mkIf (home-assistant.enable && mosquitto.enable) {
+      frigate = {
+        acl = [ "readwrite #" ];
+        hashedPasswordFile = mqttFrigatePassword.path;
       };
-
-      caddy.virtualHosts.cctv.extraConfig = ''
-        reverse_proxy http://127.0.0.1:${toString httpPort}
-      '';
-
-      caddy.virtualHosts.go2rtc.extraConfig = ''
-        reverse_proxy http://127.0.0.1:1984
-      '';
     };
+
+    caddy.virtualHosts.cctv.extraConfig = ''
+      reverse_proxy http://127.0.0.1:${toString httpPort}
+    '';
+
+    caddy.virtualHosts.go2rtc.extraConfig = ''
+      reverse_proxy http://127.0.0.1:1984
+    '';
   };
 
   users.groups.cctv.members = [
@@ -387,7 +385,7 @@ in
     '';
   };
 
-  persistence.directories = singleton {
+  ns.persistence.directories = singleton {
     directory = "/var/lib/frigate";
     user = "frigate";
     group = "frigate";

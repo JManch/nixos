@@ -31,7 +31,7 @@ in
     reverse_proxy http://127.0.0.1:${toString cfg.port}
   '';
 
-  backups.taskchampion-server = {
+  ns.backups.taskchampion-server = {
     paths = [ "/var/lib/taskchampion-sync-server" ];
     restore.pathOwnership."/var/lib/taskchampion-sync-server" = {
       user = "taskchampion";
@@ -39,7 +39,7 @@ in
     };
   };
 
-  persistence.directories = singleton {
+  ns.persistence.directories = singleton {
     directory = "/var/lib/taskchampion-sync-server";
     user = "taskchampion";
     group = "taskchampion";

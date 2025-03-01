@@ -97,17 +97,17 @@ in
     authorizedKeysFiles = [ "/etc/ssh/authorized_keys.d/%u" ];
   };
 
-  persistence.files = [
+  ns.persistence.files = [
     "/etc/ssh/ssh_host_ed25519_key"
     "/etc/ssh/ssh_host_ed25519_key.pub"
   ];
 
-  persistenceHome.directories = singleton {
+  ns.persistenceHome.directories = singleton {
     directory = ".ssh";
     mode = "0700";
   };
 
-  persistenceAdminHome.directories = mkIf (username != adminUsername) (singleton {
+  ns.persistenceAdminHome.directories = mkIf (username != adminUsername) (singleton {
     directory = ".ssh";
     mode = "0700";
   });

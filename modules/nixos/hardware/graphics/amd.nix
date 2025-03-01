@@ -72,5 +72,5 @@ in
     extraPackages = optional davinciResolve pkgs.rocmPackages.clr.icd;
   };
 
-  persistenceHome.directories = [ ".cache/AMD" ];
+  ns.persistenceHome.directories = [ ".cache/AMD" ];
 }

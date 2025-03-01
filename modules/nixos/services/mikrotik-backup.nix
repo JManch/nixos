@@ -82,7 +82,7 @@ in
     "d ${backupDir} 0700 mikrotik-backup mikrotik-backup - -"
   ];
 
-  backups.mikrotik = {
+  ns.backups.mikrotik = {
     paths = [ backupDir ];
     restore.pathOwnership.${backupDir} = {
       user = "mikrotik-backup";
@@ -90,7 +90,7 @@ in
     };
   };
 
-  persistence.directories = singleton {
+  ns.persistence.directories = singleton {
     directory = backupDir;
     user = "mikrotik-backup";
     group = "mikrotik-backup";

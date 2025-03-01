@@ -44,7 +44,7 @@ in
     };
   };
 
-  persistence.directories = singleton {
+  ns.persistence.directories = singleton {
     directory = "/var/cache/tuigreet";
     user = "greeter";
     group = "greeter";

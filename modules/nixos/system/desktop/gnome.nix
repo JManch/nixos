@@ -86,7 +86,7 @@ in
           focus-mode = "sloppy";
           resize-with-right-button = true;
           dynamic-workspaces = false;
-          num-workspaces = cfg.gnome.workspaceCount;
+          num-workspaces = cfg.workspaceCount;
         };
 
         "org/gnome/mutter" = {

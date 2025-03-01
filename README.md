@@ -21,11 +21,9 @@ Each host has two entry points for module configuration:
 `hosts/<hostname>/default.nix` for system configuration and
 `homes/<hostname>.nix` for Home Manager configuration.
 
-Modules are split into categories using directories. Each directory contains a
-`default.nix` file which defines all options for modules in that category. The
-benefits of this are that (1), modules avoid an extra layer of nesting for
-`config = {}` and (2), `default.nix` serves as a convenient location to view
-all options in a category.
+Modules are imported using a wrapper `lib/module-system.nix` that aims to
+reduce boilerplate and enforce a strict structure for options under a custom
+namespace.
 
 ## Deployment
 

@@ -37,7 +37,6 @@ let
     isString
     isList
     assertMsg
-    hasAttr
     concatMapStringsSep
     imap
     zipAttrsWith
@@ -52,21 +51,26 @@ let
     asserts
     ;
 
-  # Overview
   # This is a convenience wrapper that aims to reduce boilerplate when creating
   # a custom conditional module system. It recursively imports all modules
-  # under a directory and creates category-based options under the configured
-  # namespace `ns`.
+  # under a directory and creates directory-based category options under a a
+  # custom namespace.
 
   # Modules
+  # --- Structure ---
+  # Module structure is the same as normal except top-level mkIf and mkMerge
+  # are not necessary. If a module returns a list of config sets, they will be
+  # merged using mkMerge. Some module options can only be used in the primary
+  # config set which is the first (or only) config set provided.
+  #
   # --- Module Arguments ---
   # Additional arguments `args`, `cfg`, and `categoryCfg` are passed to
   # modules. `args` is just the args variable from doing { ... }@args in the
-  # normal module system. `cfg` is equivalent to
-  # `config.${ns}.<category>.<name>`. For the module alacritty.nix at
-  # programs/desktop/alacritty.nix `cfg` would be equivalent to
-  # `config.${ns}.programs.desktop.alacritty`. `categoryCfg` is the same but
-  # without the module name. In root modules `cfg` == `categoryCfg`.
+  # normal module system. `cfg` is equivalent to `config.${ns}.<category>.<name>`.
+  # For the module alacritty.nix at programs/desktop/alacritty.nix `cfg` would
+  # be equivalent to `config.${ns}.programs.desktop.alacritty`. `categoryCfg`
+  # is the same but without the module name. In root modules `cfg` is
+  # equivalent to `categoryCfg`.
 
   # --- Module Config ---
   # The body of the module is always treated as the config. This means options
@@ -74,17 +78,10 @@ let
   # Instead we define our own set of "additional" module options whose default
   # values are listed below:
   defaultModuleOpts = {
-    # All examples will use the module defined at
-    # `programs/desktop/gaming/mangohud.nix`. This module is in category
-    # `programs.desktop.gaming` and has the name `mangohud`.
-    #
-    #
     # When set to `true`, a boolean enable option will be created under the
     # module's namespace. The module's config will only be enabled if the
     # created enable option is set to `true`. This option has a different
     # meaning in root modules.
-    #
-    # Would create `${ns}.programs.desktop.gaming.mangohud.enable`
     enableOpt = true;
 
     # Guard type determines how config in the module is `mkIf` guarded with the
@@ -97,34 +94,24 @@ let
     #          this case only the first list element (primary config set) is
     #          guarded by the module conditions.
     # custom - Module is not guarded by module conditions at all. Guard
-    #          implemention is completely left to the module. With this guard
-    #          type module options that create additional config such as
-    #          `asserts`, `categoryConfig` and `ns` do not work.
+    #          implemention is completely left to the module.
     guardType = "full";
 
     # This is equivalent to `options` from the NixOS module system except all
-    # opts defined in this set have their path prefixed with the category and
-    # name of the module.
-    #
-    # `opts.showFps = mkOption ...` would create an option at path
-    # `${ns}.programs.desktop.gaming.mangohud.showFps`
+    # opts defined in this set have their path prefixed with the namespace,
+    # category, and name of the module.
     opts = { };
 
-    # Options to define at the root of our namespace.
-    #
-    # `nsOpts.backups = mkOption ...` would create an option at path
-    # `${ns}.backups`
+    # Options to define at the root of our namespace. `nsOpts.backups =
+    # mkOption ...` would create an option at `${ns}.backups`.
     nsOpts = { };
 
-    # Configuration to be set under the module's category's namespace.
-    #
-    # In the mangohud module `categoryConfig.gameClasses = ...` would be
-    # equivalent to `${ns}.programs.desktop.gaming.gameClasses`
+    # Configuration to be set under the module category's namespace.
     categoryConfig = { };
 
-    # Configuration to be set under the root namespace.
-    #
-    # `ns.services = ...` would be equivalent to `${ns}.services = ...`
+    # Configuration to be set under the root namespace. Equivalent to ${ns} = {
+    # ... } except can be used multiple times in the same attribute set. Nix
+    # cannot merge dynamic attribute names currently.
     ns = { };
 
     # List of string|bool conditions that must all eval to `true` to enable the
@@ -189,7 +176,7 @@ let
     # `defaultOpts` it sets also won't apply to itself.
     #
     # e.g. setting defaultOpts.conditions = [ "osConfig.desktop" ] in
-    # programs/desktop/root.nix will ensure that all modules and sub-catagories
+    # programs/desktop/root.nix will ensure that all modules and sub-categories
     # will only enable if the os desktop option is enabled.
     defaultOpts = {
       conditions = [ ];
@@ -215,32 +202,13 @@ let
     exclude = [ ];
   };
 
-  optTypes = {
-    # Option that can only be used in the primary config set
-    primary = {
-      enableOpt = true;
-      guardType = true;
-      conditions = true;
-      noChildren = true;
-      defaultOpts = true;
-      exclude = true;
-    };
-
-    # Options that can will be merged when defined in multiple config sets
-    merge = {
-      opts = true;
-      nsOpts = true;
-      imports = true;
-    };
-
-    # Options that are just aliases and will be applied to the config set they
-    # were defined in
-    alias = {
-      ns = true;
-      categoryConfig = true;
-      asserts = true;
-      requirements = true;
-    };
+  primaryOnlyOpts = {
+    enableOpt = true;
+    guardType = true;
+    conditions = true;
+    noChildren = true;
+    defaultOpts = true;
+    exclude = true;
   };
 
   mergeDefaultOpts =
@@ -459,7 +427,7 @@ in
             else
               defaultModuleOpts // setModuleOpts;
 
-          setPrimaryOpts = intersectAttrs optTypes.primary setModuleOpts;
+          setPrimaryOpts = intersectAttrs primaryOnlyOpts setModuleOpts;
 
           setCategoryOpts = intersectAttrs defaultCategoryOpts content;
           categoryOpts =
@@ -529,8 +497,9 @@ in
       inherit (head processedConfigSets) categoryOpts;
       primaryModuleOpts = (head processedConfigSets).moduleOpts;
 
-      # WARN: Not all merged options are correct to use. Some do not support
-      # merging because they depend on conditional guards of the primary config set.
+      # WARN: Not all merged options are safe to use. Some do not support
+      # merging because they depend on conditional guards of the primary config
+      # set.
       mergedModuleOpts = recursiveMerge (map (configSet: configSet.moduleOpts) processedConfigSets);
 
       throwMsg = "${

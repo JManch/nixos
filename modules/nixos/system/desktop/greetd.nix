@@ -21,6 +21,9 @@ in
     think it has something to do with opening the greeter user session before
     the graphical session has fully stopped.
 
+    Update: just had this happen without greetd so greetd isn't the only reason
+    it happens (but it consistently happens with greetd)
+
     Instead just set "uwsm" as the display manager.
   '';
 

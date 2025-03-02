@@ -201,7 +201,7 @@ in
 
         "custom/gpu" = mkIf gpuModuleEnabled {
           format = "<span color='#${colors.base04}'>󰾲</span> {}%";
-          exec = "${getExe' pkgs.coreutils "cat"} /sys/class/hwmon/hwmon${toString gpu.hwmonId}/device/gpu_busy_percent";
+          exec = "${getExe' pkgs.coreutils "cat"} /sys/class/drm/renderD128/device/gpu_busy_percent";
           interval = 5;
           tooltip = false;
         };

@@ -21,6 +21,7 @@ let
     ;
   inherit (lib.${ns}) hardeningBaseline;
   inherit (config.${ns}.system) impermanence;
+  inherit (config.${ns}.services) jellyfin;
   inherit (config.${ns}.core) device;
   inherit (inputs.nix-resources.secrets) qBittorrentPort soulseekPort;
   inherit (config.age.secrets) recyclarrSecrets slskdVars;
@@ -210,7 +211,9 @@ in
       prowlarr.extraConfig = "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.prowlarr}";
     };
 
-    systemd.services.jellyfin.serviceConfig.SupplementaryGroups = [ "media" ];
+    systemd.services.jellyfin = mkIf jellyfin.enable {
+      serviceConfig.SupplementaryGroups = [ "media" ];
+    };
 
     ns.backups = {
       prowlarr = mkArrBackup "prowlarr";

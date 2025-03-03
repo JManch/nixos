@@ -7,8 +7,6 @@
   pkgs,
   self,
   base,
-  username,
-  selfPkgs,
   modulesPath,
   ...
 }:
@@ -18,7 +16,7 @@ let
     name = "install-host";
 
     runtimeInputs = with pkgs; [
-      selfPkgs.bootstrap-kit
+      self.packages.${pkgs.system}.bootstrap-kit
       disko
       gitMinimal
       # The upstream package hardcodes the database path but we want to be able
@@ -63,8 +61,8 @@ let
 
       rm -rf "$ssh_dir"
       mkdir -p "$ssh_dir"
-      cp "$bootstrap_kit/${username}/id_ed25519" "$ssh_dir"
-      cp "$bootstrap_kit/${username}/id_ed25519.pub" "$ssh_dir"
+      cp "$bootstrap_kit/joshua/id_ed25519" "$ssh_dir"
+      cp "$bootstrap_kit/joshua/id_ed25519.pub" "$ssh_dir"
 
       vmInstall=false
       read -p "Are you installing this host in a virtual machine? (y/N): " -n 1 -r

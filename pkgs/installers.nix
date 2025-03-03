@@ -14,11 +14,7 @@ let
     value =
       (nixosSystem {
         specialArgs = {
-          inherit
-            lib
-            self
-            base
-            ;
+          inherit self base;
         };
         modules = [
           {

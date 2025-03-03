@@ -97,6 +97,15 @@ in
     "jellyfin-mpv-shim/input.conf".source = config.xdg.configFile."mpv/input.conf".source;
   };
 
+  xdg.desktopEntries.mpv-open-clipboard = {
+    name = "MPV Open Clipboard";
+    genericName = "Multimedia player";
+    exec = (pkgs.writeShellScript "mpv-open-clipboard" "mpv $(wl-paste)").outPath;
+    type = "Application";
+    icon = "mpv";
+    categories = [ "AudioVideo" ];
+  };
+
   programs.zsh.initExtra = # bash
     ''
       screenshare () {

@@ -40,7 +40,7 @@ let
     attrValues
     ;
   inherit (config.${ns}.system) impermanence;
-  inherit (config.${ns}.hardware) raspberryPi;
+  inherit (config.${ns}.hardware) raspberry-pi;
 in
 [
   {
@@ -141,7 +141,7 @@ in
       initrd.systemd.enable = true;
       tmp.useTmpfs = cfg.tmpfsTmp;
 
-      loader = mkIf (!raspberryPi.enable) {
+      loader = mkIf (!raspberry-pi.enable) {
         efi.canTouchEfiVariables = true;
         timeout = mkIf cfg.extendedLoaderTimeout 30;
         systemd-boot = {

@@ -22,7 +22,7 @@ let
     ;
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system) desktop;
-  inherit (config.${ns}.hardware) raspberryPi;
+  inherit (config.${ns}.hardware) raspberry-pi;
   wpctl = getExe' pkgs.wireplumber "wpctl";
   pactl = getExe' pkgs.pulseaudio "pactl";
   notifySend = getExe pkgs.libnotify;
@@ -232,7 +232,7 @@ in
     };
   }
 
-  (mkIf raspberryPi.enable {
+  (mkIf raspberry-pi.enable {
     # Don't know why but rtkit doesn't seem to work on raspberry pis so need
     # to add user to audio group for permissions
     security.rtkit.enable = mkForce false;

@@ -3,8 +3,8 @@ let
   inherit (lib)
     mkOption
     types
-    mkEnableOption
     hasPrefix
+    mkEnableOption
     literalExpression
     ;
 in
@@ -14,7 +14,9 @@ in
     "nix-on-droid.nix"
   ];
 
-  opts.raspberryPi = {
+  # raspberry-pi.nix is only imported when the host is a raspberry-pi so we
+  # have to define options here
+  opts.raspberry-pi = {
     enable = mkOption {
       type = types.bool;
       readOnly = true;

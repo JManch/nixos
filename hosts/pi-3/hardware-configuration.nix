@@ -4,7 +4,7 @@
 
   raspberry-pi-nix.board = "bcm2711";
 
-  ${lib.ns}.hardware.raspberryPi.uboot = {
+  ${lib.ns}.hardware.raspberry-pi.uboot = {
     enable = true;
     package = pkgs.ubootRaspberryPi3_64bit;
   };

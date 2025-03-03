@@ -1,9 +1,12 @@
 {
   lib,
-  cfg,
   inputs,
+  config,
   ...
 }:
+let
+  cfg = config.${lib.ns}.hardware.raspberry-pi;
+in
 {
   imports = with inputs.raspberry-pi-nix.nixosModules; [
     raspberry-pi

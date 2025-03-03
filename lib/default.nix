@@ -44,7 +44,6 @@ in
             self
             hostname
             username
-            lib
             ;
           selfPkgs = self.packages.${system};
         };

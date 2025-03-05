@@ -54,10 +54,7 @@ in
     "Home Assistant is only intended to work on host 'homelab'"
   ];
 
-  warnings = optional cfg.everythingPresenceContainer ''
-    Home Assistant Everything Presence container is enabled; it should only
-    be used temporarily.
-  '';
+  warnings = optional cfg.everythingPresenceContainer "Home Assistant Everything Presence container is enabled; it should only be used temporarily.";
 
   ns.services = {
     mosquitto = {
@@ -387,7 +384,7 @@ in
   virtualisation.oci-containers.containers.everything-presence =
     mkIf cfg.everythingPresenceContainer
       {
-        image = "everythingsmarthome/everything-presence-mmwave-configurator:1.1.1";
+        image = "everythingsmarthome/everything-presence-mmwave-configurator:latest";
         ports = [ "8099:8099" ];
         environment.HA_URL = "http://${device.ipAddress}:8123";
         environmentFiles = [ everythingPresenceVars.path ];

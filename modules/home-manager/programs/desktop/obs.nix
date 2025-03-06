@@ -2,6 +2,7 @@
 {
   programs.obs-studio = {
     enable = true;
+    plugins = [ pkgs.obs-studio-plugins.obs-pipewire-audio-capture ];
 
     package = pkgs.obs-studio.overrideAttrs (old: {
       patches = (old.patches or [ ]) ++ [
@@ -13,19 +14,6 @@
         })
       ];
     });
-
-    plugins = [
-      (pkgs.obs-studio-plugins.obs-pipewire-audio-capture.overrideAttrs {
-        version = "2024-09-04";
-        src = pkgs.fetchFromGitHub {
-          owner = "dimtpap";
-          repo = "obs-pipewire-audio-capture";
-          rev = "c8c57b39fddf01c365f3d1234edc983ee0da1b5b";
-          hash = "sha256-qdwJS4WJxoIg2lIq3aHgBBrQr0Y56X4eZJzOjkwXegE=";
-        };
-        cmakeFlags = [ ];
-      })
-    ];
   };
 
   ns.persistence.directories = [ ".config/obs-studio" ];

@@ -118,10 +118,11 @@ in
                     mkEnableOption ''
                       allowing manual controls to override adaptive lighting. This
                       should only be enabled if really necessary as it has a
-                      performance impact.
+                      performance impact. It's required for sleep mode disabled
+                      lights to stay off.
                     ''
                     // {
-                      default = false;
+                      default = config.lighting.adaptiveLighting.sleepMode.disabledLights != [ ];
                     };
 
                   minBrightness = mkOption {

@@ -1,7 +1,6 @@
 {
   lib,
   cfg,
-  pkgs,
   config,
 }:
 let
@@ -25,23 +24,8 @@ in
 
   services.navidrome = {
     enable = true;
-
-    package = pkgs.navidrome.overrideAttrs (
-      final: _:
-      assert lib.assertMsg (pkgs.navidrome.version == "0.54.3") "Remove the navidrome override";
-      {
-        version = "0.54.5";
-        src = pkgs.fetchFromGitHub {
-          owner = "navidrome";
-          repo = "navidrome";
-          rev = "v${final.version}";
-          hash = "sha256-74sN2qZVjsD5i3BkJKYcpL3vZsVIg0H5RI70oRdZpi0=";
-        };
-        vendorHash = "sha256-bI0iDhATvNylKnI81eeUpgsm8YqySPyinPgBbcO0y4I=";
-      }
-    );
-
     openFirewall = false;
+
     settings = {
       Address = "127.0.0.1";
       MusicFolder = (optionalString impermanence.enable "/persist") + cfg.musicDir;

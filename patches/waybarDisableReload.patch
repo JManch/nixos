@@ -1,8 +1,8 @@
 diff --git a/src/main.cpp b/src/main.cpp
-index ff446ffc..cc8654a7 100644
+index 045b2cd4..2cee774b 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
-@@ -80,9 +80,6 @@ int main(int argc, char* argv[]) {
+@@ -81,9 +81,6 @@ int main(int argc, char* argv[]) {
      });
  
      std::signal(SIGUSR2, [](int /*signal*/) {
@@ -13,14 +13,14 @@ index ff446ffc..cc8654a7 100644
  
      std::signal(SIGINT, [](int /*signal*/) {
 diff --git a/src/modules/hyprland/workspaces.cpp b/src/modules/hyprland/workspaces.cpp
-index 3c03c708..003cef8f 100644
+index ef057d6d..f9a701e5 100644
 --- a/src/modules/hyprland/workspaces.cpp
 +++ b/src/modules/hyprland/workspaces.cpp
-@@ -165,7 +165,6 @@ auto Workspaces::registerIpc() -> void {
-   gIPC->registerForIPC("closewindow", this);
-   gIPC->registerForIPC("movewindow", this);
-   gIPC->registerForIPC("urgent", this);
--  gIPC->registerForIPC("configreloaded", this);
+@@ -674,7 +674,6 @@ auto Workspaces::registerIpc() -> void {
+   m_ipc.registerForIPC("closewindow", this);
+   m_ipc.registerForIPC("movewindow", this);
+   m_ipc.registerForIPC("urgent", this);
+-  m_ipc.registerForIPC("configreloaded", this);
  
    if (windowRewriteConfigUsesTitle()) {
      spdlog::info(

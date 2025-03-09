@@ -24,7 +24,7 @@ in
     settings = {
       general = {
         hide_cursor = false;
-        grace = 3;
+        grace = 5;
       };
 
       background = singleton {

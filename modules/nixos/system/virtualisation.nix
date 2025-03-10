@@ -189,7 +189,7 @@ in
     # virtualisation enabled because it should be possible to create a VM of any host
     virtualisation.vmVariant = {
       ${ns} = {
-        device = {
+        core.device = {
           monitors = mkIf (monitors != [ ]) (mkVMOverride [
             {
               name = "Virtual-1";

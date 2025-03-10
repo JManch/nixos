@@ -158,34 +158,6 @@ in
             if test -z $SSH_TTY && uwsm check may-start -q ${optionalString select "&& uwsm select"}; then
               exec uwsm start ${if select then "default" else "-- ${cfg.defaultDesktop}"} >/dev/null
             fi
-
-            # This is needed to ensure that home-manager variables (home.sessionVariables)
-            # have precendence over system variables (environment.systemVariables).
-
-            # Explanation:
-            # 1. /etc/zshenv sourced -- doesn't do anything important
-            # 2. ~/.zshenv sourced
-            # Home Manager sources /etc/profiles/per-user/username/etc/profile.d/hm-session-vars.sh
-            # which exports all home.sessionVariables and sets EDITOR=nvim. It also sets
-            # __HM_SESS_VARS_SOURCED so child shells will not run this again.
-            # 3. /etc/zprofile sourced
-            # UWSM starts the compositor and saves the login session variables to $XDG_RUNTIME_DIR/uwsm/env_login
-            # 4. UWSM pre-loader service runs
-            # First it loads the same session variables that existed in the login shell by
-            # reading the env_login file. So at this point EDITOR=nvim which is what we
-            # want. However the pre-loader then sources /etc/profile which is where NixOS
-            # exports all system environment variables. This overrides our Home Manager
-            # EDITOR variable to EDITOR=nano.
-            # 5. The UWSM pre-loader populates the systemd user environment with exported
-            # variables and system variables have precendence over home manager variables.
-
-            # The fix is to source home-manager variables again AFTER NixOS exports the
-            # system variables in /etc/profile. __HM_SESS_VARS_SOURCED isn't an issue here
-            # because the UWSM pre-loader does not export the variables it loads from
-            # env_login.
-            ${optionalString home-manager.enable ''
-              . "/etc/profiles/per-user/${username}/etc/profile.d/hm-session-vars.sh"
-            ''}
           ''
       );
 
@@ -213,12 +185,12 @@ in
     nixpkgs.overlays = [
       (final: prev: {
         uwsm = prev.uwsm.overrideAttrs rec {
-          version = "0.21.1";
+          version = "0.21.2";
           src = final.fetchFromGitHub {
             owner = "Vladimir-csp";
             repo = "uwsm";
             tag = "v${version}";
-            hash = "sha256-12x3IUfo+sl/9XQ2rqifit4P76JGozSA0JLnpwtU8vM=";
+            hash = "sha256-VMkBhc1U/HKx9AfCQVvDHFpQFGsTuxfoyEknke46TTk=";
           };
         };
 

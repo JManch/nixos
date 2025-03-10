@@ -32,11 +32,6 @@ in
   # FPS Limit : MANGOHUD_CONFIG=read_cfg,fps_limit=200 mangohud gamemoderun %command%
   # Gamescope : gamescope -W 2560 -H 1440 -f -r 165 --mangoapp -- gamemoderun %command%
 
-  # WARN: When mangohud is launched with gamescope toggling the overlay is
-  # broken. The mangohud overlay will show if I remove no_display from my
-  # config but as soon as it's toggled it can't be brought back
-  # https://github.com/ValveSoftware/gamescope/issues/1532
-
   # -- Game Specific Tips --
   # RDR2 Modded Launch Arguments:
   # WINEDLLOVERRIDES=EasyHook,EasyHook64,EasyLoad64,NativeInterop,version,dinput8,ScriptHookRDR2,ModManager.Core,ModManager.NativeInterop,NLog=n,b %command%

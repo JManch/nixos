@@ -1,6 +1,7 @@
 {
   lib,
   cfg,
+  pkgs,
   config,
 }:
 let
@@ -26,10 +27,52 @@ in
     enable = true;
     openFirewall = false;
 
+    package =
+      (pkgs.navidrome.overrideAttrs (
+        final: prev:
+        assert lib.assertMsg (prev.version == "0.54.5") "Remove navidrome override";
+        {
+          version = "0.55.0";
+          src = pkgs.fetchFromGitHub {
+            owner = "navidrome";
+            repo = "navidrome";
+            rev = "v${final.version}";
+            hash = "sha256-PCy8ZgkCwli1YYmMzoQn0gwjOFTm2TANUa2NZ5kFtbM=";
+          };
+          vendorHash = "sha256-IF2RaEsuHADnwONrvwbL6KZVrE3bZx1sX03zpmtQZq8=";
+          npmDeps = pkgs.fetchNpmDeps {
+            inherit (final) src;
+            sourceRoot = "${final.src.name}/ui";
+            hash = "sha256-lM8637tcKc9iSPjXJPDZXFCGj7pShOXTC6X2iketg90=";
+          };
+          ldflags = [
+            "-X github.com/navidrome/navidrome/consts.gitSha=${final.src.rev}"
+            "-X github.com/navidrome/navidrome/consts.gitTag=v${final.version}"
+          ];
+        }
+      )).override
+        {
+          taglib = pkgs.taglib.overrideAttrs (
+            final: prev: {
+              version = "2.0.2";
+              src = pkgs.fetchFromGitHub {
+                owner = "taglib";
+                repo = "taglib";
+                rev = "v${final.version}";
+                hash = "sha256-3cJwCo2nUSRYkk8H8dzyg7UswNPhjfhyQ704Fn9yNV8=";
+              };
+              buildInputs = prev.buildInputs ++ [ pkgs.utf8cpp ];
+              cmakeFlags = [
+                (lib.cmakeBool "BUILD_SHARED_LIBS" (!pkgs.stdenv.hostPlatform.isStatic))
+              ];
+            }
+          );
+        };
+
     settings = {
       Address = "127.0.0.1";
       MusicFolder = (optionalString impermanence.enable "/persist") + cfg.musicDir;
-      ScanSchedule = 0; # would rather manually trigger scans
+      Scanner.Schedule = 0; # would rather manually trigger scans
       EnableInsightsCollector = false;
       ListenBrainz.Enabled = true;
       LastFM.Enabled = true;

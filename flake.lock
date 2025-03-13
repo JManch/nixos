@@ -82,11 +82,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1740069553,
-        "narHash": "sha256-fdgAQSC+MDaCbSobQvcJs2eni+ZdaW+g4SL6Uu9e4Zs=",
+        "lastModified": 1741885971,
+        "narHash": "sha256-QkMNV8FyOqDj5pWkziRLLaDKd1oUedTWO/DWIhWbeNk=",
         "owner": "JManch",
         "repo": "broadcast-box",
-        "rev": "2dd00d0655f7fe79c08f88ae395df711e71956ff",
+        "rev": "d8d377ab68e4cd699e9822df0f0ee07b319803e3",
         "type": "github"
       },
       "original": {

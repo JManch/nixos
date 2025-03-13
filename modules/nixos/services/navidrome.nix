@@ -72,7 +72,7 @@ in
     settings = {
       Address = "127.0.0.1";
       MusicFolder = (optionalString impermanence.enable "/persist") + cfg.musicDir;
-      Scanner.Schedule = 0; # would rather manually trigger scans
+      Scanner.Enabled = false; # would rather manually trigger scans
       EnableInsightsCollector = false;
       ListenBrainz.Enabled = true;
       LastFM.Enabled = true;

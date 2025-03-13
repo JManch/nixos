@@ -1,8 +1,8 @@
 diff --git a/src/Compositor.cpp b/src/Compositor.cpp
-index 2d74da19..9a78e15b 100644
+index a4acbecc..e85fa7a8 100644
 --- a/src/Compositor.cpp
 +++ b/src/Compositor.cpp
-@@ -886,9 +886,23 @@ PHLWINDOW CCompositor::vectorToWindowUnified(const Vector2D& pos, uint8_t proper
+@@ -891,9 +891,23 @@ PHLWINDOW CCompositor::vectorToWindowUnified(const Vector2D& pos, uint8_t proper
          }
      }
  
@@ -27,7 +27,7 @@ index 2d74da19..9a78e15b 100644
  
                  if (special && !w->onSpecialWorkspace()) // because special floating may creep up into regular
                      continue;
-@@ -923,12 +937,12 @@ PHLWINDOW CCompositor::vectorToWindowUnified(const Vector2D& pos, uint8_t proper
+@@ -928,12 +942,12 @@ PHLWINDOW CCompositor::vectorToWindowUnified(const Vector2D& pos, uint8_t proper
                                  // TODO: this is wrong, we should focus the parent, but idk how to get it considering it's nullptr in most cases.
                          }
  
@@ -42,7 +42,7 @@ index 2d74da19..9a78e15b 100644
                      }
                  }
              }
-@@ -2347,7 +2361,7 @@ void CCompositor::setWindowFullscreenState(const PHLWINDOW PWINDOW, SFullscreenS
+@@ -2352,7 +2366,7 @@ void CCompositor::setWindowFullscreenState(const PHLWINDOW PWINDOW, SFullscreenS
  
      // make all windows on the same workspace under the fullscreen window
      for (auto const& w : m_vWindows) {
@@ -86,10 +86,10 @@ index 3f955f6c..fda3f3ff 100644
              (int)g_pInputManager->isWindowInhibiting(w, false));
      }
 diff --git a/src/desktop/Window.hpp b/src/desktop/Window.hpp
-index ec3c0b21..62fab4ff 100644
+index 3ed4ce75..d29f4456 100644
 --- a/src/desktop/Window.hpp
 +++ b/src/desktop/Window.hpp
-@@ -319,6 +319,9 @@ class CWindow {
+@@ -321,6 +321,9 @@ class CWindow {
      // For pinned (sticky) windows
      bool m_bPinned = false;
  
@@ -100,15 +100,15 @@ index ec3c0b21..62fab4ff 100644
      bool m_bPinFullscreened = false;
  
 diff --git a/src/desktop/WindowRule.cpp b/src/desktop/WindowRule.cpp
-index cf3004b0..9036af08 100644
+index 23269085..3fcd8361 100644
 --- a/src/desktop/WindowRule.cpp
 +++ b/src/desktop/WindowRule.cpp
 @@ -5,7 +5,7 @@
  #include "../config/ConfigManager.hpp"
  
  static const auto RULES = std::unordered_set<std::string>{
--    "float", "fullscreen", "maximize", "noinitialfocus", "pin", "stayfocused", "tile", "renderunfocused",
-+    "float", "fullscreen", "maximize", "noinitialfocus", "pin", "alwaysontop", "stayfocused", "tile", "renderunfocused",
+-    "float", "fullscreen", "maximize", "noinitialfocus", "pin", "stayfocused", "tile", "renderunfocused", "persistentsize",
++    "float", "fullscreen", "maximize", "noinitialfocus", "pin", "alwaysontop", "stayfocused", "tile", "renderunfocused", "persistentsize",
  };
  static const auto RULES_PREFIX = std::unordered_set<std::string>{
      "animation", "bordercolor",   "bordersize", "center",    "content", "fullscreenstate", "group",    "idleinhibit",   "maxsize",     "minsize",
@@ -122,7 +122,7 @@ index cf3004b0..9036af08 100644
          ruleType = RULE_STAYFOCUSED;
      else if (rule == "tile")
 diff --git a/src/desktop/WindowRule.hpp b/src/desktop/WindowRule.hpp
-index 50e221f3..54ff6e21 100644
+index 192d8aa7..5c9ba35e 100644
 --- a/src/desktop/WindowRule.hpp
 +++ b/src/desktop/WindowRule.hpp
 @@ -15,6 +15,7 @@ class CWindowRule {
@@ -134,7 +134,7 @@ index 50e221f3..54ff6e21 100644
          RULE_TILE,
          RULE_RENDERUNFOCUSED,
 diff --git a/src/events/Windows.cpp b/src/events/Windows.cpp
-index 399894f9..c0c4eadb 100644
+index b5273187..4478a391 100644
 --- a/src/events/Windows.cpp
 +++ b/src/events/Windows.cpp
 @@ -246,6 +246,10 @@ void Events::listener_mapWindow(void* owner, void* data) {
@@ -159,10 +159,10 @@ index 399894f9..c0c4eadb 100644
  
      if (!WORKSPACEARGS[0].empty()) {
 diff --git a/src/layout/IHyprLayout.cpp b/src/layout/IHyprLayout.cpp
-index e84ffb21..6eb302fa 100644
+index dc6de9e3..5826c08b 100644
 --- a/src/layout/IHyprLayout.cpp
 +++ b/src/layout/IHyprLayout.cpp
-@@ -708,7 +708,8 @@ void IHyprLayout::changeWindowFloatingMode(PHLWINDOW pWindow) {
+@@ -716,7 +716,8 @@ void IHyprLayout::changeWindowFloatingMode(PHLWINDOW pWindow) {
          g_pCompositor->setWindowFullscreenInternal(pWindow, FSMODE_NONE);
      }
  
@@ -173,7 +173,7 @@ index e84ffb21..6eb302fa 100644
      g_pHyprRenderer->damageWindow(pWindow, true);
  
 diff --git a/src/managers/KeybindManager.cpp b/src/managers/KeybindManager.cpp
-index 221b3b72..8c1abbed 100644
+index 42e2bc14..6d5cfd44 100644
 --- a/src/managers/KeybindManager.cpp
 +++ b/src/managers/KeybindManager.cpp
 @@ -124,6 +124,7 @@ CKeybindManager::CKeybindManager() {
@@ -229,7 +229,7 @@ index 712fd58d..4a9e4ada 100644
      static SDispatchResult bringActiveToTop(std::string);
      static SDispatchResult alterZOrder(std::string);
 diff --git a/src/render/Renderer.cpp b/src/render/Renderer.cpp
-index 2ebf5629..13c8a5d6 100644
+index 3175b915..d331aa85 100644
 --- a/src/render/Renderer.cpp
 +++ b/src/render/Renderer.cpp
 @@ -343,8 +343,8 @@ void CHyprRenderer::renderWorkspaceWindowsFullscreen(PHLMONITOR pMonitor, PHLWOR

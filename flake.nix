@@ -83,8 +83,7 @@
 
     # Inputs that provide packages
 
-    # FIX: Remove once upstream updates flake inputs
-    hyprland.url = "git+file:///home/joshua/files/repos/Hyprland";
+    hyprland.url = "github:hyprwm/Hyprland";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
 
     hyprland-plugins.url = "github:hyprwm/hyprland-plugins";

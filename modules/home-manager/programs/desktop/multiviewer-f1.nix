@@ -296,8 +296,12 @@ let
       '';
 in
 {
-  # F1TV dropped Firefox support so the only working sign-in method is with the
-  # multiviewer companion extension in chromium
+  # How to sign in:
+  # Launch multiviewer with `multiviewer-for-f1 --no-sandbox` then select the
+  # "sign in with multiviewer" option. Future launches do not need the
+  # --no-sandbox flag. Signing in with the extension through Chromium doesn't
+  # work currently but leaving the Chromium wrapper here in-case it eventually
+  # does.
   home.packages = singleton (
     inputs.xdg-override.lib.wrapPackage {
       nameMatch = singleton {

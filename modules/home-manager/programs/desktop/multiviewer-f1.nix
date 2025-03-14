@@ -58,25 +58,37 @@ let
 
         driver_numbers = {
             "Max Verstappen": 1,
-            "Franco Colapinto": 43,
-            "Lando Norris": 4,
-            "Pierre Gasly": 10,
-            "Sergio Perez": 11,
-            "Fernando Alonso": 14,
-            "Charles Leclerc": 16,
-            "Lance Stroll": 18,
-            "Oliver Bearman": 50,
-            "Yuki Tsunoda": 22,
-            "Alex Albon": 23,
-            "Guanyu Zhou": 24,
-            "Nico Hulkenberg": 27,
-            "Esteban Ocon": 31,
-            "Lewis Hamilton": 44,
-            "Carlos Sainz": 55,
-            "George Russell": 63,
-            "Valtteri Bottas": 77,
-            "Oscar Piastri": 81,
             "Liam Lawson": 30,
+
+            "Charles Leclerc": 16,
+            "Lewis Hamilton": 44,
+
+            "Lando Norris": 4,
+            "Oscar Piastri": 81,
+
+            "George Russell": 63,
+            "Andrea Kimi Antonelli": 12,
+
+            "Fernando Alonso": 14,
+            "Lance Stroll": 18,
+
+            "Yuki Tsunoda": 22,
+            "Isack Hadjar": 6,
+
+            "Oliver Bearman": 87,
+            "Esteban Ocon": 31,
+
+            "Pierre Gasly": 10,
+            "Jack Doohan": 7,
+
+            "Alex Albon": 23,
+            "Carlos Sainz": 55,
+
+            "Nico Hulkenberg": 27,
+            "Gabriel Bortoleto": 5,
+
+            "Franco Colapinto": 43,
+            "Valtteri Bottas": 77,
         }
 
 
@@ -246,8 +258,8 @@ let
             @staticmethod
             def index_to_driver_tile(index):
                 tile = 13 + index
-                if index <= 3:
-                    tile = 4 * (index + 1)
+                if index <= 4:
+                    tile = 4 * index
                 return Tile(tile)
 
 
@@ -274,16 +286,15 @@ let
                     Window(window, (Tile(1), Tile(3)))
                 elif re.match(r"F1 Live", title):
                     Window(window, (Tile(5), Tile(15)))
-                elif re.match(r"Radio Transcriptions|Race Control Messages", title):
-                    Window(window, (Tile(4),))
                 elif re.match(r"Track Map", title):
                     Window(window, (Tile(15),))
-                    instance.dispatch(
-                        [
-                            "alterzorder",
-                            f"top,address:{window.address}",
-                        ]
-                    )
+                    if not window.is_always_on_top:
+                        instance.dispatch(
+                            [
+                                "togglealwaysontop",
+                                f"address:{window.address}",
+                            ]
+                        )
             DriverCam.get_driver_cams(windows)
 
 

@@ -16,6 +16,8 @@ buildPythonPackage rec {
     hash = "sha256-xnvoiHxDxYVwR1ZrKRGWB5oManaJSP/2sDsQ7KLRpmE=";
   };
 
+  patches = [ ../patches/hyprpyAlwaysOnTop.patch ];
+
   pyproject = true;
   build-system = [ setuptools ];
   dependencies = [ pydantic ];

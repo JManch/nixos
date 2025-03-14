@@ -1,0 +1,24 @@
+diff --git a/hyprpy/components/windows.py b/hyprpy/components/windows.py
+index 755488e..b3c4bca 100644
+--- a/hyprpy/components/windows.py
++++ b/hyprpy/components/windows.py
+@@ -49,6 +49,7 @@ class Window:
+         self.is_pinned: bool = data.is_pinned
+         #: Whether or not the window is in fullscreen mode.
+         self.is_fullscreen: int = data.is_fullscreen
++        self.is_always_on_top: int = data.is_always_on_top
+ 
+         #: The :class:`~hyprpy.components.instances.Instance` managing this window.
+         self._instance = instance
+diff --git a/hyprpy/data/models.py b/hyprpy/data/models.py
+index 93dd674..608d1fa 100644
+--- a/hyprpy/data/models.py
++++ b/hyprpy/data/models.py
+@@ -56,6 +56,7 @@ class WindowData(BaseModel):
+     is_pinned: bool = Field(..., alias="pinned")
+     #: Whether or not the window is in fullscreen mode.
+     is_fullscreen: int = Field(..., alias="fullscreen")
++    is_always_on_top: bool = Field(..., alias="alwaysOnTop")
+ 
+ class WorkspaceData(BaseModel):
+     """Deserialization and validation of ``hyprctl`` workspace data."""

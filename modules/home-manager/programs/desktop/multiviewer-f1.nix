@@ -258,8 +258,8 @@ let
             @staticmethod
             def index_to_driver_tile(index):
                 tile = 13 + index
-                if index <= 4:
-                    tile = 4 * index
+                if index <= 3:
+                    tile = 4 * (index + 1)
                 return Tile(tile)
 
 
@@ -286,6 +286,11 @@ let
                     Window(window, (Tile(1), Tile(3)))
                 elif re.match(r"F1 Live", title):
                     Window(window, (Tile(5), Tile(15)))
+                elif re.match(
+                    r"Radio Transcriptions|Race Control Messages|Sectors Leaderboard",
+                    title
+                ):
+                    Window(window, (Tile(4),))
                 elif re.match(r"Track Map", title):
                     Window(window, (Tile(15),))
                     if not window.is_always_on_top:

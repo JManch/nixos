@@ -32,12 +32,12 @@ in
         final: prev:
         assert lib.assertMsg (prev.version == "0.54.5") "Remove navidrome override";
         {
-          version = "0.55.0";
+          version = "0.55.1";
           src = pkgs.fetchFromGitHub {
             owner = "navidrome";
             repo = "navidrome";
             rev = "v${final.version}";
-            hash = "sha256-PCy8ZgkCwli1YYmMzoQn0gwjOFTm2TANUa2NZ5kFtbM=";
+            hash = "sha256-BkgHUX2kQ7OMnb9vOIwsQ9eNcqCzekz2IVMtG0IMUaA=";
           };
           vendorHash = "sha256-IF2RaEsuHADnwONrvwbL6KZVrE3bZx1sX03zpmtQZq8=";
           npmDeps = pkgs.fetchNpmDeps {

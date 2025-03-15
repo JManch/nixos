@@ -235,10 +235,8 @@ in
 
       record = {
         enabled = true;
-        events.retain = {
-          default = 10;
-          mode = "motion";
-        };
+        alerts.retain.days = 10;
+        detections.retain.days = 10;
       };
 
       snapshots.enabled = true;
@@ -258,6 +256,7 @@ in
     DeviceAllow = [ ];
     UMask = "0027";
     EnvironmentFile = cctvVars.path;
+    MemoryDenyWriteExecute = false;
   };
 
   # We just use go2rtc to provide a low latency WebRTC stream. It is lazy so

@@ -15,23 +15,26 @@
   sol2,
   toml11,
   nlohmann_json,
+  curl,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "beammp-server";
-  version = "3.7.2";
+  version = "3.8.2";
 
   src = fetchFromGitHub {
     owner = "BeamMP";
     repo = "BeamMP-Server";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-xp0XTzG9HGiPXNTnG+OM2cgLYG049hYdEj4YYlVIse4=";
+    hash = "sha256-Q790VQEc5Z9L0rLNSxdt1ipAAQeB4r6bq+gF6C3Skb4=";
     fetchSubmodules = true;
   };
 
   patches = [ ./cmake.patch ];
 
-  nativeBuildInputs = [
-    cmake
+  nativeBuildInputs = [ cmake ];
+
+  buildInputs = [
+    curl
     fmt
     openssl
     doctest

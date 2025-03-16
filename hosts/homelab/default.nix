@@ -116,6 +116,7 @@ in
       broadcast-box = {
         enable = true;
         port = 8081;
+        udpMuxPort = 3002;
         autoStart = true;
         proxy = true;
         interfaces = [ "wg-friends" ];

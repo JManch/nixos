@@ -585,9 +585,9 @@ in
             "!${mediaDir}/music/playlists"
           ];
           filters = [
-            "^library\.db$"
-            "\.nsp$"
-            "\.m3u$"
+            "library\\.db$"
+            "\\.nsp$"
+            "\\.m3u$"
           ];
         };
       };

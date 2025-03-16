@@ -1,0 +1,49 @@
+diff --git a/nixos-firewall-tool b/nixos-firewall-tool
+index a9cb27881573..2a1fb593fe7d 100755
+--- a/nixos-firewall-tool
++++ b/nixos-firewall-tool
+@@ -24,10 +24,10 @@ show_help() {
+ A tool to temporarily manipulate the NixOS firewall
+ 
+ Open TCP port:
+-  nixos-firewall-tool open tcp 8888
++  nixos-firewall-tool open eno1 tcp 8888
+ 
+ Open UDP port:
+-  nixos-firewall-tool open udp 51820
++  nixos-firewall-tool open eno1 udp 51820
+ 
+ Show all firewall rules:
+   nixos-firewall-tool show
+@@ -43,17 +43,18 @@ fi
+ 
+ case $1 in
+   "open")
+-    if [[ -z ${2+x} ]] || [[ -z ${3+x} ]]; then
++    if [[ -z ${2+x} ]] || [[ -z ${3+x} ]] || [[ -z ${4+x} ]]; then
+       show_help
+       exit 1
+     fi
+ 
+-    protocol="$2"
+-    port="$3"
++    interface="$2"
++    protocol="$3"
++    port="$4"
+ 
+     case $BACKEND in
+       iptables)
+-        ip46tables -I nixos-fw -p "$protocol" --dport "$port" -j nixos-fw-accept
++        ip46tables -I nixos-fw -i "$interface" -p "$protocol" --dport "$port" -j nixos-fw-accept
+         ;;
+       nftables)
+         nft add element inet nixos-fw "temp-ports" "{ $protocol . $port }"
+@@ -63,7 +64,7 @@ case $1 in
+   "show")
+     case $BACKEND in
+       iptables)
+-        ip46tables --numeric --list nixos-fw
++        ip46tables --verbose --numeric --list nixos-fw
+         ;;
+       nftables)
+         nft list table inet nixos-fw

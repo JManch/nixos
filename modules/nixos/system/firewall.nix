@@ -17,6 +17,7 @@ let
     hasPrefix
     attrNames
     filter
+    singleton
     ;
 in
 {
@@ -31,24 +32,35 @@ in
     '';
   };
 
-  config.networking.firewall.allInterfaces =
-    let
-      cfg = config.networking.firewall;
-      commonOptions = filter (x: hasPrefix "allowed" x) (attrNames config.networking.firewall);
+  config = {
+    networking.firewall.allInterfaces =
+      let
+        cfg = config.networking.firewall;
+        commonOptions = filter (x: hasPrefix "allowed" x) (attrNames config.networking.firewall);
 
-      defaultInterface = optionalAttrs (cfg.defaultInterfaces == [ ]) {
-        default = genAttrs commonOptions (option: cfg.${option});
-      };
+        defaultInterface = optionalAttrs (cfg.defaultInterfaces == [ ]) {
+          default = genAttrs commonOptions (option: cfg.${option});
+        };
 
-      defaultInterfaces = genAttrs cfg.defaultInterfaces (
-        interface:
-        genAttrs commonOptions (
-          option:
-          cfg.${option}
-          # Merge will override cfg.interfaces options so concat lists
-          ++ cfg.interfaces.${interface}.${option} or [ ]
-        )
-      );
-    in
-    defaultInterface // cfg.interfaces // defaultInterfaces;
+        defaultInterfaces = genAttrs cfg.defaultInterfaces (
+          interface:
+          genAttrs commonOptions (
+            option:
+            cfg.${option}
+            # Merge will override cfg.interfaces options so concat lists
+            ++ cfg.interfaces.${interface}.${option} or [ ]
+          )
+        );
+      in
+      defaultInterface // cfg.interfaces // defaultInterfaces;
+
+    nixpkgs.overlays = singleton (
+      _: prev: {
+        nixos-firewall-tool = prev.nixos-firewall-tool.overrideAttrs (old: {
+          # Allow specifying the interface to open. Only implemented for iptables
+          patches = (old.patches or [ ]) ++ [ ../../../patches/nixosFirewallToolInterface.diff ];
+        });
+      }
+    );
+  };
 }

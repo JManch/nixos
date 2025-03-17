@@ -72,9 +72,9 @@ in
     # custom module signal functionality that I don't use.
     package =
       (addPatches pkgs.waybar [
-        "waybarDisableReload.patch"
+        "waybar-disable-reload.patch"
         (pkgs.substituteAll {
-          src = ../../../../../patches/waybarSignalToggle.patch;
+          src = ../../../../../patches/waybar-signal-toggle.patch;
           sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
             sort (a: b: a.number < b.number) monitors
           );

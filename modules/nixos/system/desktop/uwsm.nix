@@ -202,7 +202,7 @@ in
 
         app2unit = addPatches selfPkgs.app2unit [
           (final.substitute {
-            src = ../../../../patches/app2unitServiceApps.patch;
+            src = ../../../../patches/app2unit-service-apps.patch;
             substitutions = [
               "--replace-fail"
               "@SERVICE_APPS@"

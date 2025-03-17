@@ -117,9 +117,6 @@ in
       pkg: patches:
       pkg.overrideAttrs (oldAttrs: {
         patches =
-          # FIX: Once I've migrated all addPatches usage don't allow abs paths
-          # WARN: It's import to concat the paths here instead of using string
-          # interpolation. Explanation in module-system.nix
           (oldAttrs.patches or [ ]) ++ (map (p: if hasPrefix "/" p then p else ../patches + "/${p}") patches);
       });
 

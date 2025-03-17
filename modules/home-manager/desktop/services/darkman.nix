@@ -166,7 +166,7 @@ in
 
   services.darkman = {
     enable = true;
-    package = addPatches pkgs.darkman [ "darkmanNoInitialSwitch.patch" ];
+    package = addPatches pkgs.darkman [ "darkman-no-initial-switch.patch" ];
     darkModeScripts = mapAttrs (_: v: v "dark") cfg.switchScripts;
     lightModeScripts = mapAttrs (_: v: v "light") cfg.switchScripts;
 

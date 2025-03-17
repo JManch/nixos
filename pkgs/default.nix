@@ -19,7 +19,7 @@ in
   soularr = pkgs.python3Packages.callPackage ./soularr.nix { };
   formulaone-card = callPackage ./formulaone-card.nix { };
   app2unit = callPackage ./app2unit.nix { };
-  microfetch = lib.${lib.ns}.addPatches pkgs.microfetch [ ../patches/microfetchIcon.patch ];
+  microfetch = lib.${lib.ns}.addPatches pkgs.microfetch [ "microfetch-icon.patch" ];
   xdg-terminal-exec = callPackage ./xdg-terminal-exec.nix { };
   jellyfin-plugin-listenbrainz = callPackage ./jellyfin-plugin-listenbrainz { };
   filen-cli = callPackage ./filen-cli.nix { };

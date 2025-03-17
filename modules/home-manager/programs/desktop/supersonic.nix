@@ -11,7 +11,7 @@
         hash = "sha256-s4q7RvAG3oDBQ9ktfonEJXjrX/75MUpVq+9c43TRgWM=";
       };
 
-      patches = [ ../../../../patches/supersonicLargeVolumeSlider.patch ];
+      patches = [ ../../../../patches/supersonic-large-volume-slider.patch ];
 
       tags = old.tags ++ [ "migrated_fynedo" ];
 

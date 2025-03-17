@@ -38,7 +38,7 @@ in
     # https://github.com/janeczku/calibre-web/issues/452
     # Also fixes unwanted gamma adjusted of cover images
     # https://github.com/janeczku/calibre-web/issues/2564
-    package = addPatches pkgs.calibre-web [ ../../../patches/calibre-web.patch ];
+    package = addPatches pkgs.calibre-web [ "calibre-web.patch" ];
     listen.ip = "127.0.0.1";
     listen.port = cfg.port;
     options = {

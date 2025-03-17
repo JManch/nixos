@@ -16,7 +16,7 @@ buildPythonPackage rec {
     hash = "sha256-xnvoiHxDxYVwR1ZrKRGWB5oManaJSP/2sDsQ7KLRpmE=";
   };
 
-  patches = [ ../patches/hyprpyAlwaysOnTop.patch ];
+  patches = [ ../patches/hyprpy-always-on-top.patch ];
 
   pyproject = true;
   build-system = [ setuptools ];

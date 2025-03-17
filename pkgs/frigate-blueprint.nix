@@ -15,7 +15,7 @@ stdenvNoCC.mkDerivation rec {
     hash = "sha256-HBetLcRli6I+E/+s35SDFilUi90yhR+ccbPVG/a0muA=";
   };
 
-  patches = [ ../patches/frigateBlueprint.patch ];
+  patches = [ ../patches/frigate-blueprint.patch ];
 
   dontBuild = true;
 

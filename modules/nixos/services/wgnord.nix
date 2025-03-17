@@ -19,7 +19,7 @@ let
   wgnord = pkgs.wgnord.overrideAttrs (old: {
     src = old.src.overrideAttrs {
       patches = (old.patches or [ ]) ++ [
-        ../../../patches/statelessWgnord.patch
+        ../../../patches/stateless-wgnord.patch
       ];
     };
   });

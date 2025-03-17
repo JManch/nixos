@@ -50,19 +50,19 @@ in
             patches = (old.patches or [ ]) ++ [
               # Makes the togglespecialworkspace dispatcher always toggle instead
               # of moving the open special workspace to the active monitor
-              ../../../../patches/hyprlandSpecialWorkspaceToggle.patch
-              ../../../../patches/hyprlandResizeParamsFloats.patch
+              ../../../../patches/hyprland-special-workspace-toggle.patch
+              ../../../../patches/hyprland-resize-params-floats.patch
               # Potential fix for https://github.com/hyprwm/Hyprland/issues/6820
-              ../../../../patches/hyprlandSpecialWorkspaceFullscreen.patch
+              ../../../../patches/hyprland-special-workspace-fullscreen.patch
               # Fixes center and size/move window rules using the active monitor instead
               # of the monitor that the window is on
-              ../../../../patches/hyprlandWindowRuleMonitor.patch
+              ../../../../patches/hyprland-windowrule-monitor.patch
               # Makes exact resizeparams in dispatchers relative to the window's current
               # monitor instead of the last active monitor
-              ../../../../patches/hyprlandBetterResizeArgs.patch
+              ../../../../patches/hyprland-better-resize-args.patch
               # Add always on top window rule and dispatching which is pinning
               # but just for workspace that the window is on
-              ../../../../patches/hyprlandAlwaysOnTop.patch
+              ../../../../patches/hyprland-always-on-top.patch
             ];
           });
         })

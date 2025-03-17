@@ -58,7 +58,7 @@ in
       _: prev: {
         nixos-firewall-tool = prev.nixos-firewall-tool.overrideAttrs (old: {
           # Allow specifying the interface to open. Only implemented for iptables
-          patches = (old.patches or [ ]) ++ [ ../../../patches/nixosFirewallToolInterface.diff ];
+          patches = (old.patches or [ ]) ++ [ ../../../patches/nixos-firewall-tool-interface.patch ];
         });
       }
     );

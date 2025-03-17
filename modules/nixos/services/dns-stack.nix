@@ -109,7 +109,7 @@ in
   systemd.services.ctrld =
     let
       # Patch Ctrld to enable loading endpoints from environment variables
-      ctrld = addPatches selfPkgs.ctrld [ ../../../patches/ctrldSecretEndpoint.patch ];
+      ctrld = addPatches selfPkgs.ctrld [ "ctrld-secret-endpoint.patch" ];
       configFile = (pkgs.formats.toml { }).generate "ctrld.toml" settings;
 
       settings = {

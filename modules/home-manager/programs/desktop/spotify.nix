@@ -13,7 +13,7 @@ let
     ;
 
   spotify-player =
-    (lib.${ns}.addPatches pkgs.spotify-player [ "spotifyPlayerNotifs.patch" ]).override
+    (lib.${ns}.addPatches pkgs.spotify-player [ "spotify-player-notifs.patch" ]).override
       { withDaemon = false; };
 in
 {

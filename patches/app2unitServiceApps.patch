@@ -1,8 +1,8 @@
 diff --git a/app2unit b/app2unit
-index 3c03239..474d643 100755
+index 497b969..05fd67a 100755
 --- a/app2unit
 +++ b/app2unit
-@@ -1343,6 +1343,13 @@ if [ -n "$ENTRY_PATH" ]; then
+@@ -1455,6 +1455,13 @@ if [ -n "$ENTRY_PATH" ]; then
  	read_entry_path "$ENTRY_PATH" "$ENTRY_ACTION"
  fi
  
@@ -13,6 +13,6 @@ index 3c03239..474d643 100755
 +  fi
 +done
 +
- # generate Unit ID
- UNIT_ID=$(gen_unit_id)
+ # generate Unit ID as UNIT_ID
+ gen_unit_id
  

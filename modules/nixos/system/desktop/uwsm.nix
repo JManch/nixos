@@ -38,6 +38,12 @@ in
     conditions = [ config.programs.uwsm.enable ];
 
     opts = {
+      enable = mkOption {
+        type = types.bool;
+        default = config.programs.uwsm.enable;
+        readOnly = true;
+      };
+
       defaultDesktop = mkOption {
         type = with types; nullOr str;
         default = null;

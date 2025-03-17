@@ -25,7 +25,7 @@ let
 in
 {
   inherit ns;
-  ${ns} = (import ./module-system.nix lib ns) // {
+  ${ns} = (import ./module-wrapper.nix lib ns) // {
     flakeUtils = self: {
       forEachSystem = lib.${ns}.forEachSystem self [
         "x86_64-linux"

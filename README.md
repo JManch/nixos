@@ -21,7 +21,7 @@ Each host has two entry points for module configuration:
 `hosts/<hostname>/default.nix` for system configuration and
 `homes/<hostname>.nix` for Home Manager configuration.
 
-Modules are imported using a wrapper `lib/module-system.nix` that aims to
+Modules are imported using a wrapper `lib/module-wrapper.nix` that aims to
 reduce boilerplate and enforce a strict structure for options under a custom
 namespace.
 

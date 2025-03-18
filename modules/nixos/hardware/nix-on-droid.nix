@@ -41,6 +41,7 @@ let
   '';
 
   hmConfig = {
+    ${ns}.core.nix-on-droid.enable = true;
     programs.zsh.shellAliases.phone-storage = "cd /storage/emulated/0";
 
     home.file.".ssh/authorized_keys".text = mkIf cfg.ssh.server.enable (

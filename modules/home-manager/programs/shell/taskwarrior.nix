@@ -3,9 +3,11 @@
   cfg,
   pkgs,
   inputs,
+  config,
 }:
 let
   inherit (lib)
+    ns
     singleton
     mkEnableOption
     mkOption
@@ -35,7 +37,12 @@ in
     colorTheme = "dark-256";
     extraConfig = ''
       news.version=3.3.0
-      include $XDG_RUNTIME_DIR/agenix/taskwarriorSyncEncryption
+      include ${
+        if config.${ns}.core.nix-on-droid.enable then
+          "$HOME/.config/task/sync-encryption"
+        else
+          "$XDG_RUNTIME_DIR/agenix/taskwarriorSyncEncryption"
+      }
       sync.server.url=https://tasks.${fqDomain}
       sync.server.client_id=${cfg.userUuid}
 

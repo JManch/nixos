@@ -69,7 +69,7 @@ in
       categories = [ "Audio" ];
     };
 
-  ns.desktop.hyprland.settings.windowrulev2 = [
+  ns.desktop.hyprland.settings.windowrule = [
     "float, class:^(cava)$"
     "size 50% 20%, class:^(cava)$"
     "center, class:^(cava)$"

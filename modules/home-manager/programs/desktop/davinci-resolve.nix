@@ -9,7 +9,7 @@
     ".local/state/DaVinciResolve"
   ];
 
-  ns.desktop.hyprland.settings.windowrulev2 = [
+  ns.desktop.hyprland.settings.windowrule = [
     "size 40% 40%, floating:1, class:^(resolve)$, title:negative:^(resolve|Message)$"
     "center, floating:1, class:^(resolve)$, title:negative:^(resolve|Message)$"
   ];

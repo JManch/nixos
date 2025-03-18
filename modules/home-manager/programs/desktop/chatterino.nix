@@ -160,7 +160,7 @@ in
           "${hyprland.namedWorkspaceIDs.TWITCH}, on-created-empty:${getExe initWorkspace}"
         ];
 
-        windowrulev2 =
+        windowrule =
           let
             workspaceMatch = "workspace:${hyprland.namedWorkspaceIDs.TWITCH}";
           in

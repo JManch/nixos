@@ -5,7 +5,7 @@
     spek
   ];
 
-  ns.desktop.hyprland.settings.windowrulev2 = [
+  ns.desktop.hyprland.settings.windowrule = [
     "float, class:^(spek)$"
   ];
 }

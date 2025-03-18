@@ -85,7 +85,7 @@ in
         gameClassRegex = concatRegex cfg.gameClasses;
       in
       {
-        windowrulev2 =
+        windowrule =
           [
             "workspace ${namedWorkspaceIDs.GAME}, class:${gameClassRegex}"
           ]

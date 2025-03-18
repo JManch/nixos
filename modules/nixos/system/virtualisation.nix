@@ -319,7 +319,7 @@ in
               "${modKey}SHIFT, V, movetoworkspace, ${namedWorkspaceIDs.VM}"
             ];
 
-            windowrulev2 = [
+            windowrule = [
               "workspace ${namedWorkspaceIDs.VM} silent, class:^(\\.?qemu.*|aquamarine|\\.virt-manager-wrapped)$"
               "float, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
               "size 80% 80%, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"

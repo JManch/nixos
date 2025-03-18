@@ -115,7 +115,7 @@ in
         colors = config.colorScheme.palette;
       in
       {
-        windowrulev2 = [
+        windowrule = [
           "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
           "workspace special:social silent, title:^(Spotify( Premium)?)$"
         ];

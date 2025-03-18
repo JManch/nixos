@@ -45,7 +45,7 @@
   ns.desktop = {
     services.playerctl.musicPlayers = lib.mkBefore [ "Supersonic" ];
 
-    hyprland.settings.windowrulev2 = [
+    hyprland.settings.windowrule = [
       "workspace special:social silent, initialTitle:^(Supersonic)$"
     ];
   };

@@ -338,7 +338,7 @@ in
         "${modKey}SHIFTCONTROL, F, exec, systemctl restart --user hyprland-multiviewer-tiler"
       ];
 
-      windowrulev2 = [
+      windowrule = [
         "float, class:^(MultiViewer for F1)$"
         "workspace ${namedWorkspaceIDs.F1}, class:^(MultiViewer for F1)$"
 

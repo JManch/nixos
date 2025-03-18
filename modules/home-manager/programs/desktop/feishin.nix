@@ -21,7 +21,7 @@
       KillMode=mixed
     '';
 
-    hyprland.settings.windowrulev2 = [
+    hyprland.settings.windowrule = [
       "workspace special:social silent, class:^(feishin)$"
     ];
   };

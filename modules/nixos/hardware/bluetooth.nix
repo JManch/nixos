@@ -35,7 +35,7 @@ in
   ];
 
   ns.hm = mkIf home-manager.enable {
-    ${ns}.desktop.hyprland.settings.windowrulev2 = [
+    ${ns}.desktop.hyprland.settings.windowrule = [
       "float, class:^(.blueman-manager-wrapped)$"
       "size 30% 30%, class:^(.blueman-manager-wrapped)$"
       "center, class:^(.blueman-manager-wrapped)$"

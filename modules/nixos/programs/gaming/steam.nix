@@ -151,7 +151,7 @@ in
           ++ [ "factorio" ];
       };
 
-      desktop.hyprland.settings.windowrulev2 = [
+      desktop.hyprland.settings.windowrule = [
         # Main steam window
         "workspace emptym, class:^(steam)$, title:^(Steam)$"
 

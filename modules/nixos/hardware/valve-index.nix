@@ -293,7 +293,7 @@ in
             "${modKey}SHIFT, Grave, movetoworkspace, ${namedWorkspaceIDs.VR}"
           ];
 
-          windowrulev2 = [
+          windowrule = [
             "workspace ${namedWorkspaceIDs.VR} silent, class:^(monado-service)$"
             "center, class:^(monado-service)$"
           ];

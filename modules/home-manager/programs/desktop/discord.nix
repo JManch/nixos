@@ -5,7 +5,7 @@
     (vesktop.override { withMiddleClickScroll = true; })
   ];
 
-  ns.desktop.hyprland.settings.windowrulev2 = [
+  ns.desktop.hyprland.settings.windowrule = [
     "workspace special:social silent, class:^(vesktop|discord)$, title:^(Discord.*)$"
   ];
 

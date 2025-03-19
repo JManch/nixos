@@ -22,7 +22,7 @@ let
     hasPrefix
     hasSuffix
     ;
-  sources = import ../pkgs/npins;
+  sources = import ../npins;
 in
 {
   inherit ns;

@@ -1,7 +1,7 @@
 self: lib: pkgs:
 let
   inherit (pkgs) callPackage;
-  sources = import ./npins;
+  sources = import ../npins;
   args = { inherit sources; };
 in
 {

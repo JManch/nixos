@@ -114,9 +114,7 @@ in
           (oldAttrs.patches or [ ]) ++ (map (p: if hasPrefix "/" p then p else ../patches + "/${p}") patches);
       });
 
-    hostIp =
-      hostname: args:
-      args.self.nixosConfigurations.${hostname}.config.${args.lib.ns}.core.device.ipAddress;
+    hostIp = hostname: self.nixosConfigurations.${hostname}.config.${ns}.core.device.ipAddress;
 
     upperFirstChar =
       string: concatStrings (imap0 (i: c: if i == 0 then toUpper c else c) (stringToCharacters string));

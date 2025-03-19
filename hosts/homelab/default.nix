@@ -4,7 +4,7 @@
   inputs,
   selfPkgs,
   ...
-}@args:
+}:
 let
   inherit (lib) ns;
   inherit (lib.${ns}) hostIp;
@@ -85,7 +85,7 @@ in
           "192.168.100.0/24"
           "10.20.20.0/24"
           "10.0.0.2/32" # NCASE-M1 on friends VPN
-          "${hostIp "surface-pro" args}/32" # Surface pro on guest network cause no WPA3 support
+          "${hostIp "surface-pro"}/32" # Surface pro on guest network cause no WPA3 support
         ];
         goAccessExcludeIPRanges = [
           "192.168.89.2"
@@ -121,8 +121,8 @@ in
         proxy = true;
         interfaces = [ "wg-friends" ];
         allowedAddresses = [
-          "${hostIp "ncase-m1" args}/32"
-          "${hostIp "surface-pro" args}/32"
+          "${hostIp "ncase-m1"}/32"
+          "${hostIp "surface-pro"}/32"
           "10.20.20.33/32" # pixel 9
           "10.20.20.11/32" # ncase-m1 wireless
         ] ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
@@ -183,8 +183,8 @@ in
       file-server = {
         enable = true;
         allowedAddresses = [
-          "${hostIp "ncase-m1" args}/32"
-          "${hostIp "surface-pro" args}/32"
+          "${hostIp "ncase-m1"}/32"
+          "${hostIp "surface-pro"}/32"
         ] ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };
 

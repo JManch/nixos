@@ -43,10 +43,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.12.0.4",
-      "revision": "5e2d8b17c378ca70bd8ee0dbe675d29016fd6394",
-      "url": "https://api.github.com/repos/SgtBatten/HA_blueprints/tarball/v0.12.0.4",
-      "hash": "1q4snkv1pmdkf6f1z19jvn5m8a8nhfadzb7z2cza52v5qhnss5qw"
+      "version": "v0.12.0.6",
+      "revision": "2ffeb0990c97582e46f2f33edaae7870bef24afa",
+      "url": "https://api.github.com/repos/SgtBatten/HA_blueprints/tarball/v0.12.0.6",
+      "hash": "07ldqyd9ri7h3ymazrrjh4yn989pihlx5x00gbxki5klhmdmgcnl"
     },
     "ModernX": {
       "type": "GitRelease",
@@ -189,10 +189,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "1.9.7",
-      "revision": "b89d2a2a7bfb0c161adf894b703ce5101873bfc7",
-      "url": "https://api.github.com/repos/marcokreeft87/formulaone-card/tarball/1.9.7",
-      "hash": "154i6s01c55r0zz83crx97hzv3xn5zij51x8s2gjv084kcywjirs"
+      "version": "1.9.8",
+      "revision": "52534527e100a095b34656911d816ebaa38d4ab9",
+      "url": "https://api.github.com/repos/marcokreeft87/formulaone-card/tarball/1.9.8",
+      "hash": "1mzwqb1azqw7ghyp8y1bczqny8lifgk258hwirygl6l3sr76sl3x"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -221,10 +221,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2.6.0",
-      "revision": "052c9220b59b6f6c84a529d32cfa02787096a02b",
-      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.6.0",
-      "hash": "028chji54gi0zkvw4vrbgy473y74j33cgf969z1qx2mw2wvzkwl1"
+      "version": "2.7.0",
+      "revision": "f613e051a073945112494d91a675984cc32f0b3c",
+      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.7.0",
+      "hash": "1xm79ydd1yljfz83m3fydp469ji7qdk7hzh122l3ikpak85c8nln"
     },
     "hass-web-proxy-lib": {
       "type": "PyPi",
@@ -261,10 +261,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.1.9",
-      "revision": "e070d286146a9b088bc66bccbb5aa1f10f8d25fa",
-      "url": "https://api.github.com/repos/ulinja/hyprpy/tarball/v0.1.9",
-      "hash": "0qd6s6ifq41vn3vgyj49frm0r6h7jq8jjssn8xq8bia3gj4fhyy6"
+      "version": "v0.2.0",
+      "revision": "530cd8b34f17349511e14073a7cfaa9a68ebd534",
+      "url": "https://api.github.com/repos/ulinja/hyprpy/tarball/v0.2.0",
+      "hash": "1i2m6ymm44bb68hksw4bdnb9ac40afby9gfy1vwz8m38c8z7czbg"
     },
     "jellyfin-plugin-listenbrainz": {
       "type": "GitRelease",
@@ -277,10 +277,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "5.0.2.0",
-      "revision": "3a061db941fef1f93e80938dd7eae73124abdce6",
-      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/5.0.2.0",
-      "hash": "0y2mnv4195xq406casy63cl5g590xyifn75wfc6hvzlwasn0mamg"
+      "version": "5.1.2.1",
+      "revision": "f4903f457fb966d8a1c9533ead5e69939de7101a",
+      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/5.1.2.1",
+      "hash": "1xz8z4y0kgxps3vgzj59cg9qrwk7ydppbp0jf57wf5bfvilk3aqb"
     },
     "miele": {
       "type": "GitRelease",
@@ -302,9 +302,9 @@
       "type": "PyPi",
       "name": "neohubapi",
       "version_upper_bound": null,
-      "version": "2.8",
-      "url": "https://files.pythonhosted.org/packages/49/4f/b5ca185458a781efae4a27ad72711af931e8cf5dfacfd48a036c8e49b7cf/neohubapi-2.8.tar.gz",
-      "hash": "f48243d925c8314aa9adb0c5d0dce95120daf75edf578119279b832eb14f4c57"
+      "version": "3.0",
+      "url": "https://files.pythonhosted.org/packages/1f/8f/f746dbf5e8b975a0556aa4b6d649bb397a2a86b9413c7dafba45750df825/neohubapi-3.0.tar.gz",
+      "hash": "03548553babb7e9508c997acd7f6f5c197cdcaae65c8c687ded611807ed57681"
     },
     "soularr": {
       "type": "Git",
@@ -343,10 +343,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2.2.4",
-      "revision": "6af848f73d658eb7344f613dbcd097ea97573d18",
-      "url": "https://api.github.com/repos/dolezsa/thermal_comfort/tarball/2.2.4",
-      "hash": "1wyh2cxxqqq8z2jdjll1y1yq1j43gm8vxjl8wapm65089xxcg5b2"
+      "version": "2.2.5",
+      "revision": "d7a81bbcd38110742124d46e7c0d2a7e5d011831",
+      "url": "https://api.github.com/repos/dolezsa/thermal_comfort/tarball/2.2.5",
+      "hash": "060cvmplgpllmdy2zs0rbl0k5bb858z4wwffzxnwkd0vdd10fgym"
     },
     "thermal_comfort_icons": {
       "type": "GitRelease",
@@ -404,10 +404,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.12.1",
-      "revision": "0def84a3ffa70831c3c63d93cf79eb1090346004",
-      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.12.1",
-      "hash": "1lvh2i78hl50y50s0y0pkk9cn7aigyq9f2l8jlflw8w0bbd2dign"
+      "version": "v0.12.3",
+      "revision": "9357b7d093f98e0b5c7aec18f2fc9eea0ae90aab",
+      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.12.3",
+      "hash": "07sy7rfzvhh8idslz6cbyxzwhrp5vq5ghhapbgpix93qz76dl3wq"
     }
   },
   "version": 5

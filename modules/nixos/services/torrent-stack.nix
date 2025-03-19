@@ -643,6 +643,25 @@ in
     ns.services.caddy.virtualHosts.slskd.extraConfig =
       "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.slskd}";
 
+    ns.backups.slskd = {
+      paths = [ "/var/lib/slskd/data" ];
+      exclude = [
+        "search*"
+        "shares*"
+        "*.cache"
+        "events.db"
+      ];
+
+      restore = {
+        removeExisting = false;
+        preRestoreScript = "sudo systemctl stop slskd";
+        pathOwnership."/var/lib/slskd" = {
+          user = "slskd";
+          group = "slskd";
+        };
+      };
+    };
+
     ns.persistence.directories = singleton {
       directory = "/var/lib/slskd";
       user = "slskd";

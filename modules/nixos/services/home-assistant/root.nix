@@ -225,7 +225,7 @@ in
 
         # Spammy entities that produce useless data should be excluded from
         # the recorder. Note that recorder data is deleted after 10 days
-        # (long-term data is managed seperately). This postgresql command is
+        # (long-term data is managed separately). This postgresql command is
         # useful for finding entities taking up db space. Run `\c hass` in
         # psql then:
         # SELECT
@@ -250,6 +250,7 @@ in
             "input_text.*_announcement_response"
             "input_boolean.*_announcement_achnowledged"
             "sensor.*_faikin_liquid"
+            "sensor.*_presence_*" # presence sensors spam A LOT
           ];
         };
       };

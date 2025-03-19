@@ -1,19 +1,14 @@
 {
   lib,
-  fetchFromGitHub,
   buildHomeAssistantComponent,
+  sources,
+  ...
 }:
 buildHomeAssistantComponent rec {
   owner = "dolezsa";
   domain = "thermal_comfort";
-  version = "2.2.4";
-
-  src = fetchFromGitHub {
-    inherit owner;
-    repo = domain;
-    tag = version;
-    hash = "sha256-YpXHek8IFFOv4ojKvlF9g8iAffCBUtmk+Ahj3DsT0PM=";
-  };
+  inherit (sources.thermal_comfort) version;
+  src = sources.thermal_comfort;
 
   dontBuild = true;
 

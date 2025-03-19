@@ -1,25 +1,19 @@
 {
   lib,
   stdenv,
-  fetchFromGitHub,
   cmake,
   zlib,
   httplib,
   nlohmann_json,
   openssl,
   curl,
+  sources,
+  ...
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "beammp-launcher";
-  version = "2.4.0";
-
-  src = fetchFromGitHub {
-    owner = "BeamMP";
-    repo = "BeamMP-Launcher";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-ZSwmX1y8LjWzoJn5ATvvLRf9zOEi+8ERvWuZulV7knI=";
-    fetchSubmodules = true;
-  };
+  inherit (sources.BeamMP-Launcher) version;
+  src = sources.BeamMP-Launcher;
 
   nativeBuildInputs = [ cmake ];
 

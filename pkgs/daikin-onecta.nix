@@ -1,19 +1,14 @@
 {
   lib,
-  fetchFromGitHub,
   buildHomeAssistantComponent,
+  sources,
+  ...
 }:
-buildHomeAssistantComponent rec {
+buildHomeAssistantComponent {
   owner = "jwillemsen";
   domain = "daikin_onecta";
-  version = "4.2.3";
-
-  src = fetchFromGitHub {
-    owner = "jwillemsen";
-    repo = "daikin_onecta";
-    tag = "v${version}";
-    hash = "sha256-ylVHgmE6zDLE73KpuIag0iUx77w6ujp3cF/+x2bJiA8=";
-  };
+  inherit (sources.daikin_onecta) version;
+  src = sources.daikin_onecta;
 
   meta = {
     description = "Home Assistant Integration for devices supported by the Daikin Onecta App";

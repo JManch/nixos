@@ -6,6 +6,7 @@
   requests,
   music-tag,
   pyarr,
+  sources,
   ...
 }:
 let
@@ -34,14 +35,8 @@ let
 in
 buildPythonApplication {
   pname = "soularr";
-  version = "0-unstable-2025-01-23";
-
-  src = fetchFromGitHub {
-    owner = "mrusse";
-    repo = "soularr";
-    rev = "dd199b19f4097955ec9f82d638836838f9b153e2";
-    hash = "sha256-8ATVC5nCTTo8ctRm/LepkGp9jJxYo6dLOwI/3UbCGqE=";
-  };
+  version = "0-unstable-${sources.soularr.revision}";
+  src = sources.soularr;
 
   pyproject = false;
 

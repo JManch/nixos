@@ -375,7 +375,14 @@ in
   };
 
   ns.adminPackages =
-    [ pkgs.nvd ] ++ rebuildScripts ++ remoteRebuildScripts ++ droidRebuildScripts ++ flakeUpdate;
+    [
+      pkgs.nvd
+      pkgs.npins
+    ]
+    ++ rebuildScripts
+    ++ remoteRebuildScripts
+    ++ droidRebuildScripts
+    ++ flakeUpdate;
   ns.persistenceAdminHome.directories = [ ".remote-builds" ];
   boot.binfmt.emulatedSystems = cfg.builder.emulatedSystems;
   services.getty.helpLine = mkForce "";

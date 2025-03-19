@@ -4,6 +4,7 @@
   pkgs,
   config,
   inputs,
+  sources,
   hostname,
   selfPkgs,
 }:
@@ -138,39 +139,18 @@ in
 
     customComponents =
       [
-        (pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs (
-          final: _: {
-            version = "2.6.0";
-            src = pkgs.fetchFromGitHub {
-              owner = "mampfes";
-              repo = "hacs_waste_collection_schedule";
-              tag = final.version;
-              hash = "sha256-gfL5Nxe8io7DTya5x8aQ5PhxiH8rb8L3/CA+UqKEDAk=";
-            };
-          }
-        ))
-        (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs (
-          final: _: {
-            version = "1.25.0";
-            src = pkgs.fetchFromGitHub {
-              owner = "basnijholt";
-              repo = "adaptive-lighting";
-              tag = "v${final.version}";
-              hash = "sha256-ykliUi/gnJB9hMNI72RCofcGzS7799lVTAXZyrho/Ng=";
-            };
-          }
-        ))
-        (pkgs.home-assistant-custom-components.miele.overrideAttrs (
-          final: _: {
-            version = "2025.1.1";
-            src = pkgs.fetchFromGitHub {
-              owner = "astrandb";
-              repo = "miele";
-              tag = "v${final.version}";
-              hash = "sha256-TShy2q3gKqTgRU3u4Wp7zQjzhEogqUVip8EkH8XIYw8=";
-            };
-          }
-        ))
+        (pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs {
+          inherit (sources.hacs_waste_collection_schedule) version;
+          src = sources.hacs_waste_collection_schedule;
+        })
+        (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs {
+          inherit (sources.adaptive-lighting) version;
+          src = sources.adaptive-lighting;
+        })
+        (pkgs.home-assistant-custom-components.miele.overrideAttrs {
+          inherit (sources.miele) version;
+          src = sources.miele;
+        })
         selfPkgs.heatmiser
         selfPkgs.thermal-comfort
         selfPkgs.daikin-onecta
@@ -179,27 +159,15 @@ in
         let
           hass-web-proxy-lib = pkgs.python313Packages.buildPythonPackage {
             pname = "hass-web-proxy-lib";
-            version = "0.0.7";
-
-            src = pkgs.fetchFromGitHub {
-              owner = "dermotduffy";
-              repo = "hass-web-proxy-lib";
-              rev = "f96dfdec6e24275dc83b462a3471d89509f3d42a";
-              sha256 = "sha256-RJ7XUkgutgnbwZnmV7jtt+Hit7ZM/08hNZWTTEARlNc=";
-            };
-
+            inherit (sources.hass-web-proxy-lib) version;
+            src = sources.hass-web-proxy-lib;
             pyproject = true;
             build-system = [ pkgs.python313Packages.poetry-core ];
           };
         in
         pkgs.home-assistant-custom-components.frigate.overridePythonAttrs {
-          version = "5.8.0";
-          src = pkgs.fetchFromGitHub {
-            owner = "blakeblackshear";
-            repo = "frigate-hass-integration";
-            rev = "v5.8.0";
-            hash = "sha256-sQgi3F44eT/iL3cE9YuKyjJmE4nZM+OcwirUyl3maGo=";
-          };
+          inherit (sources.frigate-hass-integration) version;
+          src = sources.frigate-hass-integration;
 
           dependencies = [
             pkgs.python313Packages.pytz

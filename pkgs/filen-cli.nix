@@ -1,18 +1,13 @@
 {
   lib,
   buildNpmPackage,
-  fetchFromGitHub,
+  sources,
+  ...
 }:
-buildNpmPackage rec {
+buildNpmPackage {
   pname = "filen-cli";
-  version = "0.0.29";
-
-  src = fetchFromGitHub {
-    owner = "FilenCloudDienste";
-    repo = pname;
-    rev = "v${version}";
-    hash = "sha256-ftbRv75x6o1HgElY4oLBBe5SRuLtxdrjpjZznSCyroI=";
-  };
+  inherit (sources.filen-cli) version;
+  src = sources.filen-cli;
 
   # Why inject key at compile time???
   configurePhase = ''

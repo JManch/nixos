@@ -3,6 +3,7 @@
   cfg,
   pkgs,
   config,
+  sources,
   selfPkgs,
   username,
   categoryCfg,
@@ -190,14 +191,9 @@ in
 
     nixpkgs.overlays = [
       (final: prev: {
-        uwsm = prev.uwsm.overrideAttrs rec {
-          version = "0.21.2";
-          src = final.fetchFromGitHub {
-            owner = "Vladimir-csp";
-            repo = "uwsm";
-            tag = "v${version}";
-            hash = "sha256-VMkBhc1U/HKx9AfCQVvDHFpQFGsTuxfoyEknke46TTk=";
-          };
+        uwsm = prev.uwsm.overrideAttrs {
+          inherit (sources.uwsm) version;
+          src = sources.uwsm;
         };
 
         app2unit = addPatches selfPkgs.app2unit [

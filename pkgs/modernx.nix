@@ -1,19 +1,13 @@
 {
   lib,
-  fetchFromGitHub,
   makeFontsConf,
   stdenvNoCC,
+  sources,
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "mpv-modernx";
-  version = "0.4.1";
-
-  src = fetchFromGitHub {
-    owner = "zydezu";
-    repo = "ModernX";
-    tag = finalAttrs.version;
-    hash = "sha256-tm1vsHEFX2YnQ1w3DcLd/zHASetkqQ4wYcYT9w8HVok=";
-  };
+  inherit (sources.ModernX) version;
+  src = sources.ModernX;
 
   dontBuild = true;
 

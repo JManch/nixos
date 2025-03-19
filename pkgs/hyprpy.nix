@@ -1,20 +1,14 @@
 {
   buildPythonPackage,
-  fetchFromGitHub,
   setuptools,
   pydantic,
+  sources,
   ...
 }:
-buildPythonPackage rec {
+buildPythonPackage {
   pname = "hyprpy";
-  version = "0.1.9";
-
-  src = fetchFromGitHub {
-    repo = "hyprpy";
-    owner = "ulinja";
-    tag = "v${version}";
-    hash = "sha256-xnvoiHxDxYVwR1ZrKRGWB5oManaJSP/2sDsQ7KLRpmE=";
-  };
+  inherit (sources.hyprpy) version;
+  src = sources.hyprpy;
 
   patches = [ ../patches/hyprpy-always-on-top.patch ];
 

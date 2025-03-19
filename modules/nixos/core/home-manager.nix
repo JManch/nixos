@@ -70,7 +70,7 @@ in
 
     extraSpecialArgs = {
       inherit inputs hostname vmVariant;
-      inherit (args) self selfPkgs;
+      inherit (args) self selfPkgs sources;
     };
   };
 }

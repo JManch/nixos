@@ -1,19 +1,13 @@
 {
   lib,
-  fetchFromGitHub,
   stdenvNoCC,
+  sources,
   ...
 }:
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation {
   pname = "formulaone-card";
-  version = "1.9.7";
-
-  src = fetchFromGitHub {
-    owner = "marcokreeft87";
-    repo = "formulaone-card";
-    rev = version;
-    hash = "sha256-OkfJPZsEgS2f0KiHIuMvto/94Uk9s4H+B7kUFoA2kZQ=";
-  };
+  inherit (sources.formulaone-card) version;
+  src = sources.formulaone-card;
 
   dontBuild = true;
 

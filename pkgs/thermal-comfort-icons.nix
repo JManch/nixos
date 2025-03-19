@@ -1,19 +1,13 @@
 {
   lib,
   stdenvNoCC,
-  fetchFromGitHub,
+  sources,
   ...
 }:
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation {
   pname = "thermal-comfort-icons";
-  version = "1.3.0";
-
-  src = fetchFromGitHub {
-    owner = "rautesamtr";
-    repo = "thermal_comfort_icons";
-    tag = version;
-    sha256 = "sha256-owyG70muKxVsIOGxj4CvjLtOLRuzfNsSuUxh15V94l8=";
-  };
+  inherit (sources.thermal_comfort_icons) version;
+  src = sources.thermal_comfort_icons;
 
   dontBuild = true;
 

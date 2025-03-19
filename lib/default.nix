@@ -1,4 +1,4 @@
-lib: ns:
+self: lib: ns:
 let
   inherit (lib)
     attrNames
@@ -22,20 +22,12 @@ let
     hasPrefix
     hasSuffix
     ;
+  sources = import ../pkgs/npins;
 in
 {
   inherit ns;
   ${ns} = (import ./module-wrapper.nix lib ns) // {
-    flakeUtils = self: {
-      forEachSystem = lib.${ns}.forEachSystem self [
-        "x86_64-linux"
-        "aarch64-linux"
-      ];
-      mkHost = lib.${ns}.mkHost self;
-      mkDroidHost = lib.${ns}.mkDroidHost self;
-    };
-
-    mkHost = self: hostname: username: system: {
+    mkHost = hostname: username: system: {
       name = hostname;
       value = nixosSystem {
         specialArgs = {
@@ -44,6 +36,7 @@ in
             self
             hostname
             username
+            sources
             ;
           selfPkgs = self.packages.${system};
         };
@@ -64,7 +57,7 @@ in
       };
     };
 
-    mkDroidHost = self: hostname: {
+    mkDroidHost = hostname: {
       name = hostname;
       value =
         let
@@ -89,6 +82,7 @@ in
               lib
               self
               hostname
+              sources
               ;
             selfPkgs = self.packages.${system};
           };
@@ -96,8 +90,8 @@ in
     };
 
     forEachSystem =
-      self: systems: f:
-      genAttrs systems (
+      f:
+      genAttrs [ "x86_64-linux" "aarch64-linux" ] (
         system:
         f (
           import self.inputs.nixpkgs {

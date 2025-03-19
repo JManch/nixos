@@ -3,6 +3,7 @@
   cfg,
   pkgs,
   config,
+  sources,
   osConfig,
 }:
 let
@@ -177,18 +178,10 @@ in
           font-size: 15px !important;
         }
       '';
-
-      src = pkgs.fetchFromGitHub {
-        owner = "MrOtherGuy";
-        repo = "firefox-csshacks";
-        rev = "86203c2a52541818907c8d7775bbfcd49cf56ba0";
-        hash = "sha256-eufeXtt/SDcnb+yMMxijRssQr9zeBZQWRLihnxIF49M=";
-      };
-
     in
     pkgs.runCommand "firefox-auto-hide-toolbar-css" { buildInputs = [ pkgs.gnused ]; } ''
       cat ${font} > $out
-      cat ${src}/chrome/autohide_toolbox.css >> $out
+      cat ${sources.firefox-csshacks}/chrome/autohide_toolbox.css >> $out
       # Preferred activation distance
       sed 's/^  --uc-toolbox-rotation:.*/  --uc-toolbox-rotation: 70deg;/' -i $out
       # Without this replacement the tab bar has a black background

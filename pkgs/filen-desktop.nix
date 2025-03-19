@@ -2,6 +2,7 @@
   fetchurl,
   makeWrapper,
   appimageTools,
+  ...
 }:
 let
   pname = "filen-desktop";

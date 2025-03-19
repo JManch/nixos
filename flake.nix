@@ -4,12 +4,12 @@
   outputs =
     { self, nixpkgs, ... }:
     let
-      lib = nixpkgs.lib.extend (final: _: import ./lib final "JManch");
-      inherit (lib.${lib.ns}.flakeUtils self) forEachSystem mkHost mkDroidHost;
+      lib = nixpkgs.lib.extend (final: _: import ./lib self final "JManch");
+      inherit (lib.${lib.ns}) forEachSystem mkHost mkDroidHost;
     in
     {
       templates = import ./templates;
-      packages = forEachSystem (pkgs: import ./pkgs lib pkgs self);
+      packages = forEachSystem (pkgs: import ./pkgs self lib pkgs);
 
       nixosConfigurations = lib.listToAttrs [
         (mkHost "ncase-m1" "joshua" "x86_64-linux")

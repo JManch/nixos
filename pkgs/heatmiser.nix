@@ -20,48 +20,30 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 {
-  lib,
-  fetchFromGitHub,
   buildHomeAssistantComponent,
   buildPythonPackage,
-  fetchPypi,
-  pytest,
-  pytest-asyncio,
   websockets,
+  sources,
+  ...
 }:
 let
-  async-property = buildPythonPackage rec {
+  async-property = buildPythonPackage {
     pname = "async-property";
-    version = "0.2.2";
-
-    src = fetchFromGitHub {
-      owner = "ryananguiano";
-      repo = "async_property";
-      rev = "v${version}";
-      sha256 = "sha256-Bn8PDAGNLeL3/g6mB9lGQm1jblHIOJl2w248McJ3oaE=";
-    };
+    inherit (sources.async-property) version;
+    src = sources.async-property;
 
     postPatch = ''
       substituteInPlace setup.py \
         --replace-fail "'pytest-runner'" ""
     '';
 
-    nativeCheckInputs = [
-      pytest
-      pytest-asyncio
-    ];
-
     pythonImportsCheck = [ "async_property" ];
   };
 
-  neohubapi = buildPythonPackage rec {
+  neohubapi = buildPythonPackage {
     pname = "neohubapi";
-    version = "2.8";
-
-    src = fetchPypi {
-      inherit pname version;
-      hash = "sha256-9IJD2SXIMUqprbDF0NzpUSDa917fV4EZJ5uDLrFPTFc=";
-    };
+    inherit (sources.neohubapi) version;
+    src = sources.neohubapi;
 
     propagatedBuildInputs = [
       async-property
@@ -71,17 +53,11 @@ let
     pythonImportsCheck = [ "neohubapi" ];
   };
 in
-buildHomeAssistantComponent rec {
+buildHomeAssistantComponent {
   owner = "MindrustUK";
   domain = "heatmiserneo";
-  version = "3.1.1";
-
-  src = fetchFromGitHub {
-    inherit owner;
-    repo = "heatmiser-for-home-assistant";
-    tag = "v${version}";
-    hash = "sha256-M7q4mmwsx+OUmRx9TkynXrqWwYsBWbdsuMbVhKp4P+0=";
-  };
+  inherit (sources.heatmiser-for-home-assistant) version;
+  src = sources.heatmiser-for-home-assistant;
 
   propagatedBuildInputs = [ neohubapi ];
 }

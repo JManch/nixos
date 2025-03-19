@@ -3,6 +3,7 @@
   cfg,
   pkgs,
   config,
+  sources,
 }:
 let
   inherit (lib)
@@ -35,13 +36,8 @@ in
     scripts = [
       (pkgs.stdenvNoCC.mkDerivation {
         pname = "thumbfast-vanilla-osc";
-        version = "0-unstable-2025-02-21";
-        src = pkgs.fetchFromGitHub {
-          owner = "po5";
-          repo = "thumbfast";
-          rev = "9d78edc167553ccea6290832982d0bc15838b4ac";
-          hash = "sha256-AG3w5B8lBcSXV4cbvX3nQ9hri/895xDbTsdaqF+RL64=";
-        };
+        version = "0-unstable-${sources.thumbfast-vanilla-osc.revision}";
+        src = sources.thumbfast-vanilla-osc;
         installPhase = "install -m644 player/lua/osc.lua -Dt $out/share/mpv/scripts";
         passthru.scriptName = "osc.lua";
       })

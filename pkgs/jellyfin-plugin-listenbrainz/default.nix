@@ -1,18 +1,13 @@
 {
   buildDotnetModule,
-  fetchFromGitHub,
   dotnetCorePackages,
+  sources,
+  ...
 }:
 buildDotnetModule (finalAttrs: {
   pname = "jellyfin-plugin-listenbrainz";
-  version = "5.0.2.0";
-
-  src = fetchFromGitHub {
-    owner = "lyarenei";
-    repo = "jellyfin-plugin-listenbrainz";
-    tag = finalAttrs.version;
-    hash = "sha256-r6oKrFac/g0Nc7wc66LvIJVXKBvGa8UMILiXFMi2VXg=";
-  };
+  inherit (sources.jellyfin-plugin-listenbrainz) version;
+  src = sources.jellyfin-plugin-listenbrainz;
 
   nugetDeps = ./deps.json;
   dotnet-sdk = dotnetCorePackages.sdk_8_0;

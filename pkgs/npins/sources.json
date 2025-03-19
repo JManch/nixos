@@ -1,0 +1,414 @@
+{
+  "pins": {
+    "BeamMP-Launcher": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "BeamMP",
+        "repo": "BeamMP-Launcher"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": true,
+      "version": "v2.4.0",
+      "revision": "9e93fa35fac3fff7b507d13b3d115b1a562053b4",
+      "url": null,
+      "hash": "0wljgdavm6bbpl8w3yr2w76gs5rdxwxh3ycrl2rkabmwbigjcb35"
+    },
+    "BeamMP-Server": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "BeamMP",
+        "repo": "BeamMP-Server"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": true,
+      "version": "v3.8.2",
+      "revision": "4d5d34c4ec301d1a6854a1c58cb47f27c5b5518a",
+      "url": null,
+      "hash": "1glis8nyh1g8mfdvxql10w0l0anndlblpkdjs95rzr8w05ap9gs3"
+    },
+    "HA_blueprints": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "SgtBatten",
+        "repo": "HA_blueprints"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v0.12.0.4",
+      "revision": "5e2d8b17c378ca70bd8ee0dbe675d29016fd6394",
+      "url": "https://api.github.com/repos/SgtBatten/HA_blueprints/tarball/v0.12.0.4",
+      "hash": "1q4snkv1pmdkf6f1z19jvn5m8a8nhfadzb7z2cza52v5qhnss5qw"
+    },
+    "ModernX": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "zydezu",
+        "repo": "ModernX"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "0.4.1",
+      "revision": "fcef016b3ff37c708f226023508061141da3cab1",
+      "url": "https://api.github.com/repos/zydezu/ModernX/tarball/0.4.1",
+      "hash": "12an0w7zf4y6c4q0xab4xd4w0cgzvp10sdsw8ckncpq5f6q6yvdn"
+    },
+    "adaptive-lighting": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "basnijholt",
+        "repo": "adaptive-lighting"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v1.25.0",
+      "revision": "69c3e3503c30a4298b41c0f5eb1309bb37e2f143",
+      "url": "https://api.github.com/repos/basnijholt/adaptive-lighting/tarball/v1.25.0",
+      "hash": "1n7wd2wcmn859iaxkxzv5v6hdxx189jfyj63hiyr17705x964jfa"
+    },
+    "app2unit": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "Vladimir-csp",
+        "repo": "app2unit"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "b9c13a696f5af7518550cad8184fe817650f520d",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/b9c13a696f5af7518550cad8184fe817650f520d.tar.gz",
+      "hash": "07y7s96d28lh1hbl7vz71hhrw9hq0qgfkfgx00qcz5vgl34bxzay"
+    },
+    "async-property": {
+      "type": "PyPi",
+      "name": "async-property",
+      "version_upper_bound": null,
+      "version": "0.2.2",
+      "url": "https://files.pythonhosted.org/packages/a7/12/900eb34b3af75c11b69d6b78b74ec0fd1ba489376eceb3785f787d1a0a1d/async_property-0.2.2.tar.gz",
+      "hash": "17d9bd6ca67e27915a75d92549df64b5c7174e9dc806b30a3934dc4ff0506380"
+    },
+    "ctrld": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "Control-D-Inc",
+        "repo": "ctrld"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v1.4.1",
+      "revision": "46a0d594b0b18d3ca8854929ea527607f5aecc7c",
+      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.1",
+      "hash": "0qjzrwj8zl4ks2kcy8cv944yyf0y993md46zhwyg3k1nzwksg9xp"
+    },
+    "daikin_onecta": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "jwillemsen",
+        "repo": "daikin_onecta"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v4.2.3",
+      "revision": "63885b67f2553905afeed31271384e31703811dd",
+      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/v4.2.3",
+      "hash": "03w8r5kcgzjzf1vkmfispkpk29fjl23biabjxz235k1sc614fmfa"
+    },
+    "filen-cli": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "FilenCloudDienste",
+        "repo": "filen-cli"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v0.0.29",
+      "revision": "76ec60a61acc17ea2b0259d757233ddcec7ccb43",
+      "url": "https://api.github.com/repos/FilenCloudDienste/filen-cli/tarball/v0.0.29",
+      "hash": "10mfn8h9swrnlvixmigdw9355vh5q61f4n29h13qvskipszx3mky"
+    },
+    "filen-desktop": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "FilenCloudDienste",
+        "repo": "filen-desktop"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v3.0.47",
+      "revision": "e2ec0fdfce7a25a1f3ba98eea255f88e8f061b28",
+      "url": "https://api.github.com/repos/FilenCloudDienste/filen-desktop/tarball/v3.0.47",
+      "hash": "1zf5z9hxq9k2qs8pjiacdqkiqax6ljr2wziixdnipcfz9al4jbsr"
+    },
+    "firefox-csshacks": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "MrOtherGuy",
+        "repo": "firefox-csshacks"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "80d3a24829c0643a273e5f214eac53f0afee2a16",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/80d3a24829c0643a273e5f214eac53f0afee2a16.tar.gz",
+      "hash": "1sxirhdf9g7rnak27lk0clgclpmizl7qgjanl9vhsb3yavy673w0"
+    },
+    "formulaone-card": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "marcokreeft87",
+        "repo": "formulaone-card"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "1.9.7",
+      "revision": "b89d2a2a7bfb0c161adf894b703ce5101873bfc7",
+      "url": "https://api.github.com/repos/marcokreeft87/formulaone-card/tarball/1.9.7",
+      "hash": "154i6s01c55r0zz83crx97hzv3xn5zij51x8s2gjv084kcywjirs"
+    },
+    "frigate-hass-integration": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "blakeblackshear",
+        "repo": "frigate-hass-integration"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v5.8.0",
+      "revision": "9a7d616cb2cbded845ddb6e432a0148dd374b078",
+      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/v5.8.0",
+      "hash": "0sk8wrfwmm1aqaff6cyri49nccnaia5za13p5zi3yy9qbvf2425i"
+    },
+    "hacs_waste_collection_schedule": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "mampfes",
+        "repo": "hacs_waste_collection_schedule"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "2.6.0",
+      "revision": "052c9220b59b6f6c84a529d32cfa02787096a02b",
+      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.6.0",
+      "hash": "028chji54gi0zkvw4vrbgy473y74j33cgf969z1qx2mw2wvzkwl1"
+    },
+    "hass-web-proxy-lib": {
+      "type": "PyPi",
+      "name": "hass-web-proxy-lib",
+      "version_upper_bound": null,
+      "version": "0.0.7",
+      "url": "https://files.pythonhosted.org/packages/b5/ee/130cb57fb852524e73a16f5b422b09dae60cd26ca8ebd0fac645bb99e74b/hass_web_proxy_lib-0.0.7.tar.gz",
+      "hash": "6e1cfbd6d34ea59fb8b52967752f946c2df0d965b9f9d00cb6993b4e79c5a6e4"
+    },
+    "heatmiser-for-home-assistant": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "MindrustUK",
+        "repo": "heatmiser-for-home-assistant"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v3.1.1",
+      "revision": "e755793479eb4cabc08389e0cd6906f41c909e99",
+      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/v3.1.1",
+      "hash": "1v9zg2m89mf6p1nbfn81ig0rdfjylx64wz8wk6af7ircdjdbifik"
+    },
+    "hyprpy": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "ulinja",
+        "repo": "hyprpy"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v0.1.9",
+      "revision": "e070d286146a9b088bc66bccbb5aa1f10f8d25fa",
+      "url": "https://api.github.com/repos/ulinja/hyprpy/tarball/v0.1.9",
+      "hash": "0qd6s6ifq41vn3vgyj49frm0r6h7jq8jjssn8xq8bia3gj4fhyy6"
+    },
+    "jellyfin-plugin-listenbrainz": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "lyarenei",
+        "repo": "jellyfin-plugin-listenbrainz"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "5.0.2.0",
+      "revision": "3a061db941fef1f93e80938dd7eae73124abdce6",
+      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/5.0.2.0",
+      "hash": "0y2mnv4195xq406casy63cl5g590xyifn75wfc6hvzlwasn0mamg"
+    },
+    "miele": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "astrandb",
+        "repo": "miele"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v2025.1.1",
+      "revision": "544dc19d52cd0aef1cd85fb53975a849c6372f3f",
+      "url": "https://api.github.com/repos/astrandb/miele/tarball/v2025.1.1",
+      "hash": "03v3r32iy961lxi4ba909a2g626dgdmf3vjd8pha8ap0mpd74a2d"
+    },
+    "neohubapi": {
+      "type": "PyPi",
+      "name": "neohubapi",
+      "version_upper_bound": null,
+      "version": "2.8",
+      "url": "https://files.pythonhosted.org/packages/49/4f/b5ca185458a781efae4a27ad72711af931e8cf5dfacfd48a036c8e49b7cf/neohubapi-2.8.tar.gz",
+      "hash": "f48243d925c8314aa9adb0c5d0dce95120daf75edf578119279b832eb14f4c57"
+    },
+    "soularr": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "mrusse",
+        "repo": "soularr"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "fd41ca48651dc9cb2901c887cd46a77e40d19dc7",
+      "url": "https://github.com/mrusse/soularr/archive/fd41ca48651dc9cb2901c887cd46a77e40d19dc7.tar.gz",
+      "hash": "0scb7s4bi9rk5xnc38j6vp40kslry1hbb0gy0bpzpihllxc1rsab"
+    },
+    "supersonic": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "dweymouth",
+        "repo": "supersonic"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "1a4237e493a3c9546d82eb6f0539eae8f9ea0622",
+      "url": "https://github.com/dweymouth/supersonic/archive/1a4237e493a3c9546d82eb6f0539eae8f9ea0622.tar.gz",
+      "hash": "1fiw63xw0x4ac5qly0lg5v1srwa5hx3ssa41m17pfrbl0gihzin1"
+    },
+    "thermal_comfort": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "dolezsa",
+        "repo": "thermal_comfort"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "2.2.4",
+      "revision": "6af848f73d658eb7344f613dbcd097ea97573d18",
+      "url": "https://api.github.com/repos/dolezsa/thermal_comfort/tarball/2.2.4",
+      "hash": "1wyh2cxxqqq8z2jdjll1y1yq1j43gm8vxjl8wapm65089xxcg5b2"
+    },
+    "thermal_comfort_icons": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "rautesamtr",
+        "repo": "thermal_comfort_icons"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "1.3.0",
+      "revision": "2f47f8b9a0a81a875b42c2f6ca6ae0ed8c4e7611",
+      "url": "https://api.github.com/repos/rautesamtr/thermal_comfort_icons/tarball/1.3.0",
+      "hash": "0pz2gnaxfqacp49dnz5k3cnlxfwcmy08zcg141n1aaxf97pqc353"
+    },
+    "thumbfast-vanilla-osc": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "po5",
+        "repo": "thumbfast"
+      },
+      "branch": "vanilla-osc",
+      "submodules": false,
+      "revision": "9d78edc167553ccea6290832982d0bc15838b4ac",
+      "url": "https://github.com/po5/thumbfast/archive/9d78edc167553ccea6290832982d0bc15838b4ac.tar.gz",
+      "hash": "1bigj5gshnn79vdi1rrxzy5npn23wxyvs6w7aybw81953zjg0v80"
+    },
+    "uwsm": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "Vladimir-csp",
+        "repo": "uwsm"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v0.21.2",
+      "revision": "42c36b746146df6c98ad61e927745554039310b9",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.21.2",
+      "hash": "0fad7bp929s9r3l1gfqkdca50nhwqddl3hh7yjqp5z2lrn2h3jal"
+    },
+    "xdg-terminal-exec": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "Vladimir-csp",
+        "repo": "xdg-terminal-exec"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v0.12.1",
+      "revision": "0def84a3ffa70831c3c63d93cf79eb1090346004",
+      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.12.1",
+      "hash": "1lvh2i78hl50y50s0y0pkk9cn7aigyq9f2l8jlflw8w0bbd2dign"
+    }
+  },
+  "version": 5
+}

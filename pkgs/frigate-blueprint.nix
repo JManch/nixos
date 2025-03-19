@@ -1,19 +1,13 @@
 {
   lib,
   stdenvNoCC,
-  fetchFromGitHub,
+  sources,
   ...
 }:
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation {
   pname = "frigate-blueprint";
-  version = "0.12.0.4";
-
-  src = fetchFromGitHub {
-    owner = "SgtBatten";
-    repo = "HA_blueprints";
-    rev = "v${version}";
-    hash = "sha256-HBetLcRli6I+E/+s35SDFilUi90yhR+ccbPVG/a0muA=";
-  };
+  inherit (sources.HA_blueprints) version;
+  src = sources.HA_blueprints;
 
   patches = [ ../patches/frigate-blueprint.patch ];
 

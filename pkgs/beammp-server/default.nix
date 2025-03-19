@@ -1,7 +1,6 @@
 {
   lib,
   stdenv,
-  fetchFromGitHub,
   cmake,
   lua5_3,
   fmt,
@@ -16,18 +15,13 @@
   toml11,
   nlohmann_json,
   curl,
+  sources,
+  ...
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "beammp-server";
-  version = "3.8.2";
-
-  src = fetchFromGitHub {
-    owner = "BeamMP";
-    repo = "BeamMP-Server";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-Q790VQEc5Z9L0rLNSxdt1ipAAQeB4r6bq+gF6C3Skb4=";
-    fetchSubmodules = true;
-  };
+  inherit (sources.BeamMP-Server) version;
+  src = sources.BeamMP-Server;
 
   patches = [ ./cmake.patch ];
 

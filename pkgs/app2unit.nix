@@ -1,18 +1,12 @@
 {
   lib,
   stdenvNoCC,
-  fetchFromGitHub,
+  sources,
 }:
 stdenvNoCC.mkDerivation {
   pname = "app2unit";
-  version = "0-unstable-2025-3-17";
-
-  src = fetchFromGitHub {
-    owner = "Vladimir-csp";
-    repo = "app2unit";
-    rev = "0900cb6bce30122b8db5a1292e8fc2b14c1732ec";
-    hash = "sha256-1sQs9g9fzghC60Hl7oHH6F0uDmzNuNwDAz92THQGmt8=";
-  };
+  version = "0-unstable-${sources.app2unit.revision}";
+  src = sources.app2unit;
 
   installPhase = ''
     install -Dt $out/bin app2unit

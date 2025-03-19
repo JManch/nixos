@@ -1,20 +1,15 @@
-{ lib, pkgs }:
+{
+  lib,
+  pkgs,
+  sources,
+}:
 {
   home.packages = [
     (pkgs.supersonic.overrideAttrs (old: {
-      version = "git";
-
-      src = pkgs.fetchFromGitHub {
-        owner = "dweymouth";
-        repo = "supersonic";
-        rev = "31df8ab054e010978558739d962fcb69f26fbf89";
-        hash = "sha256-s4q7RvAG3oDBQ9ktfonEJXjrX/75MUpVq+9c43TRgWM=";
-      };
-
+      version = "0-unstable-${sources.supersonic.revision}";
+      src = sources.supersonic;
       patches = [ ../../../../patches/supersonic-large-volume-slider.patch ];
-
       tags = old.tags ++ [ "migrated_fynedo" ];
-
       vendorHash = "sha256-E1F/89+pyIhmPSsfxWeMFTktGekU56HzSh3qIo8KAzo=";
 
       # desktopItems = lib.singleton (

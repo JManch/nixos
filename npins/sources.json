@@ -227,12 +227,17 @@
       "hash": "1xm79ydd1yljfz83m3fydp469ji7qdk7hzh122l3ikpak85c8nln"
     },
     "hass-web-proxy-lib": {
-      "type": "PyPi",
-      "name": "hass-web-proxy-lib",
-      "version_upper_bound": null,
-      "version": "0.0.7",
-      "url": "https://files.pythonhosted.org/packages/b5/ee/130cb57fb852524e73a16f5b422b09dae60cd26ca8ebd0fac645bb99e74b/hass_web_proxy_lib-0.0.7.tar.gz",
-      "hash": "6e1cfbd6d34ea59fb8b52967752f946c2df0d965b9f9d00cb6993b4e79c5a6e4"
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "dermotduffy",
+        "repo": "hass-web-proxy-lib"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "f96dfdec6e24275dc83b462a3471d89509f3d42a",
+      "url": "https://github.com/dermotduffy/hass-web-proxy-lib/archive/f96dfdec6e24275dc83b462a3471d89509f3d42a.tar.gz",
+      "hash": "1mwl2504r4wm6lhlzzscnsvy5qdpxnw5grlrq7dhkdif919dg7j4"
     },
     "heatmiser-for-home-assistant": {
       "type": "GitRelease",
@@ -302,9 +307,10 @@
       "type": "PyPi",
       "name": "neohubapi",
       "version_upper_bound": null,
-      "version": "3.0",
-      "url": "https://files.pythonhosted.org/packages/1f/8f/f746dbf5e8b975a0556aa4b6d649bb397a2a86b9413c7dafba45750df825/neohubapi-3.0.tar.gz",
-      "hash": "03548553babb7e9508c997acd7f6f5c197cdcaae65c8c687ded611807ed57681"
+      "version": "2.8",
+      "url": "https://files.pythonhosted.org/packages/49/4f/b5ca185458a781efae4a27ad72711af931e8cf5dfacfd48a036c8e49b7cf/neohubapi-2.8.tar.gz",
+      "hash": "f48243d925c8314aa9adb0c5d0dce95120daf75edf578119279b832eb14f4c57",
+      "frozen": true
     },
     "soularr": {
       "type": "Git",

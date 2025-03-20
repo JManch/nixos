@@ -159,10 +159,13 @@ in
         let
           hass-web-proxy-lib = pkgs.python313Packages.buildPythonPackage {
             pname = "hass-web-proxy-lib";
-            inherit (sources.hass-web-proxy-lib) version;
+            version = "0-unstable-${sources.hass-web-proxy-lib.revision}";
             src = sources.hass-web-proxy-lib;
             pyproject = true;
-            build-system = [ pkgs.python313Packages.poetry-core ];
+            build-system = [
+              pkgs.python313Packages.setuptools
+              pkgs.python313Packages.poetry-core
+            ];
           };
         in
         pkgs.home-assistant-custom-components.frigate.overridePythonAttrs {

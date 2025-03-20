@@ -1,23 +1,35 @@
-diff --git a/Frigate Camera Notifications/Stable b/Frigate Camera Notifications/Stable
-index 96cb0dc..8f41f04 100644
---- a/Frigate Camera Notifications/Stable	
-+++ b/Frigate Camera Notifications/Stable	
-@@ -1278,11 +1278,6 @@ action:
-                                     url: "{{tap_action}}"
-                                     attachment:
-                                       url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
--                                    push:
--                                      sound:
--                                        name: "{{ iif(update, 'none', sound) }}"
--                                        volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
--                                        critical: "{{ iif(critical, 1, 0) }}"
-                                     entity_id: "{{ios_live_view}}"
-                                     # Actions
-                                     actions:
-@@ -1334,11 +1329,6 @@ action:
-                                       url: "{{tap_action}}"
+diff --git a/Frigate_Camera_Notifications/Stable.yaml b/Frigate_Camera_Notifications/Stable.yaml
+index 4a5372f..55d8b5c 100644
+--- a/Frigate_Camera_Notifications/Stable.yaml
++++ b/Frigate_Camera_Notifications/Stable.yaml
+@@ -1512,11 +1512,6 @@ actions:
+                                         attachment:
+                                           url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/master.m3u8' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
+                                           content-type: "{{ 'application/vnd.apple.mpegurl' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else 'jpeg' }}"
+-                                        push:
+-                                          sound:
+-                                            name: "{{ iif(update, 'none', sound) }}"
+-                                            volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
+-                                            critical: "{{ iif(critical, 1, 0) }}"
+                                         entity_id: "{{ios_live_view}}"
+                                         # Actions
+                                         actions:
+@@ -1569,11 +1564,6 @@ actions:
+                                           attachment:
+                                             url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/master.m3u8' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
+                                             content-type: "{{ 'application/vnd.apple.mpegurl' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else 'jpeg' }}"
+-                                          push:
+-                                            sound:
+-                                              name: "{{ iif(update, 'none', sound) }}"
+-                                              volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
+-                                              critical: "{{ iif(critical, 1, 0) }}"
+                                           entity_id: "{{ios_live_view}}"
+                                           # Actions
+                                           actions:
+@@ -1623,11 +1613,6 @@ actions:
                                        attachment:
-                                         url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
+                                         url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/master.m3u8' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
+                                         content-type: "{{ 'application/vnd.apple.mpegurl' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else 'jpeg' }}"
 -                                      push:
 -                                        sound:
 -                                          name: "{{ iif(update, 'none', sound) }}"
@@ -26,15 +38,3 @@ index 96cb0dc..8f41f04 100644
                                        entity_id: "{{ios_live_view}}"
                                        # Actions
                                        actions:
-@@ -1387,11 +1377,6 @@ action:
-                                   url: "{{tap_action}}"
-                                   attachment:
-                                     url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
--                                  push:
--                                    sound:
--                                      name: "{{ iif(update, 'none', sound) }}"
--                                      volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
--                                      critical: "{{ iif(critical, 1, 0) }}"
-                                   entity_id: "{{ios_live_view}}"
-                                   # Actions
-                                   actions:

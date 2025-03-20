@@ -283,58 +283,73 @@ in
   systemd.services = mkMerge (
     mapAttrsToList (
       interface: cfg:
-      mkIf (cfg.enable && cfg.dns.host) {
-        "dnsmasq-wg-${interface}" =
-          let
-            # Use dns-stack dnsmsaq config as baseline
-            settings = dns-stack.dnsmasqConfig // {
-              port = cfg.dns.port;
-
-              address = flatten (
-                mapAttrsToList (domain: address: [
-                  "/${domain}/${address}"
-                  "/${domain}/" # respond with NXDOMAIN for ipv6
-                ]) cfg.dns.domains
-              );
-
-              host-record = mapAttrsToList (
-                address: hostname: "${hostname}.${interface},${address}"
-              ) inputs.nix-resources.secrets.wireguardHosts.${interface};
-            };
-
-            configFile = dns-stack.generateDnsmasqConfig "dnsmasq-wg-${interface}.conf" settings;
-            dnsmasq = getExe pkgs.dnsmasq;
-            baseline = config.systemd.services.dnsmasq;
-          in
-          {
-            description = "wg-${interface} dnsmasq";
-            after = [
-              "network.target"
-              "wg-quick-wg-${interface}.service"
-            ];
-            partOf = [ "wg-quick-wg-${interface}.service" ];
-            requires = [ "wg-quick-wg-${interface}.service" ];
-            wantedBy = [ "wg-quick-wg-${interface}.service" ];
-
-            serviceConfig = baseline.serviceConfig // {
-              ExecStartPre = "${dnsmasq} -C ${configFile} --test";
-              ExecStart = "${dnsmasq} -k --user=dnsmasq -C ${configFile}";
-              SocketBindAllow = cfg.dns.port;
-
-              CapabilityBoundingSet = [
-                "CAP_CHOWN"
-                "CAP_SETUID"
-                "CAP_SETGID"
-              ];
-
-              AmbientCapabilities = [
-                "CAP_CHOWN"
-                "CAP_SETUID"
-                "CAP_SETGID"
-              ];
+      mkMerge [
+        (mkIf cfg.enable {
+          "wg-quick-wg-${interface}" = {
+            # Endpoints require DNS resolution which sometimes fails due to
+            # ordering issues
+            # https://discourse.nixos.org/t/name-resolution-fails-at-boot-time/33867
+            # https://github.com/NixOS/nixpkgs/issues/260402
+            serviceConfig = {
+              Restart = "on-failure";
+              RestartSec = 30;
             };
           };
-      }
+        })
+
+        (mkIf (cfg.enable && cfg.dns.host) {
+          "dnsmasq-wg-${interface}" =
+            let
+              # Use dns-stack dnsmsaq config as baseline
+              settings = dns-stack.dnsmasqConfig // {
+                port = cfg.dns.port;
+
+                address = flatten (
+                  mapAttrsToList (domain: address: [
+                    "/${domain}/${address}"
+                    "/${domain}/" # respond with NXDOMAIN for ipv6
+                  ]) cfg.dns.domains
+                );
+
+                host-record = mapAttrsToList (
+                  address: hostname: "${hostname}.${interface},${address}"
+                ) inputs.nix-resources.secrets.wireguardHosts.${interface};
+              };
+
+              configFile = dns-stack.generateDnsmasqConfig "dnsmasq-wg-${interface}.conf" settings;
+              dnsmasq = getExe pkgs.dnsmasq;
+              baseline = config.systemd.services.dnsmasq;
+            in
+            {
+              description = "wg-${interface} dnsmasq";
+              after = [
+                "network.target"
+                "wg-quick-wg-${interface}.service"
+              ];
+              partOf = [ "wg-quick-wg-${interface}.service" ];
+              requires = [ "wg-quick-wg-${interface}.service" ];
+              wantedBy = [ "wg-quick-wg-${interface}.service" ];
+
+              serviceConfig = baseline.serviceConfig // {
+                ExecStartPre = "${dnsmasq} -C ${configFile} --test";
+                ExecStart = "${dnsmasq} -k --user=dnsmasq -C ${configFile}";
+                SocketBindAllow = cfg.dns.port;
+
+                CapabilityBoundingSet = [
+                  "CAP_CHOWN"
+                  "CAP_SETUID"
+                  "CAP_SETGID"
+                ];
+
+                AmbientCapabilities = [
+                  "CAP_CHOWN"
+                  "CAP_SETUID"
+                  "CAP_SETGID"
+                ];
+              };
+            };
+        })
+      ]
     ) interfaces
   );
 

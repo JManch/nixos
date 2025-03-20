@@ -247,7 +247,7 @@ in
           url = "/local/formulaone-card/formulaone-card.js";
         }
         (optionalAttrs frigate.enable {
-          url = "/local/frigate-hass-card/frigate-hass-card.js";
+          url = "/local/advanced-camera-card/advanced-camera-card.js";
           type = "module";
         })
       ];
@@ -272,12 +272,11 @@ in
     reloadTriggers = mkForce [ ];
   };
 
-  # Install frigate-hass-card
   systemd.services.home-assistant.preStart =
     let
       inherit (config.services.home-assistant) configDir;
       inherit (selfPkgs)
-        frigate-hass-card
+        advanced-camera-card
         frigate-blueprint
         thermal-comfort-icons
         formulaone-card
@@ -306,7 +305,7 @@ in
 
       ${optionalString frigate.enable # bash
         ''
-          ln -fsn "${frigate-hass-card}/frigate-hass-card" "${configDir}/www"
+          ln -fsn "${advanced-camera-card}/advanced-camera-card" "${configDir}/www"
 
           # For reasons I don't understand, blueprints will not work if they
           # are in a symlinked directory. The blueprint file has to be

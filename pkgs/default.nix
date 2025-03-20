@@ -24,7 +24,7 @@ in
   formulaone-card = callPackage ./formulaone-card.nix args;
 
   # Manual
-  frigate-hass-card = callPackage ./frigate-hass-card.nix { };
+  advanced-camera-card = callPackage ./advanced-camera-card.nix { };
   multiviewer-for-f1 = callPackage ./multiviewer-for-f1.nix { };
   filen-desktop = callPackage ./filen-desktop.nix args;
 

@@ -110,16 +110,12 @@ in
     };
 
   ns.desktop = {
-    hyprland.settings =
-      let
-        colors = config.colorScheme.palette;
-      in
-      {
-        windowrule = [
-          "bordercolor 0xff${colors.base0B}, initialTitle:^(Spotify( Premium)?)$"
-          "workspace special:social silent, title:^(Spotify( Premium)?)$"
-        ];
-      };
+    hyprland.settings = {
+      windowrule = [
+        "bordercolor 0xff1ED760, initialTitle:^(Spotify( Premium)?)$"
+        "workspace special:social silent, title:^(Spotify( Premium)?)$"
+      ];
+    };
 
     services.playerctl.musicPlayers = [
       "spotify_player"

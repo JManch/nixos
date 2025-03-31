@@ -16,6 +16,7 @@
   nlohmann_json,
   curl,
   sources,
+  fetchFromGitHub,
   ...
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -36,7 +37,15 @@ stdenv.mkDerivation (finalAttrs: {
     httplib
     libzip
     rapidjson
-    sol2
+    (sol2.overrideAttrs {
+      version = "3.3.1";
+      src = fetchFromGitHub {
+        owner = "ThePhD";
+        repo = "sol2";
+        rev = "v3.3.1";
+        hash = "sha256-7QHZRudxq3hdsfEAYKKJydc4rv6lyN6UIt/2Zmaejx8=";
+      };
+    })
     toml11
     nlohmann_json
     zlib

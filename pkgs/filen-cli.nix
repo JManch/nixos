@@ -2,6 +2,8 @@
   lib,
   buildNpmPackage,
   sources,
+  pkg-config,
+  libsecret,
   ...
 }:
 buildNpmPackage {
@@ -9,10 +11,8 @@ buildNpmPackage {
   inherit (sources.filen-cli) version;
   src = sources.filen-cli;
 
-  # Why inject key at compile time???
-  configurePhase = ''
-    npm run generateKey
-  '';
+  nativeBuildInputs = [ pkg-config ];
+  buildInputs = [ libsecret ];
 
   npmDepsHash = "sha256-RXA/kVvLrmrsxj6T6H2soTMYmC6VRWNjuQfefgVB/qY=";
 
@@ -20,6 +20,5 @@ buildNpmPackage {
     mainProgram = "filen";
     license = lib.licenses.agpl3Only;
     platforms = lib.platforms.linux;
-    hydraPlatforms = [ ]; # cause of the key
   };
 }

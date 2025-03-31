@@ -14,7 +14,7 @@ buildNpmPackage {
     npm run generateKey
   '';
 
-  npmDepsHash = "sha256-a+sq0vFsk4c7bl0Nn2KfBFxyq3ZF2HPvt8d1vxegnHg=";
+  npmDepsHash = "sha256-RXA/kVvLrmrsxj6T6H2soTMYmC6VRWNjuQfefgVB/qY=";
 
   meta = {
     mainProgram = "filen";

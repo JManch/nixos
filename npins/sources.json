@@ -144,10 +144,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.0.29",
-      "revision": "76ec60a61acc17ea2b0259d757233ddcec7ccb43",
-      "url": "https://api.github.com/repos/FilenCloudDienste/filen-cli/tarball/v0.0.29",
-      "hash": "10mfn8h9swrnlvixmigdw9355vh5q61f4n29h13qvskipszx3mky"
+      "version": "v0.0.32",
+      "revision": "48a89100094ae7df1070f51fd7b9820f8764cf32",
+      "url": "https://api.github.com/repos/FilenCloudDienste/filen-cli/tarball/v0.0.32",
+      "hash": "1wy10h7zd7yip5szqilv9z29mm0qma434criybcnnzn1v2112b5i"
     },
     "filen-desktop": {
       "type": "GitRelease",
@@ -174,9 +174,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "80d3a24829c0643a273e5f214eac53f0afee2a16",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/80d3a24829c0643a273e5f214eac53f0afee2a16.tar.gz",
-      "hash": "1sxirhdf9g7rnak27lk0clgclpmizl7qgjanl9vhsb3yavy673w0"
+      "revision": "9bf9c83944c7a02655b2046bf5366ed0d5f9b296",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/9bf9c83944c7a02655b2046bf5366ed0d5f9b296.tar.gz",
+      "hash": "0np12mj0hhawx5cf12bj6920cjfxwivgvbs97b790lmk18hwagy4"
     },
     "formulaone-card": {
       "type": "GitRelease",
@@ -189,10 +189,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "1.9.8",
-      "revision": "52534527e100a095b34656911d816ebaa38d4ab9",
-      "url": "https://api.github.com/repos/marcokreeft87/formulaone-card/tarball/1.9.8",
-      "hash": "1mzwqb1azqw7ghyp8y1bczqny8lifgk258hwirygl6l3sr76sl3x"
+      "version": "1.10.5",
+      "revision": "1d386083d1da2e22ff26f2019b7b0ed404051043",
+      "url": "https://api.github.com/repos/marcokreeft87/formulaone-card/tarball/1.10.5",
+      "hash": "0xinr17qn34351l7fxwcqf7jrl7gznfhch7jwr7gs7dsg08ncnwv"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -334,9 +334,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "1a4237e493a3c9546d82eb6f0539eae8f9ea0622",
-      "url": "https://github.com/dweymouth/supersonic/archive/1a4237e493a3c9546d82eb6f0539eae8f9ea0622.tar.gz",
-      "hash": "1fiw63xw0x4ac5qly0lg5v1srwa5hx3ssa41m17pfrbl0gihzin1"
+      "revision": "cc702574451b63c642b404cfc2ee50f88776e17c",
+      "url": "https://github.com/dweymouth/supersonic/archive/cc702574451b63c642b404cfc2ee50f88776e17c.tar.gz",
+      "hash": "0nk64gq6581dvkvimrmqmaibs4aizzxj9xmsr01zrh9wxara8ib1"
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -394,10 +394,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.21.2",
-      "revision": "42c36b746146df6c98ad61e927745554039310b9",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.21.2",
-      "hash": "0fad7bp929s9r3l1gfqkdca50nhwqddl3hh7yjqp5z2lrn2h3jal"
+      "version": "v0.21.3",
+      "revision": "769c10c64185a2e0ee8f7b17674fb6f8e5e121a0",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.21.3",
+      "hash": "0ia02vq3p9f461qvmqwz3lqjhzvvw5jf5asfsmxbgxjnmv7k7v4c"
     },
     "xdg-terminal-exec": {
       "type": "GitRelease",

@@ -1,6 +1,7 @@
 {
   lib,
   cfg,
+  pkgs,
   config,
   inputs,
 }:
@@ -16,7 +17,7 @@ let
     types
     ;
   inherit (inputs.nix-resources.secrets) fqDomain;
-  inherit (config.${ns}.services) mosquitto;
+  inherit (config.${ns}.services) mosquitto home-assistant;
   inherit (config.age.secrets) zigbee2mqttYamlSecrets mqttZigbee2mqttPassword;
   inherit (config.services.zigbee2mqtt) dataDir;
 in
@@ -73,26 +74,23 @@ in
 
     services.zigbee2mqtt = {
       enable = true;
+      package = pkgs.zigbee2mqtt_2;
       dataDir = "/var/lib/zigbee2mqtt";
       settings = {
-        permit_join = false;
+        homeassistant.enabled = home-assistant.enable;
+
+        # Availability is useful for detecting when people turn off switches
+        # for smart lights
+        # https://www.zigbee2mqtt.io/guide/configuration/device-availability.html#device-availability
+        availability.enabled = true;
+
         serial = {
           port = cfg.deviceNode;
           adapter = "ember";
         };
 
-        homeassistant = {
-          enable = true;
-          legacy_entity_attributes = false;
-          legacy_triggers = false;
-        };
-
-        # Availability is useful for detecting when people turn off switches
-        # for smart lights
-        # https://www.zigbee2mqtt.io/guide/configuration/device-availability.html#device-availability
-        availability = true;
-
         frontend = {
+          enabled = true;
           host = cfg.address;
           port = cfg.port;
           url = "https://zigbee.${fqDomain}";
@@ -106,8 +104,6 @@ in
 
         advanced = {
           log_level = "error";
-          legacy_api = false;
-          legacy_availability_payload = false;
           channel = 25;
           network_key = "!${zigbee2mqttYamlSecrets.path} network_key";
         };

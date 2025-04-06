@@ -9,12 +9,13 @@ in
 {
   opts = with lib; {
     autoStart = mkEnableOption "autostart";
+    openFirewall = mkEnableOption "exposing open-webui on primary interfaces";
 
     interfaces = mkOption {
       type = types.listOf types.str;
       default = [ ];
       description = ''
-        List of additional interfaces for Ollama to be exposed on.
+        List of additional interfaces for open-webui to be exposed on.
       '';
     };
   };
@@ -67,11 +68,9 @@ in
     Group = "open-webui";
   };
 
+  networking.firewall.allowedTCPPorts = optional cfg.openFirewall 11111;
   networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
-    allowedTCPPorts = [
-      11434
-      11111
-    ];
+    allowedTCPPorts = [ 11111 ];
   });
 
   ns.persistence.directories = [

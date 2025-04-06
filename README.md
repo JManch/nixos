@@ -24,33 +24,3 @@ Each host has two entry points for module configuration:
 Modules are imported using a wrapper `lib/module-wrapper.nix` that aims to
 reduce boilerplate and enforce a strict structure for options under a custom
 namespace.
-
-## Deployment
-
-Hosts can be deployed with a single command. There is no need to manually copy
-SSH keys for secret deployment. All that's required is a master password.
-Everything, including secrets, will be installed.
-
-Run `build-iso` to get a custom install ISO. The ISO authenticates my SSH key
- and provides the install script `install-host <hostname>`.
-
-The configuration also supports running a VM-variant of any host using `run-vm
-<hostname>`. This enables easy debugging/testing of host configurations. It's
-particularly useful for bisecting old versions of configurations to debug
-regressions.
-
-## Secret Management
-
-Secrets are managed using Agenix and are stored in a separate private repo. A
-private repo was required for storing personal packages and some slightly
-sensitive configuration (not sensitive enough to require encryption).
-Therefore, it was decided that secrets might as well be placed in the private
-repo as well.
-
-## Backups
-
-Restic is utilised for a declarative and opt-in backup solution. Rather than
-saving full system snapshots, specific paths are backed up on a per-module
-basis to minimise the amount of redundant data in contingency storage. The
-backup module has options for defining custom restore scripts and backup
-scripts if necessary.

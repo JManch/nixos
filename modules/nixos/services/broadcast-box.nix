@@ -102,7 +102,7 @@ in
     description = "Broadcast Box Restarter";
     serviceConfig.Type = "oneshot";
     serviceConfig.ExecStart = "${getExe' pkgs.systemd "systemctl"} restart broadcast-box";
-    startAt = "*-*-* 07:00:00";
+    startAt = "*-*-* 04:00:00";
   };
 
   networking.firewall.interfaces = genAttrs cfg.interfaces (_: {

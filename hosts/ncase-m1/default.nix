@@ -138,8 +138,12 @@ in
       lact.enable = true;
       scrutiny.collector.enable = true;
       mosquitto.explorer.enable = true;
-      ollama.enable = true;
       air-vpn.enable = true;
+
+      ollama = {
+        enable = true;
+        openFirewall = true;
+      };
 
       jellyfin = {
         enable = true;

@@ -30,6 +30,7 @@ in
 
   # Other
   bootstrap-kit = callPackage ./bootstrap-kit.nix { };
+  kobo-dither-cbz = callPackage ./kobo-dither-cbz { };
   microfetch = lib.${lib.ns}.addPatches pkgs.microfetch [ "microfetch-icon.patch" ];
 }
 // import ./installers.nix lib self

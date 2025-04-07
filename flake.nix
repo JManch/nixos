@@ -91,15 +91,29 @@
 
     hypridle.url = "github:hyprwm/hypridle";
     hypridle.inputs.nixpkgs.follows = "nixpkgs";
+    hypridle.inputs.hyprutils.follows = "hyprland/hyprutils";
+    hypridle.inputs.hyprland-protocols.follows = "hyprland/hyprland-protocols";
+    hypridle.inputs.hyprlang.follows = "hyprland/hyprlang";
+    hypridle.inputs.hyprwayland-scanner.follows = "hyprland/hyprwayland-scanner";
 
     hyprlock.url = "github:hyprwm/hyprlock";
     hyprlock.inputs.nixpkgs.follows = "nixpkgs";
+    hyprlock.inputs.hyprutils.follows = "hyprland/hyprutils";
+    hyprlock.inputs.hyprgraphics.follows = "hyprland/hyprgraphics";
+    hyprlock.inputs.hyprlang.follows = "hyprland/hyprlang";
+    hyprlock.inputs.hyprwayland-scanner.follows = "hyprland/hyprwayland-scanner";
 
     hyprpolkitagent.url = "github:hyprwm/hyprpolkitagent";
     hyprpolkitagent.inputs.nixpkgs.follows = "nixpkgs";
+    hyprpolkitagent.inputs.hyprutils.follows = "hyprland/hyprutils";
+    hyprpolkitagent.inputs.hyprland-qt-support.follows = "hyprland/hyprland-qtutils/hyprland-qt-support";
 
     hyprpaper.url = "github:hyprwm/hyprpaper";
     hyprpaper.inputs.nixpkgs.follows = "nixpkgs";
+    hyprpaper.inputs.hyprutils.follows = "hyprland/hyprutils";
+    hyprpaper.inputs.hyprgraphics.follows = "hyprland/hyprgraphics";
+    hyprpaper.inputs.hyprlang.follows = "hyprland/hyprlang";
+    hyprpaper.inputs.hyprwayland-scanner.follows = "hyprland/hyprwayland-scanner";
 
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";

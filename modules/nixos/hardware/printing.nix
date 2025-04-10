@@ -164,6 +164,7 @@ in
       wantedBy = mkForce [ ];
       requires = [ "nss-lookup.target" ];
       startAt = if cfg.server.enable then "*-*-* *:00:00" else "*-*-* *:05:00";
+      serviceConfig.RemainAfterExit = mkForce false;
 
       script =
         mkBefore

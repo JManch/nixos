@@ -56,7 +56,6 @@ writeShellApplication {
     }
 
     export -f process_cbz
-    parallel --citation >/dev/null
     parallel -j 4 process_cbz ::: "$@"
   '';
 }

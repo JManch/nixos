@@ -4,10 +4,10 @@
 # Bios options to change from default:
 
 # Tweaker/
-#   Precision Boost Overdrive: Disable
+#   Precision Boost Overdrive: Disabled
 #   Advanced CPU Settings/
 #     SVM Mode: Enabled
-#     Global C-state Control: Enabled
+#     Global C-state Control: Disabled (in an attempt to fix USB issues)
 #   Extreme Memory Profile(X.M.P.): Profile1 DDR4-3600
 # Settings/
 #   Platform Power/

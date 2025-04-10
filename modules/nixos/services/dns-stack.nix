@@ -201,6 +201,12 @@ in
       };
     };
 
+  # The QUIC library that ctrld uses wants this https://github.com/quic-go/quic-go/wiki/UDP-Buffer-Sizes
+  boot.kernel.sysctl = {
+    "net.core.rmem_max" = 7500000;
+    "net.core.wmem_max" = 7500000;
+  };
+
   # Populate hosts file for ctrld host discovery
   networking.hosts = mapAttrs (_: v: [ v ]) homeHosts;
 

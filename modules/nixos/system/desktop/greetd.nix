@@ -8,6 +8,7 @@ let
   inherit (lib) getExe' optional singleton;
 in
 {
+  enableOpt = false;
   conditions = [ (categoryCfg.displayManager.name == "greetd") ];
 
   asserts = [
@@ -22,7 +23,7 @@ in
     the graphical session has fully stopped.
 
     Update: just had this happen without greetd so greetd isn't the only reason
-    it happens (but it consistently happens with greetd)
+    (but it consistently happens with greetd)
 
     Instead just set "uwsm" as the display manager.
   '';

@@ -1,3 +1,17 @@
+# The only reliable way to export all home-manager variables into the
+# systemd user environment with UWSM is to start it from the TTY (not using a
+# display manager like greetd). For some reason display managers do not
+# source our user's .zshenv before UWSM exports the login shell variables into
+# the systemd user environment. Can be partly worked around with
+# systemd.user.sessionVariables = config.home.sessionVariables but this
+# doesn't account for home.sessionSearchVariables or home.sessionVariablesExtra
+# https://github.com/nix-community/home-manager/blob/da624eaad0fefd4dac002e1f09d300d150c20483/modules/home-environment.nix#L611.
+
+# Eventually hopefully all home.session* options will use `environment.d` so
+# they'll get directly exported into the systemd user environment instead of
+# being transfered from the login shell env. Then display managers will be
+# viable again.
+# https://github.com/nix-community/home-manager/issues/2659
 { lib, pkgs }:
 let
   inherit (lib) types mkOption;

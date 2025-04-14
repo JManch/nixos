@@ -339,37 +339,6 @@ in
                 # instead of "${dir}/${f}" do dir + "/${f}". Also never use self in paths
                 # as self + "/${f}" or "$${self}/${f}". I don't understand why but self
                 # always seems to be cast to a string in these scenarios.
-                #
-                # The problem with using strings instead of paths is that rather that copying
-                # each individual file to the store, the files will be referenced in the store
-                # relative to a directory. This completly breaks relative imports in modules
-                # and (I think) causes all files in my module system to get copied to the store
-                # whenever a single file changes. It's also a problem when applying patches, as
-                # using a string path to the patch changes the derivation after every small change
-                # in the flake, causing many unnecessary rebuilts of patched packages. So for
-                # patches it's safe to do ../../../patches/example.patch but NOT safe to do
-                # self + "/patches/examples.patch". This is due to the weirdness of self being
-                # a string not a path.
-                #
-                # patches = [
-                #   ../../../../../patches/waybarDisableReload.patch
-                #   "${self}/patches/waybarDisableReload.patch"
-                #   (self + "/patches/waybarDisableReload.patch")
-                # ]
-                #
-                # Produces:
-                # {
-                #   type = "path";
-                #   value = /nix/store/xayrvkck3gxdwbgwx7kbxkcvibxibs1s-source/patches/waybarDisableReload.patch;
-                # }
-                # {
-                #   type = "string";
-                #   value = "/nix/store/xayrvkck3gxdwbgwx7kbxkcvibxibs1s-source/patches/waybarDisableReload.patch";
-                # }
-                # {
-                #   type = "string";
-                #   value = "/nix/store/xayrvkck3gxdwbgwx7kbxkcvibxibs1s-source/patches/waybarDisableReload.patch";
-                # }
                 path = dir + "/${f}";
                 name = substring 0 ((stringLength f) - 4) f;
               })

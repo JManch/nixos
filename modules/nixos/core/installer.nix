@@ -37,7 +37,7 @@ let
 
         host_config="$flake#nixosConfigurations.$hostname.config"
         fs_type=$(nix eval --raw "$host_config.${ns}.hardware.file-system.type")
-        username=$(nix eval --raw "$host_config.${ns}.core.username")
+        username=$(nix eval --raw "$host_config.${ns}.core.users.username")
 
         if [ "$fs_type" != "sd-image" ]; then
           echo "Host $hostname does not have a sd image filesystem" 1>&2
@@ -128,7 +128,7 @@ let
         exit 1
       fi
 
-      # In the installer name matches a hostname it means it's a custom
+      # If the installer name matches a hostname it means it's a custom
       # installer with a custom implementation
       # shellcheck disable=SC2016
       host_exists=$(nix eval --impure --expr 'with import <nixpkgs> {}; pkgs.lib.hasAttr "'"$installer"'" (builtins.getFlake "'"$flake"'").nixosConfigurations')

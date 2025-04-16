@@ -45,7 +45,13 @@ let
 
       flake="/root/nixos"
       if [ ! -d "$flake" ]; then
-        git clone https://github.com/JManch/nixos "$flake"
+        read -p "Use the flake this ISO was built with? (default is to fetch latest from GitHub) (y/N): " -n 1 -r
+        echo
+        if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+          cp -r --no-preserve=mode "${self}" "$flake"
+        else
+          git clone https://github.com/JManch/nixos "$flake"
+        fi
       fi
 
       bootstrap_kit=$(mktemp -d)
@@ -73,16 +79,16 @@ let
         echo "Any nixos-rebuild commands ran in the VM will need '--override-input vmInstall github:JManch/$vmInstall' manually added"
         # Disko does not allow overriding inputs so instead we update the flake
         # lock file of our downloaded config
-        nix flake lock \
-          --update-input vmInstall \
+        nix flake update \
+          vmInstall \
           --override-input vmInstall "github:JManch/true" \
-          "$flake"
+          --flake "$flake"
       fi
 
       echo "### Fetching host information ###"
       host_config="$flake#nixosConfigurations.$hostname.config"
-      username=$(nix eval --raw "$host_config.${ns}.core.username")
-      admin_username=$(nix eval --raw "$host_config.${ns}.core.adminUsername")
+      username=$(nix eval --raw "$host_config.${ns}.core.users.username")
+      admin_username=$(nix eval --raw "$host_config.${ns}.core.users.adminUsername")
       impermanence=$(nix eval "$host_config.${ns}.system.impermanence.enable")
       secure_boot=$(nix eval "$host_config.${ns}.hardware.secure-boot.enable")
       has_disko=$(nix eval --impure --expr "(builtins.getFlake \"$flake\").nixosConfigurations.$hostname.config.disko.devices.disk or {} != {}")

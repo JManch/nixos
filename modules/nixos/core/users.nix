@@ -58,9 +58,7 @@ in
     priviledgedUser = mkOption {
       type = types.bool;
       default = true;
-      description = ''
-        Whether the host's primary user is part of the wheel group
-      '';
+      description = "Whether the host's primary user is part of the wheel group";
     };
   };
 

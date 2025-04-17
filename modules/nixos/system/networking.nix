@@ -235,8 +235,8 @@ in
           priority = 3;
         };
 
-        "Pixel 5" = {
-          pskRaw = "ext:PIXEL_5";
+        Pixel-9 = {
+          pskRaw = "ext:PIXEL_9";
           priority = 1;
         };
       };

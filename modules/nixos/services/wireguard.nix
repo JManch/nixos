@@ -76,8 +76,8 @@ let
       address = mkOption {
         type = types.str;
         default = null;
-        example = "10.0.0.2/24";
-        description = "Assigned IP address for this device on the VPN along with the subnet mask";
+        example = "10.0.0.2";
+        description = "Assigned IP address for this device on the VPN";
       };
 
       listenPort = mkOption {

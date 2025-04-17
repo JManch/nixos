@@ -20,7 +20,7 @@ in
 
       device = {
         type = "laptop";
-        ipAddress = "10.30.30.10";
+        ipAddress = "192.168.100.10";
         memory = 1024 * 8;
         backlight = "intel_backlight";
         battery = "BAT1";
@@ -79,7 +79,7 @@ in
         peers = lib.singleton {
           publicKey = "4kLZt3aTWUbqSZhz5Q64izTwA4qrDfnkso0z8gRfJ1Q=";
           presharedKeyFile = config.age.secrets.wg-home-router-psk.path;
-          allowedIPs = [ "192.168.0.0/16" ];
+          allowedIPs = [ "0.0.0.0/0" ];
           endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.homeWgRouterPort}";
         };
 
@@ -109,7 +109,7 @@ in
 
         firewall = {
           enable = true;
-          defaultInterfaces = [ "wlp1s0" ];
+          defaultInterfaces = [ "wg-home" ];
         };
 
         wireless = {

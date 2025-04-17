@@ -5,9 +5,6 @@
   config,
   ...
 }:
-let
-  inherit (inputs.nix-resources.secrets) fqDomain;
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -86,7 +83,6 @@ in
         dns = {
           enable = true;
           address = "192.168.100.1";
-          domains.${fqDomain} = "";
         };
       };
     };

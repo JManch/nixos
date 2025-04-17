@@ -2,6 +2,7 @@
   lib,
   pkgs,
   inputs,
+  config,
   username,
   ...
 }:
@@ -166,10 +167,16 @@ in
       wireguard.friends = {
         enable = true;
         autoStart = false;
-        routerPeer = true;
-        routerAllowedIPs = [ "10.0.0.0/24" ];
         address = "10.0.0.2";
         subnet = 24;
+
+        peers = lib.singleton {
+          publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
+          presharedKeyFile = config.age.secrets.wg-friends-router-psk.path;
+          allowedIPs = [ "10.0.0.0/24" ];
+          endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.friendsWgRouterPort}";
+        };
+
         dns = {
           enable = true;
           address = "10.0.0.7";

@@ -2,6 +2,7 @@
   lib,
   pkgs,
   inputs,
+  config,
   ...
 }:
 let
@@ -72,10 +73,16 @@ in
       wireguard.home = {
         enable = true;
         autoStart = true;
-        routerPeer = true;
-        routerAllowedIPs = [ "192.168.0.0/16" ];
         address = "192.168.100.10";
         subnet = 24;
+
+        peers = lib.singleton {
+          publicKey = "4kLZt3aTWUbqSZhz5Q64izTwA4qrDfnkso0z8gRfJ1Q=";
+          presharedKeyFile = config.age.secrets.wg-home-router-psk.path;
+          allowedIPs = [ "192.168.0.0/16" ];
+          endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.homeWgRouterPort}";
+        };
+
         dns = {
           enable = true;
           address = "192.168.100.1";

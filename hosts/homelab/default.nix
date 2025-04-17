@@ -145,11 +145,17 @@ in
       wireguard.friends = {
         enable = true;
         autoStart = true;
-        routerPeer = true;
-        routerAllowedIPs = [ "10.0.0.0/24" ];
         address = "10.0.0.7";
         listenPort = 51820;
         subnet = 24;
+
+        peers = lib.singleton {
+          publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
+          presharedKeyFile = config.age.secrets.wg-friends-router-psk.path;
+          allowedIPs = [ "10.0.0.0/24" ];
+          endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.friendsWgRouterPort}";
+        };
+
         dns = {
           host = true;
           domains = {

@@ -72,7 +72,6 @@ let
     options = {
       enable = mkEnableOption "the wireguard interface";
       autoStart = mkEnableOption "auto start";
-      routerPeer = mkEnableOption "my router as a peer";
 
       address = mkOption {
         type = types.str;
@@ -100,12 +99,6 @@ let
         default = null;
         example = "24";
         description = "Subnet of the wireguard network";
-      };
-
-      routerAllowedIPs = mkOption {
-        type = with types; listOf str;
-        default = [ ];
-        description = "List of allowed IPs for router peer";
       };
 
       peers = mkOption {
@@ -191,17 +184,8 @@ in
       asserts [
         (config.age.secrets."wg-${interface}-key" != null)
         "A private key secret for Wireguard VPN interface '${interface}' is missing"
-        (cfg.routerPeer -> config.age.secrets."wg-${interface}-router-psk" != null)
-        "A pre shared key for Wireguard VPN interface '${interface}' router peer is missing"
-        (cfg.routerPeer -> inputs.nix-resources.secrets ? "${interface}WgRouterPort")
-        "The router peer port for Wireguard VPN interface '${interface}' is missing"
         (cfg.dns.host -> dns-stack.enable)
         "The DNS stack must be enabled on this host to allow VPN DNS hosting"
-        (cfg.routerPeer -> cfg.routerAllowedIPs != [ ])
-        ''
-          The `routerAllowedIPs` list for Wireguard VPN interface ${interface}
-          must not be empty if `routerPeer` is enabled
-        ''
       ]
     ) interfaces
   );
@@ -226,19 +210,9 @@ in
             privateKeyFile = config.age.secrets."wg-${interface}-key".path;
             dns = mkIf cfg.dns.enable [ cfg.dns.address ];
 
-            peers =
-              cfg.peers
-              ++ optional cfg.routerPeer {
-                publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
-                presharedKeyFile = mkIf (
-                  config.age.secrets ? "wg-${interface}-router-psk"
-                ) config.age.secrets."wg-${interface}-router-psk".path;
-                allowedIPs = cfg.routerAllowedIPs;
-                endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${
-                  toString inputs.nix-resources.secrets."${interface}WgRouterPort"
-                }";
-                persistentKeepalive = mkIf (cfg.listenPort == null) 25;
-              };
+            peers = map (
+              peerConf: { persistentKeepalive = mkIf (cfg.listenPort == null) 25; } // peerConf
+            ) cfg.peers;
 
             # Route incoming DNS traffic on the wireguard interface to the DNS server
             # port. We do not use standard port 53 for the wireguard DNS server

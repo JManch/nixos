@@ -46,9 +46,9 @@
 
       desktop = {
         alacritty.enable = true;
-        spotify.enable = true;
         discord.enable = true;
         chatterino.enable = true;
+        supersonic.enable = true;
 
         firefox = {
           enable = true;

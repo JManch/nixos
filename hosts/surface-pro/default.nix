@@ -1,4 +1,12 @@
-{ lib, pkgs, ... }:
+{
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
+let
+  inherit (inputs.nix-resources.secrets) fqDomain;
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -11,7 +19,7 @@
 
       device = {
         type = "laptop";
-        ipAddress = "10.30.30.29";
+        ipAddress = "10.30.30.10";
         memory = 1024 * 8;
         backlight = "intel_backlight";
         battery = "BAT1";
@@ -53,6 +61,26 @@
         excludedDevices = [
           "04fe:0021:5b3ab73a" # HHKB
         ];
+      };
+    };
+
+    programs = {
+      winbox.enable = true;
+    };
+
+    services = {
+      wireguard.home = {
+        enable = true;
+        autoStart = true;
+        routerPeer = true;
+        routerAllowedIPs = [ "192.168.0.0/16" ];
+        address = "192.168.100.10";
+        subnet = 24;
+        dns = {
+          enable = true;
+          address = "192.168.100.1";
+          domains.${fqDomain} = "";
+        };
       };
     };
 

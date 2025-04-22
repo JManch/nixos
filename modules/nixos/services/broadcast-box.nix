@@ -70,7 +70,7 @@ in
 
   services.broadcast-box = {
     enable = true;
-    package = inputs.broadcast-box.packages.${pkgs.system}.default;
+    # package = inputs.broadcast-box.packages.${pkgs.system}.default;
     openFirewall = true;
     web = {
       inherit (cfg) port;

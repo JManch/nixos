@@ -58,7 +58,7 @@ in
       fail2ban.enable = true;
       mealie.enable = false;
       acme.enable = true;
-      taskchampion-server.enable = false; # broken cause of deprecated --port flag
+      taskchampion-server.enable = true;
       air-vpn.confinement.enable = true;
       atuin-server.enable = true;
 

@@ -14,7 +14,7 @@ buildNpmPackage {
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [ libsecret ];
 
-  npmDepsHash = "sha256-RXA/kVvLrmrsxj6T6H2soTMYmC6VRWNjuQfefgVB/qY=";
+  npmDepsHash = "sha256-4GdipHnaqv3LrejMXF73duNyZKgD/0ApzUjiI/QQ30g=";
 
   meta = {
     mainProgram = "filen";

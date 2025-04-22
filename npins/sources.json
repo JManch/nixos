@@ -89,9 +89,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "b9c13a696f5af7518550cad8184fe817650f520d",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/b9c13a696f5af7518550cad8184fe817650f520d.tar.gz",
-      "hash": "07y7s96d28lh1hbl7vz71hhrw9hq0qgfkfgx00qcz5vgl34bxzay"
+      "revision": "42613bd4c69cd5720114679a52b73b8b5d947678",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/42613bd4c69cd5720114679a52b73b8b5d947678.tar.gz",
+      "hash": "1xk68x80n6h533dxranvjsnzsmjncs89476252hcg03slv1vcj7d"
     },
     "async-property": {
       "type": "PyPi",
@@ -128,10 +128,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v4.2.3",
-      "revision": "63885b67f2553905afeed31271384e31703811dd",
-      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/v4.2.3",
-      "hash": "03w8r5kcgzjzf1vkmfispkpk29fjl23biabjxz235k1sc614fmfa"
+      "version": "v4.2.6",
+      "revision": "5ebf19ab80929b88cb083cdced2944b2b0c599e9",
+      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/v4.2.6",
+      "hash": "094x6q5i0bmr9mzinsldrnrd64l1xbf9wa79wyzf07bh9vdkc6i4"
     },
     "filen-cli": {
       "type": "GitRelease",
@@ -144,10 +144,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.0.32",
-      "revision": "48a89100094ae7df1070f51fd7b9820f8764cf32",
-      "url": "https://api.github.com/repos/FilenCloudDienste/filen-cli/tarball/v0.0.32",
-      "hash": "1wy10h7zd7yip5szqilv9z29mm0qma434criybcnnzn1v2112b5i"
+      "version": "v0.0.33",
+      "revision": "fbdad25798b6579961a1f431397c7e5e411ac398",
+      "url": "https://api.github.com/repos/FilenCloudDienste/filen-cli/tarball/v0.0.33",
+      "hash": "0377kldv8mv0ncy0b8jbxlrx28w906yk0620y2h3691hymq9f8d6"
     },
     "filen-desktop": {
       "type": "GitRelease",
@@ -174,9 +174,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "9bf9c83944c7a02655b2046bf5366ed0d5f9b296",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/9bf9c83944c7a02655b2046bf5366ed0d5f9b296.tar.gz",
-      "hash": "0np12mj0hhawx5cf12bj6920cjfxwivgvbs97b790lmk18hwagy4"
+      "revision": "016521f0a21bbb76e8eff4b8410c1e049f081c77",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/016521f0a21bbb76e8eff4b8410c1e049f081c77.tar.gz",
+      "hash": "00zbcjp2vx84a2ipxg5afba0bqvw4vxz0lyk9d7zsj6n3cryhikm"
     },
     "formulaone-card": {
       "type": "GitRelease",
@@ -189,10 +189,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "1.10.5",
-      "revision": "1d386083d1da2e22ff26f2019b7b0ed404051043",
-      "url": "https://api.github.com/repos/marcokreeft87/formulaone-card/tarball/1.10.5",
-      "hash": "0xinr17qn34351l7fxwcqf7jrl7gznfhch7jwr7gs7dsg08ncnwv"
+      "version": "v1.12.3",
+      "revision": "208ecf2578df597692c7617c937d20f82c3ecd1e",
+      "url": "https://api.github.com/repos/marcokreeft87/formulaone-card/tarball/v1.12.3",
+      "hash": "18c5f2likfciyww0l0gzrkax017973gbirrbxyjavm8q2q65v1gn"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -321,9 +321,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "fd41ca48651dc9cb2901c887cd46a77e40d19dc7",
-      "url": "https://github.com/mrusse/soularr/archive/fd41ca48651dc9cb2901c887cd46a77e40d19dc7.tar.gz",
-      "hash": "0scb7s4bi9rk5xnc38j6vp40kslry1hbb0gy0bpzpihllxc1rsab"
+      "revision": "df9945dcf224096a21edabfc7e98b638f3ce1191",
+      "url": "https://github.com/mrusse/soularr/archive/df9945dcf224096a21edabfc7e98b638f3ce1191.tar.gz",
+      "hash": "1bw6sygpyciklfgirl3cydj6cnmzy12xy6r0fqnsccvx7qvzlnqx"
     },
     "supersonic": {
       "type": "Git",
@@ -334,9 +334,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "cc702574451b63c642b404cfc2ee50f88776e17c",
-      "url": "https://github.com/dweymouth/supersonic/archive/cc702574451b63c642b404cfc2ee50f88776e17c.tar.gz",
-      "hash": "0nk64gq6581dvkvimrmqmaibs4aizzxj9xmsr01zrh9wxara8ib1"
+      "revision": "086f5c785553a5981438c8f34b5d5c6b9987bf4a",
+      "url": "https://github.com/dweymouth/supersonic/archive/086f5c785553a5981438c8f34b5d5c6b9987bf4a.tar.gz",
+      "hash": "15cna9yszhihnh22z2ighfzaq5q9c20kdmim4c3fv6crw86pvl9j"
     },
     "thermal_comfort": {
       "type": "GitRelease",

@@ -65,24 +65,13 @@ in
   ];
 
   nixpkgs.overlays = [
-    inputs.nixpkgs-xr.overlays.default
-    (final: prev: {
-      # The latest monado version that works with BeamNG
-      # https://www.beamng.com/threads/experimental-virtual-reality.94206/page-33#post-1788010
-      # WARN: This version of monado required opting out of SteamVR beta to get
-      # working. When removing this overlay opt back into SteamVR beta.
-      monado = prev.monado.overrideAttrs {
-        version = "b4fe9aaa561fa0529355752e55af4a813370c6ee";
-        src = final.fetchgit {
-          url = "https://gitlab.freedesktop.org/monado/monado.git";
-          rev = "b4fe9aaa561fa0529355752e55af4a813370c6ee";
-          fetchSubmodules = false;
-          deepClone = false;
-          leaveDotGit = false;
-          sha256 = "sha256-AJjIDeWcov4qaNGMlNBa/RxN6rope9wZn+CsHUlziWs=";
-        };
-      };
+    (_: prev: {
+      monado = prev.monado.overrideAttrs (old: {
+        # nixpkgs-xr is missing an `or []` on patches
+        patches = old.patches or [ ];
+      });
     })
+    inputs.nixpkgs-xr.overlays.default
   ];
 
   ns.userPackages = [

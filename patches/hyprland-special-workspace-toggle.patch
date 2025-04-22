@@ -1,26 +1,32 @@
 diff --git a/src/managers/KeybindManager.cpp b/src/managers/KeybindManager.cpp
-index ead83fa8..163a39e2 100644
+index 9d7163f6..317b6ec8 100644
 --- a/src/managers/KeybindManager.cpp
 +++ b/src/managers/KeybindManager.cpp
-@@ -1675,18 +1675,17 @@ void CKeybindManager::toggleSpecialWorkspace(std::string args) {
+@@ -2111,13 +2111,14 @@ SDispatchResult CKeybindManager::toggleSpecialWorkspace(std::string args) {
+         return {.success = false, .error = "Invalid workspace passed to special"};
      }
  
-     bool       requestedWorkspaceIsAlreadyOpen = false;
--    const auto PMONITOR                        = g_pCompositor->m_pLastMonitor;
+-    bool       requestedWorkspaceIsAlreadyOpen = false;
+-    const auto PMONITOR                        = g_pCompositor->m_lastMonitor;
 -    auto       specialOpenOnMonitor            = PMONITOR->activeSpecialWorkspaceID();
-+    auto       PMONITOR                        = g_pCompositor->m_pLastMonitor.get();
++    bool requestedWorkspaceIsAlreadyOpen = false;
++    auto PMONITOR                        = g_pCompositor->m_lastMonitor.get();
++    auto specialOpenOnMonitor            = PMONITOR->activeSpecialWorkspaceID();
  
-     for (auto const& m : g_pCompositor->m_vMonitors) {
+     for (auto const& m : g_pCompositor->m_monitors) {
          if (m->activeSpecialWorkspaceID() == workspaceID) {
              requestedWorkspaceIsAlreadyOpen = true;
-+            PMONITOR = m.get();
++            PMONITOR                        = m.get();
              break;
          }
      }
+@@ -2126,8 +2127,7 @@ SDispatchResult CKeybindManager::toggleSpecialWorkspace(std::string args) {
+ 
+     PHLWORKSPACEREF focusedWorkspace;
  
 -    if (requestedWorkspaceIsAlreadyOpen && specialOpenOnMonitor == workspaceID) {
 -        // already open on this monitor
 +    if (requestedWorkspaceIsAlreadyOpen) {
          Debug::log(LOG, "Toggling special workspace {} to closed", workspaceID);
          PMONITOR->setSpecialWorkspace(nullptr);
-     } else {
+ 

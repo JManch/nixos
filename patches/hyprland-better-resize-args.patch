@@ -1,8 +1,8 @@
 diff --git a/src/Compositor.cpp b/src/Compositor.cpp
-index 3d159042..5d5d3502 100644
+index 8e50019e..7d2ac2ff 100644
 --- a/src/Compositor.cpp
 +++ b/src/Compositor.cpp
-@@ -2513,12 +2513,12 @@ PHLLS CCompositor::getLayerSurfaceFromSurface(SP<CWLSurfaceResource> pSurface) {
+@@ -2577,12 +2577,12 @@ PHLLS CCompositor::getLayerSurfaceFromSurface(SP<CWLSurfaceResource> pSurface) {
  }
  
  // returns a delta
@@ -13,12 +13,12 @@ index 3d159042..5d5d3502 100644
      if (!args.contains(' ') && !args.contains('\t'))
          return relativeTo;
  
--    const auto  PMONITOR = m_pLastMonitor;
+-    const auto  PMONITOR = m_lastMonitor;
 -
      bool        xIsPercent = false;
      bool        yIsPercent = false;
      bool        isExact    = false;
-@@ -2552,8 +2552,17 @@ Vector2D CCompositor::parseWindowVectorArgsRelative(const std::string& args, con
+@@ -2616,8 +2616,17 @@ Vector2D CCompositor::parseWindowVectorArgsRelative(const std::string& args, con
      int Y = 0;
  
      if (isExact) {
@@ -34,13 +34,13 @@ index 3d159042..5d5d3502 100644
 +            Y += xIsPercent ? PMONITOR->vecPosition.y : 0;
 +        }
      } else {
-         X = xIsPercent ? std::stof(x) * 0.01 * relativeTo.x + relativeTo.x : std::stoi(x) + relativeTo.x;
-         Y = yIsPercent ? std::stof(y) * 0.01 * relativeTo.y + relativeTo.y : std::stoi(y) + relativeTo.y;
+         X = xIsPercent ? (std::stof(x) * 0.01 * relativeTo.x) + relativeTo.x : std::stoi(x) + relativeTo.x;
+         Y = yIsPercent ? (std::stof(y) * 0.01 * relativeTo.y) + relativeTo.y : std::stoi(y) + relativeTo.y;
 diff --git a/src/Compositor.hpp b/src/Compositor.hpp
-index 629b71bc..e3b27927 100644
+index 32e65286..c2a7626d 100644
 --- a/src/Compositor.hpp
 +++ b/src/Compositor.hpp
-@@ -153,7 +153,7 @@ class CCompositor {
+@@ -131,7 +131,7 @@ class CCompositor {
      void                   warpCursorTo(const Vector2D&, bool force = false);
      PHLLS                  getLayerSurfaceFromSurface(SP<CWLSurfaceResource>);
      void                   closeWindow(PHLWINDOW);
@@ -50,42 +50,42 @@ index 629b71bc..e3b27927 100644
                                                bool isEmpty = true); // will be deleted next frame if left empty and unfocused!
      void                   setActiveMonitor(PHLMONITOR);
 diff --git a/src/managers/KeybindManager.cpp b/src/managers/KeybindManager.cpp
-index fd4992eb..2f5b4b4c 100644
+index 9d7163f6..68a5f5db 100644
 --- a/src/managers/KeybindManager.cpp
 +++ b/src/managers/KeybindManager.cpp
-@@ -2043,7 +2043,7 @@ SDispatchResult CKeybindManager::resizeActive(std::string args) {
-     if (!PLASTWINDOW || PLASTWINDOW->isFullscreen())
-         return {};
+@@ -2186,7 +2186,7 @@ SDispatchResult CKeybindManager::resizeActive(std::string args) {
+     if (PLASTWINDOW->isFullscreen())
+         return {.success = false, .error = "Window is fullscreen"};
  
 -    const auto SIZ = g_pCompositor->parseWindowVectorArgsRelative(args, PLASTWINDOW->m_vRealSize->goal());
 +    const auto SIZ = g_pCompositor->parseWindowVectorArgsRelative(args, PLASTWINDOW, false);
  
      if (SIZ.x < 1 || SIZ.y < 1)
-         return {};
-@@ -2062,7 +2062,7 @@ SDispatchResult CKeybindManager::moveActive(std::string args) {
-     if (!PLASTWINDOW || PLASTWINDOW->isFullscreen())
-         return {};
+         return {.success = false, .error = "Invalid size provided"};
+@@ -2208,7 +2208,7 @@ SDispatchResult CKeybindManager::moveActive(std::string args) {
+     if (PLASTWINDOW->isFullscreen())
+         return {.success = false, .error = "Window is fullscreen"};
  
 -    const auto POS = g_pCompositor->parseWindowVectorArgsRelative(args, PLASTWINDOW->m_vRealPosition->goal());
 +    const auto POS = g_pCompositor->parseWindowVectorArgsRelative(args, PLASTWINDOW, true);
  
      g_pLayoutManager->getCurrentLayout()->moveActiveWindow(POS - PLASTWINDOW->m_vRealPosition->goal());
  
-@@ -2084,7 +2084,7 @@ SDispatchResult CKeybindManager::moveWindow(std::string args) {
+@@ -2230,7 +2230,7 @@ SDispatchResult CKeybindManager::moveWindow(std::string args) {
      if (PWINDOW->isFullscreen())
-         return {};
+         return {.success = false, .error = "Window is fullscreen"};
  
 -    const auto POS = g_pCompositor->parseWindowVectorArgsRelative(MOVECMD, PWINDOW->m_vRealPosition->goal());
 +    const auto POS = g_pCompositor->parseWindowVectorArgsRelative(MOVECMD, PWINDOW, true);
  
      g_pLayoutManager->getCurrentLayout()->moveActiveWindow(POS - PWINDOW->m_vRealPosition->goal(), PWINDOW);
  
-@@ -2106,7 +2106,7 @@ SDispatchResult CKeybindManager::resizeWindow(std::string args) {
+@@ -2252,7 +2252,7 @@ SDispatchResult CKeybindManager::resizeWindow(std::string args) {
      if (PWINDOW->isFullscreen())
-         return {};
+         return {.success = false, .error = "Window is fullscreen"};
  
 -    const auto SIZ = g_pCompositor->parseWindowVectorArgsRelative(MOVECMD, PWINDOW->m_vRealSize->goal());
 +    const auto SIZ = g_pCompositor->parseWindowVectorArgsRelative(MOVECMD, PWINDOW, false);
  
      if (SIZ.x < 1 || SIZ.y < 1)
-         return {};
+         return {.success = false, .error = "Invalid size provided"};

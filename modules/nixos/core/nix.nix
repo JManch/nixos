@@ -447,7 +447,10 @@ in
           "auto-allocate-uids"
         ];
         allow-import-from-derivation = false;
-        auto-optimise-store = true;
+        # Causes excessive writes and potential slow downs when writing
+        # content to the nix store. Optimising once a week with
+        # `nix.optimise.automatic` is probably better?
+        auto-optimise-store = false;
         # Do not create a bunch of nixbld users
         auto-allocate-uids = true;
         # Do not load the default global registry
@@ -469,8 +472,13 @@ in
 
       gc = {
         automatic = true;
-        dates = "weekly";
+        dates = "Mon *-*-* 00:00:00";
         options = "--delete-older-than 7d";
+      };
+
+      optimise = {
+        automatic = true;
+        dates = [ "Mon *-*-* 1:00:00" ];
       };
     };
 
@@ -478,76 +486,85 @@ in
     enable = true;
     flake = "github:JManch/nixos";
     operation = "boot";
-    dates = "weekly";
+    dates = "Mon *-*-* 02:00:00";
     randomizedDelaySec = "2hours";
   };
 
-  systemd.services = mkIf cfg.autoUpgrade (mkMerge [
-    (listToAttrs (
-      map
-        (
-          type:
-          nameValuePair "nixos-upgrade-${type}" {
-            restartIfChanged = false;
-            serviceConfig = {
-              type = "oneshot";
-              EnvironmentFile = notifVars.path;
-              ExecStart =
-                let
-                  title = "NixOS Auto Upgrade ${upperFirstChar type}";
-                  message = "Auto upgrade ${if type == "success" then "succeeded" else type} on host ${hostname}";
-                  shoutrrr = getExe pkgs.shoutrrr;
-                in
-                pkgs.writeShellScript "nixos-upgrade-${type}-notif" (
-                  ''
-                    ${shoutrrr} send \
-                      --url "discord://$UPGRADE_DISCORD_AUTH_${toUpper type}" \
-                      --title "${title}" \
-                      --message "${message}"
-                  ''
-                  + optionalString (type == "failure") ''
-                    ${shoutrrr} send \
-                      --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${
-                        replaceStrings [ " " ] [ "%20" ] title
-                      }" \
-                      --message "${message}"
-                  ''
-                );
-            };
-          }
-        )
-        [
-          "success"
-          "failure"
-        ]
-    ))
+  systemd.services = mkMerge [
     {
-      nixos-upgrade = {
-        onFailure = [ "nixos-upgrade-failure.service" ];
-        onSuccess = [ "nixos-upgrade-success.service" ];
-        # Because one of our flake inputs is a private repo temporarily copy host ssh
-        # keys so root uses them to authenticate with github
-        serviceConfig.ExecStart = mkForce (pkgs.writeShellScript "nixos-upgrade-ssh-auth" ''
-          set -e
-          # Copy host ssh keys to /root/.ssh
-          # Abort if /root.ssh exists
-          if [ -d /root/.ssh ]; then
-            echo "Aborting because root has ssh keys for some reason"
-            exit 1
-          fi
-
-          mkdir -p /root/.ssh
-          cp /etc/ssh/ssh_host_ed25519_key /root/.ssh/id_ed25519
-          cleanup() {
-            rm -rf "/root/.ssh"
-          }
-          trap cleanup EXIT
-
-          ${config.systemd.services.nixos-upgrade.script}
-        '').outPath;
-      };
+      nix-optimise.after = [ "nix-gc.service" ];
     }
-  ]);
+    (mkIf cfg.autoUpgrade (mkMerge [
+      (listToAttrs (
+        map
+          (
+            type:
+            nameValuePair "nixos-upgrade-${type}" {
+              restartIfChanged = false;
+              serviceConfig = {
+                type = "oneshot";
+                EnvironmentFile = notifVars.path;
+                ExecStart =
+                  let
+                    title = "NixOS Auto Upgrade ${upperFirstChar type}";
+                    message = "Auto upgrade ${if type == "success" then "succeeded" else type} on host ${hostname}";
+                    shoutrrr = getExe pkgs.shoutrrr;
+                  in
+                  pkgs.writeShellScript "nixos-upgrade-${type}-notif" (
+                    ''
+                      ${shoutrrr} send \
+                        --url "discord://$UPGRADE_DISCORD_AUTH_${toUpper type}" \
+                        --title "${title}" \
+                        --message "${message}"
+                    ''
+                    + optionalString (type == "failure") ''
+                      ${shoutrrr} send \
+                        --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${
+                          replaceStrings [ " " ] [ "%20" ] title
+                        }" \
+                        --message "${message}"
+                    ''
+                  );
+              };
+            }
+          )
+          [
+            "success"
+            "failure"
+          ]
+      ))
+      {
+        nixos-upgrade = {
+          after = [
+            "nix-optimise.service"
+            "nix-gc.service"
+          ];
+          onFailure = [ "nixos-upgrade-failure.service" ];
+          onSuccess = [ "nixos-upgrade-success.service" ];
+          # Because one of our flake inputs is a private repo temporarily copy host ssh
+          # keys so root uses them to authenticate with github
+          serviceConfig.ExecStart = mkForce (pkgs.writeShellScript "nixos-upgrade-ssh-auth" ''
+            set -e
+            # Copy host ssh keys to /root/.ssh
+            # Abort if /root.ssh exists
+            if [ -d /root/.ssh ]; then
+              echo "Aborting because root has ssh keys for some reason"
+              exit 1
+            fi
+
+            mkdir -p /root/.ssh
+            cp /etc/ssh/ssh_host_ed25519_key /root/.ssh/id_ed25519
+            cleanup() {
+              rm -rf "/root/.ssh"
+            }
+            trap cleanup EXIT
+
+            ${config.systemd.services.nixos-upgrade.script}
+          '').outPath;
+        };
+      }
+    ]))
+  ];
 
   # Sometimes nixos-rebuild compiles large pieces software that require more
   # space in /tmp than my tmpfs can provide. The obvious solution is to mount

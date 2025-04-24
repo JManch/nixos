@@ -82,11 +82,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1741885971,
-        "narHash": "sha256-QkMNV8FyOqDj5pWkziRLLaDKd1oUedTWO/DWIhWbeNk=",
+        "lastModified": 1745454189,
+        "narHash": "sha256-kHEpTP3/wYmO6/i+e4u9kiaLtOIAxOUhCLF1WbFQvs0=",
         "owner": "JManch",
         "repo": "broadcast-box",
-        "rev": "d8d377ab68e4cd699e9822df0f0ee07b319803e3",
+        "rev": "0825cf5878edbc66e541cf69a44a3863dd0a624d",
         "type": "github"
       },
       "original": {
@@ -356,16 +356,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1733668782,
-        "narHash": "sha256-tPsqU00FhgdFr0JiQUiBMgPVbl1jbPCY5gbFiJycL3I=",
-        "owner": "nix-community",
+        "lastModified": 1745400485,
+        "narHash": "sha256-0YkWCS13jpoo3+sX/3kcgdxBNt1VZTmvF+FhZb4rFKI=",
+        "owner": "tscolari",
         "repo": "gomod2nix",
-        "rev": "514283ec89c39ad0079ff2f3b1437404e4cba608",
+        "rev": "9ca7a1cd814b9c0919bbe1d35158dbdc579460b7",
         "type": "github"
       },
       "original": {
-        "owner": "nix-community",
+        "owner": "tscolari",
         "repo": "gomod2nix",
+        "rev": "9ca7a1cd814b9c0919bbe1d35158dbdc579460b7",
         "type": "github"
       }
     },

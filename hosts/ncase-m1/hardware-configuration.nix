@@ -51,6 +51,8 @@
   ...
 }:
 {
+  # Tracker for second monitor flickering issue: https://gitlab.freedesktop.org/drm/amd/-/issues/2904
+
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
   networking.hostId = "625ec505";

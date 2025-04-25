@@ -38,7 +38,7 @@
             scale = 1.5;
             position.x = 0;
             position.y = 0;
-            workspaces = builtins.genList (i: (i * 2) + 1) 25;
+            workspaces = builtins.genList (i: i + 1) 50;
           }
         ];
       };

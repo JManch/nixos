@@ -88,5 +88,7 @@
     kernelPackages = lib.mkForce pkgs.linuxPackages_6_13;
   };
 
+  programs.ryzen-monitor-ng.enable = true;
+
   system.stateVersion = "24.05";
 }

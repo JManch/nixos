@@ -6,9 +6,6 @@
   username,
   ...
 }:
-let
-  inherit (inputs.nix-resources.secrets) tomFqDomain;
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -180,7 +177,7 @@ in
         dns = {
           enable = true;
           address = "10.0.0.7";
-          domains.${tomFqDomain} = "";
+          domains.${inputs.nix-resources.secrets.tomFqDomain} = "";
         };
       };
 
@@ -204,7 +201,6 @@ in
     system = {
       impermanence.enable = true;
       ssh.server.enable = true;
-      windows.enable = true;
       virtualisation.libvirt.enable = true;
 
       desktop = {
@@ -250,6 +246,4 @@ in
       };
     };
   };
-
-  programs.ryzen-monitor-ng.enable = true;
 }

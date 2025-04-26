@@ -355,4 +355,6 @@ in
 
     Install.WantedBy = [ "graphical-session.target" ];
   };
+
+  ns.persistence.directories = [ ".local/share/hyprland" ];
 }

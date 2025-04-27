@@ -32,8 +32,7 @@
   services.logind = {
     # Power button doesn't work so these are pointless
     # https://github.com/linux-surface/linux-surface/issues/1424
-    powerKey = "hibernate";
-    powerKeyLongPress = "poweroff";
+    powerKey = "poweroff";
     lidSwitch = "suspend";
   };
 

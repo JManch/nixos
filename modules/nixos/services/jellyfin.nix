@@ -107,6 +107,15 @@ in
           default = 5055;
           description = "Jellyseerr listening port";
         };
+
+        extraAllowedAddresses = mkOption {
+          type = with types; listOf str;
+          default = [ ];
+          description = ''
+            List of address to give access to Jellyseerr in addition to the trusted
+            list.
+          '';
+        };
       };
     };
 
@@ -245,9 +254,12 @@ in
       };
     };
 
-    ns.services.caddy.virtualHosts.jellyseerr.extraConfig = ''
-      reverse_proxy http://127.0.0.1:${toString cfg.jellyseerr.port}
-    '';
+    ns.services.caddy.virtualHosts.jellyseerr = {
+      inherit (cfg.jellyseerr) extraAllowedAddresses;
+      extraConfig = ''
+        reverse_proxy http://127.0.0.1:${toString cfg.jellyseerr.port}
+      '';
+    };
 
     ns.persistence.directories = singleton {
       directory = "/var/lib/private/jellyseerr";

@@ -216,7 +216,13 @@ in
         openFirewall = false;
         autoStart = true;
         reverseProxy.enable = true;
-        jellyseerr.enable = true;
+
+        jellyseerr = {
+          enable = true;
+          extraAllowedAddresses = with wireguard.friends; [
+            "${address}/${toString subnet}"
+          ];
+        };
 
         # Google TV on guest VLAN
         reverseProxy.extraAllowedAddresses = with wireguard.friends; [

@@ -104,7 +104,7 @@ in
       ];
       description = ''
         List of address ranges representing the trusted local network. Use in
-        combination with allowAddresses to restrict access to virtual hosts.
+        combination with allowedAddresses to restrict access to virtual hosts.
       '';
     };
 

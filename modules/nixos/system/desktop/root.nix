@@ -10,6 +10,7 @@ let
     ns
     mkIf
     types
+    mkDefault
     genAttrs
     getExe'
     mkOption
@@ -77,6 +78,9 @@ in
   i18n.defaultLocale = "en_GB.UTF-8";
   services.xserver.excludePackages = [ pkgs.xterm ];
   hardware.graphics.enable = true;
+
+  # Some apps may use this to optimise for power savings
+  services.upower.enable = mkDefault config.${ns}.core.device.type == "laptop";
 
   # Enables wayland for all apps that support it
   environment.sessionVariables.NIXOS_OZONE_WL = 1;

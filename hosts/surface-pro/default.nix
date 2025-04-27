@@ -67,22 +67,44 @@
     };
 
     services = {
-      wireguard.home = {
-        enable = true;
-        autoStart = true;
-        address = "192.168.100.10";
-        subnet = 24;
+      wireguard = {
+        home = {
+          enable = true;
+          autoStart = true;
+          address = "192.168.100.10";
+          subnet = 24;
 
-        peers = lib.singleton {
-          publicKey = "4kLZt3aTWUbqSZhz5Q64izTwA4qrDfnkso0z8gRfJ1Q=";
-          presharedKeyFile = config.age.secrets.wg-home-router-psk.path;
-          allowedIPs = [ "0.0.0.0/0" ];
-          endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.homeWgRouterPort}";
+          peers = lib.singleton {
+            publicKey = "4kLZt3aTWUbqSZhz5Q64izTwA4qrDfnkso0z8gRfJ1Q=";
+            presharedKeyFile = config.age.secrets.wg-home-router-psk.path;
+            allowedIPs = [ "0.0.0.0/0" ];
+            endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.homeWgRouterPort}";
+          };
+
+          dns = {
+            enable = true;
+            address = "192.168.100.1";
+          };
         };
 
-        dns = {
+        friends = {
           enable = true;
-          address = "192.168.100.1";
+          autoStart = false;
+          address = "10.0.0.12";
+          subnet = 24;
+
+          peers = lib.singleton {
+            publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
+            presharedKeyFile = config.age.secrets.wg-friends-router-psk.path;
+            allowedIPs = [ "10.0.0.0/24" ];
+            endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.friendsWgRouterPort}";
+          };
+
+          dns = {
+            enable = true;
+            address = "10.0.0.7";
+            domains.${inputs.nix-resources.secrets.tomFqDomain} = "";
+          };
         };
       };
     };

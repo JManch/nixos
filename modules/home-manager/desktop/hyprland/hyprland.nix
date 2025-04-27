@@ -178,7 +178,6 @@ in
         inactive_timeout = 0;
         enable_hyprcursor = cfg.hyprcursor.package != null;
         hide_on_key_press = false;
-        warp_on_toggle_special = 1;
       };
 
       animations = {

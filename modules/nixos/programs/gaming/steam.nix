@@ -160,7 +160,7 @@ in
 
         # Steam sign-in window
         "noinitialfocus, class:^(steam)$, title:^(Sign in to Steam)$"
-        "workspace special:loading silent, class:^(steam)$, title:^(Sign in to Steam)$"
+        "workspace special:special silent, class:^(steam)$, title:^(Sign in to Steam)$"
 
         # Friends list
         "float, class:^(steam)$, title:^(Friends List)$"

@@ -1,6 +1,11 @@
 { lib, ... }:
 {
   ${lib.ns} = {
+    core = {
+      configManager = true;
+      backupFiles = true;
+    };
+
     desktop = {
       enable = true;
       terminal = "Alacritty";

@@ -170,10 +170,11 @@ in
             # Chatterino window opened on twitch workspace
             "tag -twitch_remove, tag:twitch_remove, class:^(com\\.chatterino\\.)$"
             "float, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
-            "move ${firefoxPercentage}% 0%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
-            "size ${chatterinoPercentage}% 100%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
+            "move ${firefoxPercentage}% 0%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$, title:negative:^(Chatterino Settings)$"
+            "size ${chatterinoPercentage}% 100%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$, title:negative:^(Chatterino Settings)$"
             "prop xray 0, class:^(com\\.chatterino\\.)$"
             "alwaysontop, class:^(com\\.chatterino\\.)$, title:^(Chatterino - Overlay)$"
+            "center, class:^(com\\.chatterino\\.)$, title:^(Chatterino Settings)$"
 
             # Firefox window opened on twitch workspace
             "tag -twitch_remove, tag:twitch_remove, class:^(firefox)$"

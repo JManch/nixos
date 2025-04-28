@@ -93,7 +93,7 @@ in
         "${modKey}, Comma, exec, ${playerctl} previous --player ${musicPlayers}"
         ", XF86AudioNext, exec, ${playerctl} next"
         ", XF86AudioPrev, exec, ${playerctl} previous"
-        ", XF86AudioPlay, exec, ${playerctl} play"
+        ", XF86AudioPlay, exec, ${playerctl} play-pause"
         ", XF86AudioPause, exec, ${playerctl} pause"
       ];
 

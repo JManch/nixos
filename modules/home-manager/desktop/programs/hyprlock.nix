@@ -11,6 +11,7 @@ let
   inherit (osConfig.${ns}.core.device) primaryMonitor;
   colors = config.colorScheme.palette;
   labelHeight = toString (builtins.ceil (0.035 * primaryMonitor.height * primaryMonitor.scale));
+  hasFingerprint = osConfig.services.fprintd.enable;
 in
 {
   categoryConfig.locker = {
@@ -25,6 +26,16 @@ in
       general = {
         hide_cursor = false;
         grace = 5;
+      };
+
+      auth = {
+        pam.enabled = true;
+
+        fingerprint = {
+          enabled = hasFingerprint;
+          ready_message = "Scan fingerprint to unlock...";
+          present_message = "Scanning fingerprint...";
+        };
       };
 
       background = singleton {
@@ -60,8 +71,11 @@ in
         font_color = "0xff${colors.base07}";
         check_color = "0xff${colors.base0D}";
         fail_color = "0xff${colors.base08}";
-        placeholder_text = "<span foreground=\"##${colors.base03}\">Password...</span>";
-        fail_text = "<span foreground=\"##${colors.base08}\">Incorrect password</span>";
+        placeholder_text = "<span foreground=\"##${colors.base03}\">${
+          # Not using $FPRINTPROMPT because its appearance gets delayed for some reason
+          if hasFingerprint then "Scan fingerprint..." else "Password..."
+        }</span>";
+        fail_text = "<span foreground=\"##${colors.base08}\">Authentication failed</span>";
         hide_input = false;
         position = "0, -${labelHeight}";
         rounding = desktop.style.cornerRadius;

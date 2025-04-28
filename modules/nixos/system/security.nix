@@ -14,6 +14,6 @@ in
 
   security.pam.services = mkIf (home-manager.enable) {
     swaylock = mkIf swaylock.enable { };
-    hyprlock = mkIf hyprlock.enable { };
+    hyprlock = mkIf (hyprlock.enable && hyprlock.settings.auth.pam.enabled) { };
   };
 }

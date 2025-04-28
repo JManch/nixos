@@ -8,7 +8,11 @@ in
   disko.devices = {
     disk.nixos = {
       type = "disk";
-      device = if vmInstall then "/dev/disk/by-path/pci-0000:04:00.0" else null; # FIX:
+      device =
+        if vmInstall then
+          "/dev/disk/by-path/pci-0000:04:00.0"
+        else
+          "/dev/disk/by-id/nvme-eui.000000000000000100a075254e014725";
       content = {
         type = "gpt";
         partitions = {
@@ -39,8 +43,6 @@ in
               extraFormatArgs = [
                 "--type=luks2"
                 "--use-random" # true randomness at the cost of blocking if there isn't enough entropy
-                # WARN: gets auto-detected but device needs to report correct sector size
-                # "--sector-size=4096"
               ];
 
               content = {

@@ -19,8 +19,8 @@
         type = "laptop";
         ipAddress = "192.168.100.11";
         memory = 1024 * 64;
-        backlight = null; # FIX:
-        battery = null; # FIX:
+        backlight = "amdgpu_bl1";
+        battery = "BAT1";
 
         cpu = {
           name = "AI 9 HX 370";
@@ -137,7 +137,7 @@
 
         wireless = {
           enable = true;
-          interface = null; # FIX:
+          interface = "wlp192s0";
         };
       };
     };

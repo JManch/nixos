@@ -13,6 +13,7 @@
 
       nixosConfigurations = lib.listToAttrs [
         (mkHost "ncase-m1" "joshua" "x86_64-linux")
+        (mkHost "framework" "joshua" "x86_64-linux")
         (mkHost "homelab" "joshua" "x86_64-linux")
         (mkHost "msi" "lauren" "x86_64-linux")
         (mkHost "pi-3" "joshua" "aarch64-linux")

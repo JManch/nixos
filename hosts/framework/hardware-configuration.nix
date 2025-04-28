@@ -17,11 +17,15 @@
   hardware.cpu.amd.updateMicrocode = true;
 
   boot = {
-    # FIX:
-    kernelModules = [ ];
+    kernelModules = [ "kvm-amd" ];
 
-    # FIX:
-    initrd.availableKernelModules = [ ];
+    initrd.availableKernelModules = [
+      "nvme"
+      "xhci_pci"
+      "thunderbolt"
+      "usb_storage"
+      "sd_mod"
+    ];
 
     # HACK: Temporarily using testing for kernel >=6.15 to fix MT7925 wifi drop outs
     kernelPackages = lib.mkForce pkgs.linuxPackages_testing;
@@ -42,6 +46,7 @@
   };
 
   services.tlp.enable = true;
+  services.power-profiles-daemon.enable = false;
 
   system.stateVersion = "25.05";
 }

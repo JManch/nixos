@@ -13,6 +13,7 @@ let
     getExe
     getExe'
     optional
+    optionalAttrs
     singleton
     optionalString
     mkEnableOption
@@ -21,6 +22,7 @@ let
   inherit (config.${ns}) desktop;
   inherit (config.home) homeDirectory;
   inherit (config.${ns}.programs.desktop) mpv;
+  inherit (osConfig.${ns}.core) device;
   impermanence = osConfig.${ns}.system.impermanence or null;
 in
 {
@@ -75,90 +77,92 @@ in
         name = "default";
         isDefault = true;
 
-        settings = {
-          # General
-          "general.autoScroll" = true;
-          "extensions.pocket.enabled" = false;
-          # Enable userChrome.css modifications
-          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-          # Enable hardware acceleration
-          # Firefox only support VAAPI acceleration. This is natively supported
-          # by AMD cards but NVIDIA cards need a translation library to go from
-          # VDPAU to VAAPI.
-          "media.ffmpeg.vaapi.enabled" = ((osConfig.${ns}.core.device.gpu.type or true) != null);
+        settings =
+          {
+            # General
+            "general.autoScroll" = true;
+            "extensions.pocket.enabled" = false;
+            # Enable userChrome.css modifications
+            "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+            # Enable hardware acceleration
+            # Firefox only support VAAPI acceleration. This is natively supported
+            # by AMD cards but NVIDIA cards need a translation library to go from
+            # VDPAU to VAAPI.
+            "media.ffmpeg.vaapi.enabled" = ((osConfig.${ns}.core.device.gpu.type or true) != null);
 
-          # Scrolling
-          "mousewheel.default.delta_multiplier_x" = 99;
-          "mousewheel.default.delta_multiplier_y" = 99;
-          "mousewheel.default.delta_multiplier_z" = 99;
-          "general.smoothScroll" = true;
-          "general.smoothScroll.lines.durationMaxMS" = 125;
-          "general.smoothScroll.lines.durationMinMS" = 125;
-          "general.smoothScroll.mouseWheel.durationMaxMS" = 200;
-          "general.smoothScroll.mouseWheel.durationMinMS" = 100;
-          "general.smoothScroll.other.durationMaxMS" = 125;
-          "general.smoothScroll.other.durationMinMS" = 125;
-          "general.smoothScroll.pages.durationMaxMS" = 125;
-          "general.smoothScroll.pages.durationMinMS" = 125;
-          "mousewheel.system_scroll_override_on_root_content.horizontal.factor" = 175;
-          "mousewheel.system_scroll_override_on_root_content.vertical.factor" = 175;
-          "toolkit.scrollbox.horizontalScrollDistance" = 6;
-          "toolkit.scrollbox.verticalScrollDistance" = 2;
+            # UI
+            "layout.css.devPixelsPerPx" = cfg.uiScale;
+            "browser.compactmode.show" = true;
+            "browser.uidensity" = 1;
+            "browser.urlbar.suggest.engines" = false;
+            "browser.urlbar.suggest.openpage" = false;
+            "browser.toolbars.bookmarks.visibility" = "never";
+            "browser.newtabpage.activity-stream.feeds.system.topstories" = false;
+            "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts" = false;
+            "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.searchEngines" = "";
+            "media.videocontrols.picture-in-picture.video-toggle-enabled" = false;
 
-          # UI
-          "layout.css.devPixelsPerPx" = cfg.uiScale;
-          "browser.compactmode.show" = true;
-          "browser.uidensity" = 1;
-          "browser.urlbar.suggest.engines" = false;
-          "browser.urlbar.suggest.openpage" = false;
-          "browser.toolbars.bookmarks.visibility" = "never";
-          "browser.newtabpage.activity-stream.feeds.system.topstories" = false;
-          "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts" = false;
-          "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.searchEngines" = "";
-          "media.videocontrols.picture-in-picture.video-toggle-enabled" = false;
+            # QOL
+            "signon.rememberSignons" = false;
+            "signon.management.page.breach-alerts.enabled" = false;
+            "layout.word_select.eat_space_to_next_word" = false;
+            "browser.download.useDownloadDir" = false;
+            "browser.aboutConfig.showWarning" = false;
+            "extensions.formautofill.creditCards.enabled" = false;
+            "doms.forms.autocomplete.formautofill" = false;
 
-          # QOL
-          "signon.rememberSignons" = false;
-          "signon.management.page.breach-alerts.enabled" = false;
-          "layout.word_select.eat_space_to_next_word" = false;
-          "browser.download.useDownloadDir" = false;
-          "browser.aboutConfig.showWarning" = false;
-          "extensions.formautofill.creditCards.enabled" = false;
-          "doms.forms.autocomplete.formautofill" = false;
-
-          # Privacy
-          "private.globalprivacycontrol.enabled" = true;
-          "private.donottrackheader.enabled" = true;
-          "browser.newtabpage.activity-stream.showSponsored" = false;
-          "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
-          "browser.newtabpage.activity-stream.default.sites" = "";
-          "extensions.getAddons.showPane" = false;
-          "extensions.htmlaboutaddons.recommendations.enabled" = false;
-          "browser.discovery.enabled" = false;
-          "datareporting.policy.dataSubmissionEnabled" = false;
-          "datareporting.healthreport.uploadEnabled" = false;
-          "toolkit.telemetry.unified" = false;
-          "toolkit.telemetry.enabled" = false;
-          "toolkit.telemetry.server" = "data:,";
-          "toolkit.telemetry.archive.enabled" = false;
-          "toolkit.telemetry.newProfilePing.enabled" = false;
-          "toolkit.telemetry.shutdownPingSender.enabled" = false;
-          "toolkit.telemetry.updatePing.enabled" = false;
-          "toolkit.telemetry.bhrPing.enabled" = false;
-          "toolkit.telemetry.firstShutdownPing.enabled" = false;
-          "toolkit.telemetry.coverage.opt-out" = true;
-          "toolkit.coverage.opt-out" = true;
-          "toolkit.coverage.endpoint.base" = "";
-          "browser.ping-centre.telemetry" = false;
-          "browser.newtabpage.activity-stream.feeds.telemetry" = false;
-          "browser.newtabpage.activity-stream.telemetry" = false;
-          "breakpad.reportURL" = "";
-          "browser.tabs.crashReporting.sendReport" = false;
-          "browser.crashReports.unsubmittedCheck.autoSubmit2" = false;
-          "captivedetect.canonicalURL" = "";
-          "network.captive-portal-service.enabled" = false;
-          "network.connectivity-service.enabled" = false;
-        };
+            # Privacy
+            "private.globalprivacycontrol.enabled" = true;
+            "private.donottrackheader.enabled" = true;
+            "browser.newtabpage.activity-stream.showSponsored" = false;
+            "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
+            "browser.newtabpage.activity-stream.default.sites" = "";
+            "extensions.getAddons.showPane" = false;
+            "extensions.htmlaboutaddons.recommendations.enabled" = false;
+            "browser.discovery.enabled" = false;
+            "datareporting.policy.dataSubmissionEnabled" = false;
+            "datareporting.healthreport.uploadEnabled" = false;
+            "toolkit.telemetry.unified" = false;
+            "toolkit.telemetry.enabled" = false;
+            "toolkit.telemetry.server" = "data:,";
+            "toolkit.telemetry.archive.enabled" = false;
+            "toolkit.telemetry.newProfilePing.enabled" = false;
+            "toolkit.telemetry.shutdownPingSender.enabled" = false;
+            "toolkit.telemetry.updatePing.enabled" = false;
+            "toolkit.telemetry.bhrPing.enabled" = false;
+            "toolkit.telemetry.firstShutdownPing.enabled" = false;
+            "toolkit.telemetry.coverage.opt-out" = true;
+            "toolkit.coverage.opt-out" = true;
+            "toolkit.coverage.endpoint.base" = "";
+            "browser.ping-centre.telemetry" = false;
+            "browser.newtabpage.activity-stream.feeds.telemetry" = false;
+            "browser.newtabpage.activity-stream.telemetry" = false;
+            "breakpad.reportURL" = "";
+            "browser.tabs.crashReporting.sendReport" = false;
+            "browser.crashReports.unsubmittedCheck.autoSubmit2" = false;
+            "captivedetect.canonicalURL" = "";
+            "network.captive-portal-service.enabled" = false;
+            "network.connectivity-service.enabled" = false;
+          }
+          // optionalAttrs (device.type != "laptop") {
+            # Scrolling
+            "mousewheel.default.delta_multiplier_x" = 99;
+            "mousewheel.default.delta_multiplier_y" = 99;
+            "mousewheel.default.delta_multiplier_z" = 99;
+            "general.smoothScroll" = true;
+            "general.smoothScroll.lines.durationMaxMS" = 125;
+            "general.smoothScroll.lines.durationMinMS" = 125;
+            "general.smoothScroll.mouseWheel.durationMaxMS" = 200;
+            "general.smoothScroll.mouseWheel.durationMinMS" = 100;
+            "general.smoothScroll.other.durationMaxMS" = 125;
+            "general.smoothScroll.other.durationMinMS" = 125;
+            "general.smoothScroll.pages.durationMaxMS" = 125;
+            "general.smoothScroll.pages.durationMinMS" = 125;
+            "mousewheel.system_scroll_override_on_root_content.horizontal.factor" = 175;
+            "mousewheel.system_scroll_override_on_root_content.vertical.factor" = 175;
+            "toolkit.scrollbox.horizontalScrollDistance" = 6;
+            "toolkit.scrollbox.verticalScrollDistance" = 2;
+          };
 
         userChrome = mkIf (!cfg.hideToolbar) ''
           * {

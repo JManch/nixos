@@ -45,7 +45,7 @@
     };
 
     hardware = {
-      secure-boot.enable = true;
+      secure-boot.enable = false;
       bluetooth.enable = true;
 
       file-system = {

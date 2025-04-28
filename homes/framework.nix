@@ -13,6 +13,7 @@
       xdg.lowercaseUserDirs = true;
 
       hyprland = {
+        vrr = true;
         tearing = true;
         directScanout = true;
       };

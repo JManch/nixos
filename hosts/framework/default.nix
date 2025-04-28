@@ -75,7 +75,7 @@
       wireguard = {
         home = {
           enable = true;
-          autoStart = true;
+          autoStart = false;
           address = "192.168.100.11";
           subnet = 24;
 

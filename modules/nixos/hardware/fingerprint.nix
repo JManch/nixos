@@ -1,5 +1,6 @@
 { lib, config }:
 {
+  enableOpt = false;
   conditions = [ config.services.fprintd.enable ];
 
   ns.persistence.directories = lib.singleton {

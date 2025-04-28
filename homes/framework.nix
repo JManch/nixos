@@ -27,7 +27,7 @@
         dunst.enable = true;
         wlsunset.enable = true;
         hypridle.enable = true;
-        swww.enable = true;
+        hyprpaper.enable = true;
         darkman.enable = true;
 
         wallpaper = {

@@ -27,8 +27,7 @@
       "sd_mod"
     ];
 
-    # HACK: Temporarily using testing for kernel >=6.15 to fix MT7925 wifi drop outs
-    kernelPackages = lib.mkForce pkgs.linuxPackages_testing;
+    kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
   };
 
   # https://www.freedesktop.org/software/systemd/man/latest/sleep.conf.d.html

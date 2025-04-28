@@ -54,6 +54,8 @@
         discord.enable = true;
         chatterino.enable = true;
         supersonic.enable = true;
+        chromium.enable = true;
+        obs.enable = true;
 
         firefox = {
           enable = true;

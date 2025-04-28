@@ -4,7 +4,7 @@
 ## Overview
 
 - Hyprland desktop environment integrated with systemd using UWSM
-- Single-command deployment with Disko and NixOS Anywhere
+- Single-command deployment with a custom installer ISO and Disko
 - Fully modular configuration utilising NixOS module options
 - Tmpfs root with opt-in persistence using Impermanence
 - Persistent ZFS file system with full-disk encryption and compression

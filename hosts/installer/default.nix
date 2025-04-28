@@ -120,16 +120,6 @@ let
         fi
       fi
 
-      if [ "$has_disko" = "true" ]; then
-        echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"
-        read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
-        echo
-        if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-          echo "Aborting" >&2
-          exit 1
-        fi
-      fi
-
       install_keys() {
         echo "### Installing keys ###"
         install -d -m755 "$rootDir/etc/ssh" "$rootDir/home"
@@ -159,12 +149,20 @@ let
         fi
 
         if [ "$secure_boot" = "true" ]; then
+          # FIX: For some reason this fails with "permission denied: must be run as root"
           sbctl create-keys --export "$rootDir/etc/secureboot/keys/" --database-path "$rootDir/etc/secureboot/"
         fi
       }
 
       run_disko() {
         if [ "$has_disko" = "true" ]; then
+          echo "WARNING: All data on the drive specified in the disko config of host '$hostname' will be destroyed"
+          read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
+          echo
+          if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+            echo "Aborting" >&2
+            exit 1
+          fi
           echo "### Running disko format and mount ###"
           disko --mode disko --flake "$flake#$hostname"
         fi

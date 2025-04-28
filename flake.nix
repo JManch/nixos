@@ -34,7 +34,8 @@
     # Critical inputs that provide imported NixOS modules or overlays. Ideally
     # should review changes after updating.
 
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # FIX: registry broke https://github.com/NixOS/nix/issues/13104
+    nixpkgs.url = "github:NixOS/nixpkgs/c11863f1e964833214b767f4a369c6e6a7aba141";
     nixpkgs-broadcast-box.url = "github:JManch/nixpkgs/broadcast-box";
 
     impermanence.url = "github:nix-community/impermanence";

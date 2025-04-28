@@ -53,13 +53,13 @@
         ext4.trim = true;
       };
 
-      keyd = {
-        enable = true;
-        swapCapsControl = true;
-        swapAltMeta = true;
-        excludedDevices = [
-          "04fe:0021:5b3ab73a" # HHKB
-        ];
+      keyd.rebinds = {
+        capslock = "layer(control)";
+        leftcontrol = "capslock";
+        leftmeta = "layer(alt)";
+        leftalt = "layer(meta)";
+        rightcontrol = "layer(altgr)";
+        rightalt = "rightmeta";
       };
     };
 
@@ -68,6 +68,8 @@
       gaming = {
         enable = true;
         steam.enable = true;
+        gamescope.enable = true;
+        gamemode.enable = true;
       };
     };
 

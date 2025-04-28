@@ -52,13 +52,11 @@
         ext4.trim = true;
       };
 
-      keyd = {
-        enable = true;
-        swapCapsControl = true;
-        swapAltMeta = true;
-        excludedDevices = [
-          "04fe:0021:5b3ab73a" # HHKB
-        ];
+      keyd.rebinds = {
+        capslock = "layer(control)";
+        leftcontrol = "capslock";
+        leftmeta = "layer(alt)";
+        leftalt = "layer(meta)";
       };
     };
 

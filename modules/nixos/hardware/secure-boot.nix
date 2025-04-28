@@ -29,8 +29,8 @@ in
 
   boot.lanzaboote = {
     enable = true;
-    pkiBundle = "${optionalString impermanence.enable "/persist"}/etc/secureboot";
+    pkiBundle = "${optionalString impermanence.enable "/persist"}/var/lib/sbctl";
   };
 
-  ns.persistence.directories = [ "/etc/secureboot" ];
+  ns.persistence.directories = [ "/var/lib/sbctl" ];
 }

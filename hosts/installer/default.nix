@@ -150,7 +150,7 @@ let
 
         if [ "$secure_boot" = "true" ]; then
           # FIX: For some reason this fails with "permission denied: must be run as root"
-          sbctl create-keys --export "$rootDir/etc/secureboot/keys/" --database-path "$rootDir/etc/secureboot/"
+          sbctl create-keys --export "$rootDir/var/lib/sbctl/keys/" --database-path "$rootDir/var/lib/sbctl/"
         fi
       }
 

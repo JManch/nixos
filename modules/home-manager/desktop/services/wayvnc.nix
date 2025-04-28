@@ -50,7 +50,7 @@ in
     Install.WantedBy = [ "wayvnc.service" ];
   };
 
-  programs.zsh.initExtra = # bash
+  programs.zsh.initContent = # bash
     ''
       vnc-start() {
         systemctl start --user wayvnc

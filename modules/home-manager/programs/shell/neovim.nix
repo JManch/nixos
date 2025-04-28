@@ -97,7 +97,7 @@ in
     };
   };
 
-  programs.zsh.initExtra =
+  programs.zsh.initContent =
     let
       inherit (config.${ns}.programs.desktop) alacritty;
     in

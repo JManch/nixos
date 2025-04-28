@@ -45,7 +45,7 @@
       lg = "lazygit";
     };
 
-    initExtra = # bash
+    initContent = # bash
       ''
         lazygit() {
           ${lib.${lib.ns}.sshAddQuiet args}

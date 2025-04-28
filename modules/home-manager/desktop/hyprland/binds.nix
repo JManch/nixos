@@ -353,7 +353,7 @@ in
     '';
   };
 
-  programs.zsh.initExtra = # bash
+  programs.zsh.initContent = # bash
     ''
       toggle-monitor() {
         if [ -z "$1" ]; then

@@ -89,7 +89,7 @@ in
     Install.WantedBy = [ "default.target" ];
   };
 
-  programs.zsh.initExtra = # bash
+  programs.zsh.initContent = # bash
     ''
       # Disable zsh history
       unset HISTFILE

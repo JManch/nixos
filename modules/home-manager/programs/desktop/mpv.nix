@@ -102,7 +102,7 @@ in
     categories = [ "AudioVideo" ];
   };
 
-  programs.zsh.initExtra = # bash
+  programs.zsh.initContent = # bash
     ''
       screenshare () {
         if [[ -z "$1" ]]; then

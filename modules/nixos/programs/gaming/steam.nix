@@ -27,6 +27,9 @@ let
   };
 in
 {
+  # WARN: If steam fails to launch with "couldn't setup Steam data" on a fresh
+  # install, delete the contents of .steam and .local/share/Steam
+
   # -- Common steam launch commands --
   # Standard  : mangohud gamemoderun %command%
   # FPS Limit : MANGOHUD_CONFIG=read_cfg,fps_limit=200 mangohud gamemoderun %command%

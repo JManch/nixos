@@ -10,11 +10,15 @@ let
     mkForce
     hiPrio
     ;
-  inherit (config.${ns}.core) home-manager;
+  inherit (config.${ns}.core) home-manager device;
 in
 {
-  hardware.bluetooth.enable = true;
   services.blueman.enable = true;
+
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = device.type != "laptop";
+  };
 
   systemd.user.services.blueman-applet = {
     path = mkForce [ ];

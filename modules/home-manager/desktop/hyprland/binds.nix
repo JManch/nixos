@@ -287,16 +287,7 @@ in
         "${mod}, M, workspace, emptym"
         "${modShift}, M, exec, ${moveToNextEmpty}"
         "${modShiftCtrl}, M, movetoworkspacesilent, emptym"
-        "${mod}, S, togglespecialworkspace, social"
-        "${modShift}, S, movetoworkspacesilent, special:social"
       ]
-      ++ (concatMap (
-        m:
-        optionals (m.mirror == null) [
-          "${mod}, D, focusmonitor, ${m.name}"
-          "${mod}, D, workspace, name:DESKTOP ${toString m.number}"
-        ]
-      ) monitors)
       ++ (flatten (
         builtins.genList (
           x:

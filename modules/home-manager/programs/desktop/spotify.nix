@@ -109,11 +109,13 @@ in
       icon = "spotify";
     };
 
+  ns.programs.desktop.music.enable = true;
+
   ns.desktop = {
     hyprland.settings = {
       windowrule = [
         "bordercolor 0xff1ED760, initialTitle:^(Spotify( Premium)?)$"
-        "workspace special:social silent, title:^(Spotify( Premium)?)$"
+        "workspace special:music silent, title:^(Spotify( Premium)?)$"
       ];
     };
 

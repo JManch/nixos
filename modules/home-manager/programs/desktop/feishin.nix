@@ -13,6 +13,8 @@
     })
   ];
 
+  ns.programs.desktop.music.enable = true;
+
   ns.desktop = {
     services.playerctl.musicPlayers = lib.mkBefore [ "Feishin" ];
 
@@ -22,7 +24,7 @@
     '';
 
     hyprland.settings.windowrule = [
-      "workspace special:social silent, class:^(feishin)$"
+      "workspace special:music silent, class:^(feishin)$"
     ];
   };
 

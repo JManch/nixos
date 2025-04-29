@@ -37,11 +37,13 @@
     }))
   ];
 
+  ns.programs.desktop.music.enable = true;
+
   ns.desktop = {
     services.playerctl.musicPlayers = lib.mkBefore [ "Supersonic" ];
 
     hyprland.settings.windowrule = [
-      "workspace special:social silent, initialTitle:^(Supersonic)$"
+      "workspace special:music silent, initialTitle:^(Supersonic)$"
     ];
   };
 

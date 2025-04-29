@@ -27,6 +27,7 @@
         waybar.enable = true;
         dunst.enable = true;
         wlsunset.enable = true;
+        wluma.enable = true;
         hypridle.enable = true;
         hyprpaper.enable = true;
         darkman.enable = true;

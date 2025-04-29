@@ -28,6 +28,12 @@
           cores = 24;
         };
 
+        gpu = {
+          name = "Radeon 890M";
+          type = "amd";
+          hwmonId = 1;
+        };
+
         monitors = [
           {
             name = "eDP-1";

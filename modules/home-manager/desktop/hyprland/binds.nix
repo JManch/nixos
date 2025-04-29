@@ -311,10 +311,10 @@ in
         "${modShiftCtrl}, XF86AudioLowerVolume, exec, ${modifyFocusedWindowVolume} 5%-"
       ])
       ++ (optionals (backlight != null)) [
-        ", XF86MonBrightnessUp, exec, ${brightnessctl} set +5%"
-        ", XF86MonBrightnessDown, exec, ${brightnessctl} set 5%-"
-        "${modShift}, XF86MonBrightnessUp, exec, ${brightnessctl} set +1%"
-        "${modShift}, XF86MonBrightnessDown, exec, ${brightnessctl} set 1%-"
+        ", XF86MonBrightnessUp, exec, ${brightnessctl} set -e4 3%+"
+        ", XF86MonBrightnessDown, exec, ${brightnessctl} set -e4 3%-"
+        "${mod}, XF86MonBrightnessUp, exec, ${brightnessctl} set 1%+"
+        "${mod}, XF86MonBrightnessDown, exec, ${brightnessctl} set 1%-"
       ];
 
     settings.bindm = [

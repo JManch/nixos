@@ -47,6 +47,9 @@
     MemorySleepMode=s2idle
   '';
 
+  # Turn off the power LED
+  powerManagement.powerUpCommands = "${lib.getExe pkgs.fw-ectool} led power off";
+
   services.logind = {
     powerKey = "poweroff";
     lidSwitch = "suspend-then-hibernate";

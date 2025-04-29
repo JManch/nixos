@@ -13,6 +13,7 @@ let
     optional
     getExe'
     toUpper
+    optionalString
     mkForce
     getExe
     concatLines
@@ -22,7 +23,8 @@ let
   inherit (lib.${ns}) addPatches sliceSuffix getMonitorByName;
   inherit (config.${ns}) desktop;
   inherit (desktop.programs) locker;
-  inherit (osConfig.${ns}.core.device)
+  inherit (osConfig.${ns}.core) device;
+  inherit (device)
     gpu
     monitors
     backlight
@@ -127,7 +129,7 @@ in
 
         clock = {
           interval = 1;
-          format = "{:%H:%M:%S}";
+          format = "{:%H:%M${optionalString (device.type == "desktop") ":%S"}}";
           format-alt = "{:%e %B %Y}";
           tooltip-format = "<tt><small>{calendar}</small></tt>";
 
@@ -220,10 +222,6 @@ in
             "󰂂"
             "󰁹"
           ];
-          states = {
-            warning = 25;
-            critical = 15;
-          };
           tooltip = false;
         };
 

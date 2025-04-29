@@ -56,6 +56,8 @@
         supersonic.enable = true;
         chromium.enable = true;
         obs.enable = true;
+        images.enable = true;
+        mpv.enable = true;
 
         firefox = {
           enable = true;

@@ -74,6 +74,7 @@
     };
 
     services = {
+      udisks.enable = true;
       wireguard = {
         home = {
           enable = true;

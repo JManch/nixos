@@ -15,11 +15,9 @@ let
     getExe
     getExe'
     flatten
-    concatMap
     concatMapStringsSep
     ;
   inherit (lib.${ns}) flakePkgs getMonitorHyprlandCfgStr;
-  inherit (osConfig.${ns}.system) audio;
   inherit (osConfig.${ns}.core.device) monitors backlight;
   inherit (config.${ns}.desktop.programs) locker;
   mod = cfg.modKey;
@@ -28,7 +26,6 @@ let
 
   jaq = getExe pkgs.jaq;
   bc = getExe' pkgs.bc "bc";
-  wpctl = getExe' pkgs.wireplumber "wpctl";
   brightnessctl = getExe pkgs.brightnessctl;
   grimblast = getExe (flakePkgs args "grimblast").grimblast;
   notifySend = getExe pkgs.libnotify;
@@ -198,28 +195,6 @@ let
     fi
     ${hyprctl} --batch "$cmd"
   '';
-
-  modifyFocusedWindowVolume = pkgs.writeShellScript "hypr-modify-focused-window-volume" ''
-    pid=$(${hyprctl} activewindow -j | ${jaq} -r '.pid')
-    node=$(${getExe' pkgs.pipewire "pw-dump"} | ${jaq} -r \
-      "[.[] | select((.type == \"PipeWire:Interface:Node\") and (.info?.props?[\"application.process.id\"]? == "$pid"))] | sort_by(if .info?.state? == \"running\" then 0 else 1 end) | first")
-    if [ "$node" == "null" ]; then
-      ${notifySend} -e --urgency=critical -t 2000 \
-        'Pipewire' "Active window does not have an interface node"
-      exit 1
-    fi
-
-    id=$(echo "$node" | ${jaq} -r '.id')
-    name=$(echo "$node" | ${jaq} -r '.info.props["application.name"]')
-    media=$(echo "$node" | ${jaq} -r '.info.props["media.name"]')
-
-    ${wpctl} set-volume "$id" "$1"
-    output=$(${wpctl} get-volume "$id")
-    volume=''${output#Volume: }
-    percentage="$(echo "$volume * 100" | ${bc})"
-    ${notifySend} -e --urgency=low -t 2000 \
-      -h 'string:x-canonical-private-synchronous:pipewire-window-volume' "''${name^} - $media" "Volume ''${percentage%.*}%"
-  '';
 in
 {
   # Force secondaryModKey VM variant because binds are repeated on host
@@ -305,11 +280,6 @@ in
       ++ (optionals cfg.plugins [
         "${mod}, Escape, hyprexpo:expo, toggle"
       ])
-      ++ (optionals audio.enable [
-        ", XF86AudioMute, exec, ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle"
-        "${modShiftCtrl}, XF86AudioRaiseVolume, exec, ${modifyFocusedWindowVolume} 5%+"
-        "${modShiftCtrl}, XF86AudioLowerVolume, exec, ${modifyFocusedWindowVolume} 5%-"
-      ])
       ++ (optionals (backlight != null)) [
         ", XF86MonBrightnessUp, exec, ${brightnessctl} set -e4 3%+"
         ", XF86MonBrightnessDown, exec, ${brightnessctl} set -e4 3%-"
@@ -322,19 +292,12 @@ in
       "${mod}, mouse:273, resizewindow"
     ];
 
-    settings.bindr = optionals audio.enable [ "${mod}ALT, ALT_L, exec, ${audio.scripts.toggleMic}" ];
-
-    settings.binde =
-      optionals audio.enable [
-        "${mod}, Right, resizeactive, 20 0"
-        "${mod}, Left, resizeactive, -20 0"
-        "${mod}, Up, resizeactive, 0 -20"
-        "${mod}, Down, resizeactive, 0 20"
-      ]
-      ++ optionals audio.enable [
-        ", XF86AudioRaiseVolume, exec, ${wpctl} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"
-        ", XF86AudioLowerVolume, exec, ${wpctl} set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-      ];
+    settings.binde = [
+      "${mod}, Right, resizeactive, 20 0"
+      "${mod}, Left, resizeactive, -20 0"
+      "${mod}, Up, resizeactive, 0 -20"
+      "${mod}, Down, resizeactive, 0 20"
+    ];
 
     extraConfig = ''
       bind = ${mod}, Delete, submap, Grab

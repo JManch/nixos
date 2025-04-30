@@ -20,26 +20,28 @@ let
     optionalString
     mapAttrsToList
     ;
-  inherit (config.${ns}.core) home-manager;
+  inherit (config.${ns}.core) home-manager device;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.hardware) raspberry-pi;
   wpctl = getExe' pkgs.wireplumber "wpctl";
   pactl = getExe' pkgs.pulseaudio "pactl";
   notifySend = getExe pkgs.libnotify;
-
-  toggleMic = pkgs.writeShellScript "toggle-mic" ''
-    ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle
-    status=$(${wpctl} get-volume @DEFAULT_AUDIO_SOURCE@)
-    message=$([[ "$status" == *MUTED* ]] && echo "Muted" || echo "Unmuted")
-    ${notifySend} -e -u critical -t 2000 \
-      -h 'string:x-canonical-private-synchronous:microphone-toggle' 'Microphone' "$message"
-  '';
 in
 [
   {
     opts = {
       extraAudioTools = mkEnableOption "extra audio tools including Easyeffects and Helvum";
       inputNoiseSuppression = mkEnableOption "input noise suppression source";
+
+      alwaysMuteSink = mkOption {
+        type = types.bool;
+        default = device.type == "laptop";
+        description = ''
+          Muting the default sink when powering up the system and when resuming
+          from sleep state. We mute in our "setup-pipewire-devices" service and
+          in our locker unlock script.
+        '';
+      };
 
       alsaDeviceAliases = mkOption {
         type = with types; attrsOf str;
@@ -62,19 +64,10 @@ in
         default = null;
         description = "System default audio source name from `pactl list short sources`";
       };
-
-      scripts = {
-        toggleMic = mkOption {
-          type = types.str;
-          readOnly = true;
-          description = "Script for toggling microphone mute";
-        };
-      };
     };
 
     ns.userPackages = mkIf desktop.enable [ pkgs.pavucontrol ];
     services.pulseaudio.enable = mkForce false;
-    ns.system.audio.scripts.toggleMic = toggleMic.outPath;
 
     # Make pipewire realtime-capable
     security.rtkit.enable = true;
@@ -167,69 +160,137 @@ in
         pipewire.unitConfig.ConditionUser = "!@system";
         wireplumber.unitConfig.ConditionUser = "!@system";
         pipewire-pulse.unitConfig.ConditionUser = "!@system";
-      };
-    };
 
-    systemd.user.services.setup-pipewire-devices = mkIf desktop.enable {
-      description = "Setup source and sink devices on login";
-      after = [ "wireplumber.service" ];
-      wants = [ "wireplumber.service" ];
-      unitConfig.ConditionUser = "!@system";
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStart = pkgs.writeShellScript "setup-pipewire-devices" ''
-          sleep 2
-          attempt=0
-          while ! ${wpctl} inspect @DEFAULT_AUDIO_SINK@ &>/dev/null; do
-            if (( attempt >= 10 )); then
-              echo "PipeWire failed to initialise in time"
-              exit 1
-            fi
+        setup-pipewire-devices = {
+          description = "Setup Pipewire devices on login";
+          after = [ "wireplumber.service" ];
+          requires = [ "wireplumber.service" ];
+          unitConfig.ConditionUser = "!@system";
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = pkgs.writeShellScript "setup-pipewire-devices" ''
+              sleep 2
+              attempt=0
+              while ! ${wpctl} inspect @DEFAULT_AUDIO_SINK@ &>/dev/null; do
+                if (( attempt >= 30 )); then
+                  echo "PipeWire failed to initialise in time"
+                  exit 1
+                fi
 
-            echo "Waiting for PipeWire to initialise..."
-            attempt=$((attempt + 1))
-            sleep 2
-          done
+                echo "Waiting for PipeWire to initialise..."
+                attempt=$((attempt + 1))
+                sleep 2
+              done
 
-          ${optionalString (cfg.defaultSink != null) "${pactl} set-default-sink \"${cfg.defaultSink}\""}
-          ${optionalString (cfg.defaultSource != null) "${pactl} set-default-source \"${cfg.defaultSource}\""}
-          ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ 0
-          ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ 1
-        '';
-      };
-      wantedBy = [ "default.target" ];
-    };
-
-    ns.hm = mkIf home-manager.enable {
-      ${ns}.desktop = {
-        programs.locker = {
-          preLockScript = ''
-            ${pactl} get-sink-mute @DEFAULT_SINK@ > /tmp/lock-mute-sink
-            ${pactl} get-source-mute @DEFAULT_SOURCE@ > /tmp/lock-mute-source
-            ${pactl} set-sink-mute @DEFAULT_SINK@ 1
-            ${pactl} set-source-mute @DEFAULT_SOURCE@ 1
-          '';
-
-          postUnlockScript = ''
-            if [[ -f /tmp/lock-mute-sink ]] && grep -q "no" /tmp/lock-mute-sink; then
-              ${pactl} set-sink-mute @DEFAULT_SINK@ 0
-            fi
-
-            if [[ -f /tmp/lock-mute-source ]] && grep -q "no" /tmp/lock-mute-source; then
-              ${pactl} set-source-mute @DEFAULT_SOURCE@ 0
-            fi
-            rm -f /tmp/lock-mute-{sink,source}
-          '';
+              ${optionalString (cfg.defaultSink != null) "${pactl} set-default-sink \"${cfg.defaultSink}\""}
+              ${optionalString (cfg.defaultSource != null) "${pactl} set-default-source \"${cfg.defaultSource}\""}
+              ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ ${if cfg.alwaysMuteSink then "1" else "0"}
+              ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ 1
+            '';
+          };
+          wantedBy = [ "default.target" ];
         };
-
-        hyprland.settings.windowrule = [
-          "float, class:^(org.pulseaudio.pavucontrol)$"
-          "size 50% 50%, class:^(org.pulseaudio.pavucontrol)$"
-          "center, class:^(org.pulseaudio.pavucontrol)$"
-        ];
       };
     };
+
+    ns.hm =
+      let
+        inherit (config.${ns}.hmNs.desktop) hyprland;
+        jaq = getExe pkgs.jaq;
+
+        toggleAudioMute = pkgs.writeShellScript "toggle-audio-mute" ''
+          device="$1"
+          ${wpctl} set-mute "$device" toggle
+          status=$(${wpctl} get-volume "$device")
+          message=$([[ "$status" == *MUTED* ]] && echo "Muted" || echo "Unmuted")
+          description=$(${wpctl} inspect "$device" | grep 'node\.description' | cut -d '"' -f 2)
+          ${notifySend} -e -u critical -t 2000 \
+            -h 'string:x-canonical-private-synchronous:pipewire-volume' "$description" "$message"
+        '';
+
+        modifyVolume = pkgs.writeShellScript "modify-volume" ''
+          ${wpctl} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "$1";
+          output=$(${wpctl} get-volume @DEFAULT_AUDIO_SINK@)
+          volume=''${output#Volume: }
+          percentage="$(echo "$volume * 100" | ${getExe pkgs.bc})"
+          description=$(${wpctl} inspect @DEFAULT_AUDIO_SINK@ | grep 'node\.description' | cut -d '"' -f 2)
+          notify-send --urgency=low -t 2000 \
+            -h 'string:x-canonical-private-synchronous:pipewire-volume' "$description" "Volume ''${percentage%.*}%"
+        '';
+
+        modifyFocusedWindowVolume = pkgs.writeShellScript "hypr-modify-focused-window-volume" ''
+          pid=$(${getExe' pkgs.hyprland "hyprctl"} activewindow -j | ${jaq} -r '.pid')
+          node=$(${getExe' pkgs.pipewire "pw-dump"} | ${jaq} -r \
+            "[.[] | select((.type == \"PipeWire:Interface:Node\") and (.info?.props?[\"application.process.id\"]? == "$pid"))] | sort_by(if .info?.state? == \"running\" then 0 else 1 end) | first")
+          if [ "$node" == "null" ]; then
+            ${notifySend} -e --urgency=critical -t 2000 \
+              'Pipewire' "Active window does not have an interface node"
+            exit 1
+          fi
+
+          id=$(echo "$node" | ${jaq} -r '.id')
+          name=$(echo "$node" | ${jaq} -r '.info.props["application.name"]')
+          media=$(echo "$node" | ${jaq} -r '.info.props["media.name"]')
+
+          ${wpctl} set-volume "$id" "$1"
+          output=$(${wpctl} get-volume "$id")
+          volume=''${output#Volume: }
+          percentage="$(echo "$volume * 100" | ${getExe pkgs.bc})"
+          ${notifySend} -e --urgency=low -t 2000 \
+            -h 'string:x-canonical-private-synchronous:pipewire-volume' "''${name^} - $media" "Volume ''${percentage%.*}%"
+        '';
+      in
+      mkIf home-manager.enable {
+        ${ns}.desktop = {
+          programs.locker = {
+            preLockScript = ''
+              ${pactl} get-sink-mute @DEFAULT_SINK@ > /tmp/lock-mute-sink
+              ${pactl} get-source-mute @DEFAULT_SOURCE@ > /tmp/lock-mute-source
+              ${pactl} set-sink-mute @DEFAULT_SINK@ 1
+              ${pactl} set-source-mute @DEFAULT_SOURCE@ 1
+            '';
+
+            postUnlockScript = ''
+              ${
+                if cfg.alwaysMuteSink then
+                  "${pactl} set-sink-mute @DEFAULT_SINK@ 1"
+                else
+                  # bash
+                  ''
+                    if [[ -f /tmp/lock-mute-sink ]] && grep -q "no" /tmp/lock-mute-sink; then
+                      ${pactl} set-sink-mute @DEFAULT_SINK@ 0
+                    fi
+                  ''
+              }
+
+              if [[ -f /tmp/lock-mute-source ]] && grep -q "no" /tmp/lock-mute-source; then
+                ${pactl} set-source-mute @DEFAULT_SOURCE@ 0
+              fi
+              rm -f /tmp/lock-mute-{sink,source}
+            '';
+          };
+
+          hyprland.settings = {
+            windowrule = [
+              "float, class:^(org.pulseaudio.pavucontrol)$"
+              "size 50% 50%, class:^(org.pulseaudio.pavucontrol)$"
+              "center, class:^(org.pulseaudio.pavucontrol)$"
+            ];
+
+            bind = [
+              ", XF86AudioRaiseVolume, exec, ${modifyVolume} 5%+"
+              ", XF86AudioLowerVolume, exec, ${modifyVolume} 5%-"
+              ", XF86AudioMute, exec, ${toggleAudioMute} \"@DEFAULT_AUDIO_SINK@\""
+              ", XF86AudioMicMute, exec, ${toggleAudioMute} \"@DEFAULT_AUDIO_SOURCE@\""
+              "${hyprland.modKey}SHIFTCONTROL, XF86AudioRaiseVolume, exec, ${modifyFocusedWindowVolume} 5%+"
+              "${hyprland.modKey}SHIFTCONTROL, XF86AudioLowerVolume, exec, ${modifyFocusedWindowVolume} 5%-"
+            ];
+
+            bindr = [ "${hyprland.modKey}ALT, ALT_L, exec, ${toggleAudioMute} \"@DEFAULT_AUDIO_SOURCE@\"" ];
+          };
+        };
+      };
   }
 
   (mkIf raspberry-pi.enable {

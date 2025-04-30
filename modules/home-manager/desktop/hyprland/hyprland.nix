@@ -207,6 +207,11 @@ in
         ];
       };
 
+      xwayland = {
+        # xwayland scaling looks terrible
+        force_zero_scaling = true;
+      };
+
       misc = {
         vrr = if cfg.vrr then 1 else 0;
         disable_autoreload = true;

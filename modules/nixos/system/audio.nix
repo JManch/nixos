@@ -274,7 +274,7 @@ in
           hyprland.settings = {
             windowrule = [
               "float, class:^(org.pulseaudio.pavucontrol)$"
-              "size 50% 50%, class:^(org.pulseaudio.pavucontrol)$"
+              "size 60% 60%, class:^(org.pulseaudio.pavucontrol)$"
               "center, class:^(org.pulseaudio.pavucontrol)$"
             ];
 

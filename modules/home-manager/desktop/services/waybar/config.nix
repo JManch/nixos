@@ -175,6 +175,7 @@ in
 
           format-icons = {
             hdmi = "󰍹";
+            headset = "󰋎";
 
             default = [
               "󰖀"

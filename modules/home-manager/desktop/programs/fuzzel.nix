@@ -35,6 +35,7 @@ in
         prompt = "\"\"";
         icons-enabled = true;
         icon-theme = config.gtk.iconTheme.name;
+        fields = "name,generic,keywords";
       };
 
       colors = {

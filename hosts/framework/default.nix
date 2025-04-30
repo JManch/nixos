@@ -128,8 +128,15 @@
     system = {
       impermanence.enable = true;
       ssh.server.enable = true;
-      audio.enable = true;
       virtualisation.libvirt.enable = true;
+
+      audio = {
+        enable = true;
+        alsaDeviceAliases = {
+          "alsa_output.pci-0000_c1_00.6.analog-stereo" = "Laptop Audio";
+          "alsa_input.pci-0000_c1_00.6.analog-stereo" = "Laptop Microphone";
+        };
+      };
 
       desktop = {
         enable = true;

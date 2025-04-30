@@ -48,7 +48,7 @@
   '';
 
   # Turn off the power LED
-  powerManagement.powerUpCommands = "${lib.getExe pkgs.fw-ectool} led power off";
+  powerManagement.powerUpCommands = "(sleep 3 && ${lib.getExe pkgs.fw-ectool} led power off) &";
 
   services.logind = {
     powerKey = "poweroff";

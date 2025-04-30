@@ -249,6 +249,7 @@ in
           inherit (config.${ns}.system) desktop;
         in
         {
+          useDefaultFilesystems = true;
           graphics = desktop.enable;
           diskSize = 8192;
 

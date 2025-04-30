@@ -129,6 +129,7 @@
       impermanence.enable = true;
       ssh.server.enable = true;
       audio.enable = true;
+      virtualisation.libvirt.enable = true;
 
       desktop = {
         enable = true;

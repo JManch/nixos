@@ -168,8 +168,12 @@ in
         };
 
         pulseaudio = mkIf audio.enable {
-          format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%{format_source}";
-          format-muted = "<span color='#${colors.base08}'>󰖁</span> {volume:2}%";
+          format = "<span color='#${
+            if audio.alwaysMuteSink then colors.base08 else colors.base04
+          }'>{icon}</span> {volume:2}%{format_source}";
+          format-muted = "<span color='#${
+            if audio.alwaysMuteSink then colors.base04 else colors.base08
+          }'>󰖁</span> {volume:2}%";
           format-source = "<span color='#${colors.base04}'>  󰍬</span> Unmuted";
           format-source-muted = "";
 
@@ -184,8 +188,17 @@ in
             ];
           } // cfg.audioDeviceIcons;
 
-          on-click = "${getExe pkgs.pavucontrol}";
-          on-click-right = "${getExe' pkgs.wireplumber "wpctl"} set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          on-click = pkgs.writeShellScript "open-pavucontrol" ''
+            ${optionalString isHyprland ''
+              # Move if already open because pavucontrol allows only a single instance to exist
+              address=$(${hyprctl} clients -j | ${jaq} -r '(.[] | select(.class == "org.pulseaudio.pavucontrol")) | .address')
+              if [[ -n $address ]]; then
+                hyprctl dispatch movetoworkspace $(${hyprctl} activeworkspace -j | ${jaq} -r '.id'), address:"$address"
+                exit 0
+              fi
+            ''}
+            ${getExe pkgs.app2unit} org.pulseaudio.pavucontrol.desktop
+          '';
           tooltip = false;
         };
 

@@ -81,10 +81,12 @@
 
     services = {
       udisks.enable = true;
+      wgnord.enable = true;
+
       wireguard = {
         home = {
           enable = true;
-          autoStart = false;
+          trustedSSIDs = [ inputs.nix-resources.secrets.homeSSID ];
           address = "192.168.100.11";
           subnet = 24;
 

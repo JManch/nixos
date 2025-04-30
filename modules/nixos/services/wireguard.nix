@@ -63,7 +63,10 @@ let
     mkEnableOption
     mkOption
     types
+    any
+    attrValues
     ;
+  inherit (config.${ns}.system) networking;
   inherit (config.${ns}.services) dns-stack;
   inherit (lib.${ns}) asserts;
   interfaces = config.${ns}.services.wireguard;
@@ -143,6 +146,16 @@ let
           description = "Port for the DNS server to listen on";
         };
       };
+
+      trustedSSIDs = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = ''
+          Automatically stop and start the VPN when connecting to different
+          SSIDs. Connecting to wired interfaces will not change the VPN
+          state.
+        '';
+      };
     };
   };
 in
@@ -186,6 +199,10 @@ in
         "A private key secret for Wireguard VPN interface '${interface}' is missing"
         (cfg.dns.host -> dns-stack.enable)
         "The DNS stack must be enabled on this host to allow VPN DNS hosting"
+        (cfg.trustedSSIDs != [ ] -> networking.useNetworkd)
+        "Trusted SSIDs automation only works with networkd (just haven't implemented it with network-manager dispatcher)"
+        (cfg.trustedSSIDs != [ ] -> networking.wireless.enable)
+        "Wireless must be enabled for trusted SSID automation"
       ]
     ) interfaces
   );
@@ -329,6 +346,49 @@ in
         })
       ]
     ) interfaces
+  );
+
+  services.networkd-dispatcher = (
+    mkIf (any (cfg: cfg.enable && cfg.trustedSSIDs != [ ]) (attrValues interfaces)) {
+      enable = true;
+      extraArgs = [ "--run-startup-triggers" ];
+      rules = mkMerge (
+        mapAttrsToList (
+          interface: cfg:
+          (mkIf (cfg.enable && cfg.trustedSSIDs != [ ]) {
+            "toggle-wg-quick-${interface}-on-trusted-ssids" = {
+              onState = [ "routable" ];
+              script = ''
+                #!${pkgs.runtimeShell}
+                declare -a trusted_ssids=(${concatMapStringsSep " " (ssid: "\"${ssid}\"") cfg.trustedSSIDs})
+
+                log() {
+                  echo "wg-quick-${interface} trusted SSID toggle: $1"
+                }
+
+                # Do nothing in the case of non-wireless changes or interfaces going down
+                if [[ -z "$ESSID" || "$IFACE" != "${networking.wireless.interface}" || "$STATE" != "routable" ]]; then
+                  log "Ignoring state change $STATE on interface $IFACE"
+                  exit 0
+                fi
+
+                for ssid in "''${trusted_ssids[@]}"; do
+                  if [[ "$ssid" == "$ESSID" ]]; then
+                    log "$ESSID is trusted, stopping VPN"
+                    systemctl stop --no-block wg-quick-wg-${interface}.service
+                    exit 0
+                  fi
+                done
+
+                log "$ESSID is untrusted, starting VPN"
+                systemctl start --no-block wg-quick-wg-${interface}.service
+              '';
+            };
+          })
+        ) interfaces
+      );
+
+    }
   );
 
   programs.zsh.shellAliases = mkMerge (

@@ -4,50 +4,24 @@
   config,
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    mkForce
-    hiPrio
-    ;
+  inherit (lib) ns mkIf;
   inherit (config.${ns}.core) home-manager device;
 in
 {
-  services.blueman.enable = true;
-
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = device.type != "laptop";
   };
 
-  systemd.user.services.blueman-applet = {
-    path = mkForce [ ];
-    after = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    serviceConfig.Slice = "session${lib.${ns}.sliceSuffix config}.slice";
-  };
-
-  environment.systemPackages = [
-    (hiPrio (
-      pkgs.runCommand "blueman-autostart-disable" { } ''
-        mkdir -p $out/etc/xdg/autostart
-        substitute ${pkgs.blueman}/etc/xdg/autostart/blueman.desktop $out/etc/xdg/autostart/blueman.desktop \
-          --replace-fail "Type=Application" "Type=Application
-        Hidden=true"
-      ''
-    ))
-  ];
+  ns.userPackages = [ pkgs.overskride ];
 
   ns.hm = mkIf home-manager.enable {
     ${ns}.desktop.hyprland.settings.windowrule = [
-      "float, class:^(.blueman-manager-wrapped)$"
-      "size 30% 30%, class:^(.blueman-manager-wrapped)$"
-      "center, class:^(.blueman-manager-wrapped)$"
+      "float, class:^(io\\.github\\.kaii_lb\\.Overskride)$"
+      "size 40% 70%, class:^(io\\.github\\.kaii_lb\\.Overskride)$"
+      "center, class:^(io\\.github\\.kaii_lb\\.Overskride)$"
     ];
   };
 
-  ns.persistence.directories = [
-    "/var/lib/bluetooth"
-    "/var/lib/blueman"
-  ];
+  ns.persistence.directories = [ "/var/lib/bluetooth" ];
 }

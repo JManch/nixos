@@ -101,6 +101,20 @@
       "url": "https://files.pythonhosted.org/packages/a7/12/900eb34b3af75c11b69d6b78b74ec0fd1ba489376eceb3785f787d1a0a1d/async_property-0.2.2.tar.gz",
       "hash": "17d9bd6ca67e27915a75d92549df64b5c7174e9dc806b30a3934dc4ff0506380"
     },
+    "brightnessctl": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "Hummer12007",
+        "repo": "brightnessctl"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "e70bc55cf053caa285695ac77507e009b5508ee3",
+      "url": "https://github.com/Hummer12007/brightnessctl/archive/e70bc55cf053caa285695ac77507e009b5508ee3.tar.gz",
+      "hash": "0kfi1az2hm1ayiphl72vxiimh1d77kyz828wy53kk58gyqzmw2va",
+      "frozen": true
+    },
     "ctrld": {
       "type": "GitRelease",
       "repository": {

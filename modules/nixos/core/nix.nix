@@ -402,7 +402,7 @@ in
   nixpkgs = {
     overlays = [
       (final: prev: {
-        inherit (selfPkgs) xdg-terminal-exec;
+        inherit (selfPkgs) xdg-terminal-exec brightnessctl;
         rnnoise-plugin = addPatches prev.rnnoise-plugin (
           optional (
             !final.stdenv.buildPlatform.canExecute final.stdenv.hostPlatform

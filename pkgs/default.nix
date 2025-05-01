@@ -22,6 +22,7 @@ in
   heatmiser = pkgs.home-assistant.python.pkgs.callPackage ./heatmiser.nix args;
   daikin-onecta = pkgs.home-assistant.python.pkgs.callPackage ./daikin-onecta.nix args;
   formulaone-card = callPackage ./formulaone-card.nix args;
+  brightnessctl = callPackage ./brightnessctl.nix args;
 
   # Manual
   advanced-camera-card = callPackage ./advanced-camera-card.nix { };

@@ -43,7 +43,6 @@ let
   systemctl = getExe' pkgs.systemd "systemctl";
   hyprctl = getExe' pkgs.hyprland "hyprctl";
   jaq = getExe pkgs.jaq;
-  brightnessctl = getExe pkgs.brightnessctl;
 
   monitorNameToNumMap = # bash
     ''
@@ -186,7 +185,7 @@ in
             ];
           } // cfg.audioDeviceIcons;
 
-          on-click = "${getExe pkgs.app2unit} org.pulseaudio.pavucontrol.desktop";
+          on-click = "${getExe pkgs.app2unit} com.saivert.pwvucontrol.desktop";
           tooltip = false;
         };
 

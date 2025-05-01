@@ -71,16 +71,16 @@ in
     ns.userPackages = mkIf desktop.enable [
       (pkgs.symlinkJoin {
         name = "pavucontrol-wrapped";
-        paths = [ pkgs.pavucontrol ];
+        paths = [ pkgs.pwvucontrol ];
         nativeBuildInputs = [ pkgs.makeWrapper ];
         buildInputs = optionals isHyprland [
           pkgs.hyprland
           pkgs.jaq
         ];
         postBuild = ''
-          wrapProgram $out/bin/pavucontrol --run '
+          wrapProgram $out/bin/pwvucontrol --run '
             ${optionalString isHyprland ''
-              address=$(hyprctl clients -j | jaq -r "(.[] | select(.class == \"org.pulseaudio.pavucontrol\")) | .address")
+              address=$(hyprctl clients -j | jaq -r "(.[] | select(.class == \"com.saivert.pwvucontrol\")) | .address")
               if [[ -n $address ]]; then
                 hyprctl dispatch movetoworkspace e+0, address:"$address"
                 exit 0
@@ -297,9 +297,9 @@ in
 
           hyprland.settings = {
             windowrule = [
-              "float, class:^(org\\.pulseaudio\\.pavucontrol)$"
-              "size 60% 60%, class:^(org\\.pulseaudio\\.pavucontrol)$"
-              "center, class:^(org\\.pulseaudio\\.pavucontrol)$"
+              "float, class:^(com\\.saivert\\.pwvucontrol)$"
+              "size 60% 60%, class:^(com\\.saivert\\.pwvucontrol)$"
+              "center, class:^(com\\.saivert\\.pwvucontrol)$"
             ];
 
             bind = [

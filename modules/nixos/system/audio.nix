@@ -17,6 +17,7 @@ let
     mkOption
     mkForce
     singleton
+    optionals
     optionalString
     mapAttrsToList
     ;
@@ -26,6 +27,7 @@ let
   wpctl = getExe' pkgs.wireplumber "wpctl";
   pactl = getExe' pkgs.pulseaudio "pactl";
   notifySend = getExe pkgs.libnotify;
+  isHyprland = lib.${ns}.isHyprland config;
 in
 [
   {
@@ -66,7 +68,29 @@ in
       };
     };
 
-    ns.userPackages = mkIf desktop.enable [ pkgs.pavucontrol ];
+    ns.userPackages = mkIf desktop.enable [
+      (pkgs.symlinkJoin {
+        name = "pavucontrol-wrapped";
+        paths = [ pkgs.pavucontrol ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        buildInputs = optionals isHyprland [
+          pkgs.hyprland
+          pkgs.jaq
+        ];
+        postBuild = ''
+          wrapProgram $out/bin/pavucontrol --run '
+            ${optionalString isHyprland ''
+              address=$(hyprctl clients -j | jaq -r "(.[] | select(.class == \"org.pulseaudio.pavucontrol\")) | .address")
+              if [[ -n $address ]]; then
+                hyprctl dispatch movetoworkspace e+0, address:"$address"
+                exit 0
+              fi
+            ''}
+          '
+        '';
+      })
+    ];
+
     services.pulseaudio.enable = mkForce false;
 
     # Make pipewire realtime-capable
@@ -210,9 +234,9 @@ in
         '';
 
         modifyVolume = pkgs.writeShellScript "modify-volume" ''
-          ${wpctl} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "$1";
+          ${wpctl} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "$1"
           output=$(${wpctl} get-volume @DEFAULT_AUDIO_SINK@)
-          volume=''${output#Volume: }
+          volume=$(echo "$output" | ${getExe pkgs.gawk} '{print $2}')
           percentage="$(echo "$volume * 100" | ${getExe pkgs.bc})"
           description=$(${wpctl} inspect @DEFAULT_AUDIO_SINK@ | grep 'node\.description' | cut -d '"' -f 2)
           notify-send --urgency=low -t 2000 \
@@ -273,9 +297,9 @@ in
 
           hyprland.settings = {
             windowrule = [
-              "float, class:^(org.pulseaudio.pavucontrol)$"
-              "size 60% 60%, class:^(org.pulseaudio.pavucontrol)$"
-              "center, class:^(org.pulseaudio.pavucontrol)$"
+              "float, class:^(org\\.pulseaudio\\.pavucontrol)$"
+              "size 60% 60%, class:^(org\\.pulseaudio\\.pavucontrol)$"
+              "center, class:^(org\\.pulseaudio\\.pavucontrol)$"
             ];
 
             bind = [

@@ -193,9 +193,10 @@ in
             "move 0% 0%, class:^(mpv)$, title:^(twitch\\.tv.*)$"
             "size ${firefoxPercentage}% 100%, class:^(mpv)$, title:^(twitch\\.tv.*)$"
 
-            # Move any non-twitch windows opened on the twitch workspace into a new
-            # empty workspace
-            "workspace emptym, tag:twitch_remove"
+            # Float any non-twitch windows
+            "float, tag:twitch_remove"
+            "size 50% 50%, tag:twitch_remove"
+            "center, tag:twitch_remove"
             "tag -twitch_remove, tag:twitch_remove"
           ];
       };

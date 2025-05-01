@@ -200,7 +200,7 @@ let
     ${brightnessctl} set -e4 "$1"
     brightness=$(${brightnessctl} get --percentage)
     notify-send --urgency=low -t 2000 \
-      -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $percentage%"
+      -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $brightness%"
   '';
 in
 {

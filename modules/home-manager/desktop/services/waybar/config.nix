@@ -186,7 +186,7 @@ in
           } // cfg.audioDeviceIcons;
 
           on-click = "${getExe pkgs.app2unit} com.saivert.pwvucontrol.desktop";
-          tooltip = false;
+          tooltip = true;
         };
 
         network = {

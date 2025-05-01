@@ -170,8 +170,8 @@ in
           }'>{icon}</span> {volume:2}%{format_source}";
           format-muted = "<span color='#${
             if audio.alwaysMuteSink then colors.base04 else colors.base08
-          }'>󰖁</span> {volume:2}%";
-          format-source = "<span color='#${colors.base04}'>  󰍬</span> Unmuted";
+          }'>󰖁</span> {volume:2}%{format_source}";
+          format-source = "<span color='#${colors.base08}'>  󰍬</span>";
           format-source-muted = "";
 
           format-icons = {

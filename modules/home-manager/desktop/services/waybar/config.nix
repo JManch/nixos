@@ -24,6 +24,7 @@ let
   inherit (config.${ns}) desktop;
   inherit (desktop.programs) locker;
   inherit (osConfig.${ns}.core) device;
+  inherit (osConfig.${ns}.system) networking;
   inherit (device)
     gpu
     monitors
@@ -111,7 +112,6 @@ in
           on-scroll-down = "${hyprctl} dispatch workspace m+1";
 
           format-icons = {
-            TWITCH = "󰕃";
             GAME = "󱎓";
           };
         };
@@ -162,8 +162,6 @@ in
             "󰃟"
             "󰃠"
           ];
-          on-scroll-up = "${brightnessctl} set +1%";
-          on-scroll-down = "${brightnessctl} set 1%-";
           tooltip = false;
         };
 
@@ -188,17 +186,7 @@ in
             ];
           } // cfg.audioDeviceIcons;
 
-          on-click = pkgs.writeShellScript "open-pavucontrol" ''
-            ${optionalString isHyprland ''
-              # Move if already open because pavucontrol allows only a single instance to exist
-              address=$(${hyprctl} clients -j | ${jaq} -r '(.[] | select(.class == "org.pulseaudio.pavucontrol")) | .address')
-              if [[ -n $address ]]; then
-                hyprctl dispatch movetoworkspace $(${hyprctl} activeworkspace -j | ${jaq} -r '.id'), address:"$address"
-                exit 0
-              fi
-            ''}
-            ${getExe pkgs.app2unit} org.pulseaudio.pavucontrol.desktop
-          '';
+          on-click = "${getExe pkgs.app2unit} org.pulseaudio.pavucontrol.desktop";
           tooltip = false;
         };
 
@@ -212,6 +200,7 @@ in
         cpu = {
           interval = 5;
           format = "<span color='#${colors.base04}'></span> {usage}%";
+          tooltip = false;
         };
 
         "custom/gpu" = mkIf gpuModuleEnabled {
@@ -236,25 +225,41 @@ in
             "󰂂"
             "󰁹"
           ];
+          interval = 60;
           tooltip = false;
         };
 
         memory = {
-          interval = 30;
           format = "<span color='#${colors.base04}'></span> {used:0.1f}GiB";
+          interval = 30;
           tooltip = false;
         };
 
-        "network#hostname" = {
-          format = toUpper hostname;
-          tooltip-format-ethernet = "{ipaddr}";
-          tooltip-format-disconnected = "<span color='#${colors.base08}'>Disconnected</span>";
+        "network#wifi" = mkIf (networking.wireless.enable && device.type == "laptop") {
+          format-wifi = "<span color='#${colors.base04}'>{icon}</span> {essid}";
+          format-icons = [
+            "󰤯"
+            "󰤟"
+            "󰤢"
+            "󰤥"
+            "󰤨"
+          ];
+          tooltip = true;
+          tooltip-format-wifi = "{signaldBm} dBm {signalStrengthApp}";
+          interval = 10;
+          interface = networking.wireless.interface;
+          on-click = "${getExe pkgs.app2unit} wpa_gui.desktop";
         };
 
         tray = {
           icon-size = 17;
           show-passive-items = true;
           spacing = 17;
+        };
+
+        "custom/hostname" = {
+          format = toUpper hostname;
+          tooltip = false;
         };
 
         "custom/poweroff" = {
@@ -275,11 +280,9 @@ in
 
         "custom/locker" = mkIf (locker.package != null) {
           format = "<span color='#${colors.base04}'>󰷛 </span> {}";
-          exec = "echo '{\"text\": \"Lock Inhibited\"}'";
-          exec-if = "${systemctl} is-active --quiet --user inhibit-lock && exit 0 || exit 1";
-          return-type = "json";
-          tooltip = false;
+          exec = ''${systemctl} is-active --quiet --user inhibit-lock && echo -n "Lock Inhibited" || echo -n ""'';
           interval = 5;
+          tooltip = false;
         };
 
         gamemode = mkIf gamemode.enable {
@@ -313,10 +316,11 @@ in
           ++ optional (backlight != null) "backlight"
           ++ optional audio.enable "pulseaudio"
           ++ optional (battery != null) "battery"
+          ++ optional (networking.wireless.enable && device.type == "laptop") "network#wifi"
           ++ [
             "tray"
             "custom/poweroff"
-            "network#hostname"
+            "custom/hostname"
           ];
       };
     };

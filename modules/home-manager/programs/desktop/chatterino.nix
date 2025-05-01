@@ -77,6 +77,10 @@ in
   ns.backups.chatterino.paths = [ ".local/share/chatterino/Settings" ];
   ns.persistence.directories = [ ".local/share/chatterino/Settings" ];
 
+  programs.waybar.settings.bar = mkIf (lib.${ns}.isHyprland config) {
+    "hyprland/workspaces".format-icons.TWITCH = "󰕃";
+  };
+
   ns.desktop = {
     services.waybar.autoHideWorkspaces = [ "TWITCH" ];
     hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false, gapsin:0, gapsout:0";

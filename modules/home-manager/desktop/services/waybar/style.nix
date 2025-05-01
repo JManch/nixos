@@ -102,7 +102,7 @@ in
           color: @red;
       }
 
-      #network.hostname {
+      #custom-hostname {
           margin: 5px 5px 5px 0px;
           padding: 0px 7px;
           border-radius: ${halfCornerRadius}px;

@@ -237,8 +237,8 @@ in
 
         "network#wifi" = mkIf (networking.wireless.enable && device.type == "laptop") {
           format = "";
-          format-wifi = "<span color='#${colors.base04}'>{icon}</span> {essid}";
-          format-disconnected = "<span color='#${colors.base04}'>󰤮</span> Offline";
+          format-wifi = "<span color='#${colors.base04}'>{icon}</span> {signaldBm}dBm";
+          format-disconnected = "<span color='#${colors.base04}'>󰤮</span> ";
           format-icons = [
             "󰤯"
             "󰤟"
@@ -247,7 +247,7 @@ in
             "󰤨"
           ];
           tooltip = true;
-          tooltip-format-wifi = "{signaldBm} dBm {signalStrengthApp}";
+          tooltip-format-wifi = "{essid} {frequency}GHz";
           interval = 10;
           interface = networking.wireless.interface;
           on-click = "${getExe pkgs.app2unit} wpa_gui.desktop";

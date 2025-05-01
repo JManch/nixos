@@ -21,7 +21,9 @@ let
     hiPrio
     length
     getExe'
+    getExe
     mkEnableOption
+    optionalString
     mkOption
     types
     ;
@@ -31,6 +33,7 @@ let
   rfkill = getExe' pkgs.util-linux "rfkill";
   ip = getExe' pkgs.iproute2 "ip";
   vlanIds = attrNames cfg.vlans;
+  isHyprland = lib.${ns}.isHyprland config;
 in
 {
   enableOpt = false;
@@ -246,16 +249,50 @@ in
   services.resolved.enable = cfg.resolved.enable;
 
   ns.userPackages = optionals (cfg.wireless.enable && desktop.enable) [
+    (pkgs.symlinkJoin {
+      name = "wpa-supplicant-gui-wrapped";
+      paths = [ pkgs.wpa_supplicant_gui ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      buildInputs = optionals isHyprland [
+        pkgs.hyprland
+        pkgs.jaq
+      ];
+      postBuild = ''
+        wrapProgram $out/bin/wpa_gui --run '
+          ${optionalString isHyprland ''
+            address=$(hyprctl clients -j | jaq -r "(.[] | select(.class == \"wpa_gui\")) | .address")
+            if [[ -n $address ]]; then
+              hyprctl dispatch movetoworkspace e+0, address:"$address"
+              exit 0
+            fi
+          ''}
+
+          if ${getExe' pkgs.procps "pidof"} wpa_gui > /dev/null; then
+            ${getExe pkgs.libnotify} --urgency=critical -t 5000 "WPA GUI" "Application already running"
+            exit 1
+          fi
+        '
+      '';
+    })
     pkgs.wpa_supplicant_gui
     (hiPrio (
-      pkgs.runCommand "wpa-supplicant-desktop-rename" { } ''
+      pkgs.runCommand "wpa-supplicant-desktop-modify" { } ''
         mkdir -p $out/share/applications
         substitute ${pkgs.wpa_supplicant_gui}/share/applications/wpa_gui.desktop $out/share/applications/wpa_gui.desktop \
           --replace-fail "Name=wpa_gui" "Name=WPA GUI"
       ''
     ))
   ];
-  systemd.services.wpa_supplicant.preStart = "${getExe' pkgs.coreutils "touch"} /etc/wpa_supplicant.conf";
+
+  ns.hm = mkIf home-manager.enable {
+    ${ns}.desktop.hyprland.settings = {
+      windowrule = [
+        "float, class:^(wpa_gui)$"
+        "size 40% 60%, class:^(wpa_gui)$"
+        "center, class:^(wpa_gui)$"
+      ];
+    };
+  };
 
   systemd.services.disable-wifi-on-boot = mkIf (cfg.wireless.enable && cfg.wireless.disableOnBoot) {
     restartIfChanged = false;

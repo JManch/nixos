@@ -1,5 +1,5 @@
 diff --git a/src/managers/input/InputManager.cpp b/src/managers/input/InputManager.cpp
-index 58ae6e93..6b77806a 100644
+index e1856f1d..a6ccb7bd 100644
 --- a/src/managers/input/InputManager.cpp
 +++ b/src/managers/input/InputManager.cpp
 @@ -185,6 +185,7 @@ void CInputManager::mouseMoveUnified(uint32_t time, bool refocus, bool mouse) {
@@ -10,24 +10,24 @@ index 58ae6e93..6b77806a 100644
  
      const auto  FOLLOWMOUSE = *PFOLLOWONDND && PROTO::data->dndActive() ? 1 : *PFOLLOWMOUSE;
  
-@@ -353,7 +354,8 @@ void CInputManager::mouseMoveUnified(uint32_t time, bool refocus, bool mouse) {
+@@ -354,7 +355,8 @@ void CInputManager::mouseMoveUnified(uint32_t time, bool refocus, bool mouse) {
      // then, we check if the workspace doesnt have a fullscreen window
-     const auto PWORKSPACE   = PMONITOR->activeWorkspace;
+     const auto PWORKSPACE   = PMONITOR->m_activeWorkspace;
      const auto PWINDOWIDEAL = g_pCompositor->vectorToWindowUnified(mouseCoords, RESERVED_EXTENTS | INPUT_EXTENTS | ALLOW_FLOATING);
 -    if (PWORKSPACE->m_hasFullscreenWindow && !foundSurface && PWORKSPACE->m_fullscreenMode == FSMODE_FULLSCREEN) {
 +    if (PWORKSPACE->m_hasFullscreenWindow && !foundSurface && PWORKSPACE->m_fullscreenMode == FSMODE_FULLSCREEN &&
-+        (!*PSPECIALFALLTHROUGH && !PMONITOR->activeSpecialWorkspace)) {
++        (!*PSPECIALFALLTHROUGH && !PMONITOR->m_activeSpecialWorkspace)) {
          pFoundWindow = PWORKSPACE->getFullscreenWindow();
  
          if (!pFoundWindow) {
-@@ -362,9 +364,7 @@ void CInputManager::mouseMoveUnified(uint32_t time, bool refocus, bool mouse) {
+@@ -363,9 +365,7 @@ void CInputManager::mouseMoveUnified(uint32_t time, bool refocus, bool mouse) {
              return;
          }
  
 -        if (PWINDOWIDEAL &&
--            ((PWINDOWIDEAL->m_bIsFloating && PWINDOWIDEAL->m_bCreatedOverFullscreen) /* floating over fullscreen */
--             || (PMONITOR->activeSpecialWorkspace == PWINDOWIDEAL->m_pWorkspace) /* on an open special workspace */))
-+        if (PWINDOWIDEAL && PWINDOWIDEAL->m_bIsFloating && PWINDOWIDEAL->m_bCreatedOverFullscreen)
+-            ((PWINDOWIDEAL->m_isFloating && PWINDOWIDEAL->m_createdOverFullscreen) /* floating over fullscreen */
+-             || (PMONITOR->m_activeSpecialWorkspace == PWINDOWIDEAL->m_workspace) /* on an open special workspace */))
++        if (PWINDOWIDEAL && PWINDOWIDEAL->m_isFloating && PWINDOWIDEAL->m_createdOverFullscreen)
              pFoundWindow = PWINDOWIDEAL;
  
-         if (!pFoundWindow->m_bIsX11) {
+         if (!pFoundWindow->m_isX11) {

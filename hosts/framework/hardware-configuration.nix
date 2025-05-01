@@ -47,8 +47,10 @@
     MemorySleepMode=s2idle
   '';
 
-  # Turn off the power LED
-  powerManagement.powerUpCommands = "(sleep 3 && ${lib.getExe pkgs.fw-ectool} led power off) &";
+  powerManagement.powerUpCommands = ''
+    echo "Disabling framework power LED"
+    (sleep 10 && ${lib.getExe pkgs.fw-ectool} led power off) &
+  '';
 
   services.logind = {
     powerKey = "poweroff";

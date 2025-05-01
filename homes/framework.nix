@@ -15,7 +15,7 @@
       hyprland = {
         vrr = true;
         tearing = true;
-        directScanout = true;
+        directScanout = false; # causing flash when switching from fullscreen workspaces
       };
 
       programs = {

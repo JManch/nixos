@@ -195,6 +195,13 @@ let
     fi
     ${hyprctl} --batch "$cmd"
   '';
+
+  modifyBrightness = pkgs.writeShellScript "modify-brightness" ''
+    ${brightnessctl} set -e4 "$1"
+    brightness=$(${brightnessctl} get --percentage)
+    notify-send --urgency=low -t 2000 \
+      -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $percentage%"
+  '';
 in
 {
   # Force secondaryModKey VM variant because binds are repeated on host
@@ -281,10 +288,10 @@ in
         "${mod}, Escape, hyprexpo:expo, toggle"
       ])
       ++ (optionals (backlight != null)) [
-        ", XF86MonBrightnessUp, exec, ${brightnessctl} set -e4 3%+"
-        ", XF86MonBrightnessDown, exec, ${brightnessctl} set -e4 3%-"
-        "${mod}, XF86MonBrightnessUp, exec, ${brightnessctl} set 1%+"
-        "${mod}, XF86MonBrightnessDown, exec, ${brightnessctl} set 1%-"
+        ", XF86MonBrightnessUp, exec, ${modifyBrightness} 3%+"
+        ", XF86MonBrightnessDown, exec, ${modifyBrightness} 3%-"
+        "${mod}, XF86MonBrightnessUp, exec, ${modifyBrightness} 1%+"
+        "${mod}, XF86MonBrightnessDown, exec, ${modifyBrightness} 1%-"
       ];
 
     settings.bindm = [

@@ -6,6 +6,8 @@ let
     imap0
     hasAttr
     elem
+    getExe
+    getExe'
     genAttrs
     head
     findFirst
@@ -270,5 +272,29 @@ in
         (!config ? home.stateVersion)
         || throw "Slice suffix should be passed osConfig not Home Manager config";
       optionalString (config.programs.uwsm.enable or false) "-graphical";
+
+    # For applications that only allow a single instance to be open
+    wrapHyprlandMoveToActive =
+      args: package: class: extra:
+      let
+        inherit (args.options._module.args.value) pkgs;
+      in
+      pkgs.symlinkJoin {
+        name = "${package.name}-workspace-wrapped";
+        paths = [ package ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/${package.meta.mainProgram} --run '
+            ${optionalString (lib.${ns}.isHyprland args.config) ''
+              address=$(${getExe' pkgs.hyprland "hyprctl"} clients -j | ${getExe pkgs.jaq} -r "(.[] | select(.class == \"${class}\")) | .address")
+              if [[ -n $address ]]; then
+                ${getExe' pkgs.hyprland "hyprctl"} dispatch movetoworkspace e+0, address:"$address"
+                exit 0
+              fi
+            ''}
+            ${extra}
+          '
+        '';
+      };
   };
 }

@@ -1,6 +1,7 @@
 {
   lib,
   cfg,
+  args,
   pkgs,
   config,
   inputs,
@@ -23,7 +24,6 @@ let
     getExe'
     getExe
     mkEnableOption
-    optionalString
     mkOption
     types
     ;
@@ -33,7 +33,6 @@ let
   rfkill = getExe' pkgs.util-linux "rfkill";
   ip = getExe' pkgs.iproute2 "ip";
   vlanIds = attrNames cfg.vlans;
-  isHyprland = lib.${ns}.isHyprland config;
 in
 {
   enableOpt = false;
@@ -249,32 +248,12 @@ in
   services.resolved.enable = cfg.resolved.enable;
 
   ns.userPackages = optionals (cfg.wireless.enable && desktop.enable) [
-    (pkgs.symlinkJoin {
-      name = "wpa-supplicant-gui-wrapped";
-      paths = [ pkgs.wpa_supplicant_gui ];
-      nativeBuildInputs = [ pkgs.makeWrapper ];
-      buildInputs = optionals isHyprland [
-        pkgs.hyprland
-        pkgs.jaq
-      ];
-      postBuild = ''
-        wrapProgram $out/bin/wpa_gui --run '
-          ${optionalString isHyprland ''
-            address=$(hyprctl clients -j | jaq -r "(.[] | select(.class == \"wpa_gui\")) | .address")
-            if [[ -n $address ]]; then
-              hyprctl dispatch movetoworkspace e+0, address:"$address"
-              exit 0
-            fi
-          ''}
-
-          if ${getExe' pkgs.procps "pidof"} wpa_gui > /dev/null; then
-            ${getExe pkgs.libnotify} --urgency=critical -t 5000 "WPA GUI" "Application already running"
-            exit 1
-          fi
-        '
-      '';
-    })
-    pkgs.wpa_supplicant_gui
+    (lib.${ns}.wrapHyprlandMoveToActive args pkgs.wpa_supplicant_gui "wpa_gui" ''
+      if ${getExe' pkgs.procps "pidof"} wpa_gui > /dev/null; then
+        ${getExe pkgs.libnotify} --urgency=critical -t 5000 "WPA GUI" "Application already running"
+        exit 1
+      fi
+    '')
     (hiPrio (
       pkgs.runCommand "wpa-supplicant-desktop-modify" { } ''
         mkdir -p $out/share/applications

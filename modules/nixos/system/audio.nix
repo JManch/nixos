@@ -1,6 +1,7 @@
 {
   lib,
   cfg,
+  args,
   pkgs,
   config,
   username,
@@ -17,7 +18,6 @@ let
     mkOption
     mkForce
     singleton
-    optionals
     optionalString
     mapAttrsToList
     ;
@@ -27,7 +27,6 @@ let
   wpctl = getExe' pkgs.wireplumber "wpctl";
   pactl = getExe' pkgs.pulseaudio "pactl";
   notifySend = getExe pkgs.libnotify;
-  isHyprland = lib.${ns}.isHyprland config;
 in
 [
   {
@@ -69,26 +68,7 @@ in
     };
 
     ns.userPackages = mkIf desktop.enable [
-      (pkgs.symlinkJoin {
-        name = "pavucontrol-wrapped";
-        paths = [ pkgs.pwvucontrol ];
-        nativeBuildInputs = [ pkgs.makeWrapper ];
-        buildInputs = optionals isHyprland [
-          pkgs.hyprland
-          pkgs.jaq
-        ];
-        postBuild = ''
-          wrapProgram $out/bin/pwvucontrol --run '
-            ${optionalString isHyprland ''
-              address=$(hyprctl clients -j | jaq -r "(.[] | select(.class == \"com.saivert.pwvucontrol\")) | .address")
-              if [[ -n $address ]]; then
-                hyprctl dispatch movetoworkspace e+0, address:"$address"
-                exit 0
-              fi
-            ''}
-          '
-        '';
-      })
+      (lib.${ns}.wrapHyprlandMoveToActive args pkgs.pwvucontrol "com.saivert.pwvucontrol" "")
     ];
 
     services.pulseaudio.enable = mkForce false;

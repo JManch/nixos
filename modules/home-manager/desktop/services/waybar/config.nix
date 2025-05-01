@@ -189,7 +189,8 @@ in
           tooltip = true;
         };
 
-        network = {
+        # not enough space on laptops for this
+        network = mkIf (device.type != "laptop") {
           interval = 5;
           format = "<span color='#${colors.base04}'>󰈀</span> {bandwidthTotalBytes}";
           tooltip-format = "<span color='#${colors.base04}'>󰇚</span>{bandwidthDownBytes:>} <span color='#${colors.base04}'>󰕒</span>{bandwidthUpBytes:>}";
@@ -235,7 +236,9 @@ in
         };
 
         "network#wifi" = mkIf (networking.wireless.enable && device.type == "laptop") {
+          format = "";
           format-wifi = "<span color='#${colors.base04}'>{icon}</span> {essid}";
+          format-disconnected = "<span color='#${colors.base04}'>󰤮</span> Offline";
           format-icons = [
             "󰤯"
             "󰤟"
@@ -306,7 +309,7 @@ in
 
         modules-right =
           optional (locker.package != null) "custom/locker"
-          ++ [ "network" ]
+          ++ optional (device.type != "laptop") "network"
           ++ optional wgnord.enable "custom/vpn"
           ++ [ "cpu" ]
           ++ optional gpuModuleEnabled "custom/gpu"

@@ -59,6 +59,7 @@
         obs.enable = true;
         images.enable = true;
         mpv.enable = true;
+        tor-browser.enable = true;
 
         firefox = {
           enable = true;

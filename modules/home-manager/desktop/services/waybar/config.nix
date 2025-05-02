@@ -129,8 +129,8 @@ in
         };
 
         clock = {
-          interval = 1;
-          format = "{:%H:%M${optionalString (device.type == "desktop") ":%S"}}";
+          interval = if (device.type != "laptop") then 1 else 60;
+          format = "{:%H:%M${optionalString (device.type != "laptop") ":%S"}}";
           format-alt = "{:%e %B %Y}";
           tooltip-format = "<tt><small>{calendar}</small></tt>";
 
@@ -257,7 +257,7 @@ in
           ];
           tooltip = true;
           tooltip-format-wifi = "{essid} {frequency}GHz";
-          interval = 10;
+          interval = 60;
           interface = networking.wireless.interface;
           on-click = "${app2unit} wpa_gui.desktop";
         };
@@ -286,13 +286,13 @@ in
           exec-if = "${getExe' pkgs.iproute2 "ip"} link show wgnord > /dev/null 2>&1";
           return-type = "json";
           tooltip = false;
-          interval = 5;
+          interval = 30;
         };
 
         "custom/locker" = mkIf (locker.package != null) {
           format = "<span color='#${colors.base04}'>󰷛 </span> {}";
-          exec = ''${systemctl} is-active --quiet --user inhibit-lock && echo -n "Lock Inhibited" || echo -n ""'';
-          interval = 5;
+          exec = ''${systemctl} is-active --quiet --user inhibit-lock && echo -n "Inhibited" || echo -n ""'';
+          interval = 30;
           tooltip = false;
         };
 

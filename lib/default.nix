@@ -288,12 +288,11 @@ in
             ${optionalString (lib.${ns}.isHyprland args.config) ''
               address=$(${getExe' pkgs.hyprland "hyprctl"} clients -j | ${getExe pkgs.jaq} -r "(.[] | select(.class == \"${class}\")) | .address")
               if [[ -n $address ]]; then
-                ${getExe' pkgs.hyprland "hyprctl"} dispatch movetoworkspace e+0, address:"$address"
+                ${getExe' pkgs.hyprland "hyprctl"} dispatch movetoworkspacesilent e+0, address:"$address"
                 exit 0
               fi
             ''}
-            ${extra}
-          '
+          ' ${extra}
         '';
       };
   };

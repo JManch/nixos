@@ -248,11 +248,19 @@ in
   services.resolved.enable = cfg.resolved.enable;
 
   ns.userPackages = optionals (cfg.wireless.enable && desktop.enable) [
+    # wpa_gui attempts to load the first interface it finds in
+    # /var/run/wpa_supplicant. If this happens to be a p2p-dev-* interface,
+    # wpa_gui goes into a fails with "Could not get status from
+    # wpa_supplicant". Forcing the correct interface with -i fixes this.
+    # (the -q flag disables the "running in tray" notification)
     (lib.${ns}.wrapHyprlandMoveToActive args pkgs.wpa_supplicant_gui "wpa_gui" ''
-      if ${getExe' pkgs.procps "pidof"} wpa_gui > /dev/null; then
-        ${getExe pkgs.libnotify} --urgency=critical -t 5000 "WPA GUI" "Application already running"
-        exit 1
-      fi
+      --add-flags "-i ${cfg.wireless.interface} -q" \
+      --run '
+        if ${getExe' pkgs.procps "pidof"} wpa_gui > /dev/null; then
+          ${getExe pkgs.libnotify} --urgency=critical -t 5000 "WPA GUI" "Application already running"
+          exit 1
+        fi
+      '
     '')
     (hiPrio (
       pkgs.runCommand "wpa-supplicant-desktop-modify" { } ''

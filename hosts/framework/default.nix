@@ -18,7 +18,7 @@
       device = {
         type = "laptop";
         ipAddress = "192.168.100.11";
-        memory = 1024 * 64;
+        memory = 1024 * 48; # lost 16 to VRAM
         backlight = "amdgpu_bl1";
         battery = "BAT1";
 

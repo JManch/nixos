@@ -93,6 +93,7 @@ in
       mountOptions = [
         "defaults"
         "mode=755"
+        "size=32g" # match ncase-m1
       ];
     };
   };

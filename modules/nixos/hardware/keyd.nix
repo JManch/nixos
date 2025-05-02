@@ -30,7 +30,14 @@
             "04fe:0021:5b3ab73a"
           ]
         );
-      settings.main = cfg.rebinds;
+      settings.main =
+        # Be default keyd remaps all right keys to left keys. We use rightshift
+        # for mangohud binds
+        # https://github.com/rvaiya/keyd/issues/114
+        # https://github.com/rvaiya/keyd/issues/773
+        {
+          rightshift = "rightshift";
+        } // cfg.rebinds;
     };
   };
 }

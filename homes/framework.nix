@@ -59,7 +59,9 @@
         obs.enable = true;
         images.enable = true;
         mpv.enable = true;
+        mpv.jellyfinShim.enable = true;
         tor-browser.enable = true;
+        qbittorrent.enable = true;
 
         firefox = {
           enable = true;

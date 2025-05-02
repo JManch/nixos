@@ -73,11 +73,6 @@
     MemorySleepMode=s2idle
   '';
 
-  powerManagement.powerUpCommands = ''
-    echo "Disabling framework power LED"
-    (sleep 10 && ${lib.getExe pkgs.fw-ectool} led power off) &
-  '';
-
   services.logind = {
     powerKey = "poweroff";
     lidSwitch = "suspend-then-hibernate";

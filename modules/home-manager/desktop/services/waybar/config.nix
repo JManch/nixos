@@ -124,14 +124,14 @@ in
         };
 
         "hyprland/window" = mkIf isHyprland {
-          max-length = 59;
+          max-length = 60;
           separate-outputs = true;
         };
 
         clock = {
           interval = if (device.type != "laptop") then 1 else 60;
-          format = "{:%H:%M${optionalString (device.type != "laptop") ":%S"}}";
-          format-alt = "{:%e %B %Y}";
+          format = "     {:%H:%M${optionalString (device.type != "laptop") ":%S"}}     ";
+          format-alt = "   {:%e %B %Y}   ";
           tooltip-format = "<tt><small>{calendar}</small></tt>";
 
           calendar = {

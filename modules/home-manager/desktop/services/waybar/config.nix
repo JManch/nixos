@@ -167,12 +167,8 @@ in
         };
 
         pulseaudio = mkIf audio.enable {
-          format = "<span color='#${
-            if audio.alwaysMuteSink then colors.base08 else colors.base04
-          }'>{icon}</span> {volume:2}%{format_source}";
-          format-muted = "<span color='#${
-            if audio.alwaysMuteSink then colors.base04 else colors.base08
-          }'>󰖁</span> {volume:2}%{format_source}";
+          format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%{format_source}";
+          format-muted = "<span color='#${colors.base04}'>󰖁</span> {volume:2}%{format_source}";
           format-source = "<span color='#${colors.base08}'>  󰍬</span>";
           format-source-muted = "";
 

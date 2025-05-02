@@ -25,6 +25,7 @@ let
   inherit (desktop.programs) locker;
   inherit (osConfig.${ns}.core) device;
   inherit (osConfig.${ns}.system) networking;
+  inherit (osConfig.${ns}.hardware) bluetooth;
   inherit (device)
     gpu
     monitors
@@ -43,6 +44,7 @@ let
   systemctl = getExe' pkgs.systemd "systemctl";
   hyprctl = getExe' pkgs.hyprland "hyprctl";
   jaq = getExe pkgs.jaq;
+  app2unit = getExe pkgs.app2unit;
 
   monitorNameToNumMap = # bash
     ''
@@ -185,7 +187,7 @@ in
             ];
           } // cfg.audioDeviceIcons;
 
-          on-click = "${getExe pkgs.app2unit} com.saivert.pwvucontrol.desktop";
+          on-click = "${app2unit} com.saivert.pwvucontrol.desktop";
           tooltip = true;
         };
 
@@ -235,9 +237,20 @@ in
           tooltip = false;
         };
 
+        bluetooth = (mkIf bluetooth.enable) {
+          format = "";
+          format-on = optionalString (device.type == "laptop") "<span color='#${colors.base04}'>󰂯</span>";
+          format-connected = "<span color='#${colors.base04}'>󰂱</span> {num_connections}";
+          on-click = "${app2unit} io.github.kaii_lb.Overskride.desktop";
+          on-click-right = "${getExe' pkgs.bluez "bluetoothctl"} power off";
+          tooltip-format = "{controller_alias}";
+          tooltip-format-connected = "{device_enumerate}";
+          tooltip-format-enumerate-connected = "{device_alias}";
+        };
+
         "network#wifi" = mkIf (networking.wireless.enable && device.type == "laptop") {
           format = "";
-          format-wifi = "<span color='#${colors.base04}'>{icon}</span> {signaldBm}dBm";
+          format-wifi = "<span color='#${colors.base04}'>{icon}</span> {signalStrength}%";
           format-disconnected = "<span color='#${colors.base04}'>󰤮</span> ";
           format-icons = [
             "󰤯"
@@ -250,7 +263,7 @@ in
           tooltip-format-wifi = "{essid} {frequency}GHz";
           interval = 10;
           interface = networking.wireless.interface;
-          on-click = "${getExe pkgs.app2unit} wpa_gui.desktop";
+          on-click = "${app2unit} wpa_gui.desktop";
         };
 
         tray = {
@@ -318,6 +331,7 @@ in
           ++ optional (backlight != null) "backlight"
           ++ optional audio.enable "pulseaudio"
           ++ optional (battery != null) "battery"
+          ++ optional (bluetooth.enable) "bluetooth"
           ++ optional (networking.wireless.enable && device.type == "laptop") "network#wifi"
           ++ [
             "tray"

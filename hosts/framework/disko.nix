@@ -96,4 +96,6 @@ in
       ];
     };
   };
+
+  # Enroll TPM key with `systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7+12 --tpm2-with-pin=yes /dev/nvme0n1p2`
 }

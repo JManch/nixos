@@ -224,7 +224,9 @@ in
             "󰁹"
           ];
           interval = 60;
-          tooltip = false;
+          tooltip = true;
+          format-time = " {H}:{m}";
+          tooltip-format = "{power:4.2f}W{time}";
         };
 
         memory = {

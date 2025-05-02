@@ -38,6 +38,32 @@
     # '';
   };
 
+  programs.zsh = {
+    shellAliases."get-pps" = "cat /sys/class/drm/card1-eDP-1/amdgpu/panel_power_savings";
+    interactiveShellInit = # bash
+      ''
+        toggle-pps() {
+          sysfs_path="/sys/class/drm/card1-eDP-1/amdgpu/panel_power_savings"
+
+          set_pps() {
+            echo "$1" | sudo tee "$sysfs_path" > /dev/null
+            if [[ $? -ne 0 ]]; then
+                echo "Failed to write to '$sysfs_path'" >&2
+                exit 1
+            fi
+          }
+
+          if [[ "$(cat "$sysfs_path")" != "0" ]]; then
+            set_pps 0
+            echo "Panel power savings disabled"
+          else
+            set_pps 2
+            echo "Panel power savings enabled"
+          fi
+        }
+      '';
+  };
+
   # https://www.freedesktop.org/software/systemd/man/latest/sleep.conf.d.html
   systemd.sleep.extraConfig = ''
     HibernateDelaySec=30m

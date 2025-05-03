@@ -316,6 +316,11 @@ in
 
   programs.zsh.initContent = # bash
     ''
+      toggle-dpms() {
+        active_monitor=$(hyprctl activeworkspace | jaq -r '.monitor')
+        sleep 2 && hyprctl dispatch dpms toggle "$active_monitor"
+      }
+
       toggle-monitor() {
         if [ -z "$1" ]; then
           echo "Usage: toggle-monitor <monitor_number>"

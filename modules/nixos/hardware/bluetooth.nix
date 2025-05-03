@@ -5,7 +5,7 @@
   config,
 }:
 let
-  inherit (lib) ns mkIf;
+  inherit (lib) ns mkIf hiPrio;
   inherit (config.${ns}.core) home-manager device;
 in
 {
@@ -19,6 +19,13 @@ in
   # https://github.com/kaii-lb/overskride/issues/25
   ns.userPackages = [
     (lib.${ns}.wrapHyprlandMoveToActive args pkgs.overskride "io.github.kaii_lb.Overskride" "")
+    (hiPrio (
+      pkgs.runCommand "overskride-desktop-modify" { } ''
+        mkdir -p $out/share/applications
+        substitute ${pkgs.overskride}/share/applications/io.github.kaii_lb.Overskride.desktop $out/share/applications/io.github.kaii_lb.Overskride.desktop \
+          --replace-fail "Name=Overskride" "Name=Bluetooth"
+      ''
+    ))
   ];
 
   ns.hm = mkIf home-manager.enable {

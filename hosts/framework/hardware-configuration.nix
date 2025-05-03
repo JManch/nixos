@@ -1,3 +1,6 @@
+# Issues:
+# https://gitlab.freedesktop.org/mesa/mesa/-/issues/12528
+# https://github.com/openwrt/mt76/issues/548
 {
   lib,
   pkgs,

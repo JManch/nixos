@@ -104,9 +104,8 @@
       WIFI_PWR_ON_AC = "off";
       WIFI_PWR_ON_BAT = "off"; # attempt to improve poor wifi performance
 
-      # Platform
-      # sysbench cpu run --threads=24
-      PLATFORM_PROFILE_ON_AC = "balanced"; # consider performance
+      # Platform (affects TDP apparently)
+      PLATFORM_PROFILE_ON_AC = "performance";
       PLATFORM_PROFILE_ON_BAT = "low-power"; # consider balanced
 
       # Processor
@@ -117,8 +116,9 @@
       # CPU_SCALING_GOVERNOR_ON_AC = "powersave";
       # CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
 
+      # https://community.frame.work/t/tracking-ppd-v-tlp-for-amd-ryzen-7040/39423/292
       CPU_ENERGY_PERF_POLICY_ON_AC = "balance_performance"; # consider performance
-      CPU_ENERGY_PERF_POLICY_ON_BAT = "power"; # consider balanced_power
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "balance_power";
 
       CPU_BOOST_ON_AC = 1;
       CPU_BOOST_ON_BAT = 0; # default without tlp is to boost on bat

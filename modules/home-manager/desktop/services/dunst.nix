@@ -15,7 +15,7 @@ let
     ;
   inherit (config.${ns}) desktop;
   inherit (config.${ns}.core.color-scheme) light;
-  inherit (osConfig.${ns}.core.device) primaryMonitor;
+  inherit (osConfig.${ns}.core) device;
   colors = config.colorScheme.palette;
   systemctl = getExe' pkgs.systemd "systemctl";
   dunstctl = getExe' config.services.dunst.package "dunstctl";
@@ -42,7 +42,8 @@ in
         in
         {
           monitor = toString cfg.monitorNumber;
-          follow = "none";
+          # follow mouse on laptops for external monitor usage
+          follow = if (device.type == "laptop") then "mouse" else "none";
           enable_posix_regex = true;
           font = "${font.family} 13";
           icon_theme = config.gtk.iconTheme.name;
@@ -51,8 +52,8 @@ in
           layer = "overlay";
 
           corner_radius = cornerRadius;
-          width = builtins.floor (primaryMonitor.width * 0.14);
-          height = "(0, ${toString (builtins.floor (primaryMonitor.height * 0.25))})";
+          width = builtins.floor (device.primaryMonitor.width * 0.14);
+          height = "(0, ${toString (builtins.floor (device.primaryMonitor.height * 0.25))})";
           offset =
             let
               offset = (gapSize * 2) + borderWidth;

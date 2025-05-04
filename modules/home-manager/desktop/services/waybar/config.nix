@@ -415,7 +415,7 @@ in
             ${updateMonitorBar}
             workspace_name="$1"
             monitor_name="$2"
-            waybar_update_monitor_bar "$monitor_name" "$workspace_name"
+            update_monitor_bar "$monitor_name" "$workspace_name"
 
             # unhide/hide the bar on the monitor where this workspace came
             # from through all monitors and update the bar based on their

@@ -80,7 +80,7 @@ in
   hardware.graphics.enable = true;
 
   # Some apps may use this to optimise for power savings
-  services.upower.enable = mkDefault config.${ns}.core.device.type == "laptop";
+  services.upower.enable = mkDefault (config.${ns}.core.device.type == "laptop");
 
   # Enables wayland for all apps that support it
   environment.sessionVariables.NIXOS_OZONE_WL = 1;

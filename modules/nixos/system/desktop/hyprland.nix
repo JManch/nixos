@@ -63,6 +63,10 @@ in
               # Add always on top window rule and dispatching which is pinning
               # but just for workspace that the window is on
               ../../../../patches/hyprland-always-on-top.patch
+              # Do not merge workspacesrule to enable modifying existing rules
+              # with `hyprctl keyword workspace`. Needed for modifying
+              # workspacerules in our external monitor scripts.
+              ../../../../patches/hyprland-no-merge-workspacerules.patch
             ];
           });
         })

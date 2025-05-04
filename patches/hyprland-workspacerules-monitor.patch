@@ -1,14 +1,23 @@
 diff --git a/src/config/ConfigManager.cpp b/src/config/ConfigManager.cpp
-index ea79f614..99ce9e67 100644
+index d1f7fcd8..799500fa 100644
 --- a/src/config/ConfigManager.cpp
 +++ b/src/config/ConfigManager.cpp
-@@ -1298,8 +1298,7 @@ SWorkspaceRule CConfigManager::getWorkspaceRuleFor(PHLWORKSPACE pWorkspace) {
+@@ -1298,7 +1298,7 @@ SWorkspaceRule CConfigManager::getWorkspaceRuleFor(PHLWORKSPACE pWorkspace) {
  SWorkspaceRule CConfigManager::mergeWorkspaceRules(const SWorkspaceRule& rule1, const SWorkspaceRule& rule2) {
      SWorkspaceRule mergedRule = rule1;
  
 -    if (rule1.monitor.empty())
--        mergedRule.monitor = rule2.monitor;
-+    mergedRule.monitor = rule2.monitor;
++    if (!rule2.monitor.empty())
+         mergedRule.monitor = rule2.monitor;
      if (rule1.workspaceString.empty())
          mergedRule.workspaceString = rule2.workspaceString;
-     if (rule1.workspaceName.empty())
+@@ -1309,8 +1309,7 @@ SWorkspaceRule CConfigManager::mergeWorkspaceRules(const SWorkspaceRule& rule1,
+ 
+     if (rule2.isDefault)
+         mergedRule.isDefault = true;
+-    if (rule2.isPersistent)
+-        mergedRule.isPersistent = true;
++    mergedRule.isPersistent = rule2.isPersistent;
+     if (rule2.gapsIn.has_value())
+         mergedRule.gapsIn = rule2.gapsIn;
+     if (rule2.gapsOut.has_value())

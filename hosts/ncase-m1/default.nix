@@ -18,7 +18,10 @@
 
       device = {
         type = "desktop";
-        ipAddress = "192.168.88.254";
+        address = "192.168.88.254";
+        altAddresses = [
+          "10.20.20.11" # wireless
+        ];
         memory = 1024 * 64;
         hassIntegration.enable = true;
 

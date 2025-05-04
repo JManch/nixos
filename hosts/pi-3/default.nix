@@ -51,7 +51,7 @@ in
 
       device = {
         type = "server";
-        ipAddress = "10.20.20.28";
+        address = "10.20.20.28";
         memory = 1024;
 
         cpu = {

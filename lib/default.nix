@@ -4,6 +4,7 @@ let
     attrNames
     filterAttrs
     imap0
+    optional
     hasAttr
     elem
     getExe
@@ -116,7 +117,18 @@ in
           (oldAttrs.patches or [ ]) ++ (map (p: if hasPrefix "/" p then p else ../patches + "/${p}") patches);
       });
 
-    hostIp = hostname: self.nixosConfigurations.${hostname}.config.${ns}.core.device.ipAddress;
+    hostIp = hostname: self.nixosConfigurations.${hostname}.config.${ns}.core.device.address;
+    hostVPNIp = hostname: self.nixosConfigurations.${hostname}.config.${ns}.core.device.vpnAddress;
+    hostIps =
+      hostname:
+      let
+        inherit (self.nixosConfigurations.${hostname}.config.${ns}.core.device)
+          address
+          altAddresses
+          vpnAddress
+          ;
+      in
+      optional (address != null) address ++ optional (vpnAddress != null) vpnAddress ++ altAddresses;
 
     upperFirstChar =
       string: concatStrings (imap0 (i: c: if i == 0 then toUpper c else c) (stringToCharacters string));

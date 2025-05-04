@@ -6,10 +6,14 @@
   ...
 }:
 let
-  inherit (lib) ns;
-  inherit (lib.${ns}) hostIp;
+  inherit (lib) ns foldl';
+  inherit (lib.${ns}) hostIp hostIps;
   inherit (config.${ns}.services) wireguard;
   inherit (inputs.nix-resources.secrets) fqDomain tomFqDomain;
+  trustedHostIps =
+    foldl' (a: e: a ++ (map (ip: "${ip}/32") (hostIps e)))
+      [ ]
+      [ "ncase-m1" "surface-pro" "framework" ];
 in
 {
   imports = [
@@ -29,7 +33,7 @@ in
         cpu.cores = 4;
         memory = 1024 * 8;
         gpu.type = null;
-        ipAddress = "192.168.89.2";
+        address = "192.168.89.2";
         vpnNamespace = "air-vpn";
       };
     };
@@ -120,12 +124,12 @@ in
         autoStart = true;
         proxy = true;
         interfaces = [ "wg-friends" ];
-        allowedAddresses = [
-          "${hostIp "ncase-m1"}/32"
-          "${hostIp "surface-pro"}/32"
-          "10.20.20.33/32" # pixel 9
-          "10.20.20.11/32" # ncase-m1 wireless
-        ] ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
+        allowedAddresses =
+          trustedHostIps
+          ++ [
+            "10.20.20.33/32" # pixel 9
+          ]
+          ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };
 
       factorio-server = {
@@ -188,10 +192,7 @@ in
 
       file-server = {
         enable = true;
-        allowedAddresses = [
-          "${hostIp "ncase-m1"}/32"
-          "${hostIp "surface-pro"}/32"
-        ] ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
+        allowedAddresses = trustedHostIps ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };
 
       minecraft-server = {

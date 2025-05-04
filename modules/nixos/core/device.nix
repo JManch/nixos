@@ -211,13 +211,27 @@ in
       '';
     };
 
-    ipAddress = mkOption {
+    address = mkOption {
       type = types.nullOr types.str;
       default = null;
       description = ''
-        The local IP address of the device on my home network. Must be a static
-        address.
+        The static IP address of device's primary interface on my home network.
       '';
+    };
+
+    altAddresses = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        List of additional addresses the device may have on alternative
+        interfaces (e.g. wireless interface). Does not include VPN addresses.
+      '';
+    };
+
+    vpnAddress = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = "The static IP address of the device on my VPN network";
     };
 
     hassIntegration = {

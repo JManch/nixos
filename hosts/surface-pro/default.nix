@@ -17,7 +17,7 @@
 
       device = {
         type = "laptop";
-        ipAddress = "192.168.100.10";
+        address = "192.168.100.10";
         memory = 1024 * 8;
         backlight = "intel_backlight";
         battery = "BAT1";

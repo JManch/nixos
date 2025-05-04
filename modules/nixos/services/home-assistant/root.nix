@@ -357,7 +357,7 @@ in
       {
         image = "everythingsmarthome/everything-presence-mmwave-configurator:latest";
         ports = [ "8099:8099" ];
-        environment.HA_URL = "http://${device.ipAddress}:8123";
+        environment.HA_URL = "http://${device.address}:8123";
         environmentFiles = [ everythingPresenceVars.path ];
       };
 

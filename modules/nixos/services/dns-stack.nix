@@ -40,9 +40,13 @@ let
     }
     //
       # Add all hosts that have a static local address
-      mapAttrs' (host: v: nameValuePair v.config.${ns}.core.device.ipAddress host) (
-        filterAttrs (host: v: v.config.${ns}.core.device.ipAddress != null) self.nixosConfigurations
-      );
+      mapAttrs' (host: v: nameValuePair v.config.${ns}.core.device.address host) (
+        filterAttrs (host: v: v.config.${ns}.core.device.address != null) self.nixosConfigurations
+      )
+    # Add VPN variants
+    // mapAttrs' (host: v: nameValuePair v.config.${ns}.core.device.vpnAddress "${host}-vpn") (
+      filterAttrs (host: v: v.config.${ns}.core.device.vpnAddress != null) self.nixosConfigurations
+    );
 in
 {
   opts = with lib; {
@@ -94,7 +98,7 @@ in
   asserts = [
     (device.type == "server")
     "DNS stack can only be used on server devices"
-    (device.ipAddress != null)
+    (device.address != null)
     "The DNS stack requires the device to have a static IP address set"
     (cfg.routerAddress != "")
     "The DNS stack requires the device to have a router IP address set"
@@ -259,7 +263,7 @@ in
       address = [
         # Point reverse proxy traffic to the device to avoid need for hairpin
         # NAT
-        "/${fqDomain}/${config.${ns}.core.device.ipAddress}"
+        "/${fqDomain}/${device.address}"
         # Return NXDOMAIN for AAAA requests. Otherwise AAAA requests resolve to
         # the public DDNS CNAME response which resolves to public IP.
         "/${fqDomain}/"

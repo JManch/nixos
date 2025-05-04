@@ -13,7 +13,7 @@
 
       device = {
         type = "desktop";
-        ipAddress = "192.168.88.244";
+        address = "192.168.88.244";
         memory = 1024 * 16;
 
         cpu = {

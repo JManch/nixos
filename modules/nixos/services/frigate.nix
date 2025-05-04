@@ -15,7 +15,7 @@ let
     singleton
     ;
   inherit (lib.${ns}) hardeningBaseline;
-  inherit (config.${ns}.core.device) ipAddress;
+  inherit (config.${ns}.core) device;
   inherit (config.${ns}.services) home-assistant mosquitto;
   inherit (config.age.secrets) cctvVars mqttFrigatePassword;
   httpPort = 5000;
@@ -286,7 +286,7 @@ in
         listen = ":${toString cfg.webrtc.port}";
 
         candidates = [
-          "${ipAddress}:${toString cfg.webrtc.port}"
+          "${device.address}:${toString cfg.webrtc.port}"
           # If using "stun" here it translates to Google's STUN server
           # "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString cfg.webrtc.port}"
         ];

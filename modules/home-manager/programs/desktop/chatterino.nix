@@ -81,87 +81,83 @@ in
     "hyprland/workspaces".format-icons.TWITCH = "󰕃";
   };
 
-  ns.desktop = {
-    services.waybar.autoHideWorkspaces = [ "TWITCH" ];
-    hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false, gapsin:0, gapsout:0";
+  ns.desktop =
+    let
+      initWorkspace = pkgs.writeShellApplication {
+        name = "hypr-chatterino-init-workspace";
+        runtimeInputs = [
+          pkgs.hyprland
+          pkgs.jaq
+          pkgs.app2unit
+        ];
+        text = ''
+          # Check if a special workspace is focused and, if so, close it
+          # (ideally hyprland would close the special workspace if the
+          # workspace that has been switched to is behind it)
+          specialworkspace=$(hyprctl monitors -j | jaq -r '.[] | select(.focused == true) | .specialWorkspace')
+          id=$(echo "$specialworkspace" | jaq -r '.id')
+          if [ "$id" -lt 0 ]; then
+            name=$(echo "$specialworkspace" | jaq -r '.name')
+            hyprctl dispatch togglespecialworkspace "''${name#special:}"
+          fi
 
-    hyprland.settings =
-      let
-        initWorkspace = pkgs.writeShellApplication {
-          name = "hypr-chatterino-init-workspace";
+          # We can't use the [workspace id silent] exec dispatcher here
+          # because firefox doesn't respect it. Instead we have to assume
+          # that the TWITCH workspace is actively focused.
+          app2unit com.chatterino.chatterino.desktop &
+          app2unit firefox.desktop:new-window https://www.twitch.tv/directory
+        '';
+      };
+
+      resetWorkspace =
+        theaterMode:
+        pkgs.writeShellApplication {
+          name = "hypr-chatterino-reset-${if theaterMode then "theater" else "fullscreen"}-workspace";
           runtimeInputs = [
             pkgs.hyprland
             pkgs.jaq
-            pkgs.app2unit
           ];
           text = ''
-            # Check if a special workspace is focused and, if so, close it
-            # (ideally hyprland would close the special workspace if the
-            # workspace that has been switched to is behind it)
-            specialworkspace=$(hyprctl monitors -j | jaq -r '.[] | select(.focused == true) | .specialWorkspace')
-            id=$(echo "$specialworkspace" | jaq -r '.id')
-            if [ "$id" -lt 0 ]; then
-              name=$(echo "$specialworkspace" | jaq -r '.name')
-              hyprctl dispatch togglespecialworkspace "''${name#special:}"
-            fi
-
-            # We can't use the [workspace id silent] exec dispatcher here
-            # because firefox doesn't respect it. Instead we have to assume
-            # that the TWITCH workspace is actively focused.
-            app2unit com.chatterino.chatterino.desktop &
-            app2unit firefox.desktop:new-window https://www.twitch.tv/directory
+            cmds=""
+            windows=$(hyprctl clients -j | jaq -r '((.[] | select(.workspace.name == "TWITCH")) | "\(.address),\(.class),\(.title),\(.alwaysOnTop)")')
+            while IFS=',' read -r address class title alwaysontop; do
+              if [ "$class" = "firefox" ] || [ "$class" = "mpv" ]; then
+                cmds+="dispatch movewindowpixel exact 0% 0%, address:$address;"
+                cmds+="dispatch resizewindowpixel exact ${
+                  if theaterMode then firefoxPercentage else "100"
+                }% 100%, address:$address;"
+              elif [ "$class" = "com.chatterino." ]; then
+                if [[ "$title" == *"Overlay"* ]]; then
+                  ${optionalString (!theaterMode) ''
+                    cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 40%, address:$address;"
+                    cmds+="dispatch movewindowpixel exact ${firefoxPercentage}% 0%, address:$address;"
+                  ''}
+                  if [ "$alwaysontop" = "${if theaterMode then "true" else "false"}" ]; then
+                    cmds+="dispatch togglealwaysontop address:$address;"
+                  fi
+                  cmds+="dispatch alterzorder ${if theaterMode then "bottom" else "top"}, address:$address;"
+                else
+                  cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 100%, address:$address;"
+                  cmds+="dispatch movewindowpixel exact ${firefoxPercentage}% 0%, address:$address;"
+                  cmds+="dispatch alterzorder ${if theaterMode then "top" else "bottom"}, address:$address;"
+                fi
+              else
+                cmds+="dispatch alterzorder top, address:$address;"
+              fi
+            done <<< "$windows"
+            hyprctl dispatch --batch "$cmds"
           '';
         };
+    in
+    {
+      services.waybar.autoHideWorkspaces = [ "TWITCH" ];
+      hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false, gapsin:0, gapsout:0, on-created-empty:${getExe initWorkspace}";
 
-        resetWorkspace =
-          theaterMode:
-          pkgs.writeShellApplication {
-            name = "hypr-chatterino-reset-${if theaterMode then "theater" else "fullscreen"}-workspace";
-            runtimeInputs = [
-              pkgs.hyprland
-              pkgs.jaq
-            ];
-            text = ''
-              cmds=""
-              windows=$(hyprctl clients -j | jaq -r '((.[] | select(.workspace.name == "TWITCH")) | "\(.address),\(.class),\(.title),\(.alwaysOnTop)")')
-              while IFS=',' read -r address class title alwaysontop; do
-                if [ "$class" = "firefox" ] || [ "$class" = "mpv" ]; then
-                  cmds+="dispatch movewindowpixel exact 0% 0%, address:$address;"
-                  cmds+="dispatch resizewindowpixel exact ${
-                    if theaterMode then firefoxPercentage else "100"
-                  }% 100%, address:$address;"
-                elif [ "$class" = "com.chatterino." ]; then
-                  if [[ "$title" == *"Overlay"* ]]; then
-                    ${optionalString (!theaterMode) ''
-                      cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 40%, address:$address;"
-                      cmds+="dispatch movewindowpixel exact ${firefoxPercentage}% 0%, address:$address;"
-                    ''}
-                    if [ "$alwaysontop" = "${if theaterMode then "true" else "false"}" ]; then
-                      cmds+="dispatch togglealwaysontop address:$address;"
-                    fi
-                    cmds+="dispatch alterzorder ${if theaterMode then "bottom" else "top"}, address:$address;"
-                  else
-                    cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 100%, address:$address;"
-                    cmds+="dispatch movewindowpixel exact ${firefoxPercentage}% 0%, address:$address;"
-                    cmds+="dispatch alterzorder ${if theaterMode then "top" else "bottom"}, address:$address;"
-                  fi
-                else
-                  cmds+="dispatch alterzorder top, address:$address;"
-                fi
-              done <<< "$windows"
-              hyprctl dispatch --batch "$cmds"
-            '';
-          };
-      in
-      {
+      hyprland.settings = {
         bind = [
           "${hyprland.modKey}, T, workspace, ${hyprland.namedWorkspaceIDs.TWITCH}"
           "${hyprland.modKey}SHIFT, T, exec, ${getExe (resetWorkspace true)}"
           "${hyprland.modKey}SHIFTCONTROL, T, exec, ${getExe (resetWorkspace false)}"
-        ];
-
-        workspace = [
-          "${hyprland.namedWorkspaceIDs.TWITCH}, on-created-empty:${getExe initWorkspace}"
         ];
 
         windowrule =
@@ -200,5 +196,5 @@ in
             "tag -twitch_remove, tag:twitch_remove"
           ];
       };
-  };
+    };
 }

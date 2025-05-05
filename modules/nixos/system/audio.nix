@@ -20,6 +20,7 @@ let
     singleton
     optionalString
     mapAttrsToList
+    hiPrio
     ;
   inherit (config.${ns}.core) home-manager device;
   inherit (config.${ns}.system) desktop;
@@ -69,6 +70,14 @@ in
 
     ns.userPackages = mkIf desktop.enable [
       (lib.${ns}.wrapHyprlandMoveToActive args pkgs.pwvucontrol "com.saivert.pwvucontrol" "")
+      (hiPrio (
+        pkgs.runCommand "pwvucontrol-desktop-modify" { } ''
+          mkdir -p $out/share/applications
+          substitute ${pkgs.pwvucontrol}/share/applications/com.saivert.pwvucontrol.desktop $out/share/applications/com.saivert.pwvucontrol.desktop \
+            --replace-fail "Name=pwvucontrol" "Name=Volume Control"
+        ''
+      ))
+
     ];
 
     services.pulseaudio.enable = mkForce false;

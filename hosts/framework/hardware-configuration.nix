@@ -30,7 +30,12 @@
       "sd_mod"
     ];
 
-    kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
+    kernelPackages =
+      lib.mkForce
+        (import (fetchTarball {
+          url = "https://github.com/JManch/nixpkgs/archive/ef9fc863c9a6bf7d89c772116a9259c1284c6f25.tar.gz";
+          sha256 = "sha256:073cc99n1819prv6f3d1p9mn7zfxc7yn1hw0i7rs1z3hizx8srbf";
+        }) { inherit (pkgs) system; }).linuxPackages_testing;
 
     # Force TLP to use cros_charge-control module instead of the framework
     # module for battery charge limits

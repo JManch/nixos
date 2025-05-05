@@ -19,6 +19,14 @@
   networking.hostId = "549d3e08";
   hardware.cpu.amd.updateMicrocode = true;
 
+  ${lib.ns}.hardware.graphics.amd.kernelPatches = [
+    # Fix for https://gitlab.freedesktop.org/mesa/mesa/-/issues/12528
+    (pkgs.fetchpatch2 {
+      url = "https://gitlab.freedesktop.org/-/project/176/uploads/d6a7812beec2760eccdd1f0439923277/vcn4_0_5-6.15-rc5.patch";
+      hash = "sha256-y+Lvq5QefQ3kNNAuLEbfTedN6Pz9dtf1ma4jtpdslyI=";
+    })
+  ];
+
   boot = {
     kernelModules = [ "kvm-amd" ];
 

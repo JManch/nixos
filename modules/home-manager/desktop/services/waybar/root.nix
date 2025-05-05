@@ -20,5 +20,17 @@
         automatically hide. Only works on Hyprland.
       '';
     };
+
+    powerOffMethod = mkOption {
+      type = types.enum [
+        "suspend"
+        "hibernate"
+        "poweroff"
+      ];
+      default = "suspend";
+      description = ''
+        Power off method used when clicking power button
+      '';
+    };
   };
 }

@@ -24,13 +24,17 @@
       };
 
       services = {
-        waybar.enable = true;
         dunst.enable = true;
         wlsunset.enable = true;
         wluma.enable = false;
         hypridle.enable = true;
         hyprpaper.enable = true;
         darkman.enable = true;
+
+        waybar = {
+          enable = true;
+          powerOffMethod = "hibernate";
+        };
 
         wallpaper = {
           randomise.enable = true;

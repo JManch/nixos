@@ -277,7 +277,7 @@ in
 
         "custom/poweroff" = {
           format = "⏻";
-          on-click = "${systemctl} suspend";
+          on-click = "${systemctl} ${cfg.powerOffMethod}";
           on-click-middle = "${systemctl} poweroff";
           tooltip = false;
         };

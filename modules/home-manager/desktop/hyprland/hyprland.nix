@@ -33,6 +33,115 @@ let
   deviceType = osConfig.${ns}.core.device.type;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
+
+  setupMonitors = pkgs.writeShellApplication {
+    name = "setup-monitors";
+    runtimeInputs = with pkgs; [
+      hyprland
+      jaq
+    ];
+    text = ''
+      monitors_json=$(hyprctl monitors all -j)
+      monitors=$(echo "$monitors_json" | jaq -r '.[] | .name')
+      declare -A selected_monitors
+
+      for monitor in $monitors; do
+        monitor_json=$(echo "$monitors_json" | jaq -r ".[] | select(.name == \"''${monitor}\")")
+        name=$(echo "$monitor_json" | jaq -r ".name")
+        description=$(echo "$monitor_json" | jaq -r ".description")
+        width=$(echo "$monitor_json" | jaq -r ".width")
+        height=$(echo "$monitor_json" | jaq -r ".height")
+        disabled=$(echo "$monitor_json" | jaq -r ".disabled")
+        modes=$(echo "$monitor_json" | jaq -r ".availableModes")
+
+        echo -e "Name: $name\nDesc: $description\nResolution: ''${width}x$height\nDisabled: $disabled\nModes: $modes\n"
+
+        read -p "Use this monitor? (Y/n): " -n 1 -r
+        if [[ -n $REPLY ]]; then echo; fi
+        if [[ $REPLY =~ ^[Nn]$ ]]; then
+          echo -e "\n"
+          continue
+        fi
+
+        read -p "Monitor number (default $((''${#selected_monitors[@]} + 1))): " -r
+        [[ -z $REPLY || $REPLY == $'\n' ]] && num="$((''${#selected_monitors[@]} + 1))" || num="$REPLY"
+
+        max_mode="$(echo "$modes" | jaq -r "first")"
+        read -p "Monitor mode (default $max_mode): " -r
+        [[ -z $REPLY || $REPLY == $'\n' ]] && mode="$max_mode" || mode="$REPLY"
+
+        read -p "Monitor scale (default 1): " -r
+        [[ -z $REPLY || $REPLY == $'\n' ]] && scale=1 || scale="$REPLY"
+
+        selected_monitors["$num"]="$monitor $mode $scale"
+        echo -e "\n"
+      done
+
+      monitor_count="''${#selected_monitors[@]}"
+      if [[ monitor_count -ne 1 ]]; then
+        echo -e "Selected monitor numbers: ''${!selected_monitors[*]}"
+        expected_sorted_str=$(printf "%s\n" "''${!selected_monitors[@]}" | sort -n | paste -sd ' ')
+        while
+          read -p "Order the monitor numbers from left to right (e.g. 2 1 3): " -r
+          ordered_monitors="$REPLY"
+          user_sorted_str=$(echo "$ordered_monitors" | tr -s ' ' '\n' | grep -E '^[0-9]+$' | sort -n | paste -sd ' ')
+          [[ $expected_sorted_str != "$user_sorted_str" ]]
+        do echo "Please order all monitors"; done
+      else
+        ordered_monitors=''${!selected_monitors[*]}
+      fi
+
+      commands=""
+
+      # Disable monitors not selected
+      for monitor in $monitors; do
+        echo "Monitor is $monitor."
+        selected=false
+        for selected_monitor in "''${selected_monitors[@]}"; do
+          if [[ $monitor == "$selected_monitor" ]]; then
+            selected=true
+            break
+          fi
+        done
+        if [[ $selected == false ]]; then
+          commands+=";keyword monitor $monitor, disable"
+        fi
+      done
+      echo "Commands are $commands"
+
+      # Calculate positions
+      pos_x=0
+      for monitor in $ordered_monitors; do
+        read -r name mode scale <<< "''${selected_monitors["$monitor"]}"
+        commands+=";keyword monitor $name, $mode, ''${pos_x}x0, $scale"
+        IFS='x' read -r width _ <<< "$mode"
+        echo "width from $mode is $width"
+        pos_x=$((pos_x + width))
+        echo "new pos_x is $pos_x"
+      done
+
+      # Assign workspaces
+      move_commands=""
+      for monitor in $ordered_monitors; do
+        workspace="$monitor"
+        count=1
+        while ((workspace < 50)); do
+          [[ $count -lt 3 ]] && persistent=true || persistent=false
+          read -r name _ <<< "''${selected_monitors["$monitor"]}"
+          commands+=";keyword workspace $workspace, monitor:$name, persistent:$persistent"
+          # needed to update the persistent property of the workspace
+          commands+=";dispatch renameworkspace $workspace $workspace"
+          move_commands+=";dispatch moveworkspacetomonitor $workspace $name"
+          workspace=$((workspace + monitor_count))
+          count=$((count + 1))
+        done
+      done
+
+      hyprctl --batch "$commands"
+      sleep 1 # for some reason move commands don't work in the same batch command
+      hyprctl --batch "$move_commands" >/dev/null
+    '';
+  };
 in
 {
   asserts = [
@@ -49,7 +158,10 @@ in
   });
 
   home.packages =
-    [ (flakePkgs args "grimblast").grimblast ]
+    [
+      setupMonitors
+      (flakePkgs args "grimblast").grimblast
+    ]
     # These are needed for xdg-desktop-portal-hyprland screenshot
     # functionality. Even though I use grimblast the portal may be used in some
     # situations?

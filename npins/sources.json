@@ -326,6 +326,22 @@
       "hash": "f48243d925c8314aa9adb0c5d0dce95120daf75edf578119279b832eb14f4c57",
       "frozen": true
     },
+    "slskd-stats": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "Arairon",
+        "repo": "slskd-stats"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v0.1.0",
+      "revision": "78479d9f41c4cc21a9d0b260c83eeb973d361334",
+      "url": "https://api.github.com/repos/Arairon/slskd-stats/tarball/v0.1.0",
+      "hash": "0avqxy739hjf82d7jsj6cx0vy971ja3vznggzgdj15qz50qfrpzz"
+    },
     "soularr": {
       "type": "Git",
       "repository": {

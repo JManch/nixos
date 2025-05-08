@@ -23,6 +23,7 @@ in
   daikin-onecta = pkgs.home-assistant.python.pkgs.callPackage ./daikin-onecta.nix args;
   formulaone-card = callPackage ./formulaone-card.nix args;
   brightnessctl = callPackage ./brightnessctl.nix args;
+  slskd-stats = pkgs.python3Packages.callPackage ./slskd-stats.nix args;
 
   # Manual
   advanced-camera-card = callPackage ./advanced-camera-card.nix { };

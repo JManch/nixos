@@ -545,19 +545,24 @@ in
           # keys so root uses them to authenticate with github
           serviceConfig.ExecStart = mkForce (pkgs.writeShellScript "nixos-upgrade-ssh-auth" ''
             set -e
-            # Copy host ssh keys to /root/.ssh
-            # Abort if /root.ssh exists
-            if [ -d /root/.ssh ]; then
-              echo "Aborting because root has ssh keys for some reason"
-              exit 1
+            mkdir -p /root/.ssh
+
+            if [ -f /root/.ssh/id_ed25519 ]; then
+              tmp=$(mktemp -d)
+              mv /root/.ssh/id_ed25519 "$tmp"
             fi
 
-            mkdir -p /root/.ssh
-            cp /etc/ssh/ssh_host_ed25519_key /root/.ssh/id_ed25519
             cleanup() {
-              rm -rf "/root/.ssh"
+              if [[ -v tmp ]]; then
+                mv "$tmp/id_ed25519" /root/.ssh
+                rm -rf "$tmp"
+              else
+                rm -rf /root/.ssh/id_ed25519
+              fi
             }
+
             trap cleanup EXIT
+            cp /etc/ssh/ssh_host_ed25519_key /root/.ssh/id_ed25519
 
             ${config.systemd.services.nixos-upgrade.script}
           '').outPath;

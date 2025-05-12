@@ -128,8 +128,12 @@
 
     system = {
       impermanence.enable = true;
-      ssh.server.enable = true;
       virtualisation.libvirt.enable = true;
+
+      ssh.server = {
+        enable = true;
+        extraInterfaces = [ "wlp192s0" ];
+      };
 
       audio = {
         enable = true;

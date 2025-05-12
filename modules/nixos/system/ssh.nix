@@ -12,7 +12,11 @@ let
   inherit (lib)
     ns
     mkIf
+    genAttrs
     mapAttrs
+    optionalAttrs
+    mkOption
+    types
     optional
     singleton
     mkEnableOption
@@ -23,7 +27,18 @@ in
   enableOpt = false;
 
   opts = {
-    server.enable = mkEnableOption "SSH server";
+    server = {
+      enable = mkEnableOption "SSH server";
+
+      extraInterfaces = mkOption {
+        type = with types; listOf str;
+        default = [ ];
+        description = ''
+          List of interfaces (in addition to the primary interfaces) that the
+          SSH server should be exposed on.
+        '';
+      };
+    };
     agent.enable = mkEnableOption "SSH authentication agent" // {
       default = username == adminUsername;
     };
@@ -47,10 +62,14 @@ in
     };
   };
 
-  # Enable using this host as a build host in VMs
-  networking.firewall.interfaces = mkIf virtualisation.libvirt.enable {
-    virbr0.allowedTCPPorts = [ 22 ];
-  };
+  networking.firewall.interfaces =
+    # Enable using this host as a build host in VMs
+    optionalAttrs virtualisation.libvirt.enable {
+      virbr0.allowedTCPPorts = [ 22 ];
+    }
+    // genAttrs cfg.server.extraInterfaces (_: {
+      allowedTCPPorts = [ 22 ];
+    });
 
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"

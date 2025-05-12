@@ -255,6 +255,8 @@ in
         '';
       in
       mkIf home-manager.enable {
+        dconf.settings."com/saivert/pwvucontrol".enable-overamplification = true;
+
         ${ns}.desktop = {
           programs.locker = {
             preLockScript = ''

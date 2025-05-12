@@ -3,20 +3,19 @@
   cfg,
   config,
 }:
-let
-  inherit (lib) mkOption types getExe';
-in
 {
   requirements = [
     "services.caddy"
     "services.postgresql"
   ];
 
-  opts.port = mkOption {
-    type = types.port;
-    default = 8888;
-    description = "Port for the Atuin server to listen on";
-  };
+  opts.port =
+    with lib;
+    mkOption {
+      type = types.port;
+      default = 8888;
+      description = "Port for the Atuin server to listen on";
+    };
 
   services.atuin = {
     enable = true;
@@ -33,7 +32,7 @@ in
 
     restore =
       let
-        pg_restore = getExe' config.services.postgresql.package "pg_restore";
+        pg_restore = lib.getExe' config.services.postgresql.package "pg_restore";
         backup = "/var/backup/postgresql/atuin.sql";
       in
       {

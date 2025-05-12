@@ -243,6 +243,11 @@ in
         openFirewall = true;
         interfaces = [ "wg-friends" ];
       };
+
+      audiobookshelf = {
+        enable = true;
+        extraAllowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
+      };
     };
 
     system = {

@@ -556,15 +556,17 @@ in
       ]
     );
 
-    systemd.timers.restic-repo-maintenance = {
-      enable = !inputs.firstBoot.value;
-      wantedBy = [ "timers.target" ];
-      timerConfig = backupTimerConfig;
+    systemd.timers = mkIf cfg.runMaintenance {
+      restic-repo-maintenance = {
+        enable = !inputs.firstBoot.value;
+        wantedBy = [ "timers.target" ];
+        timerConfig = backupTimerConfig;
+      };
     };
 
     # Persist maintenance service cache otherwise forget command can be very
     # expensive
-    ns.persistence.directories = singleton {
+    ns.persistence.directories = optional cfg.runMaintenance {
       directory = "/var/cache/restic-repo-maintenance";
       mode = "0700";
     };

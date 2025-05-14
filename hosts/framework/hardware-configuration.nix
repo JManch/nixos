@@ -142,5 +142,11 @@
     };
   };
 
+  # Disable the airplane mode key
+  services.udev.extraHwdb = ''
+    evdev:input:b0018v32ACp0006*
+      KEYBOARD_KEY_100c6=reserved
+  '';
+
   system.stateVersion = "25.05";
 }

@@ -248,6 +248,7 @@ in
         "${modShift}, L, focusmonitor, r"
         "${mod}, TAB, focusmonitor, +1"
         "${modShift}, TAB, movecurrentworkspacetomonitor, +1"
+        ", XF86AudioMedia, exec, sleep 1 && hyprctl dispatch dpms toggle"
 
         # Dwindle
         "${mod}, P, pseudo,"

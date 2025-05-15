@@ -469,8 +469,8 @@ in
     # import --timid --library <query>` (use -s to target a single track) then
     # choose the correct musicbrainz release. For some reason not all metadata
     # gets updated after this so run `beet mbsync <query>`.
-    environment.systemPackages = singleton (
-      pkgs.symlinkJoin {
+    ns.userPackages = [
+      (pkgs.symlinkJoin {
         name = "beets-wrapped-config";
         paths = singleton (
           pkgs.beets.override {
@@ -562,8 +562,54 @@ in
           ''
             wrapProgram $out/bin/beet --add-flags "--config=${config}"
           '';
-      }
-    );
+      })
+      (pkgs.writeShellApplication {
+        name = "resample-flacs";
+        runtimeInputs = [ pkgs.sox ];
+        text = ''
+          # Resamples flacs to 16 bit 44.1khz with minimal quality loss
+          if [[ $# -ne 1 || ! -d $1 ]]; then
+            echo "Usage: resample-flacs <directory>" >&2
+            exit 1
+          fi
+
+          echo "Resampling flacs in $1..."
+          source="''${1%/}"
+          failed=true
+          tmp_dir=$(mktemp -d "resample-flacs-tmp.XXXXXX")
+
+          cleanup() {
+            rm -rf "$tmp_dir"
+            if [[ $failed == true ]]; then
+              echo "Resampling failed. Flacs have not been modified." >&2
+            fi
+          }
+          trap cleanup EXIT
+
+          shopt -s nullglob
+          for input_file in "$source"/*.flac; do
+            filename=$(basename "$input_file")
+            sample_rate=$(soxi -r "$input_file")
+            bitrate=$(soxi -b "$input_file")
+
+            if [[ $sample_rate -gt 44100 || $bitrate -gt 16 ]]; then
+              sox -G "$input_file" -b 16 "$tmp_dir/$filename" rate -v 44100
+              echo "Resampled $filename: $bitrate/''${sample_rate}Hz -> 16/44100Hz"
+            else
+              echo "Skipping $filename: $bitrate/''${sample_rate}Hz"
+            fi
+          done
+
+          for resampled_file in "$tmp_dir"/*; do
+            filename=$(basename "$resampled_file")
+            mv "$resampled_file" "$source/$filename"
+          done
+
+          failed=false
+          echo "Successfully resampled and overwrote flacs"
+        '';
+      })
+    ];
 
     services.slskd = {
       enable = true;

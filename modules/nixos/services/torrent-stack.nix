@@ -13,6 +13,7 @@ let
     getExe
     getExe'
     head
+    mkForce
     hasPrefix
     genAttrs
     stringToCharacters
@@ -23,7 +24,7 @@ let
   inherit (config.${ns}.system) impermanence;
   inherit (config.${ns}.services) jellyfin;
   inherit (config.${ns}.core) device;
-  inherit (inputs.nix-resources.secrets) qBittorrentPort soulseekPort;
+  inherit (inputs.nix-resources.secrets) qBittorrentPort soulseekPort slskdExcludePaths;
   inherit (config.age.secrets) recyclarrSecrets slskdVars;
   mediaDir = (optionalString impermanence.enable "/persist") + cfg.mediaDir;
   vpnNamespaceAddress = config.vpnNamespaces.${device.vpnNamespace}.namespaceAddress;
@@ -629,7 +630,8 @@ in
           directories = [
             "${mediaDir}/music"
             "!${mediaDir}/music/playlists"
-          ];
+          ] ++ map (p: "!${mediaDir}/${p}") slskdExcludePaths;
+
           filters = [
             "library\\.db$"
             "\\.nsp$"
@@ -651,6 +653,11 @@ in
         SupplementaryGroups = [ "media" ];
         # Same reason as qbittorrent
         UMask = "0000";
+
+        # Upstream implementation makes no sense as shares.directories may
+        # contain exclusion rules. Also doesn't handle paths with spaces
+        # correctly.
+        ReadOnlyPaths = mkForce [ ];
 
         # Make file system inaccessible
         TemporaryFileSystem = "/";

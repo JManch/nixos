@@ -11,10 +11,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v2.4.0",
-      "revision": "9e93fa35fac3fff7b507d13b3d115b1a562053b4",
+      "version": "v2.4.1",
+      "revision": "cc6167cd2ecf45697f19a174a78c7b3cb83d66fd",
       "url": null,
-      "hash": "0wljgdavm6bbpl8w3yr2w76gs5rdxwxh3ycrl2rkabmwbigjcb35"
+      "hash": "112ckilkfpngm8bzbc5d7npgm5iaxc967ji2bvy151dfs1r2q9zm"
     },
     "BeamMP-Server": {
       "type": "GitRelease",
@@ -27,10 +27,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v3.8.2",
-      "revision": "4d5d34c4ec301d1a6854a1c58cb47f27c5b5518a",
+      "version": "v3.8.3",
+      "revision": "0fda70f783334b44482ddf5ea38dcaf08c6d0369",
       "url": null,
-      "hash": "1glis8nyh1g8mfdvxql10w0l0anndlblpkdjs95rzr8w05ap9gs3"
+      "hash": "13lsgq7q61w8q8gx1ihf4zdyxk76c8ai7pf6y8g54j7fw6j6i15c"
     },
     "HA_blueprints": {
       "type": "GitRelease",
@@ -89,9 +89,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "42613bd4c69cd5720114679a52b73b8b5d947678",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/42613bd4c69cd5720114679a52b73b8b5d947678.tar.gz",
-      "hash": "1xk68x80n6h533dxranvjsnzsmjncs89476252hcg03slv1vcj7d"
+      "revision": "7b9672a2dc16bdfbe7b7b7c27043529ca3bcb6ae",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/7b9672a2dc16bdfbe7b7b7c27043529ca3bcb6ae.tar.gz",
+      "hash": "03dnx5v75530fwppfgpjl6xzzmdbk73ymrlix129d9n5sqrz9wgk"
     },
     "async-property": {
       "type": "PyPi",
@@ -126,10 +126,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.4.2",
-      "revision": "ea324f04a40a434ad10278f820b87ccc7d899cba",
-      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.2",
-      "hash": "1wq80dmnm9mcnim8128wkrhd8jbacmgj2dimwk837nfk0fmifazc"
+      "version": "v1.4.3",
+      "revision": "68b8cb398f9ac8fa5404dbede5bb264a1f8b1297",
+      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.3",
+      "hash": "073ryd8divispw1ax2wcy8qmjmlg0lawlc4n06zkicd7g0sbkwca"
     },
     "daikin_onecta": {
       "type": "GitRelease",
@@ -142,10 +142,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v4.2.6",
-      "revision": "5ebf19ab80929b88cb083cdced2944b2b0c599e9",
-      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/v4.2.6",
-      "hash": "094x6q5i0bmr9mzinsldrnrd64l1xbf9wa79wyzf07bh9vdkc6i4"
+      "version": "v4.2.8",
+      "revision": "aff06b7e7faff55cd5f22fc7bbd5afebc6f49bfd",
+      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/v4.2.8",
+      "hash": "0ka8kzfj8g4gmwkymxvmz6pwaajqzrrhl5bvhs2xvzh47908jcx3"
     },
     "filen-cli": {
       "type": "GitRelease",
@@ -158,10 +158,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.0.33",
-      "revision": "fbdad25798b6579961a1f431397c7e5e411ac398",
-      "url": "https://api.github.com/repos/FilenCloudDienste/filen-cli/tarball/v0.0.33",
-      "hash": "0377kldv8mv0ncy0b8jbxlrx28w906yk0620y2h3691hymq9f8d6"
+      "version": "v0.0.34",
+      "revision": "a59d9c424e3cf98f622591b03b51c60c753b10f2",
+      "url": "https://api.github.com/repos/FilenCloudDienste/filen-cli/tarball/v0.0.34",
+      "hash": "0821x9sk4d30n6y401fyl4p4mc46hz526z98a2b1dwi483s9d148"
     },
     "filen-desktop": {
       "type": "GitRelease",
@@ -188,9 +188,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "016521f0a21bbb76e8eff4b8410c1e049f081c77",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/016521f0a21bbb76e8eff4b8410c1e049f081c77.tar.gz",
-      "hash": "00zbcjp2vx84a2ipxg5afba0bqvw4vxz0lyk9d7zsj6n3cryhikm"
+      "revision": "c880ab119af62969cee51bf9043d354b90c015a1",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/c880ab119af62969cee51bf9043d354b90c015a1.tar.gz",
+      "hash": "14vxh6pwprrj25jg7y9gfvxx3ksb7ladc6cifkwjprkdircbdjs5"
     },
     "formulaone-card": {
       "type": "GitRelease",
@@ -203,10 +203,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.12.3",
-      "revision": "208ecf2578df597692c7617c937d20f82c3ecd1e",
-      "url": "https://api.github.com/repos/marcokreeft87/formulaone-card/tarball/v1.12.3",
-      "hash": "18c5f2likfciyww0l0gzrkax017973gbirrbxyjavm8q2q65v1gn"
+      "version": "v1.12.4",
+      "revision": "3669a34843c4fe5740ed34b55eba90d8a1474658",
+      "url": "https://api.github.com/repos/marcokreeft87/formulaone-card/tarball/v1.12.4",
+      "hash": "0fzj4b3c9m7cifbb07i970ajwd0kl5dc21qnphf6v5nlw01aknis"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -219,10 +219,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v5.8.0",
-      "revision": "9a7d616cb2cbded845ddb6e432a0148dd374b078",
-      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/v5.8.0",
-      "hash": "0sk8wrfwmm1aqaff6cyri49nccnaia5za13p5zi3yy9qbvf2425i"
+      "version": "v5.9.2",
+      "revision": "415a8b9a1e1590d565f8e3a8197535ced42ef472",
+      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/v5.9.2",
+      "hash": "18sv92x2nz7q35wbbypadn0b8z6l9gsjfkrlkz63d0z713sg0lax"
     },
     "hacs_waste_collection_schedule": {
       "type": "GitRelease",
@@ -235,10 +235,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2.7.0",
-      "revision": "f613e051a073945112494d91a675984cc32f0b3c",
-      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.7.0",
-      "hash": "1xm79ydd1yljfz83m3fydp469ji7qdk7hzh122l3ikpak85c8nln"
+      "version": "2.8.0",
+      "revision": "c21343ad67d6188d966ecbf94db04bbe2755fa8c",
+      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.8.0",
+      "hash": "025f4ys4a6b2fcvhiy68ng7zfxl32b9791dv517mdg1nb46jxnyr"
     },
     "hass-web-proxy-lib": {
       "type": "Git",
@@ -249,9 +249,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "f96dfdec6e24275dc83b462a3471d89509f3d42a",
-      "url": "https://github.com/dermotduffy/hass-web-proxy-lib/archive/f96dfdec6e24275dc83b462a3471d89509f3d42a.tar.gz",
-      "hash": "1mwl2504r4wm6lhlzzscnsvy5qdpxnw5grlrq7dhkdif919dg7j4"
+      "revision": "e72cfcd1665d1d2dc643ea15f9867c278c8910ab",
+      "url": "https://github.com/dermotduffy/hass-web-proxy-lib/archive/e72cfcd1665d1d2dc643ea15f9867c278c8910ab.tar.gz",
+      "hash": "0qrykq2325ivz1rg54hsyfcvv8dyrxg9i2lj14qfpf56c7nxl9rp"
     },
     "heatmiser-for-home-assistant": {
       "type": "GitRelease",
@@ -296,26 +296,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "5.1.2.1",
-      "revision": "f4903f457fb966d8a1c9533ead5e69939de7101a",
-      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/5.1.2.1",
-      "hash": "1xz8z4y0kgxps3vgzj59cg9qrwk7ydppbp0jf57wf5bfvilk3aqb"
-    },
-    "miele": {
-      "type": "GitRelease",
-      "repository": {
-        "type": "GitHub",
-        "owner": "astrandb",
-        "repo": "miele"
-      },
-      "pre_releases": false,
-      "version_upper_bound": null,
-      "release_prefix": null,
-      "submodules": false,
-      "version": "v2025.1.1",
-      "revision": "544dc19d52cd0aef1cd85fb53975a849c6372f3f",
-      "url": "https://api.github.com/repos/astrandb/miele/tarball/v2025.1.1",
-      "hash": "03v3r32iy961lxi4ba909a2g626dgdmf3vjd8pha8ap0mpd74a2d"
+      "version": "5.2.0.4",
+      "revision": "4c9e08916cb2a2312ba1e4b673ecbef9934bc2db",
+      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/5.2.0.4",
+      "hash": "17zm0247ip50nmqj524hb23y7cz1s8id8grc0df4r4fj99n35kdk"
     },
     "neohubapi": {
       "type": "PyPi",
@@ -351,9 +335,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "df9945dcf224096a21edabfc7e98b638f3ce1191",
-      "url": "https://github.com/mrusse/soularr/archive/df9945dcf224096a21edabfc7e98b638f3ce1191.tar.gz",
-      "hash": "1bw6sygpyciklfgirl3cydj6cnmzy12xy6r0fqnsccvx7qvzlnqx"
+      "revision": "283a65096ab89ef75cd3dec3ffe6b75d38d37fc2",
+      "url": "https://github.com/mrusse/soularr/archive/283a65096ab89ef75cd3dec3ffe6b75d38d37fc2.tar.gz",
+      "hash": "1d3h5y24kj141q7kv96wrimninirxi3fsfj2mf9mgah93nw699za"
     },
     "supersonic": {
       "type": "Git",
@@ -364,9 +348,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "086f5c785553a5981438c8f34b5d5c6b9987bf4a",
-      "url": "https://github.com/dweymouth/supersonic/archive/086f5c785553a5981438c8f34b5d5c6b9987bf4a.tar.gz",
-      "hash": "15cna9yszhihnh22z2ighfzaq5q9c20kdmim4c3fv6crw86pvl9j"
+      "revision": "a23e7d382d46e2cdf4fbd697a67db032960820d3",
+      "url": "https://github.com/dweymouth/supersonic/archive/a23e7d382d46e2cdf4fbd697a67db032960820d3.tar.gz",
+      "hash": "1rzyaffswzn8389dcinblg51qycqjyk41s8fsa9622z8xwrzx883"
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -424,10 +408,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.21.3",
-      "revision": "769c10c64185a2e0ee8f7b17674fb6f8e5e121a0",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.21.3",
-      "hash": "0ia02vq3p9f461qvmqwz3lqjhzvvw5jf5asfsmxbgxjnmv7k7v4c"
+      "version": "v0.21.4",
+      "revision": "1af86eb555dddf197c28da5d580a3c6f2bf82cd2",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.21.4",
+      "hash": "1gs2ijl19jnhqvp2nifca7vpak8k19ydqxqzccq0mq2aygkmli7x"
     },
     "xdg-terminal-exec": {
       "type": "GitRelease",

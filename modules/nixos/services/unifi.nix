@@ -16,7 +16,7 @@
   services.unifi = {
     enable = true;
     openFirewall = false;
-    unifiPackage = pkgs.unifi8;
+    unifiPackage = pkgs.unifi;
     # WARN: Be careful when changing mongodb versions as mongodb requires
     # manual intervention to migrate. Safest method is to export a unifi
     # backup, clear /var/lib/unifi and then restore from backup.

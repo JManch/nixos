@@ -200,18 +200,10 @@ in
     enable = true;
     enableReload = false;
 
-    package =
-      # FIX: Using Caddy 2.9.1 until https://github.com/caddy-dns/porkbun/issues/24 is resolved
-      # After updating to 2.10 we can use the new global DNS option to avoid
-      # needing DNS config in every virtual host
-      (import (fetchTarball {
-        url = "https://github.com/NixOS/nixpkgs/archive/5e5402ecbcb27af32284d4a62553c019a3a49ea6.tar.gz";
-        sha256 = "sha256:0a8xv91nz7qkyxs3nhszxj3vb9s5v1xgyhmm32y1fbb8njx7hrw1";
-      }) { inherit (pkgs) system; }).caddy.withPlugins
-        {
-          plugins = [ "github.com/caddy-dns/porkbun@v0.2.1" ];
-          hash = "sha256-X8QbRc2ahW1B5niV8i3sbfpe1OPYoaQ4LwbfeaWvfjg=";
-        };
+    package = pkgs.caddy.withPlugins {
+      plugins = [ "github.com/caddy-dns/porkbun@v0.3.1" ];
+      hash = "sha256-sa+L2YoTM1ZfhfowoCZwmggrUsqw0NmGWRK45TevxFo=";
+    };
 
     globalConfig = ''
       admin off

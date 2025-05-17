@@ -135,6 +135,7 @@ in
       "roborock"
       "unifi"
       "esphome"
+      "miele"
     ] ++ optional mosquitto.enable "mqtt";
 
     customComponents =
@@ -146,10 +147,6 @@ in
         (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs {
           inherit (sources.adaptive-lighting) version;
           src = sources.adaptive-lighting;
-        })
-        (pkgs.home-assistant-custom-components.miele.overrideAttrs {
-          inherit (sources.miele) version;
-          src = sources.miele;
         })
         selfPkgs.heatmiser
         selfPkgs.thermal-comfort

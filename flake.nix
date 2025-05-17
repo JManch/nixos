@@ -67,7 +67,8 @@
     rpi-firmware-nonfree-src.flake = false;
 
     nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
-    nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
+    # Monado currently fails to build with our nixpkgs
+    # nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";
     nixpkgs-xr.inputs.treefmt-nix.follows = "";
 
     nix-flatpak.url = "github:gmodena/nix-flatpak";

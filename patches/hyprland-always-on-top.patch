@@ -1,5 +1,5 @@
 diff --git a/src/Compositor.cpp b/src/Compositor.cpp
-index 154ec135..fd393cd0 100644
+index 973cb26b..5729ef8f 100644
 --- a/src/Compositor.cpp
 +++ b/src/Compositor.cpp
 @@ -888,9 +888,23 @@ PHLWINDOW CCompositor::vectorToWindowUnified(const Vector2D& pos, uint8_t proper
@@ -42,7 +42,7 @@ index 154ec135..fd393cd0 100644
                      }
                  }
              }
-@@ -2362,7 +2376,7 @@ void CCompositor::setWindowFullscreenState(const PHLWINDOW PWINDOW, SFullscreenS
+@@ -2361,7 +2375,7 @@ void CCompositor::setWindowFullscreenState(const PHLWINDOW PWINDOW, SFullscreenS
  
      // make all windows on the same workspace under the fullscreen window
      for (auto const& w : m_windows) {
@@ -52,7 +52,7 @@ index 154ec135..fd393cd0 100644
      }
  
 diff --git a/src/debug/HyprCtl.cpp b/src/debug/HyprCtl.cpp
-index 2ad182ab..a323d82b 100644
+index d3f9efa1..9a8bfc6c 100644
 --- a/src/debug/HyprCtl.cpp
 +++ b/src/debug/HyprCtl.cpp
 @@ -277,6 +277,7 @@ std::string CHyprCtl::getWindowData(PHLWINDOW w, eHyprCtlOutputFormat format) {
@@ -92,10 +92,10 @@ index 2ad182ab..a323d82b 100644
  }
  
 diff --git a/src/desktop/Window.hpp b/src/desktop/Window.hpp
-index cc62dd3b..c16ef6ad 100644
+index 47d28db2..af35ba8a 100644
 --- a/src/desktop/Window.hpp
 +++ b/src/desktop/Window.hpp
-@@ -240,6 +240,9 @@ class CWindow {
+@@ -238,6 +238,9 @@ class CWindow {
      // For pinned (sticky) windows
      bool m_pinned = false;
  
@@ -106,7 +106,7 @@ index cc62dd3b..c16ef6ad 100644
      bool m_pinFullscreened = false;
  
 diff --git a/src/desktop/WindowRule.cpp b/src/desktop/WindowRule.cpp
-index db1b0dde..69f7f028 100644
+index 48bf2ff0..c5a25bbf 100644
 --- a/src/desktop/WindowRule.cpp
 +++ b/src/desktop/WindowRule.cpp
 @@ -5,7 +5,7 @@
@@ -118,7 +118,7 @@ index db1b0dde..69f7f028 100644
  };
  static const auto RULES_PREFIX = std::unordered_set<std::string>{
      "animation",     "bordercolor", "bordersize", "center",  "content", "fullscreenstate", "group",    "idleinhibit",   "maxsize",     "minsize",        "monitor",
-@@ -33,6 +33,8 @@ CWindowRule::CWindowRule(const std::string& rule, const std::string& value, bool
+@@ -32,6 +32,8 @@ CWindowRule::CWindowRule(const std::string& rule, const std::string& value, bool
          m_ruleType = RULE_NOINITIALFOCUS;
      else if (rule == "pin")
          m_ruleType = RULE_PIN;
@@ -140,7 +140,7 @@ index 9af3909a..0a3ea767 100644
          RULE_TILE,
          RULE_RENDERUNFOCUSED,
 diff --git a/src/events/Windows.cpp b/src/events/Windows.cpp
-index 838839d3..2ef25806 100644
+index 4bf54ca8..ad22c7ca 100644
 --- a/src/events/Windows.cpp
 +++ b/src/events/Windows.cpp
 @@ -248,6 +248,10 @@ void Events::listener_mapWindow(void* owner, void* data) {
@@ -161,14 +161,14 @@ index 838839d3..2ef25806 100644
 +    if (PWINDOW->m_alwaysOnTop && !PWINDOW->m_isFloating)
 +        PWINDOW->m_alwaysOnTop = false;
 +
-     const CVarList WORKSPACEARGS = CVarList(requestedWorkspace, 0, ' ');
+     CVarList WORKSPACEARGS = CVarList(requestedWorkspace, 0, ' ');
  
      if (!WORKSPACEARGS[0].empty()) {
 diff --git a/src/layout/IHyprLayout.cpp b/src/layout/IHyprLayout.cpp
-index 51ea5883..c073a89c 100644
+index 8d32e44e..d54a0020 100644
 --- a/src/layout/IHyprLayout.cpp
 +++ b/src/layout/IHyprLayout.cpp
-@@ -704,7 +704,8 @@ void IHyprLayout::changeWindowFloatingMode(PHLWINDOW pWindow) {
+@@ -710,7 +710,8 @@ void IHyprLayout::changeWindowFloatingMode(PHLWINDOW pWindow) {
          g_pCompositor->setWindowFullscreenInternal(pWindow, FSMODE_NONE);
      }
  
@@ -179,18 +179,18 @@ index 51ea5883..c073a89c 100644
      g_pHyprRenderer->damageWindow(pWindow, true);
  
 diff --git a/src/managers/KeybindManager.cpp b/src/managers/KeybindManager.cpp
-index 1bd7e1a2..a96244e7 100644
+index c4c6d4ab..2cee0492 100644
 --- a/src/managers/KeybindManager.cpp
 +++ b/src/managers/KeybindManager.cpp
 @@ -126,6 +126,7 @@ CKeybindManager::CKeybindManager() {
-     m_mDispatchers["swapnext"]                       = swapnext;
-     m_mDispatchers["swapactiveworkspaces"]           = swapActiveWorkspaces;
-     m_mDispatchers["pin"]                            = pinActive;
-+    m_mDispatchers["togglealwaysontop"]              = toggleActiveAlwaysOnTop;
-     m_mDispatchers["mouse"]                          = mouse;
-     m_mDispatchers["bringactivetotop"]               = bringActiveToTop;
-     m_mDispatchers["alterzorder"]                    = alterZOrder;
-@@ -2789,6 +2790,31 @@ SDispatchResult CKeybindManager::pinActive(std::string args) {
+     m_dispatchers["swapnext"]                       = swapnext;
+     m_dispatchers["swapactiveworkspaces"]           = swapActiveWorkspaces;
+     m_dispatchers["pin"]                            = pinActive;
++    m_dispatchers["togglealwaysontop"]              = toggleActiveAlwaysOnTop;
+     m_dispatchers["mouse"]                          = mouse;
+     m_dispatchers["bringactivetotop"]               = bringActiveToTop;
+     m_dispatchers["alterzorder"]                    = alterZOrder;
+@@ -2791,6 +2792,31 @@ SDispatchResult CKeybindManager::pinActive(std::string args) {
      return {};
  }
  
@@ -223,10 +223,10 @@ index 1bd7e1a2..a96244e7 100644
      const auto ARGS    = CVarList(args.substr(1), 2, ' ');
      const auto PRESSED = args[0] == '1';
 diff --git a/src/managers/KeybindManager.hpp b/src/managers/KeybindManager.hpp
-index ede16402..67766a3d 100644
+index be2d114b..a6b0f04f 100644
 --- a/src/managers/KeybindManager.hpp
 +++ b/src/managers/KeybindManager.hpp
-@@ -212,6 +212,7 @@ class CKeybindManager {
+@@ -214,6 +214,7 @@ class CKeybindManager {
      static SDispatchResult swapnext(std::string);
      static SDispatchResult swapActiveWorkspaces(std::string);
      static SDispatchResult pinActive(std::string);
@@ -235,28 +235,26 @@ index ede16402..67766a3d 100644
      static SDispatchResult bringActiveToTop(std::string);
      static SDispatchResult alterZOrder(std::string);
 diff --git a/src/render/Renderer.cpp b/src/render/Renderer.cpp
-index 445c39cd..0c333f1b 100644
+index 982e2ed8..98d9cf63 100644
 --- a/src/render/Renderer.cpp
 +++ b/src/render/Renderer.cpp
-@@ -338,8 +338,8 @@ void CHyprRenderer::renderWorkspaceWindowsFullscreen(PHLMONITOR pMonitor, PHLWOR
+@@ -337,8 +337,8 @@ void CHyprRenderer::renderWorkspaceWindowsFullscreen(PHLMONITOR pMonitor, PHLWOR
  
      // then render windows over fullscreen.
      for (auto const& w : g_pCompositor->m_windows) {
--        if (w->m_workspace != pWorkspaceWindow->m_workspace || !w->m_isFloating || (!w->m_createdOverFullscreen && !w->m_pinned) || (!w->m_isMapped && !w->m_fadingOut) ||
+-        if (w->workspaceID() != pWorkspaceWindow->workspaceID() || !w->m_isFloating || (!w->m_createdOverFullscreen && !w->m_pinned) || (!w->m_isMapped && !w->m_fadingOut) ||
 -            w->isFullscreen())
-+        if (w->m_workspace != pWorkspaceWindow->m_workspace || !w->m_isFloating || (!w->m_createdOverFullscreen && !w->m_pinned && !w->m_alwaysOnTop) ||
++        if (w->workspaceID() != pWorkspaceWindow->workspaceID() || !w->m_isFloating || (!w->m_createdOverFullscreen && !w->m_pinned && !w->m_alwaysOnTop) ||
 +            (!w->m_isMapped && !w->m_fadingOut) || w->isFullscreen())
              continue;
  
          if (w->m_monitor == pWorkspace->m_monitor && pWorkspace->m_isSpecialWorkspace != w->onSpecialWorkspace())
-@@ -433,6 +433,33 @@ void CHyprRenderer::renderWorkspaceWindows(PHLMONITOR pMonitor, PHLWORKSPACE pWo
+@@ -432,7 +432,28 @@ void CHyprRenderer::renderWorkspaceWindows(PHLMONITOR pMonitor, PHLWORKSPACE pWo
          if (!w)
              continue;
  
-+        if (w->m_alwaysOnTop)
-+            continue;
-+
-+        if (!w->m_isFloating || w->m_pinned)
+-        if (!w->m_isFloating || w->m_pinned)
++        if (!w->m_isFloating || w->m_pinned || w->m_alwaysOnTop)
 +            continue;
 +
 +        // some things may force us to ignore the special/not special disparity
@@ -277,9 +275,7 @@ index 445c39cd..0c333f1b 100644
 +        if (!w)
 +            continue;
 +
-+        if (!w->m_alwaysOnTop)
-+            continue;
-+
-         if (!w->m_isFloating || w->m_pinned)
++        if (!w->m_alwaysOnTop || !w->m_isFloating || w->m_pinned)
              continue;
  
+         // some things may force us to ignore the special/not special disparity

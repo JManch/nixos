@@ -1,8 +1,8 @@
 diff --git a/src/main.rs b/src/main.rs
-index 05024df..cf3ea3f 100644
+index 41a1818..0a922a5 100644
 --- a/src/main.rs
 +++ b/src/main.rs
-@@ -69,15 +69,15 @@ fn print_system_info(fields: &Fields) {
+@@ -68,15 +68,15 @@ fn print_system_info(fields: &Fields) -> Result<(), Box<dyn std::error::Error>>
      let blue = COLORS.blue;
      let reset = COLORS.reset;
      let system_info = format!("
@@ -14,7 +14,7 @@ index 05024df..cf3ea3f 100644
 -    {blue}   ▟█▛{cyan}▗█▖       {cyan}▟█▛          {cyan}  {blue}Desktop{reset}       {desktop}
 -    {blue}  ▝█▛  {cyan}██▖{blue}▗▄▄▄▄▄▄▄▄▄▄▄       {cyan}  {blue}Memory{reset}        {memory_usage}
 -    {blue}   ▝  {cyan}▟█▜█▖{blue}▀▀▀▀▀██▛▀▀▘       {cyan}󱥎  {blue}Storage (/){reset}   {storage}
--    {cyan}     ▟█▘ ▜█▖    {blue}▝█▛          {cyan}  {blue}Colors{reset}        {colors}");
+-    {cyan}     ▟█▘ ▜█▖    {blue}▝█▛          {cyan}  {blue}Colors{reset}        {colors}\n");
 + {cyan}    ▟█▖   {blue}▝█▙ ▗█▛       {user_info} ~{reset}
 + {cyan}  ▗▄▟██▄▄▄▄{blue}▝█▙█▛  {cyan}▖     {cyan}  {blue}System{reset}        {os_name}
 + {cyan}  ▀▀▀▀▀▀▀▀▀▘{blue}▝██  {cyan}▟█▖    {cyan}  {blue}Kernel{reset}        {kernel_version}
@@ -25,5 +25,5 @@ index 05024df..cf3ea3f 100644
 + {blue}  ▝  {cyan}▟█▜█▖{blue}▀▀▀▀██▛▀▘     {cyan}󱥎  {blue}Storage (/){reset}   {storage}
 + {cyan}    ▟█▘ ▜█▖   {blue}▝█▛       {cyan}  {blue}Colors{reset}        {colors}");
  
-     std::io::stdout()
-         .lock()
+     Ok(stdout().write_all(system_info.as_bytes())?)
+ }

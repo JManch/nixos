@@ -52,8 +52,6 @@ in
               # of moving the open special workspace to the active monitor
               ../../../../patches/hyprland-special-workspace-toggle.patch
               ../../../../patches/hyprland-resize-params-floats.patch
-              # Potential fix for https://github.com/hyprwm/Hyprland/issues/6820
-              ../../../../patches/hyprland-special-workspace-fullscreen.patch
               # Fixes center and size/move window rules using the active monitor instead
               # of the monitor that the window is on
               ../../../../patches/hyprland-windowrule-monitor.patch

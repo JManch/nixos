@@ -64,15 +64,7 @@ in
     "Valve Index requires the default sink and source devices to be set"
   ];
 
-  nixpkgs.overlays = [
-    (_: prev: {
-      monado = prev.monado.overrideAttrs (old: {
-        # nixpkgs-xr is missing an `or []` on patches
-        patches = old.patches or [ ];
-      });
-    })
-    inputs.nixpkgs-xr.overlays.default
-  ];
+  nixpkgs.overlays = [ inputs.nixpkgs-xr.overlays.default ];
 
   ns.userPackages = [
     pkgs.index_camera_passthrough

@@ -2,11 +2,25 @@
 let
   inherit (lib) singleton;
 
-  # The shelly should be configured with input mode "Switch", output type
-  # "Detached" and a timer that turns off the input switch after 3 seconds. The
-  # door responds to rising edge inputs.
+  # Shelly Plus 1 Configuration:
+  #   Input mode: Switch
+  #   Output type: Detached
+  #   Action on power on: Restore
+  #   Timers: Auto OFF after 3 seconds
+  #   MQTT:
+  #     Enable 'MQTT Control': Enabled
+  #     Enable RPC over MQTT: Disabled
+  #     RPC status notifications over MQTT: Disabled
+  #     Generic status update over MQTT: Enabled
+  #   Authentication: Configured
+  #   Access Point: Disabled
+  #   Bluetooth: Disabled
   shellyId = "shellyplus1-e465b8b961a4";
   doorSeconds = 20;
+  # Depending on the state of the door when the shelly is initially setup this
+  # can vary. Set this to the state of the detached input switch when the door
+  # is closed.
+  switchStateWhenDoorClosed = true;
 in
 {
   services.home-assistant.config = {
@@ -14,8 +28,8 @@ in
       binary_sensor = {
         name = "Garage Door Closed";
         icon = "mdi:garage";
-        payload_on = false;
-        payload_off = true;
+        payload_on = !switchStateWhenDoorClosed;
+        payload_off = switchStateWhenDoorClosed;
         qos = 1;
         state_topic = "${shellyId}/status/input:0";
         device_class = "garage_door";

@@ -46,6 +46,7 @@ in
             # Remove the "+" and "=" chars from version because it gets used in the
             # package path and has to be escaped in shell scripts due to SC2276
             version = replaceStrings [ "+" "=" ] [ "-" "-" ] old.version;
+            __intentionallyOverridingVersion = true;
 
             patches = (old.patches or [ ]) ++ [
               # Makes the togglespecialworkspace dispatcher always toggle instead

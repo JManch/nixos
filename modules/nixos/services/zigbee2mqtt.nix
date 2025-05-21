@@ -76,6 +76,10 @@ in
       enable = true;
       # Patch fixes an issue where groups containing lights and switches remain
       # on after all lights have been switched off
+      # https://github.com/Koenkk/zigbee2mqtt/issues/26472
+      # https://github.com/Koenkk/zigbee2mqtt/issues/21465
+      # https://github.com/Koenkk/zigbee2mqtt/issues/25241 (maybe related)
+      # https://github.com/Koenkk/zigbee2mqtt/issues/26775 (maybe related)
       package = lib.${ns}.addPatches pkgs.zigbee2mqtt_2 [ "zigbee2mqtt-light-group-fix.patch" ];
       dataDir = "/var/lib/zigbee2mqtt";
       settings = {

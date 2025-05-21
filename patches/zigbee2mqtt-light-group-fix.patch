@@ -1,0 +1,30 @@
+diff --git a/lib/extension/groups.ts b/lib/extension/groups.ts
+index 89e575df..6f255b88 100644
+--- a/lib/extension/groups.ts
++++ b/lib/extension/groups.ts
+@@ -166,6 +166,25 @@ export default class Groups extends Extension {
+             // biome-ignore lint/style/noNonNullAssertion: TODO: biome migration: valid from loop?
+             const device = this.zigbee.resolveEntity(member.getDevice())!;
+ 
++            if (device.isDevice()) {
++              const exposes = device.exposes();
++
++              // If the device is not a light skip it. This fixes a bug where
++              // the group state does not turn off if a switch is a member of the
++              // group and the switch happens to be in an 'on' state when the last
++              // light is switched off. Easy to run into if the lights are manually
++              // turned off in home assistant. This issue can also randomly happen if
++              // the switches state happens to go out of sync with the state of the
++              // lights in the group.
++
++              // Not a proper solution since this breaks functionality for
++              // groups with devices that aren't switches or lights but I don't have
++              // any groups like that so it's fine.
++              if (!exposes.some(e => isLightExpose(e))) {
++                continue;
++              }
++            }
++
+             if (this.state.exists(device)) {
+                 const state = this.state.get(device);
+                 const endpointNames = device.isDevice() && device.getEndpointNames();

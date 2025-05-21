@@ -74,7 +74,9 @@ in
 
     services.zigbee2mqtt = {
       enable = true;
-      package = pkgs.zigbee2mqtt_2;
+      # Patch fixes an issue where groups containing lights and switches remain
+      # on after all lights have been switched off
+      package = lib.${ns}.addPatches pkgs.zigbee2mqtt_2 [ "zigbee2mqtt-light-group-fix.patch" ];
       dataDir = "/var/lib/zigbee2mqtt";
       settings = {
         homeassistant.enabled = home-assistant.enable;

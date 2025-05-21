@@ -83,6 +83,7 @@
     services = {
       udisks.enable = true;
       wgnord.enable = true;
+      mosquitto.explorer.enable = true;
 
       wireguard = {
         home = {

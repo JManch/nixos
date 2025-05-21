@@ -87,5 +87,5 @@ in
     };
   }
 
-  (mkIf cfg.explorer.enable { environment.systemPackages = [ pkgs.mqtt-explorer ]; })
+  (mkIf cfg.explorer.enable { ns.userPackages = [ pkgs.mqtt-explorer ]; })
 ]

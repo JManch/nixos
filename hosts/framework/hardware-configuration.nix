@@ -77,7 +77,7 @@
 
   # https://www.freedesktop.org/software/systemd/man/latest/sleep.conf.d.html
   systemd.sleep.extraConfig = ''
-    HibernateDelaySec=30m
+    HibernateDelaySec=2h
     HibernateOnACPower=no
     SuspendState=mem
     # deep sleep is not supported sadly

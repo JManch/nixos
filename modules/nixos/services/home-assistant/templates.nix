@@ -148,33 +148,6 @@ in
           auto_off = 70; # heartbeat sent every 60 seconds
         };
       }
-      {
-        # WARN: This template requires a "Formula 1" calendar to be imported
-        # into hass. Download an .ics file from f1calendar.com then create a
-        # calendar in hass and add a random event it. This should create a
-        # local_calendar.formula_1.ics in the hass .storage dir. Replace this
-        # file with the downloaded ics.
-        trigger = [
-          {
-            platform = "time";
-            at = "00:00:00";
-          }
-          {
-            platform = "state";
-            entity_id = [ "calendar.formula_1" ];
-          }
-          {
-            platform = "homeassistant";
-            event = "start";
-          }
-        ];
-        sensor = {
-          name = "Days To Formula 1 Event";
-          icon = "mdi:calendar";
-          state = "{{ ((state_attr('calendar.formula_1', 'start_time') | as_datetime | as_local) - today_at()).days }}";
-          unit_of_measurement = "d";
-        };
-      }
       (
         let
           threshold = 10;

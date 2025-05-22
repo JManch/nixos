@@ -63,6 +63,11 @@ let
     };
   };
 
+  # WARN: This requires a "Formula 1" calendar to be imported into hass.
+  # Download an .ics file from f1calendar.com then create a calendar in hass
+  # and add a random event it. This should create a
+  # local_calendar.formula_1.ics in the hass .storage dir. Replace this file
+  # with the downloaded ics.
   formula1Notify = singleton {
     alias = "Formula 1 Notify";
     mode = "single";

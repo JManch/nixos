@@ -409,34 +409,7 @@ let
                 };
               }
             ]) cameras
-          ))
-          ++ singleton {
-            type = "custom:formulaone-card";
-            card_type = "countdown";
-            f1_font = true;
-            show_raceinfo = true;
-            countdown_type = [
-              "race"
-              "qualifying"
-              "sprint"
-            ];
-            visibility = [
-              {
-                condition = "numeric_state";
-                entity = "sensor.days_to_formula_1_event";
-                below = 2;
-              }
-              {
-                condition = "user";
-                users = [
-                  userIds.joshua
-                  userIds.${people.person1}
-                  userIds.${people.person3}
-                  userIds.${people.person5}
-                ];
-              }
-            ];
-          };
+          ));
       }
     ];
   };

@@ -239,10 +239,6 @@ in
           type = "js";
           url = "/local/thermal_comfort_icons.js";
         }
-        {
-          type = "js";
-          url = "/local/formulaone-card/formulaone-card.js";
-        }
         (optionalAttrs frigate.enable {
           url = "/local/advanced-camera-card/advanced-camera-card.js";
           type = "module";
@@ -276,7 +272,6 @@ in
         advanced-camera-card
         frigate-blueprint
         thermal-comfort-icons
-        formulaone-card
         ;
 
       # Removing existing symbolic links so that packages will uninstall if
@@ -298,7 +293,6 @@ in
       ${removeExistingLinks "www"}
       [[ -d ${configDir}/blueprints/automation/SgtBatten ]] && rm -rf "${configDir}/blueprints/automation/SgtBatten"
       ln -fsn "${thermal-comfort-icons}" "${configDir}/www/thermal_comfort_icons.js"
-      ln -fsn "${formulaone-card}/formulaone-card" "${configDir}/www"
 
       ${optionalString frigate.enable # bash
         ''

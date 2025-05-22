@@ -158,6 +158,41 @@ let
     };
   };
 
+  # When using hue wall switch modules with zigbee2mqtt they only send "toggle"
+  # events to the lights. If a subset of the lights in a group are on this
+  # makes it impossible to turn all lights off as it literally toggles them.
+  hueWallSwitchForceOff =
+    room: deviceId:
+    singleton {
+      alias = "${formattedRoomName room} Hue Wall Switch Force Off";
+      mode = "single";
+      triggers = singleton {
+        trigger = "device";
+        domain = "mqtt";
+        device_id = deviceId;
+        type = "action";
+        subtype = "toggle";
+      };
+      actions = [
+        {
+          wait_for_trigger = singleton {
+            trigger = "device";
+            domain = "mqtt";
+            device_id = deviceId;
+            type = "action";
+            subtype = "toggle";
+          };
+          timeout.seconds = 2;
+          continue_on_timeout = false;
+        }
+        { delay.seconds = 1; }
+        {
+          action = "light.turn_off";
+          target.entity_id = "light.${room}_lights";
+        }
+      ];
+    };
+
   hueTapLightSwitch =
     room: deviceId:
     let
@@ -313,8 +348,8 @@ in
       binCollectionNotify
       ++ washingMachineNotify
       ++ formula1Notify
-      ++ (hueLightSwitch "lounge" "12a188fc9e93182d852924b602153741")
       ++ (hueLightSwitch "study" "49d9c39a26397a8a228ee484114aca0b")
+      ++ (hueWallSwitchForceOff "lounge" "1e088cf4a7ed6be5c94d42e48f99fad2")
       # TODO: Need a new battery and a firmware update I think because the action names are different
       # ++ (hueLightSwitch "joshua_room" "ad126eeb4153cd333afe86a9553c06ef")
       ++ (hueTapLightSwitch "${people.person2}" "670ac1ecf423f069757c7ab30bec3142")

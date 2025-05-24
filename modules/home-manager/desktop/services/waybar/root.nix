@@ -1,14 +1,25 @@
-{ lib }:
+{ lib, osConfig }:
+let
+  inherit (lib) ns types mkOption;
+  inherit (osConfig.${ns}.core) device;
+in
 {
   enableOpt = true;
   noChildren = true;
 
-  opts = with lib; {
+  opts = {
+    float = mkOption {
+      type = types.bool;
+      default = device.type != "laptop";
+      description = "Whether to add gaps and curved borders around the bar";
+    };
+
     audioDeviceIcons = mkOption {
       type = types.attrsOf types.str;
       default = { };
       description = ''
-        Attribute set mapping audio devices to icons. Use pamixer --list-sinks to get device names.
+        Attribute set mapping audio devices to icons. Use pamixer --list-sinks
+        to get device names.
       '';
     };
 

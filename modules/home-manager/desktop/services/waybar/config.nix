@@ -101,7 +101,7 @@ in
       bar = {
         layer = "top";
         height = 41;
-        margin = "${gapSize} ${gapSize} 0 ${gapSize}";
+        margin = if cfg.float then "${gapSize} ${gapSize} 0 ${gapSize}" else "0";
         spacing = 17;
 
         "hyprland/workspaces" = mkIf isHyprland {

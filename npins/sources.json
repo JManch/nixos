@@ -392,10 +392,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.21.4",
-      "revision": "1af86eb555dddf197c28da5d580a3c6f2bf82cd2",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.21.4",
-      "hash": "1gs2ijl19jnhqvp2nifca7vpak8k19ydqxqzccq0mq2aygkmli7x"
+      "version": "v0.21.5",
+      "revision": "17ed2619d9de632cb78d5cd7f66de3499df4f757",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.21.5",
+      "hash": "16shg4lz3h2250mg83wgpgy9b3x0qdn14z4w6s8jm777bh0xkzjx"
     },
     "xdg-terminal-exec": {
       "type": "GitRelease",

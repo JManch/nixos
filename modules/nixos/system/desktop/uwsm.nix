@@ -163,7 +163,7 @@ in
           # bash
           ''
             if test -z $SSH_TTY && uwsm check may-start -q ${optionalString select "&& uwsm select"}; then
-              exec uwsm start ${if select then "default" else "-- ${cfg.defaultDesktop}"} >/dev/null
+              UWSM_SILENT_START=1 exec uwsm start ${if select then "default" else "-- ${cfg.defaultDesktop}"}
             fi
           ''
       );

@@ -124,7 +124,7 @@ in
       ''
         ${
           if home-manager.enable && homeDesktop.enable && (locker.package != null) then
-            "${systemd-run} --no-block --user --machine ${username}@.host ${locker.lockScript} --immediate"
+            "${systemd-run} --user --machine ${username}@.host ${locker.lockScript} --immediate"
           else
             "${loginctl} lock-sessions"
         }

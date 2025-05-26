@@ -34,5 +34,6 @@ in
   bootstrap-kit = callPackage ./bootstrap-kit.nix { };
   kobo-dither-cbz = callPackage ./kobo-dither-cbz { };
   microfetch = lib.${lib.ns}.addPatches pkgs.microfetch [ "microfetch-icon.patch" ];
+  resample-flacs = callPackage ./resample-flacs.nix { };
 }
 // import ./installers.nix lib self

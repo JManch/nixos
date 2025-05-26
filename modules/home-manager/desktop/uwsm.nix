@@ -44,12 +44,14 @@ in
 
   # Not perfect as it won't work for apps that wrap themselves with xdg-utils.
   # Don't want to overlay xdg-utils to avoid mass rebuilds.
-  home.packages = [
-    (lib.hiPrio (
-      pkgs.runCommand "app2unit-xdg-open" { } ''
-        mkdir -p $out/bin
-        ln -s ${pkgs.app2unit}/bin/app2unit-open $out/bin/xdg-open
-      ''
-    ))
-  ];
+  # FIX: Breaks open-with behaviour in some apps. For example in picard when
+  # opening cover art in an external program.
+  # home.packages = [
+  #   (lib.hiPrio (
+  #     pkgs.runCommand "app2unit-xdg-open" { } ''
+  #       mkdir -p $out/bin
+  #       ln -s ${pkgs.app2unit}/bin/app2unit-open $out/bin/xdg-open
+  #     ''
+  #   ))
+  # ];
 }

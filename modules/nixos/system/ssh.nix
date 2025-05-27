@@ -77,7 +77,7 @@ in
 
   users.users.${adminUsername}.openssh.authorizedKeys.keys = with keys; [
     personal
-    pixel-9
+    pixel-9-personal
   ];
 
   programs.ssh = {

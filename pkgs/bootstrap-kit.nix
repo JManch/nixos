@@ -1,4 +1,5 @@
 {
+  nix-resources,
   writeShellApplication,
   tree,
   gnutar,
@@ -30,8 +31,6 @@ writeShellApplication {
       exit 1
     fi
 
-    umask 077
-
     encrypt() {
       local input_dir="$1"
 
@@ -42,6 +41,7 @@ writeShellApplication {
 
       local encrypt_tmp
       encrypt_tmp=$(mktemp -d)
+      chmod og-rwx "$encrypt_tmp"
       trap "rm -rf '$encrypt_tmp'" EXIT
 
       cp -r "$input_dir"/* "$encrypt_tmp"
@@ -71,7 +71,7 @@ writeShellApplication {
 
       trap "rm -rf '$output_dir'" EXIT
 
-      kit="''${BOOTSTRAP_KIT:-${../hosts/bootstrap-kit.tar.age}}"
+      kit="''${BOOTSTRAP_KIT:-${nix-resources}/secrets/bootstrap-kit.tar.age}"
       while ! age -d "$kit" | tar --same-owner -xpf - -C "$output_dir"; do
         true
       done

@@ -7,11 +7,13 @@
   pkgs,
   self,
   base,
+  inputs,
   modulesPath,
   ...
 }:
 let
   inherit (lib) ns;
+  inherit (inputs.nix-resources.secrets) keys;
   installScript = pkgs.writeShellApplication {
     name = "install-host";
 
@@ -265,7 +267,7 @@ in
 
       knownHosts =
         (lib.mapAttrs (host: _: {
-          publicKeyFile = ../${host}/ssh_host_ed25519_key.pub;
+          publicKey = keys.${host};
           extraHostNames = [ "${host}.lan" ];
         }) self.nixosConfigurations)
         // {
@@ -274,10 +276,8 @@ in
         };
     };
 
-    users.users.root.openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMd4QvStEANZSnTHRuHg0edyVdRmIYYTcViO9kCyFFt7 JManch@protonmail.com"
-    ];
+    users.users.root.openssh.authorizedKeys.keys = [ keys.personal ];
 
-    system.stateVersion = "24.05";
+    system.stateVersion = "25.11";
   };
 }

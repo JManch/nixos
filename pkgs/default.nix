@@ -31,7 +31,7 @@ in
   filen-desktop = callPackage ./filen-desktop.nix args;
 
   # Other
-  bootstrap-kit = callPackage ./bootstrap-kit.nix { };
+  bootstrap-kit = callPackage ./bootstrap-kit.nix { inherit (self.inputs) nix-resources; };
   kobo-dither-cbz = callPackage ./kobo-dither-cbz { };
   microfetch = lib.${lib.ns}.addPatches pkgs.microfetch [ "microfetch-icon.patch" ];
   resample-flacs = callPackage ./resample-flacs.nix { };

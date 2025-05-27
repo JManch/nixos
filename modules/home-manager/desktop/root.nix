@@ -125,4 +125,9 @@ in
   xdg.configFile."xdg-terminals.list".text = ''
     ${cfg.terminal}.desktop
   '';
+
+  dconf.settings = {
+    "org/gtk/settings/file-chooser".show-hidden = true;
+    "org/gtk/gtk4/settings/file-chooser".show-hidden = true;
+  };
 }

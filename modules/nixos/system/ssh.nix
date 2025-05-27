@@ -15,10 +15,12 @@ let
     mkIf
     genAttrs
     mapAttrs
+    hasAttr
     optionalAttrs
     mkOption
     types
     optional
+    optionals
     singleton
     mkEnableOption
     ;
@@ -91,7 +93,14 @@ in
     knownHosts =
       (mapAttrs (host: _: {
         publicKey = keys.${host};
-        extraHostNames = ([ "${host}.lan" ] ++ optional (host == hostname) "localhost");
+        extraHostNames = (
+          [
+            "${host}.lan"
+            "${host}-vpn.lan"
+          ]
+          ++ optionals (hasAttr host self.nixosConfigurations) (lib.${ns}.hostIps host)
+          ++ optional (host == hostname) "localhost"
+        );
       }) (self.nixosConfigurations // self.nixOnDroidConfigurations))
       // {
         "github.com".publicKey =

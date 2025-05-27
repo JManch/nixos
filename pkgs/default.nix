@@ -16,6 +16,7 @@ in
   xdg-terminal-exec = callPackage ./xdg-terminal-exec.nix args;
   jellyfin-plugin-listenbrainz = callPackage ./jellyfin-plugin-listenbrainz args;
   filen-cli = callPackage ./filen-cli.nix args;
+  filen-rclone = callPackage ./filen-rclone.nix args;
   frigate-blueprint = callPackage ./frigate-blueprint.nix args;
   thermal-comfort = pkgs.home-assistant.python.pkgs.callPackage ./thermal-comfort.nix args;
   thermal-comfort-icons = callPackage ./thermal-comfort-icons.nix args;

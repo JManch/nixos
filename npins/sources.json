@@ -179,6 +179,19 @@
       "url": "https://api.github.com/repos/FilenCloudDienste/filen-desktop/tarball/v3.0.47",
       "hash": "1zf5z9hxq9k2qs8pjiacdqkiqax6ljr2wziixdnipcfz9al4jbsr"
     },
+    "filen-rclone": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "FilenCloudDienste",
+        "repo": "filen-rclone"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "f5fd5095cc042618a7531698a34b21df9d065e2a",
+      "url": "https://github.com/FilenCloudDienste/filen-rclone/archive/f5fd5095cc042618a7531698a34b21df9d065e2a.tar.gz",
+      "hash": "0hkj7zpsjmqccgvkbm5h86h9m8ij8phybaqjnqpz044qyhc4g6v0"
+    },
     "firefox-csshacks": {
       "type": "Git",
       "repository": {

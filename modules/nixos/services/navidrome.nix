@@ -27,6 +27,33 @@ in
     enable = true;
     openFirewall = false;
 
+    package = pkgs.navidrome.overrideAttrs (
+      final: prev:
+      assert lib.assertMsg (prev.version == "0.55.2") "Remove navidrome override";
+      {
+        version = "0.56.0";
+        src = pkgs.fetchFromGitHub {
+          owner = "navidrome";
+          repo = "navidrome";
+          tag = "v${final.version}";
+          hash = "sha256-/X/2Xb5YOWeuXWZJakVRlkBaBjs/Kqq0W4vQd8NbwFU=";
+        };
+
+        vendorHash = "sha256-E7Q3wxUd5JAwERBKD2NZaVyj1kszOxvxeDY0s/fEDfY=";
+
+        npmDeps = pkgs.fetchNpmDeps {
+          inherit (final) src;
+          sourceRoot = "${final.src.name}/ui";
+          hash = "sha256-tl6unHz0E0v0ObrfTiE0vZwVSyVFmrLggNM5QsUGsvI=";
+        };
+
+        ldflags = [
+          "-X github.com/navidrome/navidrome/consts.gitSha=${final.src.rev}"
+          "-X github.com/navidrome/navidrome/consts.gitTag=v${final.version}"
+        ];
+      }
+    );
+
     settings = {
       Address = "127.0.0.1";
       MusicFolder = (optionalString impermanence.enable "/persist") + cfg.musicDir;
@@ -34,6 +61,7 @@ in
       EnableInsightsCollector = false;
       ListenBrainz.Enabled = true;
       LastFM.Enabled = true;
+      LastFM.ScrobbleFirstArtistOnly = true; # lastfm doesn't support multiple artists very well
 
       Backup = {
         Path = "/var/backup/navidrome";

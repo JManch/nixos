@@ -154,9 +154,9 @@ in
       '';
 
     sshAddQuiet =
-      args: # bash
+      pkgs: # bash
       let
-        ssh-add = args.lib.getExe' args.options._module.args.value.pkgs.openssh "ssh-add";
+        ssh-add = lib.getExe' pkgs.openssh "ssh-add";
       in
       ''
         if [[ "$(${ssh-add} -l)" == "The agent has no identities." ]]; then

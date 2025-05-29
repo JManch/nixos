@@ -1,6 +1,6 @@
 {
   lib,
-  args,
+  pkgs,
   config,
 }:
 {
@@ -48,7 +48,7 @@
     initContent = # bash
       ''
         lazygit() {
-          ${lib.${lib.ns}.sshAddQuiet args}
+          ${lib.${lib.ns}.sshAddQuiet pkgs}
           command lazygit "$@"
         }
       '';

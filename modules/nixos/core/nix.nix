@@ -212,7 +212,7 @@ let
           else
             optionalString (cmd != "build") # bash
               ''
-                ${sshAddQuiet args}
+                ${sshAddQuiet pkgs}
                 nixos-rebuild ${cmd} ${optionalString (cmd != "boot") "--fast"} \
                   --use-remote-sudo --flake "$flake#$hostname" --target-host "root@$hostname.lan" "''${@:2}"
               ''

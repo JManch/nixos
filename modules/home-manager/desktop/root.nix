@@ -44,10 +44,6 @@ in
     };
 
     style = {
-      customTheme = mkEnableOption "custom GTK theme derived from base16 colorscheme" // {
-        default = osConfig.${ns}.system.desktop.desktopEnvironment == null;
-      };
-
       font = {
         family = mkOption {
           type = types.str;

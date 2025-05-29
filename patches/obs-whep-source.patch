@@ -1,0 +1,1703 @@
+From 16325dea63c5309203dfd3be3a710235307a32c7 Mon Sep 17 00:00:00 2001
+From: Sean DuBois <duboisea@amazon.com>
+Date: Mon, 8 Jul 2024 15:28:16 -0400
+Subject: [PATCH 1/3] obs-webrtc: Generalize WebRTC Logic
+
+Move logic that will be used by WHIP/WHEP into a helper file
+---
+ plugins/obs-webrtc/CMakeLists.txt     |   2 +-
+ plugins/obs-webrtc/cmake/legacy.cmake |   2 +-
+ plugins/obs-webrtc/webrtc-utils.h     | 353 ++++++++++++++++++++++++
+ plugins/obs-webrtc/whip-output.cpp    | 377 +++++---------------------
+ plugins/obs-webrtc/whip-output.h      |   2 +-
+ plugins/obs-webrtc/whip-utils.h       |  90 ------
+ 6 files changed, 428 insertions(+), 398 deletions(-)
+ create mode 100644 plugins/obs-webrtc/webrtc-utils.h
+ delete mode 100644 plugins/obs-webrtc/whip-utils.h
+
+diff --git a/plugins/obs-webrtc/CMakeLists.txt b/plugins/obs-webrtc/CMakeLists.txt
+index ced0c98efbc2f1..3b1f1a8a502f35 100644
+--- a/plugins/obs-webrtc/CMakeLists.txt
++++ b/plugins/obs-webrtc/CMakeLists.txt
+@@ -16,7 +16,7 @@ add_library(OBS::webrtc ALIAS obs-webrtc)
+ 
+ target_sources(
+   obs-webrtc PRIVATE # cmake-format: sortable
+-                     obs-webrtc.cpp whip-output.cpp whip-output.h whip-service.cpp whip-service.h whip-utils.h)
++                     obs-webrtc.cpp webrtc-utils.h whep-source.cpp whep-source.h whip-output.cpp whip-output.h whip-service.cpp whip-service.h)
+ 
+ target_link_libraries(obs-webrtc PRIVATE OBS::libobs LibDataChannel::LibDataChannel CURL::libcurl)
+ 
+diff --git a/plugins/obs-webrtc/cmake/legacy.cmake b/plugins/obs-webrtc/cmake/legacy.cmake
+index 76d9d0903ad434..3e0a004013e71a 100644
+--- a/plugins/obs-webrtc/cmake/legacy.cmake
++++ b/plugins/obs-webrtc/cmake/legacy.cmake
+@@ -13,7 +13,7 @@ add_library(obs-webrtc MODULE)
+ add_library(OBS::webrtc ALIAS obs-webrtc)
+ 
+ target_sources(obs-webrtc PRIVATE obs-webrtc.cpp whip-output.cpp whip-output.h whip-service.cpp whip-service.h
+-                                  whip-utils.h)
++                                  webrtc-utils.h)
+ 
+ target_link_libraries(obs-webrtc PRIVATE OBS::libobs LibDataChannel::LibDataChannel CURL::libcurl)
+ 
+diff --git a/plugins/obs-webrtc/webrtc-utils.h b/plugins/obs-webrtc/webrtc-utils.h
+new file mode 100644
+index 00000000000000..0b5568d81f3893
+--- /dev/null
++++ b/plugins/obs-webrtc/webrtc-utils.h
+@@ -0,0 +1,353 @@
++#pragma once
++
++#include <obs.h>
++
++#include <string>
++#include <sstream>
++#include <random>
++
++static std::string trim_string(const std::string &source)
++{
++	std::string ret(source);
++	ret.erase(0, ret.find_first_not_of(" \n\r\t"));
++	ret.erase(ret.find_last_not_of(" \n\r\t") + 1);
++	return ret;
++}
++
++static std::string value_for_header(const std::string &header,
++				    const std::string &val)
++{
++	if (val.size() <= header.size() ||
++	    astrcmpi_n(header.c_str(), val.c_str(), header.size()) != 0) {
++		return "";
++	}
++
++	auto delimiter = val.find_first_of(" ");
++	if (delimiter == std::string::npos) {
++		return "";
++	}
++
++	return val.substr(delimiter + 1);
++}
++
++static size_t curl_writefunction(char *data, size_t size, size_t nmemb,
++				 void *priv_data)
++{
++	auto read_buffer = static_cast<std::string *>(priv_data);
++
++	size_t real_size = size * nmemb;
++
++	read_buffer->append(data, real_size);
++	return real_size;
++}
++
++static size_t curl_header_function(char *data, size_t size, size_t nmemb,
++				   void *priv_data)
++{
++	auto header_buffer = static_cast<std::vector<std::string> *>(priv_data);
++	header_buffer->push_back(trim_string(std::string(data, size * nmemb)));
++	return size * nmemb;
++}
++
++// Given a Link header extract URL/Username/Credential and create rtc::IceServer
++// <turn:turn.example.net>; username="user"; credential="myPassword";
++//
++// https://www.ietf.org/archive/id/draft-ietf-wish-whip-13.html#section-4.4
++static inline void parse_link_header(std::string val,
++				     std::vector<rtc::IceServer> &iceServers)
++{
++	std::string url, username, password;
++
++	auto extractUrl = [](std::string input) -> std::string {
++		auto head = input.find("<") + 1;
++		auto tail = input.find(">");
++
++		if (head == std::string::npos || tail == std::string::npos) {
++			return "";
++		}
++		return input.substr(head, tail - head);
++	};
++
++	auto extractValue = [](std::string input) -> std::string {
++		auto head = input.find("\"") + 1;
++		auto tail = input.find_last_of("\"");
++
++		if (head == std::string::npos || tail == std::string::npos) {
++			return "";
++		}
++		return input.substr(head, tail - head);
++	};
++
++	while (true) {
++		std::string token = val;
++		auto pos = token.find(";");
++		if (pos != std::string::npos) {
++			token = val.substr(0, pos);
++		}
++
++		if (token.find("<turn:", 0) == 0) {
++			url = extractUrl(token);
++		} else if (token.find("username=") != std::string::npos) {
++			username = extractValue(token);
++		} else if (token.find("credential=") != std::string::npos) {
++			password = extractValue(token);
++		}
++
++		if (pos == std::string::npos) {
++			break;
++		}
++		val.erase(0, pos + 1);
++	}
++
++	try {
++		auto iceServer = rtc::IceServer(url);
++		iceServer.username = username;
++		iceServer.password = password;
++		iceServers.push_back(iceServer);
++	} catch (const std::invalid_argument &err) {
++		blog(LOG_WARNING,
++		     "[obs-webrtc] Failed to construct ICE Server from %s: %s",
++		     val.c_str(), err.what());
++	}
++}
++
++static inline std::string generate_user_agent()
++{
++#ifdef _WIN64
++#define OS_NAME "Windows x86_64"
++#elif __APPLE__
++#define OS_NAME "Mac OS X"
++#elif __OpenBSD__
++#define OS_NAME "OpenBSD"
++#elif __FreeBSD__
++#define OS_NAME "FreeBSD"
++#elif __linux__ && __LP64__
++#define OS_NAME "Linux x86_64"
++#else
++#define OS_NAME "Linux"
++#endif
++
++	// Build the user-agent string
++	std::stringstream ua;
++	// User agent header prefix
++	ua << "User-Agent: Mozilla/5.0 ";
++	// OBS version info
++	ua << "(OBS-Studio/" << obs_get_version_string() << "; ";
++	// Operating system version info
++	ua << OS_NAME << "; " << obs_get_locale() << ")";
++
++	return ua.str();
++}
++
++enum webrtc_network_status : int {
++	Success = 0,
++	ConnectFailed = 1,
++	InvalidHTTPStatusCode = 2,
++	NoHTTPData = 3,
++	NoLocationHeader = 4,
++	FailedToBuildResourceURL = 5,
++	InvalidLocationHeader = 6,
++	DeleteFailed = 7,
++	InvalidAnswer = 8,
++	SetRemoteDescriptionFailed = 9,
++};
++
++static inline webrtc_network_status
++send_offer(std::string bearer_token, std::string endpoint_url,
++	   std::shared_ptr<rtc::PeerConnection> peer_connection,
++	   std::string &resource_url, CURLcode *curl_code, char *error_buffer)
++{
++	const std::string user_agent = generate_user_agent();
++
++	struct curl_slist *headers = NULL;
++	headers = curl_slist_append(headers, "Content-Type: application/sdp");
++	if (!bearer_token.empty()) {
++		auto bearer_token_header =
++			std::string("Authorization: Bearer ") + bearer_token;
++		headers =
++			curl_slist_append(headers, bearer_token_header.c_str());
++	}
++
++	std::string read_buffer;
++	std::vector<std::string> http_headers;
++
++	auto offer_sdp =
++		std::string(peer_connection->localDescription().value());
++
++	// Add user-agent to our requests
++	headers = curl_slist_append(headers, user_agent.c_str());
++
++	CURL *c = curl_easy_init();
++	curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, curl_writefunction);
++	curl_easy_setopt(c, CURLOPT_WRITEDATA, (void *)&read_buffer);
++	curl_easy_setopt(c, CURLOPT_HEADERFUNCTION, curl_header_function);
++	curl_easy_setopt(c, CURLOPT_HEADERDATA, (void *)&http_headers);
++	curl_easy_setopt(c, CURLOPT_URL, endpoint_url.c_str());
++	curl_easy_setopt(c, CURLOPT_POST, 1L);
++	curl_easy_setopt(c, CURLOPT_COPYPOSTFIELDS, offer_sdp.c_str());
++	curl_easy_setopt(c, CURLOPT_TIMEOUT, 8L);
++	curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
++	curl_easy_setopt(c, CURLOPT_UNRESTRICTED_AUTH, 1L);
++	curl_easy_setopt(c, CURLOPT_ERRORBUFFER, error_buffer);
++
++	auto cleanup = [&]() {
++		curl_easy_cleanup(c);
++		curl_slist_free_all(headers);
++	};
++
++	*curl_code = curl_easy_perform(c);
++	if (*curl_code != CURLE_OK) {
++		cleanup();
++		return webrtc_network_status::ConnectFailed;
++	}
++
++	long response_code;
++	curl_easy_getinfo(c, CURLINFO_RESPONSE_CODE, &response_code);
++	if (response_code != 201) {
++		cleanup();
++		return webrtc_network_status::InvalidHTTPStatusCode;
++	}
++
++	if (read_buffer.empty()) {
++		cleanup();
++		return webrtc_network_status::NoHTTPData;
++	}
++
++	long redirect_count = 0;
++	curl_easy_getinfo(c, CURLINFO_REDIRECT_COUNT, &redirect_count);
++
++	std::string last_location_header;
++	size_t location_header_count = 0;
++	for (auto &http_header : http_headers) {
++		auto value = value_for_header("location", http_header);
++		if (value.empty())
++			continue;
++
++		location_header_count++;
++		last_location_header = value;
++	}
++
++	// Parse Link headers to extract STUN/TURN server configuration URLs
++	std::vector<rtc::IceServer> iceServers;
++	for (auto &http_header : http_headers) {
++		auto value = value_for_header("link", http_header);
++		if (value.empty())
++			continue;
++
++		// Parse multiple links separated by ','
++		for (auto end = value.find(","); end != std::string::npos;
++		     end = value.find(",")) {
++			parse_link_header(value.substr(0, end), iceServers);
++			value = value.substr(end + 1);
++		}
++		parse_link_header(value, iceServers);
++	}
++
++	CURLU *url_builder = curl_url();
++
++	// If Location header doesn't start with `http` it is a relative URL.
++	// Construct a absolute URL using the host of the effective URL
++	if (last_location_header.find("http") != 0) {
++		char *effective_url = nullptr;
++		curl_easy_getinfo(c, CURLINFO_EFFECTIVE_URL, &effective_url);
++		if (effective_url == nullptr) {
++			cleanup();
++			return webrtc_network_status::FailedToBuildResourceURL;
++		}
++
++		curl_url_set(url_builder, CURLUPART_URL, effective_url, 0);
++		curl_url_set(url_builder, CURLUPART_PATH,
++			     last_location_header.c_str(), 0);
++		curl_url_set(url_builder, CURLUPART_QUERY, "", 0);
++	} else {
++		curl_url_set(url_builder, CURLUPART_URL,
++			     last_location_header.c_str(), 0);
++	}
++
++	char *url = nullptr;
++	CURLUcode rc = curl_url_get(url_builder, CURLUPART_URL, &url,
++				    CURLU_NO_DEFAULT_PORT);
++	if (rc) {
++		cleanup();
++		return webrtc_network_status::InvalidLocationHeader;
++	}
++
++	resource_url = url;
++	curl_free(url);
++	curl_url_cleanup(url_builder);
++
++	auto response = std::string(read_buffer);
++	response.erase(0, response.find("v=0"));
++
++	rtc::Description answer(response, "answer");
++	try {
++		peer_connection->setRemoteDescription(answer);
++	} catch (const std::invalid_argument &err) {
++		snprintf(error_buffer, CURL_ERROR_SIZE, "%s", err.what());
++		return webrtc_network_status::InvalidAnswer;
++	} catch (const std::exception &err) {
++		snprintf(error_buffer, CURL_ERROR_SIZE, "%s", err.what());
++		return webrtc_network_status::SetRemoteDescriptionFailed;
++	}
++	cleanup();
++
++#if RTC_VERSION_MAJOR == 0 && RTC_VERSION_MINOR > 20 || RTC_VERSION_MAJOR > 1
++	peer_connection->gatherLocalCandidates(iceServers);
++#endif
++
++	return webrtc_network_status::Success;
++}
++
++static inline webrtc_network_status send_delete(std::string bearer_token,
++						std::string resource_url,
++						CURLcode *curl_code,
++						char *error_buffer)
++{
++	const std::string user_agent = generate_user_agent();
++
++	struct curl_slist *headers = NULL;
++	if (!bearer_token.empty()) {
++		auto bearer_token_header =
++			std::string("Authorization: Bearer ") + bearer_token;
++		headers =
++			curl_slist_append(headers, bearer_token_header.c_str());
++	}
++
++	// Add user-agent to our requests
++	headers = curl_slist_append(headers, user_agent.c_str());
++
++	CURL *c = curl_easy_init();
++	curl_easy_setopt(c, CURLOPT_HTTPHEADER, headers);
++	curl_easy_setopt(c, CURLOPT_URL, resource_url.c_str());
++	curl_easy_setopt(c, CURLOPT_CUSTOMREQUEST, "DELETE");
++	curl_easy_setopt(c, CURLOPT_TIMEOUT, 8L);
++	curl_easy_setopt(c, CURLOPT_ERRORBUFFER, error_buffer);
++
++	auto cleanup = [&]() {
++		curl_easy_cleanup(c);
++		curl_slist_free_all(headers);
++	};
++
++	*curl_code = curl_easy_perform(c);
++	if (*curl_code != CURLE_OK) {
++		cleanup();
++		return webrtc_network_status::DeleteFailed;
++	}
++
++	long response_code;
++	curl_easy_getinfo(c, CURLINFO_RESPONSE_CODE, &response_code);
++	cleanup();
++
++	if (response_code != 200) {
++		return webrtc_network_status::InvalidHTTPStatusCode;
++	}
++	return webrtc_network_status::Success;
++}
++
++static uint32_t generate_random_u32()
++{
++	std::random_device rd;
++	std::mt19937 gen(rd());
++	std::uniform_int_distribution<uint32_t> dist(1, (UINT32_MAX - 1));
++	return dist(gen);
++}
+diff --git a/plugins/obs-webrtc/whip-output.cpp b/plugins/obs-webrtc/whip-output.cpp
+index 8786fc16959589..68334f19bd0cc6 100644
+--- a/plugins/obs-webrtc/whip-output.cpp
++++ b/plugins/obs-webrtc/whip-output.cpp
+@@ -1,5 +1,9 @@
+ #include "whip-output.h"
+-#include "whip-utils.h"
++#include "webrtc-utils.h"
++
++#define do_log(level, format, ...)                              \
++	blog(level, "[obs-webrtc] [whip_output: '%s'] " format, \
++	     obs_output_get_name(output), ##__VA_ARGS__)
+ 
+ /*
+  * Sets the maximum size for a video fragment. Effective range is
+@@ -13,8 +17,6 @@ const char signaling_media_id_valid_char[] = "0123456789"
+ 					     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+ 					     "abcdefghijklmnopqrstuvwxyz";
+ 
+-const std::string user_agent = generate_user_agent();
+-
+ const char *audio_mid = "0";
+ const uint8_t audio_payload_type = 111;
+ 
+@@ -288,273 +290,69 @@ bool WHIPOutput::Setup()
+ 	return true;
+ }
+ 
+-// Given a Link header extract URL/Username/Credential and create rtc::IceServer
+-// <turn:turn.example.net>; username="user"; credential="myPassword";
+-//
+-// https://www.ietf.org/archive/id/draft-ietf-wish-whip-13.html#section-4.4
+-void WHIPOutput::ParseLinkHeader(std::string val,
+-				 std::vector<rtc::IceServer> &iceServers)
+-{
+-	std::string url, username, password;
+-
+-	auto extractUrl = [](std::string input) -> std::string {
+-		auto head = input.find("<") + 1;
+-		auto tail = input.find(">");
+-
+-		if (head == std::string::npos || tail == std::string::npos) {
+-			return "";
+-		}
+-		return input.substr(head, tail - head);
+-	};
+-
+-	auto extractValue = [](std::string input) -> std::string {
+-		auto head = input.find("\"") + 1;
+-		auto tail = input.find_last_of("\"");
+-
+-		if (head == std::string::npos || tail == std::string::npos) {
+-			return "";
+-		}
+-		return input.substr(head, tail - head);
+-	};
+-
+-	while (true) {
+-		std::string token = val;
+-		auto pos = token.find(";");
+-		if (pos != std::string::npos) {
+-			token = val.substr(0, pos);
+-		}
+-
+-		if (token.find("<turn:", 0) == 0) {
+-			url = extractUrl(token);
+-		} else if (token.find("username=") != std::string::npos) {
+-			username = extractValue(token);
+-		} else if (token.find("credential=") != std::string::npos) {
+-			password = extractValue(token);
+-		}
+-
+-		if (pos == std::string::npos) {
+-			break;
+-		}
+-		val.erase(0, pos + 1);
+-	}
+-
+-	try {
+-		auto iceServer = rtc::IceServer(url);
+-		iceServer.username = username;
+-		iceServer.password = password;
+-		iceServers.push_back(iceServer);
+-	} catch (const std::invalid_argument &err) {
+-		do_log(LOG_WARNING,
+-		       "Failed to construct ICE Server from %s: %s",
+-		       val.c_str(), err.what());
+-	}
+-}
+-
+-bool WHIPOutput::Connect()
++void WHIPOutput::StartThread()
+ {
+-	struct curl_slist *headers = NULL;
+-	headers = curl_slist_append(headers, "Content-Type: application/sdp");
+-	if (!bearer_token.empty()) {
+-		auto bearer_token_header =
+-			std::string("Authorization: Bearer ") + bearer_token;
+-		headers =
+-			curl_slist_append(headers, bearer_token_header.c_str());
+-	}
+-
+-	std::string read_buffer;
+-	std::vector<std::string> http_headers;
+-
+-	auto offer_sdp =
+-		std::string(peer_connection->localDescription().value());
+-
+-#ifdef DEBUG_SDP
+-	do_log(LOG_DEBUG, "Offer SDP:\n%s", offer_sdp.c_str());
+-#endif
++	if (!Init())
++		return;
+ 
+-	// Add user-agent to our requests
+-	headers = curl_slist_append(headers, user_agent.c_str());
++	if (!Setup())
++		return;
+ 
+ 	char error_buffer[CURL_ERROR_SIZE] = {};
+-
+-	CURL *c = curl_easy_init();
+-	curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, curl_writefunction);
+-	curl_easy_setopt(c, CURLOPT_WRITEDATA, (void *)&read_buffer);
+-	curl_easy_setopt(c, CURLOPT_HEADERFUNCTION, curl_header_function);
+-	curl_easy_setopt(c, CURLOPT_HEADERDATA, (void *)&http_headers);
+-	curl_easy_setopt(c, CURLOPT_HTTPHEADER, headers);
+-	curl_easy_setopt(c, CURLOPT_URL, endpoint_url.c_str());
+-	curl_easy_setopt(c, CURLOPT_POST, 1L);
+-	curl_easy_setopt(c, CURLOPT_COPYPOSTFIELDS, offer_sdp.c_str());
+-	curl_easy_setopt(c, CURLOPT_TIMEOUT, 8L);
+-	curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
+-	curl_easy_setopt(c, CURLOPT_UNRESTRICTED_AUTH, 1L);
+-	curl_easy_setopt(c, CURLOPT_ERRORBUFFER, error_buffer);
+-
+-	auto cleanup = [&]() {
+-		curl_easy_cleanup(c);
+-		curl_slist_free_all(headers);
+-	};
+-
+-	CURLcode res = curl_easy_perform(c);
+-	if (res != CURLE_OK) {
+-		do_log(LOG_ERROR, "Connect failed: %s",
+-		       error_buffer[0] ? error_buffer
+-				       : curl_easy_strerror(res));
+-		cleanup();
+-		obs_output_signal_stop(output, OBS_OUTPUT_CONNECT_FAILED);
+-		return false;
+-	}
+-
+-	long response_code;
+-	curl_easy_getinfo(c, CURLINFO_RESPONSE_CODE, &response_code);
+-	if (response_code != 201) {
+-		do_log(LOG_ERROR,
+-		       "Connect failed: HTTP endpoint returned response code %ld",
+-		       response_code);
+-		cleanup();
+-		obs_output_signal_stop(output, OBS_OUTPUT_INVALID_STREAM);
+-		return false;
+-	}
+-
+-	if (read_buffer.empty()) {
+-		do_log(LOG_ERROR,
+-		       "Connect failed: No data returned from HTTP endpoint request");
+-		cleanup();
+-		obs_output_signal_stop(output, OBS_OUTPUT_CONNECT_FAILED);
+-		return false;
+-	}
+-
+-	long redirect_count = 0;
+-	curl_easy_getinfo(c, CURLINFO_REDIRECT_COUNT, &redirect_count);
+-
+-	std::string last_location_header;
+-	size_t location_header_count = 0;
+-	for (auto &http_header : http_headers) {
+-		auto value = value_for_header("location", http_header);
+-		if (value.empty())
+-			continue;
+-
+-		location_header_count++;
+-		last_location_header = value;
+-	}
+-
+-	if (location_header_count < static_cast<size_t>(redirect_count) + 1) {
+-		do_log(LOG_ERROR,
+-		       "WHIP server did not provide a resource URL via the Location header");
+-		cleanup();
+-		obs_output_signal_stop(output, OBS_OUTPUT_CONNECT_FAILED);
+-		return false;
+-	}
+-
+-	CURLU *url_builder = curl_url();
+-
+-	// Parse Link headers to extract STUN/TURN server configuration URLs
+-	std::vector<rtc::IceServer> iceServers;
+-	for (auto &http_header : http_headers) {
+-		auto value = value_for_header("link", http_header);
+-		if (value.empty())
+-			continue;
+-
+-		// Parse multiple links separated by ','
+-		for (auto end = value.find(","); end != std::string::npos;
+-		     end = value.find(",")) {
+-			this->ParseLinkHeader(value.substr(0, end), iceServers);
+-			value = value.substr(end + 1);
+-		}
+-		this->ParseLinkHeader(value, iceServers);
+-	}
+-
+-	// If Location header doesn't start with `http` it is a relative URL.
+-	// Construct a absolute URL using the host of the effective URL
+-	if (last_location_header.find("http") != 0) {
+-		char *effective_url = nullptr;
+-		curl_easy_getinfo(c, CURLINFO_EFFECTIVE_URL, &effective_url);
+-		if (effective_url == nullptr) {
++	CURLcode curl_code;
++	auto status = send_offer(bearer_token, endpoint_url, peer_connection,
++				 resource_url, &curl_code, error_buffer);
++
++	if (status != webrtc_network_status::Success) {
++		if (status == webrtc_network_status::ConnectFailed) {
++			do_log(LOG_WARNING, "Connect failed: %s",
++			       error_buffer[0] ? error_buffer
++					       : curl_easy_strerror(curl_code));
++		} else if (status ==
++			   webrtc_network_status::InvalidHTTPStatusCode) {
++			do_log(LOG_ERROR,
++			       "Connect failed: HTTP endpoint returned non-201 response code");
++		} else if (status == webrtc_network_status::NoHTTPData) {
++			do_log(LOG_ERROR,
++			       "Connect failed: No data returned from HTTP endpoint request");
++		} else if (status == webrtc_network_status::NoLocationHeader) {
++			do_log(LOG_ERROR,
++			       "WHIP server did not provide a resource URL via the Location header");
++		} else if (status ==
++			   webrtc_network_status::FailedToBuildResourceURL) {
+ 			do_log(LOG_ERROR, "Failed to build Resource URL");
+-			cleanup();
+-			obs_output_signal_stop(output,
+-					       OBS_OUTPUT_CONNECT_FAILED);
+-			return false;
++		} else if (status ==
++			   webrtc_network_status::InvalidLocationHeader) {
++			do_log(LOG_ERROR,
++			       "WHIP server provided a invalid resource URL via the Location header");
++		} else if (status == webrtc_network_status::InvalidAnswer) {
++			do_log(LOG_WARNING,
++			       "WHIP server responded with invalid SDP: %s",
++			       error_buffer);
++
++			struct dstr error_message;
++			dstr_init_copy(&error_message,
++				       obs_module_text("Error.InvalidSDP"));
++			dstr_replace(&error_message, "%1", error_buffer);
++			obs_output_set_last_error(output, error_message.array);
++			dstr_free(&error_message);
++		} else if (status ==
++			   webrtc_network_status::SetRemoteDescriptionFailed) {
++			do_log(LOG_WARNING,
++			       "Failed to set remote description: %s",
++			       error_buffer);
++
++			struct dstr error_message;
++			dstr_init_copy(
++				&error_message,
++				obs_module_text("Error.NoRemoteDescription"));
++			dstr_replace(&error_message, "%1", error_buffer);
++			obs_output_set_last_error(output, error_message.array);
++			dstr_free(&error_message);
+ 		}
+ 
+-		curl_url_set(url_builder, CURLUPART_URL, effective_url, 0);
+-		curl_url_set(url_builder, CURLUPART_PATH,
+-			     last_location_header.c_str(), 0);
+-		curl_url_set(url_builder, CURLUPART_QUERY, "", 0);
+-	} else {
+-		curl_url_set(url_builder, CURLUPART_URL,
+-			     last_location_header.c_str(), 0);
+-	}
+-
+-	char *url = nullptr;
+-	CURLUcode rc = curl_url_get(url_builder, CURLUPART_URL, &url,
+-				    CURLU_NO_DEFAULT_PORT);
+-	if (rc) {
+-		do_log(LOG_ERROR,
+-		       "WHIP server provided a invalid resource URL via the Location header");
+-		cleanup();
+ 		obs_output_signal_stop(output, OBS_OUTPUT_CONNECT_FAILED);
+-		return false;
+-	}
+-
+-	resource_url = url;
+-	curl_free(url);
+-	do_log(LOG_DEBUG, "WHIP Resource URL is: %s", resource_url.c_str());
+-	curl_url_cleanup(url_builder);
+-
+-#ifdef DEBUG_SDP
+-	do_log(LOG_DEBUG, "Answer SDP:\n%s", read_buffer.c_str());
+-#endif
+-
+-	auto response = std::string(read_buffer);
+-	response.erase(0, response.find("v=0"));
+-
+-	rtc::Description answer(response, "answer");
+-	try {
+-		peer_connection->setRemoteDescription(answer);
+-	} catch (const std::invalid_argument &err) {
+-		do_log(LOG_ERROR, "WHIP server responded with invalid SDP: %s",
+-		       err.what());
+-		cleanup();
+-		struct dstr error_message;
+-		dstr_init_copy(&error_message,
+-			       obs_module_text("Error.InvalidSDP"));
+-		dstr_replace(&error_message, "%1", err.what());
+-		obs_output_set_last_error(output, error_message.array);
+-		dstr_free(&error_message);
+-		obs_output_signal_stop(output, OBS_OUTPUT_CONNECT_FAILED);
+-		return false;
+-	} catch (const std::exception &err) {
+-		do_log(LOG_ERROR, "Failed to set remote description: %s",
+-		       err.what());
+-		cleanup();
+-		struct dstr error_message;
+-		dstr_init_copy(&error_message,
+-			       obs_module_text("Error.NoRemoteDescription"));
+-		dstr_replace(&error_message, "%1", err.what());
+-		obs_output_set_last_error(output, error_message.array);
+-		dstr_free(&error_message);
+-		obs_output_signal_stop(output, OBS_OUTPUT_CONNECT_FAILED);
+-		return false;
+-	}
+-	cleanup();
+-
+-#if RTC_VERSION_MAJOR == 0 && RTC_VERSION_MINOR > 20 || RTC_VERSION_MAJOR > 1
+-	peer_connection->gatherLocalCandidates(iceServers);
+-#endif
+-
+-	return true;
+-}
+-
+-void WHIPOutput::StartThread()
+-{
+-	if (!Init())
+-		return;
+ 
+-	if (!Setup())
+-		return;
+-
+-	if (!Connect()) {
+ 		peer_connection->close();
+ 		peer_connection = nullptr;
+ 		audio_track = nullptr;
+@@ -562,6 +360,7 @@ void WHIPOutput::StartThread()
+ 		return;
+ 	}
+ 
++	do_log(LOG_DEBUG, "WHIP Resource URL is: %s", resource_url.c_str());
+ 	obs_output_begin_data_capture(output, 0);
+ 	running = true;
+ }
+@@ -574,55 +373,23 @@ void WHIPOutput::SendDelete()
+ 		return;
+ 	}
+ 
+-	struct curl_slist *headers = NULL;
+-	if (!bearer_token.empty()) {
+-		auto bearer_token_header =
+-			std::string("Authorization: Bearer ") + bearer_token;
+-		headers =
+-			curl_slist_append(headers, bearer_token_header.c_str());
+-	}
+-
+-	// Add user-agent to our requests
+-	headers = curl_slist_append(headers, user_agent.c_str());
+-
+ 	char error_buffer[CURL_ERROR_SIZE] = {};
+-
+-	CURL *c = curl_easy_init();
+-	curl_easy_setopt(c, CURLOPT_HTTPHEADER, headers);
+-	curl_easy_setopt(c, CURLOPT_URL, resource_url.c_str());
+-	curl_easy_setopt(c, CURLOPT_CUSTOMREQUEST, "DELETE");
+-	curl_easy_setopt(c, CURLOPT_TIMEOUT, 8L);
+-	curl_easy_setopt(c, CURLOPT_ERRORBUFFER, error_buffer);
+-
+-	auto cleanup = [&]() {
+-		curl_easy_cleanup(c);
+-		curl_slist_free_all(headers);
+-	};
+-
+-	CURLcode res = curl_easy_perform(c);
+-	if (res != CURLE_OK) {
++	CURLcode curl_code;
++	auto status = send_delete(bearer_token, resource_url, &curl_code,
++				  error_buffer);
++	if (status == webrtc_network_status::Success) {
++		do_log(LOG_DEBUG,
++		       "Successfully performed DELETE request for resource URL");
++		resource_url.clear();
++	} else if (status == webrtc_network_status::DeleteFailed) {
+ 		do_log(LOG_WARNING,
+-		       "DELETE request for resource URL failed: %s",
++		       "DELETE request for resource URL failed. Reason: %s",
+ 		       error_buffer[0] ? error_buffer
+-				       : curl_easy_strerror(res));
+-		cleanup();
+-		return;
+-	}
+-
+-	long response_code;
+-	curl_easy_getinfo(c, CURLINFO_RESPONSE_CODE, &response_code);
+-	if (response_code != 200) {
++				       : curl_easy_strerror(curl_code));
++	} else if (status == webrtc_network_status::InvalidHTTPStatusCode) {
+ 		do_log(LOG_WARNING,
+-		       "DELETE request for resource URL failed. HTTP Code: %ld",
+-		       response_code);
+-		cleanup();
+-		return;
++		       "DELETE request for resource URL returned non-200 Status Code");
+ 	}
+-
+-	do_log(LOG_DEBUG,
+-	       "Successfully performed DELETE request for resource URL");
+-	resource_url.clear();
+-	cleanup();
+ }
+ 
+ void WHIPOutput::StopThread(bool signal)
+diff --git a/plugins/obs-webrtc/whip-output.h b/plugins/obs-webrtc/whip-output.h
+index 88fd433eefc249..69b4be5249c881 100644
+--- a/plugins/obs-webrtc/whip-output.h
++++ b/plugins/obs-webrtc/whip-output.h
+@@ -6,9 +6,9 @@
+ #include <util/base.h>
+ #include <util/dstr.h>
+ 
+-#include <string>
+ #include <atomic>
+ #include <mutex>
++#include <string>
+ #include <thread>
+ 
+ #include <rtc/rtc.hpp>
+diff --git a/plugins/obs-webrtc/whip-utils.h b/plugins/obs-webrtc/whip-utils.h
+deleted file mode 100644
+index 64338d6edd95ce..00000000000000
+--- a/plugins/obs-webrtc/whip-utils.h
++++ /dev/null
+@@ -1,90 +0,0 @@
+-#pragma once
+-
+-#include <obs.h>
+-
+-#include <string>
+-#include <random>
+-#include <sstream>
+-
+-#define do_log(level, format, ...)                              \
+-	blog(level, "[obs-webrtc] [whip_output: '%s'] " format, \
+-	     obs_output_get_name(output), ##__VA_ARGS__)
+-
+-static uint32_t generate_random_u32()
+-{
+-	std::random_device rd;
+-	std::mt19937 gen(rd());
+-	std::uniform_int_distribution<uint32_t> dist(1, (UINT32_MAX - 1));
+-	return dist(gen);
+-}
+-
+-static std::string trim_string(const std::string &source)
+-{
+-	std::string ret(source);
+-	ret.erase(0, ret.find_first_not_of(" \n\r\t"));
+-	ret.erase(ret.find_last_not_of(" \n\r\t") + 1);
+-	return ret;
+-}
+-
+-static std::string value_for_header(const std::string &header,
+-				    const std::string &val)
+-{
+-	if (val.size() <= header.size() ||
+-	    astrcmpi_n(header.c_str(), val.c_str(), header.size()) != 0) {
+-		return "";
+-	}
+-
+-	auto delimiter = val.find_first_of(" ");
+-	if (delimiter == std::string::npos) {
+-		return "";
+-	}
+-
+-	return val.substr(delimiter + 1);
+-}
+-
+-static size_t curl_writefunction(char *data, size_t size, size_t nmemb,
+-				 void *priv_data)
+-{
+-	auto read_buffer = static_cast<std::string *>(priv_data);
+-
+-	size_t real_size = size * nmemb;
+-
+-	read_buffer->append(data, real_size);
+-	return real_size;
+-}
+-
+-static size_t curl_header_function(char *data, size_t size, size_t nmemb,
+-				   void *priv_data)
+-{
+-	auto header_buffer = static_cast<std::vector<std::string> *>(priv_data);
+-	header_buffer->push_back(trim_string(std::string(data, size * nmemb)));
+-	return size * nmemb;
+-}
+-
+-static inline std::string generate_user_agent()
+-{
+-#ifdef _WIN64
+-#define OS_NAME "Windows x86_64"
+-#elif __APPLE__
+-#define OS_NAME "Mac OS X"
+-#elif __OpenBSD__
+-#define OS_NAME "OpenBSD"
+-#elif __FreeBSD__
+-#define OS_NAME "FreeBSD"
+-#elif __linux__ && __LP64__
+-#define OS_NAME "Linux x86_64"
+-#else
+-#define OS_NAME "Linux"
+-#endif
+-
+-	// Build the user-agent string
+-	std::stringstream ua;
+-	// User agent header prefix
+-	ua << "User-Agent: Mozilla/5.0 ";
+-	// OBS version info
+-	ua << "(OBS-Studio/" << obs_get_version_string() << "; ";
+-	// Operating system version info
+-	ua << OS_NAME << "; " << obs_get_locale() << ")";
+-
+-	return ua.str();
+-}
+
+From 4050dbf0614a5534fc698a5b89708fdc1a53cfbd Mon Sep 17 00:00:00 2001
+From: Sean DuBois <sean@siobud.com>
+Date: Tue, 10 Oct 2023 15:11:22 -0400
+Subject: [PATCH 2/3] obs-webrtc: Add new WHEP Source
+
+Co-authored-by: Kevin Wang <kevmo314@gmail.com
+---
+ plugins/obs-webrtc/CMakeLists.txt        |  39 +-
+ plugins/obs-webrtc/cmake/legacy.cmake    |  38 +-
+ plugins/obs-webrtc/data/locale/en-US.ini |   1 +
+ plugins/obs-webrtc/obs-webrtc.cpp        |   2 +
+ plugins/obs-webrtc/whep-source.cpp       | 499 +++++++++++++++++++++++
+ plugins/obs-webrtc/whep-source.h         |  71 ++++
+ 6 files changed, 644 insertions(+), 6 deletions(-)
+ create mode 100644 plugins/obs-webrtc/whep-source.cpp
+ create mode 100644 plugins/obs-webrtc/whep-source.h
+
+diff --git a/plugins/obs-webrtc/CMakeLists.txt b/plugins/obs-webrtc/CMakeLists.txt
+index 3b1f1a8a502f35..c886787528d5cc 100644
+--- a/plugins/obs-webrtc/CMakeLists.txt
++++ b/plugins/obs-webrtc/CMakeLists.txt
+@@ -10,15 +10,48 @@ endif()
+ 
+ find_package(LibDataChannel 0.20 REQUIRED)
+ find_package(CURL REQUIRED)
++find_package(
++  FFmpeg REQUIRED
++  COMPONENTS avcodec
++             avfilter
++             avdevice
++             avutil
++             swscale
++             avformat
++             swresample)
++
++if(NOT TARGET OBS::media-playback)
++  add_subdirectory("${CMAKE_SOURCE_DIR}/deps/media-playback" "${CMAKE_BINARY_DIR}/deps/media-playback")
++endif()
+ 
+ add_library(obs-webrtc MODULE)
+ add_library(OBS::webrtc ALIAS obs-webrtc)
+ 
+ target_sources(
+-  obs-webrtc PRIVATE # cmake-format: sortable
+-                     obs-webrtc.cpp webrtc-utils.h whep-source.cpp whep-source.h whip-output.cpp whip-output.h whip-service.cpp whip-service.h)
++  obs-webrtc
++  PRIVATE # cmake-format: sortable
++          obs-webrtc.cpp
++          webrtc-utils.h
++          whep-source.cpp
++          whep-source.h
++          whip-output.cpp
++          whip-output.h
++          whip-service.cpp
++          whip-service.h)
+ 
+-target_link_libraries(obs-webrtc PRIVATE OBS::libobs LibDataChannel::LibDataChannel CURL::libcurl)
++target_link_libraries(
++  obs-webrtc
++  PRIVATE OBS::libobs
++          OBS::media-playback
++          LibDataChannel::LibDataChannel
++          CURL::libcurl
++          FFmpeg::avcodec
++          FFmpeg::avfilter
++          FFmpeg::avformat
++          FFmpeg::avdevice
++          FFmpeg::avutil
++          FFmpeg::swscale
++          FFmpeg::swresample)
+ 
+ # cmake-format: off
+ set_target_properties_obs(obs-webrtc PROPERTIES FOLDER plugins PREFIX "")
+diff --git a/plugins/obs-webrtc/cmake/legacy.cmake b/plugins/obs-webrtc/cmake/legacy.cmake
+index 3e0a004013e71a..6c67b8cf064757 100644
+--- a/plugins/obs-webrtc/cmake/legacy.cmake
++++ b/plugins/obs-webrtc/cmake/legacy.cmake
+@@ -8,14 +8,46 @@ endif()
+ 
+ find_package(LibDataChannel 0.20 REQUIRED)
+ find_package(CURL REQUIRED)
++find_package(
++  FFmpeg REQUIRED
++  COMPONENTS avcodec
++             avfilter
++             avdevice
++             avutil
++             swscale
++             avformat
++             swresample)
++if(NOT TARGET OBS::media-playback)
++  add_subdirectory("${CMAKE_SOURCE_DIR}/deps/media-playback" "${CMAKE_BINARY_DIR}/deps/media-playback")
++endif()
+ 
+ add_library(obs-webrtc MODULE)
+ add_library(OBS::webrtc ALIAS obs-webrtc)
+ 
+-target_sources(obs-webrtc PRIVATE obs-webrtc.cpp whip-output.cpp whip-output.h whip-service.cpp whip-service.h
+-                                  webrtc-utils.h)
++target_sources(
++  obs-webrtc
++  PRIVATE obs-webrtc.cpp
++          whip-output.cpp
++          whip-output.h
++          whip-service.cpp
++          whip-service.h
++          whep-source.cpp
++          whep-source.h
++          webrtc-utils.h)
+ 
+-target_link_libraries(obs-webrtc PRIVATE OBS::libobs LibDataChannel::LibDataChannel CURL::libcurl)
++target_link_libraries(
++  obs-webrtc
++  PRIVATE OBS::libobs
++          OBS::media-playback
++          LibDataChannel::LibDataChannel
++          CURL::libcurl
++          FFmpeg::avcodec
++          FFmpeg::avfilter
++          FFmpeg::avformat
++          FFmpeg::avdevice
++          FFmpeg::avutil
++          FFmpeg::swscale
++          FFmpeg::swresample)
+ 
+ set_target_properties(obs-webrtc PROPERTIES FOLDER "plugins")
+ 
+diff --git a/plugins/obs-webrtc/data/locale/en-US.ini b/plugins/obs-webrtc/data/locale/en-US.ini
+index c94717ec884366..2fbdb910e806c8 100644
+--- a/plugins/obs-webrtc/data/locale/en-US.ini
++++ b/plugins/obs-webrtc/data/locale/en-US.ini
+@@ -1,4 +1,5 @@
+ Output.Name="WHIP Output"
++Source.Name="WHEP Source"
+ Service.Name="WHIP Service"
+ Service.BearerToken="Bearer Token"
+ 
+diff --git a/plugins/obs-webrtc/obs-webrtc.cpp b/plugins/obs-webrtc/obs-webrtc.cpp
+index ebb2eb4fdc751e..94e5909b67337d 100644
+--- a/plugins/obs-webrtc/obs-webrtc.cpp
++++ b/plugins/obs-webrtc/obs-webrtc.cpp
+@@ -1,6 +1,7 @@
+ #include <obs-module.h>
+ 
+ #include "whip-output.h"
++#include "whep-source.h"
+ #include "whip-service.h"
+ 
+ OBS_DECLARE_MODULE()
+@@ -14,6 +15,7 @@ bool obs_module_load()
+ {
+ 	register_whip_output();
+ 	register_whip_service();
++	register_whep_source();
+ 
+ 	return true;
+ }
+diff --git a/plugins/obs-webrtc/whep-source.cpp b/plugins/obs-webrtc/whep-source.cpp
+new file mode 100644
+index 00000000000000..78bfcd633b2996
+--- /dev/null
++++ b/plugins/obs-webrtc/whep-source.cpp
+@@ -0,0 +1,499 @@
++#include "whep-source.h"
++#include "webrtc-utils.h"
++
++#define do_log(level, format, ...)                              \
++	blog(level, "[obs-webrtc] [whep_source: '%s'] " format, \
++	     obs_source_get_name(source), ##__VA_ARGS__)
++
++const auto pli_interval = 500;
++
++const auto rtp_clockrate_video = 90000;
++const auto rtp_clockrate_audio = 48000;
++
++WHEPSource::WHEPSource(obs_data_t *settings, obs_source_t *source)
++	: source(source),
++	  endpoint_url(),
++	  resource_url(),
++	  bearer_token(),
++	  peer_connection(nullptr),
++	  audio_track(nullptr),
++	  video_track(nullptr),
++	  running(false),
++	  start_stop_mutex(),
++	  start_stop_thread(),
++	  last_frame(std::chrono::system_clock::now()),
++	  last_audio_rtp_timestamp(0),
++	  last_video_rtp_timestamp(0),
++	  last_audio_pts(0),
++	  last_video_pts(0)
++{
++
++	this->video_av_codec_context = std::shared_ptr<AVCodecContext>(
++		this->CreateVideoAVCodecDecoder(),
++		[](AVCodecContext *ctx) { avcodec_free_context(&ctx); });
++
++	this->audio_av_codec_context = std::shared_ptr<AVCodecContext>(
++		this->CreateAudioAVCodecDecoder(),
++		[](AVCodecContext *ctx) { avcodec_free_context(&ctx); });
++
++	this->av_packet = std::shared_ptr<AVPacket>(
++		av_packet_alloc(), [](AVPacket *pkt) { av_packet_free(&pkt); });
++	this->av_frame =
++		std::shared_ptr<AVFrame>(av_frame_alloc(), [](AVFrame *frame) {
++			av_frame_free(&frame);
++		});
++
++	Update(settings);
++}
++
++WHEPSource::~WHEPSource()
++{
++	running = false;
++
++	Stop();
++
++	std::lock_guard<std::mutex> l(start_stop_mutex);
++	if (start_stop_thread.joinable())
++		start_stop_thread.join();
++}
++
++void WHEPSource::Stop()
++{
++	std::lock_guard<std::mutex> l(start_stop_mutex);
++	if (start_stop_thread.joinable())
++		start_stop_thread.join();
++
++	start_stop_thread = std::thread(&WHEPSource::StopThread, this);
++}
++
++void WHEPSource::StopThread()
++{
++	if (peer_connection != nullptr) {
++		peer_connection->close();
++		peer_connection = nullptr;
++		audio_track = nullptr;
++		video_track = nullptr;
++	}
++
++	SendDelete();
++}
++
++void WHEPSource::SendDelete()
++{
++	if (resource_url.empty()) {
++		do_log(LOG_DEBUG,
++		       "No resource URL available, not sending DELETE");
++		return;
++	}
++
++	char error_buffer[CURL_ERROR_SIZE] = {};
++	CURLcode curl_code;
++	auto status = send_delete(bearer_token, resource_url, &curl_code,
++				  error_buffer);
++	if (status == webrtc_network_status::Success) {
++		do_log(LOG_DEBUG,
++		       "Successfully performed DELETE request for resource URL");
++		resource_url.clear();
++	} else if (status == webrtc_network_status::DeleteFailed) {
++		do_log(LOG_WARNING,
++		       "DELETE request for resource URL failed. Reason: %s",
++		       error_buffer[0] ? error_buffer
++				       : curl_easy_strerror(curl_code));
++	} else if (status == webrtc_network_status::InvalidHTTPStatusCode) {
++		do_log(LOG_WARNING,
++		       "DELETE request for resource URL returned non-200 Status Code");
++	}
++}
++
++obs_properties_t *WHEPSource::GetProperties()
++{
++	obs_properties_t *ppts = obs_properties_create();
++
++	obs_properties_set_flags(ppts, OBS_PROPERTIES_DEFER_UPDATE);
++	obs_properties_add_text(ppts, "endpoint_url", "URL", OBS_TEXT_DEFAULT);
++	obs_properties_add_text(ppts, "bearer_token",
++				obs_module_text("Service.BearerToken"),
++				OBS_TEXT_PASSWORD);
++
++	return ppts;
++}
++
++void WHEPSource::Update(obs_data_t *settings)
++{
++	endpoint_url =
++		std::string(obs_data_get_string(settings, "endpoint_url"));
++	bearer_token =
++		std::string(obs_data_get_string(settings, "bearer_token"));
++
++	if (endpoint_url.empty() || bearer_token.empty()) {
++		return;
++	}
++
++	std::lock_guard<std::mutex> l(start_stop_mutex);
++
++	if (start_stop_thread.joinable())
++		start_stop_thread.join();
++
++	start_stop_thread = std::thread(&WHEPSource::StartThread, this);
++}
++
++AVCodecContext *WHEPSource::CreateVideoAVCodecDecoder()
++{
++	const AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_H264);
++	if (!codec) {
++		throw std::runtime_error("Failed to find H264 codec");
++	}
++
++	AVCodecContext *codec_context = avcodec_alloc_context3(codec);
++	if (!codec_context) {
++		throw std::runtime_error("Failed to allocate codec context");
++	}
++
++	if (avcodec_open2(codec_context, codec, nullptr) < 0) {
++		throw std::runtime_error("Failed to open codec");
++	}
++
++	return codec_context;
++}
++
++AVCodecContext *WHEPSource::CreateAudioAVCodecDecoder()
++{
++	const AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_OPUS);
++	if (!codec) {
++		throw std::runtime_error("Failed to find Opus codec");
++	}
++
++	AVCodecContext *codec_context = avcodec_alloc_context3(codec);
++	if (!codec_context) {
++		throw std::runtime_error("Failed to allocate codec context");
++	}
++
++	if (avcodec_open2(codec_context, codec, nullptr) < 0) {
++		throw std::runtime_error("Failed to open codec");
++	}
++
++	return codec_context;
++}
++
++static inline enum audio_format convert_sample_format(int f)
++{
++	switch (f) {
++	case AV_SAMPLE_FMT_U8:
++		return AUDIO_FORMAT_U8BIT;
++	case AV_SAMPLE_FMT_S16:
++		return AUDIO_FORMAT_16BIT;
++	case AV_SAMPLE_FMT_S32:
++		return AUDIO_FORMAT_32BIT;
++	case AV_SAMPLE_FMT_FLT:
++		return AUDIO_FORMAT_FLOAT;
++	case AV_SAMPLE_FMT_U8P:
++		return AUDIO_FORMAT_U8BIT_PLANAR;
++	case AV_SAMPLE_FMT_S16P:
++		return AUDIO_FORMAT_16BIT_PLANAR;
++	case AV_SAMPLE_FMT_S32P:
++		return AUDIO_FORMAT_32BIT_PLANAR;
++	case AV_SAMPLE_FMT_FLTP:
++		return AUDIO_FORMAT_FLOAT_PLANAR;
++	default:;
++	}
++
++	return AUDIO_FORMAT_UNKNOWN;
++}
++
++static inline enum speaker_layout convert_speaker_layout(uint8_t channels)
++{
++	switch (channels) {
++	case 0:
++		return SPEAKERS_UNKNOWN;
++	case 1:
++		return SPEAKERS_MONO;
++	case 2:
++		return SPEAKERS_STEREO;
++	case 3:
++		return SPEAKERS_2POINT1;
++	case 4:
++		return SPEAKERS_4POINT0;
++	case 5:
++		return SPEAKERS_4POINT1;
++	case 6:
++		return SPEAKERS_5POINT1;
++	case 8:
++		return SPEAKERS_7POINT1;
++	default:
++		return SPEAKERS_UNKNOWN;
++	}
++}
++
++void WHEPSource::OnFrameAudio(rtc::binary msg, rtc::FrameInfo frame_info)
++{
++	auto pts = last_audio_pts;
++	if (this->last_audio_rtp_timestamp != 0) {
++		auto rtp_diff =
++			this->last_audio_rtp_timestamp - frame_info.timestamp;
++		pts += (rtp_diff / rtp_clockrate_audio);
++	}
++
++	this->last_audio_rtp_timestamp = frame_info.timestamp;
++
++	AVPacket *pkt = this->av_packet.get();
++	pkt->data = reinterpret_cast<uint8_t *>(msg.data());
++	pkt->size = static_cast<int>(msg.size());
++
++	auto ret = avcodec_send_packet(this->audio_av_codec_context.get(), pkt);
++	if (ret < 0) {
++		return;
++	}
++
++	AVFrame *av_frame = this->av_frame.get();
++
++	while (true) {
++		ret = avcodec_receive_frame(this->audio_av_codec_context.get(),
++					    av_frame);
++		if (ret < 0) {
++			if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
++				break;
++			}
++			return;
++		}
++
++		struct obs_source_audio audio = {};
++
++		audio.samples_per_sec = av_frame->sample_rate;
++		audio.speakers =
++			convert_speaker_layout(av_frame->ch_layout.nb_channels);
++		audio.format = convert_sample_format(av_frame->format);
++		audio.frames = av_frame->nb_samples;
++		audio.timestamp = pts;
++
++		for (size_t i = 0; i < MAX_AV_PLANES; i++) {
++			audio.data[i] = av_frame->extended_data[i];
++		}
++
++		obs_source_output_audio(this->source, &audio);
++	}
++}
++
++void WHEPSource::OnFrameVideo(rtc::binary msg, rtc::FrameInfo frame_info)
++{
++	auto pts = last_video_pts;
++	if (this->last_video_rtp_timestamp != 0) {
++		auto rtp_diff =
++			this->last_video_rtp_timestamp - frame_info.timestamp;
++		pts += (rtp_diff / rtp_clockrate_video);
++	}
++
++	this->last_video_rtp_timestamp = frame_info.timestamp;
++
++	AVPacket *pkt = this->av_packet.get();
++	pkt->data = reinterpret_cast<uint8_t *>(msg.data());
++	pkt->size = static_cast<int>(msg.size());
++
++	auto ret = avcodec_send_packet(this->video_av_codec_context.get(), pkt);
++	if (ret < 0) {
++		return;
++	}
++
++	AVFrame *av_frame = this->av_frame.get();
++
++	while (true) {
++		ret = avcodec_receive_frame(this->video_av_codec_context.get(),
++					    av_frame);
++		if (ret < 0) {
++			if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
++				break;
++			}
++			return;
++		}
++
++		struct obs_source_frame frame = {};
++
++		frame.format = VIDEO_FORMAT_I420;
++		frame.width = av_frame->width;
++		frame.height = av_frame->height;
++		frame.timestamp = pts;
++		frame.max_luminance = 0;
++		frame.trc = VIDEO_TRC_DEFAULT;
++
++		video_format_get_parameters_for_format(
++			VIDEO_CS_DEFAULT, VIDEO_RANGE_DEFAULT, frame.format,
++			frame.color_matrix, frame.color_range_min,
++			frame.color_range_max);
++
++		for (size_t i = 0; i < MAX_AV_PLANES; i++) {
++			frame.data[i] = av_frame->data[i];
++			frame.linesize[i] = abs(av_frame->linesize[i]);
++		}
++
++		obs_source_output_video(this->source, &frame);
++		last_frame = std::chrono::system_clock::now();
++	}
++}
++
++void WHEPSource::SetupPeerConnection()
++{
++	rtc::Configuration cfg;
++
++#if RTC_VERSION_MAJOR == 0 && RTC_VERSION_MINOR > 20 || RTC_VERSION_MAJOR > 1
++	cfg.disableAutoGathering = true;
++#endif
++
++	peer_connection = std::make_shared<rtc::PeerConnection>(cfg);
++
++	peer_connection->onStateChange([this](rtc::PeerConnection::State state) {
++		switch (state) {
++		case rtc::PeerConnection::State::New:
++			do_log(LOG_INFO, "PeerConnection state is now: New");
++			break;
++		case rtc::PeerConnection::State::Connecting:
++			do_log(LOG_INFO,
++			       "PeerConnection state is now: Connecting");
++			break;
++		case rtc::PeerConnection::State::Connected:
++			do_log(LOG_INFO,
++			       "PeerConnection state is now: Connected");
++			break;
++		case rtc::PeerConnection::State::Disconnected:
++			do_log(LOG_INFO,
++			       "PeerConnection state is now: Disconnected");
++			break;
++		case rtc::PeerConnection::State::Failed:
++			do_log(LOG_INFO, "PeerConnection state is now: Failed");
++			break;
++		case rtc::PeerConnection::State::Closed:
++			do_log(LOG_INFO, "PeerConnection state is now: Closed");
++			break;
++		}
++	});
++
++	rtc::Description::Audio audioMedia(
++		"0", rtc::Description::Direction::RecvOnly);
++	audioMedia.addOpusCodec(111);
++	audio_track = peer_connection->addTrack(audioMedia);
++
++	auto audio_depacketizer = std::make_shared<rtc::OpusRtpDepacketizer>();
++	auto audio_session = std::make_shared<rtc::RtcpReceivingSession>();
++	audio_session->addToChain(audio_depacketizer);
++	audio_track->setMediaHandler(audio_depacketizer);
++	audio_track->onFrame([&](rtc::binary msg, rtc::FrameInfo frame_info) {
++		this->OnFrameAudio(msg, frame_info);
++	});
++
++	rtc::Description::Video videoMedia(
++		"1", rtc::Description::Direction::RecvOnly);
++	videoMedia.addH264Codec(96);
++	video_track = peer_connection->addTrack(videoMedia);
++
++	auto video_depacketizer = std::make_shared<rtc::H264RtpDepacketizer>();
++	auto video_session = std::make_shared<rtc::RtcpReceivingSession>();
++	video_session->addToChain(video_depacketizer);
++	video_track->setMediaHandler(video_depacketizer);
++	video_track->onFrame([&](rtc::binary msg, rtc::FrameInfo frame_info) {
++		this->OnFrameVideo(msg, frame_info);
++	});
++
++	peer_connection->setLocalDescription();
++}
++
++void WHEPSource::StartThread()
++{
++	running = true;
++	SetupPeerConnection();
++
++	char error_buffer[CURL_ERROR_SIZE] = {};
++	CURLcode curl_code;
++	auto status = send_offer(bearer_token, endpoint_url, peer_connection,
++				 resource_url, &curl_code, error_buffer);
++	if (status != webrtc_network_status::Success) {
++		if (status == webrtc_network_status::ConnectFailed) {
++			do_log(LOG_WARNING, "Connect failed: %s",
++			       error_buffer[0] ? error_buffer
++					       : curl_easy_strerror(curl_code));
++		} else if (status ==
++			   webrtc_network_status::InvalidHTTPStatusCode) {
++			do_log(LOG_ERROR,
++			       "Connect failed: HTTP endpoint returned non-201 response code");
++		} else if (status == webrtc_network_status::NoHTTPData) {
++			do_log(LOG_ERROR,
++			       "Connect failed: No data returned from HTTP endpoint request");
++		} else if (status == webrtc_network_status::NoLocationHeader) {
++			do_log(LOG_ERROR,
++			       "WHEP server did not provide a resource URL via the Location header");
++		} else if (status ==
++			   webrtc_network_status::FailedToBuildResourceURL) {
++			do_log(LOG_ERROR, "Failed to build Resource URL");
++		} else if (status ==
++			   webrtc_network_status::InvalidLocationHeader) {
++			do_log(LOG_ERROR,
++			       "WHEP server provided a invalid resource URL via the Location header");
++		} else if (status == webrtc_network_status::InvalidAnswer) {
++			do_log(LOG_WARNING,
++			       "WHIP server responded with invalid SDP: %s",
++			       error_buffer);
++		} else if (status ==
++			   webrtc_network_status::SetRemoteDescriptionFailed) {
++			do_log(LOG_WARNING,
++			       "Failed to set remote description: %s",
++			       error_buffer);
++		}
++
++		peer_connection->close();
++		return;
++	}
++
++	do_log(LOG_DEBUG, "WHEP Resource URL is: %s", resource_url.c_str());
++}
++
++void WHEPSource::MaybeSendPLI()
++{
++	auto time_since_frame =
++		std::chrono::system_clock::now() - last_frame.load();
++
++	if (std::chrono::duration_cast<std::chrono::milliseconds>(
++		    time_since_frame)
++		    .count() < pli_interval) {
++		return;
++	}
++
++	auto time_since_pli = std::chrono::system_clock::now() - last_pli;
++	if (std::chrono::duration_cast<std::chrono::milliseconds>(
++		    time_since_pli)
++		    .count() < pli_interval) {
++		return;
++	}
++
++	if (video_track != nullptr) {
++		video_track->requestKeyframe();
++	}
++
++	last_pli = std::chrono::system_clock::now();
++}
++
++void register_whep_source()
++{
++	struct obs_source_info info = {};
++
++	info.id = "whep_source";
++	info.type = OBS_SOURCE_TYPE_INPUT;
++	info.output_flags = OBS_SOURCE_ASYNC_VIDEO | OBS_SOURCE_AUDIO |
++			    OBS_SOURCE_DO_NOT_DUPLICATE;
++	info.get_name = [](void *) -> const char * {
++		return obs_module_text("Source.Name");
++	};
++	info.create = [](obs_data_t *settings, obs_source_t *source) -> void * {
++		return new WHEPSource(settings, source);
++	};
++	info.destroy = [](void *priv_data) {
++		delete static_cast<WHEPSource *>(priv_data);
++	};
++	info.get_properties = [](void *priv_data) -> obs_properties_t * {
++		return static_cast<WHEPSource *>(priv_data)->GetProperties();
++	};
++	info.update = [](void *priv_data, obs_data_t *settings) {
++		static_cast<WHEPSource *>(priv_data)->Update(settings);
++	};
++	info.video_tick = [](void *priv_data, float) {
++		static_cast<WHEPSource *>(priv_data)->MaybeSendPLI();
++	};
++
++	obs_register_source(&info);
++}
+diff --git a/plugins/obs-webrtc/whep-source.h b/plugins/obs-webrtc/whep-source.h
+new file mode 100644
+index 00000000000000..cb8d9a5c2ce7ed
+--- /dev/null
++++ b/plugins/obs-webrtc/whep-source.h
+@@ -0,0 +1,71 @@
++#pragma once
++
++#include <obs-module.h>
++#include <util/curl/curl-helper.h>
++#include <util/platform.h>
++#include <util/base.h>
++#include <util/dstr.h>
++
++#include <string>
++#include <atomic>
++#include <mutex>
++#include <thread>
++#include <chrono>
++
++extern "C" {
++#include "libavcodec/avcodec.h"
++}
++
++#include <rtc/rtc.hpp>
++
++class WHEPSource {
++public:
++	WHEPSource(obs_data_t *settings, obs_source_t *source);
++	~WHEPSource();
++
++	obs_properties_t *GetProperties();
++	void Update(obs_data_t *settings);
++	void MaybeSendPLI();
++
++	std::atomic<std::chrono::system_clock::time_point> last_frame;
++	std::chrono::system_clock::time_point last_pli;
++
++private:
++	bool Init();
++	void SetupPeerConnection();
++	bool Connect();
++	void StartThread();
++	void SendDelete();
++	void Stop();
++	void StopThread();
++
++	AVCodecContext *CreateVideoAVCodecDecoder();
++	AVCodecContext *CreateAudioAVCodecDecoder();
++
++	void OnFrameAudio(rtc::binary msg, rtc::FrameInfo frame_info);
++	void OnFrameVideo(rtc::binary msg, rtc::FrameInfo frame_info);
++
++	obs_source_t *source;
++
++	std::string endpoint_url;
++	std::string resource_url;
++	std::string bearer_token;
++
++	std::shared_ptr<rtc::PeerConnection> peer_connection;
++	std::shared_ptr<rtc::Track> audio_track;
++	std::shared_ptr<rtc::Track> video_track;
++
++	std::shared_ptr<AVCodecContext> video_av_codec_context;
++	std::shared_ptr<AVCodecContext> audio_av_codec_context;
++	std::shared_ptr<AVPacket> av_packet;
++	std::shared_ptr<AVFrame> av_frame;
++
++	std::atomic<bool> running;
++	std::mutex start_stop_mutex;
++	std::thread start_stop_thread;
++
++	uint64_t last_audio_rtp_timestamp, last_video_rtp_timestamp;
++	uint64_t last_audio_pts, last_video_pts;
++};
++
++void register_whep_source();
+
+From 1060ad663ecd2b19a61c78309a9f3e0e77172398 Mon Sep 17 00:00:00 2001
+From: Yondon Fu <yondon.fu@gmail.com>
+Date: Sat, 24 May 2025 23:58:25 -0400
+Subject: [PATCH 3/3] obs-webrtc: Set HTTP headers in send_offer (#11)
+
+---
+ plugins/obs-webrtc/webrtc-utils.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/plugins/obs-webrtc/webrtc-utils.h b/plugins/obs-webrtc/webrtc-utils.h
+index 0b5568d81f3893..9591884e45ee2c 100644
+--- a/plugins/obs-webrtc/webrtc-utils.h
++++ b/plugins/obs-webrtc/webrtc-utils.h
+@@ -182,6 +182,7 @@ send_offer(std::string bearer_token, std::string endpoint_url,
+ 	curl_easy_setopt(c, CURLOPT_WRITEDATA, (void *)&read_buffer);
+ 	curl_easy_setopt(c, CURLOPT_HEADERFUNCTION, curl_header_function);
+ 	curl_easy_setopt(c, CURLOPT_HEADERDATA, (void *)&http_headers);
++	curl_easy_setopt(c, CURLOPT_HTTPHEADER, headers);
+ 	curl_easy_setopt(c, CURLOPT_URL, endpoint_url.c_str());
+ 	curl_easy_setopt(c, CURLOPT_POST, 1L);
+ 	curl_easy_setopt(c, CURLOPT_COPYPOSTFIELDS, offer_sdp.c_str());

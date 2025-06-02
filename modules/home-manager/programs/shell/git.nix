@@ -11,6 +11,8 @@
 
     extraConfig = {
       init.defaultBranch = "main";
+      pull.rebase = true;
+      rebase.autoStash = true;
       gpg.format = "ssh";
       sendemail = {
         # Protonmail is bad for sending git patches so use gmail for this.

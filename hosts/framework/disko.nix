@@ -38,9 +38,16 @@ in
                 allowDiscards = true; # enables trimming support
                 bypassWorkqueues = true; # improves performance
                 crypttabExtraOpts = [
-                  "tpm2-device=auto"
-                  "tpm2-pin=yes"
                   "tries=5"
+                  # We don't need to measure the volume key in a PCR but this
+                  # is needed to allow multiple tries of TPM pins
+                  # https://github.com/systemd/systemd/issues/32041
+                  "tpm2-measure-pcr=yes"
+                  # I think the above disables the cryptsetup token plugin (the prompt that
+                  # starts with "Please enter LUKS2 token PIN: ") so we've got to use native
+                  # systemd TPM pin unlock
+                  "tpm2-pin=yes"
+                  "tpm2-device=auto"
                 ];
               };
 

@@ -144,6 +144,7 @@ in
           "cs2"
           "factorio"
           "hl2_linux"
+          "discovery\\.exe" # the finals
         ];
 
         tearingExcludedClasses =

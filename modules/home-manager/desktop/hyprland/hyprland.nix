@@ -252,6 +252,7 @@ in
 
       decoration = {
         rounding = desktopCfg.style.cornerRadius - 2;
+        rounding_power = 4;
         shadow.enabled = false;
 
         blur = {

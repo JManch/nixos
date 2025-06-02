@@ -7,13 +7,12 @@
   pkgs,
   self,
   base,
-  inputs,
   modulesPath,
   ...
 }:
 let
   inherit (lib) ns;
-  inherit (inputs.nix-resources.secrets) keys;
+  inherit (self.inputs.nix-resources.secrets) keys;
   installScript = pkgs.writeShellApplication {
     name = "install-host";
 

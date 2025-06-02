@@ -1,5 +1,4 @@
 # Issues:
-# https://gitlab.freedesktop.org/mesa/mesa/-/issues/12528
 # https://github.com/openwrt/mt76/issues/548
 {
   lib,
@@ -19,14 +18,6 @@
   networking.hostId = "549d3e08";
   hardware.cpu.amd.updateMicrocode = true;
 
-  ${lib.ns}.hardware.graphics.amd.kernelPatches = [
-    # Fix for https://gitlab.freedesktop.org/mesa/mesa/-/issues/12528
-    (pkgs.fetchpatch2 {
-      url = "https://gitlab.freedesktop.org/-/project/176/uploads/d6a7812beec2760eccdd1f0439923277/vcn4_0_5-6.15-rc5.patch";
-      hash = "sha256-y+Lvq5QefQ3kNNAuLEbfTedN6Pz9dtf1ma4jtpdslyI=";
-    })
-  ];
-
   boot = {
     kernelModules = [ "kvm-amd" ];
 
@@ -38,7 +29,14 @@
       "sd_mod"
     ];
 
-    kernelPackages = lib.mkForce pkgs.linuxPackages_testing;
+    kernelPackages =
+      assert lib.assertMsg (lib.versionOlder pkgs.linuxKernel.kernels.linux_latest.version "6.15")
+        "Remove framework kernel override";
+      lib.mkForce
+        (import (fetchTarball {
+          url = "https://github.com/NixOS/nixpkgs/archive/910796cabe436259a29a72e8d3f5e180fc6dfacc.tar.gz";
+          sha256 = "sha256:13xih2r8q1hk0c9silcjliqg8mjfmdqp7wnx9ybkp61535dapm2a";
+        }) { inherit (pkgs) system; }).linuxPackages_latest;
 
     # Force TLP to use cros_charge-control module instead of the framework
     # module for battery charge limits

@@ -37,6 +37,11 @@ in
               settings = {
                 allowDiscards = true; # enables trimming support
                 bypassWorkqueues = true; # improves performance
+                crypttabExtraOpts = [
+                  "tpm2-device=auto"
+                  "tpm2-pin=yes"
+                  "tries=5"
+                ];
               };
 
               # https://www.man7.org/linux/man-pages/man8/cryptsetup-luksFormat.8.html

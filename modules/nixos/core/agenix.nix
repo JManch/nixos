@@ -80,8 +80,14 @@ in
   enableOpt = false;
 
   ns.adminPackages = [
-    selfPkgs.bootstrap-kit
     agenix.packages.${pkgs.system}.default
+    selfPkgs.bootstrap-kit
+    editSecretScript
+    rekeySecretScript
+  ];
+
+  users.users.root.packages = [
+    selfPkgs.bootstrap-kit
     editSecretScript
     rekeySecretScript
   ];

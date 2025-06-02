@@ -99,6 +99,7 @@ in
 
     settings = {
       bar = {
+        position = if cfg.bottom then "bottom" else "top";
         layer = "top";
         height = 41;
         margin = if cfg.float then "${gapSize} ${gapSize} 0 ${gapSize}" else "0";

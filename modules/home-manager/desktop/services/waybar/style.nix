@@ -2,6 +2,7 @@
   lib,
   cfg,
   config,
+  hostname,
 }:
 let
   inherit (config.${lib.ns}) desktop;
@@ -13,7 +14,6 @@ in
       inherit (desktop.style)
         cornerRadius
         borderWidth
-        gapSize
         font
         ;
       halfCornerRadius = toString (cornerRadius / 2);
@@ -49,16 +49,29 @@ in
       window#waybar {
           background: @background;
           color: @text-light;
-          border-radius: ${if cfg.float then toString cornerRadius else "0"}px;
+          border-radius: ${
+            if cfg.float then
+              toString cornerRadius
+            else
+              (
+                if hostname == "framework" then
+                  if cfg.bottom then
+                    "7px 7px 0px 0"
+                  else
+                    "0px 0px ${toString cornerRadius}px ${toString cornerRadius}"
+                else
+                  "0"
+              )
+          }px;
           border: ${borderWidthStr}px solid @background;
       }
 
       window#waybar.fullscreen {
-          border-bottom: ${borderWidthStr}px solid @blue;
+          border-${if cfg.bottom then "top" else "bottom"}: ${borderWidthStr}px solid @blue;
       }
 
       #workspaces {
-          margin: 5px 0px 5px ${if cfg.float then "5" else toString (gapSize + borderWidth)}px;
+          margin: 5px 0px 5px 5px;
           padding: 0px;
           border-radius: ${halfCornerRadius}px;
           background: @blue;
@@ -108,7 +121,7 @@ in
       }
 
       #custom-hostname {
-          margin: 5px ${if cfg.float then "5" else toString (gapSize + borderWidth)}px 5px 0px;
+          margin: 5px 5px 5px 0px;
           padding: 0px 7px;
           border-radius: ${halfCornerRadius}px;
           background: @blue;

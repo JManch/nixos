@@ -1,6 +1,11 @@
 { lib, osConfig }:
 let
-  inherit (lib) ns types mkOption;
+  inherit (lib)
+    ns
+    types
+    mkOption
+    mkEnableOption
+    ;
   inherit (osConfig.${ns}.core) device;
 in
 {
@@ -8,6 +13,8 @@ in
   noChildren = true;
 
   opts = {
+    bottom = mkEnableOption "positioning the bar at the bottom";
+
     float = mkOption {
       type = types.bool;
       default = device.type != "laptop";

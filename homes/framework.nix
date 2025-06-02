@@ -12,6 +12,11 @@
       windowManager = "hyprland";
       xdg.lowercaseUserDirs = true;
 
+      style = {
+        cornerRadius = 16;
+        gapSize = 6;
+      };
+
       hyprland = {
         vrr = true;
         tearing = true;
@@ -33,6 +38,7 @@
 
         waybar = {
           enable = true;
+          bottom = true;
           powerOffMethod = "hibernate";
         };
 
@@ -57,6 +63,7 @@
       desktop = {
         alacritty.enable = true;
         discord.enable = true;
+        spotify.enable = true;
         chatterino.enable = true;
         supersonic.enable = true;
         chromium.enable = true;

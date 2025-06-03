@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   sources,
+  dash,
 }:
 stdenvNoCC.mkDerivation {
   pname = "app2unit";
@@ -11,6 +12,12 @@ stdenvNoCC.mkDerivation {
   installPhase = ''
     install -Dt $out/bin app2unit
     ln -s $out/bin/app2unit $out/bin/app2unit-open
+  '';
+
+  dontPatchShebangs = true;
+  postFixup = ''
+    substituteInPlace $out/bin/app2unit \
+      --replace-fail '#!/bin/sh' '#!${lib.getExe dash}'
   '';
 
   meta = {

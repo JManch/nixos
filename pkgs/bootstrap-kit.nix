@@ -66,7 +66,9 @@ writeShellApplication {
         exit 1
       fi
 
-      chown root:root "$output_dir"
+      # Do not use root:root here because in our installer we need to run in an
+      # activation script before users+groups are setup
+      chown 0:0 "$output_dir"
       chmod og-rwx "$output_dir"
 
       trap "rm -rf '$output_dir'" EXIT

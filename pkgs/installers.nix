@@ -14,6 +14,7 @@ let
     value =
       (nixosSystem {
         specialArgs = {
+          hostname = "installer";
           inherit self base;
         };
         modules = [

@@ -1,18 +1,19 @@
 # Connecting to wifi:
-# List wireless interfaces with `iwconfig`
-# Generate a wpa supplicant config with `wpa_passphrase SSID | sudo tee /etc/wpa_supplicant.conf`
-# Run `sudo wpa_supplicant -c /etc/wpa_supplicant.conf -i <interface>` (-B to run in background)
+# Assuming the network's creds are in our config just run `systemctl start wpa_supplicant.service`
+# Otherwise need to manually add the network using wpa_cli
 {
   lib,
   pkgs,
   self,
   base,
+  config,
   modulesPath,
   ...
-}:
+}@args:
 let
-  inherit (lib) ns;
-  inherit (self.inputs.nix-resources.secrets) keys;
+  inherit (lib) ns getExe;
+  inherit (self) inputs;
+  inherit (inputs.nix-resources.secrets) keys;
   installScript = pkgs.writeShellApplication {
     name = "install-host";
 
@@ -236,7 +237,10 @@ let
   };
 in
 {
-  imports = [ "${modulesPath}/installer/${base}" ];
+  imports = [
+    "${modulesPath}/installer/${base}"
+    inputs.agenix.nixosModules.default
+  ];
 
   config = {
     isoImage.compressImage = false;
@@ -247,6 +251,7 @@ in
         zellij
         btop
         neovim
+        fd
       ])
       ++ [ installScript ];
 
@@ -276,6 +281,57 @@ in
     };
 
     users.users.root.openssh.authorizedKeys.keys = [ keys.personal ];
+
+    age.identityPaths = [ "/root/agenix/agenix_ed25519_key" ];
+
+    # Agenix decrypts secrets in an activation script so we decrypt our
+    # bootstrap kit and install the necessary key in an activation script just
+    # before agenixInstall
+    system.activationScripts = {
+      agenixFetchKey = {
+        supportsDryActivation = false;
+        text = getExe (
+          pkgs.writeShellApplication {
+            name = "agenix-fetch-key";
+            runtimeInputs = [
+              self.packages.${pkgs.system}.bootstrap-kit
+            ];
+            text = ''
+              if [ -d /root/agenix ]; then
+                exit 0
+              fi
+              bootstrap_kit=$(mktemp -d)
+              clean_up_kit() {
+                rm -rf "$bootstrap_kit"
+              }
+              trap clean_up_kit EXIT
+              echo "### Decrypting bootstrap-kit for agenix ###"
+              bootstrap-kit decrypt "$bootstrap_kit"
+              mkdir -p /root/agenix
+              chmod 700 /root/agenix
+              mv "$bootstrap_kit"/installer/* /root/agenix
+            '';
+          }
+        );
+        deps = [
+          "specialfs"
+          "agenixNewGeneration"
+        ];
+      };
+      agenixInstall.deps = [ "agenixFetchKey" ];
+    };
+
+    age.secrets.wirelessNetworks = {
+      file = inputs.nix-resources + "/secrets/wireless-networks.age";
+    };
+
+    networking.wireless = {
+      enable = true;
+      secretsFile = config.age.secrets.wirelessNetworks.path;
+      scanOnLowSignal = true;
+      allowAuxiliaryImperativeNetworks = true;
+      networks = inputs.nix-resources.secrets.wirelessNetworks args;
+    };
 
     system.stateVersion = "25.11";
   };

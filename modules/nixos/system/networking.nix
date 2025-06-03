@@ -219,29 +219,7 @@ in
       secretsFile = config.age.secrets.wirelessNetworks.path;
       scanOnLowSignal = config.${ns}.core.device.type == "laptop";
       allowAuxiliaryImperativeNetworks = true;
-
-      networks = {
-        # Use psk for WPA3 and pskRaw for WPA2. More info in secret file.
-        # Priorities seem to get assigned for 2.4GHz and 5GHz so increment by 2
-        # between each network
-
-        # Inspect the generated file at /run/wpa_supplicant/wpa_supplicant.conf
-        # Manually reload config with `wpa_cli -i <wireless_interface> reconfigure`
-        Mikrotik = mkIf (!cfg.wireless.onlyWpa2) {
-          pskRaw = "ext:MIKROTIK";
-          priority = 3;
-        };
-
-        Mikrotik-Guest = mkIf cfg.wireless.onlyWpa2 {
-          pskRaw = "ext:MIKROTIK_GUEST";
-          priority = 3;
-        };
-
-        Pixel-9 = {
-          pskRaw = "ext:PIXEL_9";
-          priority = 1;
-        };
-      };
+      networks = inputs.nix-resources.secrets.wirelessNetworks args;
     };
   };
 

@@ -82,11 +82,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1745454189,
-        "narHash": "sha256-kHEpTP3/wYmO6/i+e4u9kiaLtOIAxOUhCLF1WbFQvs0=",
+        "lastModified": 1749060568,
+        "narHash": "sha256-ryK7at19pl8xlQfszuF52X7xWAmkONw/WpgnusfyybI=",
         "owner": "JManch",
         "repo": "broadcast-box",
-        "rev": "0825cf5878edbc66e541cf69a44a3863dd0a624d",
+        "rev": "93a3aed9aa56e45cacd2b2a8c6a42b1f2cc125b0",
         "type": "github"
       },
       "original": {
@@ -356,17 +356,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1745400485,
+        "lastModified": 1745875161,
         "narHash": "sha256-0YkWCS13jpoo3+sX/3kcgdxBNt1VZTmvF+FhZb4rFKI=",
-        "owner": "tscolari",
+        "owner": "nix-community",
         "repo": "gomod2nix",
-        "rev": "9ca7a1cd814b9c0919bbe1d35158dbdc579460b7",
+        "rev": "2cbd7fdd6eeab65c494cc426e18f4e4d2a5e35c0",
         "type": "github"
       },
       "original": {
-        "owner": "tscolari",
+        "owner": "nix-community",
         "repo": "gomod2nix",
-        "rev": "9ca7a1cd814b9c0919bbe1d35158dbdc579460b7",
         "type": "github"
       }
     },
@@ -1134,11 +1133,11 @@
     },
     "nixpkgs-broadcast-box": {
       "locked": {
-        "lastModified": 1745358257,
-        "narHash": "sha256-0T7tkuRCbSHswDT5J/yLC29GCR7mt4TKx6m+nqKVmcI=",
+        "lastModified": 1749072599,
+        "narHash": "sha256-DMiJ7XKfBTOUGPQx058Z29Gwvt/ic8eAbW3JpLnMLWo=",
         "owner": "JManch",
         "repo": "nixpkgs",
-        "rev": "a977d106b4652adf8d6d28c88c7535965559fd93",
+        "rev": "ab778dc6b6a3ab3c0490942053bc5589e7d75cea",
         "type": "github"
       },
       "original": {

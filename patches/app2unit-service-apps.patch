@@ -6,8 +6,8 @@ index 497b969..05fd67a 100755
  	read_entry_path "$ENTRY_PATH" "$ENTRY_ACTION"
  fi
  
-+service_apps=(@SERVICE_APPS@)
-+for app in "${service_apps[@]}"; do
++service_apps="@SERVICE_APPS@"
++for app in $service_apps; do
 +  if [ "$ENTRY_ID" = "$app.desktop" ] || [ "$EXEC_NAME" = "$app" ]; then
 +    UNIT_TYPE="service"
 +  fi

@@ -302,7 +302,10 @@ in
               "${hyprland.modKey}SHIFTCONTROL, XF86AudioLowerVolume, exec, ${modifyFocusedWindowVolume} 5%-"
             ];
 
-            bindr = [ "${hyprland.modKey}ALT, ALT_L, exec, ${toggleAudioMute} \"@DEFAULT_AUDIO_SOURCE@\"" ];
+            bindr = [
+              "${hyprland.modKey}SHIFT, SHIFT_L, exec, ${toggleAudioMute} \"@DEFAULT_AUDIO_SINK@\""
+              "${hyprland.modKey}ALT, ALT_L, exec, ${toggleAudioMute} \"@DEFAULT_AUDIO_SOURCE@\""
+            ];
           };
         };
       };

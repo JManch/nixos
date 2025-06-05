@@ -22,7 +22,6 @@ in
   thermal-comfort-icons = callPackage ./thermal-comfort-icons.nix args;
   heatmiser = pkgs.home-assistant.python.pkgs.callPackage ./heatmiser.nix args;
   daikin-onecta = pkgs.home-assistant.python.pkgs.callPackage ./daikin-onecta.nix args;
-  formulaone-card = callPackage ./formulaone-card.nix args;
   brightnessctl = callPackage ./brightnessctl.nix args;
   slskd-stats = pkgs.python3Packages.callPackage ./slskd-stats.nix args;
 

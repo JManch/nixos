@@ -41,11 +41,10 @@ in
     };
   };
 
-  services.xserver = {
+  services.desktopManager.gnome.enable = true;
+  services.displayManager.gdm = {
     enable = true;
-    displayManager.gdm.enable = true;
-    displayManager.gdm.autoSuspend = categoryCfg.suspend.enable;
-    desktopManager.gnome.enable = true;
+    autoSuspend = categoryCfg.suspend.enable;
   };
 
   # Gnome uses network manager

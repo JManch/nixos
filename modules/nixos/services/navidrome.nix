@@ -26,7 +26,7 @@ in
   services.navidrome = {
     enable = true;
     openFirewall = false;
-    package = pkgs.navidrome;
+    package = lib.${ns}.addPatches pkgs.navidrome [ "navidrome-lastfm-apostrophe.patch" ];
 
     settings = {
       Address = "127.0.0.1";

@@ -1,5 +1,5 @@
 diff --git a/core/agents/lastfm/agent.go b/core/agents/lastfm/agent.go
-index ec732f17..4e7a6477 100644
+index ec732f17..62b741c8 100644
 --- a/core/agents/lastfm/agent.go
 +++ b/core/agents/lastfm/agent.go
 @@ -294,8 +294,8 @@ func (l *lastfmAgent) NowPlaying(ctx context.Context, userId string, track *mode
@@ -13,3 +13,14 @@ index ec732f17..4e7a6477 100644
  		trackNumber: track.TrackNumber,
  		mbid:        track.MbzRecordingID,
  		duration:    int(track.Duration),
+@@ -320,8 +320,8 @@ func (l *lastfmAgent) Scrobble(ctx context.Context, userId string, s scrobbler.S
+ 	}
+ 	err = l.client.scrobble(ctx, sk, ScrobbleInfo{
+ 		artist:      l.getArtistForScrobble(&s.MediaFile),
+-		track:       s.Title,
+-		album:       s.Album,
++		track:       strings.ReplaceAll(s.Title, "’" , "'"),
++		album:       strings.ReplaceAll(s.Album, "’" , "'"),
+ 		trackNumber: s.TrackNumber,
+ 		mbid:        s.MbzRecordingID,
+ 		duration:    int(s.Duration),

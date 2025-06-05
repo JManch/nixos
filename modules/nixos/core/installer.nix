@@ -79,7 +79,12 @@ let
         install -d -m700 "$rootDir/home/$username/.ssh" "$rootDir/home/${adminUsername}/.ssh"
 
         # Host keys
-        mv "$bootstrap_kit/$hostname"/* "$rootDir/etc/ssh"
+        mv "$bootstrap_kit/$hostname"/ssh_host_ed25519_key* "$rootDir/etc/ssh"
+
+        # Nix store keys
+        if [ -f "$bootstrap_kit/$hostname/nix_store_ed25519_key" ]; then
+          mv "$bootstrap_kit/$hostname"/nix_store_ed25519_key* "$rootDir/etc/nix"
+        fi
 
         # User keys
         if [ -d "$bootstrap_kit/$username" ]; then

@@ -11,7 +11,7 @@
   ...
 }@args:
 let
-  inherit (lib) ns getExe;
+  inherit (lib) ns getExe attrValues;
   inherit (self) inputs;
   inherit (inputs.nix-resources.secrets) keys;
   installScript = pkgs.writeShellApplication {
@@ -124,12 +124,17 @@ let
 
       install_keys() {
         echo "### Installing keys ###"
-        install -d -m755 "$rootDir/etc/ssh" "$rootDir/home"
+        install -d -m755 "$rootDir/etc/ssh" "$rootDir/etc/nix" "$rootDir/home"
         install -d -m700 "$rootDir/home/$username" "$rootDir/home/$admin_username"
         install -d -m700 "$rootDir/home/$username/.ssh" "$rootDir/home/$admin_username/.ssh"
 
         # Host keys
-        mv "$bootstrap_kit/$hostname"/* "$rootDir/etc/ssh"
+        mv "$bootstrap_kit/$hostname"/ssh_host_ed25519_key* "$rootDir/etc/ssh"
+
+        # Nix store keys
+        if [ -f "$bootstrap_kit/$hostname/nix_store_ed25519_key" ]; then
+          mv "$bootstrap_kit/$hostname"/nix_store_ed25519_key* "$rootDir/etc/nix"
+        fi
 
         # User keys
         if [ -d "$bootstrap_kit/$username" ]; then
@@ -260,6 +265,7 @@ in
       auto-optimise-store = true;
       # Causes a lot of spam in the install script otherwise
       warn-dirty = false;
+      trusted-public-keys = attrValues keys.nix-store;
     };
 
     zramSwap.enable = true;
@@ -271,7 +277,7 @@ in
 
       knownHosts =
         (lib.mapAttrs (host: _: {
-          publicKey = keys.${host};
+          publicKey = keys.ssh-host.${host};
           extraHostNames = [ "${host}.lan" ];
         }) self.nixosConfigurations)
         // {
@@ -280,7 +286,7 @@ in
         };
     };
 
-    users.users.root.openssh.authorizedKeys.keys = [ keys.personal ];
+    users.users.root.openssh.authorizedKeys.keys = attrValues keys.auth;
 
     age.identityPaths = [ "/root/agenix/agenix_ed25519_key" ];
 
@@ -309,7 +315,7 @@ in
               bootstrap-kit decrypt "$bootstrap_kit"
               mkdir -p /root/agenix
               chmod 700 /root/agenix
-              mv "$bootstrap_kit"/installer/* /root/agenix
+              mv "$bootstrap_kit"/installer/agenix_ed25519_key* /root/agenix
             '';
           }
         );

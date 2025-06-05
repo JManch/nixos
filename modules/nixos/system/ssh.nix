@@ -21,6 +21,7 @@ let
     types
     optional
     optionals
+    attrValues
     singleton
     mkEnableOption
     ;
@@ -75,12 +76,8 @@ in
       allowedTCPPorts = [ 22 ];
     });
 
-  users.users.root.openssh.authorizedKeys.keys = [ keys.personal ];
-
-  users.users.${adminUsername}.openssh.authorizedKeys.keys = with keys; [
-    personal
-    pixel-9-personal
-  ];
+  users.users.root.openssh.authorizedKeys.keys = [ keys.auth.personal ];
+  users.users.${adminUsername}.openssh.authorizedKeys.keys = attrValues keys.auth;
 
   programs.ssh = {
     startAgent = cfg.agent.enable;
@@ -92,7 +89,7 @@ in
 
     knownHosts =
       (mapAttrs (host: _: {
-        publicKey = keys.${host};
+        publicKey = keys.ssh-host.${host};
         extraHostNames = (
           [
             "${host}.lan"
@@ -105,7 +102,7 @@ in
       // {
         "github.com".publicKey =
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
-        "router.lan".publicKey = keys.router;
+        "router.lan".publicKey = keys.misc.router;
       };
   };
 

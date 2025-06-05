@@ -55,7 +55,8 @@ let
         ${concatLines (
           map (
             host:
-            optionalString (host != hostname) "${host},${host}.lan ${inputs.nix-resources.secrets.keys.${host}}"
+            optionalString (host != hostname)
+              "${host},${host}.lan ${inputs.nix-resources.secrets.keys.ssh-host.${host}}"
           ) (attrNames (self.nixosConfigurations // self.nixOnDroidConfigurations))
         )}
       '';

@@ -9,7 +9,7 @@ let
   inherit (inputs) agenix nix-resources;
   inherit (config.${lib.ns}.system) impermanence;
   scriptInputs = [
-    pkgs.findutils
+    pkgs.fd
     selfPkgs.bootstrap-kit
     agenix.packages.${pkgs.system}.agenix
   ];
@@ -35,8 +35,7 @@ let
       bootstrap-kit decrypt "$bootstrap_kit"
 
       keys=""
-      # shellcheck disable=SC2044
-      for file in $(find "$bootstrap_kit" -type f ! -name "*.pub"); do
+      for file in $(fd --base-directory "$bootstrap_kit" --absolute-path --type file --exclude "*.pub"); do
         keys+=" -i $file"
       done
 

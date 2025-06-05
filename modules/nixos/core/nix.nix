@@ -24,6 +24,7 @@ let
     sort
     optionalString
     replaceStrings
+    attrValues
     listToAttrs
     nameValuePair
     getExe
@@ -40,6 +41,7 @@ let
     sshAddQuiet
     upperFirstChar
     ;
+  inherit (inputs.nix-resources.secrets) keys;
   inherit (config.${ns}.system) impermanence;
   inherit (config.age.secrets) notifVars;
   configDir = "/home/${adminUsername}/.config/nixos";
@@ -463,10 +465,13 @@ in
           "https://nix-community.cachix.org"
           "https://nix-on-droid.cachix.org"
         ];
+        # We need to sign our store contents for reliable `nix copy` usage
+        # https://github.com/NixOS/nix/issues/2127
+        secret-key-files = mkIf cfg.builder.enable [ "/etc/nix/nix_store_ed25519_key" ];
         trusted-public-keys = [
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU="
-        ];
+        ] ++ attrValues keys.nix-store;
         build-dir = mkIf impermanence.enable "/var/nix-tmp";
       };
 
@@ -616,4 +621,9 @@ in
       system-size = "nix path-info --closure-size --human-readable /run/current-system";
     };
   };
+
+  ns.persistence.files = mkIf cfg.builder.enable [
+    "/etc/nix/nix_store_ed25519_key"
+    "/etc/nix/nix_store_ed25519_key.pub"
+  ];
 }

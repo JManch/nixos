@@ -190,7 +190,7 @@ in
         };
       };
 
-      file-server = {
+      filebrowser = {
         enable = true;
         allowedAddresses = trustedHostIps ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };

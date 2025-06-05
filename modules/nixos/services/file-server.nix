@@ -10,7 +10,10 @@ in
 [
   {
     guardType = "first";
-    requirements = [ "services.caddy" ];
+    requirements = [
+      "services.caddy"
+      "!services.filebrowser"
+    ];
 
     opts = with lib; {
       uploadAlias = {

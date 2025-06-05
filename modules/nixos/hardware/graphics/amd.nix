@@ -30,6 +30,15 @@ in
     '';
   };
 
+  # Fix lockups
+  # https://gitlab.freedesktop.org/drm/amd/-/issues/4238
+  ns.hardware.graphics.amd.kernelPatches = [
+    (pkgs.fetchpatch2 {
+      url = "https://github.com/archlinux/linux/commit/30dd9945fd79d33a049da4e52984c9bc07450de2.patch";
+      hash = "sha256-t7KwMGlVaWteaWKX9KrQkqqO1XSOv9FGBQLzqKASdcA=";
+    })
+  ];
+
   boot.initrd.kernelModules = mkBefore [ "amdgpu" ];
 
   # Copied from https://github.com/Atemu/nixos-config/blob/7beb94aec277fb4cbf31360bdbd0a3e9e635a619/modules/amdgpu/module.nix

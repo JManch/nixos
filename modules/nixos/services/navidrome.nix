@@ -26,33 +26,7 @@ in
   services.navidrome = {
     enable = true;
     openFirewall = false;
-
-    package = pkgs.navidrome.overrideAttrs (
-      final: prev:
-      assert lib.assertMsg (prev.version == "0.55.2") "Remove navidrome override";
-      {
-        version = "0.56.1";
-        src = pkgs.fetchFromGitHub {
-          owner = "navidrome";
-          repo = "navidrome";
-          tag = "v${final.version}";
-          hash = "sha256-Vq8qfBqxF/PVRtYYTsFydnJ7z/IuoNUWRWTLy/RM6xg=";
-        };
-
-        vendorHash = "sha256-E7Q3wxUd5JAwERBKD2NZaVyj1kszOxvxeDY0s/fEDfY=";
-
-        npmDeps = pkgs.fetchNpmDeps {
-          inherit (final) src;
-          sourceRoot = "${final.src.name}/ui";
-          hash = "sha256-tl6unHz0E0v0ObrfTiE0vZwVSyVFmrLggNM5QsUGsvI=";
-        };
-
-        ldflags = [
-          "-X github.com/navidrome/navidrome/consts.gitSha=${final.src.rev}"
-          "-X github.com/navidrome/navidrome/consts.gitTag=v${final.version}"
-        ];
-      }
-    );
+    package = pkgs.navidrome;
 
     settings = {
       Address = "127.0.0.1";

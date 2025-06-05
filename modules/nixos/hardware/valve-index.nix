@@ -116,10 +116,9 @@ in
 
   services.monado = {
     enable = true;
-    # FIX: Remove this once monado builds again with our nixpkgs. Overlays
-    # applied by nixpkgs-xr just override the package from our nixpkgs so
-    # overlay build still fails.
-    package = inputs.nixpkgs-xr.packages.${pkgs.system}.monado;
+    # Use this if package from nixpkgs-xr overlay every fails to build (the
+    # overlay using our nixpkgs rather than nixpkgs-xr nixpkgs)
+    # package = inputs.nixpkgs-xr.packages.${pkgs.system}.monado;
     forceDefaultRuntime = true;
     highPriority = true;
     defaultRuntime = true;

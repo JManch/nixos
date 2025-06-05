@@ -14,6 +14,7 @@
   ${lib.ns} = {
     core = {
       home-manager.enable = true;
+      nix.builder.enable = true;
 
       device = {
         type = "laptop";

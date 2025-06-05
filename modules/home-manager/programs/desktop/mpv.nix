@@ -4,6 +4,7 @@
   pkgs,
   config,
   sources,
+  osConfig,
 }:
 let
   inherit (lib)
@@ -11,11 +12,32 @@ let
     mkIf
     hiPrio
     optional
+    mkOption
+    types
     mkEnableOption
     ;
+  inherit (osConfig.${ns}.core) device;
 in
 {
-  opts.jellyfinShim.enable = mkEnableOption "mpv jellyfin shim";
+  opts = {
+    jellyfinShim.enable = mkEnableOption "mpv jellyfin shim";
+
+    highQuality = mkOption {
+      type = types.bool;
+      default = device.type != "laptop";
+      description = "Whether to use high quality or fast profile";
+    };
+
+    interpolate = mkOption {
+      type = types.bool;
+      default = device.type != "laptop";
+      description = ''
+        Whether to enable interpolation and display-resample video-sync.
+        Increases GPU usage a lot especially on devices with high refresh rate
+        displays.
+      '';
+    };
+  };
 
   home.packages = [
     pkgs.yt-dlp
@@ -48,11 +70,11 @@ in
 
     config = {
       # Quality
-      profile = "high-quality";
+      profile = if cfg.highQuality then "high-quality" else "fast";
       hwdec = "auto-safe";
       vo = "gpu-next";
-      video-sync = "display-resample";
-      interpolation = true;
+      interpolation = cfg.interpolate;
+      video-sync = mkIf cfg.interpolate "display-resample";
       tscale = "oversample";
       ytdl-format = "bestvideo+bestaudio";
 

@@ -379,7 +379,13 @@ in
         ) cfg.namedWorkspaces);
 
       # https://github.com/hyprwm/Hyprland/issues/6543
-      windowrule = [ "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0" ];
+      windowrule = [
+        "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0"
+        # Hide window border when there's only 1 window in a non-special
+        # workspace or the window is fullscreen
+        "noborder, onworkspace:w[t1]s[false]"
+        "noborder, onworkspace:f[1]"
+      ];
 
       plugin = mkIf cfg.plugins {
         hyprexpo = {

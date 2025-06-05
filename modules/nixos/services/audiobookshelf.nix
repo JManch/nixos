@@ -25,6 +25,8 @@ in
     };
   };
 
+  requirements = [ "services.caddy" ];
+
   services.audiobookshelf = {
     enable = true;
     openFirewall = false;

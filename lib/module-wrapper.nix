@@ -43,6 +43,7 @@ let
     concatLists
     unique
     last
+    removePrefix
     ;
   inherit (lib.${ns})
     importCategories
@@ -138,6 +139,9 @@ let
     # If `osConfig` is null requirements with prefix "osConfig" will by ignored
     # as they eval to `true`. The prefix "osConfigStrict" can be used to eval
     # to `false` and enforce the requirement.
+    #
+    # Requirement strings prefixed with '!' will be inversed so they ensure
+    # that the targetted module is disabled.
     requirements = [ ];
 
     # List of alternating bools and strings that are converted to { assertion =
@@ -499,26 +503,39 @@ in
           requirement:
           if isString requirement then
             let
-              message = "${throwMsg} requires '${requirement}' to be enabled.";
+              isInverse = hasPrefix "!" requirement;
+              requirement' = removePrefix "!" requirement;
+              message = "${throwMsg} requires '${requirement'}' to be ${
+                if isInverse then "disabled" else "enabled"
+              }.";
             in
-            if hasPrefix "osConfig" requirement then
+            if hasPrefix "osConfig" requirement' then
               if !isHomeManager then
                 throw "${throwMsg} contains a requirement using 'osConfig'. This is only supported in Home Manager modules."
               else if args.osConfig == null then
+
                 {
-                  assertion = !hasPrefix "osConfigStrict" requirement;
+                  assertion = !hasPrefix "osConfigStrict" requirement';
                   message = "";
                 }
               else
                 {
-                  assertion = getAttrFromPath (
-                    [ ns ] ++ (tail (splitString "." requirement)) ++ [ "enable" ]
-                  ) args.osConfig;
+                  assertion =
+                    let
+                      enabled = getAttrFromPath (
+                        [ ns ] ++ (tail (splitString "." requirement')) ++ [ "enable" ]
+                      ) args.osConfig;
+                    in
+                    if isInverse then !enabled else enabled;
                   inherit message;
                 }
             else
               {
-                assertion = getAttrFromPath ([ ns ] ++ (splitString "." requirement) ++ [ "enable" ]) args.config;
+                assertion =
+                  let
+                    enabled = getAttrFromPath ([ ns ] ++ (splitString "." requirement') ++ [ "enable" ]) args.config;
+                  in
+                  if isInverse then !enabled else enabled;
                 inherit message;
               }
           else

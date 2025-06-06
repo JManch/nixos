@@ -1,14 +1,11 @@
 {
   lib,
   cfg,
-  config,
 }:
-let
-  inherit (lib) ns singleton optional;
-  inherit (config.${ns}.system) impermanence;
-in
 {
   opts = with lib; {
+    storeInRam = mkEnableOption "storing files on a tmpfs";
+
     port = mkOption {
       type = types.port;
       default = 8093;
@@ -27,16 +24,6 @@ in
     "!services.file-server"
   ];
 
-  fileSystems."/var/lib/filebrowser/data" = {
-    fsType = "tmpfs";
-    depends = optional impermanence.enable "/persist/var/lib/filebrowser";
-    options = [
-      "defaults"
-      "size=3g"
-      "mode=755"
-    ];
-  };
-
   services.filebrowser = {
     enable = true;
     openFirewall = false;
@@ -46,7 +33,10 @@ in
     };
   };
 
-  systemd.services.filebrowser.serviceConfig.StateDirectoryMode = "0700";
+  systemd.services.filebrowser.serviceConfig = {
+    TemporaryFileSystem = lib.mkIf cfg.storeInRam "/var/lib/filebrowser/data:size=20%";
+    StateDirectoryMode = "0700";
+  };
 
   ns.services.caddy.virtualHosts.files = {
     forceHttp = false;
@@ -57,7 +47,7 @@ in
     '';
   };
 
-  ns.persistence.directories = singleton {
+  ns.persistence.directories = lib.singleton {
     directory = "/var/lib/filebrowser";
     user = "filebrowser";
     group = "filebrowser";

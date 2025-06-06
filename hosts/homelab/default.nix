@@ -192,6 +192,7 @@ in
 
       filebrowser = {
         enable = true;
+        storeInRam = true;
         allowedAddresses = trustedHostIps ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };
 

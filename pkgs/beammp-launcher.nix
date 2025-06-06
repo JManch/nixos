@@ -25,7 +25,6 @@ stdenv.mkDerivation (finalAttrs: {
     curl
   ];
 
-  cmakeFlags = [ "-DCMAKE_BUILD_TYPE=Release" ];
   enableParallelBuilding = true;
 
   installPhase = ''

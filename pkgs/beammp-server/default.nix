@@ -52,8 +52,6 @@ stdenv.mkDerivation (finalAttrs: {
     lua5_3
   ];
 
-  cmakeFlags = [ "-DCMAKE_BUILD_TYPE=Release" ];
-
   enableParallelBuilding = true;
 
   installPhase = ''

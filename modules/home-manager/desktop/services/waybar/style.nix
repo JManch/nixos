@@ -12,6 +12,7 @@ in
   programs.waybar.style =
     let
       inherit (desktop.style)
+        gapSize
         cornerRadius
         borderWidth
         font
@@ -71,7 +72,7 @@ in
       }
 
       #workspaces {
-          margin: 5px 0px 5px 5px;
+          margin: 5px 0px 5px ${if cfg.float then "5" else toString gapSize}px;
           padding: 0px;
           border-radius: ${halfCornerRadius}px;
           background: @blue;
@@ -93,7 +94,7 @@ in
       }
 
       #workspaces button label {
-          border-radius: ${halfCornerRadius}px;
+          border-radius: 5px;
           border: ${borderWidthStr}px solid @transparent;
           padding: 0px 6px;
           margin: 4px 5px;
@@ -121,7 +122,7 @@ in
       }
 
       #custom-hostname {
-          margin: 5px 5px 5px 0px;
+          margin: 5px ${if cfg.float then "5" else toString gapSize}px 5px 0px;
           padding: 0px 7px;
           border-radius: ${halfCornerRadius}px;
           background: @blue;

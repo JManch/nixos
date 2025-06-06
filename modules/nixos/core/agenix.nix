@@ -35,7 +35,7 @@ let
       bootstrap-kit decrypt "$bootstrap_kit"
 
       keys=""
-      for file in $(fd --base-directory "$bootstrap_kit" --absolute-path --type file --exclude "*.pub"); do
+      for file in $(fd --base-directory "$bootstrap_kit" --absolute-path --type file --exclude "*.pub" "ssh_host_ed25519_key|agenix_ed25519_key"); do
         keys+=" -i $file"
       done
 

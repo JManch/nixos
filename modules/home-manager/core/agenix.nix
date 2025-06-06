@@ -1,7 +1,4 @@
 { config, inputs }:
-let
-  inherit (config.home) homeDirectory username;
-in
 {
   enableOpt = false;
 
@@ -10,5 +7,5 @@ in
     nix-resources.homeManagerModules.secrets
   ];
 
-  age.identityPaths = [ "${homeDirectory}/.ssh/${username}_ed25519" ];
+  age.identityPaths = [ "${config.home.homeDirectory}/.ssh/agenix_ed25519_key" ];
 }

@@ -67,10 +67,6 @@ in
           border: ${borderWidthStr}px solid @background;
       }
 
-      window#waybar.fullscreen {
-          border-${if cfg.bottom then "top" else "bottom"}: ${borderWidthStr}px solid @blue;
-      }
-
       #workspaces {
           margin: 5px 0px 5px ${if cfg.float then "5" else toString gapSize}px;
           padding: 0px;

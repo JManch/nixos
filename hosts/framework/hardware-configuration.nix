@@ -1,6 +1,7 @@
 # Issues:
 # https://github.com/openwrt/mt76/issues/548
 {
+  lib,
   pkgs,
   inputs,
   modulesPath,
@@ -40,7 +41,16 @@
   };
 
   programs.zsh = {
-    shellAliases."get-pps" = "cat /sys/class/drm/card1-eDP-1/amdgpu/panel_power_savings";
+    shellAliases =
+      let
+        ectool = lib.getExe pkgs.fw-ectool;
+      in
+      {
+        "get-pps" = "cat /sys/class/drm/card1-eDP-1/amdgpu/panel_power_savings";
+        "led-off" = "${ectool} led power off";
+        "led-on" = "${ectool} led power on";
+      };
+
     interactiveShellInit = # bash
       ''
         toggle-pps() {

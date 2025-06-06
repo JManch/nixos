@@ -198,9 +198,11 @@ let
 
   modifyBrightness = pkgs.writeShellScript "modify-brightness" ''
     ${brightnessctl} set -e4 "$1"
-    brightness=$(${brightnessctl} get --percentage)
-    notify-send --urgency=low -t 2000 \
-      -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $brightness%"
+    if [ "$(loginctl show-session $XDG_SESSION_ID -p LockedHint --value)" = "no" ]; then
+      brightness=$(${brightnessctl} get --percentage)
+      notify-send --urgency=low -t 2000 \
+        -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $brightness%"
+    fi
   '';
 in
 {
@@ -271,7 +273,7 @@ in
         "${modShift}, M, exec, ${moveToNextEmpty}"
         "${modShiftCtrl}, M, movetoworkspacesilent, emptym"
       ]
-      ++ (flatten (
+      ++ flatten (
         builtins.genList (
           x:
           let
@@ -284,16 +286,17 @@ in
             "${modShiftCtrl}, ${key}, movetoworkspacesilent, ${w}"
           ]
         ) 10
-      ))
-      ++ (optionals cfg.plugins [
+      )
+      ++ optionals cfg.plugins [
         "${mod}, Escape, hyprexpo:expo, toggle"
-      ])
-      ++ (optionals (backlight != null)) [
-        ", XF86MonBrightnessUp, exec, ${modifyBrightness} 3%+"
-        ", XF86MonBrightnessDown, exec, ${modifyBrightness} 3%-"
-        "${mod}, XF86MonBrightnessUp, exec, ${modifyBrightness} 1%+"
-        "${mod}, XF86MonBrightnessDown, exec, ${modifyBrightness} 1%-"
       ];
+
+    settings.bindl = optionals (backlight != null) [
+      ", XF86MonBrightnessUp, exec, ${modifyBrightness} 3%+"
+      ", XF86MonBrightnessDown, exec, ${modifyBrightness} 3%-"
+      "${mod}, XF86MonBrightnessUp, exec, ${modifyBrightness} 1%+"
+      "${mod}, XF86MonBrightnessDown, exec, ${modifyBrightness} 1%-"
+    ];
 
     settings.bindm = [
       "${mod}, mouse:272, movewindow"

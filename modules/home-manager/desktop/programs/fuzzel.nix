@@ -5,7 +5,7 @@
   osConfig,
 }:
 let
-  inherit (lib) ns mkIf;
+  inherit (lib) ns mkIf getExe';
   inherit (osConfig.${ns}.core.device) primaryMonitor;
   inherit (osConfig.programs) uwsm;
   desktopCfg = config.${ns}.desktop;
@@ -86,7 +86,7 @@ in
       inherit (desktopCfg.hyprland) modKey;
     in
     {
-      bindr = [ "${modKey}, ${modKey}_L, exec, pkill fuzzel || fuzzel" ];
+      bindr = [ "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} fuzzel || fuzzel" ];
       layerrule = [ "animation slide, launcher" ];
     };
 }

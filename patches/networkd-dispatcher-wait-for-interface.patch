@@ -1,0 +1,20 @@
+diff --git a/networkd-dispatcher b/networkd-dispatcher
+index 8ed2269..e93230e 100755
+--- a/networkd-dispatcher
++++ b/networkd-dispatcher
+@@ -20,6 +20,7 @@ import re
+ import socket
+ import subprocess
+ import sys
++import time
+ 
+ # Try to import the dynamic glib, or try to fall back to static
+ try:
+@@ -410,6 +411,7 @@ class Dispatcher():
+             # Try to reload configuration if even an ignored message is seen
+             logger.warning('Unknown index %r seen, reloading interface list',
+                            idx)
++            time.sleep(2)
+             self._interface_scan()
+             is_new_interface = True
+ 

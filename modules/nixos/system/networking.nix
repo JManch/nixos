@@ -131,6 +131,17 @@ in
     "A single interface cannot have more than 10 VLANs assigned (arbitrary limit because of VLAN name mapping)"
   ];
 
+  nixpkgs.overlays = [
+    (_: prev: {
+      # Workaround to fix "ERROR:Failed to get interface "wlan0"" when resuming
+      # from suspend/hibernate
+      # https://gitlab.com/craftyguy/networkd-dispatcher/-/issues/55
+      networkd-dispatcher = lib.${ns}.addPatches prev.networkd-dispatcher [
+        "networkd-dispatcher-wait-for-interface.patch"
+      ];
+    })
+  ];
+
   systemd.network = mkIf cfg.useNetworkd {
     enable = true;
     wait-online.anyInterface = true;

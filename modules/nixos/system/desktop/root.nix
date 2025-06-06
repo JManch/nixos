@@ -3,7 +3,6 @@
   cfg,
   pkgs,
   config,
-  username,
 }:
 let
   inherit (lib)
@@ -12,7 +11,6 @@ let
     types
     mkDefault
     genAttrs
-    getExe'
     mkOption
     singleton
     mkEnableOption
@@ -20,8 +18,6 @@ let
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.hmNs.desktop.programs) locker;
   homeDesktop = config.${ns}.hmNs.desktop;
-  loginctl = getExe' pkgs.systemd "loginctl";
-  systemd-run = getExe' pkgs.systemd "systemd-run";
 in
 {
   enableOpt = true;
@@ -117,6 +113,22 @@ in
       })
   );
 
+  environment.etc."systemd/system-sleep/post-hibernate-unlock-graphical-session" =
+    mkIf
+      (
+        cfg.displayManager.autoLogin
+        && home-manager.enable
+        && homeDesktop.enable
+        && locker.package != null
+        && locker.unlockCmd != null
+      )
+      {
+        source = pkgs.writeShellScript "post-hibernate-unlock-graphical-session" ''
+          if [ "$1-$SYSTEMD_SLEEP_ACTION" = "post-hibernate" ]; then
+            ${locker.unlockCmd}
+          fi
+        '';
+      };
 
   # Fix the session slice for home-manager services. I don't think it's
   # possible to do drop-in overrides like this with home-manager.

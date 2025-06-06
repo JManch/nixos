@@ -6,7 +6,7 @@
   osConfig,
 }:
 let
-  inherit (lib) ns singleton;
+  inherit (lib) ns singleton getExe';
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.core.device) primaryMonitor;
   colors = config.colorScheme.palette;
@@ -16,6 +16,7 @@ in
 {
   categoryConfig.locker = {
     package = config.programs.hyprlock.package;
+    unlockCmd = "${getExe' pkgs.procps "pkill"} -USR1 hyprlock";
     immediateFlag = "--immediate";
   };
 

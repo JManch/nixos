@@ -42,6 +42,16 @@ in
       '';
     };
 
+    unlockCmd = mkOption {
+      type = with types; nullOr str;
+      default = null;
+      description = ''
+        Command that unlocks the locker. Used to unlock when resuming from
+        hibernation on hosts that use passphrase-protected full disk
+        encryption. Must work when run as root.
+      '';
+    };
+
     preLockScript = mkOption {
       type = types.lines;
       default = "";

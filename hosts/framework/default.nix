@@ -149,6 +149,7 @@
         enable = true;
         desktopEnvironment = null;
         displayManager.name = "uwsm";
+        displayManager.autoLogin = true;
         uwsm.defaultDesktop = "${pkgs.hyprland}/share/wayland-sessions/hyprland.desktop";
       };
 

@@ -36,6 +36,10 @@
   systemd.services.filebrowser.serviceConfig = {
     TemporaryFileSystem = lib.mkIf cfg.storeInRam "/var/lib/filebrowser/data:size=20%";
     StateDirectoryMode = "0700";
+    SuccessExitStatus = [
+      0
+      1
+    ];
   };
 
   ns.services.caddy.virtualHosts.files = {

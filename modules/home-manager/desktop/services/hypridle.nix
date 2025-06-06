@@ -23,6 +23,9 @@ let
   inherit (lib.${ns}) isHyprland sliceSuffix;
   inherit (config.${ns}.desktop.programs) locker;
   systemctl = getExe' pkgs.systemd "systemctl";
+  loginctl = getExe' pkgs.systemd "loginctl";
+  hyprctl = getExe' pkgs.hyprland "hyprctl";
+  jaq = getExe pkgs.jaq;
 in
 {
   asserts = [
@@ -59,7 +62,8 @@ in
       general = {
         # Cmd triggered by `loginctl lock-session`
         lock_cmd = "${locker.lockScript} --immediate";
-        ignore_dbus_inhibit = false;
+        before_sleep_cmd = "${loginctl} lock-session";
+        inhibit_sleep = 3;
       };
 
       listener =
@@ -88,10 +92,6 @@ in
   };
 
   ns.desktop.programs.locker.postLockScript =
-    let
-      hyprctl = getExe' pkgs.hyprland "hyprctl";
-      jaq = getExe pkgs.jaq;
-    in
     mkIf (isHyprland config && !vmVariant)
       # bash
       ''

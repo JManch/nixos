@@ -58,10 +58,9 @@ in
       };
 
       autoLogin = mkEnableOption ''
-        auto graphical session login. Graphical session will lock with
-        screensaver immediately. Auto login is not at all secure and should
-        be used in combination with full disk encryption that does not
-        auto-unlock with TPM.
+        auto graphical session login. Should only be used in combination with
+        full disk encryption requiring a passphrase or TPM pin. The graphical
+        session will still lock after sleep or suspend.
       '';
     };
 
@@ -118,36 +117,6 @@ in
       })
   );
 
-  # Locking here instead of in the idle daemon (e.g. hypridle) is more robust
-  powerManagement.powerDownCommands =
-    mkIf (cfg.desktopEnvironment == null) # bash
-      ''
-        ${
-          if home-manager.enable && homeDesktop.enable && (locker.package != null) then
-            "${systemd-run} --user --machine ${username}@.host ${locker.lockScript} --immediate"
-          else
-            "${loginctl} lock-sessions"
-        }
-        sleep 5 # give lock screen time to open
-      '';
-
-  systemd.user.services.boot-graphical-session-lock = mkIf cfg.displayManager.autoLogin {
-    description = "Lock graphical session on boot";
-    after = [ "graphical-session.target" ];
-
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStartPre = "${getExe' pkgs.coreutils "sleep"} 3";
-      ExecStart =
-        if home-manager.enable && homeDesktop.enable && (locker.package != null) then
-          "${locker.lockScript} --immediate"
-        else
-          "${loginctl} lock-sessions";
-    };
-
-    wantedBy = [ "graphical-session.target" ];
-  };
 
   # Fix the session slice for home-manager services. I don't think it's
   # possible to do drop-in overrides like this with home-manager.

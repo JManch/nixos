@@ -331,14 +331,16 @@ in
         "${modKey}SHIFT, Backspace, exec, app2unit firefox.desktop"
       ];
 
-    eventScripts.windowtitlev2 = singleton (pkgs.writeShellScript "hypr-bitwarden-windowtitlev2" ''
-      if [[ $2 == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
-        hyprctl --batch "\
-          dispatch setfloating address:0x$1; \
-          dispatch resizewindowpixel exact 20% 50%, address:0x$1; \
-          dispatch centerwindow; \
-        "
-      fi
-    '').outPath;
+    eventScripts.windowtitlev2 = # bash
+      ''
+        # float bitwarden extension window
+        if [[ "''${args[1]}" == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
+          hyprctl --batch "\
+            dispatch setfloating address:0x''${args[0]}; \
+            dispatch resizewindowpixel exact 20% 50%, address:0x''${args[0]}; \
+            dispatch centerwindow; \
+          "
+        fi
+      '';
   };
 }

@@ -167,8 +167,16 @@ in
       );
     };
 
+    socketListenerExtraLines = mkOption {
+      type = types.lines;
+      default = "";
+      description = ''
+        Extra lines inserted at the start of the socket listener script.
+      '';
+    };
+
     eventScripts = mkOption {
-      type = with types; attrsOf (listOf str);
+      type = with types; attrsOf lines;
       default = { };
       description = ''
         Attribute set where the names are hyprland socket events and the values

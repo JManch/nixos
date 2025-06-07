@@ -446,6 +446,8 @@ in
           text =
             # bash
             ''
+              ${cfg.socketListenerExtraLines}
+
               ${concatMapStringsSep "\n" (
                 event: # bash
                 ''
@@ -453,9 +455,7 @@ in
                     IFS=',' read -r -a args <<< "$1"
                     # Strip event<< from the first element
                     args[0]="''${args[0]#*>>}"
-
-                    # Call scripts for this event
-                    ${concatMapStringsSep "\n" (script: ''${script} "''${args[@]}"'') cfg.eventScripts.${event}}
+                    ${cfg.eventScripts.${event}}
                   }
                 '') (attrNames cfg.eventScripts)}
 

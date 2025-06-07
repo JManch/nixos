@@ -19,12 +19,13 @@ in
 
     settings = {
       mouse.hide_when_typing = true;
+
       scrolling.history = 10000;
 
       window = {
         padding = {
-          x = 5;
-          y = 5;
+          x = 6;
+          y = 6;
         };
         dynamic_padding = true;
         decorations = "none";
@@ -117,10 +118,14 @@ in
       };
     };
 
-    hyprland.binds = mkIf (desktop.terminal == "Alacritty") [
-      "${desktop.hyprland.modKey}, Return, exec, app2unit Alacritty.desktop"
-      "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
-      "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit Alacritty.desktop"
-    ];
+    hyprland = {
+      settings.windowrule = [ "scrolltouchpad 0.6, class:^(Alacritty)$" ];
+
+      binds = mkIf (desktop.terminal == "Alacritty") [
+        "${desktop.hyprland.modKey}, Return, exec, app2unit Alacritty.desktop"
+        "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
+        "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit Alacritty.desktop"
+      ];
+    };
   };
 }

@@ -14,7 +14,6 @@ let
     getExe'
     optional
     optionalAttrs
-    singleton
     optionalString
     mkEnableOption
     ;
@@ -330,6 +329,8 @@ in
         "${modKey}SHIFT, Backspace, workspace, emptym"
         "${modKey}SHIFT, Backspace, exec, app2unit firefox.desktop"
       ];
+
+    settings.windowrule = [ "scrolltouchpad 0.6, class:^(firefox)$" ];
 
     eventScripts.windowtitlev2 = # bash
       ''

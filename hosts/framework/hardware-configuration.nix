@@ -47,8 +47,8 @@
       in
       {
         "get-pps" = "cat /sys/class/drm/card1-eDP-1/amdgpu/panel_power_savings";
-        "led-off" = "${ectool} led power off";
-        "led-on" = "${ectool} led power on";
+        "led-off" = "sudo ${ectool} led power off";
+        "led-on" = "sudo ${ectool} led power on";
       };
 
     interactiveShellInit = # bash

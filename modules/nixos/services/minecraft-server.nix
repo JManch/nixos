@@ -398,52 +398,50 @@ in
       preBackupScript = pkgs.writeShellApplication {
         name = "minecraft-server-pre-backup";
         runtimeInputs = [ pkgs.coreutils ];
-        text = # bash
-          ''
-            if [ ! -p "/run/minecraft-server.stdin" ]; then exit 0; fi
+        text = ''
+          if [ ! -p "/run/minecraft-server.stdin" ]; then exit 0; fi
 
-            ${functions}
+          ${functions}
 
-            rm -f "/tmp/minecraft-server-save-off"
-            server_running=$(run_cmd_wait_for_message "mine say Performing scheduled backup" "[Server] Performing scheduled backup")
-            if $server_running; then
-                server_say "Disabling auto-save..."
-                if [ "$(run_cmd_wait_for_message "mine save-off" ": Automatic saving is now disabled")" == "false" ]; then
-                    server_say "Failed to disable auto-save, aborting backup"
-                    exit 1
-                fi
-                touch "/tmp/minecraft-server-save-off"
-                sleep 10
-                server_say "Auto-save disabled"
+          rm -f "/tmp/minecraft-server-save-off"
+          server_running=$(run_cmd_wait_for_message "mine say Performing scheduled backup" "[Server] Performing scheduled backup")
+          if $server_running; then
+              server_say "Disabling auto-save..."
+              if [ "$(run_cmd_wait_for_message "mine save-off" ": Automatic saving is now disabled")" == "false" ]; then
+                  server_say "Failed to disable auto-save, aborting backup"
+                  exit 1
+              fi
+              touch "/tmp/minecraft-server-save-off"
+              sleep 10
+              server_say "Auto-save disabled"
 
-                server_say "Flushing pending disk writes..."
-                if [ "$(run_cmd_wait_for_message "mine save-all" ": Saved the game")" == "false" ]; then
-                    server_say "Failed to flush pending disk writes, aborting backup"
-                    exit 1
-                fi
-                sleep 10
-                server_say "Pending disk writes flushed"
-                server_say "Performing backup..."
-            fi
-          '';
+              server_say "Flushing pending disk writes..."
+              if [ "$(run_cmd_wait_for_message "mine save-all" ": Saved the game")" == "false" ]; then
+                  server_say "Failed to flush pending disk writes, aborting backup"
+                  exit 1
+              fi
+              sleep 10
+              server_say "Pending disk writes flushed"
+              server_say "Performing backup..."
+          fi
+        '';
       };
 
       postBackupScript = pkgs.writeShellApplication {
         name = "minecraft-server-post-backup";
         runtimeInputs = [ pkgs.coreutils ];
-        text = # bash
-          ''
-            ${functions}
-            if [ -e "/tmp/minecraft-server-save-off" ]; then
-                server_say "Re-enabling auto-save..."
-                if [ "$(run_cmd_wait_for_message "mine save-on" ": Automatic saving is now enabled")" == "false" ]; then
-                    server_say "Failed to re-enable auto-save, reporting failure"
-                    exit 1
-                fi
-                server_say "Auto-save re-enabled"
-                server_say "Backup completed"
-            fi
-          '';
+        text = ''
+          ${functions}
+          if [ -e "/tmp/minecraft-server-save-off" ]; then
+              server_say "Re-enabling auto-save..."
+              if [ "$(run_cmd_wait_for_message "mine save-on" ": Automatic saving is now enabled")" == "false" ]; then
+                  server_say "Failed to re-enable auto-save, reporting failure"
+                  exit 1
+              fi
+              server_say "Auto-save re-enabled"
+              server_say "Backup completed"
+          fi
+        '';
       };
     in
     {

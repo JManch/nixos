@@ -55,16 +55,20 @@ in
             temperature_key: edge
             interval_ms: 500
             curve:
-              60: 0.0
+              65: 0.25
               70: 0.5
               75: 0.6
               80: 0.65
               90: 0.75
+            spindown_delay_ms: 5000
+            change_threshold: 2
           pmfw_options:
             acoustic_limit: 3300
             acoustic_target: 2000
             minimum_pwm: 15
             target_temperature: 80
+            zero_rpm: true
+            zero_rpm_threshold: 60
           # Run at 257 for slightly better performance but louder fans
           power_cap: 231.0
           performance_level: manual
@@ -85,11 +89,10 @@ in
     in
     # yaml
     ''
+      version: 5
       daemon:
         log_level: info
-        admin_groups:
-        - wheel
-        - sudo
+        admin_group: wheel
         disable_clocks_cleanup: false
       apply_settings_timer: 5
       gpus:

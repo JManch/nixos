@@ -20,6 +20,7 @@ let
     types
     isType
     optional
+    optionals
     mapAttrsToList
     sort
     optionalString
@@ -58,25 +59,18 @@ let
     cmd:
     pkgs.writeShellApplication {
       name = "rebuild-${cmd}";
-      runtimeInputs = [ pkgs.nh ] ++ optional (cmd == "diff") pkgs.nvd;
-      # Always rebuild in ~ because I once had a bad experience where I
-      # accidentally built in /nix/store and caused irrepairable corruption
+      runtimeInputs = [ pkgs.nh ];
+      text = ''
+        flake="${configDir}"
+        if [ ! -d $flake ]; then
+          echo "Flake does not exist locally so using remote from github"
+          flake="github:JManch/nixos"
+        fi
 
-      # Use --fast on all switch modes apart from boot as I usually do a
-      # rebuild-boot after a large nixpkgs change which is the only time when
-      # --fast would be bad to use
-      text = # bash
-        ''
-          flake="${configDir}"
-          if [ ! -d $flake ]; then
-            echo "Flake does not exist locally so using remote from github"
-            flake="github:JManch/nixos"
-          fi
-
-          nh os ${
-            if (cmd == "diff") then "build" else cmd
-          } "$flake" --hostname ${hostname} --out-link ~/result-${hostname} "$@"
-        '';
+        nh os ${
+          if (cmd == "diff") then "build" else cmd
+        } "$flake" --hostname ${hostname} --out-link ~/result-${hostname} "$@"
+      '';
     }
   ) rebuildCmds;
 
@@ -91,49 +85,50 @@ let
             pkgs.openssh
             (flakePkgs args "nix-on-droid").nix-on-droid
           ];
-          text = # bash
-            ''
-              if [ "$#" = 0 ]; then
-                echo "Usage: droid-rebuild-${cmd} <hostname>"
-                exit 1
+          text = ''
+            if [ "$#" = 0 ]; then
+              echo "Usage: droid-rebuild-${cmd} <hostname>"
+              exit 1
+            fi
+            hostname=$1
+
+            droid_hosts=(${concatStringsSep " " (builtins.attrNames self.nixOnDroidConfigurations)})
+            for host in "''${droid_hosts[@]}"; do
+              if [[ $host = "$hostname" ]]; then
+                match=1
+                break
               fi
-              hostname=$1
+            done
 
-              droid_hosts=(${concatStringsSep " " (builtins.attrNames self.nixOnDroidConfigurations)})
-              for host in "''${droid_hosts[@]}"; do
-                if [[ $host = "$hostname" ]]; then
-                  match=1
-                  break
-                fi
-              done
+            if [[ $match = 0 ]]; then
+              echo "Error: Droid host '$hostname' does not exist" >&2
+              exit 1
+            fi
 
-              if [[ $match = 0 ]]; then
-                echo "Error: Droid host '$hostname' does not exist" >&2
-                exit 1
-              fi
+            flake="${configDir}"
+            if [ ! -d $flake ]; then
+              echo "Flake does not exist locally so using remote from github"
+              flake="github:JManch/nixos"
+            fi
 
-              flake="${configDir}"
-              if [ ! -d $flake ]; then
-                echo "Flake does not exist locally so using remote from github"
-                flake="github:JManch/nixos"
-              fi
-
-              remote_builds="/home/${adminUsername}/.remote-builds/$hostname"
-              mkdir -p "$remote_builds"
-              trap "popd >/dev/null 2>&1 || true" EXIT
-              pushd "$remote_builds" >/dev/null 2>&1
-              nix-on-droid build --flake "$flake#$hostname"
-              store_path="$(readlink "/home/${adminUsername}/.remote-builds/$hostname/result")"
-              ${
-                if (cmd == "switch") then # bash
-                  ''
-                    NIX_SSHOPTS="-o Port=8022" nix copy --to "ssh://nix-on-droid@$hostname.lan" "$store_path"
-                    ssh -p 8022 "nix-on-droid@$hostname.lan" "$store_path/activate"
-                  ''
-                else
-                  "echo \"$store_path\""
-              }
-            '';
+            remote_builds="/home/${adminUsername}/.remote-builds"
+            mkdir -p "$remote_builds"
+            trap "popd >/dev/null 2>&1 || true" EXIT
+            tmp=$(mktemp -d)
+            pushd "$tmp" >/dev/null 2>&1
+            nix-on-droid build --flake "$flake#$hostname"
+            mv "$tmp/result" "$remote_builds/result-$hostname"
+            store_path="$(readlink "$remote_builds/result-$hostname")"
+            ${
+              if (cmd == "switch") then
+                ''
+                  NIX_SSHOPTS="-o Port=8022" nix copy --to "ssh://nix-on-droid@$hostname.lan" "$store_path"
+                  ssh -p 8022 "nix-on-droid@$hostname.lan" "$store_path/activate"
+                ''
+              else
+                "echo \"$store_path\""
+            }
+          '';
         }
       )
       [
@@ -183,25 +178,26 @@ let
     in
     pkgs.writeShellApplication {
       name = "host-rebuild-${cmd}";
-      runtimeInputs = with pkgs; [
-        nix
-        nh
-        openssh
-        nvd
-      ];
+      runtimeInputs =
+        [ pkgs.nh ]
+        ++ optionals (cmd == "diff") [
+          pkgs.nix
+          pkgs.openssh
+          pkgs.dix
+        ];
       text =
         validation
         + (
           if (cmd == "build" || cmd == "diff") then
             ''
               nh os build "$flake" --hostname "$hostname" --out-link "$remote_builds/result-$hostname" "''${@:2}"
-            ''
-            + optionalString (cmd == "diff") ''
-              ${sshAddQuiet pkgs}
-              remote_system=$(ssh "${adminUsername}@$hostname.lan" readlink /run/current-system)
-              built_system=$(readlink "$remote_builds/result-$hostname")
-              nix copy --from "ssh://$hostname.lan" "$remote_system"
-              nvd diff "$remote_system" "$built_system"
+              ${optionalString (cmd == "diff") ''
+                ${sshAddQuiet pkgs}
+                remote_system=$(ssh "${adminUsername}@$hostname.lan" readlink /run/current-system)
+                built_system=$(readlink "$remote_builds/result-$hostname")
+                nix copy --from "ssh://$hostname.lan" "$remote_system"
+                dix "$remote_system" "$built_system"
+              ''}
             ''
           else
             ''
@@ -216,129 +212,128 @@ let
     pkgs.writeShellApplication {
       name = "flake-update";
       runtimeInputs = [ pkgs.jaq ];
-      text = # bash
-        ''
-          # List of critical inputs to check for revision changes
-          critical_inputs=(
-            "impermanence"
-            "home-manager"
-            "agenix"
-            "lanzaboote"
-            "disko"
-            "vpn-confinement"
-            "raspberry-pi-nix"
-            "rpi-firmware-nonfree-src"
-            "nixpkgs-xr"
-            "nix-on-droid"
-            "nix-flatpak"
-          )
+      text = ''
+        # List of critical inputs to check for revision changes
+        critical_inputs=(
+          "impermanence"
+          "home-manager"
+          "agenix"
+          "lanzaboote"
+          "disko"
+          "vpn-confinement"
+          "raspberry-pi-nix"
+          "rpi-firmware-nonfree-src"
+          "nixpkgs-xr"
+          "nix-on-droid"
+          "nix-flatpak"
+        )
 
-          # Inputs and with relative file paths to check for changes in.
-          # Separate multiple file paths with spaces.
-          declare -A input_file_pairs=(
-            ["nixpkgs"]="nixos/modules/tasks/filesystems/zfs.nix nixos/modules/programs/wayland/hyprland.nix nixos/modules/programs/wayland/uwsm.nix nixos/modules/services/desktops/flatpak.nix nixos/modules/services/video/frigate.nix"
-          )
+        # Inputs and with relative file paths to check for changes in.
+        # Separate multiple file paths with spaces.
+        declare -A input_file_pairs=(
+          ["nixpkgs"]="nixos/modules/tasks/filesystems/zfs.nix nixos/modules/programs/wayland/hyprland.nix nixos/modules/programs/wayland/uwsm.nix nixos/modules/services/desktops/flatpak.nix nixos/modules/services/video/frigate.nix"
+        )
 
-          input_exists_in_lockfiles() {
-            local input="$1"
-            local old_lock="$2"
-            local new_lock="$3"
-            if echo "$old_lock" | jaq -e ".\"$input\"" &>/dev/null &&
-               echo "$new_lock" | jaq -e ".\"$input\"" &>/dev/null; then
-              return 0
-            else
-              return 1
+        input_exists_in_lockfiles() {
+          local input="$1"
+          local old_lock="$2"
+          local new_lock="$3"
+          if echo "$old_lock" | jaq -e ".\"$input\"" &>/dev/null &&
+             echo "$new_lock" | jaq -e ".\"$input\"" &>/dev/null; then
+            return 0
+          else
+            return 1
+          fi
+        }
+
+        old_lock=$(<"${configDir}/flake.lock" jaq -c '.nodes')
+        pushd "${configDir}" >/dev/null
+        nix flake update
+        popd >/dev/null
+        new_lock=$(<"${configDir}/flake.lock" jaq -c '.nodes')
+
+        first_diff=true
+        for input in "''${critical_inputs[@]}"; do
+          if input_exists_in_lockfiles "$input" "$old_lock" "$new_lock"; then
+            old_rev=$(echo "$old_lock" | jaq -r ".\"$input\".locked.rev")
+            new_rev=$(echo "$new_lock" | jaq -r ".\"$input\".locked.rev")
+
+            if [ "$new_rev" != "$old_rev" ]; then
+              if $first_diff; then
+                echo -e "\033[1;31m\nCritical inputs have updated. Check changes using the URLs below:\n\033[0m"
+                first_diff=false
+              fi
+              echo -e "\033[1m• Updated critical input '$input':\033[0m"
+              source_type=$(echo "$new_lock" | jaq -r ".\"$input\".original.type")
+              if [[ "$source_type" == "github" || "$source_type" == "gitlab" ]]; then
+                owner=$(echo "$new_lock" | jaq -r ".\"$input\".original.owner")
+                repo=$(echo "$new_lock" | jaq -r ".\"$input\".original.repo")
+                echo "    'https://$source_type.com/$owner/$repo/compare/$old_rev...$new_rev'"
+              else
+                echo -e "\033[1;31m   Cannot get diff URL, source type $source_type is unsupported\033[0m"
+              fi
             fi
-          }
+          fi
+        done
 
-          old_lock=$(<"${configDir}/flake.lock" jaq -c '.nodes')
-          pushd "${configDir}" >/dev/null
-          nix flake update
-          popd >/dev/null
-          new_lock=$(<"${configDir}/flake.lock" jaq -c '.nodes')
+        tmp_repos=$(mktemp -d)
+        cleanup() {
+          rm -rf "$tmp_repos"
+        }
+        trap cleanup EXIT
+        first_diff=true
 
-          first_diff=true
-          for input in "''${critical_inputs[@]}"; do
+        for input in "''${!input_file_pairs[@]}"; do
+          file_paths="''${input_file_pairs[$input]}"
+          IFS=' ' read -r -a paths_array <<< "$file_paths"
+          for file_path in "''${paths_array[@]}"; do
             if input_exists_in_lockfiles "$input" "$old_lock" "$new_lock"; then
               old_rev=$(echo "$old_lock" | jaq -r ".\"$input\".locked.rev")
               new_rev=$(echo "$new_lock" | jaq -r ".\"$input\".locked.rev")
 
+              source_type=$(echo "$new_lock" | jaq -r ".\"$input\".original.type")
               if [ "$new_rev" != "$old_rev" ]; then
-                if $first_diff; then
-                  echo -e "\033[1;31m\nCritical inputs have updated. Check changes using the URLs below:\n\033[0m"
-                  first_diff=false
-                fi
-                echo -e "\033[1m• Updated critical input '$input':\033[0m"
-                source_type=$(echo "$new_lock" | jaq -r ".\"$input\".original.type")
                 if [[ "$source_type" == "github" || "$source_type" == "gitlab" ]]; then
                   owner=$(echo "$new_lock" | jaq -r ".\"$input\".original.owner")
                   repo=$(echo "$new_lock" | jaq -r ".\"$input\".original.repo")
-                  echo "    'https://$source_type.com/$owner/$repo/compare/$old_rev...$new_rev'"
+                  ref=$(echo "$new_lock" | jaq -r ".\"$input\".original.ref")
+                  repo_dir="$tmp_repos/$input"
+
+                  if [ -d "/home/${adminUsername}/files/repos/$repo/.git" ]; then
+                    repo_dir="/home/${adminUsername}/files/repos/$repo"
+                  elif [ ! -d "$tmp_repos/$input" ]; then
+                    git clone "https://$source_type.com/$owner/$repo" "$tmp_repos/$input" -q
+                  fi
+
+                  pushd "$repo_dir" >/dev/null
+
+                  # In our local nixpkgs repo origin is our fork
+                  if [[ "$repo" == "nixpkgs" && "$repo_dir" != "$tmp_repos/$input" && "$owner" == "NixOS" ]]; then
+                    git fetch upstream "$ref" -q
+                  else
+                    git fetch origin "$ref" -q
+                  fi
+
+                  diff_output=$(git diff "$old_rev" "$new_rev" -- "$file_path")
+                  if [[ -n "$diff_output" ]]; then
+                    if $first_diff; then
+                      echo -e "\033[1;34m\nTracked input files have changed. View diffs below:\n\033[0m"
+                      first_diff=false
+                    fi
+                    echo -e "\033[1m• File changed for input '$input': $file_path\033[0m"
+                    diff_output_path=$(mktemp -p /tmp "$input-diff-XXXXX")
+                    echo "$diff_output" > "$diff_output_path"
+                    echo "    '$diff_output_path'"
+                  fi
+                  popd >/dev/null
                 else
-                  echo -e "\033[1;31m   Cannot get diff URL, source type $source_type is unsupported\033[0m"
+                  echo -e "\033[1;31m• Cannot check file paths diff for input '$input', source type '$source_type' is unsupported\033[0m"
                 fi
               fi
             fi
           done
-
-          tmp_repos=$(mktemp -d)
-          cleanup() {
-            rm -rf "$tmp_repos"
-          }
-          trap cleanup EXIT
-          first_diff=true
-
-          for input in "''${!input_file_pairs[@]}"; do
-            file_paths="''${input_file_pairs[$input]}"
-            IFS=' ' read -r -a paths_array <<< "$file_paths"
-            for file_path in "''${paths_array[@]}"; do
-              if input_exists_in_lockfiles "$input" "$old_lock" "$new_lock"; then
-                old_rev=$(echo "$old_lock" | jaq -r ".\"$input\".locked.rev")
-                new_rev=$(echo "$new_lock" | jaq -r ".\"$input\".locked.rev")
-
-                source_type=$(echo "$new_lock" | jaq -r ".\"$input\".original.type")
-                if [ "$new_rev" != "$old_rev" ]; then
-                  if [[ "$source_type" == "github" || "$source_type" == "gitlab" ]]; then
-                    owner=$(echo "$new_lock" | jaq -r ".\"$input\".original.owner")
-                    repo=$(echo "$new_lock" | jaq -r ".\"$input\".original.repo")
-                    ref=$(echo "$new_lock" | jaq -r ".\"$input\".original.ref")
-                    repo_dir="$tmp_repos/$input"
-
-                    if [ -d "/home/${adminUsername}/files/repos/$repo/.git" ]; then
-                      repo_dir="/home/${adminUsername}/files/repos/$repo"
-                    elif [ ! -d "$tmp_repos/$input" ]; then
-                      git clone "https://$source_type.com/$owner/$repo" "$tmp_repos/$input" -q
-                    fi
-
-                    pushd "$repo_dir" >/dev/null
-
-                    # In our local nixpkgs repo origin is our fork
-                    if [[ "$repo" == "nixpkgs" && "$repo_dir" != "$tmp_repos/$input" && "$owner" == "NixOS" ]]; then
-                      git fetch upstream "$ref" -q
-                    else
-                      git fetch origin "$ref" -q
-                    fi
-
-                    diff_output=$(git diff "$old_rev" "$new_rev" -- "$file_path")
-                    if [[ -n "$diff_output" ]]; then
-                      if $first_diff; then
-                        echo -e "\033[1;34m\nTracked input files have changed. View diffs below:\n\033[0m"
-                        first_diff=false
-                      fi
-                      echo -e "\033[1m• File changed for input '$input': $file_path\033[0m"
-                      diff_output_path=$(mktemp -p /tmp "$input-diff-XXXXX")
-                      echo "$diff_output" > "$diff_output_path"
-                      echo "    '$diff_output_path'"
-                    fi
-                    popd >/dev/null
-                  else
-                    echo -e "\033[1;31m• Cannot check file paths diff for input '$input', source type '$source_type' is unsupported\033[0m"
-                  fi
-                fi
-              fi
-            done
-          done
-        '';
+        done
+      '';
     }
   );
 in
@@ -368,7 +363,7 @@ in
 
   ns.adminPackages =
     [
-      pkgs.nvd
+      pkgs.dix
       pkgs.npins
     ]
     ++ rebuildScripts

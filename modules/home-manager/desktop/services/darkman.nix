@@ -220,30 +220,29 @@ in
             pkgs.jaq
             darkman.package
           ];
-          text = # bash
-            ''
-              set +e
-              current_theme=$(darkman get)
-              switch_theme() {
-                if [ "$1" != "$(darkman get)" ]; then
-                  darkman set "$1"
-                  current_theme="$1"
-                fi
-              }
+          text = ''
+            set +e
+            current_theme=$(darkman get)
+            switch_theme() {
+              if [ "$1" != "$(darkman get)" ]; then
+                darkman set "$1"
+                current_theme="$1"
+              fi
+            }
 
-              while true
-              do
-                state=$(${curlCommand { endpoint = "states/binary_sensor.${cfg.hassEntity}"; }} | jaq -r .state)
-                if [[ "$state" = "on" && ("$current_theme" = "dark" || "$current_theme" = "null") ]]; then
-                  switch_theme "light"
-                elif [[ "$state" = "off" && ("$current_theme" = "light" || "$current_theme" = "null") ]]; then
-                  switch_theme "dark"
-                elif [ "$current_theme" = "null" ]; then
-                  darkman set dark
-                fi
-                sleep 180
-              done
-            '';
+            while true
+            do
+              state=$(${curlCommand { endpoint = "states/binary_sensor.${cfg.hassEntity}"; }} | jaq -r .state)
+              if [[ "$state" = "on" && ("$current_theme" = "dark" || "$current_theme" = "null") ]]; then
+                switch_theme "light"
+              elif [[ "$state" = "off" && ("$current_theme" = "light" || "$current_theme" = "null") ]]; then
+                switch_theme "dark"
+              elif [ "$current_theme" = "null" ]; then
+                darkman set dark
+              fi
+              sleep 180
+            done
+          '';
         }
       );
     };

@@ -52,37 +52,36 @@ let
     pkgs.writeShellApplication {
       name = "generate-caddy-certs";
       runtimeInputs = [ pkgs.openssl ];
-      text = # bash
-        ''
-          umask 077
-          dir="generated-certs"
-          if [ ! -d "$dir" ]; then
-              mkdir "$dir"
-          else
-              echo "Output directory '$dir' already exists"
-              exit 1
-          fi
+      text = ''
+        umask 077
+        dir="generated-certs"
+        if [ ! -d "$dir" ]; then
+            mkdir "$dir"
+        else
+            echo "Output directory '$dir' already exists"
+            exit 1
+        fi
 
-          temp=$(mktemp -d)
-          cleanup() {
-            rm -rf "$temp"
-          }
-          trap cleanup EXIT
+        temp=$(mktemp -d)
+        cleanup() {
+          rm -rf "$temp"
+        }
+        trap cleanup EXIT
 
-          # Generate new root certificate authority
-          openssl genrsa -out "$temp/rootCA.key" 4096
-          openssl req -x509 -new -nodes -key "$temp/rootCA.key" -sha256 -days 365 -out "$temp/rootCA.crt" \
-            -subj "/C=GB/O=${toUpper hostname}/CN=Joshua's Root Certificate"
+        # Generate new root certificate authority
+        openssl genrsa -out "$temp/rootCA.key" 4096
+        openssl req -x509 -new -nodes -key "$temp/rootCA.key" -sha256 -days 365 -out "$temp/rootCA.crt" \
+          -subj "/C=GB/O=${toUpper hostname}/CN=Joshua's Root Certificate"
 
-          # Generate leaf certificate for each domain
-          ${concatMapStrings (d: genDomain d) certDomains}
+        # Generate leaf certificate for each domain
+        ${concatMapStrings (d: genDomain d) certDomains}
 
-          mv "$temp/rootCA.crt" "$dir"
-          echo "Update the encrypted certificates in agenix with the new *.crt files in $dir"
-          echo "Import the *.p12 files into browsers and devices you want to grant access to"
-          echo "Unfortunately custom certs do not work on firefox mobile https://bugzilla.mozilla.org/show_bug.cgi?id=1813930, have to use chrome for that now"
-          echo "Remember to backup the *.p12 files somewhere safe"
-        '';
+        mv "$temp/rootCA.crt" "$dir"
+        echo "Update the encrypted certificates in agenix with the new *.crt files in $dir"
+        echo "Import the *.p12 files into browsers and devices you want to grant access to"
+        echo "Unfortunately custom certs do not work on firefox mobile https://bugzilla.mozilla.org/show_bug.cgi?id=1813930, have to use chrome for that now"
+        echo "Remember to backup the *.p12 files somewhere safe"
+      '';
     };
 in
 {

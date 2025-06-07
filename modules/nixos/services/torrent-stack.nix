@@ -398,14 +398,13 @@ in
                 gnused
                 coreutils
               ];
-              text = # bash
-                ''
-                  install -m644 "${recyclarrConfig}" "${dataDir}"/recyclarr.yaml
-                  install -m644 "${recyclarrSecrets.path}" "${dataDir}"/secrets.yaml
-                  sed 's/sonarr_api_key/!secret sonarr_api_key/' -i "${dataDir}"/recyclarr.yaml
-                  sed 's/radarr_api_key/!secret radarr_api_key/' -i "${dataDir}"/recyclarr.yaml
-                  ln -sf "${templates}"/includes -t "${dataDir}"
-                '';
+              text = ''
+                install -m644 "${recyclarrConfig}" "${dataDir}"/recyclarr.yaml
+                install -m644 "${recyclarrSecrets.path}" "${dataDir}"/secrets.yaml
+                sed 's/sonarr_api_key/!secret sonarr_api_key/' -i "${dataDir}"/recyclarr.yaml
+                sed 's/radarr_api_key/!secret radarr_api_key/' -i "${dataDir}"/recyclarr.yaml
+                ln -sf "${templates}"/includes -t "${dataDir}"
+              '';
             }
           );
           ExecStart = "${getExe pkgs.recyclarr} sync --app-data ${dataDir}";

@@ -171,21 +171,19 @@ let
           ${notifySend} -e --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
       '';
 
-  copyScreenshotText =
-    pkgs.writeShellScript "copy-screenshot-text" # bash
-      ''
-        set -o pipefail
-        ${cfg.disableShaders}
-        text=$(${grimblast} --freeze save area - | ${getExe pkgs.tesseract} stdin stdout)
-        exit=$?
-        ${cfg.enableShaders}
-        if [ $exit -eq 0 ]; then
-          echo "$text" | ${getExe' pkgs.wl-clipboard "wl-copy"}
-          ${notifySend} -e -t 5000 -a Grimblast "Text Copied" "$text"
-        else
-          ${notifySend} -e --urgency=critical -t 5000 "Screenshot" "Failed to copy text"
-        fi
-      '';
+  copyScreenshotText = pkgs.writeShellScript "copy-screenshot-text" ''
+    set -o pipefail
+    ${cfg.disableShaders}
+    text=$(${grimblast} --freeze save area - | ${getExe pkgs.tesseract} stdin stdout)
+    exit=$?
+    ${cfg.enableShaders}
+    if [ $exit -eq 0 ]; then
+      echo "$text" | ${getExe' pkgs.wl-clipboard "wl-copy"}
+      ${notifySend} -e -t 5000 -a Grimblast "Text Copied" "$text"
+    else
+      ${notifySend} -e --urgency=critical -t 5000 "Screenshot" "Failed to copy text"
+    fi
+  '';
 
   moveToNextEmpty = pkgs.writeShellScript "hypr-move-to-next-empty" ''
     fullscreen=$(${hyprctl} activewindow -j | ${jaq} -r '.fullscreen')

@@ -45,29 +45,27 @@ let
   editSecretScript = pkgs.writeShellApplication {
     name = "agenix-edit";
     runtimeInputs = scriptInputs;
-    text = # bash
-      ''
-        if [[ $# -ne 1 ]]; then
-          echo "Usage: agenix-edit <file_path>" >&2
-          exit 1
-        fi
+    text = ''
+      if [[ $# -ne 1 ]]; then
+        echo "Usage: agenix-edit <file_path>" >&2
+        exit 1
+      fi
 
-        ${setup}
+      ${setup}
 
-        eval agenix -e "$1" "$keys"
-        chown 1000:100 ./*
-      '';
+      eval agenix -e "$1" "$keys"
+      chown 1000:100 ./*
+    '';
   };
 
   rekeySecretScript = pkgs.writeShellApplication {
     name = "agenix-rekey";
     runtimeInputs = scriptInputs;
-    text = # bash
-      ''
-        ${setup}
-        eval agenix -r "$keys"
-        chown 1000:100 ./*
-      '';
+    text = ''
+      ${setup}
+      eval agenix -r "$keys"
+      chown 1000:100 ./*
+    '';
   };
 in
 {

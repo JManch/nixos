@@ -39,78 +39,77 @@ let
         xdg-terminal-exec
       ])
       ++ [ selfPkgs.bootstrap-kit ];
-    text = # bash
-      ''
-        no_secrets=false
-        while getopts 'n' flag; do
-          case "$flag" in
-            n) no_secrets=true ;;
-            *) ;;
-          esac
-        done
-        shift $(( OPTIND - 1 ))
+    text = ''
+      no_secrets=false
+      while getopts 'n' flag; do
+        case "$flag" in
+          n) no_secrets=true ;;
+          *) ;;
+        esac
+      done
+      shift $(( OPTIND - 1 ))
 
-        if [ "$#" -ne 1 ]; then
-          echo "Usage: run-vm <hostname>"
-          exit 1
+      if [ "$#" -ne 1 ]; then
+        echo "Usage: run-vm <hostname>"
+        exit 1
+      fi
+      hostname=$1
+
+      flake="/home/${username}/.config/nixos"
+      if [ ! -d $flake ]; then
+        echo "Flake does not exist locally so using remote from github"
+        flake="github:JManch/nixos"
+      fi
+
+      ${lib.${ns}.exitTrapBuilder}
+
+      # Build the VM
+      runscript="/home/${adminUsername}/result/bin/run-$hostname-vm"
+      pushd "/home/${adminUsername}" > /dev/null
+      add_exit_trap "popd >/dev/null 2>&1 || true"
+      nixos-rebuild build-vm --flake "$flake#$hostname"
+
+      # Check if the VM uses impermanence
+      impermanence=$(nix eval "$flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.${ns}.system.impermanence.enable")
+
+      # Print ports mapped to the VM
+      printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
+
+      if [[ "$no_secrets" = false && ! -e "/home/${adminUsername}/$hostname.qcow2" ]]; then
+        bootstrap_kit=$(mktemp -d)
+        # shellcheck disable=SC2016
+        add_exit_trap 'sudo rm -rf $bootstrap_kit'
+
+        sudo bootstrap-kit decrypt "$bootstrap_kit"
+
+        # Copy keys to VM
+        printf "Copying SSH keys to VM...\nNOTE: Secret decryption will not work on the first VM launch"
+        rootDir=""
+        if [ "$impermanence" = "true" ]; then
+          rootDir="persist"
         fi
-        hostname=$1
+        (sudo scp -P 50022 -i /home/${username}/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+          -o UserKnownHostsFile=/dev/null -o LogLevel=QUIET -o ConnectionAttempts=30 \
+          "$bootstrap_kit/$hostname/ssh_host_ed25519_key" "$bootstrap_kit/$hostname/ssh_host_ed25519_key.pub" \
+          root@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$bootstrap_kit") &
+      fi
 
-        flake="/home/${username}/.config/nixos"
-        if [ ! -d $flake ]; then
-          echo "Flake does not exist locally so using remote from github"
-          flake="github:JManch/nixos"
-        fi
-
-        ${lib.${ns}.exitTrapBuilder}
-
-        # Build the VM
-        runscript="/home/${adminUsername}/result/bin/run-$hostname-vm"
-        pushd "/home/${adminUsername}" > /dev/null
-        add_exit_trap "popd >/dev/null 2>&1 || true"
-        nixos-rebuild build-vm --flake "$flake#$hostname"
-
-        # Check if the VM uses impermanence
-        impermanence=$(nix eval "$flake#nixosConfigurations.$hostname.config.virtualisation.vmVariant.${ns}.system.impermanence.enable")
-
-        # Print ports mapped to the VM
-        printf '\nMapped Ports:\n%s\n' "$(grep -o 'hostfwd=[^,]*' "$runscript" | sed 's/hostfwd=//g')"
-
-        if [[ "$no_secrets" = false && ! -e "/home/${adminUsername}/$hostname.qcow2" ]]; then
-          bootstrap_kit=$(mktemp -d)
-          # shellcheck disable=SC2016
-          add_exit_trap 'sudo rm -rf $bootstrap_kit'
-
-          sudo bootstrap-kit decrypt "$bootstrap_kit"
-
-          # Copy keys to VM
-          printf "Copying SSH keys to VM...\nNOTE: Secret decryption will not work on the first VM launch"
-          rootDir=""
-          if [ "$impermanence" = "true" ]; then
-            rootDir="persist"
-          fi
-          (sudo scp -P 50022 -i /home/${username}/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null -o LogLevel=QUIET -o ConnectionAttempts=30 \
-            "$bootstrap_kit/$hostname/ssh_host_ed25519_key" "$bootstrap_kit/$hostname/ssh_host_ed25519_key.pub" \
-            root@127.0.0.1:"/$rootDir/etc/ssh"; rm -rf "$bootstrap_kit") &
-        fi
-
-        # For non-graphical VMs, launch VM and start ssh session in new
-        # terminal windows
-        if grep -q -- "-nographic" "$runscript"; then
-          ${
-            if config.${ns}.system.desktop.enable && home-manager.enable then # bash
-              ''
-                xdg-terminal-exec "zsh" "-i" "-c" "ssh-vm; zsh -i" &
-                xdg-terminal-exec --app-id=qemu -e "$runscript"
-              ''
-            else
-              "$runscript"
-          }
-        else
-          $runscript
-        fi
-      '';
+      # For non-graphical VMs, launch VM and start ssh session in new
+      # terminal windows
+      if grep -q -- "-nographic" "$runscript"; then
+        ${
+          if config.${ns}.system.desktop.enable && home-manager.enable then # bash
+            ''
+              xdg-terminal-exec "zsh" "-i" "-c" "ssh-vm; zsh -i" &
+              xdg-terminal-exec --app-id=qemu -e "$runscript"
+            ''
+          else
+            "$runscript"
+        }
+      else
+        $runscript
+      fi
+    '';
   };
 in
 [

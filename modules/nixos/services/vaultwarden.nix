@@ -35,64 +35,63 @@ let
       gnutar
       systemd
     ];
-    text = # bash
-      ''
-        if [ "$#" -ne 2 ]; then
-          echo "Usage: vaultwarden-restore-backup <backup> <encrypted_private_key>"
+    text = ''
+      if [ "$#" -ne 2 ]; then
+        echo "Usage: vaultwarden-restore-backup <backup> <encrypted_private_key>"
+        exit 1
+      fi
+
+      if [ "$(id -u)" != "0" ]; then
+         echo "This script must be run as root" >&2
+         exit 1
+      fi
+
+      echo "Tip: if you've restored from the Restic backup you can use the backup at /var/backup/vaultwarden-archive/latest";
+      echo "Be careful to ensure that it's the latest backup because Restic backups do not run as frequently";
+
+      backup=$1
+      key=$2
+      vault="/var/lib/bitwarden_rs"
+
+      if [ ! -d "$vault" ]; then
+        echo "Error: The vaultwarden state directory $vault does not exist" >&2
+        exit 1
+      fi
+
+      if [ ! -e "$backup" ]; then
+        echo "Error: $backup file does not exist" >&2
+        exit 1
+      fi
+
+      if [ ! -e "$key" ]; then
+        echo "Error: $key file does not exist" >&2
+        exit 1
+      fi
+
+      echo "WARNING: All data in the current vault ($vault) will be destroyed and replaced with the backup"
+      read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
+      echo
+      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+          echo "Aborting"
           exit 1
-        fi
+      fi;
 
-        if [ "$(id -u)" != "0" ]; then
-           echo "This script must be run as root" >&2
-           exit 1
-        fi
-
-        echo "Tip: if you've restored from the Restic backup you can use the backup at /var/backup/vaultwarden-archive/latest";
-        echo "Be careful to ensure that it's the latest backup because Restic backups do not run as frequently";
-
-        backup=$1
-        key=$2
-        vault="/var/lib/bitwarden_rs"
-
-        if [ ! -d "$vault" ]; then
-          echo "Error: The vaultwarden state directory $vault does not exist" >&2
+      echo "Hash: $(sha256sum "$backup")"
+      read -p "Does the hash match the expected value? (compare with both email and the hash file) (y/N): " -n 1 -r
+      echo
+      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+          echo "Aborting"
           exit 1
-        fi
+      fi;
 
-        if [ ! -e "$backup" ]; then
-          echo "Error: $backup file does not exist" >&2
-          exit 1
-        fi
+      systemctl stop vaultwarden
+      rm -rf "''${vault:?}/"*
 
-        if [ ! -e "$key" ]; then
-          echo "Error: $key file does not exist" >&2
-          exit 1
-        fi
+      age -d "$key" | age -d -i - "$backup" | tar -xjf - -C "$vault"
 
-        echo "WARNING: All data in the current vault ($vault) will be destroyed and replaced with the backup"
-        read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
-        echo
-        if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-            echo "Aborting"
-            exit 1
-        fi;
-
-        echo "Hash: $(sha256sum "$backup")"
-        read -p "Does the hash match the expected value? (compare with both email and the hash file) (y/N): " -n 1 -r
-        echo
-        if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-            echo "Aborting"
-            exit 1
-        fi;
-
-        systemctl stop vaultwarden
-        rm -rf "''${vault:?}/"*
-
-        age -d "$key" | age -d -i - "$backup" | tar -xjf - -C "$vault"
-
-        chown -R vaultwarden:vaultwarden "$vault"
-        echo "Vault successfully restored. The vaultwarden service must be manually started again."
-      '';
+      chown -R vaultwarden:vaultwarden "$vault"
+      echo "Vault successfully restored. The vaultwarden service must be manually started again."
+    '';
   };
 in
 {

@@ -45,30 +45,29 @@ in
             coreutils
             shoutrrr
           ];
-          text = # bash
-            ''
-              set +e
-              send_notif() {
-                shoutrrr send \
-                  --url "$DISCORD_AUTH" \
-                  --title "Index Status Changed" \
-                  --message "$1"
-              }
+          text = ''
+            set +e
+            send_notif() {
+              shoutrrr send \
+                --url "$DISCORD_AUTH" \
+                --title "Index Status Changed" \
+                --message "$1"
+            }
 
-              while true
-              do
-                ${pythonScript}
-                status=$?
-                if [[ $status -eq 0 && ! -e /var/lib/index-checker/indexed ]]; then
-                  touch /var/lib/index-checker/indexed
-                  send_notif "Yay $URL is now indexed!"
-                elif [[ $status -ne 0 && -e /var/lib/index-checker/indexed ]]; then
-                  rm -f /var/lib/index-checker/indexed
-                  send_notif "Nooo $URL is no longer indexed"
-                fi
-                sleep 8h
-              done
-            '';
+            while true
+            do
+              ${pythonScript}
+              status=$?
+              if [[ $status -eq 0 && ! -e /var/lib/index-checker/indexed ]]; then
+                touch /var/lib/index-checker/indexed
+                send_notif "Yay $URL is now indexed!"
+              elif [[ $status -ne 0 && -e /var/lib/index-checker/indexed ]]; then
+                rm -f /var/lib/index-checker/indexed
+                send_notif "Nooo $URL is no longer indexed"
+              fi
+              sleep 8h
+            done
+          '';
         }
       );
     };

@@ -31,32 +31,31 @@ let
           bc
         ])
         ++ [ pkgs.playerctl ];
-      text = # bash
-        ''
-          increment=$1
-          set +e
-          if ! current_vol=$(playerctl volume ${arg}); then
-            notify-send --urgency=critical -t 2000 \
-              -h 'string:x-canonical-private-synchronous:playerctl-${name}-volume' '${upperName}' 'No ${name} player running'
-            exit 1
-          fi
-          set -e
+      text = ''
+        increment=$1
+        set +e
+        if ! current_vol=$(playerctl volume ${arg}); then
+          notify-send --urgency=critical -t 2000 \
+            -h 'string:x-canonical-private-synchronous:playerctl-${name}-volume' '${upperName}' 'No ${name} player running'
+          exit 1
+        fi
+        set -e
 
-          round_volume() {
-            multiple=''${increment#-}
-            add_half=$(bc <<< "scale=10; ($1 + $multiple/2)")
-            rounded=$(bc <<< "($add_half / $multiple) * $multiple")
-            bc <<< "scale=2; $rounded / 100"
-          }
+        round_volume() {
+          multiple=''${increment#-}
+          add_half=$(bc <<< "scale=10; ($1 + $multiple/2)")
+          rounded=$(bc <<< "($add_half / $multiple) * $multiple")
+          bc <<< "scale=2; $rounded / 100"
+        }
 
-          current_vol=$(echo "$current_vol" | awk '{print int($1 * 100)}')
-          new_vol=$(round_volume $((current_vol + increment)))
+        current_vol=$(echo "$current_vol" | awk '{print int($1 * 100)}')
+        new_vol=$(round_volume $((current_vol + increment)))
 
-          playerctl volume "$new_vol" ${arg}
-          actual_vol=$(playerctl volume ${arg} | awk '{print int($1 * 100)}')
-          notify-send --urgency=low -t 2000 \
-            -h 'string:x-canonical-private-synchronous:playerctl-${name}-volume' '${upperName}' "Volume ''${actual_vol%.*}%"
-        '';
+        playerctl volume "$new_vol" ${arg}
+        actual_vol=$(playerctl volume ${arg} | awk '{print int($1 * 100)}')
+        notify-send --urgency=low -t 2000 \
+          -h 'string:x-canonical-private-synchronous:playerctl-${name}-volume' '${upperName}' "Volume ''${actual_vol%.*}%"
+      '';
     };
 in
 {

@@ -106,131 +106,130 @@ let
       systemd
       bash
     ];
-    text = # bash
-      ''
-        echo "Leave empty to restore from the default repo"
-        echo "Enter 'remote' to restore from the backblaze remote repo"
-        echo "Otherwise, enter a custom repo passed to the -r flag"
-        read -p "Enter the repo to restore from: " -r repo
+    text = ''
+      echo "Leave empty to restore from the default repo"
+      echo "Enter 'remote' to restore from the backblaze remote repo"
+      echo "Otherwise, enter a custom repo passed to the -r flag"
+      read -p "Enter the repo to restore from: " -r repo
 
-        env_vars="RESTIC_PASSWORD_FILE=\"${resticPasswordFile.path}\""
-        if [ -z "$repo" ]; then
-          env_vars+=" RESTIC_REPOSITORY_FILE=\"${resticRepositoryFile.path}\""
-        elif [ ! "remote" = "$repo" ]; then
-          env_vars+=" RESTIC_REPOSITORY=\"$repo\""
-        fi
+      env_vars="RESTIC_PASSWORD_FILE=\"${resticPasswordFile.path}\""
+      if [ -z "$repo" ]; then
+        env_vars+=" RESTIC_REPOSITORY_FILE=\"${resticRepositoryFile.path}\""
+      elif [ ! "remote" = "$repo" ]; then
+        env_vars+=" RESTIC_REPOSITORY=\"$repo\""
+      fi
 
-        load_vars="set -a; if [[ \"$repo\" = \"remote\" ]]; then source ${resticReadOnlyBackblazeVars.path}; fi; set +a; export $env_vars;"
-        sudo sh -c "$load_vars restic snapshots --compact --no-lock --group-by tags"
+      load_vars="set -a; if [[ \"$repo\" = \"remote\" ]]; then source ${resticReadOnlyBackblazeVars.path}; fi; set +a; export $env_vars;"
+      sudo sh -c "$load_vars restic snapshots --compact --no-lock --group-by tags"
 
-        read -p "Do you want to proceed with this repo? (y/N): " -n 1 -r
-        if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
-        echo
+      read -p "Do you want to proceed with this repo? (y/N): " -n 1 -r
+      if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
+      echo
 
-        read -p "Enter the host to restore from (leave empty for current): " -r hostname
-        if [ -z "$hostname" ]; then hostname="${hostname}"; fi
+      read -p "Enter the host to restore from (leave empty for current): " -r hostname
+      if [ -z "$hostname" ]; then hostname="${hostname}"; fi
 
-        foreign_host=false
-        if [ "$hostname" != "${hostname}" ]; then
-          foreign_host=true
-        fi
+      foreign_host=false
+      if [ "$hostname" != "${hostname}" ]; then
+        foreign_host=true
+      fi
 
-        ${concatMapStrings (
-          hostname:
-          concatStrings (
-            mapAttrsToList (
-              name: value: # bash
-              ''
-                if [ "$hostname" = "${hostname}" ]; then
-                read -p "Restore backup ${name}? (y/N): " -n 1 -r
-                if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+      ${concatMapStrings (
+        hostname:
+        concatStrings (
+          mapAttrsToList (
+            name: value: # bash
+            ''
+              if [ "$hostname" = "${hostname}" ]; then
+              read -p "Restore backup ${name}? (y/N): " -n 1 -r
+              if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+                echo
+                sudo sh -c "$load_vars restic snapshots --tag ${name} --host ${hostname} --no-lock"
+                read -p "Enter the snapshot ID to restore (leave empty for latest): " -r snapshot
+                if [ -z "$snapshot" ]; then snapshot="latest"; fi
+
+                target="/"
+                custom_target=false
+                if [ "$foreign_host" = false ]; then
+                  read -p "Would you like to restore to a custom path instead of the original? Restore scripts will NOT run. (y/N): " -n 1 -r
+                else
+                  echo -n "WARN: Since you are restoring a foreign host you must specify a restore path and restore scripts will NOT run"
+                fi
+                if [[ "$foreign_host" = true || "$REPLY" =~ ^[Yy]$ ]]; then
                   echo
-                  sudo sh -c "$load_vars restic snapshots --tag ${name} --host ${hostname} --no-lock"
-                  read -p "Enter the snapshot ID to restore (leave empty for latest): " -r snapshot
-                  if [ -z "$snapshot" ]; then snapshot="latest"; fi
-
-                  target="/"
-                  custom_target=false
-                  if [ "$foreign_host" = false ]; then
-                    read -p "Would you like to restore to a custom path instead of the original? Restore scripts will NOT run. (y/N): " -n 1 -r
-                  else
-                    echo -n "WARN: Since you are restoring a foreign host you must specify a restore path and restore scripts will NOT run"
+                  read -p "Enter an absolute path to a restore directory: " -r target
+                  if [[ -z "$target" || -e "$target" ]]; then
+                    echo "Invalid path, make sure it does not already exist" >&2
+                    exit 1
                   fi
-                  if [[ "$foreign_host" = true || "$REPLY" =~ ^[Yy]$ ]]; then
-                    echo
-                    read -p "Enter an absolute path to a restore directory: " -r target
-                    if [[ -z "$target" || -e "$target" ]]; then
-                      echo "Invalid path, make sure it does not already exist" >&2
-                      exit 1
-                    fi
-                    mkdir -p "$target"
-                    custom_target=true
-                  fi
-
-                  echo "Restoring snapshot $snapshot to $target..."
-
-                  restore_snapshot() {
-                    echo "Restoring snapshot..."
-                    sudo sh -c "$load_vars restic restore $snapshot --target $target --verify --tag ${name} --host ${hostname} --no-lock"
-                  }
-
-                  restore_ownership() {
-                    echo "Restoring ownership..."
-                    # Update ownership because UID/GID mappings are not guaranteed to match between hosts
-                    # Modules with statically mapped IDs don't need this https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix
-                    ${concatStrings (
-                      mapAttrsToList (
-                        path: ownership:
-                        let
-                          inherit (ownership) user group;
-                        in
-                        (optionalString (user != null) # bash
-                          ''
-                            if id -u "${user}" >/dev/null 2>&1; then
-                              sudo chown -R ${user} ${path}
-                            else
-                              echo "Warning: User ownership restore failed. User '${user}' does not exist on the system." >&2
-                            fi
-                          ''
-                        )
-                        + (optionalString (group != null) # bash
-                          ''
-                            if getent group "${group}" >/dev/null 2>&1; then
-                              sudo chgrp -R ${group} ${path}
-                            else
-                              echo "Warning: Group ownership restore failed. Group '${group}' does not exist on the system." >&2
-                            fi
-                          ''
-                        )
-                      ) value.restore.pathOwnership
-                    )}
-                  }
-
-                  if [ "$custom_target" = true ]; then
-                    restore_snapshot
-                    restore_ownership
-                  else
-                    read -p "Existing files are about to be replaced by the backup. Are you sure you want to continue? (y/N): " -n 1 -r
-                    if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
-                    echo
-                    ${optionalString value.restore.removeExisting (
-                      concatMapStringsSep ";" (
-                        path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}"
-                      ) value.paths
-                    )}
-                    echo "Running pre-restore script..."
-                    ${value.restore.preRestoreScript}
-                    restore_snapshot
-                    restore_ownership
-                    echo "Running post-restore script..."
-                    ${value.restore.postRestoreScript}
-                  fi
+                  mkdir -p "$target"
+                  custom_target=true
                 fi
+
+                echo "Restoring snapshot $snapshot to $target..."
+
+                restore_snapshot() {
+                  echo "Restoring snapshot..."
+                  sudo sh -c "$load_vars restic restore $snapshot --target $target --verify --tag ${name} --host ${hostname} --no-lock"
+                }
+
+                restore_ownership() {
+                  echo "Restoring ownership..."
+                  # Update ownership because UID/GID mappings are not guaranteed to match between hosts
+                  # Modules with statically mapped IDs don't need this https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix
+                  ${concatStrings (
+                    mapAttrsToList (
+                      path: ownership:
+                      let
+                        inherit (ownership) user group;
+                      in
+                      (optionalString (user != null) # bash
+                        ''
+                          if id -u "${user}" >/dev/null 2>&1; then
+                            sudo chown -R ${user} ${path}
+                          else
+                            echo "Warning: User ownership restore failed. User '${user}' does not exist on the system." >&2
+                          fi
+                        ''
+                      )
+                      + (optionalString (group != null) # bash
+                        ''
+                          if getent group "${group}" >/dev/null 2>&1; then
+                            sudo chgrp -R ${group} ${path}
+                          else
+                            echo "Warning: Group ownership restore failed. Group '${group}' does not exist on the system." >&2
+                          fi
+                        ''
+                      )
+                    ) value.restore.pathOwnership
+                  )}
+                }
+
+                if [ "$custom_target" = true ]; then
+                  restore_snapshot
+                  restore_ownership
+                else
+                  read -p "Existing files are about to be replaced by the backup. Are you sure you want to continue? (y/N): " -n 1 -r
+                  if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
+                  echo
+                  ${optionalString value.restore.removeExisting (
+                    concatMapStringsSep ";" (
+                      path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}"
+                    ) value.paths
+                  )}
+                  echo "Running pre-restore script..."
+                  ${value.restore.preRestoreScript}
+                  restore_snapshot
+                  restore_ownership
+                  echo "Running post-restore script..."
+                  ${value.restore.postRestoreScript}
                 fi
-              '') self.nixosConfigurations.${hostname}.config.${ns}.services.restic.backups
-          )
-        ) (attrNames self.nixosConfigurations)}
-      '';
+              fi
+              fi
+            '') self.nixosConfigurations.${hostname}.config.${ns}.services.restic.backups
+        )
+      ) (attrNames self.nixosConfigurations)}
+    '';
   };
 in
 [

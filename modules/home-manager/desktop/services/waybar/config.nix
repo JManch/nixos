@@ -381,6 +381,7 @@ in
     socketListenerExtraLines = ''
       ${monitorNameToNumMap}
       declare -A monitor_last_workspace
+      declare -A waybar_schedule_monitor_unhide
     '';
 
     # Update bar auto toggle when active workspace changes
@@ -400,15 +401,22 @@ in
             # hide the bar
             systemctl kill --user --signal="SIGRTMIN+$(((0 << 3) | monitor_num ))" waybar
           else
-            # If the last workspace on this monitor was an auto hide
-            # workspace then we need to unhide the bar
+            # If the last workspace on this monitor was an auto hide workspace
             if [[ ${
               concatMapStringsSep " || " (
                 workspace: "$last_workspace_name == \"${workspace}\""
               ) cfg.autoHideWorkspaces
-            } ]]; then
-              # unhide the bar
-              systemctl kill --user --signal="SIGRTMIN+$(((1 << 3) | monitor_num ))" waybar
+            } ]] || [[ ''${waybar_schedule_monitor_unhide["$focused_monitor"]:-false} == "true" ]]; then
+              last_window=$(${hyprctl} workspaces -j | ${jaq} -r "first(.[] | select(.name == \"$workspace_name\") | .lastwindow)")
+              fullscreen=$(${hyprctl} clients -j | ${jaq} -r "first(.[] | select(.address == \"$last_window\") | .fullscreen)")
+              # if active workspace is not maximised fullscreen
+              if [[ $fullscreen != "2" ]]; then
+                # unhide the bar
+                systemctl kill --user --signal="SIGRTMIN+$(((1 << 3) | monitor_num ))" waybar
+                waybar_schedule_monitor_unhide["$focused_monitor"]=false
+              else
+                waybar_schedule_monitor_unhide["$focused_monitor"]=true
+              fi
             fi
           fi
         '';

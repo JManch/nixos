@@ -20,7 +20,7 @@
         type = "desktop";
         address = "192.168.88.254";
         altAddresses = [
-          "10.20.20.11" # wireless
+          "10.20.20.11" # wireless interface
         ];
         memory = 1024 * 64;
         hassIntegration.enable = true;
@@ -166,7 +166,7 @@
 
       wireguard.friends = {
         enable = true;
-        autoStart = false;
+        autoStart = true;
         address = "10.0.0.2";
         subnet = 24;
 

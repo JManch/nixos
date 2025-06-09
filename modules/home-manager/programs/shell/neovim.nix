@@ -105,7 +105,7 @@ in
       ''
         # Disables alacritty opacity when launching nvim
         nvim() {
-          if [ -z "$DISPLAY" ] || [ "$TERM" != "alacritty" ]; then
+          if [[ -z $DISPLAY && -z $WAYLAND_DISPLAY ]] || [[ $TERM != "alacritty" ]]; then
             command nvim "$@"
           else
             alacritty msg config window.opacity=1; command nvim "$@"; alacritty msg config --reset

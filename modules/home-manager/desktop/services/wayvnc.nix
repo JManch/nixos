@@ -38,7 +38,7 @@ in
     Unit = {
       Description = "noVNC Client Web Server";
       After = [ "wayvnc.service" ];
-      PartOf = [ "wayvnc.service" ];
+      BindsTo = [ "wayvnc.service" ];
     };
 
     Service = {

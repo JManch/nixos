@@ -356,6 +356,7 @@ in
       Description = "Hyprland Multiviewer F1 Tiler";
       After = [ "graphical-session.target" ];
       PartOf = [ "graphical-session.target" ];
+      Requisite = [ "graphical-session.target" ];
     };
 
     Service = {

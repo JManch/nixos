@@ -27,6 +27,7 @@ in
     systemd.packages = [ (flakePkgs args "hyprpolkitagent").default ];
     systemd.user.services.hyprpolkitagent = {
       path = mkForce [ ]; # reason explained in desktop/default.nix
+      requisite = [ "graphical-session.target" ];
       serviceConfig.Slice = "session${sliceSuffix config}.slice";
       wantedBy = [ "graphical-session.target" ];
     };

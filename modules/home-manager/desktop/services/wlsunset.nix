@@ -35,6 +35,7 @@ in
       Description = "Day/night gamma adjustments for Wayland compositors";
       PartOf = [ "graphical-session.target" ];
       After = [ "graphical-session.target" ];
+      Requisite = [ "graphical-session.target" ];
     };
 
     Service.Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";

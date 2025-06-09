@@ -186,7 +186,7 @@ in
       Unit = {
         Description = "Set the desktop wallpaper";
         X-SwitchMethod = "keep-old";
-        Requisite = [ cfg.wallpaperUnit ];
+        Requires = [ cfg.wallpaperUnit ];
         After =
           [ cfg.wallpaperUnit ]
           ++ optional cfg.randomise.enable "randomise-wallpaper.service"

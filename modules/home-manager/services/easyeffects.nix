@@ -18,7 +18,11 @@ in
   ];
 
   services.easyeffects.enable = true;
-  systemd.user.services.easyeffects.Install.WantedBy = mkForce [ ];
+
+  systemd.user.services.easyeffects = {
+    Unit.Requisite = [ "graphical-session.target" ];
+    Install.WantedBy = mkForce [ ];
+  };
 
   programs.waybar.settings.bar =
     let

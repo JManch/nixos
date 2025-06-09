@@ -230,8 +230,9 @@ in
           X-SwitchMethod = "keep-old";
           # We don't want graphical-session.target activation to be delayed
           # until this service is active.
-          After = "graphical-session.target";
-          PartOf = "graphical-session.target";
+          After = [ "graphical-session.target" ];
+          PartOf = [ "graphical-session.target" ];
+          Requisite = [ "graphical-session.target" ];
         };
 
         Service = {
@@ -260,10 +261,8 @@ in
           Description = "Firefox persist synchroniser";
           X-SwitchMethod = "keep-old";
           After = [ "firefox-persist-init.service" ];
-          Requisite = [
-            "firefox-persist-init.service"
-            "graphical-session.target"
-          ];
+          Requires = [ "firefox-persist-init.service" ];
+          Requisite = [ "graphical-session.target" ];
         };
 
         Service = {
@@ -282,14 +281,14 @@ in
         Unit = {
           Description = "Firefox persist synchroniser timer";
           X-SwitchMethod = "keep-old";
+          PartOf = [ "graphical-session.target" ];
         };
 
         Timer = {
-          Unit = "firefox-persist-sync.service";
           OnCalendar = "*:0/30";
         };
 
-        Install.WantedBy = [ "timers.target" ];
+        Install.WantedBy = [ "graphical-session.target" ];
       };
     };
 

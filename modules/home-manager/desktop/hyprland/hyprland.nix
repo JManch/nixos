@@ -429,6 +429,7 @@ in
       Description = "Hyprland socket listener";
       PartOf = [ "graphical-session.target" ];
       After = [ "graphical-session.target" ];
+      Requisite = [ "graphical-session.target" ];
     };
 
     Service = {

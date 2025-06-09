@@ -176,8 +176,12 @@ in
 
         setup-pipewire-devices = {
           description = "Setup Pipewire devices on login";
-          after = [ "wireplumber.service" ];
+          after = [
+            "wireplumber.service"
+            "graphical-session.target"
+          ];
           requires = [ "wireplumber.service" ];
+          partOf = [ "graphical-session.target" ];
           unitConfig.ConditionUser = "!@system";
           serviceConfig = {
             Type = "oneshot";
@@ -202,7 +206,7 @@ in
               ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ 1
             '';
           };
-          wantedBy = [ "default.target" ];
+          wantedBy = [ "graphical-session.target" ];
         };
       };
     };

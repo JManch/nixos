@@ -99,6 +99,7 @@ in
 
   systemd.user.services.dunst = {
     Unit.After = mkForce [ "graphical-session.target" ];
+    Unit.Requisite = [ "graphical-session.target" ];
     Service.Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";
   };
 

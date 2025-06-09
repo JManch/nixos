@@ -342,8 +342,12 @@ in
   };
 
   systemd.user.services.waybar = {
-    Unit.After = mkForce [ "graphical-session.target" ];
-    Unit.X-Restart-Triggers = mkForce [ ];
+    Unit = {
+      Requisite = [ "graphical-session.target" ];
+      After = mkForce [ "graphical-session.target" ];
+      X-Restart-Triggers = mkForce [ ];
+    };
+
     Service = {
       Slice = "app${sliceSuffix osConfig}.slice";
       ExecReload = mkForce [ ];

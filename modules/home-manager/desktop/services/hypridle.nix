@@ -83,7 +83,11 @@ in
   };
 
   systemd.user.services.hypridle = {
-    Unit.After = mkForce [ "graphical-session.target" ];
+    Unit = {
+      After = mkForce [ "graphical-session.target" ];
+      Requisite = [ "graphical-session.target" ];
+    };
+
     Service = {
       Type = "dbus";
       BusName = "org.freedesktop.ScreenSaver";

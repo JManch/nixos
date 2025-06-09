@@ -181,7 +181,11 @@ in
   };
 
   systemd.user.services.darkman = {
-    Unit.After = [ "graphical-session.target" ];
+    Unit = {
+      After = [ "graphical-session.target" ];
+      BindsTo = mkForce [ ];
+      Requisite = [ "graphical-session.target" ];
+    };
     Service.Slice = mkForce "background${sliceSuffix osConfig}.slice";
   };
 

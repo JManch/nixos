@@ -216,7 +216,10 @@ in
           device="$1"
           ${wpctl} set-mute "$device" toggle
           status=$(${wpctl} get-volume "$device")
-          message=$([[ "$status" == *MUTED* ]] && echo "Muted" || echo "Unmuted")
+          message=$([[ $status == *MUTED* ]] && echo "Muted" || echo "Unmuted")
+          if [[ $device == "@DEFAULT_AUDIO_SOURCE@" ]]; then
+            message="Microphone $message"
+          fi
           description=$(${wpctl} inspect "$device" | grep 'node\.description' | cut -d '"' -f 2)
           ${notifySend} -e -u critical -t 2000 \
             -h 'string:x-canonical-private-synchronous:pipewire-volume' "$description" "$message"

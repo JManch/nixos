@@ -306,6 +306,8 @@ in
           };
         };
       };
+
+    ns.persistenceHome.directories = [ ".local/state/wireplumber" ];
   }
 
   (mkIf raspberry-pi.enable {
@@ -323,7 +325,6 @@ in
 
     ns.persistenceHome.directories = [
       ".config/rncbc.org"
-      ".local/state/wireplumber"
       ".config/qpwgraph" # just for manually saved configs
     ];
   })

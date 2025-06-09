@@ -436,7 +436,7 @@ in
       Type = "exec";
       Slice = "background${sliceSuffix osConfig}.slice";
       Restart = "always";
-      RestartSec = 30;
+      RestartSec = 5;
       ExecStart = getExe (
         pkgs.writeShellApplication {
           name = "hypr-socket-listener";
@@ -453,7 +453,7 @@ in
                 event: # bash
                 ''
                   ${event}() {
-                    IFS=',' read -r -a args <<< "$1"
+                    mapfile -t -d ',' args <<< "$1,"
                     # Strip event<< from the first element
                     args[0]="''${args[0]#*>>}"
                     ${cfg.eventScripts.${event}}

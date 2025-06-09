@@ -61,13 +61,16 @@
         ext4.trim = true;
       };
 
-      keyd.rebinds = {
-        capslock = "layer(control)";
-        leftcontrol = "capslock";
-        leftmeta = "layer(alt)";
-        leftalt = "layer(meta)";
-        rightcontrol = "layer(altgr)";
-        rightalt = "rightmeta";
+      keyd = {
+        excludedDevices = [ "04fe:0021:532594f8" ]; # HHKB-Hybrid_2
+        rebinds = {
+          capslock = "layer(control)";
+          leftcontrol = "capslock";
+          leftmeta = "layer(alt)";
+          leftalt = "layer(meta)";
+          rightcontrol = "layer(altgr)";
+          rightalt = "rightmeta";
+        };
       };
     };
 

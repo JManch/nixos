@@ -21,15 +21,7 @@
   services.keyd = {
     enable = true;
     keyboards.main = {
-      ids =
-        [ "*" ]
-        ++ map (d: "-${d}") (
-          cfg.excludedDevices
-          ++ [
-            # always exclude hhkb
-            "04fe:0021:5b3ab73a"
-          ]
-        );
+      ids = [ "*" ] ++ map (d: "-${d}") cfg.excludedDevices;
       settings.main =
         # Be default keyd remaps all right keys to left keys. We use rightshift
         # for mangohud binds

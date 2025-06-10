@@ -14,9 +14,7 @@ let
     mkForce
     getExe
     mkAliasOptionModule
-    concatStringsSep
-    substring
-    stringLength
+    concatMapStringsSep
     hasAttr
     ;
   inherit (config.${ns}.core) home-manager;
@@ -28,45 +26,38 @@ let
   ephemeralFinder =
     let
       excludePaths = [
-        "tmp"
-        "root/.cache/nix"
-        "home/${username}/.mozilla"
-        "home/${username}/.cache/mozilla"
-        "home/${username}/.cache/mesa_shader_cache_db"
-        "home/${username}/.local/share/chatterino/Cache"
-        "home/${username}/.local/share/darkman/variants"
+        "/tmp"
+        "/root/.cache/nix"
+        "/home/${username}/.mozilla"
+        "/home/${username}/.cache"
+        "/home/${username}/.local/share/chatterino/Cache"
+        "/home/${username}/.local/share/darkman/variants"
       ];
     in
     pkgs.writeShellScriptBin "impermanence-ephemeral" ''
-      sudo ${fd} --one-file-system --strip-cwd-prefix --base-directory / --type file \
-        --hidden --exclude "{${concatStringsSep "," excludePaths}}" "''${@:1}"
+      sudo ${fd} --unrestricted --one-file-system --absolute-path --base-directory / --type file \
+        ${concatMapStringsSep " " (path: "--exclude \"${path}\"") excludePaths} "''${@:1}"
     '';
 
   # Prints all files and directories in the persistent file system that are not
   # defined as persistent in config
   bloatFinder =
     let
-      excludePaths = [
-        "var/nix-tmp"
-        "home/${username}/.mozilla"
-      ];
-
-      persistedFiles = map (
-        v: substring 1 (stringLength v.filePath) v.filePath
-      ) config.${ns}.persistence.files;
-      persistedDirs = map (
-        v: substring 1 (stringLength v.dirPath) v.dirPath
-      ) config.${ns}.persistence.directories;
+      excludePaths =
+        [
+          "/var/nix-tmp"
+          "/home/${username}/.mozilla"
+        ]
+        ++ map (p: p.filePath) config.${ns}.persistence.files
+        ++ map (p: p.dirPath) config.${ns}.persistence.directories;
     in
     pkgs.writeShellScriptBin "impermanence-bloat" ''
-      sudo ${fd} -au --base-directory /persist --type file --type symlink \
-        --exclude "/{${concatStringsSep "," (excludePaths ++ persistedFiles ++ persistedDirs)}}" \
-        "''${@:1}"
+      sudo ${fd} --unrestricted --absolute-path --base-directory /persist --type file --type symlink \
+        ${concatMapStringsSep " " (path: "--exclude \"${path}\"") excludePaths} "''${@:1}"
 
       # Another pass for empty dirs
-      sudo ${fd} -au --base-directory /persist --type empty --type dir \
-        --exclude "/{${concatStringsSep "," (excludePaths ++ persistedFiles ++ persistedDirs)}}" \
-        "''${@:1}"
+      sudo ${fd} --unrestricted --absolute-path --base-directory /persist --type empty --type dir \
+        ${concatMapStringsSep " " (path: "--exclude \"${path}\"") excludePaths} "''${@:1}"
     '';
 in
 [

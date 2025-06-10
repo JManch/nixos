@@ -119,7 +119,6 @@ in
   ns.desktop.darkman.switchScripts.neovim =
     theme: # bash
     ''
-      ${getExe' pkgs.coreutils "sleep"} 30
       ${getExe' pkgs.coreutils "ls"} "$XDG_RUNTIME_DIR"/nvim.*.0 | ${getExe' pkgs.findutils "xargs"} -I {} \
         ${getExe config.programs.neovim.package} --server {} --remote-expr "execute('Sunset${
           if theme == "dark" then "Night" else "Day"

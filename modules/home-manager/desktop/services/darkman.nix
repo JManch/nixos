@@ -15,6 +15,7 @@ let
     hiPrio
     mapAttrs'
     getExe
+    getExe'
     concatMapStringsSep
     singleton
     substring
@@ -166,6 +167,15 @@ in
 
   services.darkman = {
     enable = true;
+    # Patch prevents darkman running switch scripts for the start-up transition
+    # from null->dark as our applications are dark themed by default. Otherwise
+    # services such as waybar get an unnecessary restart when the graphical-session
+    # is started. Could potentially be solved by starting darkman before the
+    # graphical-session starts with WantedBy=default.target (which is what upstream
+    # does). The problem with this method is that switch scripts can trigger after
+    # the graphical-session has begun starting up if they take too long to run. I
+    # don't think there's a way to enforce strict ordering of graphical-session.target
+    # after darkman has finished running all initial switch scripts.
     package = addPatches pkgs.darkman [ "darkman-no-initial-switch.patch" ];
     darkModeScripts = mapAttrs (_: v: v "dark") cfg.switchScripts;
     lightModeScripts = mapAttrs (_: v: v "light") cfg.switchScripts;
@@ -380,7 +390,7 @@ in
   categoryConfig.darkman = {
     switchScripts = mapAttrs (_: switchConfig: theme: ''
       ${concatMapStringsSep "\n" (path: ''
-        cp "${dataHome}/darkman/variants/${path}.${theme}" "${dataHome}/darkman/variants/${path}"
+        ${getExe' pkgs.coreutils "cp"} "${dataHome}/darkman/variants/${path}.${theme}" "${dataHome}/darkman/variants/${path}"
       '') switchConfig.paths}
       ${switchConfig.reloadScript}
     '') cfg.switchApps;

@@ -407,7 +407,7 @@ in
       paths = [ ".config/hypr/hyprland.conf" ];
       # Only reload if gamemode is not active to avoid overriding
       # gamemode-specific hyprland settings
-      reloadScript = "${getExe' pkgs.gamemode "gamemoded"} --status | grep 'is active' -q || ${hyprctl} reload";
+      reloadScript = "${getExe' pkgs.gamemode "gamemoded"} --status | ${getExe pkgs.gnugrep} 'is active' -q || ${hyprctl} reload";
       colorOverrides = {
         base00 = mapDarkColor "base00";
         base01 = mapDarkColor "base01";

@@ -70,6 +70,7 @@ in
   ];
 
   ns.backups.navidrome = {
+    backend = "restic";
     paths = [ "/var/backup/navidrome" ];
     restore.pathOwnership."/var/backup/navidrome" = {
       user = "navidrome";

@@ -318,11 +318,12 @@ in
   services.postgresqlBackup.databases = [ "hass" ];
 
   ns.backups.hass = {
+    backend = "restic";
     paths = [
       "/var/lib/hass"
       "/var/backup/postgresql/hass.sql"
     ];
-    exclude = [ "*.log*" ];
+    backendOptions.exclude = [ "*.log*" ];
 
     restore =
       let

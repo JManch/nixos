@@ -28,8 +28,8 @@
   services.postgresqlBackup.databases = [ "atuin" ];
 
   ns.backups.atuin-server = {
+    backend = "restic";
     paths = [ "/var/backup/postgresql/atuin.sql" ];
-
     restore =
       let
         pg_restore = lib.getExe' config.services.postgresql.package "pg_restore";

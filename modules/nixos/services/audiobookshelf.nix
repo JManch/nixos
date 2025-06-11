@@ -44,6 +44,7 @@ in
   };
 
   ns.backups.audiobookshelf = {
+    backend = "restic";
     paths = [ "/var/lib/audiobookshelf/metadata/backups" ];
     restore.pathOwnership."/var/lib/audiobookshelf" = {
       user = "audiobookshelf";

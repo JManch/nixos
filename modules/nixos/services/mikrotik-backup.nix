@@ -41,8 +41,6 @@ let
   };
 in
 {
-  requirements = [ "services.restic" ];
-
   opts = with lib; {
     routerAddress = mkOption {
       type = types.str;
@@ -82,6 +80,7 @@ in
   ];
 
   ns.backups.mikrotik = {
+    backend = "restic";
     paths = [ backupDir ];
     restore.pathOwnership.${backupDir} = {
       user = "mikrotik-backup";

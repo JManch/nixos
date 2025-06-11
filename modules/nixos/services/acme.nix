@@ -13,6 +13,7 @@
   };
 
   ns.backups.acme = {
+    backend = "restic";
     paths = [ "/var/lib/acme" ];
     restore.pathOwnership."/var/lib/acme" = {
       user = "acme";

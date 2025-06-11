@@ -6,26 +6,23 @@
   config,
   inputs,
   hostname,
-  username,
+  categoryCfg,
 }:
 let
   inherit (lib)
     ns
     mkIf
     mkMerge
-    all
-    elem
-    hasPrefix
+    filterAttrs
     mapAttrs
     mapAttrsToList
+    flatten
     getExe
-    replaceStrings
     concatStrings
     concatStringsSep
     concatMapStrings
     concatMapStringsSep
     nameValuePair
-    optionalAttrs
     optionals
     optional
     mapAttrs'
@@ -35,33 +32,26 @@ let
     mkBefore
     mkAfter
     optionalString
-    singleton
     mkOption
     mkEnableOption
-    mkAliasOptionModule
     types
     ;
-  inherit (lib.${ns}) upperFirstChar;
-  inherit (config.${ns}.services) caddy;
-  inherit (config.${ns}.core) home-manager;
-  inherit (config.${ns}.system) impermanence virtualisation;
-  inherit (caddy) trustedAddresses;
-  inherit (cfg) backups;
+  inherit (config.${ns}.system) virtualisation;
+  inherit (config.${ns}.services.caddy) trustedAddresses;
   inherit (config.age.secrets)
     resticPasswordFile
     resticHtPasswordsFile
     resticRepositoryFile
     resticReadWriteBackblazeVars
     resticReadOnlyBackblazeVars
-    notifVars
     healthCheckResticRemoteCopy
     ;
+  backups = filterAttrs (_: backup: backup.backend == "restic") categoryCfg.backups;
   resticExe = getExe pkgs.restic;
-  homeBackups = optionalAttrs home-manager.enable config.${ns}.hmNs.backups;
   vmInstall = inputs.vmInstall.value;
 
   backupTimerConfig = {
-    OnCalendar = cfg.backupSchedule;
+    OnCalendar = cfg.schedule;
     Persistent = true;
   };
 
@@ -72,30 +62,9 @@ let
     "--keep-yearly 3"
   ];
 
-  failureNotifService = name: title: message: {
-    ${name} = {
-      restartIfChanged = false;
-      serviceConfig = {
-        Type = "oneshot";
-        EnvironmentFile = notifVars.path;
-        ExecStart =
-          let
-            shoutrrr = getExe pkgs.shoutrrr;
-          in
-          pkgs.writeShellScript "${name}" ''
-            ${shoutrrr} send \
-              --url "discord://$RESTIC_DISCORD_AUTH" \
-              --title "${title}" \
-              --message "${message} failed on host ${hostname}"
-
-            ${shoutrrr} send \
-              --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${
-                replaceStrings [ " " ] [ "%20" ] title
-              }" \
-              --message "${name} failed on ${hostname}"
-          '';
-      };
-    };
+  failureCfg = {
+    discord.enable = true;
+    discord.var = "RESTIC";
   };
 
   restoreScript = pkgs.writeShellApplication {
@@ -226,7 +195,7 @@ let
                 fi
               fi
               fi
-            '') self.nixosConfigurations.${hostname}.config.${ns}.services.restic.backups
+            '') self.nixosConfigurations.${hostname}.config.${ns}.services.backups.backups
         )
       ) (attrNames self.nixosConfigurations)}
     '';
@@ -236,131 +205,61 @@ in
   {
     guardType = "custom";
 
-    imports = singleton (
-      mkAliasOptionModule
-        [ ns "backups" ]
-        [
-          ns
-          "services"
-          "restic"
-          "backups"
-        ]
-    );
+    ns.services.backups.backends.restic = args: {
+      # WARN: Exclude and include paths are not prefixed with persistence
+      # to allow non-absolute patterns, be careful with those
+
+      # Attributes get passed through to the upstream restic backup
+      # module
+
+      # Does not support merging of options that are not explicitly defined but
+      # will at least complain if there are conflicts
+      freeformType = with types; attrsOf anything;
+
+      options = {
+        # We have to define this option ourselves to ensure the backup's
+        # `extraBackupArgs` get merged with out defaults
+        extraBackupArgs = mkOption {
+          type = with types; listOf str;
+          default = [ ];
+        };
+
+      };
+
+      # Backup defaults
+      config = {
+        # We use our own initialization script because upstream uses `restic
+        # cat` without `--no-lock`
+        initialize = false;
+        createWrapper = false;
+        repositoryFile = resticRepositoryFile.path;
+        passwordFile = resticPasswordFile.path;
+        timerConfig = backupTimerConfig;
+        extraBackupArgs = [
+          # Disable cache because we don't persist cache directories
+          "--no-cache"
+          "--no-scan"
+          "--tag ${args.backupName}"
+        ];
+      };
+    };
 
     opts = {
       runMaintenance = mkEnableOption "repo maintenance after performing backups" // {
-        default = true;
+        default = cfg.server.enable;
       };
 
-      backups = mkOption {
-        type = types.attrsOf (
-          types.submodule {
-            freeformType = types.attrsOf types.anything;
-            options = {
-              preBackupScript = mkOption {
-                type = types.lines;
-                default = "";
-                description = "Script to run before backing up";
-              };
-
-              postBackupScript = mkOption {
-                type = types.lines;
-                default = "";
-                description = "Script to run after backing up";
-              };
-
-              restore = {
-                pathOwnership = mkOption {
-                  type = types.attrsOf (
-                    types.submodule {
-                      options = {
-                        user = mkOption {
-                          type = types.nullOr types.str;
-                          default = null;
-                          description = ''
-                            User to set restored files to. If null, user will not
-                            be changed. Useful for modules that do not have static
-                            IDs https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/misc/ids.nix.
-                          '';
-                        };
-
-                        group = mkOption {
-                          type = types.nullOr types.str;
-                          default = null;
-                          description = ''
-                            Group to set restored files to. If null, group will not
-                            be changed.
-                          '';
-                        };
-                      };
-                    }
-                  );
-                  default = { };
-                  description = ''
-                    Attribute for assigning ownership user and group for each
-                    backup path.
-                  '';
-                };
-
-                removeExisting = mkOption {
-                  type = types.bool;
-                  default = true;
-                  description = ''
-                    Whether to delete all files and directories in the backup
-                    paths before restoring backup.
-                  '';
-                };
-
-                preRestoreScript = mkOption {
-                  type = types.lines;
-                  default = "";
-                  description = "Script to run before restoring the backup";
-                };
-
-                postRestoreScript = mkOption {
-                  type = types.lines;
-                  default = "";
-                  description = "Script to run after restoring the backup";
-                };
-              };
-
-            };
-          }
-        );
-        default = { };
-        apply =
-          # Modify the backup paths and ownership paths to include persistence
-          # path if impermanence is enabled and merge with home manager backups
-
-          # WARN: Exclude and include paths are not prefixed with persistence
-          # to allow non-absolute patterns, be careful with those
-          backups:
-          mapAttrs (
-            name: value:
-            value
-            // {
-              paths = map (path: "${optionalString impermanence.enable "/persist"}${path}") value.paths;
-              restore = value.restore // {
-                pathOwnership = mapAttrs' (
-                  path: value: nameValuePair "${optionalString impermanence.enable "/persist"}${path}" value
-                ) value.restore.pathOwnership;
-              };
-            }
-          ) (backups // homeBackups);
-        description = ''
-          Attribute set of Restic backups matching the upstream module backups
-          options.
-        '';
-      };
-
-      backupSchedule = mkOption {
+      schedule = mkOption {
         type = types.str;
         default = "*-*-* 05:30:00";
-        description = "Backup service default OnCalendar schedule";
+        description = "When to run backups in systemd OnCalendar format";
       };
 
       server = {
-        enable = mkEnableOption "Restic REST server";
+        enable = mkEnableOption ''
+          storing the Restic repository and serving it through a REST server on
+          this host
+        '';
 
         dataDir = mkOption {
           type = types.str;
@@ -389,7 +288,7 @@ in
     };
   }
 
-  # To allow testing backup restores in the VM
+  # To allow testing backup restores in a VM
   (mkIf (cfg.enable || cfg.server.enable || (cfg.enable && virtualisation.vmVariant)) {
     ns.adminPackages = [
       pkgs.restic
@@ -397,22 +296,19 @@ in
     ];
 
     # WARN: Always interact with the repository using the REST server, even on
-    # the same machine. It ensures correct repo file ownership.
+    # the same host. It ensures correct repo file ownership.
     programs.zsh.shellAliases =
-      let
-        systemctl = getExe' pkgs.systemd "systemctl";
-      in
       {
         restic = "sudo restic --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
         restic-snapshots = "sudo restic snapshots --no-cache --compact --group-by tags --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
         restic-restore-size = "sudo restic stats --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
         restic-repo-size = "sudo restic stats --no-cache --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
         backup-all = concatStringsSep ";" (
-          mapAttrsToList (name: _: "sudo ${systemctl} start restic-backups-${name}") backups
+          mapAttrsToList (name: _: "sudo systemctl start restic-backups-${name}") backups
         );
       }
       // (mapAttrs' (
-        name: _: nameValuePair "backup-${name}" "sudo ${systemctl} start restic-backups-${name}"
+        name: _: nameValuePair "backup-${name}" "sudo systemctl start restic-backups-${name}"
       ) backups);
 
     # Backblaze bucket setup:
@@ -432,56 +328,26 @@ in
   })
 
   (mkIf (cfg.enable && !virtualisation.vmVariant && !vmInstall) {
-    asserts = [
-      (all (v: v == true) (
-        mapAttrsToList (
-          _: backup:
-          all (v: v == true) (
-            map (path: (elem path backup.paths) || (all (p: hasPrefix path p) backup.paths)) (
-              attrNames backup.restore.pathOwnership
-            )
-          )
-        ) backups
-      ))
-      "Restic pathOwnership paths must be a part of the backup paths"
-      (all (v: v == true) (
-        mapAttrsToList (_: backup: all (v: v == true) (map (path: path != "") backup.paths)) cfg.backups
-      ))
-      "Restic backup paths cannot be empty"
-      (all (v: v == true) (
-        mapAttrsToList (
-          _: backup: all (v: v == true) (map (path: path != "/home/${username}/") backup.paths)
-        ) homeBackups
-      ))
-      "Restic home backup paths cannot be empty"
-    ];
+    asserts = flatten (
+      mapAttrsToList (name: backup: [
+        (!backup.backendOptions ? backupPrepareCommand && !backup.backendOptions ? backupCleanupCommand)
+        "Restic backup ${name} uses `backendOption` '{backupPrepare,backupCleanup}Command', use '{pre,post}BackupScript' instead"
+        (!backup.backendOptions ? paths)
+        "Restic backup ${name} uses unsupported `backendOption` 'paths'"
+      ]) backups
+    );
 
-    services.restic.backups =
-      let
-        backupDefaults = name: {
-          # We use our own initialization script because upstream uses `restic
-          # cat` without `--no-lock`
-          initialize = false;
-          repositoryFile = resticRepositoryFile.path;
-          passwordFile = resticPasswordFile.path;
-          timerConfig = backupTimerConfig;
-          extraBackupArgs = [
-            # Disable cache because we don't persist cache directories
-            "--no-cache"
-            "--no-scan"
-            "--tag ${name}"
-          ];
-        };
-      in
-      mapAttrs (
-        name: value:
-        (backupDefaults name)
-        // (removeAttrs value [
-          "restore"
-          "preBackupScript"
-          "postBackupScript"
-        ])
-      ) backups;
+    ns.services.failureNotifyServices = {
+      restic-repo-maintenance = mkIf cfg.runMaintenance failureCfg;
+    } // mapAttrs' (name: value: nameValuePair "restic-backups-${name}" failureCfg) backups;
+
+    services.restic.backups = mapAttrs (
+      name: value:
+      value.backendOptions
+      // {
+        inherit (value) paths;
+      }
+    ) backups;
 
     systemd.services = mkMerge (
       [
@@ -492,7 +358,6 @@ in
             after = optional cfg.server.enable "caddy.service";
             requires = optional cfg.server.enable "caddy.service";
             environment.RESTIC_CACHE_DIR = mkForce "";
-            onFailure = [ "restic-backups-${name}-failure-notif.service" ];
 
             preStart = mkBefore ''
               ${value.preBackupScript}
@@ -505,17 +370,6 @@ in
 
             serviceConfig.CacheDirectory = mkForce "";
           }
-        ) backups)
-        (mapAttrs' (
-          name: value:
-          let
-            failureServiceName = "restic-backups-${name}-failure-notif";
-            capitalisedNamed = upperFirstChar name;
-            service =
-              failureNotifService failureServiceName "Restic Backup ${capitalisedNamed} Failed"
-                "${capitalisedNamed} backup";
-          in
-          nameValuePair failureServiceName service.${failureServiceName}
         ) backups)
       ]
       ++ optionals cfg.runMaintenance [
@@ -549,9 +403,6 @@ in
             };
           };
         }
-        (failureNotifService "restic-repo-maintenance-failure-notif" "Restic Repo Maintenance Failed"
-          "Repo maintenance"
-        )
       ]
     );
 
@@ -580,6 +431,11 @@ in
     ];
 
     # Use `htpasswd -B -c .htpasswd username` to generate login credentials for hosts
+
+    ns.services.failureNotifyServices = {
+      restic-remote-copy = failureCfg;
+      restic-remote-maintenance = failureCfg;
+    };
 
     services.restic.server = {
       enable = true;
@@ -675,10 +531,6 @@ in
           };
         };
       }
-      (failureNotifService "restic-remote-copy-failure-notif" "Restic Remote Copy Failed" "Remote copy")
-      (failureNotifService "restic-remote-maintenance-failure-notif" "Restic Remote Maintenance Failed"
-        "Remote maintenance"
-      )
     ];
 
     systemd.timers = {

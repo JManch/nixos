@@ -154,9 +154,9 @@
         mediaDirs.shows = "/home/${username}/videos/shows";
       };
 
-      restic = {
+      backups.restic = {
         enable = true;
-        backupSchedule = "*-*-* 15:00:00";
+        schedule = "*-*-* 15:00:00";
       };
 
       wgnord = {

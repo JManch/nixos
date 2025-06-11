@@ -58,6 +58,7 @@
         git.enable = true;
         neovim.enable = true;
         fastfetch.enable = true;
+        taskwarrior.enable = true;
       };
 
       desktop = {

@@ -63,8 +63,11 @@ in
     };
 
     services = {
-      restic.enable = true;
-      restic.backupSchedule = "*-*-* 03:00:00";
+      backups.restic = {
+        enable = true;
+        schedule = "*-*-* 03:00:00";
+      };
+
       zigbee2mqtt = {
         enable = false;
         address = "0.0.0.0";

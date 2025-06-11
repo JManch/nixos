@@ -130,6 +130,8 @@ in
     ];
 
     ns.backups.scrutiny = {
+      backend = "restic";
+
       paths = [
         # Contains the sqlite DB
         "/var/lib/scrutiny"

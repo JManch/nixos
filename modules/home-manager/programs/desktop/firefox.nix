@@ -305,8 +305,9 @@ in
   };
 
   ns.backups.firefox = mkIf cfg.backup {
+    backend = "restic";
     paths = [ ".mozilla" ];
-    exclude = [ ".cache" ];
+    backendOptions.exclude = [ ".cache" ];
     restore = mkIf cfg.runInRam {
       preRestoreScript = "systemctl stop --user firefox-persist-init";
       postRestoreScript = "systemctl start --user firefox-persist-init";

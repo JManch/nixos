@@ -70,6 +70,8 @@ in
   networking.firewall.allowedTCPPorts = [ 9090 ];
 
   ns.backups.calibre = {
+    backend = "restic";
+
     paths = [
       "/var/lib/calibre-web"
       "/var/lib/calibre-library"

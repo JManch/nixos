@@ -445,8 +445,10 @@ in
       };
     in
     {
+      backend = "restic";
       paths = [ "/var/lib/minecraft" ];
-      exclude = [
+
+      backendOptions.exclude = [
         "cache"
         ".cache"
       ];

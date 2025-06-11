@@ -31,6 +31,7 @@ let
   vpnNamespaceAddress = config.vpnNamespaces.${device.vpnNamespace}.namespaceAddress;
 
   mkArrBackup = service: {
+    backend = "restic";
     paths = [ "/var/lib/${service}/Backups" ];
     restore = {
       preRestoreScript = "sudo systemctl stop ${service}";
@@ -220,8 +221,9 @@ in
     ns.backups = {
       prowlarr = mkArrBackup "prowlarr";
       qbittorrent-nox = {
+        backend = "restic";
         paths = [ "/var/lib/qbittorrent-nox/qBittorrent/config" ];
-        exclude = [
+        backendOptions.exclude = [
           "ipc-socket"
           "lockfile"
           "*.lock"
@@ -652,8 +654,10 @@ in
       "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.slskd}";
 
     ns.backups.slskd = {
+      backend = "restic";
       paths = [ "/var/lib/slskd/data" ];
-      exclude = [
+
+      backendOptions.exclude = [
         "search*"
         "shares*"
         "*.cache"

@@ -63,6 +63,7 @@ in
   };
 
   ns.backups.factorio-server = {
+    backend = "restic";
     paths = [ "/var/lib/private/factorio-server" ];
     restore.pathOwnership = {
       "/var/lib/private/factorio-server" = {

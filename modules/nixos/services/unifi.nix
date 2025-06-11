@@ -56,6 +56,7 @@
 
   # WARN: Auto-backups have to be configured in the UI
   ns.backups.unifi = {
+    backend = "restic";
     paths = [ "/var/lib/unifi/data/backup/autobackup" ];
     restore.pathOwnership."/var/lib/unifi" = {
       user = "unifi";

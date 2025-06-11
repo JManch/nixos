@@ -84,9 +84,9 @@
     services = {
       scrutiny.collector.enable = true;
 
-      restic = {
+      backups.restic = {
         enable = true;
-        backupSchedule = "*-*-* 14:00:00";
+        schedule = "*-*-* 14:00:00";
         runMaintenance = false;
       };
     };

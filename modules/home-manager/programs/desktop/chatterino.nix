@@ -74,7 +74,11 @@ in
     '';
   };
 
-  ns.backups.chatterino.paths = [ ".local/share/chatterino/Settings" ];
+  ns.backups.chatterino = {
+    backend = "restic";
+    paths = [ ".local/share/chatterino/Settings" ];
+  };
+
   ns.persistence.directories = [ ".local/share/chatterino/Settings" ];
 
   programs.waybar.settings.bar = mkIf (lib.${ns}.isHyprland config) {

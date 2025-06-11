@@ -182,8 +182,9 @@ in
     # Jellyfin module has good default hardening
 
     ns.backups.jellyfin = mkIf cfg.backup {
+      backend = "restic";
       paths = [ "/var/lib/jellyfin" ];
-      exclude = [
+      backendOptions.exclude = [
         "transcodes"
         "media"
         "log"

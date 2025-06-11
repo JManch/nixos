@@ -134,8 +134,10 @@ in
     networking.firewall.allowedTCPPorts = optional (!cfg.proxy.enable) cfg.port;
 
     ns.backups.zigbee2mqtt = {
+      backend = "restic";
       paths = [ dataDir ];
-      exclude = [ "log" ];
+      backendOptions.exclude = [ "log" ];
+      backendOptions.extraBackupArgs = [ "test" ];
       restore.pathOwnership.${dataDir} = {
         user = "zigbee2mqtt";
         group = "zigbee2mqtt";

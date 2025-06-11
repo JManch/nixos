@@ -32,6 +32,7 @@ in
   '';
 
   ns.backups.taskchampion-server = {
+    backend = "restic";
     paths = [ "/var/lib/taskchampion-sync-server" ];
     restore.pathOwnership."/var/lib/taskchampion-sync-server" = {
       user = "taskchampion";

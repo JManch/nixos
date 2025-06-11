@@ -19,7 +19,7 @@ let
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets)
     notifVars
-    rcloneConfig
+    protonRcloneConfig
     vaultwardenVars
     vaultwardenSMTPVars
     vaultwardenPublicBackupKey
@@ -253,11 +253,11 @@ in
             # have to maintain a writeable copy of the config. When we detect
             # that the agenix config has been changed we replace it.
             state_dir="/var/lib/vaultwarden-cloud-backup"
-            if ! cmp -s "$state_dir/rcloneConfigOriginal" "${rcloneConfig.path}"; then
+            if ! cmp -s "$state_dir/rcloneConfigOriginal" "${protonRcloneConfig.path}"; then
               # If they have changed replace the writeable config with the agenix one
-              install -m660 "${rcloneConfig.path}" "$state_dir/rcloneConfig"
+              install -m660 "${protonRcloneConfig.path}" "$state_dir/rcloneConfig"
             fi
-            install -m660 "${rcloneConfig.path}" "$state_dir/rcloneConfigOriginal"
+            install -m660 "${protonRcloneConfig.path}" "$state_dir/rcloneConfigOriginal"
 
             rclone --config "$state_dir/rcloneConfig" copy . remote:backups/vaultwarden
 
@@ -317,6 +317,7 @@ in
   };
 
   ns.backups.vaultwarden = {
+    backend = "restic";
     paths = [ "/var/backup/vaultwarden-archive" ];
     restore.pathOwnership = {
       "/var/backup/vaultwarden-archive" = {

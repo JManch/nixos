@@ -42,7 +42,7 @@ in
       files = mkIf cfg.backupFiles {
         paths = [ "files" ];
         restore.removeExisting = false;
-        exclude =
+        backendOptions.exclude =
           let
             absPath = "${optionalString (impermanence.enable or false) "/persist"}${config.home.homeDirectory}";
           in

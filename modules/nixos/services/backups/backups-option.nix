@@ -1,23 +1,40 @@
-{ lib, config }:
+lib: cfg:
 let
   inherit (lib)
     mkOption
     types
-    mapAttrs'
-    nameValuePair
+    attrNames
     ;
-  inherit (config.home) homeDirectory;
 in
-{
-  enableOpt = false;
-  nsOpts.backups = mkOption {
-    type = types.attrsOf (
-      types.submodule {
-        freeformType = types.attrsOf types.anything;
+mkOption {
+  type = types.attrsOf (
+    types.submodule (
+      { name, config, ... }@args:
+      {
         options = {
+          backend = mkOption {
+            type = types.enum (attrNames cfg.backends);
+            description = "The backup backend to use";
+          };
+
           paths = mkOption {
             type = types.listOf types.str;
             default = [ ];
+            description = "Paths to backup";
+          };
+
+          backendOptions = mkOption {
+            type =
+              let
+                backupConfig = config;
+                backupName = name;
+              in
+              types.submodule (
+                { config, ... }@args':
+                cfg.backends.${args.config.backend} (args' // { inherit backupConfig backupName; })
+              );
+            default = { };
+            description = "Backend options";
           };
 
           preBackupScript = mkOption {
@@ -69,8 +86,8 @@ in
               type = types.bool;
               default = true;
               description = ''
-                Whether to delete all files and directories in the backup paths
-                before restoring backup.
+                Whether to delete all files and directories in the backup
+                paths before restoring backup.
               '';
             };
 
@@ -88,19 +105,7 @@ in
           };
         };
       }
-    );
-    default = { };
-    apply =
-      v:
-      mapAttrs' (
-        name: value:
-        nameValuePair "home-${name}" (
-          value // { paths = map (path: "${homeDirectory}/${path}") value.paths; }
-        )
-      ) v;
-    description = ''
-      Attribute set of Restic backups matching the upstream module backups
-      options.
-    '';
-  };
+    )
+  );
+  default = { };
 }

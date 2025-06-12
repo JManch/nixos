@@ -15,7 +15,6 @@ in
   app2unit = callPackage ./app2unit.nix args;
   xdg-terminal-exec = callPackage ./xdg-terminal-exec.nix args;
   jellyfin-plugin-listenbrainz = callPackage ./jellyfin-plugin-listenbrainz args;
-  filen-cli = callPackage ./filen-cli.nix args;
   filen-rclone = callPackage ./filen-rclone.nix args;
   frigate-blueprint = callPackage ./frigate-blueprint.nix args;
   thermal-comfort = pkgs.home-assistant.python.pkgs.callPackage ./thermal-comfort.nix args;
@@ -28,7 +27,6 @@ in
   # Manual
   advanced-camera-card = callPackage ./advanced-camera-card.nix { };
   multiviewer-for-f1 = callPackage ./multiviewer-for-f1.nix { };
-  filen-desktop = callPackage ./filen-desktop.nix args;
 
   # Other
   bootstrap-kit = callPackage ./bootstrap-kit.nix { inherit (self.inputs) nix-resources; };

@@ -1,6 +1,6 @@
-{ selfPkgs }:
+{ pkgs }:
 {
-  home.packages = [ selfPkgs.filen-desktop ];
+  home.packages = [ pkgs.filen-desktop ];
 
   ns.desktop.hyprland.settings.windowrule = [
     "nomaxsize, class:^(filen-desktop)$"

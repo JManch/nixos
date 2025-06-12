@@ -2,7 +2,6 @@
   lib,
   config,
   inputs,
-  selfPkgs,
   ...
 }:
 let
@@ -22,8 +21,6 @@ in
   ];
 
   ${ns} = {
-    adminPackages = [ selfPkgs.filen-cli ];
-
     core = {
       home-manager.enable = true;
 

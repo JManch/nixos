@@ -147,38 +147,6 @@
       "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/v4.2.8",
       "hash": "0ka8kzfj8g4gmwkymxvmz6pwaajqzrrhl5bvhs2xvzh47908jcx3"
     },
-    "filen-cli": {
-      "type": "GitRelease",
-      "repository": {
-        "type": "GitHub",
-        "owner": "FilenCloudDienste",
-        "repo": "filen-cli"
-      },
-      "pre_releases": false,
-      "version_upper_bound": null,
-      "release_prefix": null,
-      "submodules": false,
-      "version": "v0.0.34",
-      "revision": "a59d9c424e3cf98f622591b03b51c60c753b10f2",
-      "url": "https://api.github.com/repos/FilenCloudDienste/filen-cli/tarball/v0.0.34",
-      "hash": "0821x9sk4d30n6y401fyl4p4mc46hz526z98a2b1dwi483s9d148"
-    },
-    "filen-desktop": {
-      "type": "GitRelease",
-      "repository": {
-        "type": "GitHub",
-        "owner": "FilenCloudDienste",
-        "repo": "filen-desktop"
-      },
-      "pre_releases": false,
-      "version_upper_bound": null,
-      "release_prefix": null,
-      "submodules": false,
-      "version": "v3.0.47",
-      "revision": "e2ec0fdfce7a25a1f3ba98eea255f88e8f061b28",
-      "url": "https://api.github.com/repos/FilenCloudDienste/filen-desktop/tarball/v3.0.47",
-      "hash": "1zf5z9hxq9k2qs8pjiacdqkiqax6ljr2wziixdnipcfz9al4jbsr"
-    },
     "filen-rclone": {
       "type": "Git",
       "repository": {

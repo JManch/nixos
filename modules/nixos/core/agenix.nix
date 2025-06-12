@@ -53,7 +53,7 @@ let
 
       ${setup}
 
-      eval agenix -e "$1" "$keys"
+      eval agenix -e "$1" "$keys" < /dev/stdin
       chown 1000:100 ./*
     '';
   };

@@ -653,23 +653,36 @@ in
     ns.services.caddy.virtualHosts.slskd.extraConfig =
       "reverse_proxy http://${vpnNamespaceAddress}:${toString ports.slskd}";
 
-    ns.backups.slskd = {
-      backend = "restic";
-      paths = [ "/var/lib/slskd/data" ];
+    ns.backups = {
+      music = {
+        backend = "rclone";
+        paths = [ "/media/music" ];
+        backendOptions = {
+          remote = "filen";
+          mode = "sync";
+          remotePaths."/media/music" = "music";
+          flags = [ "--bwlimit 5M" ];
+        };
+      };
 
-      backendOptions.exclude = [
-        "search*"
-        "shares*"
-        "*.cache"
-        "events.db"
-      ];
+      slskd = {
+        backend = "restic";
+        paths = [ "/var/lib/slskd/data" ];
 
-      restore = {
-        removeExisting = false;
-        preRestoreScript = "sudo systemctl stop slskd";
-        pathOwnership."/var/lib/slskd" = {
-          user = "slskd";
-          group = "slskd";
+        backendOptions.exclude = [
+          "search*"
+          "shares*"
+          "*.cache"
+          "events.db"
+        ];
+
+        restore = {
+          removeExisting = false;
+          preRestoreScript = "sudo systemctl stop slskd";
+          pathOwnership."/var/lib/slskd" = {
+            user = "slskd";
+            group = "slskd";
+          };
         };
       };
     };

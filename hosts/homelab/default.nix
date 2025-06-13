@@ -177,13 +177,16 @@ in
         supportedMachines = [ "ncase-m1.lan" ];
       };
 
-      backups.restic = {
-        enable = true;
-        schedule = "*-*-* 05:00:00";
-        server = {
+      backups = {
+        rclone.enable = true;
+        restic = {
           enable = true;
-          remoteCopySchedule = "*-*-* 05:30:00";
-          remoteMaintenanceSchedule = "Sun *-*-* 06:00:00";
+          schedule = "*-*-* 05:00:00";
+          server = {
+            enable = true;
+            remoteCopySchedule = "*-*-* 05:30:00";
+            remoteMaintenanceSchedule = "Sun *-*-* 06:00:00";
+          };
         };
       };
 

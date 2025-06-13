@@ -113,6 +113,7 @@
       WIFI_PWR_ON_BAT = "off"; # attempt to improve poor wifi performance
 
       # Platform (affects TDP apparently)
+      # https://www.phoronix.com/review/framework-13-ryzen-ai-power
       PLATFORM_PROFILE_ON_AC = "performance";
       PLATFORM_PROFILE_ON_BAT = "low-power"; # consider balanced
 

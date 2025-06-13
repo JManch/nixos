@@ -39,7 +39,9 @@ let
         keys+=" -i $file"
       done
 
-      export EDITOR=nano
+      if [[ $EDITOR != "cp /dev/stdin" ]]; then
+        export EDITOR=nano
+      fi
     '';
 
   editSecretScript = pkgs.writeShellApplication {

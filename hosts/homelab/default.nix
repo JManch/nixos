@@ -178,7 +178,15 @@ in
       };
 
       backups = {
-        rclone.enable = true;
+        rclone = {
+          enable = true;
+
+          timerConfig = {
+            OnCalendar = "*-*-* 13:00:00";
+            Persistent = true;
+          };
+        };
+
         restic = {
           enable = true;
 

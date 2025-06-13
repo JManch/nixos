@@ -33,13 +33,27 @@ mkOption {
           paths = mkOption {
             type = types.listOf types.str;
             default = [ ];
-            apply = map (
-              path:
-              optionalString impermanence.enable "/persist"
-              + optionalString isHome "${args.config.home.homeDirectory}/"
-              + path
-            );
+            apply =
+              if args'.config.doNotModifyPaths then
+                v: v
+              else
+                map (
+                  path:
+                  optionalString impermanence.enable "/persist"
+                  + optionalString isHome "${args.config.home.homeDirectory}/"
+                  + path
+                );
             description = "Paths to backup";
+          };
+
+          doNotModifyPaths = mkOption {
+            type = types.bool;
+            default = false;
+            description = ''
+              By default, paths are prefixed with /persist if impermanence is enabled or with
+              the user's home dir if the backup is defined in home-manager. Enable this
+              option to false to disable this behaviour.
+            '';
           };
 
           notifications = {
@@ -159,7 +173,7 @@ mkOption {
               );
               default = { };
               apply =
-                if !isHome then
+                if !isHome && !args'.config.doNotModifyPaths then
                   mapAttrs' (name: value: nameValuePair (optionalString impermanence.enable "/persist" + name) value)
                 else
                   value: value;

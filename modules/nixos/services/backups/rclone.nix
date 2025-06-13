@@ -178,7 +178,6 @@ in
           # Writeable config is stored in cache directory
           CacheDirectory = "rclone-backups-${name}";
           CacheDirectoryMode = "0700";
-          PrivateTmp = true;
           TimeoutStartSec = mkIf (backup.backendOptions.timeout != null) backup.backendOptions.timeout;
         };
       }
@@ -208,16 +207,19 @@ in
 
         remotePaths = mkOption {
           type = with types; attrsOf str;
-          # default = genAttrs backups.${args.backupName}.paths (path: path);
           default = genAttrs args.backupConfig.paths (path: path);
-          apply = mapAttrs' (
-            name: value:
-            nameValuePair (
-              optionalString impermanence.enable "/persist"
-              + optionalString args.backupConfig.isHome "/home/${username}/"
-              + name
-            ) value
-          );
+          apply =
+            if args.backupConfig.doNotModifyPaths then
+              v: v
+            else
+              mapAttrs' (
+                name: value:
+                nameValuePair (
+                  optionalString impermanence.enable "/persist"
+                  + optionalString args.backupConfig.isHome "/home/${username}/"
+                  + name
+                ) value
+              );
           description = ''
             Attribute set of paths and their remote backup paths relative to the
             remote's `destinationRoot`. If defined, the remote path of every

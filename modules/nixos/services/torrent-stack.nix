@@ -660,7 +660,7 @@ in
 
         timerConfig = {
           OnCalendar = "Sun *-*-* 8:00:00";
-          persistent = false;
+          Persistent = false;
         };
 
         backendOptions = {

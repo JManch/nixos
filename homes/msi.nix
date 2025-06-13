@@ -31,7 +31,10 @@
       };
     };
 
-    backups.documents.paths = [ "Documents" ];
+    backups.documents = {
+      backend = "restic";
+      paths = [ "Documents" ];
+    };
   };
 
   home.stateVersion = "24.05";

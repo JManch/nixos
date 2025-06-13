@@ -1,17 +1,30 @@
-lib: cfg:
+args: cfg: isHome:
 let
-  inherit (lib)
+  inherit (args.lib)
+    ns
     mkOption
     types
+    mkEnableOption
+    nameValuePair
+    optionalString
+    mapAttrs'
     attrNames
     ;
+  impermanence = args.${if isHome then "osConfig" else "config"}.${ns}.system.impermanence;
 in
 mkOption {
   type = types.attrsOf (
     types.submodule (
-      { name, config, ... }@args:
+      { name, config, ... }@args':
       {
         options = {
+          isHome = mkOption {
+            type = types.bool;
+            internal = true;
+            readOnly = true;
+            default = isHome;
+          };
+
           backend = mkOption {
             type = types.enum (attrNames cfg.backends);
             description = "The backup backend to use";
@@ -20,7 +33,76 @@ mkOption {
           paths = mkOption {
             type = types.listOf types.str;
             default = [ ];
+            apply = map (
+              path:
+              optionalString impermanence.enable "/persist"
+              + optionalString isHome "${args.config.home.homeDirectory}/"
+              + path
+            );
             description = "Paths to backup";
+          };
+
+          notifications = {
+            failure = {
+              enable = mkEnableOption "sending an email and discord notification when the backup fails" // {
+                default = true;
+              };
+
+              config = mkOption {
+                type = types.attrs;
+                default = { };
+                example = {
+                  contentsRoot = "echo 'Custom contents'";
+                };
+                description = ''
+                  Custom failure notify service config. Not merged with the default notify config.
+                '';
+              };
+            };
+
+            success = {
+              enable = mkEnableOption "sending an email and discord notification when the backup succeeds";
+
+              config = mkOption {
+                type = types.attrs;
+                default = { };
+                description = ''
+                  Custom success notify service config. Not merged with the default notify config.
+                '';
+              };
+            };
+
+            healthCheck = {
+              enable = mkEnableOption "health check monitoring for this backup";
+
+              var = mkOption {
+                type = with types; nullOr str;
+                default = null;
+                description = ''
+                  Optionally override the health check var.
+                '';
+              };
+            };
+          };
+
+          timerConfig = mkOption {
+            type = with types; nullOr attrs;
+            default =
+              if cfg.${config.backend} ? timerConfig then
+                cfg.${config.backend}.timerConfig
+              else
+                {
+                  OnCalendar = "daily";
+                  Persistent = true;
+                };
+            example = {
+              OnCalendar = "00:05";
+              Persistent = true;
+              RandomizedDelaySec = "5h";
+            };
+            description = ''
+              When to run the backup. If set to null the backup will not automatically run.
+            '';
           };
 
           backendOptions = mkOption {
@@ -30,8 +112,8 @@ mkOption {
                 backupName = name;
               in
               types.submodule (
-                { config, ... }@args':
-                cfg.backends.${args.config.backend} (args' // { inherit backupConfig backupName; })
+                { config, ... }@args'':
+                cfg.backends.${args'.config.backend} (args'' // { inherit backupConfig backupName; })
               );
             default = { };
             description = "Backend options";
@@ -76,6 +158,11 @@ mkOption {
                 }
               );
               default = { };
+              apply =
+                if !isHome then
+                  mapAttrs' (name: value: nameValuePair (optionalString impermanence.enable "/persist" + name) value)
+                else
+                  value: value;
               description = ''
                 Attribute for assigning ownership user and group for each
                 backup path.

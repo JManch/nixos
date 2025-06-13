@@ -8,8 +8,6 @@
 let
   inherit (lib)
     ns
-    getExe
-    getExe'
     mkForce
     mkVMOverride
     optional
@@ -18,12 +16,9 @@ let
   inherit (config.${ns}.system) virtualisation;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets)
-    notifVars
-    protonRcloneConfig
     vaultwardenVars
     vaultwardenSMTPVars
     vaultwardenPublicBackupKey
-    healthCheckVaultwarden
     ;
 
   restoreScript = pkgs.writeShellApplication {
@@ -155,152 +150,51 @@ in
   systemd.timers.backup-vaultwarden.timerConfig.OnCalendar = "08,20:00";
   systemd.services.backup-vaultwarden.wantedBy = mkForce [ ];
 
+  systemd.services.backup-vaultwarden.serviceConfig.ExecStartPost = pkgs.writeShellApplication {
+    name = "vaultwarden-prepare-cloud-backup";
+    runtimeInputs = with pkgs; [
+      gnutar
+      age
+    ];
+    text = ''
+      umask 0077
+      time=$(date +%s)
+      tmp=$(mktemp -d)
+      cleanup() {
+        rm -rf "$tmp"
+      }
+      trap cleanup EXIT
+      cd "$tmp"
+
+      tar -cjf - -C "${config.services.vaultwarden.backupDir}" . | age -R ${vaultwardenPublicBackupKey.path} -o "$time"
+      hash=$(sha256sum "$time")
+      echo "$hash" > "$time-sha256"
+
+      # Archive locally
+      archive_dir="/var/backup/vaultwarden-archive"
+      mkdir -p "$archive_dir"
+      for file in "$archive_dir"/latest*; do
+        if [ -e "$file" ]; then
+          mv "$file" "''${file/latest/last}"
+        fi
+      done
+      cp "$time" "$archive_dir/latest"
+      cp "$time-sha256" "$archive_dir/latest-sha256"
+
+      # Prepare cloud upload folder
+      cloud_upload_dir="/tmp/vaultwarden-cloud-upload"
+      rm -rf "$cloud_upload_dir"
+      mkdir -p "$cloud_upload_dir"
+      mv ./* "$cloud_upload_dir"
+    '';
+  };
+
   ns.adminPackages = [ restoreScript ];
 
   systemd.tmpfiles.rules = [
     # Upstream module creates the /var/backup/vaultwarden dir
     "d /var/backup/vaultwarden-archive 0700 vaultwarden vaultwarden - -"
   ];
-
-  systemd.services.vaultwarden-cloud-backup =
-    let
-      inherit (config.services.vaultwarden) backupDir;
-      publicKey = vaultwardenPublicBackupKey.path;
-      cloudBackupScript = pkgs.writeShellApplication {
-        name = "vaultwarden-cloud-backup";
-        runtimeInputs = with pkgs; [
-          coreutils
-          diffutils
-          wget
-          gnutar
-          bzip2
-          age
-          rclone
-          shoutrrr
-        ];
-        text =
-          let
-            # This function breaks treesitter syntax highlighting so put here
-            onFailureFunc = ''
-              on_failure() {
-                echo "Sending failure email"
-                send_notification "Failure" "$(cat <<EOF
-              Time: $(date +"%Y-%m-%d %H:%M:%S")
-              Error: line $LINENO: $BASH_COMMAND failed
-              EOF
-              )"
-              }
-            '';
-          in
-          # bash
-          ''
-            set -o errtrace
-            umask 0077
-            time=$(date +%s)
-
-            # Abort if network interface is down as rclone authentication will
-            # break and need manual intervention to fix otherwise
-            if ! wget -q --spider http://google.com; then
-              echo "Error: Internet connection cannot be established, aborting backup" >&2
-              exit 1
-            fi
-
-            send_notification() {
-              if [ "$1" = "Failure" ]; then
-                discord_auth=$VAULTWARDEN_DISCORD_AUTH_FAILURE
-              else
-                discord_auth=$VAULTWARDEN_DISCORD_AUTH_SUCCESS
-              fi
-
-              shoutrrr send \
-                --url "discord://$discord_auth" \
-                --title "Vaultwarden Backup $1 $time" \
-                --message "$2"
-
-              shoutrrr send \
-                --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=Vaultwarden%20Backup%20$1%20$time" \
-                --message "$2"
-            }
-
-            ${onFailureFunc}
-            trap on_failure ERR
-
-            tmp=$(mktemp -d)
-            cleanup() {
-              rm -rf "$tmp"
-            }
-            trap cleanup EXIT
-            cd "$tmp"
-
-            tar -cjf - -C "${backupDir}" . | age -R ${publicKey} -o "$time"
-
-            hash=$(sha256sum "$time")
-            echo "$hash" > "$time-sha256"
-
-            archive_dir="/var/backup/vaultwarden-archive"
-
-            # Archive locally
-            mkdir -p "$archive_dir"
-            for file in "$archive_dir"/latest*; do
-              if [ -e "$file" ]; then
-                mv "$file" "''${file/latest/last}"
-              fi
-            done
-            cp "$time" "$archive_dir/latest"
-            cp "$time-sha256" "$archive_dir/latest-sha256"
-
-            # Because rclone writes refresh client keys to its configuration we
-            # have to maintain a writeable copy of the config. When we detect
-            # that the agenix config has been changed we replace it.
-            state_dir="/var/lib/vaultwarden-cloud-backup"
-            if ! cmp -s "$state_dir/rcloneConfigOriginal" "${protonRcloneConfig.path}"; then
-              # If they have changed replace the writeable config with the agenix one
-              install -m660 "${protonRcloneConfig.path}" "$state_dir/rcloneConfig"
-            fi
-            install -m660 "${protonRcloneConfig.path}" "$state_dir/rcloneConfigOriginal"
-
-            rclone --config "$state_dir/rcloneConfig" copy . remote:backups/vaultwarden
-
-            send_notification "Success" "$(cat <<EOF
-            Timestamp: $time ($(date -d @"$time" +"%Y-%m-%d %H:%M:%S"))
-            Hash: $(echo "$hash" | cut -d ' ' -f 1)
-            Size: $(stat -c%s "$time" | numfmt --to=iec-i --suffix=B --format="%.1f")
-            EOF
-            )"
-          '';
-      };
-    in
-    {
-      description = "Vaultwarden cloud backup";
-      after = [
-        "backup-vaultwarden.service"
-        "network-online.target"
-      ];
-      wants = [ "network-online.target" ];
-      requires = [ "backup-vaultwarden.service" ];
-      wantedBy = [ "backup-vaultwarden.service" ];
-
-      serviceConfig = {
-        EnvironmentFile = [ notifVars.path ];
-        Type = "oneshot";
-        ExecStart = getExe cloudBackupScript;
-        ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckVaultwarden.path})\"'";
-        User = "vaultwarden";
-        Group = "vaultwarden";
-        StateDirectory = "vaultwarden-cloud-backup";
-        StateDirectoryMode = "0700";
-        UMask = "0077";
-        # WARN: I've noticed that as the number of remote backup files grows,
-        # rclone backups slow down significantly because it downloads all
-        # remote files before every backup. I've seen it take 30 mins when the
-        # remote folder grows large enough. The timeout should workaround this
-        # by failing the service and notifying us when the rclone process is
-        # taking too long suggesting the remote dir has grown too big. When
-        # this happens rename the existing remote backup dir and replace it
-        # with an empty one.
-        TimeoutStartSec = 120;
-      };
-    };
 
   # Unfortunately the bitwarden app does not support TLS client authentication
   # https://github.com/bitwarden/mobile/issues/582
@@ -316,15 +210,70 @@ in
     '';
   };
 
-  ns.backups.vaultwarden = {
-    backend = "restic";
-    paths = [ "/var/backup/vaultwarden-archive" ];
-    restore.pathOwnership = {
-      "/var/backup/vaultwarden-archive" = {
+  ns.backups = {
+    vaultwarden-restic = {
+      backend = "restic";
+      paths = [ "/var/backup/vaultwarden-archive" ];
+      timerConfig = null;
+      notifications.healthCheck.enable = true;
+
+      restore.pathOwnership."/var/backup/vaultwarden-archive" = {
         user = "vaultwarden";
         group = "vaultwarden";
       };
     };
+
+    vaultwarden-rclone = {
+      backend = "rclone";
+      paths = [ "/tmp/vaultwarden-cloud-upload" ];
+      timerConfig = null;
+
+      notifications = {
+        failure.config = {
+          title = "Vaultwarden Backup Failure";
+          discord.enable = true;
+          discord.var = "VAULTWARDEN";
+        };
+
+        success.config = {
+          title = "Vaultwarden Rclone Backup Success";
+          contentsScript = pkgs.writeShellScript "vaultwarden-success-notification-contents" ''
+            export PATH="${pkgs.coreutils}/bin:${pkgs.fd}/bin:$PATH"
+            timestamp=$(fd --base-directory /tmp/vaultwarden-cloud-upload -E '*sha256')
+            timestamp_file="/tmp/vaultwarden-cloud-upload/$timestamp"
+            echo -e "Timestamp: $timestamp ($(date -d @"$timestamp" +"%Y-%m-%d %H:%M:%S"))\nHash: $(cut -d ' ' -f 1 $(<"$timestamp_file-sha256")\nSize: $(stat -c%s "$timestamp_file" | numfmt --to=iec-i --suffix=B --format="%.1f")\n"
+          '';
+          discord.enable = true;
+          discord.var = "VAULTWARDEN";
+        };
+
+        healthCheck.enable = true;
+      };
+
+      backendOptions = {
+        remote = "proton";
+        mode = "copy";
+        timeout = 120;
+        remotePaths."/tmp/vaultwarden-cloud-upload" = "vaultwarden";
+      };
+
+      restore.pathOwnership."/tmp/vaultwarden-cloud-upload" = {
+        user = "vaultwarden";
+        group = "vaultwarden";
+      };
+    };
+  };
+
+  systemd.services."rclone-backups-vaultwarden-rclone" = {
+    after = [ "backup-vaultwarden.service" ];
+    requires = [ "backup-vaultwarden.service" ];
+    wantedBy = [ "backup-vaultwarden.service" ];
+  };
+
+  systemd.services."restic-backups-vaultwarden-restic" = {
+    after = [ "backup-vaultwarden.service" ];
+    requires = [ "backup-vaultwarden.service" ];
+    wantedBy = [ "backup-vaultwarden.service" ];
   };
 
   services.fail2ban.jails =

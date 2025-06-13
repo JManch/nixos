@@ -156,7 +156,10 @@
 
       backups.restic = {
         enable = true;
-        schedule = "*-*-* 15:00:00";
+        timerConfig = {
+          OnCalendar = "*-*-* 15:00:00";
+          Persistent = true;
+        };
       };
 
       wgnord = {

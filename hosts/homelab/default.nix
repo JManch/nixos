@@ -181,7 +181,12 @@ in
         rclone.enable = true;
         restic = {
           enable = true;
-          schedule = "*-*-* 05:00:00";
+
+          timerConfig = {
+            OnCalendar = "*-*-* 05:00:00";
+            Persistent = true;
+          };
+
           server = {
             enable = true;
             remoteCopySchedule = "*-*-* 05:30:00";

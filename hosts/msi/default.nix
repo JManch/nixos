@@ -86,7 +86,10 @@
 
       backups.restic = {
         enable = true;
-        schedule = "*-*-* 14:00:00";
+        timerConfig = {
+          OnCalendar = "*-*-* 14:00:00";
+          Persistent = true;
+        };
         runMaintenance = false;
       };
     };

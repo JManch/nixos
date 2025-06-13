@@ -657,6 +657,12 @@ in
       music = {
         backend = "rclone";
         paths = [ "/media/music" ];
+
+        timerConfig = {
+          OnCalendar = "Sun *-*-* 8:00:00";
+          persistent = false;
+        };
+
         backendOptions = {
           remote = "filen";
           mode = "sync";

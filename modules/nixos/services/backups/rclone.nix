@@ -70,7 +70,7 @@ in
                 setupScript = mkOption {
                   type = types.lines;
                   default = ''
-                    rclone --config "$config_dir" config create "${name}-remote" "${name}" --all
+                    rclone --config "$config_dir" config create remote "${name}" --all
                   '';
                   description = ''
                     Script for generating the rclone config.
@@ -89,7 +89,7 @@ in
                 sudo -u "${username}" ${getExe pkgs.filen-cli} export-api-key
                 sudo -u "${username}" rm -rf "/home/${username}/.config/@filen" "/home/${username}/.config/filen-cli"
                 read -r -p "Enter the API key above: " api_key
-                rclone --config "$config_dir/config" config create "filen-remote" "filen" "api_key=$api_key" --all --obscure
+                rclone --config "$config_dir/config" config create remote filen "api_key=$api_key" --all --obscure
               '';
           };
         };
@@ -123,40 +123,6 @@ in
       ]) backups
     );
 
-    ns.userPackages = mapAttrsToList (
-      name: value:
-      pkgs.writeShellApplication {
-        name = "rclone-setup-${name}";
-        runtimeInputs = [ value.package ];
-        text = ''
-          if [[ $(id -u) != 0 ]]; then
-             echo "rclone-setup-${name} must be run as root" >&2
-             exit 1
-          fi
-
-          config_dir=$(mktemp -d)
-          chmod 700 "$config_dir"
-          ${value.setupScript}
-          echo -e "\nSaved rclone config to $config_dir/config\n"
-
-          while :; do
-            read -r -p "Enter path to nix-resources repo: " nix_resources
-            if [[ -f "$nix_resources/secrets/secrets.nix" ]]; then
-              break
-            else
-              echo "Error: '$nix_resources' is not a valid path (flake.nix not found)" >&2
-            fi
-          done
-
-
-          pushd "$nix_resources/secrets" >/dev/null
-          trap "popd >/dev/null 2>&1 || true" EXIT
-          EDITOR="cp /dev/stdin" agenix-edit "rclone-${name}-config.age" < "$config_dir/config"
-          rm -rf "$config_dir"
-        '';
-      }
-    ) cfg.remotes;
-
     systemd.services = mapAttrs' (
       name: backup:
       nameValuePair "rclone-backups-${name}" {
@@ -174,6 +140,7 @@ in
               pkgs.writeShellApplication {
                 name = "rclone-backups-${name}";
                 runtimeInputs = [
+                  pkgs.wget
                   pkgs.coreutils
                   pkgs.diffutils
                   remoteCfg.package
@@ -288,5 +255,39 @@ in
         };
       };
     };
+
+    ns.adminPackages = mapAttrsToList (
+      name: value:
+      pkgs.writeShellApplication {
+        name = "rclone-setup-${name}";
+        runtimeInputs = [ value.package ];
+        text = ''
+          if [[ $(id -u) != 0 ]]; then
+             echo "rclone-setup-${name} must be run as root" >&2
+             exit 1
+          fi
+
+          config_dir=$(mktemp -d)
+          chmod 700 "$config_dir"
+          ${value.setupScript}
+          echo -e "\nSaved rclone config to $config_dir/config\n"
+
+          while :; do
+            read -r -p "Enter path to nix-resources repo: " nix_resources
+            if [[ -f "$nix_resources/secrets/secrets.nix" ]]; then
+              break
+            else
+              echo "Error: '$nix_resources' is not a valid path (flake.nix not found)" >&2
+            fi
+          done
+
+
+          pushd "$nix_resources/secrets" >/dev/null
+          trap "popd >/dev/null 2>&1 || true" EXIT
+          EDITOR="cp /dev/stdin" agenix-edit "rclone-${name}-config.age" < "$config_dir/config"
+          rm -rf "$config_dir"
+        '';
+      }
+    ) cfg.remotes;
   }
 ]

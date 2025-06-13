@@ -17,6 +17,7 @@ let
     types
     length
     optionalString
+    concatStringsSep
     attrNames
     mkIf
     removePrefix
@@ -51,22 +52,12 @@ in
                 # be added to this host
                 enable = mkOption {
                   type = types.bool;
+                  readOnly = true;
                   internal = true;
                   default = cfg.enable && (any (backup: backup.backendOptions.remote == name) (attrValues backups));
                 };
 
                 package = mkPackageOption pkgs "rclone" { };
-
-                timerConfig = mkOption {
-                  type = with types; nullOr attrs;
-                  default = {
-                    OnCalendar = "daily";
-                    Persistent = true;
-                  };
-                  description = ''
-                    Default timer config for backups using the Rclone backend.
-                  '';
-                };
 
                 root = mkOption {
                   type = types.str;
@@ -95,9 +86,9 @@ in
             package = selfPkgs.filen-rclone;
             setupScript = # bash
               ''
-                ${getExe pkgs.filen-cli} export-api-key
-                rm -rf /root/.config/{@filen,filen-cli}
-                read -p -r "Enter the API key above: " api_key
+                sudo -u "${username}" ${getExe pkgs.filen-cli} export-api-key
+                sudo -u "${username}" rm -rf "/home/${username}/.config/@filen" "/home/${username}/.config/filen-cli"
+                read -r -p "Enter the API key above: " api_key
                 rclone --config "$config_dir/config" config create "filen-remote" "filen" "api_key=$api_key" --all --obscure
               '';
           };
@@ -108,15 +99,15 @@ in
         '';
       };
 
-      schedule = mkOption {
-        type = types.str;
-        default = "*-*-* 17:30:00";
-        description = "When to run backups in systemd OnCalendar format";
-      };
-
-      destinationRoot = mkOption {
-        type = types.str;
-        default = "";
+      timerConfig = mkOption {
+        type = with types; nullOr attrs;
+        default = {
+          OnCalendar = "daily";
+          Persistent = true;
+        };
+        description = ''
+          Default timer config for backups using the Rclone backend.
+        '';
       };
     };
 
@@ -138,21 +129,29 @@ in
         name = "rclone-setup-${name}";
         runtimeInputs = [ value.package ];
         text = ''
+          if [[ $(id -u) != 0 ]]; then
+             echo "rclone-setup-${name} must be run as root" >&2
+             exit 1
+          fi
+
           config_dir=$(mktemp -d)
           chmod 700 "$config_dir"
           ${value.setupScript}
-          echo "Saved rclone config to $config_dir/config"
+          echo -e "\nSaved rclone config to $config_dir/config\n"
 
           while :; do
             read -r -p "Enter path to nix-resources repo: " nix_resources
-            if [[ -f "$nix_resources/flake.nix" ]]; then
+            if [[ -f "$nix_resources/secrets/secrets.nix" ]]; then
               break
             else
               echo "Error: '$nix_resources' is not a valid path (flake.nix not found)" >&2
             fi
           done
 
-          EDITOR="cp /dev/stdin" agenix-edit "$nix_resources/secrets/rclone-${name}-config.age" < "$config_dir/config"
+
+          pushd "$nix_resources/secrets" >/dev/null
+          trap "popd >/dev/null 2>&1 || true" EXIT
+          EDITOR="cp /dev/stdin" agenix-edit "rclone-${name}-config.age" < "$config_dir/config"
           rm -rf "$config_dir"
         '';
       }
@@ -171,41 +170,43 @@ in
               remoteCfg = cfg.remotes.${backup.backendOptions.remote};
               remoteConfig = config.age.secrets."rclone-${backup.backendOptions.remote}-config".path;
             in
-            pkgs.writeShellApplication {
-              name = "rclone-backups-${name}";
-              runtimeInputs = [
-                pkgs.coreutils
-                pkgs.diffutils
-                remoteCfg.package
-              ];
-              text = ''
-                ${concatMapStringsSep "\n  " (path: ''
-                  if [[ ! -e "${path}" ]]; then
-                    echo "Error: Backup path '${path}' does not exist" >&2
+            getExe (
+              pkgs.writeShellApplication {
+                name = "rclone-backups-${name}";
+                runtimeInputs = [
+                  pkgs.coreutils
+                  pkgs.diffutils
+                  remoteCfg.package
+                ];
+                text = ''
+                  ${concatMapStringsSep "\n  " (path: ''
+                    if [[ ! -e "${path}" ]]; then
+                      echo "Error: Backup path '${path}' does not exist" >&2
+                      exit 1
+                    fi
+                  '') backup.paths}
+
+                  # Abort if network is down as rclone authentication will break and needs manual
+                  # intervention to fix
+                  if ! wget -q --spider http://google.com; then
+                    echo "Error: Internet connection cannot be established, aborting backup" >&2
                     exit 1
                   fi
-                '') backup.paths}
 
-                # Abort if network is down as rclone authentication will break and needs manual
-                # intervention to fix
-                if ! wget -q --spider http://google.com; then
-                  echo "Error: Internet connection cannot be established, aborting backup" >&2
-                  exit 1
-                fi
+                  if [[ ! -f "$CACHE_DIRECTORY/config" ]] || ! cmp -s "$CACHE_DIRECTORY/config" "${remoteConfig}"; then
+                    cp "${remoteConfig}" "$CACHE_DIRECTORY/config"
+                    cp "${remoteConfig}" "$CACHE_DIRECTORY/config-original"
+                  fi
 
-                if [[ ! -f "$CACHE_DIRECTORY/config" ]] || ! cmp -s "$CACHE_DIRECTORY/config" "${remoteConfig}"; then
-                  cp "${remoteConfig}" "$CACHE_DIRECTORY/config"
-                  cp "${remoteConfig}" "$CACHE_DIRECTORY/config-original"
-                fi
-
-                ${concatMapStringsSep "\n  " (
-                  path:
-                  ''rclone --config "$CACHE_DIRECTORY/config" ${backup.backendOptions.mode} "${path}" "remote:${removePrefix "/" remoteCfg.root}/${
-                    removePrefix "/" backup.backendOptions.remotePaths.${path}
-                  }"''
-                ) backup.paths}
-              '';
-            };
+                  ${concatMapStringsSep "\n  " (
+                    path:
+                    ''rclone --config "$CACHE_DIRECTORY/config" ${backup.backendOptions.mode} "${path}" "remote:${removePrefix "/" remoteCfg.root}/${
+                      removePrefix "/" backup.backendOptions.remotePaths.${path}
+                    }" --verbose ${concatStringsSep " " backup.backendOptions.flags}''
+                  ) backup.paths}
+                '';
+              }
+            );
 
           # Writeable config is stored in cache directory
           CacheDirectory = "rclone-backups-${name}";
@@ -263,6 +264,12 @@ in
             "copy"
           ];
           description = "Rclone backup mode";
+        };
+
+        flags = mkOption {
+          type = with types; listOf str;
+          default = [ ];
+          description = "List of flags appended to end of the rclone command";
         };
 
         timeout = mkOption {

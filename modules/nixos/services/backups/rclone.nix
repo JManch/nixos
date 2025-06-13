@@ -5,15 +5,18 @@
   config,
   hostname,
   selfPkgs,
+  username,
   categoryCfg,
 }:
 let
   inherit (lib)
+    ns
     mkOption
     mkPackageOption
     all
     types
     length
+    optionalString
     attrNames
     mkIf
     removePrefix
@@ -30,6 +33,7 @@ let
     concatMapStringsSep
     filterAttrs
     ;
+  inherit (config.${ns}.system) impermanence;
   backups = filterAttrs (_: backup: backup.backend == "rclone") categoryCfg.backups;
 in
 [
@@ -52,6 +56,17 @@ in
                 };
 
                 package = mkPackageOption pkgs "rclone" { };
+
+                timerConfig = mkOption {
+                  type = with types; nullOr attrs;
+                  default = {
+                    OnCalendar = "daily";
+                    Persistent = true;
+                  };
+                  description = ''
+                    Default timer config for backups using the Rclone backend.
+                  '';
+                };
 
                 root = mkOption {
                   type = types.str;
@@ -145,7 +160,7 @@ in
 
     systemd.services = mapAttrs' (
       name: backup:
-      nameValuePair "rclone-backup-${name}" {
+      nameValuePair "rclone-backups-${name}" {
         wants = [ "network-online.target" ];
         after = [ "network-online.target" ];
 
@@ -157,13 +172,27 @@ in
               remoteConfig = config.age.secrets."rclone-${backup.backendOptions.remote}-config".path;
             in
             pkgs.writeShellApplication {
-              name = "rclone-backup-${name}";
+              name = "rclone-backups-${name}";
               runtimeInputs = [
                 pkgs.coreutils
                 pkgs.diffutils
                 remoteCfg.package
               ];
               text = ''
+                ${concatMapStringsSep "\n  " (path: ''
+                  if [[ ! -e "${path}" ]]; then
+                    echo "Error: Backup path '${path}' does not exist" >&2
+                    exit 1
+                  fi
+                '') backup.paths}
+
+                # Abort if network is down as rclone authentication will break and needs manual
+                # intervention to fix
+                if ! wget -q --spider http://google.com; then
+                  echo "Error: Internet connection cannot be established, aborting backup" >&2
+                  exit 1
+                fi
+
                 if [[ ! -f "$CACHE_DIRECTORY/config" ]] || ! cmp -s "$CACHE_DIRECTORY/config" "${remoteConfig}"; then
                   cp "${remoteConfig}" "$CACHE_DIRECTORY/config"
                   cp "${remoteConfig}" "$CACHE_DIRECTORY/config-original"
@@ -179,7 +208,7 @@ in
             };
 
           # Writeable config is stored in cache directory
-          CacheDirectory = "rclone-backup-${name}";
+          CacheDirectory = "rclone-backups-${name}";
           CacheDirectoryMode = "0700";
           PrivateTmp = true;
           TimeoutStartSec = mkIf (backup.backendOptions.timeout != null) backup.backendOptions.timeout;
@@ -187,16 +216,16 @@ in
       }
     ) backups;
 
-    ns.services.failureNotifyServices = mapAttrs' (
-      name: value:
-      nameValuePair "rclone-backup-${name}" {
-        discord.enable = true;
-        discord.var = "RCLONE";
+    systemd.timers = mapAttrs' (
+      name: backup:
+      nameValuePair "rclone-backups-${name}" {
+        wantedBy = [ "timers.target" ];
+        inherit (backup) timerConfig;
       }
-    ) backups;
+    ) (filterAttrs (_: backup: backup.timerConfig != null) backups);
 
     ns.persistence.directories = mapAttrsToList (name: _: {
-      directory = "/var/cache/rclone-backup-${name}";
+      directory = "/var/cache/rclone-backups-${name}";
       mode = "0700";
     }) backups;
   }
@@ -211,7 +240,16 @@ in
 
         remotePaths = mkOption {
           type = with types; attrsOf str;
-          default = genAttrs backups.${args.backupName}.paths (path: path);
+          # default = genAttrs backups.${args.backupName}.paths (path: path);
+          default = genAttrs args.backupConfig.paths (path: path);
+          apply = mapAttrs' (
+            name: value:
+            nameValuePair (
+              optionalString impermanence.enable "/persist"
+              + optionalString args.backupConfig.isHome "/home/${username}/"
+              + name
+            ) value
+          );
           description = ''
             Attribute set of paths and their remote backup paths relative to the
             remote's `destinationRoot`. If defined, the remote path of every

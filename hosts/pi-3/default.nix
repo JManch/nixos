@@ -65,7 +65,10 @@ in
     services = {
       backups.restic = {
         enable = true;
-        schedule = "*-*-* 03:00:00";
+        timerConfig = {
+          OnCalendar = "*-*-* 03:00:00";
+          Persistent = true;
+        };
       };
 
       zigbee2mqtt = {

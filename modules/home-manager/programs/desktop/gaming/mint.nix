@@ -17,7 +17,11 @@ in
   };
 
   ns = {
-    backups.mint.paths = [ ".config/mint" ];
+    backups.mint = {
+      backend = "restic";
+      paths = [ ".config/mint" ];
+    };
+
     persistence.directories = [ ".config/mint" ];
   };
 }

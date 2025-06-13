@@ -26,7 +26,6 @@ let
     optionals
     optional
     mapAttrs'
-    getExe'
     attrNames
     mkForce
     mkBefore
@@ -44,16 +43,10 @@ let
     resticRepositoryFile
     resticReadWriteBackblazeVars
     resticReadOnlyBackblazeVars
-    healthCheckResticRemoteCopy
     ;
   backups = filterAttrs (_: backup: backup.backend == "restic") categoryCfg.backups;
   resticExe = getExe pkgs.restic;
   vmInstall = inputs.vmInstall.value;
-
-  backupTimerConfig = {
-    OnCalendar = cfg.schedule;
-    Persistent = true;
-  };
 
   pruneOpts = [
     "--keep-daily 7"
@@ -223,7 +216,6 @@ in
           type = with types; listOf str;
           default = [ ];
         };
-
       };
 
       # Backup defaults
@@ -234,7 +226,6 @@ in
         createWrapper = false;
         repositoryFile = resticRepositoryFile.path;
         passwordFile = resticPasswordFile.path;
-        timerConfig = backupTimerConfig;
         extraBackupArgs = [
           # Disable cache because we don't persist cache directories
           "--no-cache"
@@ -249,10 +240,16 @@ in
         default = cfg.server.enable;
       };
 
-      schedule = mkOption {
-        type = types.str;
-        default = "*-*-* 05:30:00";
-        description = "When to run backups in systemd OnCalendar format";
+      timerConfig = mkOption {
+        type = types.attrs;
+        default = {
+          Persistent = true;
+          OnCalendar = "*-*-* 05:30:00";
+        };
+        description = ''
+          Timer config for repo maintainence and default timer config for backups using
+          the Restic backend.
+        '';
       };
 
       server = {
@@ -337,15 +334,15 @@ in
       ]) backups
     );
 
-    ns.services.failureNotifyServices = {
-      restic-repo-maintenance = mkIf cfg.runMaintenance failureCfg;
-    } // mapAttrs' (name: value: nameValuePair "restic-backups-${name}" failureCfg) backups;
+    ns.services.failureNotifyServices = mkIf cfg.runMaintenance {
+      restic-repo-maintenance = failureCfg;
+    };
 
     services.restic.backups = mapAttrs (
       name: value:
       value.backendOptions
       // {
-        inherit (value) paths;
+        inherit (value) paths timerConfig;
       }
     ) backups;
 
@@ -408,9 +405,9 @@ in
 
     systemd.timers = mkIf cfg.runMaintenance {
       restic-repo-maintenance = {
+        inherit (cfg) timerConfig;
         enable = !inputs.firstBoot.value;
         wantedBy = [ "timers.target" ];
-        timerConfig = backupTimerConfig;
       };
     };
 
@@ -449,6 +446,8 @@ in
       ];
     };
 
+    ns.services.healthCheckServices."restic-remote-copy" = { };
+
     systemd.services = mkMerge [
       {
         restic-remote-copy = {
@@ -482,8 +481,6 @@ in
               "${resticExe} copy"
               "${resticExe} check --with-cache --retry-lock 5m"
             ];
-            ExecStartPost = "${getExe' pkgs.bash "sh"} -c '${getExe pkgs.curl} -s \"$(<${healthCheckResticRemoteCopy.path})\"'";
-
             PrivateTmp = true;
             RuntimeDirectory = "restic-remote-copy";
             CacheDirectory = "restic-remote-copy";

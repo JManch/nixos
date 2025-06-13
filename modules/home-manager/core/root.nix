@@ -37,9 +37,13 @@ in
       ++ optional cfg.configManager ".config/nixos";
 
     backups = {
-      nixos = mkIf cfg.configManager { paths = [ ".config/nixos" ]; };
+      nixos = mkIf cfg.configManager {
+        backend = "restic";
+        paths = [ ".config/nixos" ];
+      };
 
       files = mkIf cfg.backupFiles {
+        backend = "restic";
         paths = [ "files" ];
         restore.removeExisting = false;
         backendOptions.exclude =

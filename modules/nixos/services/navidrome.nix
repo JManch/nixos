@@ -1,3 +1,14 @@
+# How to modify starred at / favourited dates
+# - Stop navidrome service
+# - Mount navidrome state dir with sshfs
+# - Open database file in sqlitebrowser
+# - Copy item_id for album/track from either album or media_file table
+# - In 'Execute SQL' tab run:
+#   SELECT starred_at FROM annotation WHERE item_id = '<item_id>';
+# - Copy the starred_at timestamps and modify it (timestamps can't be copied from tables for some reason)
+# - Update data with:
+#   UPDATE annotation SET starred_at = '<new_starred_at>' WHERE item_id = '<item_id>';
+# - Press 'Write Changes'
 {
   lib,
   cfg,

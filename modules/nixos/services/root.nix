@@ -10,9 +10,9 @@ let
   inherit (lib)
     ns
     types
-    mapAttrs'
+    mkMerge
+    mapAttrsToList
     optionalString
-    nameValuePair
     mkAfter
     mapAttrs
     replaceStrings
@@ -60,46 +60,6 @@ let
       };
     }
   );
-
-  mkNotifyServices =
-    type:
-    mapAttrs' (
-      name: value:
-      nameValuePair "${name}-${type}-notify" {
-        restartIfChanged = false;
-        serviceConfig = {
-          Type = "oneshot";
-          EnvironmentFile = config.age.secrets.notifVars.path;
-          ExecStart = getExe (
-            pkgs.writeShellApplication {
-              name = "${name}-${type}-notify";
-              runtimeInputs = [ pkgs.shoutrrr ];
-              text =
-                optionalString value.discord.enable ''
-                  shoutrrr send \
-                    --url "discord://${"$" + value.discord.var}_${toUpper type}_DISCORD_AUTH" \
-                    --title "${value.title}" \
-                    --message "${
-                      if value.contentsScript == null then value.contents else "$(${value.contentsScript})"
-                    }"
-                ''
-                + optionalString value.email.enable ''
-                  shoutrrr send \
-                    --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${
-                      replaceStrings [ " " ] [ "%20" ] value.title
-                    }" \
-                    --message "${
-                      if value.contentsScript == null then value.contents else "$(${value.contentsScript})"
-                    }"
-                '';
-            }
-          );
-        };
-      }
-    ) cfg."${type}NotifyServices"
-    // mapAttrs (name: _: {
-      "on${lib.${ns}.upperFirstChar type}" = [ "${name}-${type}-notify.service" ];
-    }) cfg."${type}NotifyServices";
 in
 {
   opts = {
@@ -158,21 +118,62 @@ in
   users.users.${username}.linger = config.${ns}.core.device.type == "server";
 
   systemd.services =
-    mkNotifyServices "failure"
-    // mkNotifyServices "success"
-    // mapAttrs (name: value: {
-      serviceConfig.ExecStartPost = mkAfter [
-        (getExe (
-          pkgs.writeShellApplication {
-            name = "${name}-send-health-check";
-            runtimeInputs = [ pkgs.curl ];
-            text = ''
-              # shellcheck source=/dev/null
-              source ${config.age.secrets.healthCheckVars.path}
-              curl -s "${"$" + value.var}"
-            '';
-          }
-        ))
-      ];
-    }) cfg.healthCheckServices;
+    let
+      mkNotifyServices =
+        type:
+        mapAttrsToList (name: value: {
+          "${name}-${type}-notify" = {
+            restartIfChanged = false;
+            serviceConfig = {
+              Type = "oneshot";
+              EnvironmentFile = config.age.secrets.notifVars.path;
+              ExecStart = getExe (
+                pkgs.writeShellApplication {
+                  name = "${name}-${type}-notify";
+                  runtimeInputs = [ pkgs.shoutrrr ];
+                  text =
+                    optionalString value.discord.enable ''
+                      shoutrrr send \
+                        --url "discord://${"$" + value.discord.var}_${toUpper type}_DISCORD_AUTH" \
+                        --title "${value.title}" \
+                        --message "${
+                          if value.contentsScript == null then value.contents else "$(${value.contentsScript})"
+                        }"
+                    ''
+                    + optionalString value.email.enable ''
+                      shoutrrr send \
+                        --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${
+                          replaceStrings [ " " ] [ "%20" ] value.title
+                        }" \
+                        --message "${
+                          if value.contentsScript == null then value.contents else "$(${value.contentsScript})"
+                        }"
+                    '';
+                }
+              );
+            };
+          };
+
+          ${name}."on${lib.${ns}.upperFirstChar type}" = [ "${name}-${type}-notify.service" ];
+        }) cfg."${type}NotifyServices";
+    in
+    mkMerge [
+      (mkNotifyServices "failure")
+      (mkNotifyServices "success")
+      (mapAttrs (name: value: {
+        serviceConfig.ExecStartPost = mkAfter [
+          (getExe (
+            pkgs.writeShellApplication {
+              name = "${name}-send-health-check";
+              runtimeInputs = [ pkgs.curl ];
+              text = ''
+                # shellcheck source=/dev/null
+                source ${config.age.secrets.healthCheckVars.path}
+                curl -s "${"$" + value.var}"
+              '';
+            }
+          ))
+        ];
+      }) cfg.healthCheckServices)
+    ];
 }

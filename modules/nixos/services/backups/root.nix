@@ -58,8 +58,6 @@ in
         path: hasPrefix "/" path && stringLength path > 1 && (impermanence.enable -> path != "/persist")
       ) backup.paths)
       "Backup '${name}' contains invalid backup paths"
-      cfg.${backup.backend}.enable
-      "Backup '${name}' uses backend '${backup.backend}' but the backend is not enabled on the host"
       (backup.isHome -> backup.restore.pathOwnership == { })
       "Home backup '${name}' uses unsupported option `pathOwnership`"
     ]) cfg.backups

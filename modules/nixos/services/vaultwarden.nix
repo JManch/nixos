@@ -9,6 +9,7 @@ let
   inherit (lib)
     ns
     mkForce
+    getExe
     mkVMOverride
     optional
     mkMerge
@@ -150,44 +151,48 @@ in
   systemd.timers.backup-vaultwarden.timerConfig.OnCalendar = "08,20:00";
   systemd.services.backup-vaultwarden.wantedBy = mkForce [ ];
 
-  systemd.services.backup-vaultwarden.serviceConfig.ExecStartPost = pkgs.writeShellApplication {
-    name = "vaultwarden-prepare-cloud-backup";
-    runtimeInputs = with pkgs; [
-      gnutar
-      age
-    ];
-    text = ''
-      umask 0077
-      time=$(date +%s)
-      tmp=$(mktemp -d)
-      cleanup() {
-        rm -rf "$tmp"
-      }
-      trap cleanup EXIT
-      cd "$tmp"
+  systemd.services.backup-vaultwarden.serviceConfig.ExecStartPost = getExe (
+    pkgs.writeShellApplication {
+      name = "vaultwarden-prepare-cloud-backup";
+      runtimeInputs = with pkgs; [
+        coreutils
+        gnutar
+        bzip2
+        age
+      ];
+      text = ''
+        umask 0077
+        time=$(date +%s)
+        tmp=$(mktemp -d)
+        cleanup() {
+          rm -rf "$tmp"
+        }
+        trap cleanup EXIT
+        cd "$tmp"
 
-      tar -cjf - -C "${config.services.vaultwarden.backupDir}" . | age -R ${vaultwardenPublicBackupKey.path} -o "$time"
-      hash=$(sha256sum "$time")
-      echo "$hash" > "$time-sha256"
+        tar -cjf - -C "${config.services.vaultwarden.backupDir}" . | age -R ${vaultwardenPublicBackupKey.path} -o "$time"
+        hash=$(sha256sum "$time")
+        echo "$hash" > "$time-sha256"
 
-      # Archive locally
-      archive_dir="/var/backup/vaultwarden-archive"
-      mkdir -p "$archive_dir"
-      for file in "$archive_dir"/latest*; do
-        if [ -e "$file" ]; then
-          mv "$file" "''${file/latest/last}"
-        fi
-      done
-      cp "$time" "$archive_dir/latest"
-      cp "$time-sha256" "$archive_dir/latest-sha256"
+        # Archive locally
+        archive_dir="/var/backup/vaultwarden-archive"
+        mkdir -p "$archive_dir"
+        for file in "$archive_dir"/latest*; do
+          if [ -e "$file" ]; then
+            mv "$file" "''${file/latest/last}"
+          fi
+        done
+        cp "$time" "$archive_dir/latest"
+        cp "$time-sha256" "$archive_dir/latest-sha256"
 
-      # Prepare cloud upload folder
-      cloud_upload_dir="/tmp/vaultwarden-cloud-upload"
-      rm -rf "$cloud_upload_dir"
-      mkdir -p "$cloud_upload_dir"
-      mv ./* "$cloud_upload_dir"
-    '';
-  };
+        # Prepare cloud upload folder
+        cloud_upload_dir="/tmp/vaultwarden-cloud-upload"
+        rm -rf "$cloud_upload_dir"
+        mkdir -p "$cloud_upload_dir"
+        mv ./* "$cloud_upload_dir"
+      '';
+    }
+  );
 
   ns.adminPackages = [ restoreScript ];
 
@@ -226,6 +231,7 @@ in
     vaultwarden-rclone = {
       backend = "rclone";
       paths = [ "/tmp/vaultwarden-cloud-upload" ];
+      doNotModifyPaths = true;
       timerConfig = null;
 
       notifications = {

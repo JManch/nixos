@@ -190,7 +190,7 @@ in
             );
 
           # Writeable config is stored in cache directory
-          CacheDirectory = "rclone-backups-${name}";
+          CacheDirectory = "rclone-backups/${name}";
           CacheDirectoryMode = "0700";
           TimeoutStartSec = mkIf (backup.backendOptions.timeout != null) backup.backendOptions.timeout;
         };
@@ -206,7 +206,7 @@ in
     ) (filterAttrs (_: backup: backup.timerConfig != null) backups);
 
     ns.persistence.directories = mapAttrsToList (name: _: {
-      directory = "/var/cache/rclone-backups-${name}";
+      directory = "/var/cache/rclone-backups/${name}";
       mode = "0700";
     }) backups;
   }

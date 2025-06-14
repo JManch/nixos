@@ -220,7 +220,14 @@ in
       backend = "restic";
       paths = [ "/var/backup/vaultwarden-archive" ];
       timerConfig = null;
-      notifications.healthCheck.enable = true;
+      notifications = {
+        failure.config = {
+          title = "Vaultwarden Restic Backup Failure";
+          discord.enable = true;
+          discord.var = "VAULTWARDEN";
+        };
+        healthCheck.enable = true;
+      };
 
       restore.pathOwnership."/var/backup/vaultwarden-archive" = {
         user = "vaultwarden";
@@ -236,21 +243,25 @@ in
 
       notifications = {
         failure.config = {
-          title = "Vaultwarden Backup Failure";
+          title = "Vaultwarden Rclone Backup Failure";
           discord.enable = true;
           discord.var = "VAULTWARDEN";
         };
 
-        success.config = {
-          title = "Vaultwarden Rclone Backup Success";
-          contentsScript = pkgs.writeShellScript "vaultwarden-success-notification-contents" ''
-            export PATH="${pkgs.coreutils}/bin:${pkgs.fd}/bin:$PATH"
-            timestamp=$(fd --base-directory /tmp/vaultwarden-cloud-upload -E '*sha256')
-            timestamp_file="/tmp/vaultwarden-cloud-upload/$timestamp"
-            echo -e "Timestamp: $timestamp ($(date -d @"$timestamp" +"%Y-%m-%d %H:%M:%S"))\nHash: $(cut -d ' ' -f 1 $(<"$timestamp_file-sha256")\nSize: $(stat -c%s "$timestamp_file" | numfmt --to=iec-i --suffix=B --format="%.1f")\n"
-          '';
-          discord.enable = true;
-          discord.var = "VAULTWARDEN";
+        success = {
+          enable = true;
+          config = {
+            title = "Vaultwarden Rclone Backup Success";
+            contentsScript =
+              (pkgs.writeShellScript "vaultwarden-success-notification-contents" ''
+                export PATH="${pkgs.coreutils}/bin:${pkgs.fd}/bin:$PATH"
+                timestamp=$(fd --base-directory /tmp/vaultwarden-cloud-upload -E '*sha256')
+                timestamp_file="/tmp/vaultwarden-cloud-upload/$timestamp"
+                echo -e "Timestamp: $timestamp ($(date -d @"$timestamp" +"%Y-%m-%d %H:%M:%S"))\nHash: $(cut -d ' ' -f 1 "$timestamp_file-sha256")\nSize: $(stat -c%s "$timestamp_file" | numfmt --to=iec-i --suffix=B --format="%.1f")\n"
+              '').outPath;
+            discord.enable = true;
+            discord.var = "VAULTWARDEN";
+          };
         };
 
         healthCheck.enable = true;

@@ -26,6 +26,7 @@ let
   inherit (osConfig.${ns}.core) device;
   inherit (osConfig.${ns}.system) networking;
   inherit (osConfig.${ns}.hardware) bluetooth;
+  inherit (osConfig.programs) uwsm;
   inherit (device)
     gpu
     monitors
@@ -344,6 +345,8 @@ in
   systemd.user.services.waybar = {
     Unit = {
       Requisite = [ "graphical-session.target" ];
+      # We do not want PartOf=tray.target if we're using UWSM
+      PartOf = mkIf uwsm.enable (mkForce [ "graphical-session.target" ]);
       After = mkForce [ "graphical-session.target" ];
       X-Restart-Triggers = mkForce [ ];
     };
@@ -352,6 +355,8 @@ in
       Slice = "app${sliceSuffix osConfig}.slice";
       ExecReload = mkForce [ ];
     };
+
+    Install.WantedBy = mkIf uwsm.enable (mkForce [ "graphical-session.target" ]);
   };
 
   ns.desktop.darkman.switchApps.waybar = {

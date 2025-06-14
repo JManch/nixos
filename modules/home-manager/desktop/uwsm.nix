@@ -12,9 +12,9 @@
 # being transfered from the login shell env. Then display managers will be
 # viable again.
 # https://github.com/nix-community/home-manager/issues/2659
-{ lib, pkgs }:
+{ lib }:
 let
-  inherit (lib) types mkOption;
+  inherit (lib) types mkOption mkForce;
 in
 {
   enableOpt = false;
@@ -41,6 +41,9 @@ in
       '';
     };
   };
+
+  # The tray Requires "graphcial-session-pre.target" which is bad practice
+  xdg.configFile."systemd/user/tray.target".enable = false;
 
   # Not perfect as it won't work for apps that wrap themselves with xdg-utils.
   # Don't want to overlay xdg-utils to avoid mass rebuilds.

@@ -58,7 +58,7 @@ in
             let
               offset = (gapSize * 2) + borderWidth;
             in
-            "${toString offset}x${toString offset}";
+            "(${toString offset}, ${toString offset})";
           gap_size = gapSize;
           frame_width = borderWidth;
           transparency = 100;

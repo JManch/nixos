@@ -20,8 +20,6 @@ let
   inherit (config.age.secrets) broadcastBoxDiscordVars;
 in
 {
-  imports = [ "${inputs.nixpkgs-broadcast-box}/nixos/modules/services/video/broadcast-box.nix" ];
-
   opts = with lib; {
     autoStart = mkEnableOption "Broadcast Box service auto start";
     proxy = mkEnableOption ''

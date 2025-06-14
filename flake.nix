@@ -36,7 +36,6 @@
     # should review changes after updating.
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-broadcast-box.url = "github:JManch/nixpkgs/broadcast-box";
 
     impermanence.url = "github:nix-community/impermanence";
 

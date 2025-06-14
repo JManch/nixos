@@ -24,14 +24,8 @@ in
   programs.neovim = {
     enable = true;
 
-    # Pin Neovim to v10.2
+    # Neovim is pinned to v10.2 in our system overlays
     # TODO: Update config for Neovim 11
-    # WARN: When updating remember to remove the neovimUtils overlay from nix.nix
-    package =
-      (import (fetchTarball {
-        url = "https://github.com/NixOS/nixpkgs/archive/7ffe0edc685f14b8c635e3d6591b0bbb97365e6c.tar.gz";
-        sha256 = "sha256:08pwvljh8qskw8ajggfpx4x2jc1x69jc9vqkqzx68aj66vb2rsmh";
-      }) { inherit (pkgs) system; }).neovim-unwrapped;
 
     viAlias = true;
     vimAlias = true;

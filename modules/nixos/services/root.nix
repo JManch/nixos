@@ -106,8 +106,8 @@ in
   };
 
   asserts = [
-    ((cfg.failureNotifyServices != { }) -> config.age.secrets ? notifVars)
-    "Failure notify services require the notifVars secret"
+    ((cfg.failureNotifyServices != { }) -> config.age.secrets ? notifyVars)
+    "Failure notify services require the notifyVars secret"
     ((cfg.healthCheckServices != { }) -> config.age.secrets ? healthCheckVars)
     "Heath check services require the healthCheckVars secret"
   ];
@@ -126,7 +126,7 @@ in
             restartIfChanged = false;
             serviceConfig = {
               Type = "oneshot";
-              EnvironmentFile = config.age.secrets.notifVars.path;
+              EnvironmentFile = config.age.secrets.notifyVars.path;
               ExecStart = getExe (
                 pkgs.writeShellApplication {
                   name = "${name}-${type}-notify";

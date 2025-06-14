@@ -84,7 +84,7 @@ in
           )
         );
         default = {
-          proton = {
+          protondrive = {
             setupScript =
               # bash
               ''

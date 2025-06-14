@@ -268,7 +268,7 @@ in
       };
 
       backendOptions = {
-        remote = "proton";
+        remote = "protondrive";
         mode = "copy";
         timeout = 120;
         remotePaths."/tmp/vaultwarden-cloud-upload" = "vaultwarden";

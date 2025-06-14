@@ -44,7 +44,7 @@ let
     ;
   inherit (inputs.nix-resources.secrets) keys;
   inherit (config.${ns}.system) impermanence;
-  inherit (config.age.secrets) notifVars;
+  inherit (config.age.secrets) notifyVars;
   configDir = "/home/${adminUsername}/.config/nixos";
 
   rebuildCmds = [
@@ -493,7 +493,7 @@ in
               restartIfChanged = false;
               serviceConfig = {
                 type = "oneshot";
-                EnvironmentFile = notifVars.path;
+                EnvironmentFile = notifyVars.path;
                 ExecStart =
                   let
                     title = "NixOS Auto Upgrade ${upperFirstChar type}";

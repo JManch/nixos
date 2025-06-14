@@ -39,7 +39,7 @@ let
         keys+=" -i $file"
       done
 
-      if [[ $EDITOR != "cp /dev/stdin" ]]; then
+      if [[ ''${EDITOR:-} != "cp /dev/stdin" ]]; then
         export EDITOR=nano
       fi
     '';

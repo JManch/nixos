@@ -196,8 +196,8 @@ in
               name = "Virtual-1";
               number = 1;
               refreshRate = 60.0;
-              width = 2048;
-              height = 1152;
+              width = builtins.floor (0.75 * primaryMonitor.width);
+              height = builtins.floor (0.75 * primaryMonitor.height);
               position.x = 0;
               position.y = 0;
               workspaces = builtins.genList (i: i + 1) 9;

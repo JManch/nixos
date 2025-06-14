@@ -69,9 +69,12 @@ in
 
                 setupScript = mkOption {
                   type = types.lines;
-                  default = ''
-                    rclone --config "$config_dir" config create remote "${name}" --all
-                  '';
+                  default =
+                    # bash
+                    ''
+                      rclone --config "$config_dir/config" config create remote "${name}" --all
+
+                    '';
                   description = ''
                     Script for generating the rclone config.
                   '';
@@ -81,7 +84,17 @@ in
           )
         );
         default = {
-          proton = { };
+          proton = {
+            setupScript =
+              # bash
+              ''
+                rclone --config "$config_dir/config" config create remote protondrive --all
+                # The rclone config needs to be 'bootstrapped' to generate client keys
+                rclone --config "$config_dir/config" about remote:
+                # These keys aren't needed beyond the first run
+                sed -E -i '/^(2fa|username|password) =/d' "$config_dir/config"
+              '';
+          };
           filen = {
             package = selfPkgs.filen-rclone;
             setupScript = # bash
@@ -160,6 +173,7 @@ in
                     exit 1
                   fi
 
+                  # On some remotes rclone writes to the config to refresh tokens
                   if [[ ! -f "$CACHE_DIRECTORY/config" ]] || ! cmp -s "$CACHE_DIRECTORY/config" "${remoteConfig}"; then
                     cp "${remoteConfig}" "$CACHE_DIRECTORY/config"
                     cp "${remoteConfig}" "$CACHE_DIRECTORY/config-original"

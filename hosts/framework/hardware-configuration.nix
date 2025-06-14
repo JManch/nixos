@@ -138,6 +138,12 @@
     };
   };
 
+  # Set minimum initial brightness to 50% so we can see TTY outdoors
+  # https://www.man7.org/linux/man-pages/man8/systemd-backlight.8.html
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="amdgpu_bl1", ENV{ID_BACKLIGHT_CLAMP}="50%%"
+  '';
+
   # Disable the airplane mode key
   services.udev.extraHwdb = ''
     evdev:input:b0018v32ACp0006*

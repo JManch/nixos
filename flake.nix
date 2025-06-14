@@ -26,6 +26,7 @@
     };
 
   # To use a local flake as an input set url to "git+file://<PATH>"
+  # To use a nixpkgs PR as an input set url to "github:NixOS/nixpkgs?ref=pull/<PR_NUMBER>/head"
 
   # When locking a flake to a rev, it's important to manually run `nix flake
   # update <input>`; otherwise, the inputs of the locked flake will not be

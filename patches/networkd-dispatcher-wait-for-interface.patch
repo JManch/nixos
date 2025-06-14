@@ -14,7 +14,7 @@ index 8ed2269..7518390 100755
          return f"<Dispatcher({self.__dict__})>"
  
      def _interface_scan(self):
-+        time.sleep(10)
++        time.sleep(2)
          iface_list = get_networkctl_list()
          # Append new interfaces, keeping old ones around to avoid hotplug race
          # condition (issue #20)

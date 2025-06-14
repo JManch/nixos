@@ -157,23 +157,25 @@ in
           ${name}."on${lib.${ns}.upperFirstChar type}" = [ "${name}-${type}-notify.service" ];
         }) cfg."${type}NotifyServices";
     in
-    mkMerge [
-      (mkNotifyServices "failure")
-      (mkNotifyServices "success")
-      (mapAttrs (name: value: {
-        serviceConfig.ExecStartPost = mkAfter [
-          (getExe (
-            pkgs.writeShellApplication {
-              name = "${name}-send-health-check";
-              runtimeInputs = [ pkgs.curl ];
-              text = ''
-                # shellcheck source=/dev/null
-                source ${config.age.secrets.healthCheckVars.path}
-                curl -s "${"$" + value.var}"
-              '';
-            }
-          ))
-        ];
-      }) cfg.healthCheckServices)
-    ];
+    mkMerge (
+      mkNotifyServices "failure"
+      ++ mkNotifyServices "success"
+      ++ [
+        (mapAttrs (name: value: {
+          serviceConfig.ExecStartPost = mkAfter [
+            (getExe (
+              pkgs.writeShellApplication {
+                name = "${name}-send-health-check";
+                runtimeInputs = [ pkgs.curl ];
+                text = ''
+                  # shellcheck source=/dev/null
+                  source ${config.age.secrets.healthCheckVars.path}
+                  curl -s "${"$" + value.var}"
+                '';
+              }
+            ))
+          ];
+        }) cfg.healthCheckServices)
+      ]
+    );
 }

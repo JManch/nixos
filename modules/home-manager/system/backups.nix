@@ -24,6 +24,6 @@ in
   );
 
   opts =
-    import ../../nixos/services/backups/backups-option.nix args osConfig.${lib.ns}.services.backups
+    import ../../nixos/system/backups/backups-option.nix args osConfig.${lib.ns}.system.backups
       true;
 }

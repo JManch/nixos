@@ -63,6 +63,15 @@
       ssh.server.enable = true;
       networking.wiredInterface = "enp3s0";
 
+      backups.restic = {
+        enable = true;
+        timerConfig = {
+          OnCalendar = "*-*-* 14:00:00";
+          Persistent = true;
+        };
+        runMaintenance = false;
+      };
+
       desktop = {
         enable = true;
         # Suspend is very close to being stable but it sometimes causes
@@ -83,15 +92,6 @@
 
     services = {
       scrutiny.collector.enable = true;
-
-      backups.restic = {
-        enable = true;
-        timerConfig = {
-          OnCalendar = "*-*-* 14:00:00";
-          Persistent = true;
-        };
-        runMaintenance = false;
-      };
     };
   };
 }

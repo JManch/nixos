@@ -198,7 +198,7 @@ in
   }
 
   {
-    ns.services.backups.backends.rclone = args: {
+    categoryConfig.backends.rclone = args: {
       options = {
         remote = mkOption {
           type = types.enum (attrNames cfg.remotes);
@@ -282,7 +282,6 @@ in
               echo "Error: '$nix_resources' is not a valid path (flake.nix not found)" >&2
             fi
           done
-
 
           pushd "$nix_resources/secrets" >/dev/null
           trap "popd >/dev/null 2>&1 || true" EXIT

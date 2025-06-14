@@ -188,7 +188,7 @@ let
                 fi
               fi
               fi
-            '') self.nixosConfigurations.${hostname}.config.${ns}.services.backups.backups
+            '') self.nixosConfigurations.${hostname}.config.${ns}.system.backups.backups
         )
       ) (attrNames self.nixosConfigurations)}
     '';
@@ -198,7 +198,7 @@ in
   {
     guardType = "custom";
 
-    ns.services.backups.backends.restic = args: {
+    categoryConfig.backends.restic = args: {
       # WARN: Exclude and include paths are not prefixed with persistence
       # to allow non-absolute patterns, be careful with those
 

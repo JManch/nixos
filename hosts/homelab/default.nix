@@ -177,32 +177,6 @@ in
         supportedMachines = [ "ncase-m1.lan" ];
       };
 
-      backups = {
-        rclone = {
-          enable = true;
-
-          timerConfig = {
-            OnCalendar = "*-*-* 13:00:00";
-            Persistent = true;
-          };
-        };
-
-        restic = {
-          enable = true;
-
-          timerConfig = {
-            OnCalendar = "*-*-* 05:00:00";
-            Persistent = true;
-          };
-
-          server = {
-            enable = true;
-            remoteCopySchedule = "*-*-* 05:30:00";
-            remoteMaintenanceSchedule = "Sun *-*-* 06:00:00";
-          };
-        };
-      };
-
       filebrowser = {
         enable = true;
         storeInRam = true;
@@ -268,6 +242,32 @@ in
       impermanence.enable = true;
       ssh.server.enable = true;
       desktop.enable = false;
+
+      backups = {
+        rclone = {
+          enable = true;
+
+          timerConfig = {
+            OnCalendar = "*-*-* 13:00:00";
+            Persistent = true;
+          };
+        };
+
+        restic = {
+          enable = true;
+
+          timerConfig = {
+            OnCalendar = "*-*-* 05:00:00";
+            Persistent = true;
+          };
+
+          server = {
+            enable = true;
+            remoteCopySchedule = "*-*-* 05:30:00";
+            remoteMaintenanceSchedule = "Sun *-*-* 06:00:00";
+          };
+        };
+      };
 
       networking = {
         wiredInterface = "enp0s16u1u4c2";

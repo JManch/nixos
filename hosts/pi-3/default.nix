@@ -63,14 +63,6 @@ in
     };
 
     services = {
-      backups.restic = {
-        enable = true;
-        timerConfig = {
-          OnCalendar = "*-*-* 03:00:00";
-          Persistent = true;
-        };
-      };
-
       zigbee2mqtt = {
         enable = false;
         address = "0.0.0.0";
@@ -84,6 +76,14 @@ in
       ssh.server.enable = true;
       # Cross compilation build fails
       ssh.agent.enable = false;
+
+      backups.restic = {
+        enable = true;
+        timerConfig = {
+          OnCalendar = "*-*-* 03:00:00";
+          Persistent = true;
+        };
+      };
 
       networking = {
         wiredInterface = "enu1u1u1";

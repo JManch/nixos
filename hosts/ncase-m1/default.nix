@@ -154,14 +154,6 @@
         mediaDirs.shows = "/home/${username}/videos/shows";
       };
 
-      backups.restic = {
-        enable = true;
-        timerConfig = {
-          OnCalendar = "*-*-* 15:00:00";
-          Persistent = true;
-        };
-      };
-
       wgnord = {
         enable = true;
         excludeSubnets = [ "192.168.89.2/32" ];
@@ -208,6 +200,14 @@
       impermanence.enable = true;
       ssh.server.enable = true;
       virtualisation.libvirt.enable = true;
+
+      backups.restic = {
+        enable = true;
+        timerConfig = {
+          OnCalendar = "*-*-* 15:00:00";
+          Persistent = true;
+        };
+      };
 
       desktop = {
         enable = true;

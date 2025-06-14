@@ -401,6 +401,14 @@ in
         # abc = secret123
         # Requesting secret "abc" will return password123
         wpa_supplicant = addPatches prev.wpa_supplicant [ "wpa-supplicant-ext-password-fix.patch" ];
+        # So we can keep using neovim
+        inherit
+          (import (fetchTarball {
+            url = "https://github.com/NixOS/nixpkgs/archive/7ffe0edc685f14b8c635e3d6591b0bbb97365e6c.tar.gz";
+            sha256 = "sha256:08pwvljh8qskw8ajggfpx4x2jc1x69jc9vqkqzx68aj66vb2rsmh";
+          }) { inherit (pkgs) system; })
+          neovimUtils
+          ;
       })
     ];
     config.allowUnfree = true;

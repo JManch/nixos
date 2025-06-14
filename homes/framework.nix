@@ -21,6 +21,7 @@
         vrr = true;
         tearing = true;
         directScanout = false; # causing flash when switching from fullscreen workspaces
+        secondaryModKey = "SUPER"; # for some reason VMs ignore keyd remaps
       };
 
       programs = {

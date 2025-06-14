@@ -28,7 +28,7 @@ in
       Description = "Hyprpaper Wallpaper Daemon";
       Before = [ "set-wallpaper.service" ];
       PartOf = [ "graphical-session.target" ];
-      Requires = [ "graphical-session.target" ];
+      Requisite = [ "graphical-session.target" ];
       After = [ "graphical-session.target" ];
     };
 

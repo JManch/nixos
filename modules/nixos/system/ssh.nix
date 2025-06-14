@@ -81,7 +81,7 @@ in
 
   programs.ssh = {
     startAgent = cfg.agent.enable;
-    agentTimeout = "1h";
+    agentTimeout = null;
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
     extraConfig = mkIf cfg.agent.enable ''
       AddKeysToAgent yes

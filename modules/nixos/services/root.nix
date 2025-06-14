@@ -22,61 +22,65 @@ let
     mkEnableOption
     ;
 
-  notifyServiceSubmodule = types.submodule (
-    { name, config, ... }:
-    {
-      options = {
-        title = mkOption {
-          type = types.str;
-          default = "${replaceStrings [ "-" ] [ " " ] (lib.${ns}.upperFirstChar name)} failed";
-          description = "Message title";
-        };
-
-        contents = mkOption {
-          type = types.str;
-          default = "${config.title} on host ${hostname}";
-          description = "Message contents";
-        };
-
-        contentsScript = mkOption {
-          type = with types; nullOr str;
-          default = null;
-          description = "Single line script that prints message content to stdout. Replaces the contents option.";
-        };
-
-        email.enable = mkEnableOption "sending a success email" // {
-          default = true;
-        };
-
-        discord = {
-          enable = mkEnableOption "sending a discord success message";
-
-          var = mkOption {
+  notifyServiceSubmodule =
+    type:
+    types.submodule (
+      { name, config, ... }:
+      {
+        options = {
+          title = mkOption {
             type = types.str;
-            example = "RESTIC";
-            description = "The _(FAILURE|SUCCESS)_DISCORD_AUTH variable prefix";
+            default = "${replaceStrings [ "-" ] [ " " ] (lib.${ns}.upperFirstChar name)} ${
+              if type == "success" then "succeeded" else "failed"
+            }";
+            description = "Message title";
+          };
+
+          contents = mkOption {
+            type = types.str;
+            default = "${config.title} on host ${hostname}";
+            description = "Message contents";
+          };
+
+          contentsScript = mkOption {
+            type = with types; nullOr str;
+            default = null;
+            description = "Single line script that prints message content to stdout. Replaces the contents option.";
+          };
+
+          email.enable = mkEnableOption "sending a ${type} email" // {
+            default = true;
+          };
+
+          discord = {
+            enable = mkEnableOption "sending a discord ${type} message";
+
+            var = mkOption {
+              type = types.str;
+              example = "RESTIC";
+              description = "The _(FAILURE|SUCCESS)_DISCORD_AUTH variable prefix";
+            };
           };
         };
-      };
-    }
-  );
+      }
+    );
 in
 {
   opts = {
     successNotifyServices = mkOption {
-      type = types.attrsOf notifyServiceSubmodule;
+      type = types.attrsOf (notifyServiceSubmodule "success");
       default = { };
       description = ''
-        Attribute set of failure notification services to where the attribute
-        name matches the service that should trigger the failure service.
+        Attribute set of success notification services where the attribute
+        name matches the service that should trigger the success service.
       '';
     };
 
     failureNotifyServices = mkOption {
-      type = types.attrsOf notifyServiceSubmodule;
+      type = types.attrsOf (notifyServiceSubmodule "failure");
       default = { };
       description = ''
-        Attribute set of failure notification services to where the attribute
+        Attribute set of failure notification services where the attribute
         name matches the service that should trigger the failure service.
       '';
     };

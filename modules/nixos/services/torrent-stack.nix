@@ -658,6 +658,21 @@ in
         backend = "rclone";
         paths = [ "/media/music" ];
 
+        notifications = {
+          failure.config = {
+            discord.enable = true;
+            discord.var = "MUSIC";
+          };
+
+          success = {
+            enable = true;
+            config = {
+              discord.enable = true;
+              discord.var = "MUSIC";
+            };
+          };
+        };
+
         timerConfig = {
           OnCalendar = "Sun *-*-* 8:00:00";
           Persistent = false;

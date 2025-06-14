@@ -27,10 +27,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v3.8.3",
-      "revision": "0fda70f783334b44482ddf5ea38dcaf08c6d0369",
+      "version": "v3.8.4",
+      "revision": "ab4c2c104f47c2e781ddf948784f089b114253ec",
       "url": null,
-      "hash": "13lsgq7q61w8q8gx1ihf4zdyxk76c8ai7pf6y8g54j7fw6j6i15c"
+      "hash": "02lpmksy480acnzk8qc94ycn23ik376qlrkmhi2z35y7h8ki4ha3"
     },
     "HA_blueprints": {
       "type": "GitRelease",
@@ -89,9 +89,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "7b9672a2dc16bdfbe7b7b7c27043529ca3bcb6ae",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/7b9672a2dc16bdfbe7b7b7c27043529ca3bcb6ae.tar.gz",
-      "hash": "03dnx5v75530fwppfgpjl6xzzmdbk73ymrlix129d9n5sqrz9wgk"
+      "revision": "0b9f4bbf1dd71b4568e33d903c51cb276b75bf01",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/0b9f4bbf1dd71b4568e33d903c51cb276b75bf01.tar.gz",
+      "hash": "11sl20ys73khjnscd4q36y11qizfl8ymrdp9bpaidr1v5by8220b"
     },
     "async-property": {
       "type": "PyPi",
@@ -156,9 +156,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "f5fd5095cc042618a7531698a34b21df9d065e2a",
-      "url": "https://github.com/FilenCloudDienste/filen-rclone/archive/f5fd5095cc042618a7531698a34b21df9d065e2a.tar.gz",
-      "hash": "0hkj7zpsjmqccgvkbm5h86h9m8ij8phybaqjnqpz044qyhc4g6v0"
+      "revision": "784979078ecd573af0d9809d2c5a07bafaad2c41",
+      "url": "https://github.com/FilenCloudDienste/filen-rclone/archive/784979078ecd573af0d9809d2c5a07bafaad2c41.tar.gz",
+      "hash": "1arpcpg48x9v3bizsg1p71c3ci88px4d8g202zaydaq0yp91q8ya"
     },
     "firefox-csshacks": {
       "type": "Git",
@@ -313,9 +313,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "265e4f961f09c6aa445e91efcc6c4bc3e1f10fc8",
-      "url": "https://github.com/dweymouth/supersonic/archive/265e4f961f09c6aa445e91efcc6c4bc3e1f10fc8.tar.gz",
-      "hash": "1zcvzcv4cmkgcx4dbs0256iv1n8qkkicn9m4rwk0812c6gyqip2m"
+      "revision": "7aaba58403ade1bb483f6030004074a98bc5ff0d",
+      "url": "https://github.com/dweymouth/supersonic/archive/7aaba58403ade1bb483f6030004074a98bc5ff0d.tar.gz",
+      "hash": "1jsa536bljw4ixjzi81wim7wf46pf5laaz8jldvmp75gzilpcm1h"
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -389,10 +389,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.12.4",
-      "revision": "d942faa2628b58d42d59734b953c189ace8bde8c",
-      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.12.4",
-      "hash": "0vcn5aiwpfgpxaysspxnd1lcriql36dwb78q9i4db6253fsjs39w"
+      "version": "v0.13.0",
+      "revision": "6d64ac1479ed2fce0060a90ce88538490362eae4",
+      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.13.0",
+      "hash": "1skjns5xbz6pcr59qsfyh6hisrbjyyia54vniznllrizap18vibc"
     }
   },
   "version": 5

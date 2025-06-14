@@ -92,7 +92,6 @@ in
           mprisSupport = false;
           rfkillSupport = false;
           sndioSupport = false;
-          swaySupport = false;
           upowerSupport = false;
           wireplumberSupport = false;
           withMediaPlayer = false;

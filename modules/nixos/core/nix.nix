@@ -445,7 +445,8 @@ in
           "nix-command"
           "auto-allocate-uids"
         ];
-        allow-import-from-derivation = false;
+        # Want to disable but nvf requires it
+        allow-import-from-derivation = true;
         # Causes excessive writes and potential slow downs when writing
         # content to the nix store. Optimising once a week with
         # `nix.optimise.automatic` is probably better?

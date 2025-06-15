@@ -33,5 +33,9 @@ in
   kobo-dither-cbz = callPackage ./kobo-dither-cbz { };
   microfetch = lib.${lib.ns}.addPatches pkgs.microfetch [ "microfetch-icon.patch" ];
   resample-flacs = callPackage ./resample-flacs.nix { };
+  nvim =
+    (import ./nvim {
+      inherit self pkgs;
+    }).neovim;
 }
 // import ./installers.nix lib self

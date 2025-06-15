@@ -1,0 +1,12 @@
+diff --git a/lua/oil/init.lua b/lua/oil/init.lua
+index 992c574..8c37238 100644
+--- a/lua/oil/init.lua
++++ b/lua/oil/init.lua
+@@ -1283,7 +1283,6 @@ M.setup = function(opts)
+       local scheme = util.parse_url(bufname)
+       if scheme and config.adapters[scheme] then
+         local view = require("oil.view")
+-        view.maybe_set_cursor()
+         -- While we are in an oil buffer, set the alternate file to the buffer we were in prior to
+         -- opening oil
+         local has_orig, orig_buffer = pcall(vim.api.nvim_win_get_var, 0, "oil_original_buffer")

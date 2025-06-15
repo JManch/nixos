@@ -82,6 +82,9 @@
     gnome-keybinds.url = "github:JManch/hm-gnome-keybinds";
     gnome-keybinds.inputs.nixpkgs.follows = "nixpkgs";
 
+    nvf.url = "github:JManch/nvf/blink-cmp-fix";
+    nvf.inputs.nixpkgs.follows = "nixpkgs";
+
     # Inputs that provide packages
 
     hyprland.url = "github:hyprwm/Hyprland";

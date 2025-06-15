@@ -7,6 +7,7 @@
 let
   inherit (lib) ns mkIf concatStringsSep;
   inherit (osConfig.${ns}) persistence;
+  inherit (osConfig.${ns}.core) device;
   themePath = "btop/themes/custom.theme";
 in
 {
@@ -25,6 +26,8 @@ in
     );
 
     settings = {
+      custom_gpu_name0 = device.gpu.name;
+      shown_boxes = "cpu mem net proc gpu0";
       vim_keys = true;
       color_theme = "custom";
       disks_filter = mkIf persistence.enable (

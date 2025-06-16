@@ -1351,16 +1351,15 @@
         "systems": "systems_10"
       },
       "locked": {
-        "lastModified": 1750016443,
-        "narHash": "sha256-cmMOsjXOsUMqlfs7DJzijyG4geLUDU6w5iCCj9SftO8=",
+        "lastModified": 1750035197,
+        "narHash": "sha256-xAdGPcNEJWgaonlRxzBqp1ax8UYk5hVGqkC0i930B2I=",
         "owner": "JManch",
         "repo": "nvf",
-        "rev": "f6e6b39a47abdad33f58a27b821ace5745c90045",
+        "rev": "f50af0ea323d692d4525193c74e296cff04a7f24",
         "type": "github"
       },
       "original": {
         "owner": "JManch",
-        "ref": "blink-cmp-fix",
         "repo": "nvf",
         "type": "github"
       }

@@ -1,6 +1,7 @@
 { lib, ... }:
 {
   vim.autocomplete = {
+    enableSharedCmpSources = lib.mkForce false;
     blink-cmp = {
       enable = true;
 
@@ -70,6 +71,11 @@
             "scroll_documentation_down"
             "fallback"
           ];
+        };
+
+        sources.providers = {
+          path.opts.trailing_slash = false;
+          ripgrep.opts.score_offset = -5;
         };
       };
 

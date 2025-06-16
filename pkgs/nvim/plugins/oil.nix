@@ -6,6 +6,7 @@
     package = pkgs.vimPlugins.oil-nvim;
     lazy = true;
     setupModule = "oil";
+    cmd = [ "Oil" ];
     keys = [
       (lib.nvim.binds.mkKeymap "n" "<LEADER>fd" "<CMD>Oil --float --preview<CR>" {
         desc = "oil.nvim browse files";

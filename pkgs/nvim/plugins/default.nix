@@ -6,6 +6,7 @@
     ./oil.nix
     ./treesitter.nix
     ./colorscheme.nix
+    ./dashboard.nix
   ];
 
   vim = {
@@ -14,6 +15,7 @@
       setupOpts = {
         indent.char = "│";
         scope.enabled = false;
+        exclude.filetypes = [ "dashboard" ];
       };
     };
 

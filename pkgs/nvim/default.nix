@@ -1,12 +1,15 @@
 {
-  self,
   pkgs,
+  self,
+  sources,
 }:
 self.inputs.nvf.lib.neovimConfiguration {
   inherit pkgs;
+
   extraSpecialArgs = {
-    hmConfig = self.nixosConfigurations.ncase-m1.config.JManch.hm;
+    inherit sources;
   };
+
   modules = [
     ./core
     ./plugins

@@ -1,10 +1,5 @@
 { pkgs, ... }:
 {
-  vim.lsp = {
-    enable = true;
-    formatOnSave = true;
-  };
-
   vim.languages = {
     enableTreesitter = true;
 

@@ -35,7 +35,7 @@ in
   resample-flacs = callPackage ./resample-flacs.nix { };
   nvim =
     (import ./nvim {
-      inherit self pkgs;
+      inherit self pkgs sources;
     }).neovim;
 }
 // import ./installers.nix lib self

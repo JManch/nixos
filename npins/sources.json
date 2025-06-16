@@ -275,6 +275,19 @@
       "hash": "f48243d925c8314aa9adb0c5d0dce95120daf75edf578119279b832eb14f4c57",
       "frozen": true
     },
+    "neovim-ayu": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "JManch",
+        "repo": "neovim-ayu"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "ad7835d7ea9d49977114916973d2e10029ef7d2d",
+      "url": "https://github.com/JManch/neovim-ayu/archive/ad7835d7ea9d49977114916973d2e10029ef7d2d.tar.gz",
+      "hash": "1cfag8yn5p1bbjip0nsisj111z87v9ys9l91illlb6f5v2c0f7is"
+    },
     "slskd-stats": {
       "type": "GitRelease",
       "repository": {
@@ -303,6 +316,19 @@
       "revision": "283a65096ab89ef75cd3dec3ffe6b75d38d37fc2",
       "url": "https://github.com/mrusse/soularr/archive/283a65096ab89ef75cd3dec3ffe6b75d38d37fc2.tar.gz",
       "hash": "1d3h5y24kj141q7kv96wrimninirxi3fsfj2mf9mgah93nw699za"
+    },
+    "sunset.nvim": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "JManch",
+        "repo": "sunset.nvim"
+      },
+      "branch": "dev",
+      "submodules": false,
+      "revision": "36cd595dd77f3f5a71d430d6e465ee1a890010f4",
+      "url": "https://github.com/JManch/sunset.nvim/archive/36cd595dd77f3f5a71d430d6e465ee1a890010f4.tar.gz",
+      "hash": "0nffbsbv11mfrad6np7m7xc67rxcjas61f2hbn0310qc94aihdi9"
     },
     "supersonic": {
       "type": "Git",

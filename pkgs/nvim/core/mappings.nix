@@ -37,7 +37,6 @@ in
 
     (mkKeymap "n" "<LEADER>v" "<CMD>vsplit<CR><C-l>" { desc = "Vertical split current buffer"; })
     (mkKeymap "n" "<S-x>" "<CMD>Bwipeout<CR>" { desc = "Close current buffer"; })
-    # (mkKeymap "n" "<S-z>" utils.delete_hidden_buffers "Close all hidden buffers")
 
     (mkKeymap "n" "<LEADER>y" "\"+y" { desc = "Yank to system register"; })
     (mkKeymap "n" "<LEADER>Y" "\"+y$" { desc = "Yank till end of line to system register"; })

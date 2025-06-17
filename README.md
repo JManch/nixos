@@ -11,7 +11,7 @@
 - Passwordless disk decryption with Secure Boot and TPM
 - Declarative base-16 color scheme config with light/dark theme switching
 - Secret management using Agenix (secrets stored in private repo)
-- Declarative Restic backup system with remote redundancy
+- Declarative backup system that supports multiple backends
 
 ## Structure
 

@@ -64,13 +64,55 @@
     lib.nvim.dag.entryBefore [ "theme" ]
       # lua
       ''
+        local dashboard_utils = {
+          group = vim.api.nvim_create_augroup("DashboardCustom", { clear = true }),
+          cursor_blend = function(value)
+            local hl = vim.api.nvim_get_hl(0, { name = "Cursor", create = true })
+            hl.blend = value
+            vim.api.nvim_set_hl(0, "Cursor", hl)
+            vim.cmd("set guicursor+=a:Cursor/lCursor")
+          end,
+        }
+
         vim.api.nvim_create_autocmd("ColorScheme", {
-          group = vim.api.nvim_create_augroup("DashboardHighlights", { clear = true }),
+          group = dashboard_utils.group,
           pattern = "*",
-          desc = "Link dashboard hightlight groups",
+          desc = "Link dashboard highlight groups",
           callback = function()
             vim.api.nvim_set_hl(0, "DashboardHeader", { link = "Identifier" })
             vim.api.nvim_set_hl(0, "DashboardFooter", { link = "CmpItemMenu" })
+          end,
+        })
+
+        -- For hiding cursor when dashboard is opened on launch or later with
+        -- :Dashboard
+        vim.api.nvim_create_autocmd('User', {
+          group = dashboard_utils.group,
+          pattern = 'DashboardLoaded',
+          callback = function()
+            dashboard_utils.cursor_blend(100)
+            vim.api.nvim_create_autocmd({'BufLeave', 'TermOpen'}, {
+              callback = function()
+                dashboard_utils.cursor_blend(0)
+                return true
+              end,
+            })
+          end
+        })
+
+        -- For hiding cursor the dashboard is re-focused e.g. by closing
+        -- fzf-lua terminal
+        vim.api.nvim_create_autocmd('BufEnter', {
+          group = dashboard_utils.group,
+          callback = function()
+            if vim.bo.filetype ~= 'dashboard' then return end
+            dashboard_utils.cursor_blend(100)
+            vim.api.nvim_create_autocmd({'BufLeave', 'TermOpen'}, {
+              callback = function()
+                dashboard_utils.cursor_blend(0)
+                return true
+              end,
+            })
           end,
         })
       '';

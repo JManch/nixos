@@ -9,6 +9,7 @@
     ./dashboard.nix
     ./workspaces.nix
     ./gitsigns.nix
+    ./textobjs.nix
   ];
 
   vim = {

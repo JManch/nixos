@@ -331,7 +331,9 @@ in
         disable_hyprland_logo = true;
         focus_on_activate = false;
         mouse_move_enables_dpms = true;
-        key_press_enables_dpms = true;
+        # To enable using keybinds when screen has been manually turned off
+        # off. Locker script enables this option.
+        key_press_enables_dpms = false;
         background_color = "0x000000";
         new_window_takes_over_fullscreen = 2;
         enable_swallow = false;
@@ -395,6 +397,11 @@ in
         };
       };
     };
+  };
+
+  ns.desktop.programs.locker = {
+    preLockScript = "hyprctl keyword misc:key_press_enables_dpms true";
+    postLockScript = "hyprctl keyword misc:key_press_enables_dpms false";
   };
 
   ns.desktop.darkman.switchApps.hyprland =

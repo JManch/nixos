@@ -404,6 +404,22 @@
       "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.21.8",
       "hash": "1liklqm27wbja13bjiwp0x0kkg394dc0byqy6fxljn3lw95g96bg"
     },
+    "workspaces.nvim": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "natecraddock",
+        "repo": "workspaces.nvim"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "1.0",
+      "revision": "8f2a49449e07e5ccf0099bfe9b27ba7ccc759202",
+      "url": "https://api.github.com/repos/natecraddock/workspaces.nvim/tarball/1.0",
+      "hash": "1040bfyi2a5isx7hqdvqn9x3lwlklf2hlsyp6qglc0nk4kymc1ic"
+    },
     "xdg-terminal-exec": {
       "type": "GitRelease",
       "repository": {

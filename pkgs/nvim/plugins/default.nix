@@ -7,6 +7,7 @@
     ./treesitter.nix
     ./colorscheme.nix
     ./dashboard.nix
+    ./workspaces.nix
   ];
 
   vim = {

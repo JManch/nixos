@@ -48,11 +48,14 @@
             (mkButton "  " "q" "Quit" "qa")
           ];
 
-        footer = lib.generators.mkLuaInline ''
-          function()
-            return { "", string.match(vim.api.nvim_exec2('version', { output = true }).output, 'NVIM (.-)\n') }
-          end
-        '';
+        footer =
+          lib.generators.mkLuaInline
+            # lua
+            ''
+              function()
+                return { "", string.match(vim.api.nvim_exec2('version', { output = true }).output, 'NVIM (.-)\n'), "", "", "", "" }
+              end
+            '';
       };
     };
   };

@@ -7,6 +7,8 @@ in
     enable = true;
     profile = "telescope"; # investigate
     setupOpts = {
+      winopts.backdrop = 100;
+
       files = {
         cmd = "fd";
         fd_opts = "[[--color=never --type f --type l --exclude .git]]";
@@ -33,6 +35,24 @@ in
           "--layout" = "reverse";
         };
     };
+  };
+
+  vim.lazy.plugins."fzf-lua" = {
+    # we always use it on launch for workspace picker
+    lazy = false;
+    after =
+      # lua
+      ''
+        require("fzf-lua").register_ui_select(function(ui_opts)
+          ui_opts.winopts = {
+            height = 15,
+            width = 80,
+            row = 0.45,
+            col = 0.5,
+          }
+          return ui_opts
+        end)
+      '';
   };
 
   vim.luaConfigRC.basic = ''

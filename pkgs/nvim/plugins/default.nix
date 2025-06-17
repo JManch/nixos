@@ -8,9 +8,12 @@
     ./colorscheme.nix
     ./dashboard.nix
     ./workspaces.nix
+    ./gitsigns.nix
   ];
 
   vim = {
+    mini.pairs.enable = true;
+
     visuals.indent-blankline = {
       enable = true;
       setupOpts = {
@@ -22,7 +25,7 @@
 
     notify.nvim-notify = {
       enable = true;
-      setupOpts.position = "top_right";
+      setupOpts.position = "bottom_right";
     };
   };
 }

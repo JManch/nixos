@@ -27,6 +27,7 @@ let
     ;
   inherit (config.${ns}.system) virtualisation;
   inherit (inputs.nix-resources.secrets) keys;
+  inherit (config.${ns}.system) desktop;
 in
 {
   enableOpt = false;
@@ -48,6 +49,8 @@ in
       default = username == adminUsername;
     };
   };
+
+  services.gnome.gcr-ssh-agent.enable = cfg.agent.enable && desktop.enable;
 
   services.openssh = mkIf cfg.server.enable {
     enable = true;
@@ -80,7 +83,7 @@ in
   users.users.${adminUsername}.openssh.authorizedKeys.keys = attrValues keys.auth;
 
   programs.ssh = {
-    startAgent = cfg.agent.enable;
+    startAgent = cfg.agent.enable && !desktop.enable;
     agentTimeout = null;
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
     extraConfig = mkIf cfg.agent.enable ''

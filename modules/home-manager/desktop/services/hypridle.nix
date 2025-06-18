@@ -95,23 +95,26 @@ in
     };
   };
 
-  ns.desktop.programs.locker.postLockScript =
-    mkIf (isHyprland config && !vmVariant)
-      # bash
-      ''
-        # Turn off the display after locking. I've found that doing this in the
-        # lock script is more reliable than adding another listener.
-        while true; do
-          # If the display is on, wait screenOffTime seconds then turn off
-          # display. Then wait the full lock time before checking again.
-          if ${hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" &>/dev/null; then
-            cursor_pos=$(${hyprctl} cursorpos)
-            sleep ${toString cfg.screenOffTime}
-            if [ "$cursor_pos" != "$(${hyprctl} cursorpos)" ]; then continue; fi
-            ${hyprctl} dispatch dpms off
-          fi
-          # give screens time to turn off and prolong next countdown
-          sleep ${toString cfg.lockTime}
-        done &
-      '';
+  ns.desktop.programs.locker = {
+    postLockScript =
+      mkIf (isHyprland config && !vmVariant)
+        # bash
+        ''
+          # Turn off the display after locking. I've found that doing this in the
+          # lock script is more reliable than adding another listener.
+          while true; do
+            # If the display is on, wait screenOffTime seconds then turn off
+            # display. Then wait the full lock time before checking again.
+            if ${hyprctl} monitors -j | ${jaq} -e "first(.[] | select(.dpmsStatus == true))" &>/dev/null; then
+              cursor_pos=$(${hyprctl} cursorpos)
+              sleep ${toString cfg.screenOffTime}
+              if [ "$cursor_pos" != "$(${hyprctl} cursorpos)" ]; then continue; fi
+              ${hyprctl} dispatch dpms off
+            fi
+            # give screens time to turn off and prolong next countdown
+            sleep ${toString cfg.lockTime}
+          done &
+        '';
+    postUnlockScript = "${hyprctl} dispatch dpms on";
+  };
 }

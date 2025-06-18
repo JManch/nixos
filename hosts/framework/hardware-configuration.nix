@@ -16,8 +16,7 @@
   networking.hostId = "549d3e08";
   hardware.cpu.amd.updateMicrocode = true;
 
-  # As of kernel 6.13 the framework kmod module isn't necessary. Also seems to
-  # cause udev power event spam.
+  # As of kernel 6.13 the framework kmod module isn't necessary
   hardware.framework.enableKmod = false;
 
   boot = {

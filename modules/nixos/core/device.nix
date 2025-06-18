@@ -198,7 +198,7 @@ in
       default = null;
       example = "intel_backlight";
       description = ''
-        Name of the backlight device the directory /sys/class/backlight.
+        Name of the backlight device /sys/class/backlight.
       '';
     };
 
@@ -207,7 +207,16 @@ in
       default = null;
       example = "BAT1";
       description = ''
-        Name of the battery device the directory /sys/class/power_supply.
+        Name of the battery device in /sys/class/power_supply.
+      '';
+    };
+
+    ac = mkOption {
+      type = with types; nullOr str;
+      default = null;
+      example = "ACAD";
+      description = ''
+        Name of the AC device in /sys/class/power_supply.
       '';
     };
 
@@ -269,5 +278,7 @@ in
     "Services on this host have VPN confinement enabled but no VPN namespace is set"
     (vpnNamespace != null -> config.vpnNamespaces.${vpnNamespace}.enable or false)
     "The VPN namespace '${toString vpnNamespace}' is not enabled or does not exist"
+    (cfg.type == "laptop" -> cfg.backlight != null && cfg.battery != null && cfg.ac != null)
+    "Laptops require backlight, battery, and ac devices to be set"
   ];
 }

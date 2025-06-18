@@ -23,6 +23,7 @@
         memory = 1024 * 48; # lost 16 to VRAM
         backlight = "amdgpu_bl1";
         battery = "BAT1";
+        ac = "ACAD";
 
         cpu = {
           name = "AI 9 HX 370";

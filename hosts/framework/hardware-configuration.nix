@@ -10,13 +10,15 @@
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
-    # nixos-hardware does not have a framework ai 300 module yet
-    (inputs.nixos-hardware + "/framework/13-inch/common")
-    (inputs.nixos-hardware + "/framework/13-inch/common/amd.nix")
+    (inputs.nixos-hardware + "/framework/13-inch/amd-ai-300-series")
   ];
 
   networking.hostId = "549d3e08";
   hardware.cpu.amd.updateMicrocode = true;
+
+  # As of kernel 6.13 the framework kmod module isn't necessary. Also seems to
+  # cause udev power event spam.
+  hardware.framework.enableKmod = false;
 
   boot = {
     kernelModules = [ "kvm-amd" ];

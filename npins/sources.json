@@ -75,10 +75,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.25.0",
-      "revision": "69c3e3503c30a4298b41c0f5eb1309bb37e2f143",
-      "url": "https://api.github.com/repos/basnijholt/adaptive-lighting/tarball/v1.25.0",
-      "hash": "1n7wd2wcmn859iaxkxzv5v6hdxx189jfyj63hiyr17705x964jfa"
+      "version": "v1.26.0",
+      "revision": "a8e35ae216bb777b21084670aef601e41def0007",
+      "url": "https://api.github.com/repos/basnijholt/adaptive-lighting/tarball/v1.26.0",
+      "hash": "0wp91h22vyib0hia0vbdlzkj6dss3awh8khc7lwav3qncz5mmji3"
     },
     "app2unit": {
       "type": "Git",
@@ -126,10 +126,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.4.3",
-      "revision": "68b8cb398f9ac8fa5404dbede5bb264a1f8b1297",
-      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.3",
-      "hash": "073ryd8divispw1ax2wcy8qmjmlg0lawlc4n06zkicd7g0sbkwca"
+      "version": "v1.4.4",
+      "revision": "7d7941dc475337c6572612b66f3ead6f1dd25573",
+      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.4",
+      "hash": "1g78am3sga0jv3xridqibsq8a8q3skr6kn22pnzl7gp1n8783yab"
     },
     "daikin_onecta": {
       "type": "GitRelease",
@@ -284,9 +284,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "ad7835d7ea9d49977114916973d2e10029ef7d2d",
-      "url": "https://github.com/JManch/neovim-ayu/archive/ad7835d7ea9d49977114916973d2e10029ef7d2d.tar.gz",
-      "hash": "1cfag8yn5p1bbjip0nsisj111z87v9ys9l91illlb6f5v2c0f7is"
+      "revision": "aabf4ef569d965dd8a41ab120319cdbba26376dc",
+      "url": "https://github.com/JManch/neovim-ayu/archive/aabf4ef569d965dd8a41ab120319cdbba26376dc.tar.gz",
+      "hash": "0bnk2k12km7wr71572hznbi5z3qinfsqbppgiwgrhiq56zjgjs5h"
     },
     "slskd-stats": {
       "type": "GitRelease",
@@ -313,9 +313,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "283a65096ab89ef75cd3dec3ffe6b75d38d37fc2",
-      "url": "https://github.com/mrusse/soularr/archive/283a65096ab89ef75cd3dec3ffe6b75d38d37fc2.tar.gz",
-      "hash": "1d3h5y24kj141q7kv96wrimninirxi3fsfj2mf9mgah93nw699za"
+      "revision": "8830d64c25ac48dc86c5fbff71189708b602cd73",
+      "url": "https://github.com/mrusse/soularr/archive/8830d64c25ac48dc86c5fbff71189708b602cd73.tar.gz",
+      "hash": "09vh8ga60chxgfxazybx8r1ssd8d5kni427j5gds9v7s5ww93h8d"
     },
     "sunset.nvim": {
       "type": "Git",
@@ -339,9 +339,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "7aaba58403ade1bb483f6030004074a98bc5ff0d",
-      "url": "https://github.com/dweymouth/supersonic/archive/7aaba58403ade1bb483f6030004074a98bc5ff0d.tar.gz",
-      "hash": "1jsa536bljw4ixjzi81wim7wf46pf5laaz8jldvmp75gzilpcm1h"
+      "revision": "96cd3698242cb049e25ada2367bb60c002925fff",
+      "url": "https://github.com/dweymouth/supersonic/archive/96cd3698242cb049e25ada2367bb60c002925fff.tar.gz",
+      "hash": "09p5s415qaj2rsg4j3ajwf6y9ka3qxddl6h47ha0dmy71s5nc40m"
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -431,10 +431,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.13.0",
-      "revision": "6d64ac1479ed2fce0060a90ce88538490362eae4",
-      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.13.0",
-      "hash": "1skjns5xbz6pcr59qsfyh6hisrbjyyia54vniznllrizap18vibc"
+      "version": "v0.13.1",
+      "revision": "91deba52694c9a34a23f8c833dfee105fd6efb22",
+      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.13.1",
+      "hash": "0rksafya5hqsc1yjjaz9ibd3qzs1v1p9hkqcxdyab6qnim4ld7vx"
     }
   },
   "version": 5

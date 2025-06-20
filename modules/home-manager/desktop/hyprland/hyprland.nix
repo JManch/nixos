@@ -283,6 +283,7 @@ in
           natural_scroll = true;
           scroll_factor = "0.2";
           clickfinger_behavior = true;
+          drag_lock = 0;
         };
       };
 

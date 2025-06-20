@@ -91,8 +91,6 @@ in
                 rclone --config "$config_dir/config" config create remote protondrive --all
                 # The rclone config needs to be 'bootstrapped' to generate client keys
                 rclone --config "$config_dir/config" about remote:
-                # These keys aren't needed beyond the first run
-                sed -E -i '/^(2fa|username|password) =/d' "$config_dir/config"
               '';
           };
           filen = {

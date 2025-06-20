@@ -402,7 +402,7 @@ in
 
   ns.desktop.programs.locker = {
     preLockScript = "hyprctl keyword misc:key_press_enables_dpms true";
-    postLockScript = "hyprctl keyword misc:key_press_enables_dpms false";
+    postUnlockScript = "hyprctl keyword misc:key_press_enables_dpms false";
   };
 
   ns.desktop.darkman.switchScripts.hyprland =

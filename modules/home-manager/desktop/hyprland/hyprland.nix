@@ -405,28 +405,15 @@ in
     postLockScript = "hyprctl keyword misc:key_press_enables_dpms false";
   };
 
-  ns.desktop.darkman.switchApps.hyprland =
+  ns.desktop.darkman.switchScripts.hyprland =
     let
-      inherit (config.${ns}.core.color-scheme) colorMap dark;
+      inherit (config.${ns}.core) color-scheme;
       hyprctl = getExe' pkgs.hyprland "hyprctl";
-      mapDarkColor = base: colorMap.${base} // { light = dark.palette.${base}; };
     in
-    {
-      paths = [ ".config/hypr/hyprland.conf" ];
-      # Only reload if gamemode is not active to avoid overriding
-      # gamemode-specific hyprland settings
-      reloadScript = "${getExe' pkgs.gamemode "gamemoded"} --status | ${getExe pkgs.gnugrep} 'is active' -q || ${hyprctl} reload";
-      colorOverrides = {
-        base00 = mapDarkColor "base00";
-        base01 = mapDarkColor "base01";
-        base02 = mapDarkColor "base02";
-        base03 = mapDarkColor "base03";
-        base04 = mapDarkColor "base04";
-        base05 = mapDarkColor "base05";
-        base06 = mapDarkColor "base06";
-        base07 = mapDarkColor "base07";
-      };
-    };
+    theme: ''
+      ${hyprctl} keyword general:col.active_border 0xff${color-scheme.${theme}.palette.base0D}
+      ${hyprctl} keyword general:col.inactive_border 0x00${color-scheme.${theme}.palette.base0D}
+    '';
 
   programs.zsh.shellAliases = {
     hyprland-setup-dev = "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -B build";

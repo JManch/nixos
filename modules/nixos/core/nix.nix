@@ -174,6 +174,20 @@ let
           # Always build and store result to prevent GC deleting builds for remote hosts
           remote_builds="/home/${adminUsername}/.remote-builds"
           mkdir -p "$remote_builds"
+
+          # Check if host is on VPN
+          ${optionalString (cmd != "build")
+            # bash
+            ''
+              if ping -c 1 -W 1 "$hostname.lan"; then
+                host_address="$hostname.lan"
+              elif ping -c 1 -W 1 "$hostname-vpn.lan"; then
+                host_address="$hostname-vpn.lan"
+              else
+                echo "Host '$hostname' is not up"
+              fi
+            ''
+          }
         '';
     in
     pkgs.writeShellApplication {
@@ -193,16 +207,16 @@ let
               nh os build "$flake" --hostname "$hostname" --out-link "$remote_builds/result-$hostname" "''${@:2}"
               ${optionalString (cmd == "diff") ''
                 ${sshAddQuiet pkgs}
-                remote_system=$(ssh "${adminUsername}@$hostname.lan" readlink /run/current-system)
+                remote_system=$(ssh "${adminUsername}@$host_address" readlink /run/current-system)
                 built_system=$(readlink "$remote_builds/result-$hostname")
-                nix copy --from "ssh://$hostname.lan" "$remote_system"
+                nix copy --from "ssh://$host_address" "$remote_system"
                 dix "$remote_system" "$built_system"
               ''}
             ''
           else
             ''
               ${sshAddQuiet pkgs}
-              nh os ${cmd} "$flake" --hostname "$hostname" --out-link "$remote_builds/result-$hostname" --target-host "root@$hostname.lan" "''${@:2}"
+              nh os ${cmd} "$flake" --hostname "$hostname" --out-link "$remote_builds/result-$hostname" --target-host "root@$host_address" "''${@:2}"
             ''
         );
     }

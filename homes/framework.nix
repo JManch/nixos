@@ -76,6 +76,7 @@
         mpv.jellyfinShim.enable = true;
         tor-browser.enable = true;
         qbittorrent.enable = true;
+        jellyfin-media-player.enable = true;
 
         firefox = {
           enable = true;

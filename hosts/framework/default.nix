@@ -76,7 +76,7 @@
     };
 
     programs = {
-      waydroid.enable = true;
+      waydroid.enable = false;
       winbox.enable = true;
       gaming = {
         enable = true;

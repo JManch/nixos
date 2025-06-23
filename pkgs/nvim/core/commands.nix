@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 {
   vim.luaConfigRC.functionsForCommands =
     lib.nvim.dag.entryBefore [ "commands" ]
@@ -24,6 +24,8 @@
         end
       '';
 
+  vim.extraPlugins."nvim-highlight-colors".package = pkgs.vimPlugins.nvim-highlight-colors;
+
   vim.luaConfigRC.commands =
     lib.nvim.dag.entryBefore [ "mappings" ]
       # lua
@@ -33,6 +35,7 @@
         vim.api.nvim_create_user_command("ToggleAutoWrap", function() toggle_local_opt("formatoptions", "t") end, {})
         vim.api.nvim_create_user_command("ToggleCommentAutoWrap", function() toggle_local_opt("formatoptions", "c") end, {})
         vim.api.nvim_create_user_command("ToggleParagraphAutoFormat", function() toggle_local_opt("formatoptions", "a") end, {})
+        vim.api.nvim_create_user_command("ToggleHighlightColors", function() require('nvim-highlight-colors').toggle() end, {})
         vim.api.nvim_create_user_command('HighlightGroups', function() vim.cmd.so('$VIMRUNTIME/syntax/hitest.vim') end, {})
       '';
 }

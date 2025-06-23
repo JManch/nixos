@@ -1,3 +1,4 @@
+{ pkgs, ... }:
 {
   imports = [
     ./completion.nix
@@ -5,7 +6,7 @@
     ./languages.nix
     ./oil.nix
     ./treesitter.nix
-    ./colorscheme.nix
+    ./color-scheme.nix
     ./dashboard.nix
     ./workspaces.nix
     ./gitsigns.nix
@@ -14,6 +15,7 @@
 
   vim = {
     mini.pairs.enable = true;
+    visuals.fidget-nvim.enable = true;
 
     visuals.indent-blankline = {
       enable = true;
@@ -28,7 +30,37 @@
       enable = true;
       # nvf position option is wrong
       setupOpts.top_down = false;
+    };
 
+    mini.surround = {
+      enable = true;
+      setupOpts = {
+        highlight_duration = 2000;
+        mappings = {
+          add = "<LEADER>aa";
+          delete = "<LEADER>ad";
+          find = "<LEADER>af";
+          find_left = "<leader>aF";
+          highlight = "<LEADER>ah";
+          replace = "<LEADER>ar";
+          update_n_line = "<LEADER>an";
+        };
+      };
+    };
+
+    # nvf module is overcomplicated
+    extraPlugins."leap.nvim" = {
+      package = pkgs.vimPlugins.leap-nvim;
+      setup = ''
+        require('leap').add_default_mappings()
+      '';
+    };
+
+    lazy.plugins."tabular" = {
+      enabled = true;
+      package = pkgs.vimPlugins.tabular;
+      lazy = true;
+      cmd = [ "Tabularize" ];
     };
   };
 }

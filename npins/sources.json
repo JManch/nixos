@@ -184,10 +184,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v5.9.2",
-      "revision": "415a8b9a1e1590d565f8e3a8197535ced42ef472",
-      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/v5.9.2",
-      "hash": "18sv92x2nz7q35wbbypadn0b8z6l9gsjfkrlkz63d0z713sg0lax"
+      "version": "v5.9.3",
+      "revision": "b26abda8b6adf780ce763b4aacfca2fa218f3675",
+      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/v5.9.3",
+      "hash": "023i8pyrx9xjrphcy6by4n9lirf9iawsyj1q31scnmcdpijl7f4i"
     },
     "hacs_waste_collection_schedule": {
       "type": "GitRelease",
@@ -339,9 +339,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "96cd3698242cb049e25ada2367bb60c002925fff",
-      "url": "https://github.com/dweymouth/supersonic/archive/96cd3698242cb049e25ada2367bb60c002925fff.tar.gz",
-      "hash": "09p5s415qaj2rsg4j3ajwf6y9ka3qxddl6h47ha0dmy71s5nc40m"
+      "revision": "62cfcfffd8f2b7ff6b51c36a4c87e457c7184001",
+      "url": "https://github.com/dweymouth/supersonic/archive/62cfcfffd8f2b7ff6b51c36a4c87e457c7184001.tar.gz",
+      "hash": "051mz4z3mv11yi7cxpfc2w73lgm0zmrxih7qmd1bfib520vz8ljn"
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -399,10 +399,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.21.8",
-      "revision": "1e47082bb5126f5ddb113a0b9d896cbc3c99fb3d",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.21.8",
-      "hash": "1liklqm27wbja13bjiwp0x0kkg394dc0byqy6fxljn3lw95g96bg"
+      "version": "v0.22.0",
+      "revision": "86efb058ef3ba40bb43b33c5250436b62e9b9c78",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.22.0",
+      "hash": "08h6fy2nf31mv41n4gxlbqg4sqxc9bfzzkw3wljmand0z6sn1izh"
     },
     "workspaces.nvim": {
       "type": "GitRelease",

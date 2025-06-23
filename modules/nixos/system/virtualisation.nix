@@ -366,7 +366,6 @@ in
     programs.zsh.interactiveShellInit = # bash
       ''
         ssh-vm() {
-          ${lib.${ns}.sshAddQuiet pkgs}
           echo "Attempting SSH connection to VM..."; 
           # Extra connection attempts as VM may be starting up
           ssh \

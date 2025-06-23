@@ -39,7 +39,6 @@ let
   inherit (lib.${ns})
     addPatches
     flakePkgs
-    sshAddQuiet
     upperFirstChar
     ;
   inherit (inputs.nix-resources.secrets) keys;
@@ -206,7 +205,6 @@ let
             ''
               nh os build "$flake" --hostname "$hostname" --out-link "$remote_builds/result-$hostname" "''${@:2}"
               ${optionalString (cmd == "diff") ''
-                ${sshAddQuiet pkgs}
                 remote_system=$(ssh "${adminUsername}@$host_address" readlink /run/current-system)
                 built_system=$(readlink "$remote_builds/result-$hostname")
                 nix copy --from "ssh://$host_address" "$remote_system"
@@ -215,7 +213,6 @@ let
             ''
           else
             ''
-              ${sshAddQuiet pkgs}
               nh os ${cmd} "$flake" --hostname "$hostname" --out-link "$remote_builds/result-$hostname" --target-host "root@$host_address" "''${@:2}"
             ''
         );

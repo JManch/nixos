@@ -6,7 +6,6 @@
 }:
 let
   inherit (lib) ns mkIf;
-  inherit (lib.${ns}) sshAddQuiet;
   inherit (config.${ns}.desktop) style hyprland;
 in
 {
@@ -22,12 +21,10 @@ in
         unzip-music-homelab() {
           mkdir -p ~/homelab-{slskd-downloads,music}
           if ! mount -l | grep -q homelab-slskd-downloads; then
-            ${sshAddQuiet pkgs}
             sshfs joshua@homelab.lan:/persist/media/slskd/downloads /home/joshua/homelab-slskd-downloads
           fi
 
           if ! mount -l | grep -q homelab-music; then
-            ${sshAddQuiet pkgs}
             sshfs joshua@homelab.lan:/persist/media/music /home/joshua/homelab-music
           fi
 

@@ -1,8 +1,4 @@
-{
-  lib,
-  pkgs,
-  config,
-}:
+{ config }:
 {
   programs.git = {
     enable = true;
@@ -42,19 +38,7 @@
     settings.git.overrideGpg = true;
   };
 
-  programs.zsh = {
-    shellAliases = {
-      lg = "lazygit";
-    };
-
-    initContent = # bash
-      ''
-        lazygit() {
-          ${lib.${lib.ns}.sshAddQuiet pkgs}
-          command lazygit "$@"
-        }
-      '';
-  };
+  programs.zsh.shellAliases.lg = "lazygit";
 
   ns.persistence.directories = [ ".local/state/lazygit" ];
 }

@@ -14,32 +14,19 @@
 
       device = {
         type = "server";
-        address = "192.168.88.254"; # FIX:
-        memory = 1024 * 4; # FIX:
-
-        cpu = {
-          type = "amd";
-          cores = 4;
-        };
+        address = "10.0.2.15";
+        memory = 1024 * 4;
       };
     };
 
-    # FIX: Can have this and impermanence enabled in seperate tests
     # hardware.secure-boot.enable = false;
     hardware.file-system.type = "ext4";
     hardware.file-system.ext4.trim = false;
 
     system = {
       networking = {
-        wiredInterface = "eno1"; # FIX:
-        defaultGateway = "192.168.88.1"; # FIX:
-
-        # FIX: Separate test
-        # wireless = {
-        #   enable = true;
-        #   interface = "wlp6s0";
-        #   disableOnBoot = true;
-        # };
+        wiredInterface = "eth0";
+        defaultGateway = "10.0.2.2";
       };
     };
   };

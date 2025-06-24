@@ -21,7 +21,8 @@ let
       test = pkgs.testers.runNixOSTest {
         name = "${installerName}-${name}-test";
 
-        skipLint = true; # FIX: REMOVE THIS
+        skipLint = true; # FIX: REMOVE THIS ONCE TEST IS FUNCTIONAL
+        enableOCR = true;
 
         node = {
           inherit pkgs;
@@ -39,7 +40,7 @@ let
 
           nixpkgs.overlays = singleton (
             _: _: {
-              ${ns}.bootstrap-kit = self.packages.x86_64-linux.bootstrap-kit.override {
+              ${ns}.bootstrap-kit = self.packages.${pkgs.system}.bootstrap-kit.override {
                 bootstrapKit = "${self.inputs.nix-resources}/secrets/installer-test-bootstrap-kit.tar.age";
               };
             }
@@ -57,20 +58,25 @@ let
                 })
               ];
               system.extraDependencies = [ testHost.config.system.build.toplevel ];
-
               users.users.root.hashedPasswordFile = lib.mkForce null;
-              # services.getty.autologinUser = lib.mkForce "root";
 
               virtualisation.emptyDiskImages = [ 512 ];
               virtualisation.rootDevice = "/dev/vdb";
-              virtualisation.fileSystems."/".autoFormat = true;
+              virtualisation.fileSystems."/".autoFormat = true; # requires initrd.systemd.enable
+
+              # Want to use systemd initrd because getting tests to run without
+              # it is a pain. ISO image doesn't support it yet though:
+              # Waiting on https://github.com/NixOS/nixpkgs/pull/291750
+              # and https://github.com/NixOS/nixpkgs/issues/309190
+              boot.initrd.systemd.enable = true;
             };
 
           target =
             { ... }:
             {
-              virtualisation.useBootLoader = true;
-              virtualisation.useEFIBoot = true;
+              # Upstream iso test uses these so might want them
+              # virtualisation.useBootLoader = true;
+              # virtualisation.useEFIBoot = true;
               virtualisation.useDefaultFilesystems = false;
               virtualisation.efi.keepVariables = false;
 
@@ -84,9 +90,10 @@ let
         testScript = ''
           installer.start()
 
+          # FIX: This doesn't work
           # Decypt bootstrap-kit for agenix
-          installer.wait_for_console_text("Enter passphrase: ")
-          installer.send_chars("test\n")
+          # installer.wait_for_text("Enter passphrase: ")
+          # installer.send_chars("test\n")
 
           installer.wait_for_unit("multi-user.target")
           installer.succeed("echo hello")

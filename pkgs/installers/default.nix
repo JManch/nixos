@@ -1,6 +1,7 @@
 lib: self: pkgs:
 let
   inherit (lib)
+    ns
     listToAttrs
     mapAttrs'
     mapAttrs
@@ -23,6 +24,7 @@ let
           {
             nixpkgs.hostPlatform = system;
             nixpkgs.buildPlatform = "x86_64-linux";
+            nixpkgs.overlays = [ (_: _: { ${ns} = self.packages.${system}; }) ];
           }
           (modules.importApply ../../hosts/installer { })
         ];

@@ -4,7 +4,6 @@
   pkgs,
   config,
   hostname,
-  selfPkgs,
   username,
   categoryCfg,
 }:
@@ -94,7 +93,7 @@ in
               '';
           };
           filen = {
-            package = selfPkgs.filen-rclone;
+            package = pkgs.${ns}.filen-rclone;
             setupScript = # bash
               ''
                 sudo -u "${username}" ${getExe pkgs.filen-cli} export-api-key

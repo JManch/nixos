@@ -4,7 +4,6 @@
   pkgs,
   config,
   inputs,
-  selfPkgs,
   username,
   adminUsername,
 }:
@@ -38,7 +37,7 @@ let
         openssh
         xdg-terminal-exec
       ])
-      ++ [ selfPkgs.bootstrap-kit ];
+      ++ [ pkgs.${ns}.bootstrap-kit ];
     text = ''
       no_secrets=false
       while getopts 'n' flag; do

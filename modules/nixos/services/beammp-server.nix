@@ -3,7 +3,6 @@
   cfg,
   pkgs,
   config,
-  selfPkgs,
   hostname,
 }:
 let
@@ -125,7 +124,7 @@ in
           '';
         }
       );
-      ExecStart = "${getExe selfPkgs.beammp-server} --working-directory=/var/lib/beammp-server";
+      ExecStart = "${getExe pkgs.${ns}.beammp-server} --working-directory=/var/lib/beammp-server";
       StateDirectory = "beammp-server";
       DynamicUser = false;
       User = "beammp";

@@ -1,7 +1,6 @@
 {
   lib,
   pkgs,
-  selfPkgs,
   adminUsername,
 }:
 let
@@ -11,7 +10,7 @@ let
     name = "setup-sd-image";
     runtimeInputs = [
       pkgs.parted
-      selfPkgs.bootstrap-kit
+      pkgs.${ns}.bootstrap-kit
     ];
     text = ''
       if [ "$(id -u)" != "0" ]; then

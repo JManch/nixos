@@ -11,7 +11,6 @@
   self,
   config,
   inputs,
-  selfPkgs,
 }:
 let
   inherit (lib)
@@ -113,7 +112,7 @@ in
   systemd.services.ctrld =
     let
       # Patch Ctrld to enable loading endpoints from environment variables
-      ctrld = addPatches selfPkgs.ctrld [ "ctrld-secret-endpoint.patch" ];
+      ctrld = addPatches pkgs.${ns}.ctrld [ "ctrld-secret-endpoint.patch" ];
       configFile = (pkgs.formats.toml { }).generate "ctrld.toml" settings;
 
       settings = {

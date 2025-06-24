@@ -2,7 +2,6 @@
   lib,
   pkgs,
   config,
-  selfPkgs,
 }:
 let
   inherit (lib) ns mkIf getExe;
@@ -24,7 +23,7 @@ in
     ];
   };
 
-  home.packages = [ selfPkgs.beammp-launcher ];
+  home.packages = [ pkgs.${ns}.beammp-launcher ];
 
   xdg.desktopEntries = {
     beamng-scheme-handler = {
@@ -40,7 +39,7 @@ in
     beammp-launcher =
       let
         xdg-terminal = getExe pkgs.xdg-terminal-exec;
-        beammp-launcher = getExe selfPkgs.beammp-launcher;
+        beammp-launcher = getExe pkgs.${ns}.beammp-launcher;
       in
       mkIf desktop.enable {
         name = "BeamMP Launcher";

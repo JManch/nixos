@@ -4,7 +4,6 @@
   config,
   inputs,
   osConfig,
-  selfPkgs,
 }:
 let
   inherit (lib)
@@ -32,7 +31,7 @@ let
             gql
             aiohttp
           ])
-          ++ [ selfPkgs.hyprpy ];
+          ++ [ pkgs.${ns}.hyprpy ];
       }
       # python
       ''
@@ -324,7 +323,7 @@ in
         case = "^https?://";
         command = getExe pkgs.chromium;
       };
-    } selfPkgs.multiviewer-for-f1
+    } pkgs.${ns}.multiviewer-for-f1
   );
 
   ns.desktop = {

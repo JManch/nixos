@@ -3,14 +3,14 @@
   pkgs,
   config,
   inputs,
-  selfPkgs,
 }:
 let
+  inherit (lib) ns;
   inherit (inputs) agenix nix-resources;
   inherit (config.${lib.ns}.system) impermanence;
   scriptInputs = [
     pkgs.fd
-    selfPkgs.bootstrap-kit
+    pkgs.${ns}.bootstrap-kit
     agenix.packages.${pkgs.system}.agenix
   ];
 
@@ -80,13 +80,13 @@ in
 
   ns.adminPackages = [
     agenix.packages.${pkgs.system}.default
-    selfPkgs.bootstrap-kit
+    pkgs.${ns}.bootstrap-kit
     editSecretScript
     rekeySecretScript
   ];
 
   users.users.root.packages = [
-    selfPkgs.bootstrap-kit
+    pkgs.${ns}.bootstrap-kit
     editSecretScript
     rekeySecretScript
   ];

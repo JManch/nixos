@@ -4,6 +4,7 @@ let
     attrNames
     filterAttrs
     imap0
+    pathExists
     optional
     hasAttr
     elem
@@ -30,7 +31,7 @@ in
 {
   inherit ns;
   ${ns} = (import ./module-wrapper.nix lib ns) // {
-    mkHost = hostname: username: system: {
+    mkHost = hostname: username: system: extraModules: {
       name = hostname;
       value = nixosSystem {
         specialArgs = {
@@ -41,22 +42,23 @@ in
             username
             sources
             ;
-          selfPkgs = self.packages.${system};
         };
         modules =
           [
             {
               nixpkgs.hostPlatform = system;
               nixpkgs.buildPlatform = "x86_64-linux";
+              nixpkgs.overlays = [ (_: _: { ${ns} = self.packages.${system}; }) ];
             }
-            ../hosts/${hostname}
             ../modules/nixos
           ]
+          ++ optional (pathExists ../hosts/${hostname}) ../hosts/${hostname}
           # Raspberry-pi-nix does not have an enable option so we have to
           # conditionally import like this
           ++ optionals (hasPrefix "pi" hostname) [
             ../modules/nixos/hardware/raspberry-pi.nix
-          ];
+          ]
+          ++ extraModules;
       };
     };
 
@@ -72,7 +74,10 @@ in
             inherit system;
             config = {
               allowUnfree = true;
-              overlays = [ nix-on-droid.overlays.default ];
+              overlays = [
+                (_: _: { ${ns} = self.packages.${system}; })
+                nix-on-droid.overlays.default
+              ];
             };
           };
           modules = [
@@ -87,7 +92,6 @@ in
               hostname
               sources
               ;
-            selfPkgs = self.packages.${system};
           };
         };
     };
@@ -99,7 +103,12 @@ in
         f (
           import self.inputs.nixpkgs {
             inherit system;
-            config.allowUnfree = true;
+            config = {
+              allowUnfree = true;
+              overlays = [
+                (_: _: { ${ns} = self.packages.${system}; })
+              ];
+            };
           }
         )
       );

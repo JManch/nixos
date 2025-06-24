@@ -6,7 +6,6 @@
   inputs,
   sources,
   hostname,
-  selfPkgs,
 }:
 let
   inherit (lib)
@@ -148,9 +147,9 @@ in
           inherit (sources.adaptive-lighting) version;
           src = sources.adaptive-lighting;
         })
-        selfPkgs.heatmiser
-        selfPkgs.thermal-comfort
-        selfPkgs.daikin-onecta
+        pkgs.${ns}.heatmiser
+        pkgs.${ns}.thermal-comfort
+        pkgs.${ns}.daikin-onecta
       ]
       ++ optional frigate.enable (
         let
@@ -268,7 +267,7 @@ in
   systemd.services.home-assistant.preStart =
     let
       inherit (config.services.home-assistant) configDir;
-      inherit (selfPkgs)
+      inherit (pkgs.${ns})
         advanced-camera-card
         frigate-blueprint
         thermal-comfort-icons

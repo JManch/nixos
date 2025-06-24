@@ -5,7 +5,6 @@
   config,
   inputs,
   username,
-  selfPkgs,
 }:
 let
   inherit (lib)
@@ -473,7 +472,7 @@ in
     # choose the correct musicbrainz release. For some reason not all metadata
     # gets updated after this so run `beet mbsync <query>`.
     ns.userPackages = [
-      selfPkgs.resample-flacs
+      pkgs.${ns}.resample-flacs
       (pkgs.symlinkJoin {
         name = "beets-wrapped-config";
         paths = singleton (

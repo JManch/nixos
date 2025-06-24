@@ -4,7 +4,6 @@
   pkgs,
   config,
   sources,
-  selfPkgs,
   username,
   categoryCfg,
 }:
@@ -196,7 +195,7 @@ in
           src = sources.uwsm;
         };
 
-        app2unit = addPatches selfPkgs.app2unit [
+        app2unit = addPatches pkgs.${ns}.app2unit [
           (final.substitute {
             src = ../../../../patches/app2unit-service-apps.patch;
             substitutions = [

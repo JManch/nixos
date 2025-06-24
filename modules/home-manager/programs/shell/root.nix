@@ -1,7 +1,6 @@
 {
   lib,
   pkgs,
-  selfPkgs,
   osConfig,
 }:
 {
@@ -32,7 +31,7 @@
       man-pages
       rsync
     ])
-    ++ lib.optional (osConfig != null) selfPkgs.microfetch;
+    ++ lib.optional (osConfig != null) pkgs.${lib.ns}.microfetch;
 
   home.sessionVariables.COLORTERM = "truecolor";
 }

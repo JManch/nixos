@@ -10,14 +10,15 @@
     {
       templates = import ./templates;
       packages = forEachSystem (pkgs: import ./pkgs self lib pkgs);
+      # checks = forEachSystem (pkgs: import ./tests self lib pkgs);
 
       nixosConfigurations = lib.listToAttrs [
-        (mkHost "ncase-m1" "joshua" "x86_64-linux")
-        (mkHost "framework" "joshua" "x86_64-linux")
-        (mkHost "homelab" "joshua" "x86_64-linux")
-        (mkHost "msi" "lauren" "x86_64-linux")
-        (mkHost "pi-3" "joshua" "aarch64-linux")
-        (mkHost "surface-pro" "joshua" "x86_64-linux")
+        (mkHost "ncase-m1" "joshua" "x86_64-linux" [ ])
+        (mkHost "framework" "joshua" "x86_64-linux" [ ])
+        (mkHost "homelab" "joshua" "x86_64-linux" [ ])
+        (mkHost "msi" "lauren" "x86_64-linux" [ ])
+        (mkHost "pi-3" "joshua" "aarch64-linux" [ ])
+        (mkHost "surface-pro" "joshua" "x86_64-linux" [ ])
       ];
 
       nixOnDroidConfigurations = lib.listToAttrs [

@@ -2,7 +2,6 @@
   lib,
   pkgs,
   config,
-  selfPkgs,
 }:
 let
   inherit (lib) ns mkIf;
@@ -12,7 +11,7 @@ in
   home.packages = [
     pkgs.picard
     pkgs.spek
-    selfPkgs.resample-flacs
+    pkgs.${ns}.resample-flacs
   ];
 
   programs.zsh.initContent =

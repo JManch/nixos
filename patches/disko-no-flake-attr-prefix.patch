@@ -1,0 +1,64 @@
+diff --git a/cli.nix b/cli.nix
+index 1416aff..3718cb7 100644
+--- a/cli.nix
++++ b/cli.nix
+@@ -82,13 +82,14 @@ let
+   hasDiskoConfigFlake =
+     hasDiskoFile || lib.hasAttrByPath [ "diskoConfigurations" flakeAttr ] (builtins.getFlake flake);
+ 
+-  hasDiskoModuleFlake = lib.hasAttrByPath [
+-    "nixosConfigurations"
+-    flakeAttr
+-    "config"
+-    "disko"
+-    "devices"
+-  ] (builtins.getFlake flake);
++  hasDiskoModuleFlake = lib.hasAttrByPath (
++    (lib.splitString "." flakeAttr)
++    ++ [
++      "config"
++      "disko"
++      "devices"
++    ]
++  ) (builtins.getFlake flake);
+ 
+   diskFormat =
+     let
+@@ -106,18 +107,26 @@ let
+     if hasDiskoConfigFlake then
+       diskoEval
+     else if hasDiskoModuleFlake then
+-      (builtins.getFlake flake).nixosConfigurations.${flakeAttr}.config.system.build.${diskoAttr}
+-        or (pkgs.writeShellScriptBin "disko-compat-error" ''
+-          echo 'Error: Attribute `nixosConfigurations.${flakeAttr}.config.system.build.${diskoAttr}`' >&2
+-          echo '       not found in flake `${flake}`!' >&2
+-          echo '       This is probably caused by the locked version of disko in the flake' >&2
+-          echo '       being different from the version of disko you executed.' >&2
+-          echo 'EITHER set the `disko` input of your flake to `github:nix-community/disko/latest`,' >&2
+-          echo '       run `nix flake update disko` in the flake directory and then try again,' >&2
+-          echo 'OR run `nix run github:nix-community/disko/v1.9.0 -- --help` and use one of its modes.' >&2
+-          exit 1;'')
++      lib.getAttrFromPath (
++        (lib.splitString "." flakeAttr)
++        ++ [
++          "config"
++          "system"
++          "build"
++          diskoAttr
++        ]
++      ) (builtins.getFlake flake)
++    # or (pkgs.writeShellScriptBin "disko-compat-error" ''
++    #   echo 'Error: Attribute `${flakeAttr}.config.system.build.${diskoAttr}`' >&2
++    #   echo '       not found in flake `${flake}`!' >&2
++    #   echo '       This is probably caused by the locked version of disko in the flake' >&2
++    #   echo '       being different from the version of disko you executed.' >&2
++    #   echo 'EITHER set the `disko` input of your flake to `github:nix-community/disko/latest`,' >&2
++    #   echo '       run `nix flake update disko` in the flake directory and then try again,' >&2
++    #   echo 'OR run `nix run github:nix-community/disko/v1.9.0 -- --help` and use one of its modes.' >&2
++    #   exit 1;'')
+     else
+-      (builtins.abort "couldn't find `diskoConfigurations.${flakeAttr}` or `nixosConfigurations.${flakeAttr}.config.disko.devices`");
++      (builtins.abort "couldn't find `diskoConfigurations.${flakeAttr}` or `${flakeAttr}.config.disko.devices`");
+ 
+ in
+ diskoScript

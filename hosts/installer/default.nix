@@ -2,6 +2,10 @@
 # Assuming the network's creds are in our config just run `systemctl start wpa_supplicant.service`
 # Otherwise need to manually add the network using wpa_cli
 {
+  hostPath ? "nixosConfigurations",
+  vendorNixResources ? false, # used in installer tests to avoid needing ssh key for nix-resources access
+}:
+{
   lib,
   pkgs,
   self,
@@ -11,19 +15,24 @@
   ...
 }@args:
 let
-  inherit (lib) ns getExe attrValues;
+  inherit (lib)
+    ns
+    getExe
+    attrValues
+    optionalString
+    ;
   inherit (self) inputs;
   inherit (inputs.nix-resources.secrets) keys;
   installScript = pkgs.writeShellApplication {
     name = "install-host";
 
-    runtimeInputs = with pkgs; [
-      self.packages.${pkgs.system}.bootstrap-kit
-      disko
-      gitMinimal
+    runtimeInputs = [
+      pkgs.${ns}.bootstrap-kit
+      (lib.${ns}.addPatches pkgs.disko [ "disko-no-flake-attr-prefix.patch" ])
+      pkgs.gitMinimal
       # The upstream package hardcodes the database path but we want to be able
       # to modify it at runtime using the --export and --database-path flags
-      (sbctl.overrideAttrs {
+      (pkgs.sbctl.overrideAttrs {
         ldflags = [
           "-s"
           "-w"
@@ -55,6 +64,14 @@ let
           git clone https://github.com/JManch/nixos "$flake"
         fi
       fi
+
+      ${optionalString vendorNixResources ''
+        cp -r --no-preserve=mode "${inputs.nix-resources}" /root/nix-resources
+        git config --global user.name "root"
+        git config --global user.email "root@installer"
+        (cd /root/nix-resources && git init && git add . && git commit -m "Initial commit")
+        nix flake update nix-resources --override-input nix-resources "git+file:///root/nix-resources" --flake "$flake"
+      ''}
 
       bootstrap_kit=$(mktemp -d)
       ssh_dir="/root/.ssh"
@@ -88,12 +105,12 @@ let
       fi
 
       echo "### Fetching host information ###"
-      host_config="$flake#nixosConfigurations.$hostname.config"
+      host_config="$flake#${hostPath}.$hostname.config"
       username=$(nix eval --raw "$host_config.${ns}.core.users.username")
       admin_username=$(nix eval --raw "$host_config.${ns}.core.users.adminUsername")
       impermanence=$(nix eval "$host_config.${ns}.system.impermanence.enable")
       secure_boot=$(nix eval "$host_config.${ns}.hardware.secure-boot.enable")
-      has_disko=$(nix eval --impure --expr "(builtins.getFlake \"$flake\").nixosConfigurations.$hostname.config.disko.devices.disk or {} != {}")
+      has_disko=$(nix eval --impure --expr "(builtins.getFlake \"$flake\").${hostPath}.$hostname.config.disko.devices.disk or {} != {}")
 
       if [[ "$has_disko" = "false" ]]; then
           echo "The host does not have a disko config"
@@ -171,7 +188,7 @@ let
             exit 1
           fi
           echo "### Running disko format and mount ###"
-          disko --mode disko --flake "$flake#$hostname"
+          disko --mode disko --flake "$flake#${hostPath}.$hostname"
         fi
       }
 
@@ -224,7 +241,7 @@ let
               --extra-experimental-features "nix-command flakes" \
               --override-input firstBoot "github:JManch/true" \
               --override-input vmInstall "github:JManch/$vmInstall" \
-              "$flake#nixosConfigurations.\"$hostname\".config.system.build.toplevel"
+              "$flake#${hostPath}.\"$hostname\".config.system.build.toplevel"
           )
         fi
 
@@ -248,6 +265,7 @@ in
   ];
 
   config = {
+    boot.initrd.systemd.enable = true;
     isoImage.compressImage = false;
 
     environment.systemPackages =

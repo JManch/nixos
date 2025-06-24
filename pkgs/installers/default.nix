@@ -1,12 +1,14 @@
-lib: self:
+lib: self: pkgs:
 let
   inherit (lib)
     listToAttrs
     mapAttrs'
+    mapAttrs
     nameValuePair
     hasPrefix
     nixosSystem
     filterAttrs
+    modules
     ;
 
   mkInstaller = name: system: base: {
@@ -22,9 +24,18 @@ let
             nixpkgs.hostPlatform = system;
             nixpkgs.buildPlatform = "x86_64-linux";
           }
-          ../hosts/installer
+          (modules.importApply ../../hosts/installer { })
         ];
-      }).config.system.build.isoImage;
+      }).config.system.build.isoImage.overrideAttrs
+        (
+          let
+            tests = import ./tests.nix lib self name base pkgs;
+          in
+          {
+            passthru.tests = mapAttrs (_: value: value.test) tests;
+            passthru.testHosts = mapAttrs (_: value: value.testHost) tests;
+          }
+        );
   };
 
   piInstallers = mapAttrs' (

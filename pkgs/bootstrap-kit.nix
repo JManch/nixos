@@ -4,6 +4,7 @@
   tree,
   gnutar,
   age,
+  bootstrapKit ? "${nix-resources}/secrets/bootstrap-kit.tar.age",
 }:
 writeShellApplication {
   name = "bootstrap-kit";
@@ -73,7 +74,7 @@ writeShellApplication {
 
       trap "rm -rf '$output_dir'" EXIT
 
-      kit="''${BOOTSTRAP_KIT:-${nix-resources}/secrets/bootstrap-kit.tar.age}"
+      kit="''${BOOTSTRAP_KIT:-${bootstrapKit}}"
       while ! age -d "$kit" | tar --same-owner -xpf - -C "$output_dir"; do
         true
       done

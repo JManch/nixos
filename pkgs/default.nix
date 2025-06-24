@@ -38,4 +38,4 @@ in
       inherit self pkgs sources;
     }).neovim;
 }
-// import ./installers.nix lib self
+// import ./installers lib self pkgs

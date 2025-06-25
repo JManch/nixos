@@ -209,6 +209,7 @@ in
           tooltip = false;
         };
 
+        # The upower module has less configuration
         battery = mkIf (battery != null) {
           format = "<span color='#${colors.base04}'>{icon}</span> {capacity}%";
           format-charging = "<span color='#${colors.base04}'>󰂄</span> {capacity}%";

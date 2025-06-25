@@ -267,7 +267,7 @@ in
       input = {
         follow_mouse = 1;
         mouse_refocus = true;
-        accel_profile = mkIf (deviceType != "laptop") "flat";
+        accel_profile = "flat";
         sensitivity = 0;
 
         kb_layout = "us";

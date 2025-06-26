@@ -14,6 +14,8 @@ in
     extraArgs = [
       "-s"
       "-S"
+      "-i"
+      "line power"
     ];
   };
 }

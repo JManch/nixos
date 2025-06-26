@@ -7,6 +7,9 @@
   modulesPath,
   ...
 }:
+let
+  inherit (lib) singleton getExe;
+in
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -16,10 +19,11 @@
   networking.hostId = "549d3e08";
   hardware.cpu.amd.updateMicrocode = true;
 
-  # As of kernel 6.13 the framework kmod module isn't necessary
+  # As of kernel 6.13 the framework kmod isn't necessary
   hardware.framework.enableKmod = false;
 
   boot = {
+    kernelPackages = pkgs.linuxPackages_latest;
     kernelModules = [ "kvm-amd" ];
 
     initrd.availableKernelModules = [
@@ -30,21 +34,26 @@
       "sd_mod"
     ];
 
-    kernelPackages = pkgs.linuxPackages_latest;
+    # Contrary to what the tlp docs say, we need probe_with_fwk_charge_control=1
+    # even though we do not use the custom framework kmod
+    extraModprobeConfig = ''
+      options cros_charge_control probe_with_fwk_charge_control=1
+    '';
 
-    # Force TLP to use cros_charge-control module instead of the framework
-    # module for battery charge limits
-    # FIX: Doesn't work for some reason, seems like we don't even have the
-    # cros_charge module?
-    # extraModprobeConfig = ''
-    #   options cros_charge-control probe_with_fwk_charge_control=1
-    # '';
+    # https://github.com/FrameworkComputer/SoftwareFirmwareIssueTracker/issues/70
+    kernelPatches = singleton {
+      name = "cros-charge-fix";
+      patch = pkgs.fetchpatch2 {
+        url = "https://lore.kernel.org/lkml/20250521-cros-ec-mfd-chctl-probe-v1-1-6ebfe3a6efa7@weissschuh.net/raw";
+        hash = "sha256-Lt12B/JgEbmOOdRX28hs1t/khySxbB2FG3W1y8nj1us=";
+      };
+    };
   };
 
   programs.zsh = {
     shellAliases =
       let
-        ectool = lib.getExe pkgs.fw-ectool;
+        ectool = getExe pkgs.fw-ectool;
       in
       {
         "get-pps" = "cat /sys/class/drm/card1-eDP-1/amdgpu/panel_power_savings";

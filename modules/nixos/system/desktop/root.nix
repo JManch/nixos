@@ -75,7 +75,13 @@ in
   hardware.graphics.enable = true;
 
   # Some apps may use this to optimise for power savings
-  services.upower.enable = mkDefault (device.type == "laptop");
+  services.upower = {
+    enable = mkDefault (device.type == "laptop");
+    percentageLow = 15;
+    percentageCritical = 5;
+    percentageAction = 3;
+  };
+
   # Service doesn't autostart otherwise https://github.com/NixOS/nixpkgs/issues/81138
   systemd.services.upower.wantedBy = mkIf config.services.upower.enable [ "graphical.target" ];
 

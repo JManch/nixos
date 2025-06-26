@@ -50,6 +50,13 @@ in
     };
   };
 
+  services.upower = {
+    enable = true;
+    criticalPowerAction = "Hibernate";
+    # Framework hardware supports battery events
+    noPollBatteries = true;
+  };
+
   programs.zsh = {
     shellAliases =
       let

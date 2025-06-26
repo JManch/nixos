@@ -76,6 +76,8 @@ in
 
   # Some apps may use this to optimise for power savings
   services.upower.enable = mkDefault (device.type == "laptop");
+  # Service doesn't autostart otherwise https://github.com/NixOS/nixpkgs/issues/81138
+  systemd.services.upower.wantedBy = mkIf config.services.upower.enable [ "graphical.target" ];
 
   # Enables wayland for all apps that support it
   environment.sessionVariables.NIXOS_OZONE_WL = 1;

@@ -27,6 +27,7 @@ in
 
     settings = {
       custom_gpu_name0 = device.gpu.name;
+      show_gpu_info = "off";
       shown_boxes = "cpu mem net proc gpu0";
       vim_keys = true;
       color_theme = "custom";

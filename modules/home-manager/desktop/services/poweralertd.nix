@@ -1,6 +1,7 @@
 { lib, osConfig, ... }:
 let
-  inherit (osConfig.${lib.ns}.core) device;
+  inherit (lib) ns;
+  inherit (osConfig.${ns}.core) device;
 in
 {
   enableOpt = false;
@@ -13,9 +14,13 @@ in
     enable = true;
     extraArgs = [
       "-s"
-      "-S"
       "-i"
       "line power"
     ];
+  };
+
+  systemd.user.services."poweralertd" = {
+    Unit.Requisite = [ "graphical-session.target" ];
+    Service.Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";
   };
 }

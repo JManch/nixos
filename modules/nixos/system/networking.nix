@@ -18,6 +18,8 @@ let
     optionalAttrs
     imap0
     optionals
+    mapAttrs
+    optionalString
     attrNames
     hiPrio
     length
@@ -33,9 +35,15 @@ let
   rfkill = getExe' pkgs.util-linux "rfkill";
   ip = getExe' pkgs.iproute2 "ip";
   vlanIds = attrNames cfg.vlans;
+  freqList = "5180 5200 5220 5240 5260 5280 5300 5320 5500 5520 5540 5560 5580 5600 5620 5640 5660 5680 5700 5720 5745 5765 5785 5805 5825";
 in
 {
   enableOpt = false;
+
+  disabledModules = [ "services/networking/wpa_supplicant.nix" ];
+  imports = [
+    "${inputs.nixpkgs-wpa-supplicant}/nixos/modules/services/networking/wpa_supplicant.nix"
+  ];
 
   opts = {
     useNetworkd =
@@ -78,9 +86,11 @@ in
 
     wireless = {
       enable = mkEnableOption "wireless";
+      force5GHz = mkEnableOption "forcing 5GHz unless toggled with `toggle-force-5ghz`";
 
-      onlyWpa2 = mkEnableOption ''
-        only configuring WPA2 networks for devices that do not support WPA3
+      fallbackToWPA2 = mkEnableOption ''
+        creating WPA2 fallback variants of wireless networks. Useful for
+        devices that do not support WPA3.
       '';
 
       interface = mkOption {
@@ -230,35 +240,66 @@ in
       secretsFile = config.age.secrets.wirelessNetworks.path;
       scanOnLowSignal = config.${ns}.core.device.type == "laptop";
       allowAuxiliaryImperativeNetworks = true;
-      networks = inputs.nix-resources.secrets.wirelessNetworks args;
+      fallbackToWPA2 = cfg.wireless.fallbackToWPA2;
+      networks = mapAttrs (
+        _: network:
+        network
+        // {
+          extraConfig = ''
+            ${network.extraConfig or ""}
+            ${optionalString cfg.wireless.force5GHz "freq_list=${freqList}"}
+          '';
+        }
+      ) inputs.nix-resources.secrets.wirelessNetworks;
     };
   };
 
   services.resolved.enable = cfg.resolved.enable;
 
-  ns.userPackages = optionals (cfg.wireless.enable && desktop.enable) [
-    # wpa_gui attempts to load the first interface it finds in
-    # /var/run/wpa_supplicant. If this happens to be a p2p-dev-* interface,
-    # wpa_gui goes into a fails with "Could not get status from
-    # wpa_supplicant". Forcing the correct interface with -i fixes this.
-    # (the -q flag disables the "running in tray" notification)
-    (lib.${ns}.wrapHyprlandMoveToActive args pkgs.wpa_supplicant_gui "wpa_gui" ''
-      --add-flags "-i ${cfg.wireless.interface} -q" \
-      --run '
-        if ${getExe' pkgs.procps "pidof"} wpa_gui > /dev/null; then
-          ${getExe pkgs.libnotify} --urgency=critical -t 5000 "WPA GUI" "Application already running"
-          exit 1
+  ns.userPackages =
+    optional (cfg.wireless.enable && cfg.wireless.force5GHz) (
+      pkgs.writeShellScriptBin "toggle-force-5ghz" ''
+        net_id=$(wpa_cli -i "${cfg.wireless.interface}" list_networks | grep '\[CURRENT\]' | cut -f1)
+
+        if [[ -z $net_id ]]; then
+          wpa_cli -i "${cfg.wireless.interface}" list_networks
+          read -p "Could not get active network. Enter a networkd id (e.g. 0): " -r net_id
         fi
-      '
-    '')
-    (hiPrio (
-      pkgs.runCommand "wpa-supplicant-desktop-modify" { } ''
-        mkdir -p $out/share/applications
-        substitute ${pkgs.wpa_supplicant_gui}/share/applications/wpa_gui.desktop $out/share/applications/wpa_gui.desktop \
-          --replace-fail "Name=wpa_gui" "Name=WPA GUI"
+
+        if [[ $(wpa_cli -i "${cfg.wireless.interface}" get_network "$net_id" freq_list) == "${freqList}" ]]; then
+          wpa_cli -i "${cfg.wireless.interface}" set_network "$net_id" freq_list '""'
+          echo "Disabled forcing 5Ghz"
+        else
+          wpa_cli -i "${cfg.wireless.interface}" set_network "$net_id" freq_list "${freqList}"
+          echo "Enabled forcing 5Ghz"
+        fi
+
+        wpa_cli -i "${cfg.wireless.interface}" reassociate
       ''
-    ))
-  ];
+    )
+    ++ optionals (cfg.wireless.enable && desktop.enable) [
+      # wpa_gui attempts to load the first interface it finds in
+      # /var/run/wpa_supplicant. If this happens to be a p2p-dev-* interface,
+      # wpa_gui goes into a fails with "Could not get status from
+      # wpa_supplicant". Forcing the correct interface with -i fixes this.
+      # (the -q flag disables the "running in tray" notification)
+      (lib.${ns}.wrapHyprlandMoveToActive args pkgs.wpa_supplicant_gui "wpa_gui" ''
+        --add-flags "-i ${cfg.wireless.interface} -q" \
+        --run '
+          if ${getExe' pkgs.procps "pidof"} wpa_gui > /dev/null; then
+            ${getExe pkgs.libnotify} --urgency=critical -t 5000 "WPA GUI" "Application already running"
+            exit 1
+          fi
+        '
+      '')
+      (hiPrio (
+        pkgs.runCommand "wpa-supplicant-desktop-modify" { } ''
+          mkdir -p $out/share/applications
+          substitute ${pkgs.wpa_supplicant_gui}/share/applications/wpa_gui.desktop $out/share/applications/wpa_gui.desktop \
+            --replace-fail "Name=wpa_gui" "Name=WPA GUI"
+        ''
+      ))
+    ];
 
   ns.hm = mkIf home-manager.enable {
     ${ns}.desktop.hyprland.settings = {

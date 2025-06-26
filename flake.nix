@@ -37,6 +37,7 @@
     # should review changes after updating.
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-wpa-supplicant.url = "github:JManch/nixpkgs/wpa-supplicant-improvements";
 
     impermanence.url = "github:nix-community/impermanence";
 

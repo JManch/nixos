@@ -130,7 +130,7 @@
 
         wireless = {
           enable = true;
-          onlyWpa2 = true;
+          fallbackToWPA2 = true;
           interface = "wlp1s0";
         };
       };

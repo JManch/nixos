@@ -148,9 +148,11 @@ let
     # ...; message = ...; } assertions.
     asserts = [ ];
 
-    # Same NixOS module imports `imports`. Imports are always defined even if
-    # the module is disable.
+    # Same as NixOS top-level `imports` option
     imports = [ ];
+
+    # Same as NixOS top-level `disabledModules` option
+    disabledModules = [ ];
   };
 
   # Category-specific options can only be defined in the root (root.nix) module
@@ -549,6 +551,7 @@ in
           { ... }:
           {
             imports = mergedModuleOpts.imports;
+            disabledModules = mergedModuleOpts.disabledModules;
 
             options.${ns} =
               let

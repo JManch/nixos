@@ -1159,11 +1159,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1750786364,
-        "narHash": "sha256-72W13hl8bYWywqbbYmpaJy+c4K+YKpaQqSgf2vrr3ac=",
+        "lastModified": 1750963040,
+        "narHash": "sha256-mW70bOcU/E2HEmaxbOvr5OxPChvr9RFOH3wplS+T2ts=",
         "ref": "refs/heads/main",
-        "rev": "17b434bb8c238d5f361cad478e5d39f4af6dd50b",
-        "revCount": 288,
+        "rev": "ad0601743c9e6b1b32617d3a70f11d9ed826eb80",
+        "revCount": 289,
         "type": "git",
         "url": "ssh://git@github.com/JManch/nix-resources"
       },
@@ -1260,6 +1260,22 @@
       "original": {
         "type": "tarball",
         "url": "https://github.com/NixOS/nixpkgs/archive/5daf0514482af3f97abaefc78a6606365c9108e2.tar.gz"
+      }
+    },
+    "nixpkgs-wpa-supplicant": {
+      "locked": {
+        "lastModified": 1750963004,
+        "narHash": "sha256-8nktaBlaJoYq0lWKaSbtdcPMZITrzUmLcHNT0s9oy5E=",
+        "owner": "JManch",
+        "repo": "nixpkgs",
+        "rev": "fc5ac10c357c7df3978f453b63e9190a177f7f58",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JManch",
+        "ref": "wpa-supplicant-improvements",
+        "repo": "nixpkgs",
+        "type": "github"
       }
     },
     "nixpkgs-xr": {
@@ -1461,6 +1477,7 @@
         "nix-resources": "nix-resources",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_2",
+        "nixpkgs-wpa-supplicant": "nixpkgs-wpa-supplicant",
         "nixpkgs-xr": "nixpkgs-xr",
         "nvf": "nvf",
         "raspberry-pi-nix": "raspberry-pi-nix",

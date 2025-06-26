@@ -351,6 +351,7 @@ in
 
     networking.wireless = {
       enable = true;
+      fallbackToWPA2 = true;
       secretsFile = config.age.secrets.wirelessNetworks.path;
       scanOnLowSignal = true;
       allowAuxiliaryImperativeNetworks = true;

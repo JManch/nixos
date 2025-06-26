@@ -169,6 +169,7 @@
 
         wireless = {
           enable = true;
+          force5GHz = true;
           interface = "wlp192s0";
         };
       };

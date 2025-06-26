@@ -172,34 +172,4 @@ in
           Slice=session${lib.${ns}.sliceSuffix config}.slice
         '';
       });
-
-  systemd.user.services = mkIf (cfg.desktopEnvironment == null) {
-    "notify-ac-plugged-in" = {
-      description = "Notify AC Plugged In";
-      after = [ "graphical-session.target" ];
-      requisite = [ "graphical-session.target" ];
-      wantedBy = [ "ac.target" ];
-      unitConfig.ConditionUser = "!@system";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = pkgs.writeShellScript "notify-ac-plugged-in" ''
-          ${lib.getExe pkgs.libnotify} --urgency=low -t 5000 "Power" "AC plugged in"
-        '';
-      };
-    };
-
-    "notify-ac-unplugged" = {
-      description = "Notify AC Unplugged";
-      after = [ "graphical-session.target" ];
-      requisite = [ "graphical-session.target" ];
-      wantedBy = [ "battery.target" ];
-      unitConfig.ConditionUser = "!@system";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = pkgs.writeShellScript "notify-unplugged" ''
-          ${lib.getExe pkgs.libnotify} --urgency=low -t 5000 "Power" "AC unplugged"
-        '';
-      };
-    };
-  };
 }

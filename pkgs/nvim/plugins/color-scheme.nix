@@ -9,6 +9,7 @@
     (pkgs.vimPlugins.neovim-ayu.overrideAttrs {
       version = "0-unstable-${sources.neovim-ayu.revision}";
       src = sources.neovim-ayu;
+      patches = [ ../../../patches/neovim-ayu-colors.patch ];
     })
 
     (pkgs.vimUtils.buildVimPlugin {
@@ -23,6 +24,18 @@
     lib.nvim.dag.entryBefore [ "pluginConfigs" "lazyConfigs" ]
       # lua
       ''
+        local colors = require('ayu.colors')
+        colors.generate(true)
+        require('ayu').setup({
+          overrides = function()
+            return {
+              Pmenu = { bg = colors.panel_bg },
+              PmenuSel = { fg = "None", reverse = false },
+              Comment = { italic = false },
+            }
+          end
+        })
+
         local sunset_opts = {
           day_callback = function()
             vim.cmd.colorscheme("ayu-light")

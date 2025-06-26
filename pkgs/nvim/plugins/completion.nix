@@ -1,4 +1,7 @@
 { lib, ... }:
+let
+  inherit (lib.generators) mkLuaInline;
+in
 {
   vim.autocomplete = {
     enableSharedCmpSources = lib.mkForce false;
@@ -6,16 +9,40 @@
       enable = true;
 
       setupOpts = {
+        appearance.use_nvim_cmp_as_default = true;
         completion = {
           trigger.show_in_snippet = false;
           list.selection.preselect = false;
+          menu = {
+            scrollbar = false;
+            draw = {
+              components.source_name.text = mkLuaInline ''
+                function(ctx)
+                  return '[' .. (ctx.source_id or ctx.source_name) .. ']'
+                end
+              '';
+              columns = [
+                [
+                  "label"
+                  "label_description"
+                  (mkLuaInline "gap = 1")
+                ]
+                [
+                  "kind_icon"
+                  (mkLuaInline "gap = 1")
+                  "kind"
+                ]
+                [ "source_name" ]
+              ];
+            };
+          };
         };
 
         cmdline = {
           keymap.preset = "inherit";
           completion = {
             list.selection.preselect = false;
-            menu.auto_show = lib.generators.mkLuaInline ''
+            menu.auto_show = mkLuaInline ''
               function(ctx)
                 return vim.fn.getcmdtype() == ':'
               end

@@ -279,14 +279,14 @@
       "type": "Git",
       "repository": {
         "type": "GitHub",
-        "owner": "JManch",
+        "owner": "Shatur",
         "repo": "neovim-ayu"
       },
       "branch": "master",
       "submodules": false,
-      "revision": "aabf4ef569d965dd8a41ab120319cdbba26376dc",
-      "url": "https://github.com/JManch/neovim-ayu/archive/aabf4ef569d965dd8a41ab120319cdbba26376dc.tar.gz",
-      "hash": "0bnk2k12km7wr71572hznbi5z3qinfsqbppgiwgrhiq56zjgjs5h"
+      "revision": "30e53f8a0f3708e92c84d4df676898cd16b8b64f",
+      "url": "https://github.com/Shatur/neovim-ayu/archive/30e53f8a0f3708e92c84d4df676898cd16b8b64f.tar.gz",
+      "hash": "1fxq7klf69byi6m8gqd3fq9zs96zc92qjzksafhgl8y7gs0hwzi5"
     },
     "slskd-stats": {
       "type": "GitRelease",

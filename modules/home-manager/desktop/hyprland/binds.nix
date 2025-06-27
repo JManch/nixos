@@ -236,8 +236,6 @@ in
         "${modShiftCtrl}, J, movewindow, d"
         "${mod}, mouse:275, workspace, m-1"
         "${mod}, mouse:276, workspace, m+1"
-        "${mod}, mouse_down, workspace, m-1"
-        "${mod}, mouse_up, workspace, m+1"
         "${modShift}, Left, movetoworkspace, r-1"
         "${modShift}, Right, movetoworkspace, r+1"
         "${modShift}, J, workspace, m-1"

@@ -1,6 +1,7 @@
 {
   buildPythonApplication,
   sources,
+  installShellFiles,
 }:
 buildPythonApplication {
   pname = "slskd-stats";
@@ -8,8 +9,11 @@ buildPythonApplication {
   src = sources.slskd-stats;
   pyproject = false;
 
+  nativeBuildInputs = [ installShellFiles ];
+
   installPhase = ''
-    install -Dm755 main.py $out/bin/slskd-stats
+    mv main.py slskd-stats
+    installBin slskd-stats
   '';
 
   meta.mainProgram = "slskd-stats";

@@ -17,6 +17,7 @@
   curl,
   sources,
   fetchFromGitHub,
+  installShellFiles,
   ...
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -26,7 +27,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   patches = [ ./cmake.patch ];
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    installShellFiles
+  ];
 
   buildInputs = [
     curl
@@ -55,7 +59,7 @@ stdenv.mkDerivation (finalAttrs: {
   enableParallelBuilding = true;
 
   installPhase = ''
-    install BeamMP-Server -D -t "$out/bin"
+    installBin BeamMP-Server
   '';
 
   meta = {

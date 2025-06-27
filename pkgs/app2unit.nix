@@ -3,14 +3,17 @@
   stdenvNoCC,
   sources,
   dash,
+  installShellFiles,
 }:
 stdenvNoCC.mkDerivation {
   pname = "app2unit";
   version = "0-unstable-${sources.app2unit.revision}";
   src = sources.app2unit;
 
+  nativeBuildInputs = [ installShellFiles ];
+
   installPhase = ''
-    install -Dt $out/bin app2unit
+    installBin app2unit
     ln -s $out/bin/app2unit $out/bin/app2unit-open
   '';
 

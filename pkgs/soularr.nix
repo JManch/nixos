@@ -7,6 +7,7 @@
   music-tag,
   pyarr,
   sources,
+  installShellFiles,
   ...
 }:
 let
@@ -38,6 +39,8 @@ buildPythonApplication {
   version = "0-unstable-${sources.soularr.revision}";
   src = sources.soularr;
 
+  nativeBuildInputs = [ installShellFiles ];
+
   pyproject = false;
 
   dependencies = [
@@ -47,7 +50,8 @@ buildPythonApplication {
   ];
 
   installPhase = ''
-    install -Dm755 soularr.py $out/bin/soularr
+    mv soularr.py soularr
+    installBin soularr
   '';
 
   meta.mainProgram = "soularr";

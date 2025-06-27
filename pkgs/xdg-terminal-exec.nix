@@ -2,6 +2,7 @@
   stdenvNoCC,
   scdoc,
   sources,
+  installShellFiles,
   ...
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
@@ -9,11 +10,14 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   inherit (sources.xdg-terminal-exec) version;
   src = sources.xdg-terminal-exec;
 
-  nativeBuildInputs = [ scdoc ];
+  nativeBuildInputs = [
+    scdoc
+    installShellFiles
+  ];
 
   installPhase = ''
-    install -Dm755 xdg-terminal-exec -t $out/bin
-    install -Dm644 xdg-terminal-exec.1.gz -t $out/share/man/man1
+    installBin xdg-terminal-exec
+    installManPage xdg-terminal-exec.1.gz
     install -Dm644 xdg-terminals.list -t $out/share/xdg-terminal-exec
   '';
 

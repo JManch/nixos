@@ -8,6 +8,7 @@
   openssl,
   curl,
   sources,
+  installShellFiles,
   ...
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -15,7 +16,10 @@ stdenv.mkDerivation (finalAttrs: {
   inherit (sources.BeamMP-Launcher) version;
   src = sources.BeamMP-Launcher;
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    installShellFiles
+  ];
 
   buildInputs = [
     zlib
@@ -28,7 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
   enableParallelBuilding = true;
 
   installPhase = ''
-    install BeamMP-Launcher -D -t $out/bin
+    installBin BeamMP-Launcher
   '';
 
   meta = {

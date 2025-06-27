@@ -94,7 +94,7 @@
       wireguard = {
         home = {
           enable = true;
-          trustedSSIDs = [ inputs.nix-resources.secrets.homeSSID ];
+          trustedSSIDs = [ inputs.nix-resources.secrets.ssids.home ];
           address = "192.168.100.11";
           subnet = 24;
 
@@ -169,7 +169,7 @@
 
         wireless = {
           enable = true;
-          force5GHz = true;
+          force5GHzNetworks = [ inputs.nix-resources.secrets.ssids.home ];
           interface = "wlp192s0";
         };
       };

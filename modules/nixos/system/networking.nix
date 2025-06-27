@@ -12,6 +12,7 @@ let
     ns
     mkMerge
     mkIf
+    elem
     listToAttrs
     toInt
     optional
@@ -35,15 +36,10 @@ let
   rfkill = getExe' pkgs.util-linux "rfkill";
   ip = getExe' pkgs.iproute2 "ip";
   vlanIds = attrNames cfg.vlans;
-  freqList = "5180 5200 5220 5240 5260 5280 5300 5320 5500 5520 5540 5560 5580 5600 5620 5640 5660 5680 5700 5720 5745 5765 5785 5805 5825";
+  freq5GHzList = "5180 5200 5220 5240 5260 5280 5300 5320 5500 5520 5540 5560 5580 5600 5620 5640 5660 5680 5700 5720 5745 5765 5785 5805 5825";
 in
 {
   enableOpt = false;
-
-  disabledModules = [ "services/networking/wpa_supplicant.nix" ];
-  imports = [
-    "${inputs.nixpkgs-wpa-supplicant}/nixos/modules/services/networking/wpa_supplicant.nix"
-  ];
 
   opts = {
     useNetworkd =
@@ -86,7 +82,15 @@ in
 
     wireless = {
       enable = mkEnableOption "wireless";
-      force5GHz = mkEnableOption "forcing 5GHz unless toggled with `toggle-force-5ghz`";
+
+      force5GHzNetworks = mkOption {
+        type = with types; listOf str;
+        default = [ ];
+        description = ''
+          List of wireless network SSIDs to force 5GHz by default. Can be
+          toggled at runtime `toggle-force-5ghz`.
+        '';
+      };
 
       fallbackToWPA2 = mkEnableOption ''
         creating WPA2 fallback variants of wireless networks. Useful for
@@ -242,22 +246,22 @@ in
       allowAuxiliaryImperativeNetworks = true;
       fallbackToWPA2 = cfg.wireless.fallbackToWPA2;
       networks = mapAttrs (
-        _: network:
+        ssid: network:
         network
         // {
           extraConfig = ''
             ${network.extraConfig or ""}
-            ${optionalString cfg.wireless.force5GHz "freq_list=${freqList}"}
+            ${optionalString (elem ssid cfg.wireless.force5GHzNetworks) "freq_list=${freq5GHzList}"}
           '';
         }
-      ) inputs.nix-resources.secrets.wirelessNetworks;
+      ) inputs.nix-resources.secrets.wirelessNetworksConfig;
     };
   };
 
   services.resolved.enable = cfg.resolved.enable;
 
   ns.userPackages =
-    optional (cfg.wireless.enable && cfg.wireless.force5GHz) (
+    optional cfg.wireless.enable (
       pkgs.writeShellScriptBin "toggle-force-5ghz" ''
         net_id=$(wpa_cli -i "${cfg.wireless.interface}" list_networks | grep '\[CURRENT\]' | cut -f1)
 
@@ -266,11 +270,11 @@ in
           read -p "Could not get active network. Enter a networkd id (e.g. 0): " -r net_id
         fi
 
-        if [[ $(wpa_cli -i "${cfg.wireless.interface}" get_network "$net_id" freq_list) == "${freqList}" ]]; then
+        if [[ $(wpa_cli -i "${cfg.wireless.interface}" get_network "$net_id" freq_list) == "${freq5GHzList}" ]]; then
           wpa_cli -i "${cfg.wireless.interface}" set_network "$net_id" freq_list '""'
           echo "Disabled forcing 5Ghz"
         else
-          wpa_cli -i "${cfg.wireless.interface}" set_network "$net_id" freq_list "${freqList}"
+          wpa_cli -i "${cfg.wireless.interface}" set_network "$net_id" freq_list "${freq5GHzList}"
           echo "Enabled forcing 5Ghz"
         fi
 

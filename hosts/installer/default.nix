@@ -13,7 +13,7 @@
   config,
   modulesPath,
   ...
-}@args:
+}:
 let
   inherit (lib)
     ns
@@ -355,7 +355,7 @@ in
       secretsFile = config.age.secrets.wirelessNetworks.path;
       scanOnLowSignal = true;
       allowAuxiliaryImperativeNetworks = true;
-      networks = inputs.nix-resources.secrets.wirelessNetworks args;
+      networks = inputs.nix-resources.secrets.wirelessNetworksConfig;
     };
 
     system.stateVersion = "25.11";

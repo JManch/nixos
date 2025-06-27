@@ -23,7 +23,7 @@ in
     # css
     ''
       @define-color background #${colors.base00};
-      @define-color border #${colors.base05};
+      @define-color border #${colors.base04};
       @define-color text-dark #${colors.base00};
       @define-color text-light #${colors.base07};
       @define-color green #${colors.base0B};
@@ -37,14 +37,21 @@ in
           font-family: '${font.family}';
           font-size: 15px;
           font-weight: 600;
+          text-shadow: none;
           min-height: 0px;
+          border: none;
       }
 
       tooltip {
           background: @background;
-          color: @text-light;
           border-radius: ${halfCornerRadius}px;
-          border: ${borderWidthStr}px solid @background;
+          border: ${borderWidthStr}px solid @blue;
+      }
+
+      tooltip label {
+          color: @text-light;
+          margin: 0px;
+          padding: 0px;
       }
 
       window#waybar {
@@ -64,7 +71,6 @@ in
                   "0"
               )
           }px;
-          border: ${borderWidthStr}px solid @background;
       }
 
       #workspaces {
@@ -75,8 +81,8 @@ in
       }
 
       button {
-        border-color: @transparent;
-        background: @transparent;
+          border-color: @transparent;
+          background: @transparent;
       }
 
       #workspaces button {
@@ -91,8 +97,7 @@ in
 
       #workspaces button label {
           border-radius: 5px;
-          border: ${borderWidthStr}px solid @transparent;
-          padding: 0px 6px;
+          padding: 0px 8px;
           margin: 4px 5px;
           color: @text-dark;
           font-weight: 500;
@@ -100,14 +105,11 @@ in
 
       #workspaces button.visible label {
           background: @transparent;
-          border: ${borderWidthStr}px solid @background;
           color: @text-dark;
-          font-weight: 900;
       }
 
       #workspaces button.active label {
           background: @background;
-          border: ${borderWidthStr}px solid @background;
           color: @text-light;
           font-weight: 900;
       }

@@ -138,9 +138,10 @@ in
       })
     ];
 
-    # Would like to disable clearing the TTY but it sometimes causes the issue
-    # message to printed over the login prompt
-    # systemd.services."getty@".serviceConfig.TTYVTDisallocate = "no";
+    # Only disable TTY clearing with autologin because it sometimes causes the
+    # issue message to be printed over the login prompt
+    systemd.services."getty@".serviceConfig.TTYVTDisallocate =
+      mkIf categoryCfg.displayManager.autoLogin "no";
 
     # Remove excess new lines and use normal green instead of bright
     environment.etc.issue.text = ''

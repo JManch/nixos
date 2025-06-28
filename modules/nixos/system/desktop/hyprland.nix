@@ -67,6 +67,8 @@ in
               # to change workspace monitors layouts in our external monitor
               # layout scripts with `hyprctl keyword workspace x, monitor:`
               ../../../../patches/hyprland-workspacerules-monitor.patch
+              # Add fullscreenMode to `hyprctl workspaces`
+              ../../../../patches/hyprland-hyprctl-workspace-fullscreen-mode.patch
             ];
           });
         })

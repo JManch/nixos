@@ -416,10 +416,9 @@ in
                 workspace: "$last_workspace_name == \"${workspace}\""
               ) cfg.autoHideWorkspaces
             } ]] || [[ ''${waybar_schedule_monitor_unhide["$focused_monitor"]:-false} == "true" ]]; then
-              last_window=$(${hyprctl} workspaces -j | ${jaq} -r "first(.[] | select(.name == \"$workspace_name\") | .lastwindow)")
-              fullscreen=$(${hyprctl} clients -j | ${jaq} -r "first(.[] | select(.address == \"$last_window\") | .fullscreen)")
+              fullscreen_mode=$(${hyprctl} workspaces -j | ${jaq} -r "first(.[] | select(.name == \"$workspace_name\") | .fullscreenMode)")
               # if active workspace is not maximised fullscreen
-              if [[ $fullscreen != "2" ]]; then
+              if [[ $fullscreen_mode != "2" ]]; then
                 # unhide the bar
                 systemctl kill --user --signal="SIGRTMIN+$(((1 << 3) | monitor_num ))" waybar
                 waybar_schedule_monitor_unhide["$focused_monitor"]=false

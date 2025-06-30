@@ -11,11 +11,13 @@
     ./workspaces.nix
     ./gitsigns.nix
     ./textobjs.nix
+    ./statusline
   ];
 
   vim = {
     mini.pairs.enable = true;
     visuals.fidget-nvim.enable = true;
+    visuals.nvim-web-devicons.enable = true;
 
     visuals.indent-blankline = {
       enable = true;

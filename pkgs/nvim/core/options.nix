@@ -27,6 +27,7 @@
       tabstop = 2;
       foldenable = false;
       breakindent = true;
+      ruler = false;
     };
 
     globals = {

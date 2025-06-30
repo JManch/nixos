@@ -30,10 +30,11 @@ in
     (mkKeymap [ "n" "v" "o" ] "<S-h>" "^" { desc = "Go first non-blank character"; })
     (mkKeymap [ "n" "v" "o" ] "<S-l>" "g_" { desc = "Go to last non-blank character"; })
 
-    (mkKeymap "n" "<C-d>" "<C-d>zz" { desc = "Scroll down half a page and centre cursor"; })
-    (mkKeymap "n" "<C-u>" "<C-u>zz" { desc = "Scroll up half a page and centre cursor"; })
-    (mkKeymap "n" "<C-o>" "<C-o>zz" { desc = "Go to prev marker and centre cursor"; })
-    (mkKeymap "n" "<C-i>" "<C-i>zz" { desc = "Go to next marker and centre cursor"; })
+    # Not using due to https://github.com/neovim/neovim/issues/20431
+    # (mkKeymap "n" "<C-d>" "<C-d>zz" { desc = "Scroll down half a page and centre cursor"; })
+    # (mkKeymap "n" "<C-u>" "<C-u>zz" { desc = "Scroll up half a page and centre cursor"; })
+    # (mkKeymap "n" "<C-o>" "<C-o>zz" { desc = "Go to prev marker and centre cursor"; })
+    # (mkKeymap "n" "<C-i>" "<C-i>zz" { desc = "Go to next marker and centre cursor"; })
 
     (mkKeymap "n" "<LEADER>v" "<CMD>vsplit<CR><C-l>" { desc = "Vertical split current buffer"; })
     (mkKeymap "n" "<S-x>" "<CMD>Bwipeout<CR>" { desc = "Close current buffer"; })

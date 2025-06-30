@@ -102,13 +102,13 @@ in
 
         sources.providers = {
           path.opts.trailing_slash = false;
-          ripgrep.opts.score_offset = -5;
+          # ripgrep.opts.score_offset = -5;
         };
       };
 
-      sourcePlugins = {
-        ripgrep.enable = true;
-      };
+      # sourcePlugins = {
+      #   ripgrep.enable = true;
+      # };
 
       mappings = {
         close = null;

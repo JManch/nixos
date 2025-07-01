@@ -40,6 +40,7 @@
         hypridle.enable = true;
         hyprpaper.enable = true;
         darkman.enable = true;
+        poweralertd.chargeThreshold = 80;
 
         waybar = {
           enable = true;

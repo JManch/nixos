@@ -1,8 +1,8 @@
 diff --git a/src/bar.cpp b/src/bar.cpp
-index 872632ac..ba578b1e 100644
+index 3c3ab690..a0279217 100644
 --- a/src/bar.cpp
 +++ b/src/bar.cpp
-@@ -405,6 +405,7 @@ void waybar::Bar::onMap(GdkEventAny*) {
+@@ -413,6 +413,7 @@ void waybar::Bar::onMap(GdkEventAny* /*unused*/) {
  }
  
  void waybar::Bar::setVisible(bool value) {
@@ -11,30 +11,30 @@ index 872632ac..ba578b1e 100644
    if (auto mode = config.get("mode", {}); mode.isString()) {
      setMode(visible ? config["mode"].asString() : MODE_INVISIBLE);
 diff --git a/src/main.cpp b/src/main.cpp
-index ff446ffc..131c8fb7 100644
+index 6e7650a9..1edee6e5 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
-@@ -93,8 +93,22 @@ int main(int argc, char* argv[]) {
- 
-     for (int sig = SIGRTMIN + 1; sig <= SIGRTMAX; ++sig) {
-       std::signal(sig, [](int sig) {
-+        std::vector<std::string> monitors = {@sortedMonitors@};
-+        int action = (sig - SIGRTMIN) >> 3;
-+        int monitorNum = (sig - SIGRTMIN) & ((1 << 3) - 1);
-+        if (monitorNum > monitors.size() || monitorNum < 1) {
-+          spdlog::error("Monitor with number {} does not exist", monitorNum);
-+          return;
-+        }
-+        auto& monitorName = monitors[monitorNum - 1];
-         for (auto& bar : waybar::Client::inst()->bars) {
--          bar->handleSignal(sig);
-+          if (bar->output->name == monitorName) {
-+            if (action == 2)
-+              bar->toggle();
-+            else
-+              bar->setVisible(action);
-+            break;
-+          }
-         }
-       });
+@@ -77,8 +77,22 @@ static void catchSignals(waybar::SafeSignal<int>& signal_handler) {
+ // `true` or `false`, respectively, into `reload`.
+ static void handleSignalMainThread(int signum, bool& reload) {
+   if (signum >= SIGRTMIN + 1 && signum <= SIGRTMAX) {
++    std::vector<std::string> monitors = {@sortedMonitors@};
++    int action = (signum - SIGRTMIN) >> 3;
++    int monitorNum = (signum - SIGRTMIN) & ((1 << 3) - 1);
++    if (monitorNum > monitors.size() || monitorNum < 1) {
++      spdlog::error("Monitor with number {} does not exist", monitorNum);
++      return;
++    }
++    auto& monitorName = monitors[monitorNum - 1];
+     for (auto& bar : waybar::Client::inst()->bars) {
+-      bar->handleSignal(signum);
++      if (bar->output->name == monitorName) {
++        if (action == 2)
++          bar->toggle();
++        else
++          bar->setVisible(action);
++        break;
++      }
      }
+ 
+     return;

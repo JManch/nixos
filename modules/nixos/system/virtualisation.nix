@@ -14,6 +14,7 @@ let
     mkVMOverride
     mod
     mkEnableOption
+    optional
     mkOption
     types
     ;
@@ -25,6 +26,7 @@ let
     ;
   inherit (config.${ns}.hmNs.desktop) hyprland;
   inherit (config.${ns}.core) home-manager;
+  inherit (config.${ns}.system) desktop;
 
   runVMScript = pkgs.writeShellApplication {
     name = "run-vm";
@@ -331,7 +333,7 @@ in
       };
     };
 
-    ns.adminPackages = [ runVMScript ];
+    ns.adminPackages = optional desktop.enable runVMScript;
   }
 
   (mkIf cfg.libvirt.enable {

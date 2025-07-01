@@ -177,9 +177,9 @@ let
           ${optionalString (cmd != "build")
             # bash
             ''
-              if ping -c 1 -W 1 "$hostname.lan"; then
+              if ping -c 1 -W 1 "$hostname.lan" >/dev/null; then
                 host_address="$hostname.lan"
-              elif ping -c 1 -W 1 "$hostname-vpn.lan"; then
+              elif ping -c 1 -W 1 "$hostname-vpn.lan" >/dev/null; then
                 host_address="$hostname-vpn.lan"
               else
                 echo "Host '$hostname' is not up"

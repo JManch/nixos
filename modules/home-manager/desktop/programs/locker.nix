@@ -118,6 +118,10 @@ in
         # Exit type main is required so that the service stops even if there
         # are background processes running from the pre/post lock scripts
         ExitType=main
+        # KillMode control-group ensures that any background processes started
+        # from the preLock or postLock scripts get killed. postUnlock script
+        # will be given TimeoutStopSec (90 secs default) to finish.
+        KillMode=control-group
         ExecStartPre=-${cfg.preLockScript}
         ExecStartPost=-${cfg.postLockScript}
         ExecStopPost=-${cfg.postUnlockScript}

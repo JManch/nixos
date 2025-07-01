@@ -30,7 +30,6 @@ let
     ;
   inherit (osConfig.${ns}.core.device) monitors primaryMonitor;
   inherit (desktopCfg.style) gapSize borderWidth;
-  deviceType = osConfig.${ns}.core.device.type;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
 

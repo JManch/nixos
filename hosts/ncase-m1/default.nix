@@ -142,7 +142,7 @@
       air-vpn.enable = true;
 
       ollama = {
-        enable = true;
+        enable = false; # open-webui build failure
         openFirewall = true;
       };
 

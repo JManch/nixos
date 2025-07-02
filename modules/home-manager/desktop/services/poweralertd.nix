@@ -44,7 +44,7 @@ in
   services.dunst.settings = mkIf (cfg.chargeThreshold != null) {
     ignore_poweralertd_threshold = {
       appname = "poweralertd";
-      body = "Battery (dis|)charging\\nCurrent level: ${toString cfg.chargeThreshold}%\\n";
+      body = "Battery *charging*Current level: ${toString cfg.chargeThreshold}%*";
       skip_display = true;
       history_ignore = true;
     };

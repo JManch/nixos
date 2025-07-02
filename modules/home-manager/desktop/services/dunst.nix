@@ -44,7 +44,9 @@ in
           monitor = toString cfg.monitorNumber;
           # follow mouse on laptops for external monitor usage
           follow = if (device.type == "laptop") then "mouse" else "none";
-          enable_posix_regex = true;
+          # I can't get newline matching to work with this enabled. If changing
+          # update regex in poweralertd module.
+          enable_posix_regex = false;
           font = "${font.family} 13";
           icon_theme = config.gtk.iconTheme.name;
           show_indicators = true;

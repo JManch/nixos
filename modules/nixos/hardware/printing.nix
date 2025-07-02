@@ -17,6 +17,7 @@ let
     mkEnableOption
     types
     ;
+  inherit (config.${ns}) device;
 
   dcp9015cdwlpr = pkgs.dcp9020cdwlpr.overrideAttrs (
     final: prev: {
@@ -48,11 +49,19 @@ in
 
     opts = {
       server.enable = mkEnableOption "printing server";
+
       client = {
         enable = mkEnableOption "printing client";
+
         serverAddress = mkOption {
           type = types.str;
           description = "Address of the cups server to print from";
+        };
+
+        autoAdd = mkOption {
+          type = types.bool;
+          default = device.type != "laptop";
+          description = "Whether to attempt printer setup every hour";
         };
       };
     };
@@ -163,7 +172,9 @@ in
       wants = [ "network-online.target" ];
       wantedBy = mkForce [ ];
       requires = [ "nss-lookup.target" ];
-      startAt = if cfg.server.enable then "*-*-* *:00:00" else "*-*-* *:05:00";
+      startAt = mkIf (cfg.server.enable || cfg.client.autoAdd) (
+        if cfg.server.enable then "*-*-* *:00:00" else "*-*-* *:05:00"
+      );
       serviceConfig.RemainAfterExit = mkForce false;
 
       script =

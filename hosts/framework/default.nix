@@ -56,6 +56,10 @@
     hardware = {
       secure-boot.enable = true;
       bluetooth.enable = true;
+      printing.client = {
+        enable = true;
+        serverAddress = "homelab.lan";
+      };
 
       file-system = {
         type = "ext4";

@@ -82,6 +82,7 @@
         tor-browser.enable = true;
         qbittorrent.enable = true;
         jellyfin-media-player.enable = true;
+        zathura.enable = true;
 
         firefox = {
           enable = true;

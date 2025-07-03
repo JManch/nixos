@@ -17,7 +17,7 @@ let
     mkEnableOption
     types
     ;
-  inherit (config.${ns}) device;
+  inherit (config.${ns}.core) device;
 
   dcp9015cdwlpr = pkgs.dcp9020cdwlpr.overrideAttrs (
     final: prev: {

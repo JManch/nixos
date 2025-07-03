@@ -1,3 +1,6 @@
+-- TODO:
+-- Fix git update opening file
+-- Fix searchcount update when clearing search
 local setup_colors = function()
   return require("ayu.colors")
 end
@@ -14,10 +17,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
   end,
 })
 
-local align = {
-  provider = "%=",
-  hl = { bg = "panel_border" },
-}
+local align = { provider = "%=" }
 local space = { provider = " " }
 
 local vi_mode = {
@@ -80,6 +80,44 @@ local vi_mode = {
   },
 }
 
+local git = {
+  condition = conditions.is_git_repo,
+  init = function(self)
+    self.status_dict = vim.b.gitsigns_status_dict
+    self.has_changes = self.status_dict.added ~= 0 or self.status_dict.removed ~= 0 or self.status_dict.changed ~= 0
+  end,
+  hl = { fg = "entity" },
+  {
+    provider = function(self)
+      return " " .. self.status_dict.head
+    end,
+    hl = function(self)
+      return { fg = self:mode_highlight().bg }
+    end,
+  },
+  {
+    provider = function(self)
+      local count = self.status_dict.added or 0
+      return count > 1 and (" +" .. count)
+    end,
+    hl = { fg = "vcs_added" },
+  },
+  {
+    provider = function(self)
+      local count = self.status_dict.removed or 0
+      return count > 0 and (" -" .. count)
+    end,
+    hl = { fg = "vcs_removed" },
+  },
+  {
+    provider = function(self)
+      local count = self.status_dict.changed or 0
+      return count > 0 and (" ~" .. count)
+    end,
+    hl = { fg = "vcs_modified" },
+  },
+}
+
 local file_name_block = {
   init = function(self)
     self.filename = vim.api.nvim_buf_get_name(0)
@@ -87,48 +125,39 @@ local file_name_block = {
   provider = function()
     return "%="
   end,
-  hl = function()
-    return { fg = "fg", bg = "panel_border" }
-  end,
-}
-
-local file_icon = {
-  init = function(self)
-    local filename = self.filename
-    local extension = vim.fn.fnamemodify(filename, ":e")
-    self.icon, self.icon_color =
-    require("nvim-web-devicons").get_icon_color(filename, extension, { default = true })
-  end,
-  provider = function(self)
-    return self.icon and (self.icon .. " ")
-  end,
-  hl = function(self)
-    return { fg = self.icon_color }
-  end,
-}
-
-local file_name = {
-  init = function(self)
-    self.lfilename = vim.fn.fnamemodify(self.filename, ":.")
-    if self.lfilename == "" then
-      self.lfilename = "[No Name]"
-    end
-  end,
-  flexible = 2,
-  hl = { fg = "fg" },
   {
+    init = function(self)
+      local filename = self.filename
+      local extension = vim.fn.fnamemodify(filename, ":e")
+      self.icon, self.icon_color =
+      require("nvim-web-devicons").get_icon_color(filename, extension, { default = true })
+    end,
     provider = function(self)
-      return self.lfilename
+      return self.icon and (self.icon .. " ")
+    end,
+    hl = function(self)
+      return { fg = self.icon_color }
     end,
   },
   {
-    provider = function(self)
-      return vim.fn.pathshorten(self.lfilename)
+    init = function(self)
+      self.lfilename = vim.fn.fnamemodify(self.filename, ":.")
+      if self.lfilename == "" then
+        self.lfilename = "[No Name]"
+      end
     end,
+    flexible = 2,
+    {
+      provider = function(self)
+        return self.lfilename
+      end,
+    },
+    {
+      provider = function(self)
+        return vim.fn.pathshorten(self.lfilename)
+      end,
+    },
   },
-}
-
-local file_flags = {
   {
     condition = function()
       return vim.bo.modified
@@ -143,7 +172,24 @@ local file_flags = {
   },
 }
 
-file_name_block = utils.insert(file_name_block, file_icon, file_name, file_flags, { provider = "%<" })
+local search_count = {
+  condition = function()
+    return vim.v.hlsearch ~= 0
+  end,
+
+  hl = function(self)
+    return { fg = self:mode_highlight().bg }
+  end,
+
+  provider = function()
+    local ok, result = pcall(vim.fn.searchcount, { maxcount = 999, timeout = 500 })
+    if not ok or next(result) == nil then
+      return ""
+    end
+    local denominator = math.min(result.total, result.maxcount)
+    return string.format("[%d/%d]", result.current, denominator)
+  end,
+}
 
 local position = {
   provider = " %P ",
@@ -154,9 +200,14 @@ local position = {
 
 local statusline = {
   vi_mode,
+  space,
+  git,
   file_name_block,
   align,
+  search_count,
+  space,
   position,
+  hl = { fg = "fg", bg = "panel_border" },
   static = {
     mode_highlights_map = {
       n = { fg = "bg", bg = "entity", bold = true },

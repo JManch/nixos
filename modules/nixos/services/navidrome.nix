@@ -37,7 +37,44 @@ in
   services.navidrome = {
     enable = true;
     openFirewall = false;
-    package = lib.${ns}.addPatches pkgs.navidrome [ "navidrome-lastfm-apostrophe.patch" ];
+    # package = lib.${ns}.addPatches pkgs.navidrome [ "navidrome-lastfm-apostrophe.patch" ];
+    package = pkgs.navidrome.overrideAttrs (
+      final: prev:
+      assert lib.assertMsg (prev.version == "0.56.1") "Remove navidrome override";
+      {
+        version = "0.57.0";
+        src = pkgs.fetchFromGitHub {
+          owner = "navidrome";
+          repo = "navidrome";
+          tag = "v${final.version}";
+          hash = "sha256-KTgh+dA2YYPyNdGr2kYEUlYeRwNnEcSQlpQ7ZTbAjP0=";
+        };
+
+        patches = prev.patches or [ ] ++ [ ../../../patches/navidrome-lastfm-apostrophe.patch ];
+
+        postPatch = ''
+          ${prev.postPatch}
+          substituteInPlace core/playback/mpv/mpv_test.go --replace-fail "/bin/bash" "${pkgs.runtimeShell}"
+        '';
+
+        vendorHash = "sha256-/WeEimHCEQbTbCZ+4kXVJdHAa9PJEk1bG1d2j3V9JKM=";
+
+        postBuild = ''
+          ls -la /build
+        '';
+
+        npmDeps = pkgs.fetchNpmDeps {
+          inherit (final) src;
+          sourceRoot = "${final.src.name}/ui";
+          hash = "sha256-tl6unHz0E0v0ObrfTiE0vZwVSyVFmrLggNM5QsUGsvI=";
+        };
+
+        ldflags = [
+          "-X github.com/navidrome/navidrome/consts.gitSha=${final.src.rev}"
+          "-X github.com/navidrome/navidrome/consts.gitTag=v${final.version}"
+        ];
+      }
+    );
 
     settings = {
       Address = "127.0.0.1";

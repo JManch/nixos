@@ -166,7 +166,6 @@ local filename_block = {
     self.filename_chars = utils.count_chars(
                               self.icon_str .. self.lfilename .. self.tag_str)
   end,
-  {provider = count_provider("filename_space", " ")},
   {
     provider = function(self)
       local left_chars = 0
@@ -175,7 +174,7 @@ local filename_block = {
 
       -- Because we left align the filename by default right_chars will always
       -- be >= left_chars
-      return string.rep(' ', math.floor((right_chars - left_chars) / 2))
+      return " " .. string.rep(' ', math.floor((right_chars - left_chars) / 2))
     end
   },
   {

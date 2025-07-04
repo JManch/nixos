@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, sources, ... }:
 {
   imports = [
     ./completion.nix
@@ -18,15 +18,6 @@
     mini.pairs.enable = true;
     visuals.fidget-nvim.enable = true;
     visuals.nvim-web-devicons.enable = true;
-
-    visuals.indent-blankline = {
-      enable = true;
-      setupOpts = {
-        indent.char = "│";
-        scope.enabled = false;
-        exclude.filetypes = [ "dashboard" ];
-      };
-    };
 
     notify.nvim-notify = {
       enable = true;
@@ -56,6 +47,31 @@
       setup = ''
         require('leap').add_default_mappings()
       '';
+    };
+
+    extraPlugins."indentmini.nvim" = {
+      package = pkgs.vimUtils.buildVimPlugin {
+        pname = "indentmini.nvim";
+        version = "0-unstable-${sources."indentmini.nvim".revision}";
+        src = sources."indentmini.nvim";
+        meta.homepage = "https://github.com/nvimdev/indentmini.nvim";
+      };
+      setup =
+        # lua
+        ''
+          vim.api.nvim_set_hl(0, "IndentLine", { link = "LineNr" })
+          vim.api.nvim_set_hl(0, "IndentLineCurrent", { link = "LineNr" })
+          vim.api.nvim_create_autocmd("ColorScheme", {
+            group = vim.api.nvim_create_augroup("IndentMini", { clear = true }),
+            pattern = "*",
+            desc = "Link indentmini highlight groups",
+            callback = function()
+              vim.api.nvim_set_hl(0, "IndentLine", { link = "LineNr" })
+              vim.api.nvim_set_hl(0, "IndentLineCurrent", { link = "LineNr" })
+            end,
+          })
+          require("indentmini").setup()
+        '';
     };
 
     lazy.plugins."tabular" = {

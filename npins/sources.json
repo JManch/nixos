@@ -250,6 +250,19 @@
       "url": "https://api.github.com/repos/ulinja/hyprpy/tarball/v0.2.0",
       "hash": "1i2m6ymm44bb68hksw4bdnb9ac40afby9gfy1vwz8m38c8z7czbg"
     },
+    "indentmini.nvim": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "nvimdev",
+        "repo": "indentmini.nvim"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "0dc4bc2b3fc763420793e748b672292bc43ee722",
+      "url": "https://github.com/nvimdev/indentmini.nvim/archive/0dc4bc2b3fc763420793e748b672292bc43ee722.tar.gz",
+      "hash": "1n8vb7wgkb81x9zqhmsdrl2ilx40l4r6jg9qnmd3ihbfwbsjgi48"
+    },
     "jellyfin-plugin-listenbrainz": {
       "type": "GitRelease",
       "repository": {

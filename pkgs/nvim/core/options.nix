@@ -28,6 +28,7 @@
       foldenable = false;
       breakindent = true;
       ruler = false;
+      title = true;
     };
 
     globals = {

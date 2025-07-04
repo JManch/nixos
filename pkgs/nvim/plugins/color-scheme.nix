@@ -24,6 +24,21 @@
     lib.nvim.dag.entryBefore [ "pluginConfigs" "lazyConfigs" ]
       # lua
       ''
+        vim.api.nvim_create_autocmd('ColorScheme', {
+          group = vim.api.nvim_create_augroup('SetHighlights', {}),
+          pattern = "*",
+          callback = function()
+            vim.api.nvim_set_hl(0, 'MatchParen', { link = 'Constant' })
+
+            -- Missing highlight groups from ayu
+            vim.api.nvim_set_hl(0, 'Bold', { bold = true })
+            vim.api.nvim_set_hl(0, 'Italic', { italic = true })
+            vim.api.nvim_set_hl(0, '@text.strong', { link = 'Bold' })
+            vim.api.nvim_set_hl(0, '@text.emphasis', { link = 'Italic' })
+            vim.api.nvim_set_hl(0, '@text.literal.help', { link = 'help' })
+          end,
+        })
+
         local colors = require('ayu.colors')
         colors.generate(true)
         require('ayu').setup({
@@ -74,6 +89,8 @@
       '';
 
   vim.keymaps = [
-    (lib.nvim.binds.mkKeymap "n" "<LEADER>l" "<CMD>SunsetToggle<CR>" { desc = "Toggle sunset theme"; })
+    (lib.nvim.binds.mkKeymap "n" "<LEADER><S-c>" "<CMD>SunsetToggle<CR>" {
+      desc = "Toggle sunset theme";
+    })
   ];
 }

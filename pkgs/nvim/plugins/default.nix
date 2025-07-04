@@ -62,7 +62,7 @@
           vim.api.nvim_set_hl(0, "IndentLine", { link = "LineNr" })
           vim.api.nvim_set_hl(0, "IndentLineCurrent", { link = "LineNr" })
           vim.api.nvim_create_autocmd("ColorScheme", {
-            group = vim.api.nvim_create_augroup("IndentMini", { clear = true }),
+            group = vim.api.nvim_create_augroup("IndentMini", {}),
             pattern = "*",
             desc = "Link indentmini highlight groups",
             callback = function()

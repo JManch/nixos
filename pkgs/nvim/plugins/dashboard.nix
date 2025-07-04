@@ -65,7 +65,7 @@
       # lua
       ''
         local dashboard_utils = {
-          group = vim.api.nvim_create_augroup("DashboardCustom", { clear = true }),
+          group = vim.api.nvim_create_augroup("DashboardCustom", {}),
           cursor_blend = function(value)
             local hl = vim.api.nvim_get_hl(0, { name = "Cursor", create = true })
             hl.blend = value

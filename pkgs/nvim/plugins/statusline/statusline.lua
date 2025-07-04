@@ -6,9 +6,8 @@ local utils = require("heirline.utils")
 
 require("heirline").load_colors(setup_colors)
 
-vim.api.nvim_create_augroup("Heirline", {clear = true})
 vim.api.nvim_create_autocmd("ColorScheme", {
-  group = "Heirline",
+  group = vim.api.nvim_create_augroup("Heirline", {}),
   callback = function() utils.on_colorscheme(setup_colors) end
 })
 
@@ -45,8 +44,6 @@ local count_condition = function(names, condition)
     return result
   end
 end
-
-local space = {provider = " "}
 
 local mode = {
   static = {
@@ -148,8 +145,7 @@ local filename_block = {
     local filename = vim.api.nvim_buf_get_name(0)
 
     local extension = vim.fn.fnamemodify(filename, ":e")
-    self.icon, self.icon_color = require("nvim-web-devicons").get_icon_color(
-                                     filename, extension, {default = true})
+    self.icon, self.icon_color = require("nvim-web-devicons").get_icon_color(filename, extension, {default = true})
     self.icon_str = self.icon and (self.icon .. " ")
 
     self.lfilename = vim.fn.fnamemodify(filename, ":.")
@@ -163,8 +159,7 @@ local filename_block = {
       self.tag_str = ""
     end
 
-    self.filename_chars = utils.count_chars(
-                              self.icon_str .. self.lfilename .. self.tag_str)
+    self.filename_chars = utils.count_chars(self.icon_str .. self.lfilename .. self.tag_str)
   end,
   {
     provider = function(self)
@@ -186,21 +181,73 @@ local filename_block = {
 
 local search_count = {
   condition = function() return vim.v.hlsearch ~= 0 end,
-
   hl = function(self) return {fg = self:mode_highlight().bg} end,
-
   provider = function()
     local ok, result =
         pcall(vim.fn.searchcount, {maxcount = 999, timeout = 500})
     if not ok or next(result) == nil then return "" end
     local denominator = math.min(result.total, result.maxcount)
-    return string.format("[%d/%d]", result.current, denominator)
+    return string.format(" [%d/%d]", result.current, denominator)
   end
 }
 
+local diagnostics = {
+  condition = conditions.has_diagnostics,
+  static = {
+    error_icon = vim.diagnostic.config()['signs']['text']['vim.diagnostic.severity.ERROR'],
+    warn_icon = vim.diagnostic.config()['signs']['text']['vim.diagnostic.severity.WARN'],
+    info_icon = vim.diagnostic.config()['signs']['text']['vim.diagnostic.severity.INFO'],
+    hint_icon = vim.diagnostic.config()['signs']['text']['vim.diagnostic.severity.HINT'],
+  },
+  init = function(self)
+    self.errors = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
+    self.warnings = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.WARN })
+    self.hints = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.HINT })
+    self.info = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.INFO })
+  end,
+  update = { "DiagnosticChanged", "BufEnter" },
+  {
+    provider = function(self)
+      return self.errors > 0 and (" " .. self.error_icon .. self.errors)
+    end,
+    hl = { fg = "error" },
+  },
+  {
+    provider = function(self)
+      return self.warnings > 0 and (" " .. self.warn_icon .. self.warnings)
+    end,
+    hl = { fg = "keyword" },
+  },
+  {
+    provider = function(self)
+      return self.info > 0 and (" " .. self.info_icon .. self.info)
+    end,
+    hl = { fg = "tag" },
+  },
+  {
+    provider = function(self)
+      return self.hints > 0 and (" " .. self.hint_icon .. self.hints)
+    end,
+    hl = { fg = "regexp" },
+  },
+}
+
+local tabs = {
+  init = function(self)
+    self.tab_count = vim.fn.tabpagenr('$')
+  end,
+  provider = function(self)
+    return self.tab_count ~= 1 and (" " .. vim.fn.tabpagenr() .. "/" .. self.tab_count)
+  end,
+  hl = function(self) return {fg = self:mode_highlight().bg} end
+}
+
 local position = {
-  provider = " %P ",
-  hl = function(self) return self:mode_highlight() end
+  { provider = " "},
+  {
+    provider = " %P ",
+    hl = function(self) return self:mode_highlight() end
+  }
 }
 
 local statusline = {
@@ -229,7 +276,8 @@ local statusline = {
   filename_block,
   {provider = "%="},
   search_count,
-  space,
+  diagnostics,
+  tabs,
   position
 }
 

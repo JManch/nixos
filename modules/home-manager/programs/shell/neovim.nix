@@ -17,60 +17,19 @@ let
     mkEnableOption
     ;
   inherit (config.${ns}.desktop.services) darkman;
+  nvimPackage = pkgs.${ns}.nvim;
 in
 {
   opts.neovide.enable = mkEnableOption "neovide";
 
-  programs.neovim = {
-    enable = true;
-
-    # Neovim is pinned to v10.2 in our system overlays
-    # TODO: Update config for Neovim 11
-
-    viAlias = true;
-    vimAlias = true;
-    vimdiffAlias = true;
-    defaultEditor = true;
-
-    extraPackages = with pkgs; [
-      # Runtime dependendies
-      fzf
-      ripgrep
-      gnumake
-      gcc
-      luajit
-
-      # Language servers
-      lua-language-server
-      nil
-      nixd
-      ltex-ls
-
-      # Formatters
-      nixfmt-rfc-style
-      stylua
-
-      # NOTE: These 'extra' lsp and formatters should be installed on a
-      # per-project basis using nix shell
-
-      # clang-tools
-      # ltex-ls
-      # omnisharp-roslyn
-      # matlab-language-server
-      # prettierd
-      # black
-    ];
-
-    # Some treesitter parsers need this library
-    extraWrapperArgs = [
-      "--suffix"
-      "LD_LIBRARY_PATH"
-      ":"
-      "${lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}"
-    ];
+  programs.zsh.shellAliases = {
+    vi = "nvim";
+    vim = "nvim";
+    vimdiff = "nvim -d";
   };
 
   home.packages = [
+    nvimPackage
     (hiPrio (
       pkgs.runCommand "neovim-desktop-rename" { } ''
         mkdir -p $out/share/applications
@@ -82,9 +41,9 @@ in
 
   xdg.configFile."nvim".source = inputs.neovim-config.outPath;
 
-  # For conditional nix-specific config in nvim config
   home.sessionVariables = {
-    NIX_NEOVIM = 1;
+    EDITOR = "nvim";
+    NIX_NEOVIM = 1; # this is just for our legacy config
     NIX_NEOVIM_DARKMAN = if darkman.enable then 1 else 0;
   };
 
@@ -114,15 +73,15 @@ in
   ns.desktop.darkman.switchScripts.neovim =
     theme: # bash
     ''
-      ${getExe' pkgs.coreutils "ls"} "$XDG_RUNTIME_DIR"/nvim.*.0 | ${getExe' pkgs.findutils "xargs"} -I {} \
-        ${getExe config.programs.neovim.package} --server {} --remote-expr "execute('Sunset${
+      ${getExe' pkgs.coreutils "ls"} "$XDG_RUNTIME_DIR"/nvf.*.0 | ${getExe' pkgs.findutils "xargs"} -I {} \
+        ${getExe nvimPackage} --server {} --remote-expr "execute('Sunset${
           if theme == "dark" then "Night" else "Day"
         }')"
     '';
 
   ns.persistence.directories = [
-    ".cache/nvim"
-    ".local/share/nvim"
-    ".local/state/nvim"
+    ".cache/nvf"
+    ".local/share/nvf"
+    ".local/state/nvf"
   ];
 }

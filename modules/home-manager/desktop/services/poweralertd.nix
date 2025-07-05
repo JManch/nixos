@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (lib) ns mkIf;
+  inherit (lib) ns mkIf foldl';
   inherit (osConfig.${ns}.core) device;
 in
 {
@@ -41,12 +41,18 @@ in
     Service.Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";
   };
 
-  services.dunst.settings = mkIf (cfg.chargeThreshold != null) {
-    ignore_poweralertd_threshold = {
-      appname = "poweralertd";
-      body = "Battery *charging*Current level: ${toString cfg.chargeThreshold}%*";
-      skip_display = true;
-      history_ignore = true;
-    };
-  };
+  services.dunst.settings = mkIf (cfg.chargeThreshold != null) (
+    foldl' (
+      acc: percentage:
+      acc
+      // {
+        "ignore_poweralertd_threshold_${toString percentage}" = {
+          appname = "poweralertd";
+          body = "Battery *Current level: ${toString percentage}%*";
+          skip_display = true;
+          history_ignore = true;
+        };
+      }
+    ) { } (builtins.genList (i: cfg.chargeThreshold - 2 + i) 3)
+  );
 }

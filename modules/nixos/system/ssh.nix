@@ -113,16 +113,6 @@ in
 
   programs.zsh.shellAliases.ssh-forget = "ssh -o UserKnownHostsFile=/dev/null";
 
-  # WARN: For some reason enabling the agent on hosts where the primary user
-  # does not have admin priviledges causes sudo commands to fail after `su
-  # adminUser` with "pam_ssh_agent_auth: fatal: uid `adminUid`` attempted to
-  # open an agent socket owned by uid `userUid`". I don't need the agent on
-  # these hosts anyway so it's disabled by default.
-  security.pam.sshAgentAuth = mkIf cfg.agent.enable {
-    enable = true;
-    authorizedKeysFiles = [ "/etc/ssh/authorized_keys.d/%u" ];
-  };
-
   ns.persistence.files = [
     "/etc/ssh/ssh_host_ed25519_key"
     "/etc/ssh/ssh_host_ed25519_key.pub"

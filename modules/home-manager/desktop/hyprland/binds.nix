@@ -19,7 +19,6 @@ let
     ;
   inherit (lib.${ns}) flakePkgs getMonitorHyprlandCfgStr;
   inherit (osConfig.${ns}.core.device) monitors backlight;
-  inherit (config.${ns}.desktop.programs) locker;
   mod = cfg.modKey;
   modShift = "${cfg.modKey}SHIFT";
   modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
@@ -222,7 +221,6 @@ in
         "${modShift}, R, exec, ${make16By9}"
         "${mod}, A, exec, ${scaleTabletToWindow}"
         "${modShift}, A, exec, ${toggleGaps}"
-        "${mod}, Space, exec, ${locker.lockScript} --immediate"
         "${modShiftCtrl}, V, exec, ${syncClipboard}"
 
         # Movement

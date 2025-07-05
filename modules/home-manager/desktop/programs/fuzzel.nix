@@ -128,7 +128,7 @@ in
     {
       bindr = [ "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} fuzzel || fuzzel" ];
       bind = [
-        "${modKey}SHIFT, N, exec, ${getExe' pkgs.procps "pkill"} fuzzel || ${getExe hyprlandWindowSwitcher}"
+        "${modKey}, Space, exec, ${getExe' pkgs.procps "pkill"} fuzzel || ${getExe hyprlandWindowSwitcher}"
       ];
       layerrule = [ "animation slide, launcher" ];
     };

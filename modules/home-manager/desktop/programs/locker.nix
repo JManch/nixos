@@ -148,5 +148,8 @@ in
         }
       '';
     in
-    [ "${modKey}, U, exec, ${toggleLockInhibit}" ];
+    [
+      "${modKey}, U, exec, ${toggleLockInhibit}"
+      "${modKey}, Escape, exec, ${cfg.lockScript} --immediate"
+    ];
 }

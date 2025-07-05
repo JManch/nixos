@@ -11,6 +11,7 @@ let
     mkOption
     types
     findFirst
+    any
     sort
     zipListsWith
     init
@@ -183,6 +184,13 @@ in
     monitors = mkOption {
       type = types.listOf (types.submodule monitorSubmodule);
       default = [ ];
+    };
+
+    isGammaCustom = mkOption {
+      type = types.bool;
+      default = any (m: m.gamma != 1.0) cfg.monitors;
+      readOnly = true;
+      description = "Whether any of the monitors have a custom gamma";
     };
 
     primaryMonitor = mkOption {

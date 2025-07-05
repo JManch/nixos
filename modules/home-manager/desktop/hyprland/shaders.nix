@@ -8,16 +8,16 @@
 let
   inherit (lib)
     ns
-    mkIf
     concatMap
     concatLines
-    any
+    mkOption
+    types
     getExe
     getExe'
     ;
-  inherit (osConfig.${ns}.core.device) monitors;
-  isGammaCustom = any (m: m.gamma != 1.0) monitors;
+  inherit (osConfig.${ns}.core.device) isGammaCustom monitors;
 
+  hyprctl = getExe' pkgs.hyprland "hyprctl";
   monitorGammaConditionals =
     (concatMap (
       m:
@@ -69,6 +69,32 @@ let
 
 in
 {
+  conditions = [ isGammaCustom ];
+
+  opts = {
+    enableShaders = mkOption {
+      type = types.str;
+      readOnly = true;
+      default =
+        if isGammaCustom then
+          "${hyprctl} keyword decoration:screen_shader '${cfg.shaderDir}/monitorGamma.frag'"
+        else
+          "";
+      description = "Command to enable Hyprland screen shaders";
+    };
+
+    disableShaders = mkOption {
+      type = types.str;
+      readOnly = true;
+      default =
+        if isGammaCustom then
+          "${hyprctl} keyword decoration:screen_shader '${cfg.shaderDir}/blank.frag'"
+        else
+          "";
+      description = "Command to disable Hyprland screen shaders";
+    };
+  };
+
   xdg.configFile = {
     "hypr/shaders/monitorGamma.frag".text = gammaShader;
     "hypr/shaders/blank.frag".text = blankShader;
@@ -89,7 +115,7 @@ in
             fi
           '';
     in
-    mkIf isGammaCustom {
+    {
       decoration.screen_shader = "${config.xdg.configHome}/hypr/shaders/monitorGamma.frag";
       bind = [ "${cfg.modKey}, O, exec, ${toggleShader}" ];
     };

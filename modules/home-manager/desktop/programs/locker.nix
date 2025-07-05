@@ -11,6 +11,7 @@ let
     getExe
     optionalString
     escapeShellArg
+    concatMapStringsSep
     mkOption
     types
     ;
@@ -33,11 +34,17 @@ in
       description = "The package to use for locking";
     };
 
-    immediateFlag = mkOption {
-      type = with types; nullOr str;
+    defaultArgs = mkOption {
+      type = with types; listOf str;
+      default = [ ];
+      description = "List of default args passed to lock command";
+    };
+
+    immediateArgs = mkOption {
+      type = with types; nullOr (listOf str);
       default = null;
       description = ''
-        Flag for immediate locking (meaning skipping the grace period). Leave
+        Args for immediate locking (meaning skipping the grace period). Leave
         null if unsupported.
       '';
     };
@@ -101,9 +108,11 @@ in
           # Exit if locker is already running
           systemctl --quiet --user is-active app-*-${builtins.baseNameOf (getExe cfg.package)}@*.service && exit 1
 
-          ${optionalString (cfg.immediateFlag != null) ''
+          lockArgs=(${concatMapStringsSep " " (s: "\"${s}\"") cfg.defaultArgs})
+
+          ${optionalString (cfg.immediateArgs != null) ''
             if [ -n "$immediate" ]; then
-              lockArgs+=(${cfg.immediateFlag})
+              lockArgs+=(${concatMapStringsSep " " (s: "\"${s}\"") cfg.immediateArgs})
             fi
           ''}
 

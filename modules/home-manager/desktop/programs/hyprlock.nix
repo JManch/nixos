@@ -17,17 +17,23 @@ in
   categoryConfig.locker = {
     package = config.programs.hyprlock.package;
     unlockCmd = "${getExe' pkgs.procps "pkill"} -USR1 hyprlock";
-    immediateFlag = "--immediate";
+
+    defaultArgs = [
+      "--grace" # hyprlock removed the grace option https://github.com/hyprwm/hyprlock/issues/782
+      "5"
+    ];
+
+    immediateArgs = [
+      "--grace"
+      "0"
+    ];
   };
 
   programs.hyprlock = {
     enable = true;
     package = inputs.hyprlock.packages.${pkgs.system}.default;
     settings = {
-      general = {
-        hide_cursor = false;
-        grace = 5;
-      };
+      general.hide_cursor = true;
 
       auth = {
         pam.enabled = true;

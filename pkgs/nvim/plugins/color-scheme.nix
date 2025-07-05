@@ -89,7 +89,7 @@
       '';
 
   vim.keymaps = [
-    (lib.nvim.binds.mkKeymap "n" "<LEADER><S-c>" "<CMD>SunsetToggle<CR>" {
+    (lib.nvim.binds.mkKeymap "n" "<LEADER>C" "<CMD>SunsetToggle<CR>" {
       desc = "Toggle sunset theme";
     })
   ];

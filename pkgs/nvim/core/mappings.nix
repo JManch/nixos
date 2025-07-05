@@ -48,8 +48,6 @@ in
     (mkKeymap "n" "<LEADER>O" "O<ESC>" { desc = "Create new line above"; })
 
     (mkKeymap "n" "<LEADER>c" "<CMD>nohl<CR>" { desc = "Clear search highlighting"; })
-
-    (mkKeymap "n" "<LEADER>l" "<CMD>SunsetToggle<CR>" { desc = "Toggle sunset theme"; })
     (mkKeymap "n" "<LEADER>n" "<CMD>ToggleCMDHeight<CR>" { desc = "Toggle cmdheight"; })
 
     (mkKeymap "n" "die" "diwx" { desc = "Extended deleted inner word"; })

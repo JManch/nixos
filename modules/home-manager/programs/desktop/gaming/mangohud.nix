@@ -24,7 +24,7 @@ in
       # UI
       legacy_layout = 0;
       no_display = true; # hide the HUD by default
-      font_size = 20;
+      font_size = 18;
       round_corners = "${toString config.${ns}.desktop.style.cornerRadius}";
       hud_compact = true;
       text_color = palette.base07;
@@ -85,12 +85,12 @@ in
       refresh_rate = true;
 
       # Bindings
-      toggle_fps_limit = "Shift_L+F1";
-      toggle_hud = "Shift_R+F12";
-      toggle_preset = "Shift_R+F10";
-      toggle_hud_position = "Shift_R+F11";
-      toggle_logging = "Shift_L+F2";
-      reload_cfg = "Shift_L+F4";
+      toggle_fps_limit = "Shift+F1";
+      toggle_hud = "Shift+F12";
+      toggle_preset = "Shift+F10";
+      toggle_hud_position = "Shift+F11";
+      toggle_logging = "Shift+F2";
+      reload_cfg = "Shift+F4";
     };
   };
 }

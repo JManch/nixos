@@ -68,6 +68,7 @@
 
       keyd = {
         excludedDevices = [ "04fe:0021:532594f8" ]; # HHKB-Hybrid_2
+        hhkbArrowLayer = true;
         rebinds = {
           capslock = "layer(control)";
           leftcontrol = "capslock";

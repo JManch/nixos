@@ -10,6 +10,7 @@ in
 
       setupOpts = {
         appearance.use_nvim_cmp_as_default = true;
+        signature.enabled = true;
         completion = {
           trigger.show_in_snippet = false;
           list.selection.preselect = false;

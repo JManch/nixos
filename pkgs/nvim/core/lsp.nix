@@ -17,8 +17,8 @@
       removeWorkspaceFolder = null;
       listWorkspaceFolders = null;
       listWorkspaceSymbols = null;
-      hover = "<LEADER>lH";
-      signatureHelp = "<LEADER>lh";
+      hover = "<LEADER>lh";
+      signatureHelp = "<LEADER>lH";
       renameSymbol = "<LEADER>lR";
       codeAction = "<LEADER>la";
       format = "<LEADER>lf";

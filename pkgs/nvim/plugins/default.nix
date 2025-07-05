@@ -12,6 +12,7 @@
     ./gitsigns.nix
     ./textobjs.nix
     ./statusline
+    ./terminal.nix
   ];
 
   vim = {

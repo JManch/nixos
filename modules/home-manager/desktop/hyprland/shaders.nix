@@ -109,9 +109,9 @@ in
           ''
             shader=$(${hyprctl} getoption decoration:screen_shader -j | ${jaq} -r '.str')
             if [[ $shader == "${cfg.shaderDir}/monitorGamma.frag" ]]; then
-                ${cfg.disableShaders};
+                ${cfg.disableShaders}
             else
-                ${cfg.enableShaders};
+                ${cfg.enableShaders}
             fi
           '';
     in

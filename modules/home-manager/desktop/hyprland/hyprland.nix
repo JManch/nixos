@@ -366,27 +366,42 @@ in
       };
 
       workspace =
-        (concatMap (
+        concatMap (
           m:
-          (imap (
+          imap (
             i: w:
             "${toString w}, monitor:${m.name}"
             + optionalString (i == 1) ", default:true"
             + optionalString (i < 3) ", persistent:true"
-          ) m.workspaces)
-        ) monitors)
-        ++ (mapAttrsToList (
+          ) m.workspaces
+        ) monitors
+        ++ mapAttrsToList (
           name: value:
           "${cfg.namedWorkspaceIDs.${name}}, defaultName:${name}" + optionalString (value != "") ", ${value}"
-        ) cfg.namedWorkspaces);
+        ) cfg.namedWorkspaces
+        ++ optionals cfg.noGapsWhenOnly [
+          "w[tv1]s[false], gapsout:0, gapsin:0"
+          "f[1]s[false], gapsout:0, gapsin:0"
+        ];
 
-      windowrule = [
-        # https://github.com/hyprwm/Hyprland/issues/6543
-        "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0"
-        # Hide window border when there's only 1 window in a non-special
-        # workspace
-        "noborder, onworkspace:w[t1]s[false]"
-      ];
+      windowrule =
+        [
+          # https://github.com/hyprwm/Hyprland/issues/6543
+          "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0"
+        ]
+        ++ (
+          if cfg.noGapsWhenOnly then
+            [
+              "bordersize 0, floating:0, onworkspace:w[tv1]s[false]"
+              "rounding 0, floating:0, onworkspace:w[tv1]s[false]"
+            ]
+          else
+            [
+              # Hide window border when there's only 1 window in a non-special
+              # workspace
+              "noborder, onworkspace:w[t1]s[false]"
+            ]
+        );
 
       plugin = mkIf cfg.plugins {
         hyprexpo = {

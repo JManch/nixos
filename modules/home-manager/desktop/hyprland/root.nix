@@ -61,6 +61,7 @@ in
     logging = mkEnableOption "logging";
     tearing = mkEnableOption "enable tearing";
     plugins = mkEnableOption "plugins";
+    noGapsWhenOnly = mkEnableOption "no gaps when only";
     vrr = mkEnableOption "vrr";
     directScanout = mkEnableOption ''
       enable direct scanout. Direct scanout reduces input lag for fullscreen

@@ -4,5 +4,6 @@
     ./mappings.nix
     ./commands.nix
     ./lsp.nix
+    ./languages.nix
   ];
 }

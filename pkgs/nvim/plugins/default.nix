@@ -3,9 +3,7 @@
   imports = [
     ./completion.nix
     ./fzf-lua.nix
-    ./languages.nix
     ./oil.nix
-    ./treesitter.nix
     ./color-scheme.nix
     ./dashboard.nix
     ./workspaces.nix

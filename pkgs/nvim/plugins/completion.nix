@@ -17,9 +17,9 @@ in
           menu = {
             scrollbar = false;
             draw = {
-              components.source_name.text = mkLuaInline ''
+              components.client_name.text = mkLuaInline ''
                 function(ctx)
-                  return '[' .. (ctx.source_id or ctx.source_name) .. ']'
+                  return '[' .. (ctx.item.client_name or ctx.source_id or ctx.source_name) .. ']'
                 end
               '';
               columns = [
@@ -33,7 +33,7 @@ in
                   (mkLuaInline "gap = 1")
                   "kind"
                 ]
-                [ "source_name" ]
+                [ "client_name" ]
               ];
             };
           };
@@ -103,13 +103,13 @@ in
 
         sources.providers = {
           path.opts.trailing_slash = false;
-          # ripgrep.opts.score_offset = -5;
+          ripgrep.opts.score_offset = -5;
         };
       };
 
-      # sourcePlugins = {
-      #   ripgrep.enable = true;
-      # };
+      sourcePlugins = {
+        ripgrep.enable = true;
+      };
 
       mappings = {
         close = null;

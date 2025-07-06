@@ -60,7 +60,7 @@ let
       runtimeInputs = [ pkgs.nh ];
       text = ''
         flake="${configDir}"
-        if [ ! -d $flake ]; then
+        if [[ ! -d $flake ]]; then
           echo "Flake does not exist locally so using remote from github"
           flake="github:JManch/nixos"
         fi

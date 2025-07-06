@@ -30,7 +30,7 @@ let
   notifySend = getExe pkgs.libnotify;
   hyprctl = getExe' pkgs.hyprland "hyprctl";
   loginctl = getExe' pkgs.systemd "loginctl";
-  disableShadersCommand = command: "${cfg.disableShaders}; ${command}; ${cfg.enableShaders}";
+  disableShadersCommand = command: "${cfg.disableShaders} ${command}; ${cfg.enableShaders}";
 
   toggleDwindleGaps =
     pkgs.writeShellScript "hypr-toggle-dwindle-gaps" # bash

@@ -290,7 +290,7 @@ in
         inherit (args.options._module.args.value) pkgs;
       in
       pkgs.symlinkJoin {
-        name = "${package.name}-workspace-wrapped";
+        name = "${package.name}-hyprland-move-to-active";
         paths = [ package ];
         nativeBuildInputs = [ pkgs.makeWrapper ];
         postBuild = ''
@@ -305,5 +305,35 @@ in
           ' ${extra}
         '';
       };
+
+    wrapAlacrittyOpaque =
+      args: package:
+      let
+        inherit (args.options._module.args.value) pkgs;
+      in
+      if
+        args.config.programs.alacritty.enable or args.config.${args.lib.ns}.hm.programs.alacritty.enable
+      then
+        (pkgs.symlinkJoin {
+          name = "${package.name}-alacritty-opaque";
+          paths = [ package ];
+          postBuild = ''
+            ln -fs ${pkgs.writeShellScript "${package.name}-alacritty-opaque-wrapped" ''
+              if [[ -z $DISPLAY && -z $WAYLAND_DISPLAY ]] || [[ $TERM != "alacritty" ]]; then
+                exec ${getExe package} "$@"
+              fi
+
+              reset() {
+                ${getExe pkgs.alacritty} msg config --reset
+              }
+              trap reset EXIT
+
+              ${getExe pkgs.alacritty} msg config window.opacity=1
+              ${getExe package} "$@"
+            ''} $out/bin/${package.meta.mainProgram}
+          '';
+        })
+      else
+        package;
   };
 }

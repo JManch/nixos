@@ -1,6 +1,7 @@
 {
   lib,
   pkgs,
+  args,
   config,
   osConfig,
 }:
@@ -13,18 +14,12 @@ in
 {
   programs.btop = {
     enable = true;
-    package = mkIf (osConfig != null) (
-      pkgs.btop.override (
-        let
-          inherit (osConfig.${ns}.core.device) gpu;
-        in
-        {
-          cudaSupport = gpu.type == "nvidia";
-          rocmSupport = gpu.type == "amd";
-        }
-      )
+    package = lib.${ns}.wrapAlacrittyOpaque args (
+      pkgs.btop.override {
+        cudaSupport = device.gpu.type == "nvidia";
+        rocmSupport = device.gpu.type == "amd";
+      }
     );
-
     settings = {
       custom_gpu_name0 = device.gpu.name;
       show_gpu_info = "off";

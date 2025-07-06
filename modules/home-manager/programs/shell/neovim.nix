@@ -1,6 +1,7 @@
 {
   lib,
   cfg,
+  args,
   pkgs,
   config,
   inputs,
@@ -29,7 +30,7 @@ in
   };
 
   home.packages = [
-    nvimPackage
+    (lib.${ns}.wrapAlacrittyOpaque args nvimPackage)
     (hiPrio (
       pkgs.runCommand "neovim-desktop-rename" { } ''
         mkdir -p $out/share/applications
@@ -52,22 +53,6 @@ in
       "text/plain" = [ "nvim.desktop" ];
     };
   };
-
-  programs.zsh.initContent =
-    let
-      inherit (config.${ns}.programs.desktop) alacritty;
-    in
-    optionalString alacritty.enable # bash
-      ''
-        # Disables alacritty opacity when launching nvim
-        nvim() {
-          if [[ -z $DISPLAY && -z $WAYLAND_DISPLAY ]] || [[ $TERM != "alacritty" ]]; then
-            command nvim "$@"
-          else
-            alacritty msg config window.opacity=1; command nvim "$@"; alacritty msg config --reset
-          fi
-        }
-      '';
 
   # Change theme of all active Neovim instances
   ns.desktop.darkman.switchScripts.neovim =

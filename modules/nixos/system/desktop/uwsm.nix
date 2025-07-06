@@ -162,7 +162,7 @@ in
         mkOrder 2000
           # bash
           ''
-            if test -z $SSH_TTY && uwsm check may-start -q ${optionalString select "&& uwsm select"}; then
+            if [[ $(id -u) -ne 0 && -z $SSH_CONNECTION && -z $SSH_CLIENT && -z $SSH_TTY ]] && uwsm check may-start -q${optionalString select " && uwsm select"}; then
               UWSM_SILENT_START=1 exec uwsm start ${if select then "default" else "-- ${cfg.defaultDesktop}"}
             fi
           ''

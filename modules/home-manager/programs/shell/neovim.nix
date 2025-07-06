@@ -10,7 +10,6 @@ let
   inherit (lib)
     ns
     mkIf
-    optionalString
     hiPrio
     optional
     getExe'

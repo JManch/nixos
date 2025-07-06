@@ -8,65 +8,15 @@
 let
   inherit (lib)
     ns
-    concatMap
-    concatLines
+    concatMapStringsSep
+    optionalString
     mkOption
     types
     getExe
     getExe'
     ;
   inherit (osConfig.${ns}.core.device) isGammaCustom monitors;
-
   hyprctl = getExe' pkgs.hyprland "hyprctl";
-  monitorGammaConditionals =
-    (concatMap (
-      m:
-      if m.gamma == 1.0 then
-        [ ]
-      else
-        [
-          # WARNING: The monitor number here can be weird sometimes so might
-          # need to manually set it for specific hosts
-          # glsl
-          ''
-            if (wl_output == ${toString (m.number - 1)}) {
-                vec4 pixColor = texture2D(tex, v_texcoord);
-                pixColor.rgb = pow(pixColor.rgb, vec3(1.0 / ${toString m.gamma}));
-                gl_FragColor = pixColor;
-                return;
-            }
-          ''
-        ]
-    ) monitors)
-    ++ [ "gl_FragColor = texture2D(tex, v_texcoord);" ];
-
-  blankShader = # glsl
-    ''
-      precision mediump float;
-      varying vec2 v_texcoord;
-      uniform sampler2D tex;
-
-      void main() {
-          vec4 pixColor = texture2D(tex, v_texcoord);
-          gl_FragColor = pixColor;
-      }
-    '';
-
-  gammaShader =
-    if isGammaCustom then # glsl
-      ''
-        precision mediump float;
-        varying vec2 v_texcoord;
-        uniform sampler2D tex;
-        uniform int wl_output;
-
-        void main() {
-          ${concatLines monitorGammaConditionals}
-        }
-      ''
-    else
-      blankShader;
-
 in
 {
   conditions = [ isGammaCustom ];
@@ -96,8 +46,60 @@ in
   };
 
   xdg.configFile = {
-    "hypr/shaders/monitorGamma.frag".text = gammaShader;
-    "hypr/shaders/blank.frag".text = blankShader;
+    "hypr/shaders/monitorGamma.frag".text = # glsl
+      ''
+        #version 300 es
+        precision mediump float;
+
+        uniform sampler2D tex;
+        uniform int wl_output;
+
+        in highp vec2 v_texcoord;
+
+        layout(location = 0) out vec4 fragColor;
+
+        ${concatMapStringsSep "\n" (
+          m:
+          optionalString (
+            m.gamma != 1.0
+          ) "const float GAMMA_${toString m.number} = 1.0 / ${toString m.gamma};"
+        ) monitors}
+
+        void main() {
+          vec4 pixColor = texture(tex, v_texcoord);
+          ${
+            (concatMapStringsSep "\n" (
+              m:
+              optionalString (m.gamma != 1.0)
+                # WARNING: The monitor number here can be weird sometimes so might
+                # need to manually set it for specific hosts
+                # glsl
+                ''
+                  if (wl_output == ${toString (m.number - 1)}) {
+                      pixColor.rgb = pow(pixColor.rgb, vec3(GAMMA_${toString m.number}));
+                    }
+                ''
+            ) monitors)
+          }
+          fragColor = pixColor;
+        }
+      '';
+
+    "hypr/shaders/blank.frag".text = # glsl
+      ''
+        #version 300 es
+        precision mediump float;
+
+        uniform sampler2D tex;
+
+        in highp vec2 v_texcoord;
+
+        layout(location = 0) out vec4 fragColor;
+
+        void main() {
+          fragColor = texture(tex, v_texcoord);
+        }
+      '';
   };
 
   wayland.windowManager.hyprland.settings =

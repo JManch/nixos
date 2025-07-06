@@ -14,26 +14,25 @@ let
     ;
   inherit (config.${ns}.programs.desktop) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
-  inherit (config.home) homeDirectory;
   inherit (config.${ns}.desktop) hyprland;
   secondMonitor = lib.${ns}.getMonitorByNumber osConfig 2;
   chatterinoPercentage = "17.5";
   firefoxPercentage = "82.5";
 
   # Wrap with twitch auth token config
-  streamlinkPkg = pkgs.symlinkJoin {
+  streamlink = pkgs.symlinkJoin {
     name = "streamlink-wrapped";
     paths = [ pkgs.streamlink ];
     nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       wrapProgram $out/bin/streamlink \
-        --add-flags '--config ${homeDirectory}/.config/streamlink/config' \
+        --add-flags '--config "${config.xdg.configHome}/streamlink/config"' \
         --add-flags '--config "${streamlinkTwitchAuth.path}"'
     '';
   };
 in
 {
-  home.packages = [ pkgs.chatterino7 ] ++ optional mpv.enable streamlinkPkg;
+  home.packages = [ pkgs.chatterino7 ] ++ optional mpv.enable streamlink;
 
   programs.mpv.profiles.streamlink = {
     # No point doing fancy scaling on streams

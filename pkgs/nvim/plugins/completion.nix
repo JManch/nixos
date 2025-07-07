@@ -101,14 +101,11 @@ in
           ];
         };
 
-        sources.providers = {
-          path.opts.trailing_slash = false;
-          ripgrep.opts.score_offset = -5;
+        sources = {
+          providers = {
+            path.opts.trailing_slash = false;
+          };
         };
-      };
-
-      sourcePlugins = {
-        ripgrep.enable = true;
       };
 
       mappings = {

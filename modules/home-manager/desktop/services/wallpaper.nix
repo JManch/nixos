@@ -19,8 +19,7 @@ let
     ;
   inherit (config.${ns}.desktop.services) darkman;
   wallpaperCache = "${config.xdg.cacheHome}/wallpaper";
-  wallpapers =
-    type: "${(lib.${ns}.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers"}/wallpapers";
+  wallpapers = type: (lib.${ns}.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers";
 
   setWallpaper = pkgs.writeShellApplication {
     name = "set-wallpaper";
@@ -88,7 +87,7 @@ let
     runtimeInputs =
       (with pkgs; [
         coreutils
-        findutils
+        fd
       ])
       ++ optional darkman.enable config.services.darkman.package;
     text = ''
@@ -96,12 +95,17 @@ let
         wallpapers="$1"
         cache_file="$2"
         previous_wallpaper=""
-        [[ -f "$cache_file" ]] && previous_wallpaper=$(<"$cache_file")
+        [[ -f $cache_file ]] && previous_wallpaper=$(<"$cache_file")
+
+        # make --exclude flag conditional because fd --exlude "" matches everything
+        previous_wallpaper_name=$(basename "$previous_wallpaper")
+        cmd=(fd --base-directory "$wallpapers" --absolute-path --print0)
+        if [[ -n $previous_wallpaper_name ]]; then
+          cmd+=(--exclude "$previous_wallpaper_name")
+        fi
+
         # Randomly select a wallpaper excluding the previous
-        new_wallpaper=$(
-          find "$wallpapers" -type f ! -name "$(basename "$previous_wallpaper")" -print0 |
-          shuf -z -n 1 | tr -d '\0'
-        )
+        new_wallpaper=$( "''${cmd[@]}" | shuf -z -n 1 | tr -d '\0')
         echo "$new_wallpaper" > "$cache_file"
       }
 

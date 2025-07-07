@@ -5,11 +5,24 @@ in
 {
   vim.fzf-lua = {
     enable = true;
-    profile = "telescope"; # investigate
+    profile = "telescope";
     setupOpts = {
-      winopts.backdrop = 100;
+      winopts = {
+        backdrop = 100;
+        preview = {
+          horizontal = "right:65%";
+          layout = "horizontal";
+          scrollbar = false;
+        };
+      };
 
       files = {
+        # Unfortunately can't use fzfs dynamic --preview-window options
+        previewer = lib.generators.mkLuaInline ''
+          function()
+            return vim.o.columns > 120 and "builtin" or false
+          end
+        '';
         cmd = "fd";
         fd_opts = "[[--color=never --type f --type l --exclude .git]]";
         hidden = false;
@@ -25,15 +38,7 @@ in
         };
       };
 
-      fzf_opts =
-        let
-          transformer = "echo -n change-preview-window: ; if ((100 * fzf_columns / fzf_lines >= 150)) && ((fzf_columns >= 120)); then; echo right; elif ((fzf_lines >= 40)); then; echo up; else; echo hidden; fi";
-        in
-        {
-          # doesn't work for some reason
-          # "--bind" = ''"start:transform(${transformer}),resize:transform(${transformer})"'';
-          "--layout" = "reverse";
-        };
+      fzf_opts."--layout" = "reverse";
     };
   };
 

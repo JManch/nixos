@@ -205,7 +205,7 @@ in
                       Triggers that signify a change to presence in the room.
                       This can be presence enabling or disabling. Must be used
                       in conjunction with `presenceConditions` and
-                      `noPresenceConditions` to have an effect.
+                      `absenceConditions` to have an effect.
                     '';
                   };
 
@@ -221,11 +221,11 @@ in
                     ];
                     description = ''
                       Conditions for room presence that signifies lights should be
-                      turned on
+                      turned on.
                     '';
                   };
 
-                  noPresenceConditions = mkOption {
+                  absenceConditions = mkOption {
                     type = with types; listOf attrs;
                     default = [ ];
                     example = [
@@ -236,8 +236,8 @@ in
                       }
                     ];
                     description = ''
-                      Conditions for no room presence that signifies lights should
-                      be turned off
+                      Conditions for room absence that signifies lights should
+                      be turned off.
                     '';
                   };
 
@@ -268,6 +268,7 @@ in
                   adaptiveLighting
                   wakeUpLights
                   basicLights
+                  automatedToggle
                   ;
               in
               [
@@ -294,6 +295,16 @@ in
                   ] ++ optional (!basicLights) { type = "light-color-temp"; };
                 }
               ]
+              ++ optional automatedToggle.enable {
+                name = "Automated Toggle";
+                type = "tile";
+                entity = "input_boolean.${name}_automated_lights_toggle";
+                tap_action.action = "toggle";
+                layout_options = {
+                  grid_columns = 4;
+                  grid_rows = 1;
+                };
+              }
               ++ (
                 if floorPlan.enable then
                   singleton {
@@ -691,7 +702,7 @@ in
           let
             inherit (cfg'.automatedToggle)
               luminence
-              noPresenceConditions
+              absenceConditions
               presenceConditions
               presenceTriggers
               ;
@@ -798,7 +809,7 @@ in
                           conditions = [
                             {
                               condition = "and";
-                              conditions = noPresenceConditions;
+                              conditions = absenceConditions;
                             }
                             {
                               condition = "and";
@@ -814,10 +825,10 @@ in
                   };
               }
               {
-                # This automation disables automated light toggling if the lights are
-                # "manually" turned off. We treat any trigger that was not an automation as
-                # "manual". This way lights can be forced off even when the room has a presence
-                # sensor.
+                # Disables automated lighting if the lights are "manually"
+                # (not triggered by an automation) turned off. Automated
+                # lighting will re-enable if lights are turned on by an
+                # automation such as sunrise lighting.
                 alias = "${formattedRoomName} Automated Lights Toggle";
                 mode = "single";
                 triggers = singleton {
@@ -826,31 +837,43 @@ in
                   from = null;
                 };
                 actions = singleton {
-                  "if" = [
+                  choose = [
                     {
-                      condition = "state";
-                      entity_id = "light.${room}_lights";
-                      state = "off";
+                      conditions = [
+                        {
+                          condition = "template";
+                          value_template = "{{ trigger.to_state.context.parent_id == none }}";
+                        }
+                        {
+                          condition = "state";
+                          entity_id = "light.${room}_lights";
+                          state = "off";
+                        }
+                      ];
+                      sequence = singleton {
+                        action = "input_boolean.turn_off";
+                        target.entity_id = "input_boolean.${room}_automated_lights_toggle";
+                      };
                     }
                     {
-                      condition = "template";
-                      value_template = "{{ trigger.to_state.context.parent_id == none }}";
+                      conditions = singleton {
+                        condition = "template";
+                        value_template = "{{ trigger.to_state.context.parent_id != none }}";
+                      };
+                      sequence = singleton {
+                        action = "input_boolean.turn_on";
+                        target.entity_id = "input_boolean.${room}_automated_lights_toggle";
+                      };
                     }
                   ];
-                  "then" = singleton {
-                    action = "input_boolean.turn_off";
-                    target.entity_id = "input_boolean.${room}_automated_lights_toggle";
-                  };
-                  "else" = singleton {
-                    action = "input_boolean.turn_on";
-                    target.entity_id = "input_boolean.${room}_automated_lights_toggle";
-                  };
                 };
               }
             ];
 
-            input_boolean."${room}_automated_lights_toggle".name =
-              "${formattedRoomName} Automated Lights Toggle";
+            input_boolean."${room}_automated_lights_toggle" = {
+              name = "${formattedRoomName} Automated Lights Toggle";
+              icon = "mdi:lightbulb-auto";
+            };
           }
         )
       ])

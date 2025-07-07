@@ -179,7 +179,7 @@ in
             state = "on";
           };
 
-          noPresenceConditions = [
+          absenceConditions = [
             {
               condition = "state";
               entity_id = "binary_sensor.joshua_presence_occupancy";

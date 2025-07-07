@@ -7,6 +7,8 @@ in
     enable = true;
     profile = "telescope";
     setupOpts = {
+      fzf_colors = true;
+      hls.title = "TelescopePromptBorder";
       winopts = {
         backdrop = 100;
         preview = {

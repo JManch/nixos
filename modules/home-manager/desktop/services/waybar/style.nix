@@ -96,19 +96,22 @@ in
       }
 
       #workspaces button label {
+          border: ${borderWidthStr}px solid @transparent;
           border-radius: 5px;
-          padding: 0px 8px;
+          padding: 0px 6px;
           margin: 4px 5px;
           color: @text-dark;
           font-weight: 500;
       }
 
       #workspaces button.visible label {
+          border: ${borderWidthStr}px solid @background;
           background: @transparent;
           color: @text-dark;
       }
 
       #workspaces button.active label {
+          border: ${borderWidthStr}px solid @background;
           background: @background;
           color: @text-light;
           font-weight: 900;

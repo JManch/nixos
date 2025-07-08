@@ -142,6 +142,18 @@
       impermanence.enable = true;
       virtualisation.libvirt.enable = true;
 
+      backups = {
+        ssidBlacklist = [ inputs.nix-resources.secrets.ssids.hotspot ];
+        restic = {
+          enable = true;
+          timerConfig = {
+            OnCalendar = "*-*-* 17:00:00";
+            RandomizedDelaySec = "30m";
+            Persistent = true;
+          };
+        };
+      };
+
       ssh.server = {
         enable = true;
         extraInterfaces = [ "wlp192s0" ];

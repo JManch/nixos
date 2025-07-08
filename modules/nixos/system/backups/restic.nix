@@ -29,7 +29,6 @@ let
     attrNames
     mkForce
     mkBefore
-    mkAfter
     optionalString
     mkOption
     mkEnableOption
@@ -357,12 +356,7 @@ in
             environment.RESTIC_CACHE_DIR = mkForce "";
 
             preStart = mkBefore ''
-              ${value.preBackupScript}
               ${resticExe} cat config --no-cache --no-lock > /dev/null || ${resticExe} init
-            '';
-
-            postStop = mkAfter ''
-              ${value.postBackupScript}
             '';
 
             serviceConfig.CacheDirectory = mkForce "";

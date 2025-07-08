@@ -2,6 +2,7 @@
   lib,
   cfg,
   args,
+  pkgs,
   config,
 }:
 let
@@ -11,16 +12,21 @@ let
     types
     flatten
     mapAttrs'
+    mkOrder
     mkIf
     toUpper
     intersectAttrs
     assertMsg
     any
+    optionalString
+    concatMapStringsSep
     concatStringsSep
     singleton
     mkAliasOptionModule
     nameValuePair
     all
+    getExe
+    getExe'
     mapAttrsToList
     stringLength
     elem
@@ -29,7 +35,7 @@ let
     optionalAttrs
     ;
   inherit (config.${ns}.core) home-manager;
-  inherit (config.${ns}.system) impermanence;
+  inherit (config.${ns}.system) impermanence networking;
   homeBackups = optionalAttrs home-manager.enable config.${ns}.hmNs.backups;
 in
 {
@@ -46,22 +52,29 @@ in
       ]
   );
 
-  asserts = flatten (
-    mapAttrsToList (name: backup: [
-      (backup.paths != [ ])
-      "Backup '${name}' does not define any backup paths"
-      (all (oPath: elem oPath backup.paths || any (path: hasPrefix oPath path) backup.paths) (
-        attrNames backup.restore.pathOwnership
-      ))
-      "Backup '${name}' defines `pathOwnership` paths that are not a part of the backup paths"
-      (all (
-        path: hasPrefix "/" path && stringLength path > 1 && (impermanence.enable -> path != "/persist")
-      ) backup.paths)
-      "Backup '${name}' contains invalid backup paths"
-      (backup.isHome -> backup.restore.pathOwnership == { })
-      "Home backup '${name}' uses unsupported option `pathOwnership`"
-    ]) cfg.backups
-  );
+  asserts =
+    flatten (
+      mapAttrsToList (name: backup: [
+        (backup.paths != [ ])
+        "Backup '${name}' does not define any backup paths"
+        (all (oPath: elem oPath backup.paths || any (path: hasPrefix oPath path) backup.paths) (
+          attrNames backup.restore.pathOwnership
+        ))
+        "Backup '${name}' defines `pathOwnership` paths that are not a part of the backup paths"
+        (all (
+          path: hasPrefix "/" path && stringLength path > 1 && (impermanence.enable -> path != "/persist")
+        ) backup.paths)
+        "Backup '${name}' contains invalid backup paths"
+        (backup.isHome -> backup.restore.pathOwnership == { })
+        "Home backup '${name}' uses unsupported option `pathOwnership`"
+      ]) cfg.backups
+    )
+    ++ [
+      (cfg.ssidBlacklist != [ ] -> networking.wireless.enable)
+      "Backups `ssidBlacklist` requires wireless to be enabled"
+      (cfg.ssidBlacklist != [ ] -> networking.useNetworkd)
+      "Backups `ssidBlacklist` only support wpa-supplicant with systemd-networkd"
+    ];
 
   opts = {
     backends = mkOption {
@@ -87,7 +100,58 @@ in
           "The following backups are defined in both Home Manager and NixOS: ${concatStringsSep ", " (attrNames homeIntersection)}";
         backups // homeBackups;
     };
+
+    ssidBlacklist = mkOption {
+      type = with types; listOf str;
+      default = [ ];
+      description = ''
+        Blacklist of SSIDs to not perform backups on.
+      '';
+    };
   };
+
+  # only check ssid blacklist if wired interface is down
+  systemd.services =
+    let
+      ssidCheck = pkgs.writeShellScript "backup-ssid-check" ''
+        active_ssid=$(${getExe' pkgs.wpa_supplicant "wpa_cli"} status | ${getExe pkgs.gnugrep} '^ssid=' | ${getExe' pkgs.coreutils "cut"} -d'=' -f2)
+        blacklist=(${concatMapStringsSep " " (ssid: "\"${ssid}\"") cfg.ssidBlacklist})
+        for ssid in "''${blacklist[@]}"; do
+          if [[ $ssid == $active_ssid ]]; then
+            echo "Active SSID is blacklisted from performing backups"
+            exit 1
+          fi
+        done
+      '';
+    in
+    mapAttrs' (
+      name: value:
+      nameValuePair "${value.backend}-backups-${name}" (
+        mkIf cfg.${value.backend}.enable {
+          preStart = mkOrder 0 ''
+            ${optionalString (cfg.ssidBlacklist != [ ]) ssidCheck.outPath}
+            ${value.preBackupScript}
+          '';
+
+          postStop = mkOrder 2000 ''
+            ${value.postBackupScript}
+          '';
+
+          unitConfig = {
+            StartLimitBurst = 4;
+            StartLimitIntervalSec = "infinity";
+          };
+
+          serviceConfig = {
+            Restart = "on-failure";
+            RestartSec = "15m";
+
+            ProtectSystem = "strict";
+            ProtectHome = "read-only";
+          };
+        }
+      )
+    ) cfg.backups;
 
   ns.services =
     let

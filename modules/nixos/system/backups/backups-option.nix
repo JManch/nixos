@@ -142,7 +142,9 @@ mkOption {
           postBackupScript = mkOption {
             type = types.lines;
             default = "";
-            description = "Script to run after backing up";
+            description = ''
+              Script to run after backing up. Runs even if the backup fails.
+            '';
           };
 
           restore = {

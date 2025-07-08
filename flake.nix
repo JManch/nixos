@@ -10,7 +10,6 @@
     {
       templates = import ./templates;
       packages = forEachSystem (pkgs: import ./pkgs self lib pkgs);
-      # checks = forEachSystem (pkgs: import ./tests self lib pkgs);
 
       nixosConfigurations = lib.listToAttrs [
         (mkHost "ncase-m1" "joshua" "x86_64-linux" [ ])

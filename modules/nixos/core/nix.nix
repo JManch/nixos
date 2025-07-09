@@ -7,6 +7,7 @@
   config,
   inputs,
   hostname,
+  username,
   adminUsername,
 }:
 let
@@ -43,6 +44,7 @@ let
   inherit (inputs.nix-resources.secrets) keys;
   inherit (config.${ns}.system) impermanence;
   inherit (config.age.secrets) notifyVars;
+  inherit (config.${ns}.core) home-manager;
   configDir = "/home/${adminUsername}/.config/nixos";
 
   rebuildCmds = [
@@ -456,6 +458,13 @@ in
         # WARN: Do not use this, it's insecure
         # https://github.com/NixOS/nix/issues/9649#issuecomment-1868001568
         # trusted-users = [ adminUsername ];
+        allowed-users =
+          [ adminUsername ]
+          ++ optional (username != adminUsername && home-manager.enable)
+            # Home manager user needs access to the nix daemon for some reason
+            # https://github.com/nix-community/home-manager/issues/5704
+            # https://github.com/nix-community/home-manager/issues/4014
+            username;
         substituters = [
           "https://nix-community.cachix.org"
           "https://nix-on-droid.cachix.org"

@@ -7,9 +7,6 @@
   modulesPath,
   ...
 }:
-let
-  inherit (lib) singleton getExe;
-in
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -41,7 +38,7 @@ in
     '';
 
     # https://github.com/FrameworkComputer/SoftwareFirmwareIssueTracker/issues/70
-    kernelPatches = singleton {
+    kernelPatches = lib.singleton {
       name = "cros-charge-fix";
       patch = pkgs.fetchpatch2 {
         url = "https://lore.kernel.org/lkml/20250521-cros-ec-mfd-chctl-probe-v1-1-6ebfe3a6efa7@weissschuh.net/raw";
@@ -58,15 +55,11 @@ in
   };
 
   programs.zsh = {
-    shellAliases =
-      let
-        ectool = getExe pkgs.fw-ectool;
-      in
-      {
-        "get-pps" = "cat /sys/class/drm/card1-eDP-1/amdgpu/panel_power_savings";
-        "led-off" = "sudo ${ectool} led power off";
-        "led-on" = "sudo ${ectool} led power on";
-      };
+    shellAliases = {
+      "get-pps" = "cat /sys/class/drm/card1-eDP-1/amdgpu/panel_power_savings";
+      "led-off" = "echo 0 | sudo tee /sys/class/leds/chromeos:white:power/brightness >/dev/null";
+      "led-on" = "echo 1 | sudo tee /sys/class/leds/chromeos:white:power/brightness >/dev/null";
+    };
 
     interactiveShellInit = # bash
       ''

@@ -25,6 +25,7 @@ let
 
   jaq = getExe pkgs.jaq;
   bc = getExe' pkgs.bc "bc";
+  awk = getExe pkgs.gawk;
   brightnessctl = getExe pkgs.brightnessctl;
   grimblast = getExe (flakePkgs args "grimblast").grimblast;
   notifySend = getExe pkgs.libnotify;
@@ -162,7 +163,7 @@ let
   # having a bind to manually sync is an acceptable workaround.
   # https://github.com/hyprwm/Hyprland/issues/2319
   syncClipboard =
-    pkgs.writeShellScript "sync-clipboard" # bash
+    pkgs.writeShellScript "hypr-sync-clipboard" # bash
       ''
         set -o pipefail
         echo -n "$(${getExe' pkgs.wl-clipboard "wl-paste"} -n)" | ${getExe pkgs.xclip} -selection clipboard && \
@@ -170,7 +171,7 @@ let
           ${notifySend} -e --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
       '';
 
-  copyScreenshotText = pkgs.writeShellScript "copy-screenshot-text" ''
+  copyScreenshotText = pkgs.writeShellScript "hypr-copy-screenshot-text" ''
     set -o pipefail
     ${cfg.disableShaders}
     text=$(${grimblast} --freeze save area - | ${getExe pkgs.tesseract} stdin stdout)
@@ -193,7 +194,7 @@ let
     ${hyprctl} --batch "$cmd"
   '';
 
-  modifyBrightness = pkgs.writeShellScript "modify-brightness" ''
+  modifyBrightness = pkgs.writeShellScript "hypr-modify-brightness" ''
     ${brightnessctl} set -e4 "$1"
     if [ "$(loginctl show-session $XDG_SESSION_ID -p LockedHint --value)" = "no" ]; then
       brightness=$(${brightnessctl} get --percentage)
@@ -201,6 +202,15 @@ let
         -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $brightness%"
     fi
   '';
+
+  zoom =
+    type:
+    pkgs.writeShellScript "hypr-zoom-${type}" ''
+      new_zoom=$(${hyprctl} getoption cursor:zoom_factor | ${awk} 'NR==1 {factor = $2; if (factor < 1) {factor = 1}; print factor ${
+        if type == "in" then "*" else "/"
+      } 1.25}' "$zoom_factor")
+      ${hyprctl} keyword cursor:zoom_factor "$new_zoom"
+    '';
 in
 {
   # Force secondaryModKey VM variant because binds are repeated on host
@@ -238,6 +248,12 @@ in
         "${modShift}, Right, movetoworkspace, r+1"
         "${modShift}, J, workspace, m-1"
         "${modShift}, K, workspace, m+1"
+        "${mod}, mouse_down, exec, ${zoom "in"}"
+        "${mod}, mouse_up, exec, ${zoom "out"}"
+        "${modShift}, mouse_up, exec, ${hyprctl} keyword cursor:zoom_factor 1"
+        "${mod}, Equal, exec, ${zoom "in"}"
+        "${mod}, Minus, exec, ${zoom "out"}"
+        "${modShift}, Minus, exec, ${hyprctl} keyword cursor:zoom_factor 1"
 
         # Monitors
         "${modShift}, H, focusmonitor, l"

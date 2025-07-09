@@ -32,6 +32,7 @@ let
   inherit (desktopCfg.style) gapSize borderWidth;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
+  hyprctl = getExe' pkgs.hyprland "hyprctl";
 
   setupMonitors = pkgs.writeShellApplication {
     name = "setup-monitors";
@@ -415,8 +416,8 @@ in
   };
 
   ns.desktop.programs.locker = {
-    preLockScript = "hyprctl keyword misc:key_press_enables_dpms true";
-    postUnlockScript = "hyprctl keyword misc:key_press_enables_dpms false";
+    preLockScript = "${hyprctl} keyword misc:key_press_enables_dpms true";
+    postUnlockScript = "${hyprctl} keyword misc:key_press_enables_dpms false";
   };
 
   ns.desktop.darkman.switchScripts.hyprland =

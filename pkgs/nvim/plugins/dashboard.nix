@@ -84,35 +84,31 @@
           end,
         })
 
-        -- For hiding cursor when dashboard is opened on launch or later with
-        -- :Dashboard
-        vim.api.nvim_create_autocmd('User', {
+        vim.api.nvim_create_autocmd({ 'FileType' }, {
           group = dashboard_utils.group,
-          pattern = 'DashboardLoaded',
-          callback = function()
+          pattern = 'dashboard',
+          callback = function(args)
             dashboard_utils.cursor_blend(100)
-            vim.api.nvim_create_autocmd({'BufLeave', 'TermOpen'}, {
-              callback = function()
-                dashboard_utils.cursor_blend(0)
-                return true
-              end,
-            })
-          end
+          end,
         })
 
         -- For hiding cursor the dashboard is re-focused e.g. by closing
         -- fzf-lua terminal
-        vim.api.nvim_create_autocmd('BufEnter', {
+        vim.api.nvim_create_autocmd({ 'BufEnter' }, {
           group = dashboard_utils.group,
-          callback = function()
-            if vim.bo.filetype ~= 'dashboard' then return end
-            dashboard_utils.cursor_blend(100)
-            vim.api.nvim_create_autocmd({'BufLeave', 'TermOpen'}, {
-              callback = function()
-                dashboard_utils.cursor_blend(0)
-                return true
-              end,
-            })
+          callback = function(args)
+            if vim.bo[args.buf].filetype == 'dashboard' then
+              dashboard_utils.cursor_blend(100)
+            end
+          end,
+        })
+
+        vim.api.nvim_create_autocmd({ 'BufLeave', 'TermOpen' }, {
+          group = dashboard_utils.group,
+          callback = function(args)
+            if (args.event == 'BufLeave' and vim.bo[args.buf].filetype == 'dashboard') or (args.event ~= 'BufLeave') then
+              dashboard_utils.cursor_blend(0)
+            end
           end,
         })
       '';

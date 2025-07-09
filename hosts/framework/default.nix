@@ -148,7 +148,6 @@
           enable = true;
           timerConfig = {
             OnCalendar = "*-*-* 17:00:00";
-            RandomizedDelaySec = "30m";
             Persistent = true;
           };
         };

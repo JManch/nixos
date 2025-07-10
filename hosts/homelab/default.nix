@@ -62,7 +62,13 @@ in
       taskchampion-server.enable = true;
       air-vpn.confinement.enable = true;
       atuin-server.enable = true;
-      silverbullet.enable = true;
+
+      silverbullet = {
+        enable = true;
+        allowedAddresses = trustedHostIps ++ [
+          "10.20.20.33/32" # pixel 9
+        ];
+      };
 
       calibre = {
         enable = true;

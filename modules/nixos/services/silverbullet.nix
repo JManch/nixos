@@ -21,7 +21,8 @@
   requirements = [ "services.caddy" ];
 
   # nixos module is out of date and broken
-  # WARN: Remember to change ownership of secrets and persist directories when switching to nixos module
+  # WARN: Remember to change ownership of secrets, persist directories and
+  # backup restores when switching to nixos module
 
   # services.silverbullet = {
   #   enable = true;
@@ -57,6 +58,11 @@
     extraConfig = ''
       reverse_proxy http://127.0.0.1:${toString cfg.port}
     '';
+  };
+
+  ns.backups.silverbullet = {
+    backend = "restic";
+    paths = [ "/var/lib/silverbullet" ];
   };
 
   ns.persistence.directories = lib.singleton {

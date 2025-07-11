@@ -5,5 +5,6 @@
     ./commands.nix
     ./lsp.nix
     ./languages.nix
+    ./treesitter.nix
   ];
 }

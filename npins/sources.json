@@ -11,10 +11,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v2.5.0",
-      "revision": "7bef6f35c2f10b6a1a1b7ba0b96b8fe390708a1b",
+      "version": "v2.5.1",
+      "revision": "406c79ef8261772ba3f963889d2fe2e74e829ad4",
       "url": null,
-      "hash": "00cvhyyspinfdrqr0mx4gxvprw4rmc2f6qyjjv9jibfbdjf7rih8"
+      "hash": "0i0agbxg79car3762ib8s94bp5ypsfvl141zn5bp0s5i76kwpd1c"
     },
     "BeamMP-Server": {
       "type": "GitRelease",
@@ -89,9 +89,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "34fe24a230c0e48637c3e2bbfeeb0a3f3a48813b",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/34fe24a230c0e48637c3e2bbfeeb0a3f3a48813b.tar.gz",
-      "hash": "03sdrchyhz0jkbzz6agcklaynxvy8jbar33ck84gfw3j1w48yyn4"
+      "revision": "6a2fe29210fd939571fdfcd78581965ef479c749",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/6a2fe29210fd939571fdfcd78581965ef479c749.tar.gz",
+      "hash": "01a8id66xpd5h3f35avk5x40fp9ibh330cr7blddkfsn9wsqydsf"
     },
     "async-property": {
       "type": "PyPi",
@@ -200,10 +200,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2.8.0",
-      "revision": "c21343ad67d6188d966ecbf94db04bbe2755fa8c",
-      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.8.0",
-      "hash": "025f4ys4a6b2fcvhiy68ng7zfxl32b9791dv517mdg1nb46jxnyr"
+      "version": "2.9.0",
+      "revision": "653e39ce8900a829d8d96a1acb7d381c98fbb504",
+      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.9.0",
+      "hash": "0f6vls5jlc6kykh5rmkcpcpg1s3h1n11zs737dqa6k1q7p9kqzx8"
     },
     "hass-web-proxy-lib": {
       "type": "Git",
@@ -352,9 +352,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "dcf3e63238339f4d61606dce7df441d597c75e5a",
-      "url": "https://github.com/dweymouth/supersonic/archive/dcf3e63238339f4d61606dce7df441d597c75e5a.tar.gz",
-      "hash": "11v9gs043zd25pkmrw1fha6z54hf95sc0wlkvqfmp80zl5634ma0"
+      "revision": "5be4bd900f26f50f8498dc62b9229c5f1da7d5dd",
+      "url": "https://github.com/dweymouth/supersonic/archive/5be4bd900f26f50f8498dc62b9229c5f1da7d5dd.tar.gz",
+      "hash": "00xqbqahwxqisggjp9szya1mw91d1khs1ii33dfs0k6zlzmyr2ff"
     },
     "thermal_comfort": {
       "type": "GitRelease",

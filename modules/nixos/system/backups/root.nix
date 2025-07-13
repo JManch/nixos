@@ -139,7 +139,7 @@ in
 
           unitConfig = {
             StartLimitBurst = 4;
-            StartLimitIntervalSec = "infinity";
+            StartLimitIntervalSec = "2h";
           };
 
           serviceConfig = {

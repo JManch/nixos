@@ -85,7 +85,7 @@
     #       url = "https://github.com/NixOS/nixpkgs/archive/2768c7d042a37de65bb1b5b3268fc987e534c49d.tar.gz";
     #       sha256 = "sha256:17pikpqk1icgy4anadd9yg3plwfrsmfwv1frwm78jg2rf84jcmq2";
     #     }) { inherit (pkgs) system; }).linuxPackages_6_10;
-    kernelPackages = lib.mkForce pkgs.linuxPackages_6_14;
+    kernelPackages = lib.mkForce pkgs.linuxPackages_6_15;
   };
 
   programs.ryzen-monitor-ng.enable = true;

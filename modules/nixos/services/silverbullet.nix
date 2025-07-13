@@ -50,6 +50,7 @@
   systemd.services.podman-silverbullet.serviceConfig = {
     StateDirectory = "silverbullet";
     StateDirectoryMode = "0700";
+    StandardOutput = "null"; # spams "Requested file ..." when a client is connected
   };
 
   ns.services.caddy.virtualHosts.notes = {

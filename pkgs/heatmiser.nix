@@ -23,6 +23,7 @@
   buildHomeAssistantComponent,
   buildPythonPackage,
   websockets,
+  setuptools,
   sources,
   ...
 }:
@@ -31,6 +32,8 @@ let
     pname = "async-property";
     inherit (sources.async-property) version;
     src = sources.async-property;
+    pyproject = true;
+    build-system = [ setuptools ];
 
     postPatch = ''
       substituteInPlace setup.py \
@@ -44,6 +47,8 @@ let
     pname = "neohubapi";
     inherit (sources.neohubapi) version;
     src = sources.neohubapi;
+    pyproject = true;
+    build-system = [ setuptools ];
 
     propagatedBuildInputs = [
       async-property
@@ -58,6 +63,5 @@ buildHomeAssistantComponent {
   domain = "heatmiserneo";
   inherit (sources.heatmiser-for-home-assistant) version;
   src = sources.heatmiser-for-home-assistant;
-
   propagatedBuildInputs = [ neohubapi ];
 }

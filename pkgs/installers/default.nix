@@ -7,7 +7,6 @@ let
     mapAttrs
     nameValuePair
     hasPrefix
-    nixosSystem
     filterAttrs
     modules
     ;
@@ -15,29 +14,36 @@ let
   mkInstaller = name: system: base: {
     inherit name;
     value =
-      (nixosSystem {
-        specialArgs = {
-          hostname = "installer";
-          inherit self base;
-        };
-        modules = [
-          {
-            nixpkgs.hostPlatform = system;
-            nixpkgs.buildPlatform = "x86_64-linux";
-            nixpkgs.overlays = [ (_: _: { ${ns} = self.packages.${system}; }) ];
-          }
-          (modules.importApply ../../hosts/installer { })
-        ];
-      }).config.system.build.isoImage.overrideAttrs
-        (
-          let
-            tests = import ./tests.nix lib self name base pkgs;
-          in
-          {
-            passthru.tests = mapAttrs (_: value: value.test) tests;
-            passthru.testHosts = mapAttrs (_: value: value.testHost) tests;
+      let
+        nixosSystem = (
+          lib.nixosSystem {
+            specialArgs = {
+              hostname = "installer";
+              inherit self base;
+            };
+            modules = [
+              {
+                nixpkgs.hostPlatform = system;
+                nixpkgs.buildPlatform = "x86_64-linux";
+                nixpkgs.overlays = [ (_: _: { ${ns} = self.packages.${system}; }) ];
+              }
+              (modules.importApply ../../hosts/installer { })
+            ];
           }
         );
+      in
+      nixosSystem.config.system.build.isoImage.overrideAttrs (
+        let
+          tests = import ./tests.nix lib self name base pkgs;
+        in
+        {
+          passthru = {
+            inherit nixosSystem;
+            tests = mapAttrs (_: value: value.test) tests;
+            testHosts = mapAttrs (_: value: value.testHost) tests;
+          };
+        }
+      );
   };
 
   piInstallers = mapAttrs' (
@@ -47,5 +53,8 @@ let
 in
 listToAttrs [
   (mkInstaller "installer-x86_64" "x86_64-linux" "cd-dvd/installation-cd-minimal.nix")
+  (mkInstaller "installer-x86_64-latest-kernel" "x86_64-linux"
+    "cd-dvd/installation-cd-minimal-new-kernel.nix"
+  )
 ]
 // piInstallers

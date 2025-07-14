@@ -18,6 +18,7 @@ let
   inherit (lib)
     ns
     getExe
+    mkForce
     attrValues
     optionalString
     ;
@@ -349,14 +350,21 @@ in
       file = inputs.nix-resources + "/secrets/wireless-networks.age";
     };
 
+    # Upstream switched to network manager but we'd rather use wpa supplicant
+    # https://github.com/NixOS/nixpkgs/commit/1ef7d63228898f5b04019b8f3883f4d2f58f81cf
+    networking.networkmanager.enable = mkForce false;
+
     networking.wireless = {
       enable = true;
+      userControlled.enable = true;
       fallbackToWPA2 = true;
       secretsFile = config.age.secrets.wirelessNetworks.path;
       scanOnLowSignal = true;
       allowAuxiliaryImperativeNetworks = true;
       networks = inputs.nix-resources.secrets.wirelessNetworksConfig;
     };
+
+    systemd.services.wpa_supplicant.wantedBy = mkForce [ ];
 
     system.stateVersion = "25.11";
   };

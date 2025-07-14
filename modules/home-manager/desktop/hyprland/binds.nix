@@ -53,6 +53,16 @@ let
         fi
       '';
 
+  toggleAnimations = pkgs.writeShellScript "hypr-toggle-animations" ''
+    if [[ $(${hyprctl} getoption -j animations:enabled | ${jaq} -r '.int') == "1" ]]; then
+      hyprctl keyword animations:enabled false
+      ${notifySend} -e --urgency=low -t 2000 'Hyprland' 'Animations disabled'
+    else
+      hyprctl keyword animations:enabled true
+      ${notifySend} -e --urgency=low -t 2000 'Hyprland' 'Animations enabled'
+    fi
+  '';
+
   toggleAlwaysOnTop =
     pkgs.writeShellScript "hypr-toggle-always-on-top" # bash
       ''
@@ -229,7 +239,7 @@ in
         "${mod}Shift, Z, pin, active"
         "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
         "${modShift}, R, exec, ${make16By9}"
-        "${mod}, A, exec, ${scaleTabletToWindow}"
+        "${mod}, A, exec, ${toggleAnimations}"
         "${modShift}, A, exec, ${toggleGaps}"
         "${modShiftCtrl}, V, exec, ${syncClipboard}"
 

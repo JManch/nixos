@@ -21,7 +21,11 @@ in
   thermal-comfort-icons = callPackage ./thermal-comfort-icons.nix args;
   heatmiser = pkgs.home-assistant.python.pkgs.callPackage ./heatmiser.nix args;
   daikin-onecta = pkgs.home-assistant.python.pkgs.callPackage ./daikin-onecta.nix args;
-  brightnessctl = callPackage ./brightnessctl.nix args;
+  # Because both `prev.callPackage` and `final.callPackage` always pass `final`
+  # packages as arguments we need to manually pass in the `prev` brightnessctl
+  # here to avoid infinite recursion
+  # https://discourse.nixos.org/t/why-does-prev-callpackage-use-packages-from-final/25263
+  brightnessctl = callPackage ./brightnessctl.nix (args // { inherit (pkgs) brightnessctl; });
   slskd-stats = pkgs.python3Packages.callPackage ./slskd-stats.nix args;
 
   # Manual

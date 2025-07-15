@@ -9,6 +9,7 @@ let
     hasPrefix
     filterAttrs
     modules
+    mkBefore
     ;
 
   mkInstaller = name: system: base: {
@@ -25,7 +26,7 @@ let
               {
                 nixpkgs.hostPlatform = system;
                 nixpkgs.buildPlatform = "x86_64-linux";
-                nixpkgs.overlays = [ (_: _: { ${ns} = self.packages.${system}; }) ];
+                nixpkgs.overlays = mkBefore [ (_: prev: { ${ns} = import ../../pkgs self lib prev; }) ];
               }
               (modules.importApply ../../hosts/installer { })
             ];

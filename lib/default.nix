@@ -25,6 +25,7 @@ let
     optionals
     hasPrefix
     hasSuffix
+    mkBefore
     ;
   sources = import ../npins;
 in
@@ -48,7 +49,7 @@ in
             {
               nixpkgs.hostPlatform = system;
               nixpkgs.buildPlatform = "x86_64-linux";
-              nixpkgs.overlays = [ (_: _: { ${ns} = self.packages.${system}; }) ];
+              nixpkgs.overlays = mkBefore [ (_: prev: { ${ns} = import ../pkgs self lib prev; }) ];
             }
             ../modules/nixos
           ]
@@ -74,8 +75,8 @@ in
             inherit system;
             config = {
               allowUnfree = true;
-              overlays = [
-                (_: _: { ${ns} = self.packages.${system}; })
+              overlays = mkBefore [
+                (_: prev: { ${ns} = import ../pkgs self lib prev; })
                 nix-on-droid.overlays.default
               ];
             };
@@ -105,9 +106,7 @@ in
             inherit system;
             config = {
               allowUnfree = true;
-              overlays = [
-                (_: _: { ${ns} = self.packages.${system}; })
-              ];
+              overlays = [ (_: prev: { ${ns} = import ../pkgs self lib prev; }) ];
             };
           }
         )

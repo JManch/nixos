@@ -6,13 +6,13 @@
 }:
 let
   inherit (lib) ns foldl';
-  inherit (lib.${ns}) hostIp hostIps;
+  inherit (lib.${ns}) hostIps;
   inherit (config.${ns}.services) wireguard;
   inherit (inputs.nix-resources.secrets) fqDomain tomFqDomain;
   trustedHostIps =
     foldl' (a: e: a ++ (map (ip: "${ip}/32") (hostIps e)))
       [ ]
-      [ "ncase-m1" "surface-pro" "framework" ];
+      [ "ncase-m1" "framework" ];
 in
 {
   imports = [
@@ -93,7 +93,6 @@ in
           "192.168.100.0/24"
           "10.20.20.0/24"
           "10.0.0.2/32" # NCASE-M1 on friends VPN
-          "${hostIp "surface-pro"}/32" # Surface pro on guest network cause no WPA3 support
         ];
         goAccessExcludeIPRanges = [
           "192.168.89.2"

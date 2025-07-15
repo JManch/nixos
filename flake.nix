@@ -17,7 +17,7 @@
         (mkHost "homelab" "joshua" "x86_64-linux" [ ])
         (mkHost "msi" "lauren" "x86_64-linux" [ ])
         (mkHost "pi-3" "joshua" "aarch64-linux" [ ])
-        (mkHost "surface-pro" "joshua" "x86_64-linux" [ ])
+        # (mkHost "surface-pro" "joshua" "x86_64-linux" [ ])
       ];
 
       nixOnDroidConfigurations = lib.listToAttrs [
@@ -27,6 +27,9 @@
 
   # To use a local flake as an input set url to "git+file://<PATH>"
   # To use a nixpkgs PR as an input set url to "github:NixOS/nixpkgs?ref=pull/<PR_NUMBER>/head"
+
+  # To identify which inputs are causing evaluation warnings use NIX_ABORT_ON_WARN=1
+  # with the --impure flag and inspect the stack trace
 
   # When locking a flake to a rev, it's important to manually run `nix flake
   # update <input>`; otherwise, the inputs of the locked flake will not be

@@ -2,17 +2,22 @@
   lib,
   pkgs,
   config,
+  inputs,
 }:
 let
   inherit (lib) ns mkIf;
   inherit (config.${ns}.desktop) style hyprland;
 in
 {
-  home.packages = [
-    pkgs.picard
-    pkgs.spek
-    pkgs.${ns}.resample-flacs
-  ];
+  home.packages =
+    assert lib.assertMsg (
+      inputs.nixpkgs.rev == "62e0f05ede1da0d54515d4ea8ce9c733f12d9f08"
+    ) "Re-enable spek";
+    [
+      pkgs.picard
+      # pkgs.spek
+      pkgs.${ns}.resample-flacs
+    ];
 
   programs.zsh.initContent =
     mkIf (config.home.username == "joshua") # bash

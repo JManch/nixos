@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, inputs, ... }:
 {
   ${lib.ns} = {
     core = {
@@ -76,7 +76,11 @@
         vscode.enable = true;
         mpv.enable = true;
         mpv.jellyfinShim.enable = true;
-        chatterino.enable = true;
+        chatterino.enable =
+          assert lib.assertMsg (
+            inputs.nixpkgs.rev == "62e0f05ede1da0d54515d4ea8ce9c733f12d9f08"
+          ) "Re-enable chatterino";
+          false;
         images.enable = true;
         anki.enable = true;
         zathura.enable = true;
@@ -101,7 +105,11 @@
           mangohud.enable = true;
           r2modman.enable = true;
           bottles.enable = true;
-          prism-launcher.enable = true;
+          prism-launcher.enable =
+            assert lib.assertMsg (
+              inputs.nixpkgs.rev == "62e0f05ede1da0d54515d4ea8ce9c733f12d9f08"
+            ) "Re-enable prism-launcher";
+            false;
           mint.enable = true;
           ryujinx.enable = true;
           osu.enable = true;

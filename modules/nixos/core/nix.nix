@@ -413,6 +413,13 @@ in
         # abc = secret123
         # Requesting secret "abc" will return password123
         wpa_supplicant = addPatches prev.wpa_supplicant [ "wpa-supplicant-ext-password-fix.patch" ];
+
+        libedgetpu =
+          assert lib.assertMsg (lib.length prev.libedgetpu.patches == 1) "Remove libedgetpu overlay";
+          (import (fetchTarball {
+            url = "https://github.com/jackwilsdon/nixpkgs/archive/369b49c104c2e281a08a3d992e613460f56ff7b4.tar.gz";
+            sha256 = "sha256:1chx698dczyn6d59p2pfx5fbn1aqxfxm8j55a8jk95pzxzr8vm44";
+          }) { inherit (pkgs) system; }).libedgetpu;
       })
     ];
     config.allowUnfree = true;

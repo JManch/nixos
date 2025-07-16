@@ -10,6 +10,7 @@
     {
       templates = import ./templates;
       packages = forEachSystem (pkgs: import ./pkgs self lib pkgs);
+      formatter = forEachSystem (pkgs: pkgs.nixfmt-tree);
 
       nixosConfigurations = lib.listToAttrs [
         (mkHost "ncase-m1" "joshua" "x86_64-linux" [ ])

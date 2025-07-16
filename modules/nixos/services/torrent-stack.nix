@@ -655,7 +655,7 @@ in
     ns.backups = {
       music = {
         backend = "rclone";
-        paths = [ "/media/music" ];
+        paths = [ "${cfg.mediaDir}/music" ];
 
         notifications = {
           failure.config = {
@@ -680,7 +680,7 @@ in
         backendOptions = {
           remote = "filen";
           mode = "sync";
-          remotePaths."/media/music" = "music";
+          remotePaths."${cfg.mediaDir}/music" = "music";
           flags = [ "--bwlimit 5M" ];
         };
       };

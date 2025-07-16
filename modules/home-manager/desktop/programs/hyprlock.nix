@@ -24,6 +24,7 @@ in
     ];
 
     immediateArgs = [
+      "--no-fade-in"
       "--grace"
       "0"
     ];

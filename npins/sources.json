@@ -33,20 +33,17 @@
       "hash": "02lpmksy480acnzk8qc94ycn23ik376qlrkmhi2z35y7h8ki4ha3"
     },
     "HA_blueprints": {
-      "type": "GitRelease",
+      "type": "Git",
       "repository": {
         "type": "GitHub",
         "owner": "SgtBatten",
         "repo": "HA_blueprints"
       },
-      "pre_releases": false,
-      "version_upper_bound": null,
-      "release_prefix": null,
+      "branch": "main",
       "submodules": false,
-      "version": "v0.12.0.6",
-      "revision": "2ffeb0990c97582e46f2f33edaae7870bef24afa",
-      "url": "https://api.github.com/repos/SgtBatten/HA_blueprints/tarball/v0.12.0.6",
-      "hash": "07ldqyd9ri7h3ymazrrjh4yn989pihlx5x00gbxki5klhmdmgcnl"
+      "revision": "5127a80c64d9371e817d54ad32a8fc09933a1b5d",
+      "url": "https://github.com/SgtBatten/HA_blueprints/archive/5127a80c64d9371e817d54ad32a8fc09933a1b5d.tar.gz",
+      "hash": "1w09pbjxj1ggh2vgdvccjm3liyja1akzyimd9sk7dsdkhnjzcm8b"
     },
     "ModernX": {
       "type": "GitRelease",

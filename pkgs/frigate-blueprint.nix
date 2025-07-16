@@ -6,15 +6,14 @@
 }:
 stdenvNoCC.mkDerivation {
   pname = "frigate-blueprint";
-  inherit (sources.HA_blueprints) version;
+  version = "0-unstable-${sources.HA_blueprints.revision}";
   src = sources.HA_blueprints;
-
-  patches = [ ../patches/frigate-blueprint.patch ];
+  # patches = [ ../patches/frigate-blueprint.patch ];
 
   dontBuild = true;
 
   installPhase = ''
-    install -D Frigate_Camera_Notifications/Stable.yaml -T $out/frigate_notifications.yaml
+    install -D Frigate_Camera_Notifications/Beta.yaml -T $out/frigate_notifications.yaml
   '';
 
   meta = with lib; {

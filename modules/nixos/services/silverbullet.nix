@@ -43,6 +43,7 @@
     ports = [ "127.0.0.1:${toString cfg.port}:3000" ];
     volumes = [ "/var/lib/silverbullet:/space" ];
     environmentFiles = [ config.age.secrets.silverbulletVars.path ];
+    log-driver = "none"; # spams "Requested file ..." when a client is connected
     # Can't get rootless podman to work unfortunately
     # podman.users = "silverbullet";
   };
@@ -50,7 +51,6 @@
   systemd.services.podman-silverbullet.serviceConfig = {
     StateDirectory = "silverbullet";
     StateDirectoryMode = "0700";
-    StandardOutput = "null"; # spams "Requested file ..." when a client is connected
   };
 
   ns.services.caddy.virtualHosts.notes = {

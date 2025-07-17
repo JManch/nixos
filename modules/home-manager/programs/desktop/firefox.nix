@@ -330,7 +330,10 @@ in
         "${modKey}SHIFT, Backspace, exec, app2unit firefox.desktop"
       ];
 
-    settings.windowrule = [ "scrolltouchpad 0.6, class:^(firefox)$" ];
+    settings.windowrule = [
+      "scrolltouchpad 0.6, class:^(firefox)$"
+      "noscreenshare, title:^(Extension: \(Bitwarden Password Manager\) - Bitwarden — Mozilla Firefox)$"
+    ];
 
     eventScripts.windowtitlev2 = # bash
       ''

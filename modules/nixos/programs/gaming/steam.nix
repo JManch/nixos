@@ -15,6 +15,7 @@ let
     mkEnableOption
     ;
   inherit (config.${ns}.core) home-manager;
+  inherit (config.${ns}.core) device;
   inherit (config.${ns}.hm.xdg) dataHome;
 
   steamAppIDs = {
@@ -173,8 +174,10 @@ in
     };
 
     # Fix slow steam client downloads https://redd.it/16e1l4h
+    # Speed up shader processing by using more than a single thread
     home.file.".steam/steam/steam_dev.cfg".text = ''
       @nClientDownloadEnableHTTP2PlatformLinux 0
+      unShaderBackgroundProcessingThreads ${toString device.cpu.threads}
     '';
 
     # Create compatdata symlinks to make finding proton prefixes easier

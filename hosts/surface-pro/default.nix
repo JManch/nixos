@@ -25,7 +25,7 @@
         cpu = {
           name = "i5 7300U";
           type = "intel";
-          cores = 4;
+          threads = 4;
         };
 
         monitors = [

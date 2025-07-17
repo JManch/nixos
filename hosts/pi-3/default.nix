@@ -57,7 +57,7 @@ in
         cpu = {
           name = "Cortex-A53";
           type = "arm";
-          cores = "4";
+          threads = "4";
         };
       };
     };

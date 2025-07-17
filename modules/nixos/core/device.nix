@@ -139,9 +139,9 @@ in
         description = "The CPU name, not critical";
       };
 
-      cores = mkOption {
+      threads = mkOption {
         type = types.int;
-        description = "The CPU core count";
+        description = "The CPU thread count";
       };
     };
 

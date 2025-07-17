@@ -334,7 +334,7 @@ in
 
     settings.windowrule = [
       "scrolltouchpad 0.6, class:^(firefox)$"
-      "noscreenshare, title:^(Extension: \(Bitwarden Password Manager\) - Bitwarden — Mozilla Firefox)$"
+      "noscreenshare, title:^(Extension: \\(Bitwarden Password Manager\\) - Bitwarden — Mozilla Firefox)$"
     ];
 
     eventScripts.windowtitlev2 = # bash

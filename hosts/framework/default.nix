@@ -28,7 +28,7 @@
         cpu = {
           name = "AI 9 HX 370";
           type = "amd";
-          cores = 24;
+          threads = 24;
         };
 
         gpu = {

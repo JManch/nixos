@@ -27,7 +27,7 @@ in
       device = {
         type = "server";
         cpu.type = "amd";
-        cpu.cores = 4;
+        cpu.threads = 4;
         memory = 1024 * 8;
         gpu.type = null;
         address = "192.168.89.2";

@@ -28,7 +28,7 @@
         cpu = {
           name = "R7 3700x";
           type = "amd";
-          cores = 16;
+          threads = 16;
         };
 
         gpu = {

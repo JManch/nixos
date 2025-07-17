@@ -344,10 +344,10 @@ in
     environment.sessionVariables =
       let
         memoryStr = toString (if (memory / 4) >= 4096 then 4096 else builtins.floor (memory / 4));
-        cores = toString (if (cpu.cores / 2) >= 8 then 8 else builtins.floor (cpu.cores / 2));
+        threads = toString (if (cpu.threads / 2) >= 8 then 8 else builtins.floor (cpu.threads / 2));
       in
       {
-        QEMU_OPTS = "-m ${memoryStr} -smp ${cores}";
+        QEMU_OPTS = "-m ${memoryStr} -smp ${threads}";
       };
 
     ns.hm = mkIf home-manager.enable {

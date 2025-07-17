@@ -218,6 +218,7 @@ in
           audio.enable = mkVMOverride false;
           virtualisation.libvirt.enable = mkVMOverride false;
           virtualisation.vmVariant = true;
+          backups.ssidBlacklist = mkVMOverride [ ];
 
           networking = {
             wiredInterface = mkVMOverride "eth0";

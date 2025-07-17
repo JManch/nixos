@@ -4,6 +4,7 @@
   args,
   pkgs,
   config,
+  inputs,
 }:
 let
   inherit (lib)
@@ -36,6 +37,7 @@ let
     ;
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system) impermanence networking;
+  inherit (config.${ns}.system) virtualisation;
   homeBackups = optionalAttrs home-manager.enable config.${ns}.hmNs.backups;
 in
 {
@@ -96,9 +98,12 @@ in
         let
           homeIntersection = intersectAttrs backups homeBackups;
         in
-        assert assertMsg (homeIntersection == { })
-          "The following backups are defined in both Home Manager and NixOS: ${concatStringsSep ", " (attrNames homeIntersection)}";
-        backups // homeBackups;
+        if inputs.vmInstall.value || virtualisation.vmVariant then
+          { }
+        else
+          assert assertMsg (homeIntersection == { })
+            "The following backups are defined in both Home Manager and NixOS: ${concatStringsSep ", " (attrNames homeIntersection)}";
+          backups // homeBackups;
     };
 
     ssidBlacklist = mkOption {

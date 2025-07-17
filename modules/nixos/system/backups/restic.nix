@@ -45,7 +45,6 @@ let
     ;
   backups = filterAttrs (_: backup: backup.backend == "restic") categoryCfg.backups;
   resticExe = getExe pkgs.restic;
-  vmInstall = inputs.vmInstall.value;
 
   pruneOpts = [
     "--keep-daily 7"
@@ -284,8 +283,7 @@ in
     };
   }
 
-  # To allow testing backup restores in a VM
-  (mkIf (cfg.enable || cfg.server.enable || (cfg.enable && virtualisation.vmVariant)) {
+  (mkIf (cfg.enable || cfg.server.enable) {
     ns.adminPackages = [
       pkgs.restic
       restoreScript
@@ -323,7 +321,7 @@ in
     # Restore tool: https://github.com/viltgroup/bucket-restore
   })
 
-  (mkIf (cfg.enable && !virtualisation.vmVariant && !vmInstall) {
+  (mkIf cfg.enable {
     asserts = flatten (
       mapAttrsToList (name: backup: [
         (!backup.backendOptions ? backupPrepareCommand && !backup.backendOptions ? backupCleanupCommand)
@@ -413,7 +411,7 @@ in
     };
   })
 
-  (mkIf (cfg.server.enable && !virtualisation.vmVariant && !vmInstall) {
+  (mkIf (cfg.server.enable && !virtualisation.vmVariant && !inputs.vmInstall.value) {
     requirements = [ "services.caddy" ];
 
     asserts = [

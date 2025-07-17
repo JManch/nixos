@@ -37,60 +37,37 @@ in
     '';
   };
 
-  programs.atuin = {
-    enable = true;
-    flags = [ "--disable-up-arrow" ];
-    settings = {
-      dotfiles.enabled = false;
-      auto_sync = true;
-      update_check = false;
-      sync_address = cfg.syncAddress;
-      sync_frequency = "10m";
-      enter_accept = false;
-      inline_height = 15;
-      show_preview = false;
-      show_help = false;
-      show_tabs = false;
-      scroll_exits = false;
+  home.packages = [ pkgs.atuin ];
 
-      # WARN: The daemon service must be manually restarted after logging in
-      # otherwise stuff is encrypted with the wrong key
-      daemon = {
-        enabled = true;
-        systemd_socket = true;
-        socket_path = "/run/user/1000/atuin.sock";
-      };
+  xdg.configFile."atuin/config.toml".source = (pkgs.formats.toml { }).generate "atuin-config" {
+    dotfiles.enabled = false;
+    network_timeout = 10;
+    auto_sync = true;
+    update_check = false;
+    sync_address = cfg.syncAddress;
+    sync_frequency = "10m";
+    enter_accept = false;
+    inline_height = 15;
+    show_preview = false;
+    show_help = false;
+    show_tabs = false;
+    scroll_exits = false;
+
+    # WARN: The daemon service must be manually restarted after logging in
+    # otherwise stuff is encrypted with the wrong key
+    daemon = {
+      enabled = true;
+      systemd_socket = true;
+      socket_path = "/run/user/1000/atuin.sock";
     };
-  };
-
-  systemd.user.sockets.atuin-daemon = {
-    Unit.Description = "Atuin Daemon Socket";
-
-    Socket = {
-      ListenStream = "%t/atuin.sock";
-      SocketMode = "0600";
-    };
-
-    Install.WantedBy = [ "sockets.target" ];
-  };
-
-  systemd.user.services.atuin-daemon = {
-    Unit = {
-      Description = "Atuin Daemon";
-      Requires = [ "atuin-daemon.socket" ];
-      After = [ "atuin-daemon.socket" ];
-    };
-
-    Service = {
-      Slice = "background.slice";
-      ExecStart = "${getExe pkgs.atuin} daemon";
-    };
-
-    Install.WantedBy = [ "default.target" ];
   };
 
   programs.zsh.initContent = # bash
     ''
+      if [[ $options[zle] = on ]]; then
+        eval "$(${lib.getExe pkgs.atuin} init zsh --disable-up-arrow)"
+      fi
+
       # Disable zsh history
       unset HISTFILE
 
@@ -107,6 +84,33 @@ in
         fi
       }
     '';
+
+  systemd.user.services.atuin-daemon = {
+    Unit = {
+      Description = "Atuin Daemon";
+      Requires = [ "atuin-daemon.socket" ];
+      After = [ "atuin-daemon.socket" ];
+    };
+
+    Service = {
+      Slice = "background.slice";
+      ExecStart = "${getExe pkgs.atuin} daemon";
+      Restart = "on-failure";
+    };
+
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  systemd.user.sockets.atuin-daemon = {
+    Unit.Description = "Atuin Daemon Socket";
+
+    Socket = {
+      ListenStream = "%t/atuin.sock";
+      SocketMode = "0600";
+    };
+
+    Install.WantedBy = [ "sockets.target" ];
+  };
 
   # https://github.com/starship/starship/issues/5410 would make this easier
   programs.starship.settings.env_var.ATUIN_INCOGNITO = {

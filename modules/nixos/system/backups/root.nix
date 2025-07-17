@@ -149,7 +149,9 @@ in
 
           serviceConfig = {
             Restart = "on-failure";
-            RestartSec = "15m";
+            RestartSec = "5m";
+            RestartMaxDelaySec = "30m";
+            RestartSteps = 3;
 
             ProtectSystem = "strict";
             ProtectHome = "read-only";

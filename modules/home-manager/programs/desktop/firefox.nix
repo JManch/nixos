@@ -269,6 +269,8 @@ in
           Type = "oneshot";
           Slice = "background${sliceSuffix osConfig}.slice";
           CPUSchedulingPolicy = "idle";
+          # Sleep in an attempt to mitigate EXT4 file system corruption when resuming from hibernation
+          ExecStartPre = "${getExe' pkgs.coreutils "sleep"} 30";
           IOSchedulingClass = "idle";
           ExecStart =
             (pkgs.writeShellScript "firefox-persist-sync" ''

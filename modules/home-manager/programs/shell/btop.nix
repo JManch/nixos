@@ -6,34 +6,35 @@
   osConfig,
 }:
 let
-  inherit (lib) ns mkIf concatStringsSep;
+  inherit (lib) ns concatStringsSep optionalString;
   inherit (osConfig.${ns}) persistence;
   inherit (osConfig.${ns}.core) device;
+
   themePath = "btop/themes/custom.theme";
+  package = lib.${ns}.wrapAlacrittyOpaque args (
+    pkgs.btop.override {
+      cudaSupport = device.gpu.type == "nvidia";
+      rocmSupport = device.gpu.type == "amd";
+    }
+  );
 in
 {
-  programs.btop = {
-    enable = true;
-    package = lib.${ns}.wrapAlacrittyOpaque args (
-      pkgs.btop.override {
-        cudaSupport = device.gpu.type == "nvidia";
-        rocmSupport = device.gpu.type == "amd";
-      }
-    );
-    settings = {
-      custom_gpu_name0 = device.gpu.name;
-      show_gpu_info = "off";
-      shown_boxes = "cpu mem net proc gpu0";
-      vim_keys = true;
-      color_theme = "custom";
-      disks_filter = mkIf persistence.enable (
-        "exclude="
-        + concatStringsSep " " (
+  home.packages = [ package ];
+
+  xdg.configFile."btop/btop.conf".text = ''
+    color_theme = "custom"
+    custom_gpu_name0 = "${device.gpu.name}"
+    show_gpu_info = "off"
+    shown_boxes = "cpu mem net proc gpu0"
+    vim_keys = True
+    ${optionalString persistence.enable ''
+      disks_filter = "exclude=${
+        concatStringsSep " " (
           map (p: p.filePath) persistence.files ++ map (p: p.dirPath) persistence.directories
         )
-      );
-    };
-  };
+      }"
+    ''}
+  '';
 
   xdg.configFile.${themePath}.text = with config.colorScheme.palette; ''
     theme[main_bg]="#${base00}"

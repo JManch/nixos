@@ -1,18 +1,10 @@
+{ pkgs }:
 {
   enableOpt = false;
-
-  programs.eza = {
-    enable = true;
-    git = true;
-    icons = "auto";
-    enableBashIntegration = false;
-    enableZshIntegration = false;
-    enableFishIntegration = false;
-    enableIonIntegration = false;
-    enableNushellIntegration = false;
-  };
+  home.packages = [ pkgs.eza ];
 
   programs.zsh.shellAliases = {
+    eza = "eza --icons=auto --color=auto --git";
     l = "ll"; # because nixpkgs creates an l alias by default
     ls = "eza";
     ll = "eza -l";

@@ -1,14 +1,9 @@
 {
   lib,
-  pkgs,
   osConfig,
 }:
 let
-  inherit (lib)
-    getExe
-    mkForce
-    getExe'
-    ;
+  inherit (lib) mkForce;
 in
 {
   conditions = [ "osConfig.system.audio" ];
@@ -23,26 +18,6 @@ in
     Unit.Requisite = [ "graphical-session.target" ];
     Install.WantedBy = mkForce [ ];
   };
-
-  programs.waybar.settings.bar =
-    let
-      systemctl = getExe' pkgs.systemd "systemctl";
-      notifySend = getExe pkgs.libnotify;
-    in
-    {
-      pulseaudio = {
-        "on-click-middle" = # bash
-          ''
-            ${systemctl} is-active --quiet --user easyeffects && {
-              ${systemctl} stop --user easyeffects
-              ${notifySend} -e --urgency=low -t 3000 'Easyeffects disabled'
-            } || {
-              ${systemctl} start --user easyeffects
-              ${notifySend} -e --urgency=low -t 3000 'Easyeffects enabled'
-            }
-          '';
-      };
-    };
 
   xdg.configFile = {
     "easyeffects/input/improved-microphone.json".text = # json

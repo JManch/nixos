@@ -146,6 +146,7 @@ in
           "factorio"
           "hl2_linux"
           "discovery\\.exe" # the finals
+          "STRAFTAT\\.x86_64"
         ];
 
         tearingExcludedClasses =
@@ -170,7 +171,10 @@ in
         "center, class:^(steam)$, title:^(Friends List)$"
       ];
 
-      persistence.directories = [ ".factorio" ];
+      persistence.directories = [
+        ".factorio"
+        ".config/unity3d/LemaitreBros/STRAFTAT"
+      ];
     };
 
     # Fix slow steam client downloads https://redd.it/16e1l4h

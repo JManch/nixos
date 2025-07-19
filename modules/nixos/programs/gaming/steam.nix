@@ -146,6 +146,7 @@ in
           "factorio"
           "hl2_linux"
           "discovery\\.exe" # the finals
+          "STRAFTAT\\.x86_64"
         ];
 
         tearingExcludedClasses =

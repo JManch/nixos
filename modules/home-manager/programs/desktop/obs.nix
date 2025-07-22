@@ -7,10 +7,9 @@
     package =
       lib.${lib.ns}.addPatches
         # Have to use obs 30.2.3 as the OBS WHEP source patch has not been rebased onto latest version
-        (import (fetchTarball {
-          url = "https://github.com/NixOS/nixpkgs/archive/028048884dc9517e548703beb24a11408cc51402.tar.gz";
-          sha256 = "sha256:0gamch7a5586q568s8i5iszxljm1lw791k507crzcwqrcm41rs8y";
-        }) { inherit (pkgs) system; }).obs-studio
+        (import (fetchTree "github:NixOS/nixpkgs/028048884dc9517e548703beb24a11408cc51402") {
+          inherit (pkgs) system;
+        }).obs-studio
         [
           # https://github.com/obsproject/obs-studio/pull/10353
           "obs-whep-source.patch"

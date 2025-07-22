@@ -17,7 +17,7 @@
         (mkHost "framework" "joshua" "x86_64-linux" [ ])
         (mkHost "homelab" "joshua" "x86_64-linux" [ ])
         (mkHost "msi" "lauren" "x86_64-linux" [ ])
-        (mkHost "pi-3" "joshua" "aarch64-linux" [ ])
+        # (mkHost "pi-3" "joshua" "aarch64-linux" [ ])
         # (mkHost "surface-pro" "joshua" "x86_64-linux" [ ])
       ];
 
@@ -63,12 +63,9 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
 
-    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
-    raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
-    raspberry-pi-nix.inputs.rpi-firmware-nonfree-src.follows = "rpi-firmware-nonfree-src";
-
-    rpi-firmware-nonfree-src.url = "github:RPi-Distro/firmware-nonfree/bookworm";
-    rpi-firmware-nonfree-src.flake = false;
+    # Project dead? https://discourse.nixos.org/t/what-happened-to-raspberry-pi-nix/62417
+    # raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
+    # raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
     nixpkgs-xr.inputs.nixpkgs.follows = "nixpkgs";

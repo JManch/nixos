@@ -19,7 +19,7 @@
         cpu = {
           name = "i7 6700k";
           type = "intel";
-          threads = "8";
+          threads = 8;
         };
 
         gpu = {

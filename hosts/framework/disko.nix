@@ -110,7 +110,9 @@ in
     };
   };
 
-  # Enroll TPM key with `systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7+12 --tpm2-with-pin=yes /dev/nvme0n1p2`
+  # Initially enroll TPM key with: `systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7+12 --tpm2-with-pin=yes /dev/nvme0n1p2`
+  # To re-enroll the key after the TPM has changed (e.g. after a firemware
+  # update) additionally pass `--wipe-slot=tpm2` to replace the old key slot
 
   # Make hibernation images as small as possible
   systemd.tmpfiles.rules = [ "w /sys/power/image_size - - - - 0" ];

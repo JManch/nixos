@@ -4,6 +4,7 @@
   pkgs,
   config,
   inputs,
+  sources,
   username,
 }:
 let
@@ -337,8 +338,8 @@ in
 
         templates = pkgs.runCommand "recyclarr-merged-templates" { } ''
           mkdir $out
-          cp --no-preserve=mode -r "${inputs.recyclarr-templates}"/radarr/includes $out
-          cp --no-preserve=mode -r "${inputs.recyclarr-templates}"/sonarr/includes $out
+          cp --no-preserve=mode -r "${sources.recyclarr-templates}"/radarr/includes $out
+          cp --no-preserve=mode -r "${sources.recyclarr-templates}"/sonarr/includes $out
         '';
 
         recyclarrConfig = (pkgs.formats.yaml { }).generate "recyclarr.yaml" {

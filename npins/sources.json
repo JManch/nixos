@@ -298,6 +298,32 @@
       "url": "https://github.com/Shatur/neovim-ayu/archive/30e53f8a0f3708e92c84d4df676898cd16b8b64f.tar.gz",
       "hash": "1fxq7klf69byi6m8gqd3fq9zs96zc92qjzksafhgl8y7gs0hwzi5"
     },
+    "neovim-config": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "JManch",
+        "repo": "nvim"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "558f11f9d85a40f2ad43a4a5a86f7f5af8eda2c5",
+      "url": "https://github.com/JManch/nvim/archive/558f11f9d85a40f2ad43a4a5a86f7f5af8eda2c5.tar.gz",
+      "hash": "1l0f6rvy6jb94dvgzch3c2f02037fn9yg7fjivyyb94nwibp9xny"
+    },
+    "recyclarr-templates": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "recyclarr",
+        "repo": "config-templates"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "3a2c4796b3aee5ccd4e66642bcd777ad38e0d739",
+      "url": "https://github.com/recyclarr/config-templates/archive/3a2c4796b3aee5ccd4e66642bcd777ad38e0d739.tar.gz",
+      "hash": "1haxl6f1hqn2d6rws1lbi9ns1zc9kf6m3i15nkdfgvy869668c1l"
+    },
     "slskd-stats": {
       "type": "GitRelease",
       "repository": {

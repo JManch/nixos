@@ -134,9 +134,6 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
-    recyclarr-templates.url = "github:recyclarr/config-templates";
-    recyclarr-templates.flake = false;
-
     xdg-override.url = "github:koiuo/xdg-override";
     xdg-override.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -147,9 +144,6 @@
 
     nix-resources.url = "git+ssh://git@github.com/JManch/nix-resources";
     nix-resources.inputs.nixpkgs.follows = "nixpkgs";
-
-    neovim-config.url = "github:JManch/nvim";
-    neovim-config.flake = false;
 
     grimblast.url = "github:JManch/grimblast";
     grimblast.inputs.nixpkgs.follows = "nixpkgs";

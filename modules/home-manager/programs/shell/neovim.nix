@@ -4,7 +4,7 @@
   args,
   pkgs,
   config,
-  inputs,
+  sources,
 }:
 let
   inherit (lib)
@@ -39,7 +39,7 @@ in
     ))
   ] ++ optional cfg.neovide.enable pkgs.neovide;
 
-  xdg.configFile."nvim".source = inputs.neovim-config.outPath;
+  xdg.configFile."nvim".source = sources.neovim-config;
 
   home.sessionVariables = {
     EDITOR = "nvim";

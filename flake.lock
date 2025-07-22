@@ -991,22 +991,6 @@
         "type": "github"
       }
     },
-    "neovim-config": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1749500742,
-        "narHash": "sha256-3vZ0V+SWpOX9jtKd55N1ZwABnGADsv92I2lJ43c2DtA=",
-        "owner": "JManch",
-        "repo": "nvim",
-        "rev": "558f11f9d85a40f2ad43a4a5a86f7f5af8eda2c5",
-        "type": "github"
-      },
-      "original": {
-        "owner": "JManch",
-        "repo": "nvim",
-        "type": "github"
-      }
-    },
     "nix-colors": {
       "inputs": {
         "base16-schemes": "base16-schemes",
@@ -1387,22 +1371,6 @@
         "type": "github"
       }
     },
-    "recyclarr-templates": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1748995181,
-        "narHash": "sha256-NDBkTDLI7+fatCXEUY2bif2gbYqLBs2zacJiGJyhXcE=",
-        "owner": "recyclarr",
-        "repo": "config-templates",
-        "rev": "3a2c4796b3aee5ccd4e66642bcd777ad38e0d739",
-        "type": "github"
-      },
-      "original": {
-        "owner": "recyclarr",
-        "repo": "config-templates",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "agenix": "agenix",
@@ -1421,7 +1389,6 @@
         "impermanence": "impermanence",
         "lanzaboote": "lanzaboote",
         "mint": "mint",
-        "neovim-config": "neovim-config",
         "nix-colors": "nix-colors",
         "nix-flatpak": "nix-flatpak",
         "nix-index-database": "nix-index-database",
@@ -1433,7 +1400,6 @@
         "nixpkgs-xr": "nixpkgs-xr",
         "nvf": "nvf",
         "raspberry-pi-nix": "raspberry-pi-nix",
-        "recyclarr-templates": "recyclarr-templates",
         "rpi-firmware-nonfree-src": "rpi-firmware-nonfree-src",
         "vmInstall": "vmInstall",
         "vpn-confinement": "vpn-confinement",

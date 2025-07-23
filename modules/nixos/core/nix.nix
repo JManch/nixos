@@ -14,7 +14,6 @@ let
   inherit (lib)
     ns
     mkIf
-    mkMerge
     mapAttrs
     filterAttrs
     types
@@ -24,26 +23,19 @@ let
     mapAttrsToList
     sort
     optionalString
-    replaceStrings
     attrValues
-    listToAttrs
-    nameValuePair
-    getExe
     mkForce
     singleton
     concatStringsSep
     mkEnableOption
     mkOption
-    toUpper
     ;
   inherit (lib.${ns})
     addPatches
     flakePkgs
-    upperFirstChar
     ;
   inherit (inputs.nix-resources.secrets) keys;
   inherit (config.${ns}.system) impermanence;
-  inherit (config.age.secrets) notifyVars;
   inherit (config.${ns}.core) home-manager;
   configDir = "/home/${adminUsername}/.config/nixos";
 
@@ -505,86 +497,52 @@ in
     randomizedDelaySec = "2hours";
   };
 
-  systemd.services = mkMerge [
-    {
-      nix-optimise.after = [ "nix-gc.service" ];
-    }
-    (mkIf cfg.autoUpgrade (mkMerge [
-      (listToAttrs (
-        map
-          (
-            type:
-            nameValuePair "nixos-upgrade-${type}" {
-              restartIfChanged = false;
-              serviceConfig = {
-                type = "oneshot";
-                EnvironmentFile = notifyVars.path;
-                ExecStart =
-                  let
-                    title = "NixOS Auto Upgrade ${upperFirstChar type}";
-                    message = "Auto upgrade ${if type == "success" then "succeeded" else type} on host ${hostname}";
-                    shoutrrr = getExe pkgs.shoutrrr;
-                  in
-                  pkgs.writeShellScript "nixos-upgrade-${type}-notif" (
-                    ''
-                      ${shoutrrr} send \
-                        --url "discord://$UPGRADE_DISCORD_AUTH_${toUpper type}" \
-                        --title "${title}" \
-                        --message "${message}"
-                    ''
-                    + optionalString (type == "failure") ''
-                      ${shoutrrr} send \
-                        --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${
-                          replaceStrings [ " " ] [ "%20" ] title
-                        }" \
-                        --message "${message}"
-                    ''
-                  );
-              };
-            }
-          )
-          [
-            "success"
-            "failure"
-          ]
-      ))
-      {
-        nixos-upgrade = {
-          after = [
-            "nix-optimise.service"
-            "nix-gc.service"
-          ];
-          onFailure = [ "nixos-upgrade-failure.service" ];
-          onSuccess = [ "nixos-upgrade-success.service" ];
-          # Because one of our flake inputs is a private repo temporarily copy host ssh
-          # keys so root uses them to authenticate with github
-          serviceConfig.ExecStart = mkForce (pkgs.writeShellScript "nixos-upgrade-ssh-auth" ''
-            set -e
-            mkdir -p /root/.ssh
+  systemd.services.nix-optimise.after = [ "nix-gc.service" ];
 
-            if [ -f /root/.ssh/id_ed25519 ]; then
-              tmp=$(mktemp -d)
-              mv /root/.ssh/id_ed25519 "$tmp"
-            fi
+  systemd.services.nixos-upgrade = mkIf cfg.autoUpgrade {
+    after = [
+      "nix-optimise.service"
+      "nix-gc.service"
+    ];
+    # Because one of our flake inputs is a private repo temporarily copy host ssh
+    # keys so root uses them to authenticate with github
+    serviceConfig.ExecStart = mkForce (pkgs.writeShellScript "nixos-upgrade-ssh-auth" ''
+      set -e
+      mkdir -p /root/.ssh
 
-            cleanup() {
-              if [[ -v tmp ]]; then
-                mv "$tmp/id_ed25519" /root/.ssh
-                rm -rf "$tmp"
-              else
-                rm -rf /root/.ssh/id_ed25519
-              fi
-            }
+      if [ -f /root/.ssh/id_ed25519 ]; then
+        tmp=$(mktemp -d)
+        mv /root/.ssh/id_ed25519 "$tmp"
+      fi
 
-            trap cleanup EXIT
-            cp /etc/ssh/ssh_host_ed25519_key /root/.ssh/id_ed25519
-
-            ${config.systemd.services.nixos-upgrade.script}
-          '').outPath;
-        };
+      cleanup() {
+        if [[ -v tmp ]]; then
+          mv "$tmp/id_ed25519" /root/.ssh
+          rm -rf "$tmp"
+        else
+          rm -rf /root/.ssh/id_ed25519
+        fi
       }
-    ]))
-  ];
+
+      trap cleanup EXIT
+      cp /etc/ssh/ssh_host_ed25519_key /root/.ssh/id_ed25519
+
+      ${config.systemd.services.nixos-upgrade.script}
+    '').outPath;
+  };
+
+  ns.services = mkIf cfg.autoUpgrade {
+    successNotifyServices.nixos-upgrade = {
+      discord.enable = true;
+      discord.var = "UPGRADE";
+      email.enable = false;
+    };
+
+    failureNotifyServices.nixos-upgrade = {
+      discord.enable = true;
+      discord.var = "UPGRADE";
+    };
+  };
 
   # Sometimes nixos-rebuild compiles large pieces software that require more
   # space in /tmp than my tmpfs can provide. The obvious solution is to mount

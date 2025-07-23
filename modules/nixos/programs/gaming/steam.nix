@@ -22,6 +22,7 @@ let
     "BeamNG.drive" = 284160;
     "Red Dead Redemption 2" = 1174180;
     "Deep Rock Galactic" = 548430;
+    "No Man's Sky" = 275850;
     Noita = 881100;
     iRacing = 266410;
     BONELAB = 1592190;

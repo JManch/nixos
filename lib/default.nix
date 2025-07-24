@@ -334,5 +334,10 @@ in
         })
       else
         package;
+
+    revDisableCondition =
+      name: rev:
+      assert lib.assertMsg (self.inputs.nixpkgs.rev == rev) "Module ${name} can be re-enabled";
+      false;
   };
 }

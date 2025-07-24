@@ -45,7 +45,9 @@
 
     vpn-confinement.url = "github:Maroka-chan/VPN-Confinement";
 
-    home-manager.url = "github:nix-community/home-manager";
+    # Locking as something broke sd-switch activation so all services get restarted on every rebuild
+    # Probably https://github.com/nix-community/home-manager/commit/de448dcb577570f2a11f243299b6536537e05bbe
+    home-manager.url = "github:nix-community/home-manager/1e54837569e0b80797c47be4720fab19e0db1616";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-on-droid.url = "github:nix-community/nix-on-droid";

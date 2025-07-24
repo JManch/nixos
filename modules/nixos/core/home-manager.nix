@@ -49,6 +49,7 @@ in
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
+    verbose = false; # useful for debugging activation script
 
     users = mkMerge [
       { ${username} = ../../../homes/${hostname}.nix; }

@@ -90,5 +90,6 @@ in
         Interface-specific open ports.
       '';
     };
-  } // commonOptions;
+  }
+  // commonOptions;
 }

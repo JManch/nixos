@@ -45,19 +45,18 @@ in
       type = "zpool";
       options.ashift = "12";
 
-      rootFsOptions =
-        {
-          atime = "off";
-          mountpoint = "none";
-          xattr = "sa";
-          acltype = "posixacl";
-          compression = "lz4";
-        }
-        // lib.optionalAttrs (!vmInstall) {
-          encryption = "aes-256-gcm";
-          keyformat = "passphrase";
-          keylocation = "prompt";
-        };
+      rootFsOptions = {
+        atime = "off";
+        mountpoint = "none";
+        xattr = "sa";
+        acltype = "posixacl";
+        compression = "lz4";
+      }
+      // lib.optionalAttrs (!vmInstall) {
+        encryption = "aes-256-gcm";
+        keyformat = "passphrase";
+        keylocation = "prompt";
+      };
 
       datasets.root = {
         type = "zfs_fs";

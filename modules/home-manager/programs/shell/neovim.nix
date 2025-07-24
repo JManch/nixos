@@ -37,7 +37,8 @@ in
           --replace-fail "Name=Neovim wrapper" "Name=Neovim"
       ''
     ))
-  ] ++ optional cfg.neovide.enable pkgs.neovide;
+  ]
+  ++ optional cfg.neovide.enable pkgs.neovide;
 
   xdg.configFile."nvim".source = sources.neovim-config;
 

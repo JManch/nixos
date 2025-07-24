@@ -227,89 +227,88 @@ in
   categoryConfig.modKey = mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);
 
   wayland.windowManager.hyprland = {
-    settings.bind =
-      [
-        # General
-        "${modShiftCtrl}, Q, exec, ${loginctl} terminate-session \"$XDG_SESSION_ID\""
-        "${mod}, ${cfg.killActiveKey}, killactive"
-        "${mod}, C, exec, ${toggleFloating}"
-        "${mod}, E, exec, ${toggleFullscreen}"
-        "${modShift}, E, fullscreen, 0"
-        "${mod}, Z, exec, ${toggleAlwaysOnTop}"
-        "${mod}Shift, Z, pin, active"
-        "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
-        "${modShift}, R, exec, ${make16By9}"
-        "${mod}, A, exec, ${toggleAnimations}"
-        "${modShift}, A, exec, ${toggleGaps}"
-        "${modShiftCtrl}, V, exec, ${syncClipboard}"
+    settings.bind = [
+      # General
+      "${modShiftCtrl}, Q, exec, ${loginctl} terminate-session \"$XDG_SESSION_ID\""
+      "${mod}, ${cfg.killActiveKey}, killactive"
+      "${mod}, C, exec, ${toggleFloating}"
+      "${mod}, E, exec, ${toggleFullscreen}"
+      "${modShift}, E, fullscreen, 0"
+      "${mod}, Z, exec, ${toggleAlwaysOnTop}"
+      "${mod}Shift, Z, pin, active"
+      "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
+      "${modShift}, R, exec, ${make16By9}"
+      "${mod}, A, exec, ${toggleAnimations}"
+      "${modShift}, A, exec, ${toggleGaps}"
+      "${modShiftCtrl}, V, exec, ${syncClipboard}"
 
-        # Movement
-        "${mod}, H, movefocus, l"
-        "${mod}, L, movefocus, r"
-        "${mod}, K, movefocus, u"
-        "${mod}, J, movefocus, d"
-        "${modShiftCtrl}, H, movewindow, l"
-        "${modShiftCtrl}, L, movewindow, r"
-        "${modShiftCtrl}, K, movewindow, u"
-        "${modShiftCtrl}, J, movewindow, d"
-        "${mod}, mouse:275, workspace, m-1"
-        "${mod}, mouse:276, workspace, m+1"
-        "${modShift}, Left, movetoworkspace, r-1"
-        "${modShift}, Right, movetoworkspace, r+1"
-        "${modShift}, J, workspace, m-1"
-        "${modShift}, K, workspace, m+1"
-        "${mod}, mouse_down, exec, ${zoom "in"}"
-        "${mod}, mouse_up, exec, ${zoom "out"}"
-        "${modShift}, mouse_up, exec, ${hyprctl} keyword cursor:zoom_factor 1"
-        "${mod}, Equal, exec, ${zoom "in"}"
-        "${mod}, Minus, exec, ${zoom "out"}"
-        "${modShift}, Minus, exec, ${hyprctl} keyword cursor:zoom_factor 1"
+      # Movement
+      "${mod}, H, movefocus, l"
+      "${mod}, L, movefocus, r"
+      "${mod}, K, movefocus, u"
+      "${mod}, J, movefocus, d"
+      "${modShiftCtrl}, H, movewindow, l"
+      "${modShiftCtrl}, L, movewindow, r"
+      "${modShiftCtrl}, K, movewindow, u"
+      "${modShiftCtrl}, J, movewindow, d"
+      "${mod}, mouse:275, workspace, m-1"
+      "${mod}, mouse:276, workspace, m+1"
+      "${modShift}, Left, movetoworkspace, r-1"
+      "${modShift}, Right, movetoworkspace, r+1"
+      "${modShift}, J, workspace, m-1"
+      "${modShift}, K, workspace, m+1"
+      "${mod}, mouse_down, exec, ${zoom "in"}"
+      "${mod}, mouse_up, exec, ${zoom "out"}"
+      "${modShift}, mouse_up, exec, ${hyprctl} keyword cursor:zoom_factor 1"
+      "${mod}, Equal, exec, ${zoom "in"}"
+      "${mod}, Minus, exec, ${zoom "out"}"
+      "${modShift}, Minus, exec, ${hyprctl} keyword cursor:zoom_factor 1"
 
-        # Monitors
-        "${modShift}, H, focusmonitor, l"
-        "${modShift}, L, focusmonitor, r"
-        "${mod}, TAB, focusmonitor, +1"
-        "${modShift}, TAB, movecurrentworkspacetomonitor, +1"
-        ", XF86AudioMedia, exec, sleep 1 && hyprctl dispatch dpms toggle"
+      # Monitors
+      "${modShift}, H, focusmonitor, l"
+      "${modShift}, L, focusmonitor, r"
+      "${mod}, TAB, focusmonitor, +1"
+      "${modShift}, TAB, movecurrentworkspacetomonitor, +1"
+      ", XF86AudioMedia, exec, sleep 1 && hyprctl dispatch dpms toggle"
 
-        # Dwindle
-        "${mod}, P, pseudo,"
-        "${modShiftCtrl}, G, exec, ${toggleDwindleGaps}"
-        "${mod}, X, layoutmsg, togglesplit"
-        "${modShift}, X, layoutmsg, swapsplit"
+      # Dwindle
+      "${mod}, P, pseudo,"
+      "${modShiftCtrl}, G, exec, ${toggleDwindleGaps}"
+      "${mod}, X, layoutmsg, togglesplit"
+      "${modShift}, X, layoutmsg, swapsplit"
 
-        # Screenshots
-        ", Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy area"}"
-        "${mod}, I, exec, ${disableShadersCommand "${grimblast} --notify copy output"}"
-        "${modShift}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save area"}"
-        "${modShift}, I, exec, ${disableShadersCommand "${grimblast} --notify save output"}"
-        "${modShiftCtrl}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save window"}"
-        "${modShiftCtrl}, I, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy window"}"
-        "${modShiftCtrl}, C, exec, ${copyScreenshotText}"
+      # Screenshots
+      ", Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy area"}"
+      "${mod}, I, exec, ${disableShadersCommand "${grimblast} --notify copy output"}"
+      "${modShift}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save area"}"
+      "${modShift}, I, exec, ${disableShadersCommand "${grimblast} --notify save output"}"
+      "${modShiftCtrl}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save window"}"
+      "${modShiftCtrl}, I, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy window"}"
+      "${modShiftCtrl}, C, exec, ${copyScreenshotText}"
 
-        # Workspaces other
-        "${mod}, N, workspace, previous_per_monitor"
-        "${mod}, M, workspace, emptym"
-        "${modShift}, M, exec, ${moveToNextEmpty}"
-        "${modShiftCtrl}, M, movetoworkspacesilent, emptym"
-      ]
-      ++ flatten (
-        builtins.genList (
-          x:
-          let
-            key = toString x;
-            w = toString (if x == 0 then 10 else x);
-          in
-          [
-            "${mod}, ${key}, workspace, ${w}"
-            "${modShift}, ${key}, movetoworkspace, ${w}"
-            "${modShiftCtrl}, ${key}, movetoworkspacesilent, ${w}"
-          ]
-        ) 10
-      )
-      ++ optionals cfg.plugins [
-        "${mod}, Escape, hyprexpo:expo, toggle"
-      ];
+      # Workspaces other
+      "${mod}, N, workspace, previous_per_monitor"
+      "${mod}, M, workspace, emptym"
+      "${modShift}, M, exec, ${moveToNextEmpty}"
+      "${modShiftCtrl}, M, movetoworkspacesilent, emptym"
+    ]
+    ++ flatten (
+      builtins.genList (
+        x:
+        let
+          key = toString x;
+          w = toString (if x == 0 then 10 else x);
+        in
+        [
+          "${mod}, ${key}, workspace, ${w}"
+          "${modShift}, ${key}, movetoworkspace, ${w}"
+          "${modShiftCtrl}, ${key}, movetoworkspacesilent, ${w}"
+        ]
+      ) 10
+    )
+    ++ optionals cfg.plugins [
+      "${mod}, Escape, hyprexpo:expo, toggle"
+    ];
 
     settings.bindl = optionals (backlight != null) [
       ", XF86MonBrightnessUp, exec, ${modifyBrightness} 3%+"

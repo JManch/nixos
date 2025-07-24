@@ -182,7 +182,8 @@ in
               "󰕾"
               "󰕾"
             ];
-          } // cfg.audioDeviceIcons;
+          }
+          // cfg.audioDeviceIcons;
 
           on-click = "${app2unit} com.saivert.pwvucontrol.desktop";
           tooltip = true;

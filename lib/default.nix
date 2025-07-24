@@ -44,22 +44,21 @@ in
             sources
             ;
         };
-        modules =
-          [
-            {
-              nixpkgs.hostPlatform = system;
-              nixpkgs.buildPlatform = "x86_64-linux";
-              nixpkgs.overlays = mkBefore [ (_: prev: { ${ns} = import ../pkgs self lib prev; }) ];
-            }
-            ../modules/nixos
-          ]
-          ++ optional (pathExists ../hosts/${hostname}) ../hosts/${hostname}
-          # Raspberry-pi-nix does not have an enable option so we have to
-          # conditionally import like this
-          ++ optionals (hasPrefix "pi" hostname) [
-            ../modules/nixos/hardware/raspberry-pi.nix
-          ]
-          ++ extraModules;
+        modules = [
+          {
+            nixpkgs.hostPlatform = system;
+            nixpkgs.buildPlatform = "x86_64-linux";
+            nixpkgs.overlays = mkBefore [ (_: prev: { ${ns} = import ../pkgs self lib prev; }) ];
+          }
+          ../modules/nixos
+        ]
+        ++ optional (pathExists ../hosts/${hostname}) ../hosts/${hostname}
+        # Raspberry-pi-nix does not have an enable option so we have to
+        # conditionally import like this
+        ++ optionals (hasPrefix "pi" hostname) [
+          ../modules/nixos/hardware/raspberry-pi.nix
+        ]
+        ++ extraModules;
       };
     };
 

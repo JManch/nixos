@@ -43,13 +43,12 @@ let
   # defined as persistent in config
   bloatFinder =
     let
-      excludePaths =
-        [
-          "/var/nix-tmp"
-          "/home/${username}/.mozilla"
-        ]
-        ++ map (p: p.filePath) config.${ns}.persistence.files
-        ++ map (p: p.dirPath) config.${ns}.persistence.directories;
+      excludePaths = [
+        "/var/nix-tmp"
+        "/home/${username}/.mozilla"
+      ]
+      ++ map (p: p.filePath) config.${ns}.persistence.files
+      ++ map (p: p.dirPath) config.${ns}.persistence.directories;
     in
     pkgs.writeShellScriptBin "impermanence-bloat" ''
       sudo ${fd} --unrestricted --absolute-path --base-directory /persist --type file --type symlink \

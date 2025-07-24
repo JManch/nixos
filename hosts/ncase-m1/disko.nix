@@ -147,15 +147,14 @@ in
             "${pseudoRoot}/persist" = {
               type = "zfs_fs";
               mountpoint = "/persist";
-              options =
-                {
-                  mountpoint = "legacy";
-                }
-                // optionalAttrs (!vmInstall) {
-                  encryption = "aes-256-gcm";
-                  keyformat = "passphrase";
-                  keylocation = "prompt";
-                };
+              options = {
+                mountpoint = "legacy";
+              }
+              // optionalAttrs (!vmInstall) {
+                encryption = "aes-256-gcm";
+                keyformat = "passphrase";
+                keylocation = "prompt";
+              };
             };
 
             "${pseudoRoot}/persist/videos" = {

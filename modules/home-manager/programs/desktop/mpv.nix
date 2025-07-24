@@ -50,7 +50,8 @@ in
           --replace-fail "Name=umpv Media Player" "Name=UMPV Media Player"
       ''
     ))
-  ] ++ optional cfg.jellyfinShim.enable pkgs.jellyfin-mpv-shim;
+  ]
+  ++ optional cfg.jellyfinShim.enable pkgs.jellyfin-mpv-shim;
 
   programs.mpv = {
     enable = true;

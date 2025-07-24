@@ -223,20 +223,19 @@ in
     hostName = hostname;
     useNetworkd = cfg.useNetworkd;
 
-    firewall =
-      {
-        enable = cfg.firewall.enable;
-        defaultInterfaces = cfg.firewall.defaultInterfaces;
-      }
-      // (optionalAttrs home-manager.enable {
-        inherit (homeFirewall)
-          allowedTCPPorts
-          allowedTCPPortRanges
-          allowedUDPPorts
-          allowedUDPPortRanges
-          interfaces
-          ;
-      });
+    firewall = {
+      enable = cfg.firewall.enable;
+      defaultInterfaces = cfg.firewall.defaultInterfaces;
+    }
+    // (optionalAttrs home-manager.enable {
+      inherit (homeFirewall)
+        allowedTCPPorts
+        allowedTCPPortRanges
+        allowedUDPPorts
+        allowedUDPPortRanges
+        interfaces
+        ;
+    });
 
     wireless = mkIf cfg.wireless.enable {
       enable = true;

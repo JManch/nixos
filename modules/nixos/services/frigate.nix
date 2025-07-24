@@ -331,7 +331,8 @@ in
       8554
       1984
       5353 # for mDNS
-    ] ++ optional cfg.webrtc.enable cfg.webrtc.port;
+    ]
+    ++ optional cfg.webrtc.enable cfg.webrtc.port;
     # go2rtc sometimes randomly crashes
     Restart = "on-failure";
     RestartSec = 10;

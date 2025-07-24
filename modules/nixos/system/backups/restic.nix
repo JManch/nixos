@@ -291,19 +291,18 @@ in
 
     # WARN: Always interact with the repository using the REST server, even on
     # the same host. It ensures correct repo file ownership.
-    programs.zsh.shellAliases =
-      {
-        restic = "sudo restic --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-        restic-snapshots = "sudo restic snapshots --no-cache --compact --group-by tags --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-        restic-restore-size = "sudo restic stats --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-        restic-repo-size = "sudo restic stats --no-cache --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-        backup-all = concatStringsSep ";" (
-          mapAttrsToList (name: _: "sudo systemctl start restic-backups-${name}") backups
-        );
-      }
-      // (mapAttrs' (
-        name: _: nameValuePair "backup-${name}" "sudo systemctl start restic-backups-${name}"
-      ) backups);
+    programs.zsh.shellAliases = {
+      restic = "sudo restic --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-snapshots = "sudo restic snapshots --no-cache --compact --group-by tags --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-restore-size = "sudo restic stats --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-repo-size = "sudo restic stats --no-cache --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      backup-all = concatStringsSep ";" (
+        mapAttrsToList (name: _: "sudo systemctl start restic-backups-${name}") backups
+      );
+    }
+    // (mapAttrs' (
+      name: _: nameValuePair "backup-${name}" "sudo systemctl start restic-backups-${name}"
+    ) backups);
 
     # Backblaze bucket setup:
     # backblaze-b2 create-bucket --defaultServerSideEncryption=SSE-B2 <bucket_name> --lifecycleRule '{"daysFromHidingToDeleting": 7, "daysFromUploadingToHiding": null, "fileNamePrefix": ""}' allPrivate

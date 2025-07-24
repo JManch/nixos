@@ -184,13 +184,14 @@ let
     in
     pkgs.writeShellApplication {
       name = "host-rebuild-${cmd}";
-      runtimeInputs =
-        [ pkgs.nh ]
-        ++ optionals (cmd == "diff") [
-          pkgs.nix
-          pkgs.openssh
-          pkgs.dix
-        ];
+      runtimeInputs = [
+        pkgs.nh
+      ]
+      ++ optionals (cmd == "diff") [
+        pkgs.nix
+        pkgs.openssh
+        pkgs.dix
+      ];
       text =
         validation
         + (
@@ -365,15 +366,14 @@ in
     };
   };
 
-  ns.adminPackages =
-    [
-      pkgs.dix
-      pkgs.npins
-    ]
-    ++ rebuildScripts
-    ++ remoteRebuildScripts
-    ++ droidRebuildScripts
-    ++ flakeUpdate;
+  ns.adminPackages = [
+    pkgs.dix
+    pkgs.npins
+  ]
+  ++ rebuildScripts
+  ++ remoteRebuildScripts
+  ++ droidRebuildScripts
+  ++ flakeUpdate;
   ns.persistenceAdminHome.directories = [ ".remote-builds" ];
   boot.binfmt.emulatedSystems = cfg.builder.emulatedSystems;
   services.getty.helpLine = mkForce "";
@@ -450,9 +450,11 @@ in
         # WARN: Do not use this, it's insecure
         # https://github.com/NixOS/nix/issues/9649#issuecomment-1868001568
         # trusted-users = [ adminUsername ];
-        allowed-users =
-          [ adminUsername ]
-          ++ optional (username != adminUsername && home-manager.enable)
+        allowed-users = [
+          adminUsername
+        ]
+        ++
+          optional (username != adminUsername && home-manager.enable)
             # Home manager user needs access to the nix daemon for some reason
             # https://github.com/nix-community/home-manager/issues/5704
             # https://github.com/nix-community/home-manager/issues/4014
@@ -467,7 +469,8 @@ in
         trusted-public-keys = [
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU="
-        ] ++ attrValues keys.nix-store;
+        ]
+        ++ attrValues keys.nix-store;
         build-dir = mkIf impermanence.enable "/var/nix-tmp";
       };
 

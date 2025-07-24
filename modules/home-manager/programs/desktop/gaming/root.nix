@@ -85,16 +85,15 @@ in
         gameClassRegex = concatRegex cfg.gameClasses;
       in
       {
-        windowrule =
-          [
-            "workspace ${namedWorkspaceIDs.GAME}, class:${gameClassRegex}"
-          ]
-          ++ optionals hyprland.tearing [
-            "tag +tear_game, class:${gameClassRegex}"
-            "tag -tear_game, tag:tear_game*, class:${concatRegex cfg.tearingExcludedClasses}"
-            "tag -tear_game, tag:tear_game*, title:${concatRegex cfg.tearingExcludedTitles}"
-            "prop immediate, tag:tear_game"
-          ];
+        windowrule = [
+          "workspace ${namedWorkspaceIDs.GAME}, class:${gameClassRegex}"
+        ]
+        ++ optionals hyprland.tearing [
+          "tag +tear_game, class:${gameClassRegex}"
+          "tag -tear_game, tag:tear_game*, class:${concatRegex cfg.tearingExcludedClasses}"
+          "tag -tear_game, tag:tear_game*, title:${concatRegex cfg.tearingExcludedTitles}"
+          "prop immediate, tag:tear_game"
+        ];
 
         bind = [
           "${modKey}, G, workspace, ${namedWorkspaceIDs.GAME}"

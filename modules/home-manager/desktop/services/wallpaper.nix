@@ -191,10 +191,11 @@ in
         Description = "Set the desktop wallpaper";
         X-SwitchMethod = "keep-old";
         Requires = [ cfg.wallpaperUnit ];
-        After =
-          [ cfg.wallpaperUnit ]
-          ++ optional cfg.randomise.enable "randomise-wallpaper.service"
-          ++ optional darkman.enable "darkman.service";
+        After = [
+          cfg.wallpaperUnit
+        ]
+        ++ optional cfg.randomise.enable "randomise-wallpaper.service"
+        ++ optional darkman.enable "darkman.service";
       };
 
       Service = {

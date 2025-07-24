@@ -28,264 +28,263 @@ let
     path = "home";
     type = "sections";
     max_columns = 1;
-    badges =
-      [
-        {
-          type = "entity";
-          display_type = "complete";
+    badges = [
+      {
+        type = "entity";
+        display_type = "complete";
+        entity = "sensor.ac_on_count";
+        name = "HVAC Running";
+        color = "purple";
+        visibility = singleton {
+          condition = "numeric_state";
           entity = "sensor.ac_on_count";
-          name = "HVAC Running";
-          color = "purple";
-          visibility = singleton {
-            condition = "numeric_state";
-            entity = "sensor.ac_on_count";
-            above = 0;
-          };
-          tap_action = {
-            action = "navigate";
-            navigation_path = "/lovelace/hvac";
-          };
-        }
-        {
-          type = "entity";
+          above = 0;
+        };
+        tap_action = {
+          action = "navigate";
+          navigation_path = "/lovelace/hvac";
+        };
+      }
+      {
+        type = "entity";
+        entity = "switch.lewis_enable_schedule";
+        icon = "mdi:robot-mower";
+        name = "Disabled";
+        state_content = "name";
+        color = "red";
+        visibility = singleton {
+          condition = "state";
           entity = "switch.lewis_enable_schedule";
-          icon = "mdi:robot-mower";
-          name = "Disabled";
-          state_content = "name";
-          color = "red";
-          visibility = singleton {
-            condition = "state";
-            entity = "switch.lewis_enable_schedule";
-            state = "off";
-          };
-        }
-        {
-          type = "entity";
+          state = "off";
+        };
+      }
+      {
+        type = "entity";
+        entity = "sensor.lewis_error";
+        icon = "mdi:robot-mower";
+        color = "red";
+        visibility = singleton {
+          condition = "state";
           entity = "sensor.lewis_error";
-          icon = "mdi:robot-mower";
-          color = "red";
-          visibility = singleton {
-            condition = "state";
-            entity = "sensor.lewis_error";
-            state_not = "no_error";
-          };
-        }
-        {
-          type = "entity";
+          state_not = "no_error";
+        };
+      }
+      {
+        type = "entity";
+        entity = "input_boolean.high_alert_surveillance";
+        color = "red";
+        name = "High Alert Enabled";
+        state_content = "name";
+        tap_action = {
+          action = "navigate";
+          navigation_path = "/lovelace/cctv";
+        };
+        visibility = singleton {
+          condition = "state";
           entity = "input_boolean.high_alert_surveillance";
-          color = "red";
-          name = "High Alert Enabled";
-          state_content = "name";
-          tap_action = {
-            action = "navigate";
-            navigation_path = "/lovelace/cctv";
-          };
-          visibility = singleton {
-            condition = "state";
-            entity = "input_boolean.high_alert_surveillance";
-            state = "on";
-          };
-        }
-        {
-          type = "entity";
-          entity = "sensor.guinea_pig_feeder";
-          icon = "mdi:carrot";
-          name = "Guinea Pig Feeder";
-          display_type = "complete";
-          color = "orange";
-          visibility = singleton {
-            condition = "state";
-            entity = "input_boolean.guinea_pigs_fed";
-            state = "off";
-          };
-        }
-        {
-          type = "entity";
+          state = "on";
+        };
+      }
+      {
+        type = "entity";
+        entity = "sensor.guinea_pig_feeder";
+        icon = "mdi:carrot";
+        name = "Guinea Pig Feeder";
+        display_type = "complete";
+        color = "orange";
+        visibility = singleton {
+          condition = "state";
           entity = "input_boolean.guinea_pigs_fed";
-          name = "Guinea Pigs Not Fed";
-          color = "red";
-          state_content = "name";
-          tap_action.action = "toggle";
-          visibility = singleton {
-            condition = "state";
-            entity = "input_boolean.guinea_pigs_fed";
-            state = "off";
-          };
-        }
-        {
-          type = "entity";
-          entity = "sensor.outdoor_thermal_comfort_heat_index";
-          display_type = "complete";
-          name = "Heat Index";
-          visibility = singleton {
-            condition = "or";
-            conditions = [
-              {
-                condition = "numeric_state";
-                entity = "sensor.outdoor_thermal_comfort_heat_index";
-                below = 5;
-              }
-              {
-                condition = "numeric_state";
-                entity = "sensor.outdoor_thermal_comfort_heat_index";
-                above = 22;
-              }
-            ];
-          };
-        }
-        {
-          type = "entity";
+          state = "off";
+        };
+      }
+      {
+        type = "entity";
+        entity = "input_boolean.guinea_pigs_fed";
+        name = "Guinea Pigs Not Fed";
+        color = "red";
+        state_content = "name";
+        tap_action.action = "toggle";
+        visibility = singleton {
+          condition = "state";
+          entity = "input_boolean.guinea_pigs_fed";
+          state = "off";
+        };
+      }
+      {
+        type = "entity";
+        entity = "sensor.outdoor_thermal_comfort_heat_index";
+        display_type = "complete";
+        name = "Heat Index";
+        visibility = singleton {
+          condition = "or";
+          conditions = [
+            {
+              condition = "numeric_state";
+              entity = "sensor.outdoor_thermal_comfort_heat_index";
+              below = 5;
+            }
+            {
+              condition = "numeric_state";
+              entity = "sensor.outdoor_thermal_comfort_heat_index";
+              above = 22;
+            }
+          ];
+        };
+      }
+      {
+        type = "entity";
+        entity = "sensor.outdoor_thermal_comfort_frost_risk";
+        display_type = "complete";
+        color = "red";
+        name = "Frost Risk";
+        visibility = singleton {
+          condition = "state";
           entity = "sensor.outdoor_thermal_comfort_frost_risk";
-          display_type = "complete";
-          color = "red";
-          name = "Frost Risk";
-          visibility = singleton {
-            condition = "state";
-            entity = "sensor.outdoor_thermal_comfort_frost_risk";
-            state_not = "no_risk";
-          };
-        }
-        {
-          type = "entity";
-          name = "Garage Door";
+          state_not = "no_risk";
+        };
+      }
+      {
+        type = "entity";
+        name = "Garage Door";
+        entity = "sensor.garage_door_status";
+        display_type = "complete";
+        visibility = singleton {
+          condition = "state";
           entity = "sensor.garage_door_status";
-          display_type = "complete";
-          visibility = singleton {
-            condition = "state";
-            entity = "sensor.garage_door_status";
-            state_not = "Closed";
-          };
-          tap_action = {
-            action = "perform-action";
-            perform_action = "script.garage_door_toggle";
-          };
-        }
-        {
-          type = "entity";
-          entity = "sensor.next_bin_collection";
-          color = "light-green";
-          visibility = singleton {
-            condition = "numeric_state";
-            entity = "sensor.days_to_bin_collection";
-            below = 2;
-          };
-          tap_action = {
-            action = "navigate";
-            navigation_path = "/calendar";
-          };
-        }
-        {
-          type = "entity";
-          entity = "sensor.powerwall_battery_percentage";
-          visibility = singleton {
-            condition = "or";
-            conditions = [
-              {
-                condition = "numeric_state";
-                entity = "sensor.powerwall_battery_percentage";
-                above = 95;
-              }
-              {
-                condition = "numeric_state";
-                entity = "sensor.powerwall_battery_percentage";
-                below = 30;
-              }
-            ];
-          };
-        }
-        {
-          type = "entity";
-          entity = "sensor.powerwall_site_export_power";
-          display_type = "complete";
-          name = "Exporting Power";
-          visibility = singleton {
-            condition = "state";
-            entity = "binary_sensor.powerwall_grid_charge_status";
-            state = "on";
-          };
-          color = "purple";
-        }
-        {
-          type = "entity";
+          state_not = "Closed";
+        };
+        tap_action = {
+          action = "perform-action";
+          perform_action = "script.garage_door_toggle";
+        };
+      }
+      {
+        type = "entity";
+        entity = "sensor.next_bin_collection";
+        color = "light-green";
+        visibility = singleton {
+          condition = "numeric_state";
+          entity = "sensor.days_to_bin_collection";
+          below = 2;
+        };
+        tap_action = {
+          action = "navigate";
+          navigation_path = "/calendar";
+        };
+      }
+      {
+        type = "entity";
+        entity = "sensor.powerwall_battery_percentage";
+        visibility = singleton {
+          condition = "or";
+          conditions = [
+            {
+              condition = "numeric_state";
+              entity = "sensor.powerwall_battery_percentage";
+              above = 95;
+            }
+            {
+              condition = "numeric_state";
+              entity = "sensor.powerwall_battery_percentage";
+              below = 30;
+            }
+          ];
+        };
+      }
+      {
+        type = "entity";
+        entity = "sensor.powerwall_site_export_power";
+        display_type = "complete";
+        name = "Exporting Power";
+        visibility = singleton {
+          condition = "state";
+          entity = "binary_sensor.powerwall_grid_charge_status";
+          state = "on";
+        };
+        color = "purple";
+      }
+      {
+        type = "entity";
+        entity = "binary_sensor.powerwall_grid_status";
+        visibility = singleton {
+          condition = "state";
           entity = "binary_sensor.powerwall_grid_status";
-          visibility = singleton {
+          state_not = "on";
+        };
+      }
+      {
+        type = "entity";
+        entity = "binary_sensor.washing_machine_door";
+        display_type = "complete";
+        name = "Washing Machine Door";
+        visibility = singleton {
+          condition = "and";
+          conditions = [
+            {
+              condition = "state";
+              entity = "binary_sensor.washing_machine_door";
+              state = "off";
+            }
+            {
+              condition = "state";
+              entity = "sensor.washing_machine_status";
+              state_not = "running";
+            }
+          ];
+        };
+        color = "red";
+      }
+      {
+        type = "entity";
+        entity = "sensor.dishwasher_finish_at";
+        display_type = "complete";
+        name = "Dishwasher Finish";
+        visibility = [
+          {
             condition = "state";
-            entity = "binary_sensor.powerwall_grid_status";
-            state_not = "on";
-          };
-        }
-        {
-          type = "entity";
-          entity = "binary_sensor.washing_machine_door";
-          display_type = "complete";
-          name = "Washing Machine Door";
-          visibility = singleton {
+            entity = "binary_sensor.dishwasher_running";
+            state = "on";
+          }
+          {
             condition = "and";
             conditions = [
               {
                 condition = "state";
-                entity = "binary_sensor.washing_machine_door";
-                state = "off";
+                entity = "binary_sensor.dishwasher_running";
+                state = "on";
               }
               {
                 condition = "state";
-                entity = "sensor.washing_machine_status";
-                state_not = "running";
+                entity = "sensor.dishwasher_finish_at";
+                state_not = "unknown";
               }
             ];
-          };
-          color = "red";
-        }
-        {
-          type = "entity";
-          entity = "sensor.dishwasher_finish_at";
-          display_type = "complete";
-          name = "Dishwasher Finish";
-          visibility = [
-            {
-              condition = "state";
-              entity = "binary_sensor.dishwasher_running";
-              state = "on";
-            }
-            {
-              condition = "and";
-              conditions = [
-                {
-                  condition = "state";
-                  entity = "binary_sensor.dishwasher_running";
-                  state = "on";
-                }
-                {
-                  condition = "state";
-                  entity = "sensor.dishwasher_finish_at";
-                  state_not = "unknown";
-                }
-              ];
-            }
-          ];
-        }
-        {
-          type = "entity";
-          entity = "sensor.washing_machine_finish_at";
-          display_type = "complete";
-          name = "Washing Machine Finish";
-          visibility = singleton {
-            condition = "state";
-            entity = "binary_sensor.washing_machine_running";
-            state = "on";
-          };
-        }
-      ]
-      ++ (map (person: {
+          }
+        ];
+      }
+      {
         type = "entity";
-        entity = "person.${person}";
+        entity = "sensor.washing_machine_finish_at";
         display_type = "complete";
+        name = "Washing Machine Finish";
         visibility = singleton {
           condition = "state";
-          entity = "person.${person}";
-          state = "home";
+          entity = "binary_sensor.washing_machine_running";
+          state = "on";
         };
-      }) peopleList);
+      }
+    ]
+    ++ (map (person: {
+      type = "entity";
+      entity = "person.${person}";
+      display_type = "complete";
+      visibility = singleton {
+        condition = "state";
+        entity = "person.${person}";
+        state = "home";
+      };
+    }) peopleList);
     sections = [
       {
         title = "";
@@ -325,91 +324,90 @@ let
       {
         title = "";
         type = "grid";
-        cards =
-          [
+        cards = [
+          {
+            type = "tile";
+            entity = "vacuum.roborock_s6_maxv";
+            name = "Roborock";
+            features = singleton {
+              type = "vacuum-commands";
+              commands = [
+                "start_pause"
+                "stop"
+                "clean_spot"
+              ];
+            };
+            layout_options = {
+              grid_columns = 4;
+              grid_rows = 2;
+            };
+            visibility = singleton {
+              condition = "state";
+              entity = "vacuum.roborock_s6_maxv";
+              state = "cleaning";
+            };
+          }
+          {
+            type = "tile";
+            entity = "lawn_mower.lewis";
+            features = singleton {
+              type = "lawn-mower-commands";
+              commands = [
+                "start_pause"
+                "dock"
+              ];
+            };
+            layout_options = {
+              grid_columns = 4;
+              grid_rows = 2;
+            };
+            visibility = [
+              {
+                condition = "state";
+                entity = "lawn_mower.lewis";
+                state_not = "docked";
+              }
+              {
+                condition = "state";
+                entity = "lawn_mower.lewis";
+                state_not = "unavailable";
+              }
+            ];
+          }
+        ]
+        ++ (optionals frigate.enable (
+          concatMap (camera: [
             {
               type = "tile";
-              entity = "vacuum.roborock_s6_maxv";
-              name = "Roborock";
-              features = singleton {
-                type = "vacuum-commands";
-                commands = [
-                  "start_pause"
-                  "stop"
-                  "clean_spot"
-                ];
+              entity = "switch.${camera}_detect";
+              visibility = singleton {
+                condition = "state";
+                entity = "switch.${camera}_detect";
+                state = "off";
               };
               layout_options = {
                 grid_columns = 4;
-                grid_rows = 2;
+                grid_rows = 1;
+              };
+            }
+            {
+              camera_view = "auto";
+              entity = "image.${camera}_person";
+              show_name = true;
+              show_state = true;
+              type = "picture-entity";
+              layout_options = {
+                grid_columns = 4;
+                grid_rows = 5;
               };
               visibility = singleton {
                 condition = "state";
-                entity = "vacuum.roborock_s6_maxv";
-                state = "cleaning";
+                entity = "binary_sensor.${camera}_person_recently_updated";
+                state = "on";
               };
             }
-            {
-              type = "tile";
-              entity = "lawn_mower.lewis";
-              features = singleton {
-                type = "lawn-mower-commands";
-                commands = [
-                  "start_pause"
-                  "dock"
-                ];
-              };
-              layout_options = {
-                grid_columns = 4;
-                grid_rows = 2;
-              };
-              visibility = [
-                {
-                  condition = "state";
-                  entity = "lawn_mower.lewis";
-                  state_not = "docked";
-                }
-                {
-                  condition = "state";
-                  entity = "lawn_mower.lewis";
-                  state_not = "unavailable";
-                }
-              ];
-            }
-          ]
-          ++ (optionals frigate.enable (
-            concatMap (camera: [
-              {
-                type = "tile";
-                entity = "switch.${camera}_detect";
-                visibility = singleton {
-                  condition = "state";
-                  entity = "switch.${camera}_detect";
-                  state = "off";
-                };
-                layout_options = {
-                  grid_columns = 4;
-                  grid_rows = 1;
-                };
-              }
-              {
-                camera_view = "auto";
-                entity = "image.${camera}_person";
-                show_name = true;
-                show_state = true;
-                type = "picture-entity";
-                layout_options = {
-                  grid_columns = 4;
-                  grid_rows = 5;
-                };
-                visibility = singleton {
-                  condition = "state";
-                  entity = "binary_sensor.${camera}_person_recently_updated";
-                  state = "on";
-                };
-              }
-            ]) cameras
-          ));
+          ]) cameras
+        ));
       }
     ];
   };
@@ -747,16 +745,15 @@ in
   services.home-assistant.lovelaceConfig = {
     title = "Dashboard";
 
-    views =
-      [
-        home
-        cfg.homeAnnouncements.lovelaceView
-        cfg.guineaPigs.lovelaceView
-        energy
-        outside
-      ]
-      ++ mapAttrsToList (_: roomCfg: roomCfg.lovelace.dashboard) (
-        filterAttrs (_: v: v.lovelace.enable) cfg.rooms
-      );
+    views = [
+      home
+      cfg.homeAnnouncements.lovelaceView
+      cfg.guineaPigs.lovelaceView
+      energy
+      outside
+    ]
+    ++ mapAttrsToList (_: roomCfg: roomCfg.lovelace.dashboard) (
+      filterAttrs (_: v: v.lovelace.enable) cfg.rooms
+    );
   };
 }

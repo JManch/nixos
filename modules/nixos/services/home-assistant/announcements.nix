@@ -32,70 +32,69 @@ in
         {
           title = "Controls";
           type = "grid";
-          cards =
-            [
-              {
-                name = "Send Announcement";
-                type = "button";
-                icon = "mdi:bell";
-                tap_action = {
-                  action = "perform-action";
-                  perform_action = "script.send_announcement";
-                };
-                visibility = singleton {
-                  condition = "state";
-                  entity = "script.send_announcement";
-                  state = "off";
-                };
-                layout_options = {
-                  grid_columns = 2;
-                  grid_rows = 2;
-                };
-              }
-              {
-                name = "Sending Announcements...";
-                type = "button";
-                icon = "mdi:send-circle";
-                tap_action.action = "none";
-                hold_action.action = "none";
-                visibility = singleton {
-                  condition = "state";
-                  entity = "script.send_announcement";
-                  state = "on";
-                };
-                layout_options = {
-                  grid_columns = 2;
-                  grid_rows = 2;
-                };
-              }
-              {
-                type = "entity";
-                name = "Message";
-                entity = "input_text.announcement_message";
-              }
-            ]
-            ++ (concatMap (person: [
-              {
-                type = "tile";
-                entity = "input_boolean.${person}_announcement_enable";
-                name = upperFirstChar person;
-                tap_action.action = "toggle";
-                visibility = singleton {
-                  condition = "state";
-                  entity = "person.${person}";
-                  state = "home";
-                };
-              }
-              {
-                type = "tile";
+          cards = [
+            {
+              name = "Send Announcement";
+              type = "button";
+              icon = "mdi:bell";
+              tap_action = {
+                action = "perform-action";
+                perform_action = "script.send_announcement";
+              };
+              visibility = singleton {
+                condition = "state";
+                entity = "script.send_announcement";
+                state = "off";
+              };
+              layout_options = {
+                grid_columns = 2;
+                grid_rows = 2;
+              };
+            }
+            {
+              name = "Sending Announcements...";
+              type = "button";
+              icon = "mdi:send-circle";
+              tap_action.action = "none";
+              hold_action.action = "none";
+              visibility = singleton {
+                condition = "state";
+                entity = "script.send_announcement";
+                state = "on";
+              };
+              layout_options = {
+                grid_columns = 2;
+                grid_rows = 2;
+              };
+            }
+            {
+              type = "entity";
+              name = "Message";
+              entity = "input_text.announcement_message";
+            }
+          ]
+          ++ (concatMap (person: [
+            {
+              type = "tile";
+              entity = "input_boolean.${person}_announcement_enable";
+              name = upperFirstChar person;
+              tap_action.action = "toggle";
+              visibility = singleton {
+                condition = "state";
                 entity = "person.${person}";
-                visibility = singleton {
-                  condition = "state";
-                  entity = "person.${person}";
-                  state = "not_home";
-                };
-              }
-            ]) peopleList);
+                state = "home";
+              };
+            }
+            {
+              type = "tile";
+              entity = "person.${person}";
+              visibility = singleton {
+                condition = "state";
+                entity = "person.${person}";
+                state = "not_home";
+              };
+            }
+          ]) peopleList);
         }
         {
           title = "Responses";
@@ -302,34 +301,33 @@ in
                             condition = "template";
                             value_template = "{{ wait.trigger != none }}";
                           };
-                          "then" =
-                            [
-                              {
-                                action = "input_boolean.turn_on";
-                                target.entity_id = "input_boolean.${person}_announcement_acknowledged";
-                              }
-                              {
-                                action = "input_text.set_value";
-                                target.entity_id = "input_text.${person}_announcement_response";
-                                data.value = ''
-                                  {% if wait.trigger.event.data.action == action_coming %}
-                                    I'm coming
-                                  {% elif wait.trigger.event.data.action == action_delayed %}
-                                    I'll be delayed
-                                  {% else %}
-                                    {{ wait.trigger.event.data.reply_text }}
-                                  {% endif %}
-                                '';
-                              }
-                            ]
-                            ++ optional isAndroid {
-                              alias = "Clear the sticky notification on Android";
-                              action = "notify.mobile_app_${device.name}";
-                              data = {
-                                message = "clear_notification";
-                                data.tag = "household-announcement";
-                              };
+                          "then" = [
+                            {
+                              action = "input_boolean.turn_on";
+                              target.entity_id = "input_boolean.${person}_announcement_acknowledged";
+                            }
+                            {
+                              action = "input_text.set_value";
+                              target.entity_id = "input_text.${person}_announcement_response";
+                              data.value = ''
+                                {% if wait.trigger.event.data.action == action_coming %}
+                                  I'm coming
+                                {% elif wait.trigger.event.data.action == action_delayed %}
+                                  I'll be delayed
+                                {% else %}
+                                  {{ wait.trigger.event.data.reply_text }}
+                                {% endif %}
+                              '';
+                            }
+                          ]
+                          ++ optional isAndroid {
+                            alias = "Clear the sticky notification on Android";
+                            action = "notify.mobile_app_${device.name}";
+                            data = {
+                              message = "clear_notification";
+                              data.tag = "household-announcement";
                             };
+                          };
                         }
                       ];
                     };

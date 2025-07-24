@@ -23,23 +23,22 @@ in
   # start-up.
   xdg.portal.xdgOpenUsePortal = true;
 
-  xdg.userDirs =
-    {
-      enable = true;
-      createDirectories = true;
-      extraConfig.XDG_SCREENSHOTS_DIR = "${home}/Pictures/Screenshots";
-    }
-    // optionalAttrs cfg.lowercaseUserDirs {
-      desktop = "${home}/desktop";
-      documents = "${home}/documents";
-      download = "${home}/downloads";
-      music = "${home}/music";
-      pictures = "${home}/pictures";
-      videos = "${home}/videos";
-      templates = "${home}/templates";
-      publicShare = "${home}/public";
-      extraConfig.XDG_SCREENSHOTS_DIR = "${home}/pictures/screenshots";
-    };
+  xdg.userDirs = {
+    enable = true;
+    createDirectories = true;
+    extraConfig.XDG_SCREENSHOTS_DIR = "${home}/Pictures/Screenshots";
+  }
+  // optionalAttrs cfg.lowercaseUserDirs {
+    desktop = "${home}/desktop";
+    documents = "${home}/documents";
+    download = "${home}/downloads";
+    music = "${home}/music";
+    pictures = "${home}/pictures";
+    videos = "${home}/videos";
+    templates = "${home}/templates";
+    publicShare = "${home}/public";
+    extraConfig.XDG_SCREENSHOTS_DIR = "${home}/pictures/screenshots";
+  };
 
   xdg.mimeApps.enable = osConfig.${ns}.system.desktop.desktopEnvironment == null;
 

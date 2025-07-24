@@ -39,7 +39,8 @@ in
             # https://github.com/rvaiya/keyd/issues/114
             # https://github.com/rvaiya/keyd/issues/773
             rightshift = if cfg.hhkbArrowLayer then "layer(hhkb_arrows)" else "rightshift";
-          } // cfg.rebinds;
+          }
+          // cfg.rebinds;
 
         }
 

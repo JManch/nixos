@@ -38,7 +38,8 @@ in
     pkgs.picard
     pkgs.spek
     pkgs.${ns}.resample-flacs
-  ] ++ optional (config.home.username == "joshua") unzipMusicHomelab;
+  ]
+  ++ optional (config.home.username == "joshua") unzipMusicHomelab;
 
   ns.desktop.hyprland.settings = {
     workspace = [

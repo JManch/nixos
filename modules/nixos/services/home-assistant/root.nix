@@ -135,45 +135,45 @@ in
       "unifi"
       "esphome"
       "miele"
-    ] ++ optional mosquitto.enable "mqtt";
+    ]
+    ++ optional mosquitto.enable "mqtt";
 
-    customComponents =
-      [
-        (pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs {
-          inherit (sources.hacs_waste_collection_schedule) version;
-          src = sources.hacs_waste_collection_schedule;
-        })
-        (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs {
-          inherit (sources.adaptive-lighting) version;
-          src = sources.adaptive-lighting;
-        })
-        pkgs.${ns}.heatmiser
-        pkgs.${ns}.thermal-comfort
-        pkgs.${ns}.daikin-onecta
-      ]
-      ++ optional frigate.enable (
-        let
-          hass-web-proxy-lib = pkgs.python313Packages.buildPythonPackage {
-            pname = "hass-web-proxy-lib";
-            version = "0-unstable-${sources.hass-web-proxy-lib.revision}";
-            src = sources.hass-web-proxy-lib;
-            pyproject = true;
-            build-system = [
-              pkgs.python313Packages.setuptools
-              pkgs.python313Packages.poetry-core
-            ];
-          };
-        in
-        pkgs.home-assistant-custom-components.frigate.overridePythonAttrs {
-          inherit (sources.frigate-hass-integration) version;
-          src = sources.frigate-hass-integration;
-
-          dependencies = [
-            pkgs.python313Packages.pytz
-            hass-web-proxy-lib
+    customComponents = [
+      (pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs {
+        inherit (sources.hacs_waste_collection_schedule) version;
+        src = sources.hacs_waste_collection_schedule;
+      })
+      (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs {
+        inherit (sources.adaptive-lighting) version;
+        src = sources.adaptive-lighting;
+      })
+      pkgs.${ns}.heatmiser
+      pkgs.${ns}.thermal-comfort
+      pkgs.${ns}.daikin-onecta
+    ]
+    ++ optional frigate.enable (
+      let
+        hass-web-proxy-lib = pkgs.python313Packages.buildPythonPackage {
+          pname = "hass-web-proxy-lib";
+          version = "0-unstable-${sources.hass-web-proxy-lib.revision}";
+          src = sources.hass-web-proxy-lib;
+          pyproject = true;
+          build-system = [
+            pkgs.python313Packages.setuptools
+            pkgs.python313Packages.poetry-core
           ];
-        }
-      );
+        };
+      in
+      pkgs.home-assistant-custom-components.frigate.overridePythonAttrs {
+        inherit (sources.frigate-hass-integration) version;
+        src = sources.frigate-hass-integration;
+
+        dependencies = [
+          pkgs.python313Packages.pytz
+          hass-web-proxy-lib
+        ];
+      }
+    );
 
     configWritable = false;
     config = {
@@ -209,7 +209,8 @@ in
           entities = [
             "sun.sun"
             "input_text.announcement_message"
-          ] ++ (map (camera: "binary_sensor.${camera}_motion") cameras);
+          ]
+          ++ (map (camera: "binary_sensor.${camera}_motion") cameras);
           entity_globs = [
             "sensor.sun*"
             "switch.adaptive_lighting_*"

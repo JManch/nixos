@@ -587,7 +587,8 @@ in
           directories = [
             "${mediaDir}/music"
             "!${mediaDir}/music/playlists"
-          ] ++ map (p: "!${mediaDir}/${p}") slskdExcludePaths;
+          ]
+          ++ map (p: "!${mediaDir}/${p}") slskdExcludePaths;
 
           filters = [
             "library\\.db$"

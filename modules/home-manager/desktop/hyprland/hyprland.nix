@@ -157,19 +157,18 @@ in
     animations = false;
   });
 
-  home.packages =
-    [
-      setupMonitors
-      (flakePkgs args "grimblast").grimblast
-    ]
-    # These are needed for xdg-desktop-portal-hyprland screenshot
-    # functionality. Even though I use grimblast the portal may be used in some
-    # situations?
-    ++ (with pkgs; [
-      grim
-      slurp
-      hyprpicker
-    ]);
+  home.packages = [
+    setupMonitors
+    (flakePkgs args "grimblast").grimblast
+  ]
+  # These are needed for xdg-desktop-portal-hyprland screenshot
+  # functionality. Even though I use grimblast the portal may be used in some
+  # situations?
+  ++ (with pkgs; [
+    grim
+    slurp
+    hyprpicker
+  ]);
 
   # Install Hyprcursor package
   home.file = mkIf (cfg.hyprcursor.package != null) {
@@ -385,24 +384,23 @@ in
           "f[1]s[false], gapsout:0, gapsin:0"
         ];
 
-      windowrule =
-        [
-          # https://github.com/hyprwm/Hyprland/issues/6543
-          "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0"
-        ]
-        ++ (
-          if cfg.noGapsWhenOnly then
-            [
-              "bordersize 0, floating:0, onworkspace:w[tv1]s[false]"
-              "rounding 0, floating:0, onworkspace:w[tv1]s[false]"
-            ]
-          else
-            [
-              # Hide window border when there's only 1 window in a non-special
-              # workspace
-              "noborder, onworkspace:w[t1]s[false]"
-            ]
-        );
+      windowrule = [
+        # https://github.com/hyprwm/Hyprland/issues/6543
+        "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0"
+      ]
+      ++ (
+        if cfg.noGapsWhenOnly then
+          [
+            "bordersize 0, floating:0, onworkspace:w[tv1]s[false]"
+            "rounding 0, floating:0, onworkspace:w[tv1]s[false]"
+          ]
+        else
+          [
+            # Hide window border when there's only 1 window in a non-special
+            # workspace
+            "noborder, onworkspace:w[t1]s[false]"
+          ]
+      );
 
       plugin = mkIf cfg.plugins {
         hyprexpo = {

@@ -292,7 +292,8 @@ in
                   };
                   features = [
                     { type = "light-brightness"; }
-                  ] ++ optional (!basicLights) { type = "light-color-temp"; };
+                  ]
+                  ++ optional (!basicLights) { type = "light-color-temp"; };
                 }
               ]
               ++ optional automatedToggle.enable {
@@ -419,40 +420,39 @@ in
               alias = "${formattedRoomName} Lighting Sun Times";
               trace.stored_traces = 5;
               mode = "single";
-              trigger =
-                [
-                  {
-                    platform = "homeassistant";
-                    event = "start";
-                  }
-                  {
+              trigger = [
+                {
+                  platform = "homeassistant";
+                  event = "start";
+                }
+                {
+                  platform = "state";
+                  entity_id = [ "input_number.${room}_sleep_duration" ];
+                  from = null;
+                }
+              ]
+              ++ (
+                if (!useAlarm) then
+                  singleton {
                     platform = "state";
-                    entity_id = [ "input_number.${room}_sleep_duration" ];
+                    entity_id = [ "input_datetime.${room}_wake_up_time" ];
                     from = null;
                   }
-                ]
-                ++ (
-                  if (!useAlarm) then
-                    singleton {
+                else
+                  [
+                    {
                       platform = "state";
-                      entity_id = [ "input_datetime.${room}_wake_up_time" ];
+                      entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
                       from = null;
                     }
-                  else
-                    [
-                      {
-                        platform = "state";
-                        entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
-                        from = null;
-                      }
-                      {
-                        platform = "state";
-                        entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
-                        to = "unavailable";
-                        for.minutes = 5;
-                      }
-                    ]
-                );
+                    {
+                      platform = "state";
+                      entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
+                      to = "unavailable";
+                      for.minutes = 5;
+                    }
+                  ]
+              );
               action =
                 let
                   unavailableConditions =
@@ -624,44 +624,43 @@ in
               alias = "${formattedRoomName} Sleep Mode Toggle";
               trace.stored_traces = 5;
               mode = "single";
-              trigger =
-                [
+              trigger = [
+                {
+                  platform = "state";
+                  entity_id = [ "binary_sensor.${roomCfg.deviceId}_is_charging" ];
+                  from = "off";
+                  to = "on";
+                }
+                {
+                  # 1 hour before wake-up time (1 min earlier to run before wake-up lights)
+                  platform = "template";
+                  value_template = "{{ (now().timestamp() + 61*60) | round(0) == ${wakeUpTimestamp} }}";
+                }
+                {
+                  # 1 hour after sleep time
+                  platform = "template";
+                  value_template = "{{ (now().timestamp() - 60*60) | round(0) == ${sleepTimestamp} }}";
+                }
+                {
+                  platform = "state";
+                  entity_id = [ "input_number.${room}_sleep_duration" ];
+                  from = null;
+                }
+              ]
+              ++ singleton (
+                if useAlarm then
                   {
                     platform = "state";
-                    entity_id = [ "binary_sensor.${roomCfg.deviceId}_is_charging" ];
-                    from = "off";
-                    to = "on";
-                  }
-                  {
-                    # 1 hour before wake-up time (1 min earlier to run before wake-up lights)
-                    platform = "template";
-                    value_template = "{{ (now().timestamp() + 61*60) | round(0) == ${wakeUpTimestamp} }}";
-                  }
-                  {
-                    # 1 hour after sleep time
-                    platform = "template";
-                    value_template = "{{ (now().timestamp() - 60*60) | round(0) == ${sleepTimestamp} }}";
-                  }
-                  {
-                    platform = "state";
-                    entity_id = [ "input_number.${room}_sleep_duration" ];
+                    entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
                     from = null;
                   }
-                ]
-                ++ singleton (
-                  if useAlarm then
-                    {
-                      platform = "state";
-                      entity_id = [ "sensor.${roomCfg.deviceId}_next_alarm" ];
-                      from = null;
-                    }
-                  else
-                    {
-                      platform = "state";
-                      entity_id = [ "input_datetime.${room}_wake_up_time" ];
-                      from = null;
-                    }
-                );
+                else
+                  {
+                    platform = "state";
+                    entity_id = [ "input_datetime.${room}_wake_up_time" ];
+                    from = null;
+                  }
+              );
               condition = singleton {
                 condition = "state";
                 entity_id = "switch.adaptive_lighting_${room}_adaptive_lighting";
@@ -726,7 +725,8 @@ in
                     below = luminence.threshold.lower;
                     id = "luminence";
                   }
-                ] ++ presenceTriggers;
+                ]
+                ++ presenceTriggers;
                 conditions = singleton {
                   condition = "state";
                   entity_id = "input_boolean.${room}_automated_lights_toggle";

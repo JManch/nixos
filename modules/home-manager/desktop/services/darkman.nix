@@ -180,14 +180,13 @@ in
     darkModeScripts = mapAttrs (_: v: v "dark") cfg.switchScripts;
     lightModeScripts = mapAttrs (_: v: v "light") cfg.switchScripts;
 
-    settings =
-      {
-        usegeoclue = false;
-      }
-      // optionalAttrs (cfg.switchMethod == "coordinates") {
-        lat = 50.8;
-        lng = -0.1;
-      };
+    settings = {
+      usegeoclue = false;
+    }
+    // optionalAttrs (cfg.switchMethod == "coordinates") {
+      lat = 50.8;
+      lng = -0.1;
+    };
   };
 
   systemd.user.services.darkman = {

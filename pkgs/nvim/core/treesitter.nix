@@ -1,19 +1,11 @@
-{ lib, pkgs, ... }:
-let
-  inherit (lib) attrValues filterAttrs hasPrefix;
-in
+{ pkgs, ... }:
 {
   vim.treesitter = {
     enable = true;
     autotagHtml = true;
     incrementalSelection.enable = false;
     addDefaultGrammars = false;
-
-    # I don't think nvf supports vimPlugins.nvim-treesitter.withAllGrammars
-    grammars = attrValues (
-      filterAttrs (n: _: hasPrefix "tree-sitter-" n) pkgs.vimPlugins.nvim-treesitter.builtGrammars
-    );
-
+    grammars = pkgs.vimPlugins.nvim-treesitter.allGrammars;
     indent.disable = [ "nix" ];
   };
 }

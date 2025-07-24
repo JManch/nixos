@@ -1,4 +1,4 @@
-{ lib, inputs, ... }:
+{ lib, ... }:
 {
   ${lib.ns} = {
     core = {
@@ -72,11 +72,7 @@
         alacritty.enable = true;
         discord.enable = true;
         spotify.enable = true;
-        chatterino.enable =
-          assert lib.assertMsg (
-            inputs.nixpkgs.rev == "62e0f05ede1da0d54515d4ea8ce9c733f12d9f08"
-          ) "Re-enable chatterino";
-          false;
+        chatterino.enable = true;
         supersonic.enable = true;
         chromium.enable = true;
         multiviewer-f1.enable = true;
@@ -98,11 +94,7 @@
 
         gaming = {
           mangohud.enable = true;
-          prism-launcher.enable =
-            assert lib.assertMsg (
-              inputs.nixpkgs.rev == "62e0f05ede1da0d54515d4ea8ce9c733f12d9f08"
-            ) "Re-enable prism-launcher";
-            false;
+          prism-launcher.enable = true;
           beamng.enable = true;
         };
       };

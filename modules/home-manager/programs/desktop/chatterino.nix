@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  inputs,
   osConfig,
 }:
 let
@@ -32,7 +33,17 @@ let
   };
 in
 {
-  home.packages = [ pkgs.chatterino7 ] ++ optional mpv.enable streamlink;
+  home.packages = [
+    (pkgs.chatterino7.overrideAttrs (
+      old:
+      assert lib.assertMsg (
+        inputs.nixpkgs.rev == "fc02ee70efb805d3b2865908a13ddd4474557ecf"
+      ) "Remove chatterino override";
+      {
+        buildInputs = lib.remove pkgs.libavif old.buildInputs;
+      }
+    ))
+  ] ++ optional mpv.enable streamlink;
 
   programs.mpv.profiles.streamlink = {
     # No point doing fancy scaling on streams

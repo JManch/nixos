@@ -166,9 +166,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "bedf5da5134360f5031dbd5ea78f0ccb2937c99b",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/bedf5da5134360f5031dbd5ea78f0ccb2937c99b.tar.gz",
-      "hash": "1dyf8gkq57rbdqy03xvpzwwbi201bd58akcf2gp3s7s2l6076q2y"
+      "revision": "eaddc9b4dd42e79a47e2536df388f795697046c9",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/eaddc9b4dd42e79a47e2536df388f795697046c9.tar.gz",
+      "hash": "14zv72vvnawxx4q6w10yz9hal6mqr0pmhy6bpdrhs5ckhxd62j78"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -375,9 +375,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "5be4bd900f26f50f8498dc62b9229c5f1da7d5dd",
-      "url": "https://github.com/dweymouth/supersonic/archive/5be4bd900f26f50f8498dc62b9229c5f1da7d5dd.tar.gz",
-      "hash": "00xqbqahwxqisggjp9szya1mw91d1khs1ii33dfs0k6zlzmyr2ff"
+      "revision": "04f744c7894fe416e3dd2fbdbaadd2f4e3132f5b",
+      "url": "https://github.com/dweymouth/supersonic/archive/04f744c7894fe416e3dd2fbdbaadd2f4e3132f5b.tar.gz",
+      "hash": "0cf5y3p0pdg7qr0w3pczyiaxh54qa3j9axp4mjwnswmbycr1d052"
     },
     "thermal_comfort": {
       "type": "GitRelease",

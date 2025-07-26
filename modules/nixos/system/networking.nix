@@ -257,6 +257,9 @@ in
     };
   };
 
+  # To persist imperatively configured networks
+  ns.persistence.files = mkIf cfg.wireless.enable [ "/etc/wpa_supplicant.conf" ];
+
   services.resolved.enable = cfg.resolved.enable;
 
   ns.userPackages =

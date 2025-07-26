@@ -43,7 +43,7 @@ let
     text = ''
       monitors_json=$(hyprctl monitors all -j)
       monitors=$(echo "$monitors_json" | jaq -r '.[] | .name')
-      declare -A selected_monitors
+      declare -A selected_monitors=()
 
       for monitor in $monitors; do
         monitor_json=$(echo "$monitors_json" | jaq -r ".[] | select(.name == \"''${monitor}\")")
@@ -63,8 +63,10 @@ let
           continue
         fi
 
-        read -p "Monitor number (default $((''${#selected_monitors[@]} + 1))): " -r
-        [[ -z $REPLY || $REPLY == $'\n' ]] && num="$((''${#selected_monitors[@]} + 1))" || num="$REPLY"
+        count=''${#selected_monitors[@]}
+        default_num=$((count + 1))
+        read -p "Monitor number (default $default_num): " -r
+        [[ -z $REPLY || $REPLY == $'\n' ]] && num="$default_num" || num="$REPLY"
 
         max_mode="$(echo "$modes" | jaq -r "first")"
         read -p "Monitor mode (default $max_mode): " -r

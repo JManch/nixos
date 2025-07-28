@@ -123,10 +123,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.4.4",
-      "revision": "7d7941dc475337c6572612b66f3ead6f1dd25573",
-      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.4",
-      "hash": "1g78am3sga0jv3xridqibsq8a8q3skr6kn22pnzl7gp1n8783yab"
+      "version": "v1.4.5",
+      "revision": "7a47c69c236c035c43eab46b5de65722b442ff7f",
+      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.5",
+      "hash": "04sw4vy7vcv2lk7p7fliq1n0a26dqyn1l24k3f0s9ivqqw3p48v6"
     },
     "daikin_onecta": {
       "type": "GitRelease",
@@ -166,9 +166,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "eaddc9b4dd42e79a47e2536df388f795697046c9",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/eaddc9b4dd42e79a47e2536df388f795697046c9.tar.gz",
-      "hash": "14zv72vvnawxx4q6w10yz9hal6mqr0pmhy6bpdrhs5ckhxd62j78"
+      "revision": "14d2fa0d0320fa98f7c4334e901d2b34adfc8090",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/14d2fa0d0320fa98f7c4334e901d2b34adfc8090.tar.gz",
+      "hash": "16l8jv648x22gqz33jmbbd9z4kxch16qljnig23f5sq1x3b0gn3s"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -226,10 +226,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v3.1.1",
-      "revision": "e755793479eb4cabc08389e0cd6906f41c909e99",
-      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/v3.1.1",
-      "hash": "1v9zg2m89mf6p1nbfn81ig0rdfjylx64wz8wk6af7ircdjdbifik"
+      "version": "v3.2.1",
+      "revision": "4846bd0c9242f4fa73943655a75c67b4bd729356",
+      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/v3.2.1",
+      "hash": "1czps64lw9kxqrjv8q4izzj47ra9fmcwqz408kmwahjp6mynm88q"
     },
     "hyprpy": {
       "type": "GitRelease",

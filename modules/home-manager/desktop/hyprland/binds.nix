@@ -18,7 +18,7 @@ let
     concatMapStringsSep
     ;
   inherit (lib.${ns}) flakePkgs getMonitorHyprlandCfgStr;
-  inherit (osConfig.${ns}.core.device) monitors backlight;
+  inherit (osConfig.${ns}.core) device;
   mod = cfg.modKey;
   modShift = "${cfg.modKey}SHIFT";
   modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
@@ -221,6 +221,12 @@ let
       } 1.25}' "$zoom_factor")
       ${hyprctl} keyword cursor:zoom_factor "$new_zoom"
     '';
+
+  resetMonitors = pkgs.writeShellScript "hypr-reset-monitors" ''
+    ${hyprctl} --batch "${
+      concatMapStringsSep ";" (m: "keyword monitor ${getMonitorHyprlandCfgStr m}") device.monitors
+    }"
+  '';
 in
 {
   # Force secondaryModKey VM variant because binds are repeated on host
@@ -270,6 +276,7 @@ in
       "${mod}, TAB, focusmonitor, +1"
       "${modShift}, TAB, movecurrentworkspacetomonitor, +1"
       ", XF86AudioMedia, exec, sleep 1 && hyprctl dispatch dpms toggle"
+      "${mod}, XF86AudioMedia, exec, ${resetMonitors}"
 
       # Dwindle
       "${mod}, P, pseudo,"
@@ -310,7 +317,7 @@ in
       "${mod}, Escape, hyprexpo:expo, toggle"
     ];
 
-    settings.bindl = optionals (backlight != null) [
+    settings.bindl = optionals (device.backlight != null) [
       ", XF86MonBrightnessUp, exec, ${modifyBrightness} 3%+"
       ", XF86MonBrightnessDown, exec, ${modifyBrightness} 3%-"
       "${mod}, XF86MonBrightnessUp, exec, ${modifyBrightness} 1%+"
@@ -337,48 +344,15 @@ in
     '';
   };
 
+  ns.desktop.hyprland.eventScripts.monitorremoved = mkIf (
+    device.type == "laptop"
+  ) resetMonitors.outPath;
+
   programs.zsh.initContent = # bash
     ''
       toggle-dpms() {
         active_monitor=$(hyprctl activeworkspace | jaq -r '.monitor')
         sleep 2 && hyprctl dispatch dpms toggle "$active_monitor"
-      }
-
-      toggle-monitor() {
-        if [ -z "$1" ]; then
-          echo "Usage: toggle-monitor <monitor_number>"
-          return 1
-        fi
-
-        declare -A monitor_num_to_name
-        ${concatMapStringsSep "\n  " (
-          m: "monitor_num_to_name[${toString m.number}]='${m.name}'"
-        ) monitors}
-
-        declare -A monitor_name_to_cfg
-        ${concatMapStringsSep "\n  " (
-          m: "monitor_name_to_cfg[${m.name}]='${getMonitorHyprlandCfgStr m}'"
-        ) monitors}
-
-        if [[ ! -v monitor_num_to_name[$1] ]]; then
-          echo "Error: monitor with number '$1' does not exist"
-          return 1
-        fi
-
-        local monitor_name=''${monitor_num_to_name[$1]}
-
-        # Check if the monitor is already disabled
-        hyprctl monitors all -j | ${jaq} -e 'first(.[] | select((.name == "'"$monitor_name"'") and (.disabled == false)))' > /dev/null 2>&1
-
-        if [ $? -ne 0 ]; then
-          hyprctl keyword monitor ''${monitor_name_to_cfg[$monitor_name]} > /dev/null
-          echo "Enabled monitor $monitor_name"
-          # Some wallpapers programs such as swww do not reload the wallpaper for toggled monitors
-          systemctl start --user set-wallpaper
-        else
-          hyprctl keyword monitor $monitor_name,disable > /dev/null
-          echo "Disabled monitor $monitor_name"
-        fi
       }
     '';
 }

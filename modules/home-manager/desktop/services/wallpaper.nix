@@ -122,9 +122,14 @@ in
 [
   {
     enableOpt = false;
-    conditions = [ (cfg.setWallpaperScript != null) ];
 
     opts = {
+      enable = mkOption {
+        type = types.bool;
+        readOnly = true;
+        default = cfg.setWallpaperScript != null;
+      };
+
       defaults = {
         default = mkOption {
           type = types.package;

@@ -28,11 +28,57 @@ let
     sliceSuffix
     getMonitorHyprlandCfgStr
     ;
-  inherit (osConfig.${ns}.core.device) monitors primaryMonitor;
+  inherit (config.${ns}.desktop.services) wallpaper;
+  inherit (osConfig.${ns}.core) device;
   inherit (desktopCfg.style) gapSize borderWidth;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
   hyprctl = getExe' pkgs.hyprland "hyprctl";
+
+  toggleMonitor = pkgs.writeShellApplication {
+    name = "toggle-monitor";
+    runtimeInputs = with pkgs; [
+      systemd
+      hyprland
+      jaq
+    ];
+    text = ''
+      if [ -z "$1" ]; then
+        echo "Usage: toggle-monitor <monitor_number>"
+        return 1
+      fi
+
+      declare -A monitor_num_to_name
+      ${concatMapStringsSep "\n  " (
+        m: "monitor_num_to_name[${toString m.number}]='${m.name}'"
+      ) device.monitors}
+
+      declare -A monitor_name_to_cfg
+      ${concatMapStringsSep "\n  " (
+        m: "monitor_name_to_cfg[${m.name}]='${getMonitorHyprlandCfgStr m}'"
+      ) device.monitors}
+
+      if [[ ! -v monitor_num_to_name[$1] ]]; then
+        echo "Error: monitor with number '$1' does not exist"
+        return 1
+      fi
+
+      monitor_name=''${monitor_num_to_name[$1]}
+
+      # If the monitor is currently disabled
+      if ! hyprctl monitors all -j | jaq -e 'first(.[] | select((.name == "'"$monitor_name"'") and (.disabled == false)))' &>/dev/null; then
+        hyprctl keyword monitor "''${monitor_name_to_cfg[$monitor_name]}" > /dev/null
+        echo "Enabled monitor $monitor_name"
+        # Some wallpapers programs such as swww do not reload the wallpaper for
+        # toggled monitors. Also if scaling changes then the wallpaper is often
+        # broken and needs to be reset
+        ${optionalString wallpaper.enable "systemctl start --user set-wallpaper || true"}
+      else
+        hyprctl keyword monitor "$monitor_name,disable" > /dev/null
+        echo "Disabled monitor $monitor_name"
+      fi
+    '';
+  };
 
   setupMonitors = pkgs.writeShellApplication {
     name = "setup-monitors";
@@ -139,9 +185,12 @@ let
         done
       done
 
-      hyprctl --batch "$commands"
+      hyprctl --batch "$commands" >/dev/null
       sleep 1 # for some reason move commands don't work in the same batch command
       hyprctl --batch "$move_commands" >/dev/null
+
+      # Wallpapers tend to break if a monitor is toggled or scaling was changed
+      ${optionalString wallpaper.enable "systemctl start --user set-wallpaper || true"}
     '';
   };
 in
@@ -160,6 +209,7 @@ in
   });
 
   home.packages = [
+    toggleMonitor
     setupMonitors
     (flakePkgs args "grimblast").grimblast
   ]
@@ -182,7 +232,7 @@ in
   xdg.configFile."hypr/hyprland.conf".onChange =
     let
       hyprDir = "${config.xdg.configHome}/hypr";
-      m = primaryMonitor;
+      m = device.primaryMonitor;
     in
     # bash
     ''
@@ -196,7 +246,7 @@ in
         -e '/^exec-once/d' \
         -e '/^monitor/d' \
         -e 's/, monitor:(.*),//g' \
-        -e 's/${primaryMonitor.name}/WAYLAND-1/g' \
+        -e 's/${device.primaryMonitor.name}/WAYLAND-1/g' \
         ${hyprDir}/hyprland.conf > ${hyprDir}/hyprlandd.conf
 
       # Add monitor config
@@ -234,7 +284,7 @@ in
 
     settings = {
       monitor =
-        (map (m: if !m.enabled then "${m.name},disable" else getMonitorHyprlandCfgStr m) monitors)
+        (map (m: if !m.enabled then "${m.name},disable" else getMonitorHyprlandCfgStr m) device.monitors)
         ++ [
           ",preferred,auto,1" # automatic monitor detection
         ];
@@ -376,7 +426,7 @@ in
             + optionalString (i == 1) ", default:true"
             + optionalString (i < 3) ", persistent:true"
           ) m.workspaces
-        ) monitors
+        ) device.monitors
         ++ mapAttrsToList (
           name: value:
           "${cfg.namedWorkspaceIDs.${name}}, defaultName:${name}" + optionalString (value != "") ", ${value}"

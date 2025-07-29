@@ -5,7 +5,6 @@
 }:
 let
   inherit (lib)
-    ns
     types
     mkOption
     mkIf
@@ -13,8 +12,8 @@ let
     singleton
     mkMerge
     concatMap
+    toSentenceCase
     ;
-  inherit (lib.${ns}) upperFirstChar;
   inherit (secrets.general) devices userIds peopleList;
   secrets = inputs.nix-resources.secrets.homeAssistant { inherit lib config; };
 in
@@ -77,7 +76,7 @@ in
             {
               type = "tile";
               entity = "input_boolean.${person}_announcement_enable";
-              name = upperFirstChar person;
+              name = toSentenceCase person;
               tap_action.action = "toggle";
               visibility = singleton {
                 condition = "state";
@@ -106,7 +105,7 @@ in
                 (variant: {
                   type = "tile";
                   entity = "input_text.${person}_announcement_response";
-                  name = upperFirstChar person;
+                  name = toSentenceCase person;
                   inherit (variant) color;
                   visibility = singleton {
                     condition = "state";
@@ -136,7 +135,7 @@ in
               ++ singleton {
                 type = "tile";
                 entity = "input_text.${person}_announcement_response";
-                name = upperFirstChar person;
+                name = toSentenceCase person;
                 color = "blue";
                 visibility = singleton {
                   condition = "and";
@@ -357,18 +356,18 @@ in
     }
     ++ (map (person: {
       input_text."${person}_announcement_response" = {
-        name = "${upperFirstChar person} Announcement Response";
+        name = "${toSentenceCase person} Announcement Response";
         icon = "mdi:account";
         initial = "No response";
       };
 
       input_boolean = {
         "${person}_announcement_enable" = {
-          name = "${upperFirstChar person} Announcement Enable";
+          name = "${toSentenceCase person} Announcement Enable";
           icon = "mdi:bell";
         };
         "${person}_announcement_acknowledged" = {
-          name = "${upperFirstChar person} Announcement Acknowledged";
+          name = "${toSentenceCase person} Announcement Acknowledged";
         };
       };
     }) peopleList)

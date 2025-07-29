@@ -21,6 +21,7 @@ let
     getExe
     mkOption
     mkEnableOption
+    toSentenceCase
     ;
   inherit (config.${ns}.core) device;
 
@@ -41,7 +42,7 @@ let
         options = {
           title = mkOption {
             type = types.str;
-            default = "${replaceStrings [ "-" ] [ " " ] (lib.${ns}.upperFirstChar name)} ${
+            default = "${replaceStrings [ "-" ] [ " " ] (toSentenceCase name)} ${
               if type == "success" then "succeeded" else "failed"
             }";
             description = "Message title";
@@ -169,7 +170,7 @@ in
             };
           };
 
-          ${name}."on${lib.${ns}.upperFirstChar type}" = [ "${name}-${type}-notify.service" ];
+          ${name}."on${toSentenceCase type}" = [ "${name}-${type}-notify.service" ];
         }) cfg."${type}NotifyServices";
     in
     mkMerge (

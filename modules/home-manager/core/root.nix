@@ -10,6 +10,7 @@ let
     mkIf
     optionalString
     optional
+    toSentenceCase
     ;
   inherit (config.${ns}.desktop.xdg) lowercaseUserDirs;
   impermanence = osConfig.${ns}.system.impermanence or null;
@@ -22,7 +23,7 @@ in
 
   ns = {
     persistence.directories =
-      (map (xdgDir: if !lowercaseUserDirs then lib.${ns}.upperFirstChar xdgDir else xdgDir) [
+      (map (xdgDir: if !lowercaseUserDirs then toSentenceCase xdgDir else xdgDir) [
         "downloads"
         "pictures"
         "music"

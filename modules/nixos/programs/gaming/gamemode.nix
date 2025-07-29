@@ -20,9 +20,9 @@ let
     mapAttrsToList
     optionalString
     concatLines
+    toSentenceCase
     ;
   inherit (lib.${ns})
-    upperFirstChar
     getMonitorHyprlandCfgStr
     isHyprland
     ;
@@ -69,7 +69,7 @@ let
           ${optionalString (mode == "stop") "rm \"$profiles_file\""}
         else
           notify-send -e --urgency=critical -t 5000 \
-            'GameMode' '${upperFirstChar mode} script args file missing'
+            'GameMode' '${toSentenceCase mode} script args file missing'
           exit 1
         fi
 

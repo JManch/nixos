@@ -9,8 +9,8 @@ let
     singleton
     attrNames
     mkAfter
+    toSentenceCase
     ;
-  inherit (lib.${ns}) upperFirstChar;
   inherit (config.${ns}.services) frigate;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (secrets.general) devices userIds people;
@@ -27,7 +27,7 @@ let
         state_entity = "input_boolean.high_alert_surveillance";
         state_filter_states = [ "off" ];
         notify_device = devices.joshua.id;
-        notify_group = "Adults Except ${upperFirstChar people.person5}";
+        notify_group = "Adults Except ${toSentenceCase people.person5}";
         base_url = "https://home.${fqDomain}";
         group = "frigate-entrance-notification";
         title = "Security Alert";
@@ -41,7 +41,7 @@ let
   };
 
   highAlertNotify = map (camera: {
-    alias = "High Alert ${upperFirstChar camera} Notify";
+    alias = "High Alert ${toSentenceCase camera} Notify";
     use_blueprint = {
       path = "SgtBatten/frigate_notifications.yaml";
       input = {
@@ -50,7 +50,7 @@ let
         state_entity = "input_boolean.high_alert_surveillance";
         state_filter_states = [ "on" ];
         notify_device = devices.joshua.id;
-        notify_group = "Adults Except ${upperFirstChar people.person5}";
+        notify_group = "Adults Except ${toSentenceCase people.person5}";
         sticky = true;
         group = "frigate-notification";
         base_url = "https://home.${fqDomain}";
@@ -64,14 +64,14 @@ let
   }) cameras;
 
   catNotify = map (camera: {
-    alias = "${upperFirstChar camera} Cat Notify";
+    alias = "${toSentenceCase camera} Cat Notify";
     use_blueprint = {
       path = "SgtBatten/frigate_notifications.yaml";
       input = {
         camera = "camera.${camera}";
         custom_filter = "{{ states('sensor.outdoor_sensor_temperature') | float(0) >= 20 }}";
         notify_device = devices.joshua.id;
-        notify_group = "Adults Except ${upperFirstChar people.person5}";
+        notify_group = "Adults Except ${toSentenceCase people.person5}";
         sticky = true;
         group = "frigate-cat-notification";
         base_url = "https://home.${fqDomain}";

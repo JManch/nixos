@@ -6,19 +6,18 @@
 }:
 let
   inherit (lib)
-    ns
     imap
     optional
     singleton
     splitString
     concatMapStringsSep
+    toSentenceCase
     ;
-  inherit (lib.${ns}) upperFirstChar;
   inherit (secrets.general) devices people;
   secrets = inputs.nix-resources.secrets.homeAssistant { inherit lib config; };
 
   formattedRoomName =
-    room: (concatMapStringsSep " " (string: upperFirstChar string) (splitString "_" room));
+    room: (concatMapStringsSep " " (string: toSentenceCase string) (splitString "_" room));
 
   binCollectionNotify = singleton {
     alias = "Bin Collection Notify";

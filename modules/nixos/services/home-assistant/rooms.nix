@@ -7,7 +7,6 @@
 let
   inherit (secrets.general) people userIds devices;
   inherit (lib)
-    ns
     mkOption
     mkEnableOption
     types
@@ -17,6 +16,7 @@ let
     removeAttrs
     singleton
     sortOn
+    toSentenceCase
     ;
   secrets = inputs.nix-resources.secrets.homeAssistant { inherit lib config; };
 in
@@ -37,7 +37,7 @@ in
             };
 
             formattedRoomName = mkOption {
-              default = concatMapStringsSep " " (s: lib.${ns}.upperFirstChar s) (splitString "_" name);
+              default = concatMapStringsSep " " (s: toSentenceCase s) (splitString "_" name);
               readOnly = true;
             };
 

@@ -2,10 +2,10 @@
 { lib, config }:
 let
   inherit (lib)
-    ns
     mkIf
     attrNames
     singleton
+    toSentenceCase
     ;
   cameras = attrNames config.services.frigate.settings.cameras;
 in
@@ -44,7 +44,7 @@ in
           }
         ]
         ++ map (camera: {
-          name = "${lib.${ns}.upperFirstChar camera} Person Recently Updated";
+          name = "${toSentenceCase camera} Person Recently Updated";
           icon = "mdi:walk";
           state = "{{ (now().timestamp() - as_timestamp(states('image.${camera}_person'), default = 0)) < 5*60 }}";
           device_class = "update";

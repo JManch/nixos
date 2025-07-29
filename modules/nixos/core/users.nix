@@ -13,6 +13,7 @@ let
     ns
     optional
     mkAliasOptionModule
+    toSentenceCase
     ;
 in
 {
@@ -68,7 +69,7 @@ in
     users = {
       ${username} = {
         isNormalUser = true;
-        description = lib.${ns}.upperFirstChar username; # displayed in GDM
+        description = toSentenceCase username; # displayed in GDM
         hashedPasswordFile = config.age.secrets."${username}Passwd".path;
         extraGroups = optional cfg.priviledgedUser "wheel";
       };

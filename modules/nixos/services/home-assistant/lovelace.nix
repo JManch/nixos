@@ -14,14 +14,14 @@ let
     filterAttrs
     concatMap
     mapAttrsToList
+    toSentenceCase
     ;
-  inherit (lib.${ns}) upperFirstChar;
   inherit (config.${ns}.services) frigate;
-  inherit (secrets.general) people userIds peopleList;
+  inherit (secrets.general) people peopleList;
 
   secrets = inputs.nix-resources.secrets.homeAssistant { inherit lib config; };
   cameras = attrNames config.services.frigate.settings.cameras;
-  upperPeople = mapAttrs (_: p: upperFirstChar p) people;
+  upperPeople = mapAttrs (_: p: toSentenceCase p) people;
 
   home = {
     title = "Home";

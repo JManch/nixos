@@ -11,6 +11,7 @@ let
     types
     concatStringsSep
     getExe
+    toSentenceCase
     ;
   inherit (cfg) musicPlayers;
   playerctl = getExe pkgs.playerctl;
@@ -19,7 +20,7 @@ let
     isMusic:
     let
       name = if isMusic then "music" else "media";
-      upperName = lib.${ns}.upperFirstChar name;
+      upperName = toSentenceCase name;
       arg = if isMusic then "--player ${musicPlayers}" else "--ignore-player ${musicPlayers}";
     in
     pkgs.writeShellApplication {

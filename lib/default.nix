@@ -137,9 +137,6 @@ in
       in
       optional (address != null) address ++ optional (vpnAddress != null) vpnAddress ++ altAddresses;
 
-    upperFirstChar =
-      string: concatStrings (imap0 (i: c: if i == 0 then toUpper c else c) (stringToCharacters string));
-
     # Adding multiple EXIT traps in a bash script is a pain because they
     # overwrite each other. This makes that easier.
     exitTrapBuilder = # bash

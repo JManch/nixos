@@ -20,7 +20,8 @@
   hardware.framework.enableKmod = false;
 
   boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
+    # Using 6.16-rc7 for screen flickering fix and potential cros_charge fix
+    kernelPackages = pkgs.linuxPackages_testing;
     kernelModules = [ "kvm-amd" ];
 
     initrd.availableKernelModules = [

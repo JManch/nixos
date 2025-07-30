@@ -34,7 +34,6 @@ in
     Unit = {
       Requires = [ "home-${username}-.config-syncthing.mount" ];
       After = [ "home-${username}-.config-syncthing.mount" ];
-      X-SwitchMethod = "keep-old";
     };
   };
 

@@ -194,7 +194,6 @@ in
     systemd.user.services.set-wallpaper = {
       Unit = {
         Description = "Set the desktop wallpaper";
-        X-SwitchMethod = "keep-old";
         Requires = [ cfg.wallpaperUnit ];
         After = [
           cfg.wallpaperUnit
@@ -231,7 +230,6 @@ in
           Description = "Randomise the desktop wallpaper";
           Before = [ "set-wallpaper.service" ];
           Wants = [ "set-wallpaper.service" ];
-          X-SwitchMethod = "keep-old";
         };
 
         Service = {
@@ -243,7 +241,6 @@ in
       timers.randomise-wallpaper = {
         Unit = {
           Description = "Timer for randomising the desktop wallpaper";
-          X-SwitchMethod = "keep-old";
         };
 
         Timer = {

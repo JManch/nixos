@@ -10,7 +10,7 @@ let
     ns
     singleton
     getExe'
-    optional
+    optionals
     optionalString
     ;
   inherit (config.${ns}) desktop;
@@ -23,8 +23,13 @@ in
 {
   categoryConfig.locker = {
     package = lib.${ns}.addPatches config.programs.hyprlock.package (
-      # Allows unlocking with fingerprint when display is off but breaks fade-in animation
-      optional hasFingerprint "hyprlock-dpms-off-unlock.patch"
+      optionals hasFingerprint [
+        # Allows unlocking with fingerprint when display is off but breaks fade-in animation
+        "hyprlock-dpms-off-unlock.patch"
+        # Adds fingerprint initialising message to fix brief period where
+        # FPRINTPROMPT is empty on launch
+        "hyprlock-fingerprint-initialising-message.patch"
+      ]
     );
     unlockCmd = "${getExe' pkgs.procps "pkill"} -USR1 hyprlock";
 
@@ -53,6 +58,7 @@ in
 
         fingerprint = {
           enabled = hasFingerprint;
+          initialising_message = "Scan fingerprint to unlock...";
           ready_message = "Scan fingerprint to unlock...";
           present_message = "Scanning fingerprint...";
         };
@@ -92,8 +98,7 @@ in
         check_color = "0xff${colors.base0D}";
         fail_color = "0xff${colors.base08}";
         placeholder_text = "<span foreground=\"##${colors.base03}\">${
-          # Not using $FPRINTPROMPT because its appearance gets delayed for some reason
-          if hasFingerprint then "Scan fingerprint..." else "Password..."
+          if hasFingerprint then "$FPRINTPROMPT" else "Password..."
         }</span>";
         fail_text = "<span foreground=\"##${colors.base08}\">Authentication failed</span>";
         hide_input = false;

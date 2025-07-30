@@ -1,0 +1,58 @@
+diff --git a/src/auth/Fingerprint.cpp b/src/auth/Fingerprint.cpp
+index db4bba7..370499c 100644
+--- a/src/auth/Fingerprint.cpp
++++ b/src/auth/Fingerprint.cpp
+@@ -36,10 +36,12 @@ static std::map<std::string, MatchResult> s_mapStringToTestType = {{"verify-no-m
+                                                                    {"verify-unknown-error", MATCH_UNKNOWN_ERROR}};
+ 
+ CFingerprint::CFingerprint() {
+-    static const auto FINGERPRINTREADY   = g_pConfigManager->getValue<Hyprlang::STRING>("auth:fingerprint:ready_message");
+-    m_sFingerprintReady                  = *FINGERPRINTREADY;
+-    static const auto FINGERPRINTPRESENT = g_pConfigManager->getValue<Hyprlang::STRING>("auth:fingerprint:present_message");
+-    m_sFingerprintPresent                = *FINGERPRINTPRESENT;
++    static const auto FINGERPRINTINITIALISING = g_pConfigManager->getValue<Hyprlang::STRING>("auth:fingerprint:initialising_message");
++    m_sFingerprintInitialising                = *FINGERPRINTINITIALISING;
++    static const auto FINGERPRINTREADY        = g_pConfigManager->getValue<Hyprlang::STRING>("auth:fingerprint:ready_message");
++    m_sFingerprintReady                       = *FINGERPRINTREADY;
++    static const auto FINGERPRINTPRESENT      = g_pConfigManager->getValue<Hyprlang::STRING>("auth:fingerprint:present_message");
++    m_sFingerprintPresent                     = *FINGERPRINTPRESENT;
+ }
+ 
+ CFingerprint::~CFingerprint() {
+@@ -86,9 +88,10 @@ std::optional<std::string> CFingerprint::getLastFailText() {
+ }
+ 
+ std::optional<std::string> CFingerprint::getLastPrompt() {
+-    if (!m_sPrompt.empty())
++    if (m_sPrompt.empty())
++        return std::optional(m_sFingerprintInitialising);
++    else
+         return std::optional(m_sPrompt);
+-    return std::nullopt;
+ }
+ 
+ bool CFingerprint::checkWaiting() {
+diff --git a/src/auth/Fingerprint.hpp b/src/auth/Fingerprint.hpp
+index 404a5ca..4e9a9b0 100644
+--- a/src/auth/Fingerprint.hpp
++++ b/src/auth/Fingerprint.hpp
+@@ -37,6 +37,7 @@ class CFingerprint : public IAuthImplementation {
+         bool                                verifying = false;
+     } m_sDBUSState;
+ 
++    std::string m_sFingerprintInitialising;
+     std::string m_sFingerprintReady;
+     std::string m_sFingerprintPresent;
+ 
+diff --git a/src/config/ConfigManager.cpp b/src/config/ConfigManager.cpp
+index 00365d7..f5b7af7 100644
+--- a/src/config/ConfigManager.cpp
++++ b/src/config/ConfigManager.cpp
+@@ -223,6 +223,7 @@ void CConfigManager::init() {
+     m_config.addConfigValue("auth:pam:enabled", Hyprlang::INT{1});
+     m_config.addConfigValue("auth:pam:module", Hyprlang::STRING{"hyprlock"});
+     m_config.addConfigValue("auth:fingerprint:enabled", Hyprlang::INT{0});
++    m_config.addConfigValue("auth:fingerprint:initialising_message", Hyprlang::STRING{"(Fingerprint scanner initialising)"});
+     m_config.addConfigValue("auth:fingerprint:ready_message", Hyprlang::STRING{"(Scan fingerprint to unlock)"});
+     m_config.addConfigValue("auth:fingerprint:present_message", Hyprlang::STRING{"Scanning fingerprint"});
+     m_config.addConfigValue("auth:fingerprint:retry_delay", Hyprlang::INT{250});

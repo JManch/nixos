@@ -29,6 +29,11 @@ in
         # Adds fingerprint initialising message to fix brief period where
         # FPRINTPROMPT is empty on launch
         "hyprlock-fingerprint-initialising-message.patch"
+        # Fixes the fingerprint present prompt not being displayed. Password box
+        # border color only gets update in time if animation are disabled. Need
+        # to figure out how to trigger another render pass to update color
+        # animations.
+        "hyprlock-fingerprint-present-fix.patch"
       ]
     );
     unlockCmd = "${getExe' pkgs.procps "pkill"} -USR1 hyprlock";
@@ -52,6 +57,7 @@ in
     package = inputs.hyprlock.packages.${pkgs.system}.default;
     settings = {
       general.hide_cursor = true;
+      animations.enabled = !hasFingerprint; # because of our fingerprint present patch
 
       auth = {
         pam.enabled = true;

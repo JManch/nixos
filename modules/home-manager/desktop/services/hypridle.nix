@@ -100,13 +100,33 @@ in
       ''
         # Turn off the display after locking. I've found that doing this in the
         # lock script is more reliable than adding another listener.
+
+        dpms_state_dir="/tmp/hypridle-dpms-state"
+        rm -rf "$dpms_state_dir"
+        mkdir "$dpms_state_dir"
+
+        dbus-monitor --system "type='signal',interface='org.freedesktop.login1.Manager',member='PrepareForSleep'" 2>/dev/null |
+          while read -r line; do
+            # Check for sleep prepare or sleep resume events
+            if echo "$line" | grep -q "PrepareForSleep"; then
+              touch "$dpms_state_dir/sleep_delay"
+            fi
+          done &
+
         while true; do
           # If the display is on, wait screenOffTime seconds then turn off
           # display. Then wait the full lock time before checking again.
           if hyprctl monitors -j | jaq -e "first(.[] | select(.dpmsStatus == true))" &>/dev/null; then
             cursor_pos=$(hyprctl cursorpos)
             sleep ${toString cfg.screenOffTime}
-            if [ "$cursor_pos" != "$(hyprctl cursorpos)" ]; then continue; fi
+            if [[ "$cursor_pos" != "$(hyprctl cursorpos)" ]]; then continue; fi
+
+            # If a sleep action just happened then delay the next dpms off
+            if [[ -f "$dpms_state_dir/sleep_delay" ]]; then
+              rm "$dpms_state_dir/sleep_delay"
+              continue
+            fi
+
             hyprctl dispatch dpms off
           fi
           # give screens time to turn off and prolong next countdown
@@ -114,9 +134,6 @@ in
         done &
       '';
 
-    postUnlockScript = ''
-      # would like to turn on dpms here after fingerprint unlock but it seems
-      # hyprlock doesnt unlock until dpms is enabled
-    '';
+    postUnlockScript = "rm -rf /tmp/hypridle-dpms-state";
   };
 }

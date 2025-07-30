@@ -1,0 +1,11 @@
+diff --git a/src/renderer/Renderer.cpp b/src/renderer/Renderer.cpp
+index 41bdb0a..fa06e7b 100644
+--- a/src/renderer/Renderer.cpp
++++ b/src/renderer/Renderer.cpp
+@@ -617,5 +617,5 @@ void CRenderer::startFadeOut(bool unlock) {
+     *opacity = 0.f;
+ 
+     if (unlock)
+-        opacity->setCallbackOnEnd([](auto) { g_pHyprlock->releaseSessionLock(); }, true);
++        g_pHyprlock->releaseSessionLock();
+ }

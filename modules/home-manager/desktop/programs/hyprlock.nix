@@ -6,16 +6,26 @@
   osConfig,
 }:
 let
-  inherit (lib) ns singleton getExe';
+  inherit (lib)
+    ns
+    singleton
+    getExe'
+    optional
+    optionalString
+    ;
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.core.device) primaryMonitor;
+  hyprctl = getExe' pkgs.hyprland "hyprctl";
   colors = config.colorScheme.palette;
   labelHeight = toString (builtins.ceil (0.035 * primaryMonitor.height * primaryMonitor.scale));
   hasFingerprint = osConfig.services.fprintd.enable;
 in
 {
   categoryConfig.locker = {
-    package = config.programs.hyprlock.package;
+    package = lib.${ns}.addPatches config.programs.hyprlock.package (
+      # Allows unlocking with fingerprint when display is off but breaks fade-in animation
+      optional hasFingerprint "hyprlock-dpms-off-unlock.patch"
+    );
     unlockCmd = "${getExe' pkgs.procps "pkill"} -USR1 hyprlock";
 
     defaultArgs = [
@@ -28,6 +38,8 @@ in
       "--grace"
       "0"
     ];
+
+    postUnlockScript = optionalString hasFingerprint "${hyprctl} dispatch dpms on";
   };
 
   programs.hyprlock = {

@@ -55,6 +55,13 @@
     noPollBatteries = true;
   };
 
+  systemd.services.disable-power-led = {
+    description = "Disable power LED";
+    serviceConfig.Type = "oneshot";
+    script = "echo 0 > /sys/class/leds/chromeos:white:power/brightness";
+    wantedBy = [ "multi-user.target" ];
+  };
+
   programs.zsh = {
     shellAliases = {
       "get-pps" = "cat /sys/class/drm/card1-eDP-1/amdgpu/panel_power_savings";

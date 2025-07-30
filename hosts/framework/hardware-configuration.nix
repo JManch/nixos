@@ -34,18 +34,18 @@
 
     # Contrary to what the tlp docs say, we need probe_with_fwk_charge_control=1
     # even though we do not use the custom framework kmod
-    extraModprobeConfig = ''
-      options cros_charge_control probe_with_fwk_charge_control=1
-    '';
+    # extraModprobeConfig = ''
+    #   options cros_charge_control probe_with_fwk_charge_control=1
+    # '';
 
     # https://github.com/FrameworkComputer/SoftwareFirmwareIssueTracker/issues/70
-    kernelPatches = lib.singleton {
-      name = "cros-charge-fix";
-      patch = pkgs.fetchpatch2 {
-        url = "https://lore.kernel.org/lkml/20250521-cros-ec-mfd-chctl-probe-v1-1-6ebfe3a6efa7@weissschuh.net/raw";
-        hash = "sha256-Lt12B/JgEbmOOdRX28hs1t/khySxbB2FG3W1y8nj1us=";
-      };
-    };
+    # kernelPatches = lib.singleton {
+    #   name = "cros-charge-fix";
+    #   patch = pkgs.fetchpatch2 {
+    #     url = "https://lore.kernel.org/lkml/20250521-cros-ec-mfd-chctl-probe-v1-1-6ebfe3a6efa7@weissschuh.net/raw";
+    #     hash = "sha256-Lt12B/JgEbmOOdRX28hs1t/khySxbB2FG3W1y8nj1us=";
+    #   };
+    # };
   };
 
   services.upower = {
@@ -114,9 +114,9 @@
     settings = {
       # Battery
       # `tlp fullcharge` to disable threshold until AC is unplugged
-      RESTORE_THRESHOLDS_ON_BAT = 1;
-      START_CHARGE_THRESH_BAT1 = 75;
-      STOP_CHARGE_THRESH_BAT1 = 80;
+      # RESTORE_THRESHOLDS_ON_BAT = 1;
+      # START_CHARGE_THRESH_BAT1 = 75;
+      # STOP_CHARGE_THRESH_BAT1 = 80;
 
       # Graphics
       RADEON_DPM_PERF_LEVEL_ON_AC = "auto";

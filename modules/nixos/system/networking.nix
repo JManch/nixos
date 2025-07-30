@@ -318,15 +318,11 @@ in
   };
 
   systemd.services.disable-wifi-on-boot = mkIf (cfg.wireless.enable && cfg.wireless.disableOnBoot) {
-    restartIfChanged = false;
     description = "Disable wifi on boot";
-    after = [ "systemd-networkd.service" ];
     wantedBy = [ "multi-user.target" ];
-
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${rfkill} block wifi";
-      RemainAfterExit = true;
     };
   };
 

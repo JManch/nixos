@@ -14,12 +14,9 @@ let
     head
     findFirst
     optionalString
-    concatStrings
-    toUpper
     mod
     elemAt
     concatMap
-    stringToCharacters
     singleton
     nixosSystem
     optionals

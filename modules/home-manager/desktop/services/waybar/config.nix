@@ -287,11 +287,12 @@ in
 
         "custom/vpn" = mkIf wgnord.enable {
           format = "<span color='#${colors.base04}'></span> {}";
-          exec = "echo '{\"text\": \"${wgnord.country}\"}'";
+          exec = "echo '{\"text\": \"'$(</tmp/wgnord-country)'\"}'";
           exec-if = "${getExe' pkgs.iproute2 "ip"} link show wgnord > /dev/null 2>&1";
           return-type = "json";
-          tooltip = false;
+          tooltip-format = "Disconnect";
           interval = 30;
+          on-click = "wgnord-down";
         };
 
         "custom/locker" = mkIf (locker.package != null) {

@@ -109,6 +109,23 @@ in
       };
   };
 
+  # We want sshfs mounts to disconnect on connection loss otherwise they will
+  # block IO operations and hang applications until the VPN is reconnected.
+  # For specific uses can also pass the '-o reconnect' flag which allows mounts
+  # to reconnect when the network is accessible again.
+  nixpkgs.overlays = singleton (
+    final: prev: {
+      sshfs = final.symlinkJoin {
+        name = "sshfs-no-hanging";
+        paths = [ prev.sshfs ];
+        nativeBuildInputs = [ final.makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/sshfs --add-flags "-o ServerAliveInterval=5"
+        '';
+      };
+    }
+  );
+
   environment.systemPackages = [ pkgs.sshfs ];
 
   programs.zsh.shellAliases.ssh-forget = "ssh -o UserKnownHostsFile=/dev/null";

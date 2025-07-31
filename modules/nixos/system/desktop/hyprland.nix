@@ -26,7 +26,7 @@ in
     # https://discourse.nixos.org/t/how-to-enable-upstream-systemd-user-services-declaratively/7649/9
     systemd.packages = [ (flakePkgs args "hyprpolkitagent").default ];
     systemd.user.services.hyprpolkitagent = {
-      path = mkForce [ ]; # reason explained in desktop/default.nix
+      path = mkForce [ ]; # reason explained in desktop/root.nix
       requisite = [ "graphical-session.target" ];
       serviceConfig.Slice = "session${sliceSuffix config}.slice";
       wantedBy = [ "graphical-session.target" ];

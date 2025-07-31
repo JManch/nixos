@@ -280,10 +280,9 @@
       "type": "PyPi",
       "name": "neohubapi",
       "version_upper_bound": null,
-      "version": "2.8",
-      "url": "https://files.pythonhosted.org/packages/49/4f/b5ca185458a781efae4a27ad72711af931e8cf5dfacfd48a036c8e49b7cf/neohubapi-2.8.tar.gz",
-      "hash": "f48243d925c8314aa9adb0c5d0dce95120daf75edf578119279b832eb14f4c57",
-      "frozen": true
+      "version": "3.1",
+      "url": "https://files.pythonhosted.org/packages/8b/16/af8642c21fe276938b4fa7f7264f358ae12b41c9a1f7a3a49dd51b431e37/neohubapi-3.1.tar.gz",
+      "hash": "e547166b108b7219993f56b1becdc74bd049c16a07ed5f58eaa799f4ea42e87c"
     },
     "neovim-ayu": {
       "type": "Git",

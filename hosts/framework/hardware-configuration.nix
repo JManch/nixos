@@ -1,7 +1,7 @@
 # Issues:
-# https://github.com/openwrt/mt76/issues/548
+# - https://github.com/openwrt/mt76/issues/548
+# - Userspace charge limiter has been broken since the 3.04 bios update https://github.com/tlvince/nixos-config/issues/309
 {
-  lib,
   pkgs,
   inputs,
   modulesPath,
@@ -20,8 +20,7 @@
   hardware.framework.enableKmod = false;
 
   boot = {
-    # Using 6.16-rc7 for screen flickering fix and potential cros_charge fix
-    kernelPackages = pkgs.linuxPackages_testing;
+    kernelPackages = pkgs.linuxPackages_latest;
     kernelModules = [ "kvm-amd" ];
 
     initrd.availableKernelModules = [

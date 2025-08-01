@@ -14,7 +14,7 @@ in
     enable = true;
     autosuggestion.enable = true;
     enableCompletion = true;
-    dotDir = ".config/zsh";
+    dotDir = "${config.xdg.configHome}/zsh";
 
     plugins = singleton {
       name = "zsh-vi-mode";

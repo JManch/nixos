@@ -217,14 +217,29 @@ in
         jaq = getExe pkgs.jaq;
 
         toggleAudioMute = pkgs.writeShellScript "toggle-audio-mute" ''
-          device="$1"
+          class=$1
+          if [[ $class != "source" && $class != "sink" ]]; then
+            echo "Invalid device class: '$class'. Must be 'source' or 'sink'." >&2
+            exit 1
+          fi
+          device="@DEFAULT_AUDIO_''${class^^}@"
+          inspect_data=$(${wpctl} inspect "$device")
+
+          # @DEFAULT_AUDIO_SOURCE@ can resolve to a sink if no sources exist
+          # https://gitlab.freedesktop.org/pipewire/wireplumber/-/issues/509
+          if [[ "Audio/''${class^}" != $(echo "$inspect_data" | grep 'media\.class' | cut -d '"' -f 2) ]]; then
+            ${notifySend} -e -u critical -t 2000 \
+              -h 'string:x-canonical-private-synchronous:pipewire-volume' 'Toggle Mute' "''${class^} device does not exist"
+            exit 0
+          fi
+
           ${wpctl} set-mute "$device" toggle
           status=$(${wpctl} get-volume "$device")
           message=$([[ $status == *MUTED* ]] && echo "Muted" || echo "Unmuted")
-          if [[ $device == "@DEFAULT_AUDIO_SOURCE@" ]]; then
+          if [[ $class == "SOURCE" ]]; then
             message="Microphone $message"
           fi
-          description=$(${wpctl} inspect "$device" | grep 'node\.description' | cut -d '"' -f 2)
+          description=$(echo "$inspect_data" | grep 'node\.description' | cut -d '"' -f 2)
           ${notifySend} -e -u critical -t 2000 \
             -h 'string:x-canonical-private-synchronous:pipewire-volume' "$description" "$message"
         '';
@@ -264,8 +279,8 @@ in
       mkIf home-manager.enable {
         dconf.settings."com/saivert/pwvucontrol".enable-overamplification = true;
         programs.waybar.settings.bar = {
-          "wireplumber#sink".on-click-right = "${toggleAudioMute} \"@DEFAULT_AUDIO_SINK@\"";
-          "wireplumber#source".on-click = "${toggleAudioMute} \"@DEFAULT_AUDIO_SOURCE@\"";
+          "wireplumber#sink".on-click-right = "${toggleAudioMute} sink";
+          "wireplumber#source".on-click = "${toggleAudioMute} source";
         };
 
         ${ns}.desktop = {
@@ -307,13 +322,13 @@ in
             bind = [
               ", XF86AudioRaiseVolume, exec, ${modifyVolume} 5%+"
               ", XF86AudioLowerVolume, exec, ${modifyVolume} 5%-"
-              ", XF86AudioMute, exec, ${toggleAudioMute} \"@DEFAULT_AUDIO_SINK@\""
-              ", XF86AudioMicMute, exec, ${toggleAudioMute} \"@DEFAULT_AUDIO_SOURCE@\""
+              ", XF86AudioMute, exec, ${toggleAudioMute} sink"
+              ", XF86AudioMicMute, exec, ${toggleAudioMute} source"
               "${hyprland.modKey}SHIFTCONTROL, XF86AudioRaiseVolume, exec, ${modifyFocusedWindowVolume} 5%+"
               "${hyprland.modKey}SHIFTCONTROL, XF86AudioLowerVolume, exec, ${modifyFocusedWindowVolume} 5%-"
             ];
 
-            bindr = [ "${hyprland.modKey}ALT, ALT_L, exec, ${toggleAudioMute} \"@DEFAULT_AUDIO_SOURCE@\"" ];
+            bindr = [ "${hyprland.modKey}ALT, ALT_L, exec, ${toggleAudioMute} source" ];
           };
         };
       };

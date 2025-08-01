@@ -264,7 +264,6 @@ in
 
   ns.hm = {
     ${ns}.desktop = {
-      services.waybar.audioDeviceIcons.${cfg.audio.sink} = "";
       hyprland.namedWorkspaces.VR = "monitor:${primaryMonitor.name}";
 
       hyprland.settings =

@@ -21,15 +21,6 @@ in
       description = "Whether to add gaps and curved borders around the bar";
     };
 
-    audioDeviceIcons = mkOption {
-      type = types.attrsOf types.str;
-      default = { };
-      description = ''
-        Attribute set mapping audio devices to icons. Use pamixer --list-sinks
-        to get device names.
-      '';
-    };
-
     autoHideWorkspaces = mkOption {
       type = types.listOf types.str;
       default = [ ];

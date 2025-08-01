@@ -11,6 +11,7 @@ let
     ns
     mkIf
     optional
+    optionals
     getExe'
     toUpper
     optionalString
@@ -83,6 +84,10 @@ in
             sort (a: b: a.number < b.number) monitors
           );
         })
+        # Hides the module if the format string is empty
+        # Forces use of device description instead of nick name in tooltip
+        # Hides the module instead of crashing when no source device exists
+        "waybar-wireplumber-improvements.patch"
       ]).override
         {
           cavaSupport = false;
@@ -93,7 +98,7 @@ in
           rfkillSupport = false;
           sndioSupport = false;
           upowerSupport = false;
-          wireplumberSupport = false;
+          pulseSupport = false;
           withMediaPlayer = false;
         };
 
@@ -167,25 +172,22 @@ in
           tooltip = false;
         };
 
-        pulseaudio = mkIf audio.enable {
-          format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%{format_source}";
-          format-muted = "<span color='#${colors.base04}'>󰖁</span> {volume:2}%{format_source}";
-          format-source = "<span color='#${colors.base08}'>  󰍬</span>";
-          format-source-muted = "";
-
-          format-icons = {
-            hdmi = "󰍹";
-            headset = "󰋎";
-
-            default = [
-              "󰖀"
-              "󰕾"
-              "󰕾"
-            ];
-          }
-          // cfg.audioDeviceIcons;
-
+        "wireplumber#sink" = mkIf audio.enable {
+          format = "<span color='#${colors.base04}'>{icon}</span> {volume:2}%";
+          format-muted = "<span color='#${colors.base04}'>󰖁</span> {volume:2}%";
+          format-icons = [
+            "󰖀"
+            "󰕾"
+            "󰕾"
+          ];
           on-click = "${app2unit} com.saivert.pwvucontrol.desktop";
+          tooltip = true;
+        };
+
+        "wireplumber#source" = mkIf audio.enable {
+          node-type = "Audio/Source";
+          format = "<span color='#${colors.base08}'>󰍬</span>";
+          format-muted = "";
           tooltip = true;
         };
 
@@ -331,7 +333,10 @@ in
           ++ optional gamemode.enable "gamemode"
           ++ [ "memory" ]
           ++ optional (backlight != null) "backlight"
-          ++ optional audio.enable "pulseaudio"
+          ++ optionals audio.enable [
+            "wireplumber#sink"
+            "wireplumber#source"
+          ]
           ++ optional (battery != null) "battery"
           ++ optional (bluetooth.enable) "bluetooth"
           ++ optional (networking.wireless.enable && device.type == "laptop") "network#wifi"

@@ -263,8 +263,10 @@ in
       in
       mkIf home-manager.enable {
         dconf.settings."com/saivert/pwvucontrol".enable-overamplification = true;
-        programs.waybar.settings.bar.pulseaudio.on-click-right =
-          "${toggleAudioMute} \"@DEFAULT_AUDIO_SINK@\"";
+        programs.waybar.settings.bar = {
+          "wireplumber#sink".on-click-right = "${toggleAudioMute} \"@DEFAULT_AUDIO_SINK@\"";
+          "wireplumber#source".on-click = "${toggleAudioMute} \"@DEFAULT_AUDIO_SOURCE@\"";
+        };
 
         ${ns}.desktop = {
           programs.locker = {

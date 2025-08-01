@@ -77,9 +77,7 @@
     "broadcast-box": {
       "inputs": {
         "gomod2nix": "gomod2nix",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "nixpkgs": "nixpkgs"
       },
       "locked": {
         "lastModified": 1752540509,
@@ -941,7 +939,7 @@
     },
     "mint": {
       "inputs": {
-        "nixpkgs": "nixpkgs",
+        "nixpkgs": "nixpkgs_2",
         "rust-overlay": "rust-overlay_2"
       },
       "locked": {
@@ -1140,16 +1138,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1746188796,
-        "narHash": "sha256-ZZ38C6Wy11lqVNKV/N5DOM4hnVyJNwS0cb03yD3ZTqk=",
-        "owner": "nixos",
+        "lastModified": 1751984180,
+        "narHash": "sha256-LwWRsENAZJKUdD3SpLluwDmdXY9F45ZEgCb0X+xgOL0=",
+        "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4be4d7a7758d92d60a092a503c93a381f95c71b1",
+        "rev": "9807714d6944a957c2e036f84b0ff8caf9930bc0",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
-        "ref": "nixpkgs-unstable",
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -1222,6 +1220,22 @@
       }
     },
     "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1746188796,
+        "narHash": "sha256-ZZ38C6Wy11lqVNKV/N5DOM4hnVyJNwS0cb03yD3ZTqk=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "4be4d7a7758d92d60a092a503c93a381f95c71b1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
       "locked": {
         "lastModified": 1753939845,
         "narHash": "sha256-K2ViRJfdVGE8tpJejs8Qpvvejks1+A4GQej/lBk5y7I=",
@@ -1348,7 +1362,7 @@
         "nix-on-droid": "nix-on-droid",
         "nix-resources": "nix-resources",
         "nixos-hardware": "nixos-hardware",
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs_3",
         "nixpkgs-xr": "nixpkgs-xr",
         "nvf": "nvf",
         "vmInstall": "vmInstall",

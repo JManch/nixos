@@ -84,9 +84,6 @@
     gnome-keybinds.url = "github:JManch/hm-gnome-keybinds";
     gnome-keybinds.inputs.nixpkgs.follows = "nixpkgs";
 
-    nvf.url = "github:JManch/nvf";
-    nvf.inputs.nixpkgs.follows = "nixpkgs";
-
     # Inputs that provide packages
 
     hyprland.url = "github:hyprwm/Hyprland";
@@ -134,6 +131,8 @@
 
     xdg-override.url = "github:koiuo/xdg-override";
     xdg-override.inputs.nixpkgs.follows = "nixpkgs";
+
+    nvf.url = "github:JManch/nvf"; # do not override nixpkgs input for stability
 
     # Personal inputs
 

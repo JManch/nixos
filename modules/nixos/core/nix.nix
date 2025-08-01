@@ -231,6 +231,7 @@ let
           "nixpkgs-xr"
           "nix-on-droid"
           "nix-flatpak"
+          "nvf"
         )
 
         # Inputs and with relative file paths to check for changes in.

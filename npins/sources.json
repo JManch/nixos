@@ -27,10 +27,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v3.8.4",
-      "revision": "ab4c2c104f47c2e781ddf948784f089b114253ec",
+      "version": "v3.8.5",
+      "revision": "9635fd00c0c41510a2cc6e725790e889457fdd4f",
       "url": null,
-      "hash": "02lpmksy480acnzk8qc94ycn23ik376qlrkmhi2z35y7h8ki4ha3"
+      "hash": "14a9gvql7hv6qf3zj51nmdy351whafi0cv56dh4jnaibyr0rvmqz"
     },
     "HA_blueprints": {
       "type": "Git",
@@ -226,10 +226,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v3.2.1",
-      "revision": "4846bd0c9242f4fa73943655a75c67b4bd729356",
-      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/v3.2.1",
-      "hash": "1czps64lw9kxqrjv8q4izzj47ra9fmcwqz408kmwahjp6mynm88q"
+      "version": "v3.2.2",
+      "revision": "2dc88f25a9ba14b310a8292653f6266fd1e2e244",
+      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/v3.2.2",
+      "hash": "0dzkavh815mm4awl7bqxj2lhhx4xn148zpj283ky4r7bh0n491gg"
     },
     "hyprpy": {
       "type": "GitRelease",

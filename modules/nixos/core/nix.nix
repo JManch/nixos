@@ -474,6 +474,11 @@ in
         build-dir = mkIf impermanence.enable "/var/nix-tmp";
       };
 
+      # https://github.com/NixOS/nix/issues/6536#issuecomment-1254858889
+      extraOptions = ''
+        !include ${config.age.secrets.nixAccessTokens.path}
+      '';
+
       gc = {
         automatic = true;
         dates = "Mon *-*-* 00:00:00";
@@ -501,31 +506,6 @@ in
       "nix-optimise.service"
       "nix-gc.service"
     ];
-    # Because one of our flake inputs is a private repo temporarily copy host ssh
-    # keys so root uses them to authenticate with github
-    serviceConfig.ExecStart = mkForce (pkgs.writeShellScript "nixos-upgrade-ssh-auth" ''
-      set -e
-      mkdir -p /root/.ssh
-
-      if [ -f /root/.ssh/id_ed25519 ]; then
-        tmp=$(mktemp -d)
-        mv /root/.ssh/id_ed25519 "$tmp"
-      fi
-
-      cleanup() {
-        if [[ -v tmp ]]; then
-          mv "$tmp/id_ed25519" /root/.ssh
-          rm -rf "$tmp"
-        else
-          rm -rf /root/.ssh/id_ed25519
-        fi
-      }
-
-      trap cleanup EXIT
-      cp /etc/ssh/ssh_host_ed25519_key /root/.ssh/id_ed25519
-
-      ${config.systemd.services.nixos-upgrade.script}
-    '').outPath;
   };
 
   ns.services = mkIf cfg.autoUpgrade {

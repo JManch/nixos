@@ -386,7 +386,10 @@ in
   );
 
   # Useful for finding the exact config that built a generation
-  environment.etc.current-flake.source = self;
+  environment.etc = {
+    current-flake.source = self;
+    current-rev.text = "${self.sourceInfo.rev or "dirty"}";
+  };
 
   # Nice explanation of overlays: https://archive.is/f8goR
   # How to override python packages:

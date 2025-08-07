@@ -395,6 +395,8 @@ in
   # How to override python packages:
   # https://nixos.org/manual/nixpkgs/unstable/#how-to-override-a-python-package-using-overlays
   nixpkgs = {
+    config.allowUnfree = true;
+
     overlays = [
       (final: prev: {
         inherit (final.${ns}) xdg-terminal-exec brightnessctl;
@@ -403,15 +405,8 @@ in
             !final.stdenv.buildPlatform.canExecute final.stdenv.hostPlatform
           ) "rnnoise-plugin-cross.patch"
         );
-        # wpa_supplicant matches substrings of the requested secret from the
-        # ext password file. So if you have:
-        # a = password123
-        # abc = secret123
-        # Requesting secret "abc" will return password123
-        wpa_supplicant = addPatches prev.wpa_supplicant [ "wpa-supplicant-ext-password-fix.patch" ];
       })
     ];
-    config.allowUnfree = true;
   };
 
   nix =

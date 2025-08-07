@@ -30,6 +30,7 @@ let
     mkOption
     types
     ;
+  inherit (lib.${ns}) addPatches;
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system) desktop;
   homeFirewall = config.${ns}.hmNs.firewall;
@@ -153,6 +154,21 @@ in
       networkd-dispatcher = lib.${ns}.addPatches prev.networkd-dispatcher [
         "networkd-dispatcher-wait-for-interface.patch"
       ];
+
+      wpa_supplicant = addPatches prev.wpa_supplicant [
+        # wpa_supplicant matches substrings of the requested secret from the
+        # ext password file. So if you have:
+        # a = password123
+        # abc = secret123
+        # Requesting secret "abc" will return password123
+        "wpa-supplicant-ext-password-fix.patch"
+        # We want to persist /etc/wpa_supplicant.conf with a bind mount but
+        # wpa_supplicant renames a temporary file to modify the config. This
+        # doesn't work with bind mounts due to "device or resource busy" error.
+        # Patch works around this by copying file contents instead of renaming.
+        # https://github.com/nix-community/impermanence/issues/175
+        "wpa-supplicant-impermanence-config-rename.patch"
+      ];
     })
   ];
 
@@ -258,7 +274,7 @@ in
   };
 
   # To persist imperatively configured networks
-  ns.persistence.files = mkIf cfg.wireless.enable [ "/etc/wpa_supplicant.conf" ];
+  ns.persistence.files = optional cfg.wireless.enable "/etc/wpa_supplicant.conf";
 
   services.resolved.enable = cfg.resolved.enable;
 

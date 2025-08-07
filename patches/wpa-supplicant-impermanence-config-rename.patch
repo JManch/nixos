@@ -1,0 +1,53 @@
+diff --git a/wpa_supplicant/config_file.c b/wpa_supplicant/config_file.c
+index 885c7d8dc..8b60282d9 100644
+--- a/wpa_supplicant/config_file.c
++++ b/wpa_supplicant/config_file.c
+@@ -1861,6 +1861,48 @@ int wpa_config_write(const char *name, struct wpa_config *config)
+ 		if (chmod_ret != 0 || rename(tmp_name, orig_name) != 0)
+ 			ret = -1;
+ 
++		if (chmod_ret != 0) {
++			ret = -1;
++		} else {
++			if (rename(tmp_name, orig_name) != 0) {
++				if (errno == EBUSY || errno == EXDEV) {
++					FILE *f_in, *f_out;
++					char buf[8192];
++					size_t nread;
++					int copy_failed = 0;
++
++					f_in = fopen(tmp_name, "rb");
++					if (f_in == NULL) {
++						copy_failed = 1;
++					} else {
++						f_out = fopen(orig_name, "wb");
++						if (f_out == NULL) {
++							copy_failed = 1;
++						} else {
++							while ((nread = fread(buf, 1, sizeof(buf), f_in)) > 0) {
++								if (fwrite(buf, 1, nread, f_out) != nread) {
++									copy_failed = 1;
++									break;
++								}
++							}
++							if (ferror(f_in) || ferror(f_out))
++								copy_failed = 1;
++							fclose(f_out);
++						}
++						fclose(f_in);
++					}
++
++					if (copy_failed) {
++						ret = -1;
++					} else {
++						unlink(tmp_name);
++					}
++				} else {
++					ret = -1;
++				}
++			}
++		}
++
+ 		os_free(tmp_name);
+ 	}
+ 

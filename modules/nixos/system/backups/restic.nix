@@ -368,7 +368,6 @@ in
             restartIfChanged = false;
             after = map (backup: "restic-backups-${backup}.service") (attrNames backups);
             requires = optional cfg.server.enable "caddy.service";
-            onFailure = [ "restic-repo-maintenance-failure-notif.service" ];
 
             environment = {
               RESTIC_CACHE_DIR = "/var/cache/restic-repo-maintenance";
@@ -450,7 +449,6 @@ in
             "restic-repo-maintenance.service"
             "caddy.service"
           ];
-          onFailure = [ "restic-remote-copy-failure-notif.service" ];
           restartIfChanged = false;
 
           environment = {
@@ -488,7 +486,6 @@ in
             "restic-remote-copy.service"
             "caddy.service"
           ];
-          onFailure = [ "restic-remote-maintenance-failure-notif.service" ];
           restartIfChanged = false;
 
           environment = {

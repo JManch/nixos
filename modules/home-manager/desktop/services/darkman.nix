@@ -32,6 +32,7 @@ let
   inherit (lib.${ns}) addPatches sliceSuffix;
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.core.device) hassIntegration;
+  inherit (osConfig.${ns}.core.time-zone) coordinates;
   inherit (config.${ns}.services.hass) curlCommand;
   inherit (config.xdg) dataHome;
   inherit (config.services) darkman;
@@ -167,16 +168,22 @@ in
 
   services.darkman = {
     enable = true;
-    # Patch prevents darkman running switch scripts for the start-up transition
-    # from null->dark as our applications are dark themed by default. Otherwise
-    # services such as waybar get an unnecessary restart when the graphical-session
-    # is started. Could potentially be solved by starting darkman before the
-    # graphical-session starts with WantedBy=default.target (which is what upstream
-    # does). The problem with this method is that switch scripts can trigger after
-    # the graphical-session has begun starting up if they take too long to run. I
-    # don't think there's a way to enforce strict ordering of graphical-session.target
-    # after darkman has finished running all initial switch scripts.
-    package = addPatches pkgs.darkman [ "darkman-no-initial-switch.patch" ];
+    package = addPatches pkgs.darkman [
+      # Patch prevents darkman running switch scripts for the start-up transition
+      # from null->dark as our applications are dark themed by default. Otherwise
+      # services such as waybar get an unnecessary restart when the graphical-session
+      # is started. Could potentially be solved by starting darkman before the
+      # graphical-session starts with WantedBy=default.target (which is what upstream
+      # does). The problem with this method is that switch scripts can trigger after
+      # the graphical-session has begun starting up if they take too long to run. I
+      # don't think there's a way to enforce strict ordering of graphical-session.target
+      # after darkman has finished running all initial switch scripts.
+      "darkman-no-initial-switch.patch"
+      # Attempt to read latitude and longitude coordinates from
+      # /etc/coordinates if a latitude and longitude are set in the darkman
+      # config
+      "darkman-env-coordinates.patch"
+    ];
     darkModeScripts = mapAttrs (_: v: v "dark") cfg.switchScripts;
     lightModeScripts = mapAttrs (_: v: v "light") cfg.switchScripts;
 
@@ -184,8 +191,10 @@ in
       usegeoclue = false;
     }
     // optionalAttrs (cfg.switchMethod == "coordinates") {
-      lat = 50.8;
-      lng = -0.1;
+      # Darkman is patched to replace these with the current value of
+      # /etc/coordinates/*
+      lat = coordinates.latitude;
+      lng = coordinates.longitude;
     };
   };
 

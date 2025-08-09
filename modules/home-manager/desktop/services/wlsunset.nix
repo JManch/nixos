@@ -8,15 +8,12 @@
 # includes using the headphone jack on a monitor.
 {
   lib,
+  cfg,
   pkgs,
-  config,
   osConfig,
 }:
 let
   inherit (lib) ns mkIf getExe;
-  cfg = config.${ns}.desktop.services.wlsunset;
-  latitude = "50.8";
-  longitude = "-0.1";
 in
 {
   opts = with lib; {
@@ -47,14 +44,14 @@ in
         grep = getExe pkgs.gnugrep;
       in
       if cfg.transition then
-        "${wlsunset} ${args} -l ${latitude} -L ${longitude}"
+        "${wlsunset} ${args} -l $(</etc/coordinates/latitude) -L $(</etc/coordinates/longitude)"
       else
         # If starting in no-transition mode we have to calculate the sunrise
         # and sunset times ourselves because duration=0 only works with manual
         # sunrise and sunset times
         (pkgs.writeShellScript "wlsunset-manual-sun-times" ''
           line=$(
-            ${sunwait} report offset 30 ${latitude}N ${longitude}E \
+            ${sunwait} report offset 30 "$(</etc/coordinates/latitude)N" "$(</etc/coordinates/longitude)E" \
             | ${grep} 'twilight & offset')
 
           sunrise=$(echo "$line" | awk '{print $6}')

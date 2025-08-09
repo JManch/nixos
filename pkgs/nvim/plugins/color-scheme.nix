@@ -51,6 +51,18 @@
           end
         })
 
+        local get_coord = function(coord)
+          local file = io.open("/etc/coordinates/" .. coord, "rb")
+          if not file then return nil end
+          local content = file:read("*a")
+          file:close()
+          if not content then return nil end
+          return tonumber(content)
+        end
+
+        latitude = get_coord("latitude") or 50.8
+        longitude = get_coord("longitude") or -0.1
+
         local sunset_opts = {
           day_callback = function()
             vim.cmd.colorscheme("ayu-light")
@@ -59,8 +71,8 @@
             vim.cmd.colorscheme("ayu-mirage")
           end,
           update_interval = 10000,
-          latitude = 50.85,
-          longitute = -0.14,
+          latitude = latitude,
+          longitude = longitude,
           sunrise_offset = 1800,
           sunset_offset = -1800,
         }

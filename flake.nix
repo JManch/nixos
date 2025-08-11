@@ -39,8 +39,7 @@
     # Critical inputs that provide imported NixOS modules or overlays. Ideally
     # should review changes after updating.
 
-    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-personal";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     impermanence.url = "github:nix-community/impermanence";
 
@@ -132,7 +131,7 @@
     xdg-override.url = "github:koiuo/xdg-override";
     xdg-override.inputs.nixpkgs.follows = "nixpkgs";
 
-    nvf.url = "github:JManch/nvf"; # do not override nixpkgs input for stability
+    nvf.url = "github:JManch/nvf/blink-cmdline-inherit"; # do not override nixpkgs input for stability
 
     # Personal inputs
 

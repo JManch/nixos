@@ -1,26 +1,24 @@
 diff --git a/src/main.cpp b/src/main.cpp
-index 6e7650a9..57d877ac 100644
+index 021f8e1a..6f3be6d0 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
-@@ -92,9 +92,6 @@ static void handleSignalMainThread(int signum, bool& reload) {
-       }
+@@ -128,7 +128,6 @@ static void handleSignalMainThread(int signum, bool& reload) {
+       handleUserSignal(SIGUSR1, reload);
        break;
      case SIGUSR2:
--      spdlog::info("Reloading...");
--      reload = true;
--      waybar::Client::inst()->reset();
+-      handleUserSignal(SIGUSR2, reload);
        break;
      case SIGINT:
        spdlog::info("Quitting.");
 diff --git a/src/modules/hyprland/workspaces.cpp b/src/modules/hyprland/workspaces.cpp
-index bb03f707..394c08ab 100644
+index 5d2903dc..891df753 100644
 --- a/src/modules/hyprland/workspaces.cpp
 +++ b/src/modules/hyprland/workspaces.cpp
-@@ -699,7 +699,6 @@ auto Workspaces::registerIpc() -> void {
+@@ -795,7 +795,6 @@ auto Workspaces::registerIpc() -> void {
    m_ipc.registerForIPC("closewindow", this);
    m_ipc.registerForIPC("movewindowv2", this);
    m_ipc.registerForIPC("urgent", this);
 -  m_ipc.registerForIPC("configreloaded", this);
  
-   if (windowRewriteConfigUsesTitle()) {
+   if (windowRewriteConfigUsesTitle() || m_taskbarWithTitle) {
      spdlog::info(

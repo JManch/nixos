@@ -61,6 +61,14 @@
     wantedBy = [ "multi-user.target" ];
   };
 
+  # Also disable LED when resuming from hibernation
+  environment.etc."systemd/system-sleep/post-hibernate-disable-power-led".source =
+    pkgs.writeShellScript "post-hibernate-disable-power-led" ''
+      if [ "$1-$SYSTEMD_SLEEP_ACTION" = "post-hibernate" ]; then
+        echo 0 > /sys/class/leds/chromeos:white:power/brightness
+      fi
+    '';
+
   programs.zsh = {
     shellAliases = {
       "get-pps" = "cat /sys/class/drm/card1-eDP-1/amdgpu/panel_power_savings";

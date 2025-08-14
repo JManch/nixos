@@ -86,9 +86,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "6a2fe29210fd939571fdfcd78581965ef479c749",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/6a2fe29210fd939571fdfcd78581965ef479c749.tar.gz",
-      "hash": "01a8id66xpd5h3f35avk5x40fp9ibh330cr7blddkfsn9wsqydsf"
+      "revision": "d951c2b277a32cd2c57659c363bee4872c989969",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/d951c2b277a32cd2c57659c363bee4872c989969.tar.gz",
+      "hash": "0zgpfiqfkcsrrvafs2y7y9l0z24zl094hpmv6jzlzwiy1f71bqgd"
     },
     "async-property": {
       "type": "PyPi",
@@ -166,9 +166,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "14d2fa0d0320fa98f7c4334e901d2b34adfc8090",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/14d2fa0d0320fa98f7c4334e901d2b34adfc8090.tar.gz",
-      "hash": "16l8jv648x22gqz33jmbbd9z4kxch16qljnig23f5sq1x3b0gn3s"
+      "revision": "b169686cc34df107929101fa345e5b7e3c2040f1",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/b169686cc34df107929101fa345e5b7e3c2040f1.tar.gz",
+      "hash": "1vqgzpsj11vzgnwpkj2iw237p19r8ix25b1w899jkcjyrzk60qs5"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -293,9 +293,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "30e53f8a0f3708e92c84d4df676898cd16b8b64f",
-      "url": "https://github.com/Shatur/neovim-ayu/archive/30e53f8a0f3708e92c84d4df676898cd16b8b64f.tar.gz",
-      "hash": "1fxq7klf69byi6m8gqd3fq9zs96zc92qjzksafhgl8y7gs0hwzi5"
+      "revision": "8f236d3d65cf55bf0664aefd850c326580152270",
+      "url": "https://github.com/Shatur/neovim-ayu/archive/8f236d3d65cf55bf0664aefd850c326580152270.tar.gz",
+      "hash": "1dqhwkfb61x12klbbshbi5l99lqbyziily93p7xi78afr7vgxi87"
     },
     "neovim-config": {
       "type": "Git",
@@ -374,9 +374,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "04f744c7894fe416e3dd2fbdbaadd2f4e3132f5b",
-      "url": "https://github.com/dweymouth/supersonic/archive/04f744c7894fe416e3dd2fbdbaadd2f4e3132f5b.tar.gz",
-      "hash": "0cf5y3p0pdg7qr0w3pczyiaxh54qa3j9axp4mjwnswmbycr1d052"
+      "revision": "51b2b2ca0b90622b6d0f15907109aa41f4e7a614",
+      "url": "https://github.com/dweymouth/supersonic/archive/51b2b2ca0b90622b6d0f15907109aa41f4e7a614.tar.gz",
+      "hash": "074r66s5pzfr9q7ppmzxx6rk9ijp0bnaiynkyzkha4nmln3860rz"
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -434,10 +434,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.23.0",
-      "revision": "b6e8a89b63fa46ef114226d6e9270504e54a2255",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.23.0",
-      "hash": "09w51pxml1m7b60dib5ak6i8h9vnh5djadgy62vb6bvgqbrm822m"
+      "version": "v0.23.2",
+      "revision": "93bc364a3fe07c854d655aa908acadd5990bb5c0",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.23.2",
+      "hash": "0yisj9998s0jwxcqhq4znr89rkakskrrfq8vdgxhc86zajvc58wl"
     },
     "workspaces.nvim": {
       "type": "GitRelease",

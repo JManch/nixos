@@ -14,7 +14,7 @@
 # https://github.com/nix-community/home-manager/issues/2659
 { lib }:
 let
-  inherit (lib) types mkOption mkForce;
+  inherit (lib) types mkOption;
 in
 {
   enableOpt = false;
@@ -24,6 +24,7 @@ in
     serviceApps = mkOption {
       type = with types; listOf str;
       default = [ ];
+      example = [ "chromium-browser" ];
       description = ''
         List of application desktop entry IDs that should be started in
         services instead of scopes. Useful for applications where we want to

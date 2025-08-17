@@ -103,7 +103,6 @@
           bottles.enable = true;
           prism-launcher.enable = true;
           mint.enable = true;
-          ryujinx.enable = true;
           osu.enable = true;
           beamng.enable = true;
         };

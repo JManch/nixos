@@ -1,8 +1,8 @@
 diff --git a/src/Compositor.cpp b/src/Compositor.cpp
-index 154ec135..73c5381c 100644
+index b06710f6..d066c42f 100644
 --- a/src/Compositor.cpp
 +++ b/src/Compositor.cpp
-@@ -2577,12 +2577,12 @@ PHLLS CCompositor::getLayerSurfaceFromSurface(SP<CWLSurfaceResource> pSurface) {
+@@ -2596,12 +2596,12 @@ PHLLS CCompositor::getLayerSurfaceFromSurface(SP<CWLSurfaceResource> pSurface) {
  }
  
  // returns a delta
@@ -18,7 +18,7 @@ index 154ec135..73c5381c 100644
      bool        xIsPercent = false;
      bool        yIsPercent = false;
      bool        isExact    = false;
-@@ -2616,8 +2616,17 @@ Vector2D CCompositor::parseWindowVectorArgsRelative(const std::string& args, con
+@@ -2635,8 +2635,17 @@ Vector2D CCompositor::parseWindowVectorArgsRelative(const std::string& args, con
      int Y = 0;
  
      if (isExact) {
@@ -37,23 +37,23 @@ index 154ec135..73c5381c 100644
          X = xIsPercent ? (std::stof(x) * 0.01 * relativeTo.x) + relativeTo.x : std::stoi(x) + relativeTo.x;
          Y = yIsPercent ? (std::stof(y) * 0.01 * relativeTo.y) + relativeTo.y : std::stoi(y) + relativeTo.y;
 diff --git a/src/Compositor.hpp b/src/Compositor.hpp
-index 7c81c777..d916bb6a 100644
+index 70b18691..f99698c5 100644
 --- a/src/Compositor.hpp
 +++ b/src/Compositor.hpp
-@@ -131,7 +131,7 @@ class CCompositor {
+@@ -139,7 +139,7 @@ class CCompositor {
      void                   warpCursorTo(const Vector2D&, bool force = false);
      PHLLS                  getLayerSurfaceFromSurface(SP<CWLSurfaceResource>);
      void                   closeWindow(PHLWINDOW);
 -    Vector2D               parseWindowVectorArgsRelative(const std::string&, const Vector2D&);
 +    Vector2D               parseWindowVectorArgsRelative(const std::string&, const PHLWINDOW pWindow, const bool isPosition);
-     PHLWORKSPACE           createNewWorkspace(const WORKSPACEID&, const MONITORID&, const std::string& name = "",
-                                               bool isEmpty = true); // will be deleted next frame if left empty and unfocused!
-     void                   setActiveMonitor(PHLMONITOR);
+     [[nodiscard]] PHLWORKSPACE          createNewWorkspace(const WORKSPACEID&, const MONITORID&, const std::string& name = "",
+                                                            bool isEmpty = true); // will be deleted next frame if left empty and unfocused!
+     void                                setActiveMonitor(PHLMONITOR);
 diff --git a/src/managers/KeybindManager.cpp b/src/managers/KeybindManager.cpp
-index 1bd7e1a2..27eace7d 100644
+index ef0d3da7..8954315e 100644
 --- a/src/managers/KeybindManager.cpp
 +++ b/src/managers/KeybindManager.cpp
-@@ -2192,7 +2192,7 @@ SDispatchResult CKeybindManager::resizeActive(std::string args) {
+@@ -2186,7 +2186,7 @@ SDispatchResult CKeybindManager::resizeActive(std::string args) {
      if (PLASTWINDOW->isFullscreen())
          return {.success = false, .error = "Window is fullscreen"};
  
@@ -62,7 +62,7 @@ index 1bd7e1a2..27eace7d 100644
  
      if (SIZ.x < 1 || SIZ.y < 1)
          return {.success = false, .error = "Invalid size provided"};
-@@ -2214,7 +2214,7 @@ SDispatchResult CKeybindManager::moveActive(std::string args) {
+@@ -2208,7 +2208,7 @@ SDispatchResult CKeybindManager::moveActive(std::string args) {
      if (PLASTWINDOW->isFullscreen())
          return {.success = false, .error = "Window is fullscreen"};
  
@@ -71,7 +71,7 @@ index 1bd7e1a2..27eace7d 100644
  
      g_pLayoutManager->getCurrentLayout()->moveActiveWindow(POS - PLASTWINDOW->m_realPosition->goal());
  
-@@ -2236,7 +2236,7 @@ SDispatchResult CKeybindManager::moveWindow(std::string args) {
+@@ -2230,7 +2230,7 @@ SDispatchResult CKeybindManager::moveWindow(std::string args) {
      if (PWINDOW->isFullscreen())
          return {.success = false, .error = "Window is fullscreen"};
  
@@ -80,7 +80,7 @@ index 1bd7e1a2..27eace7d 100644
  
      g_pLayoutManager->getCurrentLayout()->moveActiveWindow(POS - PWINDOW->m_realPosition->goal(), PWINDOW);
  
-@@ -2258,7 +2258,7 @@ SDispatchResult CKeybindManager::resizeWindow(std::string args) {
+@@ -2252,7 +2252,7 @@ SDispatchResult CKeybindManager::resizeWindow(std::string args) {
      if (PWINDOW->isFullscreen())
          return {.success = false, .error = "Window is fullscreen"};
  

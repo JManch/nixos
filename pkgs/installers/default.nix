@@ -10,9 +10,10 @@ let
     filterAttrs
     modules
     mkBefore
+    mkForce
     ;
 
-  mkInstaller = name: system: base: {
+  mkInstaller = name: system: base: extraConfig: {
     inherit name;
     value =
       let
@@ -29,6 +30,7 @@ let
                 nixpkgs.overlays = mkBefore [ (_: prev: { ${ns} = import ../../pkgs self lib prev; }) ];
               }
               (modules.importApply ../../hosts/installer { })
+              extraConfig
             ];
           }
         );
@@ -53,9 +55,12 @@ let
 
 in
 listToAttrs [
-  (mkInstaller "installer-x86_64" "x86_64-linux" "cd-dvd/installation-cd-minimal.nix")
+  (mkInstaller "installer-x86_64" "x86_64-linux" "cd-dvd/installation-cd-minimal.nix" { })
   (mkInstaller "installer-x86_64-latest-kernel" "x86_64-linux"
     "cd-dvd/installation-cd-minimal-new-kernel.nix"
+    {
+      boot.supportedFilesystems.zfs = mkForce false;
+    }
   )
 ]
 // piInstallers

@@ -348,9 +348,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "bb7199ad4303942b3651524d7132e6e5c9032767",
-      "url": "https://github.com/mrusse/soularr/archive/bb7199ad4303942b3651524d7132e6e5c9032767.tar.gz",
-      "hash": "14yh9gb639h2smdc369nbvmaaravai6f2d5r7q5hz0q8dk0301ng"
+      "revision": "0af2c5a392f134b3a0b963963821ad30beaaa012",
+      "url": "https://github.com/mrusse/soularr/archive/0af2c5a392f134b3a0b963963821ad30beaaa012.tar.gz",
+      "hash": "17nbzdvbks7l8cxhs73bgxjl4clxkv5jqzjxxgvbk7pnxh35y098"
     },
     "sunset.nvim": {
       "type": "Git",

@@ -30,6 +30,7 @@
       jaq
       man-pages
       rsync
+      sd
     ])
     ++ lib.optional (osConfig != null) pkgs.${lib.ns}.microfetch;
 

@@ -20,6 +20,7 @@ let
     singleton
     optionalString
     mapAttrsToList
+    optional
     hiPrio
     ;
   inherit (config.${ns}.core) home-manager device;
@@ -32,7 +33,6 @@ in
 [
   {
     opts = {
-      extraAudioTools = mkEnableOption "extra audio tools including Easyeffects and Helvum";
       inputNoiseSuppression = mkEnableOption "input noise suppression source";
 
       alwaysMuteSink = mkOption {
@@ -77,7 +77,7 @@ in
             --replace-fail "Name=pwvucontrol" "Name=Volume Control"
         ''
       ))
-
+      pkgs.qpwgraph
     ];
 
     services.pulseaudio.enable = mkForce false;
@@ -333,7 +333,10 @@ in
         };
       };
 
-    ns.persistenceHome.directories = [ ".local/state/wireplumber" ];
+    ns.persistenceHome.directories = [
+      ".local/state/wireplumber"
+    ]
+    ++ optional desktop.enable ".config/qpwgraph";
   }
 
   (mkIf raspberry-pi.enable {
@@ -341,17 +344,5 @@ in
     # to add user to audio group for permissions
     security.rtkit.enable = mkForce false;
     users.users.${username}.extraGroups = [ "audio" ];
-  })
-
-  (mkIf cfg.extraAudioTools {
-    ns.userPackages = with pkgs; [
-      helvum
-      qpwgraph
-    ];
-
-    ns.persistenceHome.directories = [
-      ".config/rncbc.org"
-      ".config/qpwgraph" # just for manually saved configs
-    ];
   })
 ]

@@ -239,7 +239,6 @@
 
       audio = {
         enable = true;
-        extraAudioTools = true;
         defaultSource = "alsa_input.usb-BLUE_MICROPHONE_Blue_Snowball_201306-00.mono-fallback";
         defaultSink = "alsa_output.pci-0000_0b_00.4.analog-stereo";
 

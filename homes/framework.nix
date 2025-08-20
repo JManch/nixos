@@ -20,7 +20,7 @@
       hyprland = {
         vrr = true;
         tearing = true;
-        animations = false;
+        animations = true;
         directScanout = false; # causing flash when switching from fullscreen workspaces
         secondaryModKey = "SUPER"; # for some reason VMs ignore keyd remaps
         settings.device = lib.singleton {

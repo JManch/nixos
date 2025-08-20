@@ -60,10 +60,7 @@ in
     };
   };
 
-  # sd-switch broke after https://github.com/nix-community/home-manager/commit/de448dcb577570f2a11f243299b6536537e05bbe
-  # https://github.com/nix-community/home-manager/issues/7583
-  # I'd rather restart services manually anyway so disabling
-  # WARN: If I ever re-enable this check the commit history cause I removed all
-  # the X-SwitchMethod override
-  systemd.user.startServices = false;
+  # Reload systemd services on home-manager restart
+  # Add [Unit] X-SwitchMethod=(reload|restart|stop-start|keep-old) to control service behaviour
+  systemd.user.startServices = "sd-switch";
 }

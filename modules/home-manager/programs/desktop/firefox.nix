@@ -226,6 +226,7 @@ in
       services.firefox-persist-init = {
         Unit = {
           Description = "Firefox persist initialiser";
+          X-SwitchMethod = "keep-old";
           # We don't want graphical-session.target activation to be delayed
           # until this service is active.
           After = [ "graphical-session.target" ];
@@ -257,6 +258,7 @@ in
       services.firefox-persist-sync = {
         Unit = {
           Description = "Firefox persist synchroniser";
+          X-SwitchMethod = "keep-old";
           After = [ "firefox-persist-init.service" ];
           Requires = [ "firefox-persist-init.service" ];
           Requisite = [ "graphical-session.target" ];
@@ -279,6 +281,7 @@ in
       timers.firefox-persist-sync = {
         Unit = {
           Description = "Firefox persist synchroniser timer";
+          X-SwitchMethod = "keep-old";
           PartOf = [ "graphical-session.target" ];
         };
 

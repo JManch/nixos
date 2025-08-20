@@ -20,7 +20,7 @@
     # WARN: Be careful when changing mongodb versions as mongodb requires
     # manual intervention to migrate. Safest method is to export a unifi
     # backup, clear /var/lib/unifi and then restore from backup.
-    mongodbPackage = pkgs.mongodb-6_0;
+    mongodbPackage = pkgs.mongodb-7_0;
   };
 
   networking.firewall = {

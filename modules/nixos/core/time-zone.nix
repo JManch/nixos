@@ -10,6 +10,7 @@ let
     mkIf
     singleton
     optionalString
+    getExe'
     ;
   inherit (config.${ns}.core) device;
   inherit (config.${ns}.system) impermanence;
@@ -50,7 +51,7 @@ in
           chown 644 "/etc/coordinates/latitude"
         fi
 
-        if [[ ! -f "/etc/coordinates/longitude" ]]; then
+        if [ ! -f "/etc/coordinates/longitude" ]; then
           echo -n "${toString cfg.coordinates.longitude}" > "/etc/coordinates/longitude"
           chown 644 "/etc/coordinates/longitude"
         fi
@@ -69,7 +70,7 @@ in
           ${optionalString (config.time.timeZone == null) ''
             timedatectl list-timezones --no-pager
             timedatectl status
-            read -p "Enter one of the above timezone (leave blank to not modify): " -r timezone
+            read -p "Enter one of the above timezones (leave blank to not modify): " -r timezone
 
             if [[ -n $timezone ]]; then
               timedatectl set-timezone "$timezone"
@@ -124,7 +125,7 @@ in
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        ExecStop = "cp -d /etc/localtime /persist/etc/localtime";
+        ExecStop = "${getExe' pkgs.coreutils "cp"} -d /etc/localtime /persist/etc/localtime";
       };
       wantedBy = [ "multi-user.target" ];
     };

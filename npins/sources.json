@@ -86,9 +86,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "d951c2b277a32cd2c57659c363bee4872c989969",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/d951c2b277a32cd2c57659c363bee4872c989969.tar.gz",
-      "hash": "0zgpfiqfkcsrrvafs2y7y9l0z24zl094hpmv6jzlzwiy1f71bqgd"
+      "revision": "05b0656624d8e7797782dca2bb63e07ffc3e28dc",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/05b0656624d8e7797782dca2bb63e07ffc3e28dc.tar.gz",
+      "hash": "1x68q6px0c39cgshsc7bn5vx3abqf4cahsixpklwvlfjmvy63hdp"
     },
     "async-property": {
       "type": "PyPi",
@@ -166,9 +166,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "b169686cc34df107929101fa345e5b7e3c2040f1",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/b169686cc34df107929101fa345e5b7e3c2040f1.tar.gz",
-      "hash": "1vqgzpsj11vzgnwpkj2iw237p19r8ix25b1w899jkcjyrzk60qs5"
+      "revision": "2addb2381931bfec4e66e3cdd922c55f1751d56b",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/2addb2381931bfec4e66e3cdd922c55f1751d56b.tar.gz",
+      "hash": "0jq420x3sfaf7yv27h38dkfvcf4jdfp6pala7lbpwah0m5f748sn"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -293,9 +293,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "8f236d3d65cf55bf0664aefd850c326580152270",
-      "url": "https://github.com/Shatur/neovim-ayu/archive/8f236d3d65cf55bf0664aefd850c326580152270.tar.gz",
-      "hash": "1dqhwkfb61x12klbbshbi5l99lqbyziily93p7xi78afr7vgxi87"
+      "revision": "cc78e880cce5dfc1187d144ed7251c746feff259",
+      "url": "https://github.com/Shatur/neovim-ayu/archive/cc78e880cce5dfc1187d144ed7251c746feff259.tar.gz",
+      "hash": "1fdxapbm08g1hqdk31261c2fnfr4vawgb9pg0kxglc8lkyrn2w8b"
     },
     "neovim-config": {
       "type": "Git",
@@ -319,9 +319,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "3a2c4796b3aee5ccd4e66642bcd777ad38e0d739",
-      "url": "https://github.com/recyclarr/config-templates/archive/3a2c4796b3aee5ccd4e66642bcd777ad38e0d739.tar.gz",
-      "hash": "1haxl6f1hqn2d6rws1lbi9ns1zc9kf6m3i15nkdfgvy869668c1l"
+      "revision": "50222550a6a21b4b341cddf1855e5be9db90a352",
+      "url": "https://github.com/recyclarr/config-templates/archive/50222550a6a21b4b341cddf1855e5be9db90a352.tar.gz",
+      "hash": "137l0mahx8xhk65805a3zml7bp9vcks2flc0anl9ypnjz6fdmmg6"
     },
     "slskd-stats": {
       "type": "GitRelease",
@@ -374,9 +374,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "51b2b2ca0b90622b6d0f15907109aa41f4e7a614",
-      "url": "https://github.com/dweymouth/supersonic/archive/51b2b2ca0b90622b6d0f15907109aa41f4e7a614.tar.gz",
-      "hash": "074r66s5pzfr9q7ppmzxx6rk9ijp0bnaiynkyzkha4nmln3860rz"
+      "revision": "a8f252de33196e26dea93849c7e3c3a9fdd17b4f",
+      "url": "https://github.com/dweymouth/supersonic/archive/a8f252de33196e26dea93849c7e3c3a9fdd17b4f.tar.gz",
+      "hash": "1qkmi4kjpkgn27h2z1wqhxcnvi1bvk09kw8krm7f4vyka0l4pza9"
     },
     "thermal_comfort": {
       "type": "GitRelease",

@@ -38,22 +38,22 @@
   #   listenAddress = "127.0.0.1";
   # };
 
-  virtualisation.oci-containers.containers.silverbullet = {
+  virtualisation.oci-containers.containers."silverbullet" = {
     image = "ghcr.io/silverbulletmd/silverbullet:v2";
+    pull = "always";
     ports = [ "127.0.0.1:${toString cfg.port}:3000" ];
     volumes = [ "/var/lib/silverbullet:/space" ];
     environmentFiles = [ config.age.secrets.silverbulletVars.path ];
-    log-driver = "none"; # spams "Requested file ..." when a client is connected
     # Can't get rootless podman to work unfortunately
     # podman.users = "silverbullet";
   };
 
-  systemd.services.podman-silverbullet.serviceConfig = {
+  systemd.services."podman-silverbullet".serviceConfig = {
     StateDirectory = "silverbullet";
     StateDirectoryMode = "0700";
   };
 
-  ns.services.caddy.virtualHosts.notes = {
+  ns.services.caddy.virtualHosts."notes" = {
     allowTrustedAddresses = false;
     extraAllowedAddresses = cfg.allowedAddresses;
     extraConfig = ''
@@ -61,7 +61,7 @@
     '';
   };
 
-  ns.backups.silverbullet = {
+  ns.backups."silverbullet" = {
     backend = "restic";
     paths = [ "/var/lib/silverbullet" ];
   };

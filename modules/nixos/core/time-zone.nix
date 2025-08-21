@@ -43,17 +43,23 @@ in
     # when we are away from home
     time.timeZone = if device.type == "laptop" then null else "Europe/London";
 
-    system.activationScripts."setup-coordinates" = # bash
+    system.activationScripts."setup-coordinates" =
+      let
+        # Activation runs in initrd before impermanence bind mounts so we need
+        # to use persist path
+        coordsDir = optionalString impermanence.enable "/persist" + "/etc/coordinates";
+      in
+      # bash
       ''
-        mkdir -p /etc/coordinates
-        if [ ! -f "/etc/coordinates/latitude" ]; then
-          echo -n "${toString cfg.coordinates.latitude}" > "/etc/coordinates/latitude"
-          chown 644 "/etc/coordinates/latitude"
+        mkdir -p ${coordsDir}
+        if [ ! -f "${coordsDir}/latitude" ]; then
+          echo -n "${toString cfg.coordinates.latitude}" > "${coordsDir}/latitude"
+          chown 644 "${coordsDir}/latitude"
         fi
 
-        if [ ! -f "/etc/coordinates/longitude" ]; then
-          echo -n "${toString cfg.coordinates.longitude}" > "/etc/coordinates/longitude"
-          chown 644 "/etc/coordinates/longitude"
+        if [ ! -f "${coordsDir}/longitude" ]; then
+          echo -n "${toString cfg.coordinates.longitude}" > "${coordsDir}/longitude"
+          chown 644 "${coordsDir}/longitude"
         fi
       '';
 

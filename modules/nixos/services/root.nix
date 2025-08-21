@@ -147,34 +147,36 @@ in
               ExecStart = getExe (
                 pkgs.writeShellApplication {
                   name = "${name}-${type}-notify";
+                  bashOptions = [
+                    "nounset"
+                    "pipefail"
+                  ];
                   runtimeInputs = with pkgs; [
                     shoutrrr
                     systemd
                   ];
-                  text = ''
-                    set +e
-                  ''
-                  + optionalString desktop.enable ''
-                    systemd-run --user --machine ${username}@.host -- \
-                      ${getExe pkgs.libnotify} --urgency=critical -t 10000 -- "${value.title} Failed" "${value.contents}"
-                  ''
-                  + optionalString value.discord.enable ''
-                    shoutrrr send \
-                      --url "discord://${"$" + value.discord.var}_${toUpper type}_DISCORD_AUTH" \
-                      --title "${value.title}" \
-                      --message "${
-                        if value.contentsScript == null then value.contents else "$(${value.contentsScript})"
-                      }"
-                  ''
-                  + optionalString value.email.enable ''
-                    shoutrrr send \
-                      --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${
-                        replaceStrings [ " " ] [ "%20" ] value.title
-                      }" \
-                      --message "${
-                        if value.contentsScript == null then value.contents else "$(${value.contentsScript})"
-                      }"
-                  '';
+                  text =
+                    optionalString desktop.enable ''
+                      systemd-run --user --machine ${username}@.host -- \
+                        ${getExe pkgs.libnotify} --urgency=critical -t 10000 -- "${value.title} Failed" "${value.contents}"
+                    ''
+                    + optionalString value.discord.enable ''
+                      shoutrrr send \
+                        --url "discord://${"$" + value.discord.var}_${toUpper type}_DISCORD_AUTH" \
+                        --title "${value.title}" \
+                        --message "${
+                          if value.contentsScript == null then value.contents else "$(${value.contentsScript})"
+                        }"
+                    ''
+                    + optionalString value.email.enable ''
+                      shoutrrr send \
+                        --url "smtp://$SMTP_USERNAME:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT/?from=$SMTP_FROM&to=JManch@protonmail.com&Subject=${
+                          replaceStrings [ " " ] [ "%20" ] value.title
+                        }" \
+                        --message "${
+                          if value.contentsScript == null then value.contents else "$(${value.contentsScript})"
+                        }"
+                    '';
                 }
               );
             };

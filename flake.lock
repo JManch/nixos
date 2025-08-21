@@ -1232,11 +1232,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1754800730,
-        "narHash": "sha256-HfVZCXic9XLBgybP0318ym3cDnGwBs/+H5MgxFVYF4I=",
+        "lastModified": 1755049066,
+        "narHash": "sha256-ANrc15FSoOAdNbfKHxqEJjZLftIwIsenJGRb/04K41s=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "641d909c4a7538f1539da9240dedb1755c907e40",
+        "rev": "e45f8f193029378d0aaee5431ba098dc80054e9a",
         "type": "github"
       },
       "original": {
@@ -1293,16 +1293,15 @@
         "systems": "systems_9"
       },
       "locked": {
-        "lastModified": 1754881827,
-        "narHash": "sha256-TViMce8V97wpvRO9lXqgcWoZipNX+V7ZFIwQiy1aEEQ=",
+        "lastModified": 1755739073,
+        "narHash": "sha256-govNLtHBXqQACmi7f8OniSNg3hmmicLLmA1h6rWwFe4=",
         "owner": "JManch",
         "repo": "nvf",
-        "rev": "f2427a36d097e700f7bef2086ff9790e25724944",
+        "rev": "20043471f996019f8e145232e04d0d43f1f76291",
         "type": "github"
       },
       "original": {
         "owner": "JManch",
-        "ref": "blink-cmdline-inherit",
         "repo": "nvf",
         "type": "github"
       }

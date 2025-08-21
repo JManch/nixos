@@ -186,25 +186,44 @@ in
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = pkgs.writeShellScript "setup-pipewire-devices" ''
-              sleep 2
-              attempt=0
-              while ! ${wpctl} inspect @DEFAULT_AUDIO_SINK@ &>/dev/null; do
-                if (( attempt >= 30 )); then
-                  echo "PipeWire failed to initialise in time"
-                  exit 1
-                fi
+            ExecStart = getExe (
+              pkgs.writeShellApplication {
+                name = "setup-pipewire-devices";
+                runtimeInputs = with pkgs; [
+                  coreutils
+                  wireplumber
+                  pulseaudio
+                  gnugrep
+                ];
+                bashOptions = [
+                  "nounset"
+                  "pipefail"
+                ];
+                text = ''
+                  sleep 2
+                  attempt=0
+                  while ! wpctl inspect @DEFAULT_AUDIO_SINK@ &>/dev/null; do
+                    if (( attempt >= 30 )); then
+                      echo "PipeWire failed to initialise in time"
+                      exit 1
+                    fi
 
-                echo "Waiting for PipeWire to initialise..."
-                attempt=$((attempt + 1))
-                sleep 2
-              done
+                    echo "Waiting for PipeWire to initialise..."
+                    attempt=$((attempt + 1))
+                    sleep 2
+                  done
 
-              ${optionalString (cfg.defaultSink != null) "${pactl} set-default-sink \"${cfg.defaultSink}\""}
-              ${optionalString (cfg.defaultSource != null) "${pactl} set-default-source \"${cfg.defaultSource}\""}
-              ${wpctl} set-mute @DEFAULT_AUDIO_SINK@ ${if cfg.alwaysMuteSink then "1" else "0"}
-              ${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ 1
-            '';
+                  ${optionalString (cfg.defaultSink != null) "pactl set-default-sink \"${cfg.defaultSink}\""}
+                  ${optionalString (cfg.defaultSource != null) "pactl set-default-source \"${cfg.defaultSource}\""}
+                  wpctl set-mute @DEFAULT_AUDIO_SINK@ ${if cfg.alwaysMuteSink then "1" else "0"}
+                  # @DEFAULT_AUDIO_SOURCE@ can resolve to a sink if no sources exist
+                  # https://gitlab.freedesktop.org/pipewire/wireplumber/-/issues/509
+                  if [[ $(wpctl inspect @DEFAULT_AUDIO_SOURCE@ | grep 'media\.class' | cut -d '"' -f 2) == "Audio/Source" ]]; then
+                    wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1
+                  fi
+                '';
+              }
+            );
           };
           wantedBy = [ "graphical-session.target" ];
         };

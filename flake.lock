@@ -404,26 +404,6 @@
         "type": "github"
       }
     },
-    "grimblast": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1734196751,
-        "narHash": "sha256-uZq+t3GjMnz2zVNAY+e8lg171ePhMSP3DyKF3QzOu+8=",
-        "owner": "JManch",
-        "repo": "grimblast",
-        "rev": "4386874c3c53bcd917639bc0efcb8167e3eaf65f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "JManch",
-        "repo": "grimblast",
-        "type": "github"
-      }
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -1336,7 +1316,6 @@
         "disko": "disko",
         "firstBoot": "firstBoot",
         "gnome-keybinds": "gnome-keybinds",
-        "grimblast": "grimblast",
         "home-manager": "home-manager",
         "hypridle": "hypridle",
         "hyprland": "hyprland",

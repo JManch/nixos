@@ -211,7 +211,6 @@ in
   home.packages = [
     toggleMonitor
     setupMonitors
-    (flakePkgs args "grimblast").grimblast
   ]
   # These are needed for xdg-desktop-portal-hyprland screenshot
   # functionality. Even though I use grimblast the portal may be used in some

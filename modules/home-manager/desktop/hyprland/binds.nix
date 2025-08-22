@@ -1,7 +1,6 @@
 {
   lib,
   cfg,
-  args,
   pkgs,
   config,
   osConfig,
@@ -17,7 +16,8 @@ let
     flatten
     concatMapStringsSep
     ;
-  inherit (lib.${ns}) flakePkgs getMonitorHyprlandCfgStr;
+  inherit (lib.${ns}) getMonitorHyprlandCfgStr;
+  inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.core) device;
   mod = cfg.modKey;
   modShift = "${cfg.modKey}SHIFT";
@@ -27,11 +27,9 @@ let
   bc = getExe' pkgs.bc "bc";
   awk = getExe pkgs.gawk;
   brightnessctl = getExe pkgs.brightnessctl;
-  grimblast = getExe (flakePkgs args "grimblast").grimblast;
   notifySend = getExe pkgs.libnotify;
   hyprctl = getExe' pkgs.hyprland "hyprctl";
   loginctl = getExe' pkgs.systemd "loginctl";
-  disableShadersCommand = command: "${cfg.disableShaders} ${command}; ${cfg.enableShaders}";
 
   toggleDwindleGaps =
     pkgs.writeShellScript "hypr-toggle-dwindle-gaps" # bash
@@ -183,13 +181,11 @@ let
 
   copyScreenshotText = pkgs.writeShellScript "hypr-copy-screenshot-text" ''
     set -o pipefail
-    ${cfg.disableShaders}
-    text=$(${grimblast} --freeze save area - | ${getExe pkgs.tesseract} stdin stdout)
+    text=$(${takeScreenshot} copy area - | ${getExe pkgs.tesseract} stdin stdout)
     exit=$?
-    ${cfg.enableShaders}
     if [ $exit -eq 0 ]; then
       echo "$text" | ${getExe' pkgs.wl-clipboard "wl-copy"}
-      ${notifySend} -e -t 5000 -a Grimblast "Text Copied" "$text"
+      ${notifySend} -e -t 5000 Screenshot "Text Copied" "$text"
     else
       ${notifySend} -e --urgency=critical -t 5000 "Screenshot" "Failed to copy text"
     fi
@@ -227,6 +223,84 @@ let
       concatMapStringsSep ";" (m: "keyword monitor ${getMonitorHyprlandCfgStr m}") device.monitors
     }"
   '';
+
+  takeScreenshot = getExe (
+    pkgs.writeShellApplication {
+      name = "hypr-screenshot";
+      runtimeInputs = with pkgs; [
+        hyprland
+        hyprpicker
+        libnotify
+        wl-clipboard
+        grim
+        jq
+        slurp
+        satty
+        procps
+        app2unit
+      ];
+      text = ''
+        output_dir="''${XDG_SCREENSHOTS_DIR:-''${XDG_PICTURES_DIR:-$HOME}}"
+        date=$(date +'%Y%m%d-%H%M%S')
+
+        action=''${1:-""}
+        subject=''${2:-""}
+        output_file=''${3:-""}
+
+        if [[ $action != "save" && $action != "copy" && $subject != "area" && $subject != "output" ]]; then
+          echo "Usage: wl-screenshot copy|save area|output"
+          exit 1
+        fi
+
+        if [[ -z $output_file ]]; then
+          if [[ $action == "copy" ]]; then
+            output_file="/tmp/$(mktemp "screenshot-$date-XXXX.png")"
+            message="Image saved to $output_file and copied to the clipboard"
+          else
+            output_file="$output_dir/$date.png"
+            message="Image saved to $output_file"
+          fi
+        fi
+
+        die() {
+          pkill hyprpicker || true
+          exit 1
+        }
+
+        ${cfg.disableShaders} >/dev/null
+
+        if [[ $subject == "output" ]]; then
+          output=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')
+          grim -o "$output" "$output_file"
+        elif [[ $subject == "area" ]]; then
+          hyprpicker --render-inactive --no-zoom &
+          sleep 0.2
+
+          # fix black border around screenshots
+          hyprctl keyword layerrule "noanim,selection" >/dev/null
+
+          geom=$(slurp -d)
+          [[ -z $geom ]] && die
+          grim -g "$geom" "$output_file" || die
+        fi
+
+        ${cfg.enableShaders} >/dev/null
+        pkill hyprpicker || true
+
+        if [[ $output_file == "-" ]]; then
+          exit 0
+        fi
+
+        notify_action=$(notify-send --action 'default=Edit image' --icon "$output_file" Screenshot "$message")
+        if [[ $notify_action = "default" ]]; then
+          [[ $action == "copy" ]] && output_edit_file="$output_dir/$date.png" || output_edit_file="$output_dir/$date-edit.png"
+          app2unit satty --filename "$output_file" --output-filename "$output_edit_file" --font-family "${desktop.style.font.family}" &
+        elif [[ $action == "copy" ]]; then
+          rm "$output_file"
+        fi
+      '';
+    }
+  );
 in
 {
   # Force secondaryModKey VM variant because binds are repeated on host
@@ -285,12 +359,10 @@ in
       "${modShift}, X, layoutmsg, swapsplit"
 
       # Screenshots
-      ", Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy area"}"
-      "${mod}, I, exec, ${disableShadersCommand "${grimblast} --notify copy output"}"
-      "${modShift}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save area"}"
-      "${modShift}, I, exec, ${disableShadersCommand "${grimblast} --notify save output"}"
-      "${modShiftCtrl}, Print, exec, ${disableShadersCommand "${grimblast} --notify --freeze save window"}"
-      "${modShiftCtrl}, I, exec, ${disableShadersCommand "${grimblast} --notify --freeze copy window"}"
+      ", Print, exec, ${takeScreenshot} copy area"
+      "${mod}, I, exec, ${takeScreenshot} copy output"
+      "${modShift}, Print, exec, ${takeScreenshot} save area"
+      "${modShift}, I, exec, ${takeScreenshot} save output"
       "${modShiftCtrl}, C, exec, ${copyScreenshotText}"
 
       # Workspaces other

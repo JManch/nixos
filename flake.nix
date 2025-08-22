@@ -140,8 +140,5 @@
 
     nix-resources.url = "git+ssh://git@github.com/JManch/nix-resources";
     nix-resources.inputs.nixpkgs.follows = "nixpkgs";
-
-    grimblast.url = "github:JManch/grimblast";
-    grimblast.inputs.nixpkgs.follows = "nixpkgs";
   };
 }

@@ -470,6 +470,22 @@
       "revision": "65cdde23699bebdb3443a16031e7fa1c64633dd0",
       "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.13.2",
       "hash": "1n1y6xpfr45lplkyx7i8zq219qpcj37czhkkzlpb30jvf9r38s2v"
+    },
+    "yt-dlp": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "yt-dlp",
+        "repo": "yt-dlp"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "2025.08.20",
+      "revision": "575753b9f398da0aca52bfb675779fd5d1ae68b5",
+      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/2025.08.20",
+      "hash": "17g32lgax04yrhlvgaphdkkhv0xkxdimw57m6a1d3yhsnrbjiqhm"
     }
   },
   "version": 5

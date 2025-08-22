@@ -27,6 +27,7 @@ in
   # https://discourse.nixos.org/t/why-does-prev-callpackage-use-packages-from-final/25263
   brightnessctl = callPackage ./brightnessctl.nix (args // { inherit (pkgs) brightnessctl; });
   slskd-stats = pkgs.python3Packages.callPackage ./slskd-stats.nix args;
+  yt-dlp = callPackage ./yt-dlp.nix args;
 
   # Manual
   advanced-camera-card = callPackage ./advanced-camera-card.nix { };

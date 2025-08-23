@@ -27,7 +27,7 @@ in
       readOnly = true;
       default =
         if isGammaCustom then
-          "${hyprctl} keyword decoration:screen_shader '${cfg.shaderDir}/monitorGamma.frag'"
+          "${hyprctl} keyword decoration:screen_shader '${cfg.shaderDir}/monitorGamma.frag' >/dev/null"
         else
           "";
       description = "Command to enable Hyprland screen shaders";
@@ -38,7 +38,7 @@ in
       readOnly = true;
       default =
         if isGammaCustom then
-          "${hyprctl} keyword decoration:screen_shader '${cfg.shaderDir}/blank.frag'"
+          "${hyprctl} keyword decoration:screen_shader '${cfg.shaderDir}/blank.frag' >/dev/null"
         else
           "";
       description = "Command to disable Hyprland screen shaders";

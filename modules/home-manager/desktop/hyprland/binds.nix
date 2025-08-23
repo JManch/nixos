@@ -267,7 +267,7 @@ let
           exit 1
         }
 
-        ${cfg.disableShaders} >/dev/null
+        ${cfg.disableShaders}
 
         if [[ $subject == "output" ]]; then
           output=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')
@@ -284,7 +284,7 @@ let
           grim -g "$geom" "$output_file" || die
         fi
 
-        ${cfg.enableShaders} >/dev/null
+        ${cfg.enableShaders}
         pkill hyprpicker || true
 
         if [[ $output_file == "-" ]]; then

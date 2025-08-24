@@ -254,7 +254,7 @@ let
 
         if [[ -z $output_file ]]; then
           if [[ $action == "copy" ]]; then
-            output_file="/tmp/$(mktemp "screenshot-$date-XXXX.png")"
+            output_file="$(mktemp "/tmp/screenshot-$date-XXXX.png")"
             message="Image saved to $output_file and copied to the clipboard"
           else
             output_file="$output_dir/$date.png"
@@ -268,6 +268,10 @@ let
         }
 
         ${cfg.disableShaders}
+        enable_shaders() {
+          ${cfg.enableShaders}
+        }
+        trap enable_shaders EXIT
 
         if [[ $subject == "output" ]]; then
           output=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')
@@ -284,8 +288,8 @@ let
           grim -g "$geom" "$output_file" || die
         fi
 
-        ${cfg.enableShaders}
         pkill hyprpicker || true
+        wl-copy --type image/png < "$output_file"
 
         if [[ $output_file == "-" ]]; then
           exit 0

@@ -288,6 +288,7 @@ let
           grim -g "$geom" "$output_file" || die
         fi
 
+        enable_shaders
         pkill hyprpicker || true
         wl-copy --type image/png < "$output_file"
 

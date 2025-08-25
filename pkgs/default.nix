@@ -28,6 +28,7 @@ in
   brightnessctl = callPackage ./brightnessctl.nix (args // { inherit (pkgs) brightnessctl; });
   slskd-stats = pkgs.python3Packages.callPackage ./slskd-stats.nix args;
   yt-dlp = callPackage ./yt-dlp.nix args;
+  comick-downloader = pkgs.python3Packages.callPackage ./comick-downloader.nix args;
 
   # Manual
   advanced-camera-card = callPackage ./advanced-camera-card.nix { };

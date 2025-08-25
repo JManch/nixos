@@ -112,6 +112,19 @@
       "hash": "0kfi1az2hm1ayiphl72vxiimh1d77kyz828wy53kk58gyqzmw2va",
       "frozen": true
     },
+    "comick_downloader": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "zzyil",
+        "repo": "comick.io-Downloader"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "ae952a1068e711db66bcd4e644e8f44137b3de1f",
+      "url": "https://github.com/zzyil/comick.io-Downloader/archive/ae952a1068e711db66bcd4e644e8f44137b3de1f.tar.gz",
+      "hash": "1d67wkkib19ywcqcfrxpfg6s85lfr8jlv2jpnv7w2g8l3r0wj3ab"
+    },
     "ctrld": {
       "type": "GitRelease",
       "repository": {

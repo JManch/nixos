@@ -113,7 +113,7 @@ in
   };
 
   # https://github.com/starship/starship/issues/5410 would make this easier
-  programs.starship.settings.env_var.ATUIN_INCOGNITO = {
+  categoryConfig.starship.settings.env_var.ATUIN_INCOGNITO = {
     default = "";
     format = "$env_value";
   };

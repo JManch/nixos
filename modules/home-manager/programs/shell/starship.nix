@@ -1,17 +1,23 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
 }:
 let
   inherit (config.${lib.ns}.programs.shell) promptColor;
+  tomlFormat = pkgs.formats.toml { };
 in
 {
   enableOpt = false;
 
-  home.packages = [ pkgs.starship ];
+  opts.settings = lib.mkOption {
+    type = tomlFormat.type;
+    default = { };
+    description = "Starship settings";
+  };
 
-  xdg.configFile."starship.toml".source = (pkgs.formats.toml { }).generate "starship-config" {
+  categoryConfig.starship.settings = {
     add_newline = false;
     format = "$directory$character";
     right_format = "$all";
@@ -46,6 +52,10 @@ in
       diverged = "󰹺";
     };
   };
+
+  xdg.configFile."starship.toml".source = tomlFormat.generate "starship-config" cfg.settings;
+
+  home.packages = [ pkgs.starship ];
 
   programs.zsh.initContent = ''
     if [[ $TERM != "dumb" ]]; then

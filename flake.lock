@@ -1067,17 +1067,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1755786426,
-        "narHash": "sha256-YIJ61TGgLwwYH/uElKiCOSKT3ZQBj9t3sx2iN+sZK9c=",
-        "ref": "refs/heads/main",
-        "rev": "d65eeb5fdb5e30c31201a39dbc4a0fac92c21bdc",
-        "revCount": 300,
-        "type": "git",
-        "url": "ssh://git@github.com/JManch/nix-resources"
+        "lastModified": 1756326786,
+        "narHash": "sha256-tR4S0b3MnAbzV14/iNH6RaIQ1fAWqiMc39E00N1kHVg=",
+        "owner": "JManch",
+        "repo": "nix-resources",
+        "rev": "f580e2a0693782f3c9f47b41535f0aaaef0eb8d8",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/JManch/nix-resources"
+        "owner": "JManch",
+        "repo": "nix-resources",
+        "type": "github"
       }
     },
     "nixos-hardware": {

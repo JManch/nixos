@@ -138,7 +138,7 @@
     firstBoot.url = "github:JManch/false";
     vmInstall.url = "github:JManch/false";
 
-    nix-resources.url = "git+ssh://git@github.com/JManch/nix-resources";
+    nix-resources.url = "github:JManch/nix-resources"; # needs access-token configured to access
     nix-resources.inputs.nixpkgs.follows = "nixpkgs";
   };
 }

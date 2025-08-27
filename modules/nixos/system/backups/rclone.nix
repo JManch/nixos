@@ -31,6 +31,7 @@ let
     mapAttrsToList
     nameValuePair
     concatMapStringsSep
+    concatMapStrings
     filterAttrs
     ;
   inherit (config.${ns}.system) impermanence;
@@ -176,11 +177,28 @@ in
                     cp "${remoteConfig}" "$CACHE_DIRECTORY/config-original"
                   fi
 
-                  ${concatMapStringsSep "\n  " (
+                  ${concatMapStrings (
                     path:
-                    ''rclone --config "$CACHE_DIRECTORY/config" ${backup.backendOptions.mode} "${path}" "remote:${removePrefix "/" remoteCfg.root}/${
-                      removePrefix "/" backup.backendOptions.remotePaths.${path}
-                    }" --verbose ${concatStringsSep " " backup.backendOptions.flags}''
+                    let
+                      defaultFlags = [
+                        ''--config "$CACHE_DIRECTORY/config"''
+                        "--verbose"
+                      ];
+
+                      remotePath = "remote:${removePrefix "/" remoteCfg.root}/${
+                        removePrefix "/" backup.backendOptions.remotePaths.${path}
+                      }";
+                    in
+                    ''
+                      rclone ${backup.backendOptions.mode} "${path}" "${remotePath}" ${
+                        concatStringsSep " " (defaultFlags ++ backup.backendOptions.flags)
+                      }
+                    ''
+                    + optionalString backup.backendOptions.check.enable ''
+                      rclone check "${path}" "${remotePath}" ${
+                        concatStringsSep " " (defaultFlags ++ backup.backendOptions.check.flags)
+                      }
+                    ''
                   ) backup.paths}
                 '';
               }
@@ -249,7 +267,7 @@ in
         flags = mkOption {
           type = with types; listOf str;
           default = [ ];
-          description = "List of flags appended to end of the rclone command";
+          description = "List of flags appended to rclone command";
         };
 
         timeout = mkOption {
@@ -265,6 +283,20 @@ in
             us. This way we know when the remote dir needs changing. Only makes sense for
             small backups that should not take very long.
           '';
+        };
+
+        check = {
+          enable = mkOption {
+            type = types.bool;
+            default = false;
+            description = "running `rlcone check` after performing the backup";
+          };
+
+          flags = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "List of flags appended to check command";
+          };
         };
       };
     };

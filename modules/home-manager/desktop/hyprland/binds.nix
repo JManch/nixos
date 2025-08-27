@@ -270,6 +270,7 @@ let
         ${cfg.disableShaders}
         enable_shaders() {
           ${cfg.enableShaders}
+          :
         }
         trap enable_shaders EXIT
 

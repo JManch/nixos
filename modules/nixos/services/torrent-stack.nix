@@ -684,6 +684,20 @@ in
           mode = "sync";
           remotePaths."${cfg.mediaDir}/music" = "music";
           flags = [ "--bwlimit 5M" ];
+          check = {
+            # Filen uses a case-insensitive file system so syncs can break if we change the
+            # case of local directory names. Basically results in every backup run
+            # attempting to re-upload the "renamed" directory with the remote directory
+            # never changing.
+
+            # Enabling checks allows us to detect when this happens so we can manually
+            # intervene and fix it. A proper solution would be to use --track-renames but
+            # it seems like the filen rclone implementation does not support move
+            # operations: `PostV3FileMove: response error: Cannot move this file.
+            # cannot_move_this_file : can't move object - incompatible remotes`
+            enable = true;
+            flags = [ "--size-only" ];
+          };
         };
       };
 

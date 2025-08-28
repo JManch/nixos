@@ -1,11 +1,15 @@
 {
   lib,
-  args,
   pkgs,
   config,
 }:
 let
-  inherit (lib) ns mkIf hiPrio;
+  inherit (lib)
+    ns
+    mkIf
+    hiPrio
+    mkForce
+    ;
   inherit (config.${ns}.core) home-manager device;
 in
 {
@@ -14,27 +18,46 @@ in
     powerOnBoot = device.type != "laptop";
   };
 
-  # WARN: Overskride has a horrendous bug where clicking on button toggles does
-  # nothing (even though the toggle visually flips). Must click on the bars.
-  # https://github.com/kaii-lb/overskride/issues/25
-  ns.userPackages = [
-    (lib.${ns}.wrapHyprlandMoveToActive args pkgs.overskride "io.github.kaii_lb.Overskride" "")
+  services.blueman.enable = true;
+
+  systemd.user.services.blueman-applet = {
+    path = mkForce [ ];
+    after = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    requisite = [ "graphical-session.target" ];
+    serviceConfig.Slice = "session${lib.${ns}.sliceSuffix config}.slice";
+  };
+
+  environment.systemPackages = [
     (hiPrio (
-      pkgs.runCommand "overskride-desktop-modify" { } ''
+      pkgs.runCommand "blueman-autostart-disable" { } ''
+        mkdir -p $out/etc/xdg/autostart
+        substitute ${pkgs.blueman}/etc/xdg/autostart/blueman.desktop $out/etc/xdg/autostart/blueman.desktop \
+          --replace-fail "Type=Application" "Type=Application
+        Hidden=true"
+      ''
+    ))
+
+    (hiPrio (
+      pkgs.runCommand "blueman-adapter-desktop-entry-disable" { } ''
         mkdir -p $out/share/applications
-        substitute ${pkgs.overskride}/share/applications/io.github.kaii_lb.Overskride.desktop $out/share/applications/io.github.kaii_lb.Overskride.desktop \
-          --replace-fail "Name=Overskride" "Name=Bluetooth"
+        substitute ${pkgs.blueman}/share/applications/blueman-adapters.desktop $out/share/applications/blueman-adapters.desktop \
+          --replace-fail "Type=Application" "Type=Application
+        Hidden=true"
       ''
     ))
   ];
 
   ns.hm = mkIf home-manager.enable {
     ${ns}.desktop.hyprland.settings.windowrule = [
-      "float, class:^(io\\.github\\.kaii_lb\\.Overskride)$"
-      "size 40% 70%, class:^(io\\.github\\.kaii_lb\\.Overskride)$"
-      "center, class:^(io\\.github\\.kaii_lb\\.Overskride)$"
+      "float, class:^(.blueman-manager-wrapped)$"
+      "size 40% 40%, class:^(.blueman-manager-wrapped)$"
+      "center, class:^(.blueman-manager-wrapped)$"
     ];
   };
 
-  ns.persistence.directories = [ "/var/lib/bluetooth" ];
+  ns.persistence.directories = [
+    "/var/lib/bluetooth"
+    "/var/lib/blueman"
+  ];
 }

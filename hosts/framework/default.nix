@@ -161,8 +161,8 @@
       audio = {
         enable = true;
         alsaDeviceAliases = {
-          "alsa_output.pci-0000_c1_00.6.analog-stereo" = "Laptop Audio";
-          "alsa_input.pci-0000_c1_00.6.analog-stereo" = "Laptop Microphone";
+          "alsa_output.pci-0000_c1_00.6.HiFi__Speaker__sink" = "Laptop Audio";
+          "alsa_input.pci-0000_c1_00.6.HiFi__Mic1__source" = "Laptop Microphone";
         };
       };
 

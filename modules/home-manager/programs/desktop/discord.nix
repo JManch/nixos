@@ -26,6 +26,8 @@ in
       "${hyprland.modKey}, D, togglespecialworkspace, discord"
       "${hyprland.modKey}SHIFT, D, movetoworkspacesilent, special:discord"
     ];
+
+    gesture = [ "3, down, special, discord" ];
   };
 
   # Electron apps core dump on exit with the default KillMode control-group.

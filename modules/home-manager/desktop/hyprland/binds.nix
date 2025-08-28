@@ -414,6 +414,13 @@ in
       "${mod}, Down, resizeactive, 0 20"
     ];
 
+    settings.gesture = [
+      "3, horizontal, workspace"
+      "4, swipe, scale: 2, resize"
+      "4, swipe, mod: ALT, scale: 2, move"
+      "3, pinch, fullscreen, maximise"
+    ];
+
     extraConfig = ''
       bind = ${mod}, Delete, submap, Grab
       submap = Grab

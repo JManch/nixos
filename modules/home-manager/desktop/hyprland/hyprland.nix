@@ -337,8 +337,6 @@ in
         };
       };
 
-      gestures.workspace_swipe = true;
-
       cursor = {
         inactive_timeout = 0;
         enable_hyprcursor = cfg.hyprcursor.package != null;

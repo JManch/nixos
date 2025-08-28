@@ -51,6 +51,8 @@ in
       "${hyprland.modKey}SHIFT, S, movetoworkspacesilent, special:music"
     ];
 
+    gesture = [ "3, up, special, music" ];
+
     windowrule = [ "float, class:^(spek)$" ];
   };
 }

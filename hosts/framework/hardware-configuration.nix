@@ -2,6 +2,7 @@
 # - https://github.com/openwrt/mt76/issues/548
 # - Userspace charge limiter has been broken since the 3.04 bios update https://github.com/tlvince/nixos-config/issues/309
 {
+  lib,
   pkgs,
   inputs,
   modulesPath,
@@ -109,12 +110,12 @@
     MemorySleepMode=s2idle
   '';
 
-  services.logind = {
-    powerKey = "poweroff";
-    lidSwitch = "suspend-then-hibernate";
+  services.logind.settings.Login = {
+    HandlePowerKey = "poweroff";
+    HandleLidSwitch = "suspend-then-hibernate";
   };
 
-  services.fwupd.enable = false; # enable when necessary
+  services.fwupd.enable = lib.mkForce false; # enable when necessary
   services.power-profiles-daemon.enable = false;
   services.tlp = {
     enable = true;

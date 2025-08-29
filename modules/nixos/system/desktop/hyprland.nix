@@ -69,6 +69,10 @@ in
               ../../../../patches/hyprland-workspacerules-monitor.patch
               # Add fullscreenMode to `hyprctl workspaces`
               ../../../../patches/hyprland-hyprctl-workspace-fullscreen-mode.patch
+              # Adds dynamic mode to the resize gesture which moves the window
+              # if it's floating
+              ../../../../patches/hyprland-dynamic-resize-gesture.patch
+              ../../../../patches/hyprland-fullscreen-gesture-maximize-fix.patch
             ];
           });
         })

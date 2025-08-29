@@ -315,6 +315,9 @@ in
     };
   };
 
+  # In an attempt to fix failed session restores
+  ns.desktop.uwsm.serviceApps = [ "firefox" ];
+
   ns.persistence.directories = mkIf (!cfg.runInRam) [
     ".mozilla"
     ".cache/mozilla"

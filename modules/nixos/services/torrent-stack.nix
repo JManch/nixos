@@ -497,6 +497,8 @@ in
             config = (pkgs.formats.yaml { }).generate "beets-config.yaml" {
               directory = "${mediaDir}/music";
               library = "${mediaDir}/music/library.db";
+              paths.singleton = "$albumartist/Non-Album/$title";
+
               plugins = [
                 "replaygain"
                 "autobpm"

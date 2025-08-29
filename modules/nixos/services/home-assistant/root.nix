@@ -109,6 +109,17 @@ in
         # For postgres support
         ps.psycopg2
       ];
+
+      packageOverrides = self: super: {
+        python-roborock =
+          assert lib.assertMsg (
+            super.python-roborock.version == "2.18.2"
+          ) "Remove the home assistant python-roborock overlay";
+          super.python-roborock.overridePythonAttrs {
+            # Checks broke for some reason
+            doCheck = false;
+          };
+      };
     };
 
     extraComponents = [

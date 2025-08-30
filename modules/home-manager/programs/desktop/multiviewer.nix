@@ -312,7 +312,7 @@ let
 in
 {
   # How to sign in:
-  # Launch multiviewer with `multiviewer-for-f1 --no-sandbox` then select the
+  # Launch multiviewer with `multiviewer --no-sandbox` then select the
   # "sign in with multiviewer" option. Future launches do not need the
   # --no-sandbox flag. Signing in with the extension through Chromium doesn't
   # work currently but leaving the Chromium wrapper here in-case it eventually
@@ -323,7 +323,7 @@ in
         case = "^https?://";
         command = getExe pkgs.chromium;
       };
-    } pkgs.${ns}.multiviewer-for-f1
+    } pkgs.${ns}.multiviewer
   );
 
   ns.desktop = {
@@ -338,17 +338,17 @@ in
       ];
 
       windowrule = [
-        "float, class:^(MultiViewer for F1)$"
-        "workspace ${namedWorkspaceIDs.F1}, class:^(MultiViewer for F1)$"
+        "float, class:^(MultiViewer)$"
+        "workspace ${namedWorkspaceIDs.F1}, class:^(MultiViewer)$"
 
-        "prop xray 0, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
-        "prop noblur, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
-        "prop noborder, class:^(MultiViewer for F1)$, title:^(Track Map.*)$"
+        "prop xray 0, class:^(MultiViewer)$, title:^(Track Map.*)$"
+        "prop noblur, class:^(MultiViewer)$, title:^(Track Map.*)$"
+        "prop noborder, class:^(MultiViewer)$, title:^(Track Map.*)$"
       ];
     };
   };
 
-  ns.persistence.directories = [ ".config/MultiViewer for F1" ];
+  ns.persistence.directories = [ ".config/MultiViewer" ];
 
   systemd.user.services.hyprland-multiviewer-tiler = mkIf (isHyprland config) {
     Unit = {

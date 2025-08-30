@@ -22,7 +22,7 @@
       firefox.backup = false;
       anki.enable = true;
       rnote.enable = true;
-      multiviewer-f1.enable = true;
+      multiviewer.enable = true;
       jellyfin-media-player.enable = true;
 
       gaming = {

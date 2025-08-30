@@ -82,7 +82,7 @@
         zathura.enable = true;
         qbittorrent.enable = true;
         filen-desktop.enable = true;
-        multiviewer-f1.enable = true;
+        multiviewer.enable = true;
         chromium.enable = true;
         foliate.enable = true;
         rnote.enable = true;

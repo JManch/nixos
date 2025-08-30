@@ -32,7 +32,7 @@ in
 
   # Manual
   advanced-camera-card = callPackage ./advanced-camera-card.nix { };
-  multiviewer-for-f1 = callPackage ./multiviewer-for-f1.nix { };
+  multiviewer = callPackage ./multiviewer.nix { };
 
   # Other
   bootstrap-kit = callPackage ./bootstrap-kit.nix { inherit (self.inputs) nix-resources; };

@@ -75,7 +75,7 @@
         chatterino.enable = true;
         supersonic.enable = true;
         chromium.enable = true;
-        multiviewer-f1.enable = true;
+        multiviewer.enable = true;
         obs.enable = true;
         images.enable = true;
         mpv.enable = true;

@@ -39,7 +39,7 @@
   # };
 
   virtualisation.oci-containers.containers."silverbullet" = {
-    image = "ghcr.io/silverbulletmd/silverbullet:v2";
+    image = "ghcr.io/silverbulletmd/silverbullet:latest";
     pull = "always";
     ports = [ "127.0.0.1:${toString cfg.port}:3000" ];
     volumes = [ "/var/lib/silverbullet:/space" ];

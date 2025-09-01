@@ -67,6 +67,7 @@ in
         enable = true;
         allowedAddresses = trustedHostIps ++ [
           "10.20.20.33/32" # pixel 9
+          "192.168.100.2/32" # pixel 9 VPN
         ];
       };
 
@@ -131,6 +132,7 @@ in
           trustedHostIps
           ++ [
             "10.20.20.33/32" # pixel 9
+            "192.168.100.2/32" # pixel 9 VPN
           ]
           ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
       };

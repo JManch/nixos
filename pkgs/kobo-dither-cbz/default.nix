@@ -56,6 +56,6 @@ writeShellApplication {
     }
 
     export -f process_cbz
-    parallel -j 4 process_cbz ::: "$@"
+    parallel --will-cite -j 4 process_cbz ::: "$@"
   '';
 }

@@ -128,7 +128,7 @@
       gaming = {
         enable = true;
         steam.enable = true;
-        steam.lanTransfer = true;
+        steam.lanTransfer = false;
         gamescope.enable = true;
         gamemode.enable = true;
       };
@@ -147,7 +147,7 @@
       };
 
       jellyfin = {
-        enable = true;
+        enable = false;
         openFirewall = true;
         autoStart = false;
         backup = false;
@@ -224,10 +224,7 @@
 
         firewall = {
           enable = true;
-          defaultInterfaces = [
-            "eno1"
-            "wlp6s0"
-          ];
+          defaultInterfaces = [ "wg-home" ];
         };
 
         wireless = {

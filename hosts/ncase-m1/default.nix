@@ -19,6 +19,7 @@
       device = {
         type = "desktop";
         address = "192.168.88.254";
+        vpnAddress = "192.168.100.12";
         altAddresses = [
           "10.20.20.11" # wireless interface
         ];

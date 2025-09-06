@@ -403,7 +403,7 @@ in
   programs.zsh.shellAliases = mkMerge (
     mapAttrsToList (
       interface: cfg:
-      mkIf (cfg.enable && !cfg.autoStart) {
+      mkIf cfg.enable {
         "wg-${interface}-up" = "sudo systemctl start wg-quick-wg-${interface}";
         "wg-${interface}-down" = "sudo systemctl stop wg-quick-wg-${interface}";
       }

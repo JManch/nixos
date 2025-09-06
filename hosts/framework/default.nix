@@ -99,7 +99,8 @@
       wireguard = {
         home = {
           enable = true;
-          trustedSSIDs = [ inputs.nix-resources.secrets.ssids.home ];
+          autoStart = true;
+          # trustedSSIDs = [ inputs.nix-resources.secrets.ssids.home ];
           address = "192.168.100.11";
           subnet = 24;
 

@@ -1,6 +1,7 @@
 {
   lib,
   cfg,
+  pkgs,
   config,
   inputs,
 }:
@@ -21,6 +22,10 @@ in
 
   services.mealie = {
     enable = true;
+    package =
+      (import (fetchTree "github:NixOS/nixpkgs/c6a788f552b7b7af703b1a29802a7233c0067908") {
+        inherit (pkgs) system;
+      }).mealie;
     listenAddress = "127.0.0.1";
     port = cfg.port;
     settings = {
@@ -38,6 +43,10 @@ in
   systemd.services.mealie.serviceConfig = lib.${ns}.hardeningBaseline config {
     User = "mealie";
     Group = "mealie";
+    SystemCallFilter = [
+      "@system-service"
+      "~@privileged"
+    ];
   };
 
   ns.services.caddy.virtualHosts.mealie.extraConfig = ''

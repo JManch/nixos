@@ -57,7 +57,7 @@ in
       mikrotik-backup.enable = true;
       index-checker.enable = false;
       fail2ban.enable = true;
-      mealie.enable = false;
+      mealie.enable = true;
       acme.enable = true;
       taskchampion-server.enable = true;
       air-vpn.confinement.enable = true;

@@ -1,3 +1,4 @@
+# TODO: Move to a NixOS module
 {
   lib,
   pkgs,

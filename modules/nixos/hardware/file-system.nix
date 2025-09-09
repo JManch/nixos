@@ -13,6 +13,7 @@
   pkgs,
   config,
   inputs,
+  hostname,
 }:
 let
   inherit (lib)
@@ -248,7 +249,16 @@ in
                                   # Store the passphrase in a variable so that the same passphrase can be used to
                                   # decrypt multiple datasets. Obviously this makes the assumption that all our
                                   # datasets are encrypted with the same passphrase.
-                                  tpm_passphrase="$(${systemd-creds} decrypt --name= - - <<< "${cfg.zfs.encryption.passphraseCred}" || true)";
+                                  ${
+                                    if hostname == "homelab" then
+                                      ''
+                                        tpm_passphrase="${cfg.zfs.encryption.passphraseCred}"
+                                      ''
+                                    else
+                                      ''
+                                        tpm_passphrase="$(${systemd-creds} decrypt --name= - - <<< "${cfg.zfs.encryption.passphraseCred}" || true)"
+                                      ''
+                                  }
                                 fi
 
                                 echo "$tpm_passphrase" | ${zfs} load-key "$ds" \

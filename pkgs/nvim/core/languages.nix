@@ -40,6 +40,11 @@
       enable = true;
       lsp.enable = true;
     };
+
+    java = {
+      enable = true;
+      lsp.enable = true;
+    };
   };
 
   # The languages.nix module doesn't let us enable both nil and nixd so enable

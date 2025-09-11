@@ -178,6 +178,7 @@
       networking = {
         tcpOptimisations = true;
         resolved.enable = true;
+        eduroam.enable = true;
 
         firewall = {
           enable = true;

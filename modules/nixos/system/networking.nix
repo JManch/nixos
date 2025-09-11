@@ -53,6 +53,7 @@ in
 
     tcpOptimisations = mkEnableOption "TCP optimisations";
     resolved.enable = mkEnableOption "Resolved";
+    eduroam.enable = mkEnableOption "eduroam";
 
     wiredInterface = mkOption {
       type = with types; nullOr str;
@@ -269,7 +270,7 @@ in
             ${optionalString (elem ssid cfg.wireless.force5GHzNetworks) "freq_list=${freq5GHzList}"}
           '';
         }
-      ) inputs.nix-resources.secrets.wirelessNetworksConfig;
+      ) (inputs.nix-resources.secrets.wirelessNetworksConfig args);
     };
   };
 

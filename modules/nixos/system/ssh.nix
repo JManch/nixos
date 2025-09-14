@@ -28,6 +28,7 @@ let
   inherit (config.${ns}.system) virtualisation;
   inherit (inputs.nix-resources.secrets) keys;
   inherit (config.${ns}.system) desktop;
+  inherit (config.${ns}.core) home-manager;
 in
 {
   enableOpt = false;
@@ -129,6 +130,12 @@ in
   environment.systemPackages = [ pkgs.sshfs ];
 
   programs.zsh.shellAliases.ssh-forget = "ssh -o UserKnownHostsFile=/dev/null";
+
+  ns.hm = mkIf home-manager.enable {
+    ${ns}.desktop.hyprland.settings.windowrule = [
+      "stayfocused, class:^(gcr-prompter)$"
+    ];
+  };
 
   ns.persistence.files = [
     "/etc/ssh/ssh_host_ed25519_key"

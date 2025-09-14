@@ -406,22 +406,6 @@ in
           ) "rnnoise-plugin-cross.patch"
         );
 
-        jellyfin-mpv-shim = prev.jellyfin-mpv-shim.override {
-          pywebview =
-            (final.python313Packages.pywebview.override {
-              pyqtwebengine = final.python313Packages.pyqtwebengine.override {
-                libsForQt5 = final.libsForQt5 // {
-                  qtwebengine = final.libsForQt5.qtwebengine.overrideAttrs (old: {
-                    meta = old.meta // {
-                      knownVulnerabilities = [ ];
-                    };
-                  });
-                };
-              };
-            }).overrideAttrs
-              { doInstallCheck = false; };
-        };
-
         jellyfin-media-player = prev.jellyfin-media-player.override {
           qtwebengine = final.libsForQt5.qtwebengine.overrideAttrs (old: {
             meta = old.meta // {

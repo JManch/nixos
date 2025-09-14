@@ -63,6 +63,7 @@ let
     mkEnableOption
     mkOption
     types
+    elem
     any
     optionals
     attrValues
@@ -157,6 +158,12 @@ let
           state.
         '';
       };
+
+      conflicts = mkOption {
+        type = with types; listOf str;
+        default = [ ];
+        description = "List of Wireguard VPNs this VPN conflicts with";
+      };
     };
   };
 in
@@ -201,6 +208,8 @@ in
           "A private key secret for Wireguard VPN interface '${interface}' is missing"
           (cfg.dns.host -> dns-stack.enable)
           "The DNS stack must be enabled on this host to allow VPN DNS hosting"
+          (all (v: v != interface && elem v (attrNames interfaces)) cfg.conflicts)
+          "One of the conflicts for Wireguard VPN interface '${interface}' is invalid"
         ]
         ++ optionals (!virtualisation.vmVariant) [
           (cfg.trustedSSIDs != [ ] -> networking.useNetworkd)
@@ -294,6 +303,9 @@ in
               Restart = "on-failure";
               RestartSec = 30;
             };
+
+            before = map (i: "wg-quick-wg-${i}.service") cfg.conflicts;
+            conflicts = map (i: "wg-quick-wg-${i}.service") cfg.conflicts;
           };
         })
 

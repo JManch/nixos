@@ -202,7 +202,10 @@
 
         firewall = {
           enable = true;
-          defaultInterfaces = [ "wg-home" ];
+          defaultInterfaces = [
+            "wg-home"
+            "wg-home-minimal"
+          ];
         };
 
         wireless = {

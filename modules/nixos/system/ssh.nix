@@ -20,6 +20,7 @@ let
     mkOption
     types
     optional
+    optionalString
     optionals
     attrValues
     singleton
@@ -87,15 +88,17 @@ in
     startAgent = cfg.agent.enable && !desktop.enable;
     agentTimeout = null;
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
-    extraConfig = mkIf cfg.agent.enable ''
-      AddKeysToAgent yes
-
-      Host uni
-        HostName ${inputs.nix-resources.secrets.uniSSHHostname}
-        User ${inputs.nix-resources.secrets.uniUsername}
-        # The server is misconfigured and doesn't advertise ed25519 cert support
-        PubkeyAcceptedAlgorithms +ssh-ed25519-cert-v01@openssh.com
-    '';
+    extraConfig =
+      optionalString cfg.agent.enable ''
+        AddKeysToAgent yes
+      ''
+      + optionalString (username == "joshua") ''
+        Host uni
+          HostName ${inputs.nix-resources.secrets.uniSSHHostname}
+          User ${inputs.nix-resources.secrets.uniUsername}
+          # The server is misconfigured and doesn't advertise ed25519 cert support
+          PubkeyAcceptedAlgorithms +ssh-ed25519-cert-v01@openssh.com
+      '';
 
     knownHosts =
       (mapAttrs (host: _: {

@@ -13,7 +13,7 @@
   config,
   modulesPath,
   ...
-}:
+}@args:
 let
   inherit (lib)
     ns
@@ -361,7 +361,7 @@ in
       secretsFile = config.age.secrets.wirelessNetworks.path;
       scanOnLowSignal = true;
       allowAuxiliaryImperativeNetworks = true;
-      networks = inputs.nix-resources.secrets.wirelessNetworksConfig;
+      networks = inputs.nix-resources.secrets.wirelessNetworksConfig args;
     };
 
     systemd.services.wpa_supplicant.wantedBy = mkForce [ ];

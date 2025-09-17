@@ -89,6 +89,12 @@ in
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
     extraConfig = mkIf cfg.agent.enable ''
       AddKeysToAgent yes
+
+      Host uni
+        HostName ${inputs.nix-resources.secrets.uniSSHHostname}
+        User ${inputs.nix-resources.secrets.uniUsername}
+        # The server is misconfigured and doesn't advertise ed25519 cert support
+        PubkeyAcceptedAlgorithms +ssh-ed25519-cert-v01@openssh.com
     '';
 
     knownHosts =

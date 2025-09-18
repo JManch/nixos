@@ -161,11 +161,31 @@
       };
 
       wireguard = {
-        home = {
+        home-minimal = {
           enable = true;
           autoStart = true;
           address = "192.168.100.12";
           subnet = 24;
+
+          peers = lib.singleton {
+            publicKey = "4kLZt3aTWUbqSZhz5Q64izTwA4qrDfnkso0z8gRfJ1Q=";
+            presharedKeyFile = config.age.secrets.wg-home-router-psk.path;
+            allowedIPs = [ "192.168.0.0/16" ];
+            endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.homeWgRouterPort}";
+          };
+
+          dns = {
+            enable = true;
+            address = "192.168.100.1";
+          };
+        };
+
+        home = {
+          enable = true;
+          autoStart = false;
+          address = "192.168.100.12";
+          subnet = 24;
+          conflicts = [ "home-minimal" ];
 
           peers = lib.singleton {
             publicKey = "4kLZt3aTWUbqSZhz5Q64izTwA4qrDfnkso0z8gRfJ1Q=";
@@ -247,7 +267,10 @@
 
         firewall = {
           enable = true;
-          defaultInterfaces = [ "wg-home" ];
+          defaultInterfaces = [
+            "wg-home"
+            "wg-home-minimal"
+          ];
         };
 
         wireless = {

@@ -234,7 +234,7 @@ let
 
                 found_drivers = dict()
                 for window in windows:
-                    if window.wm_class != "MultiViewer for F1":
+                    if window.wm_class != "MultiViewer":
                         continue
                     match = re.search(r"^([^—]+)", window.title)
                     if match:
@@ -277,21 +277,23 @@ let
             windows = instance.get_windows()
             for window in windows:
                 title = window.title
-                if window.wm_class != "MultiViewer for F1":
+                if window.wm_class != "MultiViewer":
                     continue
                 elif re.match(r"20|MultiViewer|Home", title):
                     continue
                 elif re.match(r"(Replay )?Live Timing", title):
                     Window(window, (Tile(1), Tile(3)))
                 elif re.match(r"F1 Live", title):
-                    Window(window, (Tile(5), Tile(15)))
+                    Window(window, (Tile(5), Tile(16)))
                 elif re.match(
-                    r"Radio Transcriptions|Race Control Messages|Sectors Leaderboard",
+                    r"(Replay )?Radio Transcriptions"
+                    r"|Race Control Messages"
+                    r"|Sectors Leaderboard",
                     title
                 ):
                     Window(window, (Tile(4),))
                 elif re.match(r"Track Map", title):
-                    Window(window, (Tile(15),))
+                    Window(window, (Tile(16),))
                     if not window.is_always_on_top:
                         instance.dispatch(
                             [

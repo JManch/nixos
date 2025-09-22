@@ -134,14 +134,23 @@ let
 
                 self.number = number
                 self.posX = round(
-                    monitor.position_x + (col - 1) * (monitor.width / Tile.tile_factor)
+                    (
+                        monitor.position_x
+                        + (col - 1) * (monitor.width / Tile.tile_factor)
+                    )
+                    / monitor.scale
                 )
                 self.posY = round(
-                    monitor.position_y + (row - 1) *
-                    (monitor.height / Tile.tile_factor)
+                    (
+                        monitor.position_y
+                        + (row - 1) * (monitor.height / Tile.tile_factor)
+                    )
+                    / monitor.scale
                 )
-                self.width = round(monitor.width / Tile.tile_factor)
-                self.height = round(monitor.height / Tile.tile_factor)
+                self.width = round((monitor.width / Tile.tile_factor) / monitor.scale)
+                self.height = round(
+                    (monitor.height / Tile.tile_factor) / monitor.scale
+                )
 
             def __eq__(self, other):
                 return (
@@ -284,7 +293,7 @@ let
                 elif re.match(r"(Replay )?Live Timing", title):
                     Window(window, (Tile(1), Tile(3)))
                 elif re.match(r"F1 Live", title):
-                    Window(window, (Tile(5), Tile(16)))
+                    Window(window, (Tile(5), Tile(15)))
                 elif re.match(
                     r"(Replay )?Radio Transcriptions"
                     r"|Race Control Messages"

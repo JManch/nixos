@@ -201,7 +201,7 @@ in
 
     package = pkgs.caddy.withPlugins {
       plugins = [ "github.com/caddy-dns/porkbun@v0.3.1" ];
-      hash = "sha256-g/Nmi4X/qlqqjY/zoG90iyP5Y5fse6Akr8exG5Spf08=";
+      hash = "sha256-PUHu+KPywdJMuPLHPtQhUaw3Cv1pED5XQ1MOzlT/6h4=";
     };
 
     globalConfig = ''

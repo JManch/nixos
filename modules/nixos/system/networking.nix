@@ -157,12 +157,6 @@ in
       ];
 
       wpa_supplicant = addPatches prev.wpa_supplicant [
-        # wpa_supplicant matches substrings of the requested secret from the
-        # ext password file. So if you have:
-        # a = password123
-        # abc = secret123
-        # Requesting secret "abc" will return password123
-        "wpa-supplicant-ext-password-fix.patch"
         # We want to persist /etc/wpa_supplicant.conf with a bind mount but
         # wpa_supplicant renames a temporary file to modify the config. This
         # doesn't work with bind mounts due to "device or resource busy" error.

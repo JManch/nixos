@@ -1,8 +1,8 @@
 diff --git a/src/auth/Fingerprint.cpp b/src/auth/Fingerprint.cpp
-index 370499c..a8610c6 100644
+index db4bba7..f24364d 100644
 --- a/src/auth/Fingerprint.cpp
 +++ b/src/auth/Fingerprint.cpp
-@@ -95,7 +95,7 @@ std::optional<std::string> CFingerprint::getLastPrompt() {
+@@ -92,7 +92,7 @@ std::optional<std::string> CFingerprint::getLastPrompt() {
  }
  
  bool CFingerprint::checkWaiting() {
@@ -11,7 +11,7 @@ index 370499c..a8610c6 100644
  }
  
  void CFingerprint::terminate() {
-@@ -134,8 +134,10 @@ bool CFingerprint::createDeviceProxy() {
+@@ -131,8 +131,10 @@ bool CFingerprint::createDeviceProxy() {
                  bool       isPresent      = presentVariant.get<bool>();
                  if (!isPresent)
                      return;
@@ -23,7 +23,7 @@ index 370499c..a8610c6 100644
              } catch (std::out_of_range& e) {}
          });
  
-@@ -196,6 +198,8 @@ void CFingerprint::handleVerifyStatus(const std::string& result, bool done) {
+@@ -193,6 +195,8 @@ void CFingerprint::handleVerifyStatus(const std::string& result, bool done) {
              break;
      }
  
@@ -33,7 +33,7 @@ index 370499c..a8610c6 100644
          g_pAuth->enqueueFail(m_sFailureReason, AUTH_IMPL_FINGERPRINT);
      else if (retry)
 diff --git a/src/auth/Fingerprint.hpp b/src/auth/Fingerprint.hpp
-index 4e9a9b0..83a3edc 100644
+index 404a5ca..93a3b09 100644
 --- a/src/auth/Fingerprint.hpp
 +++ b/src/auth/Fingerprint.hpp
 @@ -35,6 +35,7 @@ class CFingerprint : public IAuthImplementation {
@@ -43,9 +43,9 @@ index 4e9a9b0..83a3edc 100644
 +        bool                                waiting   = false;
      } m_sDBUSState;
  
-     std::string m_sFingerprintInitialising;
+     std::string m_sFingerprintReady;
 diff --git a/src/renderer/widgets/PasswordInputField.cpp b/src/renderer/widgets/PasswordInputField.cpp
-index 6098463..b58acad 100644
+index 604278e..01fc926 100644
 --- a/src/renderer/widgets/PasswordInputField.cpp
 +++ b/src/renderer/widgets/PasswordInputField.cpp
 @@ -301,7 +301,7 @@ bool CPasswordInputField::draw(const SRenderData& data) {
@@ -54,6 +54,6 @@ index 6098463..b58acad 100644
  
 -    if (passwordLength == 0 && !checkWaiting && !placeholder.resourceID.empty()) {
 +    if (passwordLength == 0 && (!checkWaiting || g_pAuth->getImpl(AUTH_IMPL_FINGERPRINT)->checkWaiting()) && !placeholder.resourceID.empty()) {
-         SPreloadedAsset* currAsset = nullptr;
+         ASP<SPreloadedAsset> currAsset = nullptr;
  
          if (!placeholder.asset)

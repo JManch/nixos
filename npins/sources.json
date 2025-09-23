@@ -11,10 +11,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v2.5.1",
-      "revision": "406c79ef8261772ba3f963889d2fe2e74e829ad4",
+      "version": "v2.6.3",
+      "revision": "c03b1d59461d7335f010ab2908f4b1dbe63d5474",
       "url": null,
-      "hash": "0i0agbxg79car3762ib8s94bp5ypsfvl141zn5bp0s5i76kwpd1c"
+      "hash": "00ixqjsvzf8v4g6y8fndj1i8gycifpm03qkpyycxcvwjhjnk6ppy"
     },
     "BeamMP-Server": {
       "type": "GitRelease",
@@ -86,9 +86,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "3cefa363fcb12adad671353e4042e8cb8b980a30",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/3cefa363fcb12adad671353e4042e8cb8b980a30.tar.gz",
-      "hash": "1xbl1r7vaf6j80lpi8n5zd07a4zn3xyjnzvh63shsz0qya4jf7cz"
+      "revision": "da89627765177d8f54033ee24cee8e864860baeb",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/da89627765177d8f54033ee24cee8e864860baeb.tar.gz",
+      "hash": "0hi4ybwbwzr0v5glpmm85zr1jiw1gkj1z0r6hpnj4dfhbav24srk"
     },
     "async-property": {
       "type": "PyPi",
@@ -121,9 +121,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "ae952a1068e711db66bcd4e644e8f44137b3de1f",
-      "url": "https://github.com/zzyil/comick.io-Downloader/archive/ae952a1068e711db66bcd4e644e8f44137b3de1f.tar.gz",
-      "hash": "1d67wkkib19ywcqcfrxpfg6s85lfr8jlv2jpnv7w2g8l3r0wj3ab"
+      "revision": "4a48f62fd9d76143a9ba9c1035ce87111b324f6c",
+      "url": "https://github.com/zzyil/comick.io-Downloader/archive/4a48f62fd9d76143a9ba9c1035ce87111b324f6c.tar.gz",
+      "hash": "1bc2073fx7fmkr5nh5mfs435nfny43jz2fgk10vmzqc9z8b8p4y2"
     },
     "ctrld": {
       "type": "GitRelease",
@@ -179,9 +179,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "0903662c2ba448d676d0d37b4462bdee8c251392",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/0903662c2ba448d676d0d37b4462bdee8c251392.tar.gz",
-      "hash": "0hfx7c0xgqhzfwj0dim388barzlska79flxgwdfp7l8g0dlh9q3m"
+      "revision": "c9cc22f418c794c5efe326aa109eed6427d86543",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/c9cc22f418c794c5efe326aa109eed6427d86543.tar.gz",
+      "hash": "1qm8j63zbklvf1l3c4m35kaq76mhl2wx2zrx2k4rmr9s0awxg1d0"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -210,10 +210,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2.9.0",
-      "revision": "653e39ce8900a829d8d96a1acb7d381c98fbb504",
-      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.9.0",
-      "hash": "0f6vls5jlc6kykh5rmkcpcpg1s3h1n11zs737dqa6k1q7p9kqzx8"
+      "version": "2.10.0",
+      "revision": "c011e5956fb31ecca31a300e03d651e0eae4b7ed",
+      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.10.0",
+      "hash": "18g5g1158r88r47gpl7zpgx24j2np9nm43nww5m01cila7cshmx8"
     },
     "hass-web-proxy-lib": {
       "type": "Git",
@@ -224,9 +224,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "e72cfcd1665d1d2dc643ea15f9867c278c8910ab",
-      "url": "https://github.com/dermotduffy/hass-web-proxy-lib/archive/e72cfcd1665d1d2dc643ea15f9867c278c8910ab.tar.gz",
-      "hash": "0qrykq2325ivz1rg54hsyfcvv8dyrxg9i2lj14qfpf56c7nxl9rp"
+      "revision": "9e2ce98787f7af12b8398a88cd40750692f66d2c",
+      "url": "https://github.com/dermotduffy/hass-web-proxy-lib/archive/9e2ce98787f7af12b8398a88cd40750692f66d2c.tar.gz",
+      "hash": "00m5jzhmzwvhf5n78i13ahwnjv1mn9ridgdw86hj1ns86ynqvjib"
     },
     "heatmiser-for-home-assistant": {
       "type": "GitRelease",
@@ -332,9 +332,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "f4ad0dde03b77de227700e26ade3e22d4b41a2ce",
-      "url": "https://github.com/recyclarr/config-templates/archive/f4ad0dde03b77de227700e26ade3e22d4b41a2ce.tar.gz",
-      "hash": "1vh8wjsyqxh1hn16i601lw81sl0gfdpm4bbzcyaw50a9gdxhx2vn"
+      "revision": "d24dca2305b86de382e4e977301bd3faf8612c08",
+      "url": "https://github.com/recyclarr/config-templates/archive/d24dca2305b86de382e4e977301bd3faf8612c08.tar.gz",
+      "hash": "1g1sjjx0xafbs110ci88a9pz15xg325ai1dl1iir7swl19avsmpx"
     },
     "slskd-stats": {
       "type": "GitRelease",
@@ -361,9 +361,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "0af2c5a392f134b3a0b963963821ad30beaaa012",
-      "url": "https://github.com/mrusse/soularr/archive/0af2c5a392f134b3a0b963963821ad30beaaa012.tar.gz",
-      "hash": "17nbzdvbks7l8cxhs73bgxjl4clxkv5jqzjxxgvbk7pnxh35y098"
+      "revision": "9bc0068293cc1ae398d5f3287eceadb243a5ca9b",
+      "url": "https://github.com/mrusse/soularr/archive/9bc0068293cc1ae398d5f3287eceadb243a5ca9b.tar.gz",
+      "hash": "19l1yzlf3fxl1ingxykbva8yqfbc7wzr0r2ykr767v860dsrllrh"
     },
     "sunset.nvim": {
       "type": "Git",
@@ -387,9 +387,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "729dc91b53280e2f8495aca6b0b2cc9df0482ff0",
-      "url": "https://github.com/dweymouth/supersonic/archive/729dc91b53280e2f8495aca6b0b2cc9df0482ff0.tar.gz",
-      "hash": "1nnc203va9r5wmf8c6b2zzgrf2n77d8i65qdlncgh9x8japgzh8f"
+      "revision": "2fa02343215ebf1016b580cd7921374bac448c24",
+      "url": "https://github.com/dweymouth/supersonic/archive/2fa02343215ebf1016b580cd7921374bac448c24.tar.gz",
+      "hash": "0bhgdnc4g3mkgxdi3gwx42n724xlg4r3gr0icwhp2ak1bpjl2s08"
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -479,10 +479,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.13.2",
-      "revision": "65cdde23699bebdb3443a16031e7fa1c64633dd0",
-      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.13.2",
-      "hash": "1n1y6xpfr45lplkyx7i8zq219qpcj37czhkkzlpb30jvf9r38s2v"
+      "version": "v0.13.3",
+      "revision": "363db91851b5a83d67603556b2da690125ac05f4",
+      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.13.3",
+      "hash": "1736fgf2y3js113x39jj9psinzqxd4682lxymgqm3iliyjbh6l5w"
     },
     "yt-dlp": {
       "type": "GitRelease",
@@ -495,10 +495,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2025.08.27",
-      "revision": "487a90c8efe74644b14a1324374473960def41ae",
-      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/2025.08.27",
-      "hash": "0p408am4xjmnpdlf62gs94mga279p96zbgs5vlyrcjmz0bzbxkqk"
+      "version": "2025.09.23",
+      "revision": "4429fd0450a3fbd5e89573e06533c1a0874fae42",
+      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/2025.09.23",
+      "hash": "0x6yjvv0wwyx10bpk2s06k8amah4q6v1g2plwrng1ap2jza539x6"
     }
   },
   "version": 5

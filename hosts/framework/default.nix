@@ -83,11 +83,17 @@
     programs = {
       waydroid.enable = false;
       winbox.enable = true;
+
       gaming = {
         enable = true;
         steam.enable = true;
         gamescope.enable = true;
         gamemode.enable = true;
+      };
+
+      wireshark = {
+        enable = true;
+        graphical = true;
       };
     };
 

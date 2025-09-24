@@ -67,7 +67,11 @@
       };
 
       keyd = {
-        excludedDevices = [ "04fe:0021:532594f8" ]; # HHKB-Hybrid_2
+        excludedDevices = [
+          "04fe:0021:532594f8"
+          "04fe:0021:38fc4e01"
+          "04fe:0021:f26878c3"
+        ]; # HHKB-Hybrid_2
         hhkbArrowLayer = true;
         rebinds = {
           capslock = "layer(control)";

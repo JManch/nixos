@@ -500,6 +500,7 @@ in
               paths.singleton = "$albumartist/Non-Album/$title";
 
               plugins = [
+                "musicbrainz"
                 "replaygain"
                 "autobpm"
                 "fetchart"
@@ -539,7 +540,7 @@ in
               };
 
               # some release groups have lots of CD/vinyls
-              musicbrainz.searchlimit = 20;
+              musicbrainz.search_limit = 20;
 
               embedart = {
                 auto = true;

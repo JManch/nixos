@@ -84,6 +84,7 @@
         qbittorrent.enable = true;
         jellyfin-media-player.enable = true;
         zathura.enable = true;
+        rnote.enable = true;
 
         firefox = {
           enable = true;

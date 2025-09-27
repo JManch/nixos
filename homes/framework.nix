@@ -85,6 +85,7 @@
         jellyfin-media-player.enable = true;
         zathura.enable = true;
         rnote.enable = true;
+        vscode.enable = true;
 
         firefox = {
           enable = true;

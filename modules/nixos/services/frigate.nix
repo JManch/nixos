@@ -104,13 +104,6 @@ in
 
   services.frigate = {
     enable = true;
-    package =
-      assert lib.assertMsg (
-        inputs.nixpkgs.rev == "554be6495561ff07b6c724047bdd7e0716aa7b46"
-      ) "Remove frigate package override once 436579 is merged";
-      (import (fetchTree "github:NixOS/nixpkgs/ab0f3607a6c7486ea22229b92ed2d355f1482ee0") {
-        inherit (pkgs) system;
-      }).frigate;
 
     # Run check config for new versions as automatic migrations don't work on
     # NixOS. For the check to work we have to temporarily remove all custom

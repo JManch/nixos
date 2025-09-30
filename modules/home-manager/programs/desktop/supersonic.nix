@@ -10,7 +10,7 @@
       src = sources.supersonic;
       patches = [ ../../../../patches/supersonic-large-volume-slider.patch ];
       tags = old.tags ++ [ "migrated_fynedo" ];
-      vendorHash = "sha256-Sh3PxRwb6ElSeWzdvIQ+nD9VVGlpUDwxG7nAoGWPTRQ=";
+      vendorHash = "sha256-FQmaxDIVWCxyFdgz03aNRXFyi8UeMeCqiVHNZOqq/8Q=";
 
       # desktopItems = lib.singleton (
       #   pkgs.makeDesktopItem {

@@ -11,10 +11,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v2.6.3",
-      "revision": "c03b1d59461d7335f010ab2908f4b1dbe63d5474",
+      "version": "v2.6.4",
+      "revision": "6f84b56f1b06a25d6897d7c7228a18f7a5e90cff",
       "url": null,
-      "hash": "00ixqjsvzf8v4g6y8fndj1i8gycifpm03qkpyycxcvwjhjnk6ppy"
+      "hash": "1ip0k0kbwmaym9nxfi6zyqihh9ybs4rzjbsh763i1aj0rkkybhgh"
     },
     "BeamMP-Server": {
       "type": "GitRelease",
@@ -41,9 +41,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "5127a80c64d9371e817d54ad32a8fc09933a1b5d",
-      "url": "https://github.com/SgtBatten/HA_blueprints/archive/5127a80c64d9371e817d54ad32a8fc09933a1b5d.tar.gz",
-      "hash": "1w09pbjxj1ggh2vgdvccjm3liyja1akzyimd9sk7dsdkhnjzcm8b"
+      "revision": "7960ca8ff2ceb798394a1d80845e42dfad8cab4d",
+      "url": "https://github.com/SgtBatten/HA_blueprints/archive/7960ca8ff2ceb798394a1d80845e42dfad8cab4d.tar.gz",
+      "hash": "0mhr06w52dx8zxss98v3frvij6im5aq9m82yjcijdarkywsr03ak"
     },
     "ModernX": {
       "type": "GitRelease",
@@ -387,9 +387,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "2fa02343215ebf1016b580cd7921374bac448c24",
-      "url": "https://github.com/dweymouth/supersonic/archive/2fa02343215ebf1016b580cd7921374bac448c24.tar.gz",
-      "hash": "0bhgdnc4g3mkgxdi3gwx42n724xlg4r3gr0icwhp2ak1bpjl2s08"
+      "revision": "9b75faf9bce6e06f09a824e216e381ebf91b0d08",
+      "url": "https://github.com/dweymouth/supersonic/archive/9b75faf9bce6e06f09a824e216e381ebf91b0d08.tar.gz",
+      "hash": "11bxcqkbv9nh6cldal4anggjxfq0sgmzywgsygwpclipc6bfnq7h"
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -495,10 +495,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2025.09.23",
-      "revision": "4429fd0450a3fbd5e89573e06533c1a0874fae42",
-      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/2025.09.23",
-      "hash": "0x6yjvv0wwyx10bpk2s06k8amah4q6v1g2plwrng1ap2jza539x6"
+      "version": "2025.09.26",
+      "revision": "88e2a2de8e2fb247b3e2c55891625b7a148f09e5",
+      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/2025.09.26",
+      "hash": "0j6l2zskmsvqk8h3ialbymk75i0bfzn2qmc2gk6s1ybhnpryrv7y"
     }
   },
   "version": 5

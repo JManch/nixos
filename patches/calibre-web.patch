@@ -1,29 +1,29 @@
 diff --git a/cps/cover.py b/cps/cover.py
-index 5dd29534..787cf21c 100644
+index 6c42d73e..3bc6345a 100644
 --- a/cps/cover.py
 +++ b/cps/cover.py
-@@ -35,7 +35,6 @@ def cover_processing(tmp_file_name, img, extension):
+@@ -36,7 +36,6 @@ def cover_processing(tmp_file_path, img, extension):
          if use_IM:
              with Image(blob=img) as imgc:
                  imgc.format = 'jpeg'
--                imgc.transform_colorspace('rgb')
+-                imgc.transform_colorspace('srgb')
                  imgc.save(filename=tmp_cover_name)
                  return tmp_cover_name
          else:
 diff --git a/cps/helper.py b/cps/helper.py
-index e6d56bf6..b4f50846 100644
+index 3d712165..b3d6244c 100644
 --- a/cps/helper.py
 +++ b/cps/helper.py
-@@ -917,7 +917,6 @@ def save_cover(img, book_path):
+@@ -891,7 +891,6 @@ def save_cover(img, book_path):
              else:
                  imgc = Image(blob=io.BytesIO(img.content))
              imgc.format = 'jpeg'
--            imgc.transform_colorspace("rgb")
+-            imgc.transform_colorspace("srgb")
              img = imgc
          except (BlobError, MissingDelegateError):
              log.error("Invalid cover file content")
 diff --git a/cps/server.py b/cps/server.py
-index c0f83403..942bdafe 100644
+index dca407a7..3f1ea9fd 100644
 --- a/cps/server.py
 +++ b/cps/server.py
 @@ -242,7 +242,7 @@ class WebServer(object):

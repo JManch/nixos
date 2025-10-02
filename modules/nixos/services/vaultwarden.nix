@@ -270,8 +270,11 @@ in
       backendOptions = {
         remote = "protondrive";
         mode = "copy";
-        timeout = 5 * 60;
         remotePaths."/tmp/vaultwarden-cloud-upload" = "vaultwarden";
+        flags = [
+          "--protondrive-replace-existing-draft=true"
+          "--no-traverse"
+        ];
       };
 
       restore.pathOwnership."/tmp/vaultwarden-cloud-upload" = {

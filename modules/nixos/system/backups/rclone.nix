@@ -207,7 +207,6 @@ in
           # Writeable config is stored in cache directory
           CacheDirectory = "rclone-backups/${name}";
           CacheDirectoryMode = "0700";
-          TimeoutStartSec = mkIf (backup.backendOptions.timeout != null) backup.backendOptions.timeout;
         };
       }
     ) backups;
@@ -268,21 +267,6 @@ in
           type = with types; listOf str;
           default = [ ];
           description = "List of flags appended to rclone command";
-        };
-
-        timeout = mkOption {
-          type = with types; nullOr int;
-          default = null;
-          example = 120;
-          description = ''
-            Sometimes rclone backups of small files get take an abnormally long time if the
-            remote directory has lots of files. The fix is to move the remote backup dir
-            and save new backups to an empty one.
-
-            Timeout is the number of seconds after which the service should fail and notify
-            us. This way we know when the remote dir needs changing. Only makes sense for
-            small backups that should not take very long.
-          '';
         };
 
         check = {

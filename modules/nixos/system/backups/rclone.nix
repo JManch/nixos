@@ -18,7 +18,6 @@ let
     optionalString
     concatStringsSep
     attrNames
-    mkIf
     removePrefix
     elemAt
     flatten
@@ -84,15 +83,18 @@ in
           )
         );
         default = {
-          protondrive = {
-            setupScript =
-              # bash
-              ''
-                rclone --config "$config_dir/config" config create remote protondrive --all
-                # The rclone config needs to be 'bootstrapped' to generate client keys
-                rclone --config "$config_dir/config" about remote:
-              '';
-          };
+          # Proton drive is currently broken:
+          # https://github.com/rclone/rclone/issues/8870
+          # https://forum.rclone.org/t/proton-drive-unable-sync-copy-anything/52556/7
+          # protondrive = {
+          #   setupScript =
+          #     # bash
+          #     ''
+          #       rclone --config "$config_dir/config" config create remote protondrive --all
+          #       # The rclone config needs to be 'bootstrapped' to generate client keys
+          #       rclone --config "$config_dir/config" about remote:
+          #     '';
+          # };
           filen = {
             package = pkgs.${ns}.filen-rclone;
             setupScript = # bash

@@ -268,13 +268,16 @@ in
       };
 
       backendOptions = {
-        remote = "protondrive";
+        # remote = "protondrive";
+        # mode = "copy";
+        # remotePaths."/tmp/vaultwarden-cloud-upload" = "vaultwarden";
+        # flags = [
+        #   "--protondrive-replace-existing-draft=true"
+        #   "--no-traverse"
+        # ];
+        remote = "filen";
         mode = "copy";
         remotePaths."/tmp/vaultwarden-cloud-upload" = "vaultwarden";
-        flags = [
-          "--protondrive-replace-existing-draft=true"
-          "--no-traverse"
-        ];
       };
 
       restore.pathOwnership."/tmp/vaultwarden-cloud-upload" = {

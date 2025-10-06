@@ -327,6 +327,7 @@ in
       "${mod}, A, exec, ${toggleAnimations}"
       "${modShift}, A, exec, ${toggleGaps}"
       "${modShiftCtrl}, V, exec, ${syncClipboard}"
+      "${mod}, Y, exec, ${scaleTabletToWindow}"
 
       # Movement
       "${mod}, H, movefocus, l"

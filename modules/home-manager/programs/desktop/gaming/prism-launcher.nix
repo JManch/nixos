@@ -7,7 +7,16 @@ let
   inherit (lib) ns mkIf;
 in
 {
-  home.packages = [ pkgs.prismlauncher ];
+  home.packages = [
+    (pkgs.prismlauncher.override {
+      jdks = with pkgs; [
+        jdk21
+        jdk17
+        jdk8
+        jdk25
+      ];
+    })
+  ];
   categoryConfig.gameClasses = [ "Minecraft.*" ];
 
   ns = {

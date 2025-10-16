@@ -51,7 +51,8 @@
             height = 1440;
             position.x = 2560;
             position.y = 0;
-            workspaces = builtins.genList (i: (i * 2) + 1) 25;
+            workspaces = builtins.genList (i: i + 1) 25;
+            # workspaces = builtins.genList (i: (i * 2) + 1) 25;
           }
           # {
           #   name = "HDMI-A-1";

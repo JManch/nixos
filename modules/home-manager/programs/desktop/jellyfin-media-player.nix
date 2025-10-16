@@ -1,5 +1,8 @@
 { pkgs }:
 {
+  # Package is broken due to vulnerabilities in qtwebengine
+  conditions = [ false ];
+
   home.packages = [ pkgs.jellyfin-media-player ];
 
   ns.persistence.directories = [

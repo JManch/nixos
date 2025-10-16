@@ -405,14 +405,6 @@ in
             !final.stdenv.buildPlatform.canExecute final.stdenv.hostPlatform
           ) "rnnoise-plugin-cross.patch"
         );
-
-        jellyfin-media-player = prev.jellyfin-media-player.override {
-          qtwebengine = final.libsForQt5.qtwebengine.overrideAttrs (old: {
-            meta = old.meta // {
-              knownVulnerabilities = [ ];
-            };
-          });
-        };
       })
     ];
   };

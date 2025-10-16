@@ -45,15 +45,15 @@ index 404a5ca..93a3b09 100644
  
      std::string m_sFingerprintReady;
 diff --git a/src/renderer/widgets/PasswordInputField.cpp b/src/renderer/widgets/PasswordInputField.cpp
-index 604278e..01fc926 100644
+index e7f63ee..411292c 100644
 --- a/src/renderer/widgets/PasswordInputField.cpp
 +++ b/src/renderer/widgets/PasswordInputField.cpp
-@@ -301,7 +301,7 @@ bool CPasswordInputField::draw(const SRenderData& data) {
+@@ -299,7 +299,7 @@ bool CPasswordInputField::draw(const SRenderData& data) {
          }
      }
  
--    if (passwordLength == 0 && !checkWaiting && !placeholder.resourceID.empty()) {
-+    if (passwordLength == 0 && (!checkWaiting || g_pAuth->getImpl(AUTH_IMPL_FINGERPRINT)->checkWaiting()) && !placeholder.resourceID.empty()) {
-         ASP<SPreloadedAsset> currAsset = nullptr;
+-    if (passwordLength == 0 && !checkWaiting && placeholder.resourceID > 0) {
++    if (passwordLength == 0 && (!checkWaiting || g_pAuth->getImpl(AUTH_IMPL_FINGERPRINT)->checkWaiting()) && placeholder.resourceID > 0) {
+         ASP<CTexture> currAsset = nullptr;
  
          if (!placeholder.asset)

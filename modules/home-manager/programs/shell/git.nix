@@ -35,7 +35,8 @@
   # config.
   programs.lazygit = {
     enable = true;
-    settings.git.overrideGpg = true;
+    # Breaks prompt for passphrase when signing commits in an ssh session
+    settings.git.overrideGpg = false;
   };
 
   programs.zsh.shellAliases.lg = "lazygit";

@@ -3,7 +3,6 @@
   cfg,
   pkgs,
   config,
-  sources,
   username,
   categoryCfg,
 }:
@@ -191,11 +190,6 @@ in
 
     nixpkgs.overlays = [
       (final: prev: {
-        uwsm = prev.uwsm.overrideAttrs {
-          inherit (sources.uwsm) version;
-          src = sources.uwsm;
-        };
-
         app2unit = addPatches pkgs.${ns}.app2unit [
           (final.substitute {
             src = ../../../../patches/app2unit-service-apps.patch;

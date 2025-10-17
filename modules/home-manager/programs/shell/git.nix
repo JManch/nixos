@@ -1,4 +1,8 @@
-{ config }:
+{
+  lib,
+  pkgs,
+  config,
+}:
 {
   programs.git = {
     enable = true;
@@ -33,11 +37,31 @@
   # To disable the circles in the commit view hit <C-l> and set "show git
   # graph" to "when maximised". For some reason lazygit is forcing stateful
   # config.
-  programs.lazygit = {
-    enable = true;
-    # Breaks prompt for passphrase when signing commits in an ssh session
-    settings.git.overrideGpg = false;
-  };
+  home.packages = [
+    (pkgs.symlinkJoin {
+      name = "lazygit-wrapped";
+      paths = [ pkgs.lazygit ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      # WARN: The --use-config-file flag overrides the default lazygit config
+      # so keep this in mind if I want to change any other lazygit settings in
+      # the future
+      postBuild = ''
+        wrapProgram $out/bin/${pkgs.lazygit.meta.mainProgram} --run '
+          # If we are NOT in an SSH session override lazygit config to enable overrideGpg. 
+          # Doing this because overrideGpg causes commit signing to hang over
+          # SSH as the SSH passphrase prompts breaks. I do not want to disable
+          # overrideGpg all the time because it causes the lazygit window to
+          # temporarily close everytime we make a commit.
+          if [[ -z $SSH_CONNECTION && -z $SSH_CLIENT && -z $SSH_TTY ]]; then
+            exec ${lib.getExe pkgs.lazygit} --use-config-file ${pkgs.writeText "lazygit-override-gpg-config" ''
+              git:
+                overrideGpg: true
+            ''} "$@"
+          fi
+        '
+      '';
+    })
+  ];
 
   programs.zsh.shellAliases.lg = "lazygit";
 

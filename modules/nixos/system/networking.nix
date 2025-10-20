@@ -107,6 +107,12 @@ in
       disableOnBoot = mkEnableOption ''
         disabling of wireless on boot. Use `rfkill unblock wifi` to manually enable.
       '';
+
+      powersave = mkOption {
+        type = types.bool;
+        default = config.${ns}.core.device.type == "laptop";
+        description = "Whether to enable wireless power management";
+      };
     };
 
     firewall = {
@@ -334,6 +340,15 @@ in
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${rfkill} block wifi";
+    };
+  };
+
+  systemd.services.disable-wifi-powersave = mkIf (cfg.wireless.enable && !cfg.wireless.powersave) {
+    description = "Disable wifi powersave";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${getExe pkgs.iw} dev ${cfg.wireless.interface} set power_save off";
     };
   };
 

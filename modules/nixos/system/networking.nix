@@ -177,6 +177,15 @@ in
     enable = true;
     wait-online.anyInterface = true;
 
+    # The default timeout of 120 seconds is too long for devices where we want
+    # to get into the desktop regardless of network connectivity. This also
+    # fixes an issue with UWSM. By default, the `uwsm check may-start` and
+    # `uwsm start` commands hava a 60 second timeout waiting for
+    # `graphical.target` before they give up. This caused our tty to get
+    # dropped into an interactive shell where we had to manually start the UWSM
+    # session.
+    wait-online.timeout = mkIf desktop.enable 10;
+
     # Nix generates default systemd-networkd network configs which match all
     # interfaces so manually defining networks is not really necessary unless
     # custom configuration is required

@@ -27,7 +27,6 @@ let
     nameValuePair
     all
     getExe
-    getExe'
     mapAttrsToList
     stringLength
     elem
@@ -115,26 +114,35 @@ in
     };
   };
 
-  # only check ssid blacklist if wired interface is down
   systemd.services =
     let
-      ssidCheck = pkgs.writeShellScript "backup-ssid-check" ''
-        active_ssid=$(${getExe' pkgs.wpa_supplicant "wpa_cli"} status | ${getExe pkgs.gnugrep} '^ssid=' | ${getExe' pkgs.coreutils "cut"} -d'=' -f2)
-        blacklist=(${concatMapStringsSep " " (ssid: "\"${ssid}\"") cfg.ssidBlacklist})
-        for ssid in "''${blacklist[@]}"; do
-          if [[ $ssid == $active_ssid ]]; then
-            echo "Active SSID is blacklisted from performing backups"
-            exit 1
-          fi
-        done
-      '';
+      ssidCheck = pkgs.writeShellApplication {
+        name = "backup-ssid-check";
+        runtimeInputs = with pkgs; [
+          coreutils
+          gnugrep
+          systemd
+          jaq
+        ];
+        bashOptions = [ "nounset" ];
+        text = ''
+          active_ssid=$(networkctl status "${networking.wireless.interface}" --json short | jaq -r '.SSID')
+          blacklist=(${concatMapStringsSep " " (ssid: "\"${ssid}\"") cfg.ssidBlacklist})
+          for ssid in "''${blacklist[@]}"; do
+            if [[ "$ssid" == "$active_ssid" ]]; then
+              echo "Active SSID is blacklisted from performing backups"
+              exit 1
+            fi
+          done
+        '';
+      };
     in
     mapAttrs' (
       name: value:
       nameValuePair "${value.backend}-backups-${name}" (
         mkIf cfg.${value.backend}.enable {
           preStart = mkOrder 0 ''
-            ${optionalString (cfg.ssidBlacklist != [ ]) ssidCheck.outPath}
+            ${optionalString (cfg.ssidBlacklist != [ ]) (getExe ssidCheck)}
             ${value.preBackupScript}
           '';
 

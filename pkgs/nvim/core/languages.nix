@@ -46,6 +46,12 @@
       lsp.enable = true;
       lsp.package = pkgs.jdt-language-server.override { jdk = pkgs.corretto21; };
     };
+
+    typst = {
+      enable = true;
+      lsp.enable = true;
+      format.enable = true;
+    };
   };
 
   # The languages.nix module doesn't let us enable both nil and nixd so enable

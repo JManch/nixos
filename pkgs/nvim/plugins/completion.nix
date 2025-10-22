@@ -7,10 +7,12 @@ in
     enableSharedCmpSources = lib.mkForce false;
     blink-cmp = {
       enable = true;
+      friendly-snippets.enable = true;
 
       setupOpts = {
         appearance.use_nvim_cmp_as_default = true;
         signature.enabled = true;
+        signature.window.show_documentation = true;
         completion = {
           trigger.show_in_snippet = false;
           list.selection.preselect = false;
@@ -58,8 +60,17 @@ in
             "show_documentation"
             "hide_documentation"
           ];
+          "<C-s>" = [
+            "show_signature"
+            "hide_signature"
+            "fallback"
+          ];
           "<C-e>" = [
             "hide"
+            "fallback"
+          ];
+          "<C-y>" = [
+            "select_and_accept"
             "fallback"
           ];
           "<Tab>" = [
@@ -93,10 +104,12 @@ in
           ];
           "<S-Up>" = [
             "scroll_documentation_up"
+            "scroll_signature_up"
             "fallback"
           ];
           "<S-Down>" = [
             "scroll_documentation_down"
+            "scroll_signature_down"
             "fallback"
           ];
         };

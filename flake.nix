@@ -131,7 +131,7 @@
     xdg-override.url = "github:koiuo/xdg-override";
     xdg-override.inputs.nixpkgs.follows = "nixpkgs";
 
-    nvf.url = "github:NotAShelf/nvf"; # do not override nixpkgs input for stability
+    nvf.url = "github:JManch/nvf/blink-cmp-v1.7.0"; # do not override nixpkgs input for stability
 
     # Personal inputs
 

@@ -1263,15 +1263,16 @@
         "systems": "systems_9"
       },
       "locked": {
-        "lastModified": 1760153667,
-        "narHash": "sha256-F7KmXT/Izse6Q6CkD5GCImoGPaDJxl03Kd7eD+eY/bU=",
-        "owner": "NotAShelf",
+        "lastModified": 1761139779,
+        "narHash": "sha256-8yTFQJ3tLMikFhogOIXHLIcoLvr/Aw+oWb2RtIqD8qI=",
+        "owner": "JManch",
         "repo": "nvf",
-        "rev": "9df9d51fd9fc8f9a8fc377f984ea3b7ae796172d",
+        "rev": "93c66e0fbf6046bd8192e855a833ab866e1a094b",
         "type": "github"
       },
       "original": {
-        "owner": "NotAShelf",
+        "owner": "JManch",
+        "ref": "blink-cmp-v1.7.0",
         "repo": "nvf",
         "type": "github"
       }

@@ -115,6 +115,7 @@
     timerConfig = {
       OnBootSec = "2h";
       OnUnitActiveSec = "2h";
+      RandomizedDelaySec = "30m";
     };
     wantedBy = [ "timers.target" ];
   };

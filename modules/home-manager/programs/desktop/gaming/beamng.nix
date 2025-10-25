@@ -62,7 +62,7 @@ in
   xdg.dataFile."BeamMP/nix-placeholder".text = "";
 
   ns.persistence.directories = [
-    ".local/share/BeamNG.drive"
+    ".local/share/BeamNG"
     ".local/share/BeamMP"
   ];
 }

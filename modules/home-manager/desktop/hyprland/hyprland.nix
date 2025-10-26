@@ -391,6 +391,7 @@ in
       };
 
       render = {
+        new_render_scheduling = true;
         direct_scanout = cfg.directScanout;
         # Fixes stretching artifacts in animations
         # https://github.com/hyprwm/Hyprland/issues/8203

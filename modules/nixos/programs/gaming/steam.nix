@@ -133,6 +133,18 @@ in
       '';
   };
 
+  # https://github.com/BeamMP/BeamMP-Launcher/issues/186
+  security.pki.certificateFiles =
+    mkIf (home-manager.enable && config.${ns}.hmNs.programs.desktop.gaming.beamng.enable)
+      [
+        (pkgs.stdenvNoCC.mkDerivation {
+          name = "beammp-cert";
+          nativeBuildInputs = [ pkgs.curl ];
+          builder = pkgs.writeScript "beammp-cert-builder" "curl -w %{certs} https://auth.beammp.com/userlogin -k > $out";
+          outputHash = "sha256-8qyV7wLQBcpNUKasJFRb5BuPD87Orbpy3E5KFeWAkr0=";
+        })
+      ];
+
   ns.persistenceHome.directories = [
     ".steam"
     ".local/share/Steam"

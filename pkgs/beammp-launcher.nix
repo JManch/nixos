@@ -15,6 +15,7 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "beammp-launcher";
   inherit (sources.BeamMP-Launcher) version;
   src = sources.BeamMP-Launcher;
+  strictDeps = true;
 
   nativeBuildInputs = [
     cmake

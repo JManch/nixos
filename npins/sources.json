@@ -11,10 +11,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v2.6.4",
-      "revision": "6f84b56f1b06a25d6897d7c7228a18f7a5e90cff",
+      "version": "v2.7.0",
+      "revision": "a2789a852462b1c0cbe9d3a5c7d584f22b96f21b",
       "url": null,
-      "hash": "1ip0k0kbwmaym9nxfi6zyqihh9ybs4rzjbsh763i1aj0rkkybhgh"
+      "hash": "0w7np9hk88k6smrh508jyapf36kw510501fdh8f1a135b4nw490y"
     },
     "BeamMP-Server": {
       "type": "GitRelease",

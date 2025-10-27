@@ -132,7 +132,7 @@
       RADEON_DPM_STATE_ON_AC = "performance";
       RADEON_DPM_STATE_ON_BAT = "battery";
       AMDGPU_ABM_LEVEL_ON_AC = "0";
-      AMDGPU_ABM_LEVEL_ON_BAT = "2";
+      AMDGPU_ABM_LEVEL_ON_BAT = "0";
 
       # Networking
       WIFI_PWR_ON_AC = "off";

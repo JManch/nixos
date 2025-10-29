@@ -1,18 +1,18 @@
 diff --git a/app2unit b/app2unit
-index 497b969..05fd67a 100755
+index 9b6cfd8..19eff55 100755
 --- a/app2unit
 +++ b/app2unit
-@@ -1455,6 +1455,13 @@ if [ -n "$ENTRY_PATH" ]; then
- 	read_entry_path "$ENTRY_PATH" "$ENTRY_ACTION"
+@@ -1879,6 +1879,13 @@ if [ -n "$A2U__ENTRY_URL" ]; then
+ 	read_entry_path "$A2U__ENTRY_PATH"
  fi
  
 +service_apps="@SERVICE_APPS@"
 +for app in $service_apps; do
-+  if [ "$ENTRY_ID" = "$app.desktop" ] || [ "$EXEC_NAME" = "$app" ]; then
-+    UNIT_TYPE="service"
++  if [ "$A2U__ENTRY_ID" = "$app.desktop" ] || [ "$A2U__EXEC_NAME" = "$app" ]; then
++    A2U__UNIT_TYPE="service"
 +  fi
 +done
 +
- # generate Unit ID as UNIT_ID
+ # generate Unit ID as A2U__UNIT_ID
  gen_unit_id
  

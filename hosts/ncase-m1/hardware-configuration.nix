@@ -81,10 +81,13 @@
 
     kernelModules = [ "kvm-amd" ];
 
-    # kernelPackages =
-    #   lib.mkForce
-    #     (import (fetchTree "github:NixOS/nixpkgs/2768c7d042a37de65bb1b5b3268fc987e534c49d") { inherit (pkgs) system; }).linuxPackages_6_10;
-    kernelPackages = lib.mkForce pkgs.linuxPackages_6_16;
+    kernelPackages =
+      assert lib.assertMsg (pkgs.zfs.version == "2.3.4") "zfs should support newer kernel now";
+      lib.mkForce
+        (import (fetchTree "github:NixOS/nixpkgs/544961dfcce86422ba200ed9a0b00dd4b1486ec5") {
+          inherit (pkgs) system;
+        }).linuxPackages_6_16;
+    # kernelPackages = lib.mkForce pkgs.linuxPackages_6_16;
   };
 
   programs.ryzen-monitor-ng.enable = true;

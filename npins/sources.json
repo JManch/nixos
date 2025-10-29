@@ -27,10 +27,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v3.8.5",
-      "revision": "9635fd00c0c41510a2cc6e725790e889457fdd4f",
+      "version": "v3.9.0",
+      "revision": "0c10df2407dc557418ee498537379f2f9476a869",
       "url": null,
-      "hash": "14a9gvql7hv6qf3zj51nmdy351whafi0cv56dh4jnaibyr0rvmqz"
+      "hash": "12359r8x949rsvsiz1vzz0kb81cgx3g8xf1yyy0hxp4rsbbk9gn1"
     },
     "HA_blueprints": {
       "type": "Git",
@@ -86,9 +86,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "da89627765177d8f54033ee24cee8e864860baeb",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/da89627765177d8f54033ee24cee8e864860baeb.tar.gz",
-      "hash": "0hi4ybwbwzr0v5glpmm85zr1jiw1gkj1z0r6hpnj4dfhbav24srk"
+      "revision": "6e2f0cd6939093ff2792d88d56c453fd66ec4871",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/6e2f0cd6939093ff2792d88d56c453fd66ec4871.tar.gz",
+      "hash": "0mxzqp58cky1a69sznmbmcj4q8g264nwqaz28lvim7i69iv54fjy"
     },
     "async-property": {
       "type": "PyPi",
@@ -179,9 +179,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "a53bb3bf96a050719f68535acf9a71a67a2af15e",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/a53bb3bf96a050719f68535acf9a71a67a2af15e.tar.gz",
-      "hash": "01343yjdha24yi13m9laz7bad73vw0pn8fbn4ynvhhv5ph7b36d7"
+      "revision": "41d995ac7b79da88c2f6d91784aa511a9b3aea8d",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/41d995ac7b79da88c2f6d91784aa511a9b3aea8d.tar.gz",
+      "hash": "1xkdpgvp5lr502vnrf8lz3qnxs3j1wgfihq0ll46z1l85z8bz8v0"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -284,10 +284,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "5.2.0.4",
-      "revision": "4c9e08916cb2a2312ba1e4b673ecbef9934bc2db",
-      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/5.2.0.4",
-      "hash": "17zm0247ip50nmqj524hb23y7cz1s8id8grc0df4r4fj99n35kdk"
+      "version": "6.0.1.1",
+      "revision": "971318be806f0ae5bb8ab74d8386825bf418ae90",
+      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/6.0.1.1",
+      "hash": "15i5jchpnknv68mj1caz4w2zx92zj5dkmbfkvsf6s6v7k85rv0xy"
     },
     "neohubapi": {
       "type": "PyPi",
@@ -306,9 +306,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "cc78e880cce5dfc1187d144ed7251c746feff259",
-      "url": "https://github.com/Shatur/neovim-ayu/archive/cc78e880cce5dfc1187d144ed7251c746feff259.tar.gz",
-      "hash": "1fdxapbm08g1hqdk31261c2fnfr4vawgb9pg0kxglc8lkyrn2w8b"
+      "revision": "38caa8b5b969010b1dcae8ab1a569d7669a643d5",
+      "url": "https://github.com/Shatur/neovim-ayu/archive/38caa8b5b969010b1dcae8ab1a569d7669a643d5.tar.gz",
+      "hash": "18a7gj7l6ahhbb1hpsmb9gh21dmcd0fkjzgl4cncq42rjby7ysyq"
     },
     "neovim-config": {
       "type": "Git",
@@ -347,10 +347,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.1.0",
-      "revision": "78479d9f41c4cc21a9d0b260c83eeb973d361334",
-      "url": "https://api.github.com/repos/Arairon/slskd-stats/tarball/v0.1.0",
-      "hash": "0avqxy739hjf82d7jsj6cx0vy971ja3vznggzgdj15qz50qfrpzz"
+      "version": "v0.1.2",
+      "revision": "dbb8588e39bf93cae0dcf11316e50e3759268724",
+      "url": "https://api.github.com/repos/Arairon/slskd-stats/tarball/v0.1.2",
+      "hash": "15lz81zhrilkgz8p7svlfjhl454w7cxrjlq4vwhw2h6y6ffr9lif"
     },
     "soularr": {
       "type": "Git",
@@ -387,9 +387,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "887d3bb2c7b3955e77c1a73bc53dbabd3f58ad0d",
-      "url": "https://github.com/dweymouth/supersonic/archive/887d3bb2c7b3955e77c1a73bc53dbabd3f58ad0d.tar.gz",
-      "hash": "0smn7241i6diha5myy4qgad8l1xgj3vs9kbhjjpc22fbrlwgxk6n"
+      "revision": "35b27432a5cf7dd3819ebe4f848b00f5247feea5",
+      "url": "https://github.com/dweymouth/supersonic/archive/35b27432a5cf7dd3819ebe4f848b00f5247feea5.tar.gz",
+      "hash": "0v10zwz3r5bykg13cjlnv3bf1wfm50nxqx9jm375l50v7188ij8q"
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -447,10 +447,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.24.1",
-      "revision": "2e8625362ddb544571dcf0df78ae5ff625f12bfa",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.24.1",
-      "hash": "1vgwmj6s9qyslh5kikzhbz6a6v6xwbs4k6266zffh819iv8p3hy7"
+      "version": "v0.24.2",
+      "revision": "9fae82c1b86b904e002c1a2b2b23dacccc498ca7",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.24.2",
+      "hash": "1cp8f89f1xyjyxbkzniacm33r5gzdnjrmcp2lv26jxp7v5yblzw1"
     },
     "workspaces.nvim": {
       "type": "GitRelease",
@@ -495,10 +495,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2025.10.14",
-      "revision": "264044286dc30a3dcbe48134f6bebda90b3e43a2",
-      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/2025.10.14",
-      "hash": "187rwpdh881m922h6m32pikqah1wlxjqww73ijw511i2fnwykfy7"
+      "version": "2025.10.22",
+      "revision": "a75399d89f90b249ccfda148987e10bc688e2f84",
+      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/2025.10.22",
+      "hash": "19viqfk3gnl6yk9p17kp0a21w18yr32qii4grm3mys758ws881ld"
     }
   },
   "version": 5

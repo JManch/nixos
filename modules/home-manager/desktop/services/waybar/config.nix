@@ -356,7 +356,7 @@ in
       # We do not want PartOf=tray.target if we're using UWSM
       PartOf = mkIf uwsm.enable (mkForce [ "graphical-session.target" ]);
       After = mkForce [ "graphical-session.target" ];
-      X-Restart-Triggers = mkForce [ ];
+      X-Reload-Triggers = mkForce [ ];
     };
 
     Service = {

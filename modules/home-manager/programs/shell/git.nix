@@ -6,10 +6,10 @@
 {
   programs.git = {
     enable = true;
-    userEmail = "JManch@protonmail.com";
-    userName = "Joshua Manchester";
 
-    extraConfig = {
+    settings = {
+      user.email = "JManch@protonmail.com";
+      user.name = "Joshua Manchester";
       init.defaultBranch = "main";
       pull.rebase = true;
       rebase.autoStash = true;

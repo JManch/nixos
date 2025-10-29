@@ -51,6 +51,7 @@
       enable = true;
       lsp.enable = true;
       format.enable = true;
+      format.package = pkgs.typstyle;
     };
   };
 

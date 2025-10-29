@@ -203,6 +203,7 @@ in
           interval = 5;
           format = "<span color='#${colors.base04}'></span> {usage}%";
           tooltip = false;
+          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} btop.desktop";
         };
 
         "custom/gpu" = mkIf gpuModuleEnabled {

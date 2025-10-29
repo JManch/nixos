@@ -17,6 +17,24 @@
   networking.hostId = "549d3e08";
   hardware.cpu.amd.updateMicrocode = true;
 
+  nixpkgs.overlays = [
+    (final: prev: {
+      linux-firmware =
+        assert lib.assertMsg (
+          prev.linux-firmware.version == "20251021"
+        ) "Remove the framework linux-firmware overlay";
+        prev.linux-firmware.overrideAttrs {
+          version = "20251029";
+          src = final.fetchFromGitLab {
+            owner = "kernel-firmware";
+            repo = "linux-firmware";
+            rev = "bfc84303530a1cdd603fc40aa25b4452f10870dc";
+            hash = "sha256-TUrG5v0U8Y7HbcR82KPsYk3Ysm/TAxV/K6ny/UayXqY=";
+          };
+        };
+    })
+  ];
+
   # As of kernel 6.13 the framework kmod isn't necessary
   hardware.framework.enableKmod = false;
 

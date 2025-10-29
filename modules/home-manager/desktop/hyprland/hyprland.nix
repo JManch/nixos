@@ -393,6 +393,7 @@ in
       render = {
         new_render_scheduling = true;
         direct_scanout = cfg.directScanout;
+        expand_undersized_textures = false;
       };
 
       dwindle = {

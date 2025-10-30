@@ -220,8 +220,9 @@
 
         wireless = {
           enable = true;
+          backend = "iwd";
           force5GHzNetworks = [ inputs.nix-resources.secrets.ssids.home ];
-          interface = "wlp192s0";
+          interface = "wlan0";
         };
       };
     };

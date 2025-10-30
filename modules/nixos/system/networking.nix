@@ -308,7 +308,7 @@ in
   systemd.services.iwd = mkIf (cfg.wireless.enable && cfg.wireless.backend == "iwd") {
     preStart = ''
       ${lib.concatMapStrings (network: ''
-        cp ${config.age.secrets."iwd-${network}".path} /var/lib/iwd/${network}
+        cp --no-preserve=mode ${config.age.secrets."iwd-${network}".path} /var/lib/iwd/${network}
       '') inputs.nix-resources.secrets.iwdNetworks}
     '';
   };

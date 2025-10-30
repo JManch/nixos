@@ -3,9 +3,6 @@
   pkgs,
   config,
 }:
-let
-  inherit (lib) ns mkIf getExe;
-in
 {
   conditions = [ "osConfig.system.audio" ];
 
@@ -50,22 +47,15 @@ in
     };
   };
 
-  xdg.desktopEntries.cava =
-    let
-      xdg-terminal = getExe pkgs.xdg-terminal-exec;
-      alacritty = getExe config.programs.alacritty.package;
-      cava = getExe config.programs.cava.package;
-      zsh = getExe pkgs.zsh;
-    in
-    mkIf config.${ns}.desktop.enable {
-      name = "Cava";
-      genericName = "Audio Visualizer";
-      exec = ''${xdg-terminal} --title=Cava --app-id=cava -e ${zsh} "-c" "${alacritty} msg config font.size=9 || true; ${cava}"'';
-      terminal = false;
-      type = "Application";
-      icon = "audio-x-generic";
-      categories = [ "Audio" ];
-    };
+  xdg.desktopEntries.cava = lib.mkIf config.${lib.ns}.desktop.enable {
+    name = "Cava";
+    genericName = "Audio Visualizer";
+    exec = ''xdg-terminal-exec --title=Cava --app-id=cava -e zsh "-c" "alacritty msg config font.size=9 || true; cava"'';
+    terminal = false;
+    type = "Application";
+    icon = "audio-x-generic";
+    categories = [ "Audio" ];
+  };
 
   ns.desktop.hyprland.settings.windowrule = [
     "float, class:^(cava)$"

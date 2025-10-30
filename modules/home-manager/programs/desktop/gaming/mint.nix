@@ -1,7 +1,6 @@
 { lib, args }:
 let
-  inherit (lib) ns getExe;
-  mint = (lib.${ns}.flakePkgs args "mint").default;
+  mint = (lib.${lib.ns}.flakePkgs args "mint").default;
 in
 {
   home.packages = [ mint ];
@@ -9,7 +8,7 @@ in
   xdg.desktopEntries.mint = {
     name = "Mint";
     genericName = "Mod Loader";
-    exec = getExe mint;
+    exec = "mint";
     terminal = false;
     type = "Application";
     icon = "applications-games";

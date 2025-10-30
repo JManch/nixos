@@ -53,6 +53,18 @@
       format.enable = true;
       format.package = pkgs.typstyle;
     };
+
+    css = {
+      enable = true;
+      lsp.enable = true;
+      format.enable = true;
+    };
+
+    ts = {
+      enable = true;
+      lsp.enable = true;
+      format.enable = true;
+    };
   };
 
   # The languages.nix module doesn't let us enable both nil and nixd so enable

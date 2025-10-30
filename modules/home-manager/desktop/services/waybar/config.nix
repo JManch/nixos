@@ -252,10 +252,11 @@ in
           tooltip-format-enumerate-connected = "{device_alias}";
         };
 
-        "network#wifi" = mkIf (networking.wireless.enable && device.type == "laptop") {
+        "network#wifi" = mkIf networking.wireless.enable {
           format = "";
           format-wifi = "<span color='#${colors.base04}'>{icon}</span> {signalStrength}%";
-          format-disconnected = "<span color='#${colors.base04}'>󰤮</span> ";
+          format-disconnected =
+            if networking.wireless.disableOnBoot then "" else "<span color='#${colors.base04}'>󰤮</span> ";
           format-icons = [
             "󰤯"
             "󰤟"
@@ -344,7 +345,7 @@ in
           ]
           ++ optional (battery != null) "battery"
           ++ optional (bluetooth.enable) "bluetooth"
-          ++ optional (networking.wireless.enable && device.type == "laptop") "network#wifi"
+          ++ optional networking.wireless.enable "network#wifi"
           ++ [
             "tray"
             "custom/poweroff"

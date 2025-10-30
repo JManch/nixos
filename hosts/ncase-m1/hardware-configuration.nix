@@ -47,8 +47,6 @@
 {
   lib,
   pkgs,
-  config,
-  inputs,
   modulesPath,
   ...
 }:
@@ -91,37 +89,6 @@
   };
 
   programs.ryzen-monitor-ng.enable = true;
-
-  # Cause uni wifi sucks and slows down after a few hours unless we reassociate
-  # systemd.services."${inputs.nix-resources.secrets.ssids.uni}-reassociate" = {
-  #   description = "Reassociate ${inputs.nix-resources.secrets.ssids.uni} connection";
-  #   wants = [ "network-online.target" ];
-  #   after = [ "network-online.target" ];
-  #   script =
-  #     let
-  #       wpa_cli = lib.getExe' pkgs.wpa_supplicant "wpa_cli";
-  #       interface = config.${lib.ns}.system.networking.wireless.interface;
-  #     in
-  #     # bash
-  #     ''
-  #       if [[ $(${wpa_cli} -i "${interface}" status | grep '^ssid=' | cut -d'=' -f2) == "${inputs.nix-resources.secrets.ssids.uni}" ]]; then
-  #         echo "Reassociating with wireless network"
-  #         ${wpa_cli} -i ${interface} reassociate
-  #       else
-  #         echo "Skipping reassociation"
-  #       fi
-  #     '';
-  # };
-  #
-  # systemd.timers."${inputs.nix-resources.secrets.ssids.uni}-reassociate" = {
-  #   description = "Reassociate ${inputs.nix-resources.secrets.ssids.uni} connection timer";
-  #   timerConfig = {
-  #     OnBootSec = "2h";
-  #     OnUnitActiveSec = "2h";
-  #     RandomizedDelaySec = "30m";
-  #   };
-  #   wantedBy = [ "timers.target" ];
-  # };
 
   system.stateVersion = "24.05";
 }

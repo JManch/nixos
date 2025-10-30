@@ -269,7 +269,7 @@ in
           volume=$(echo "$output" | ${getExe pkgs.gawk} '{print $2}')
           percentage="$(echo "$volume * 100" | ${getExe pkgs.bc})"
           description=$(${wpctl} inspect @DEFAULT_AUDIO_SINK@ | grep 'node\.description' | cut -d '"' -f 2)
-          notify-send --urgency=low -t 2000 \
+          ${notifySend} --urgency=low -t 2000 \
             -h 'string:x-canonical-private-synchronous:pipewire-volume' "$description" "Volume ''${percentage%.*}%"
         '';
 

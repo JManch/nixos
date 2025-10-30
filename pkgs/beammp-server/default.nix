@@ -24,6 +24,7 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "beammp-server";
   inherit (sources.BeamMP-Server) version;
   src = sources.BeamMP-Server;
+  strictDeps = true;
 
   patches = [ ./cmake.patch ];
 

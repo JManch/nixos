@@ -1,9 +1,7 @@
 {
   lib,
   cfg,
-  pkgs,
   config,
-  inputs,
   hostname,
 }:
 let
@@ -108,7 +106,7 @@ in
     # Run check config for new versions as automatic migrations don't work on
     # NixOS. For the check to work we have to temporarily remove all custom
     # FRIGATE_ env vars in our config as they break the check for some reason.
-    checkConfig = config.services.frigate.package.version != "0.16.1";
+    checkConfig = config.services.frigate.package.version != "0.16.2";
     hostname = "frigate.internal.com";
 
     settings = {

@@ -90,7 +90,12 @@ in
           "iwd"
           "wpa_supplicant"
         ];
-        default = "wpa_supplicant";
+        default = "iwd";
+        description = ''
+          The wireless authentication backend to use. I've had issues with
+          wpa_supplicant not working with specific Wifi-7 APs so iwd is the
+          default.
+        '';
       };
 
       force5GHzNetworks = mkOption {

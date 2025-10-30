@@ -186,7 +186,7 @@
 
       ssh.server = {
         enable = true;
-        extraInterfaces = [ "wlp192s0" ];
+        extraInterfaces = [ "wlan0" ];
       };
 
       audio = {
@@ -220,8 +220,6 @@
 
         wireless = {
           enable = true;
-          backend = "iwd";
-          force5GHzNetworks = [ inputs.nix-resources.secrets.ssids.home ];
           interface = "wlan0";
         };
       };

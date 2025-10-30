@@ -277,7 +277,7 @@
 
         wireless = {
           enable = true;
-          interface = "wlp6s0";
+          interface = "wlan0";
           disableOnBoot = false;
         };
       };

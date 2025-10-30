@@ -74,7 +74,7 @@ in
       (cfg.ssidBlacklist != [ ] -> networking.wireless.enable)
       "Backups `ssidBlacklist` requires wireless to be enabled"
       (cfg.ssidBlacklist != [ ] -> networking.useNetworkd)
-      "Backups `ssidBlacklist` only support wpa-supplicant with systemd-networkd"
+      "Backups `ssidBlacklist` only supports systemd-networkd"
     ];
 
   opts = {

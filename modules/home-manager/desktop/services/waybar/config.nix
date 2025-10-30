@@ -267,7 +267,11 @@ in
           tooltip-format-wifi = "{essid} {frequency}GHz";
           interval = 60;
           interface = networking.wireless.interface;
-          on-click = "${app2unit} wpa_gui.desktop";
+          on-click =
+            if networking.wireless.backend == "wpa_supplicant" then
+              "${app2unit} wpa_gui.desktop"
+            else
+              "${app2unit} impala.desktop";
         };
 
         tray = {

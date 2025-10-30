@@ -85,6 +85,14 @@ in
     wireless = {
       enable = mkEnableOption "wireless";
 
+      backend = mkOption {
+        type = types.enum [
+          "iwd"
+          "wpa_supplicant"
+        ];
+        default = "wpa_supplicant";
+      };
+
       force5GHzNetworks = mkOption {
         type = with types; listOf str;
         default = [ ];
@@ -264,9 +272,9 @@ in
     });
 
     wireless = mkIf cfg.wireless.enable {
-      enable = true;
+      enable = cfg.wireless.backend == "wpa_supplicant";
       userControlled.enable = true;
-      secretsFile = config.age.secrets.wirelessNetworks.path;
+      secretsFile = config.age.secrets.wpaSupplicantSecrets.path;
       scanOnLowSignal = config.${ns}.core.device.type == "laptop";
       allowAuxiliaryImperativeNetworks = true;
       fallbackToWPA2 = cfg.wireless.fallbackToWPA2;
@@ -279,8 +287,30 @@ in
             ${optionalString (elem ssid cfg.wireless.force5GHzNetworks) "freq_list=${freq5GHzList}"}
           '';
         }
-      ) (inputs.nix-resources.secrets.wirelessNetworksConfig args);
+      ) (inputs.nix-resources.secrets.wpaSupplicantNetworks args);
+
+      iwd = {
+        enable = cfg.wireless.backend == "iwd";
+        settings = {
+          General.AddressRandomization = "network";
+          # https://github.com/nixos/nixpkgs/issues/454655
+          DriverQuirks.DefaultInterface = "";
+        };
+      };
     };
+  };
+
+  ns.persistence.directories = optional (cfg.wireless.enable && cfg.wireless.backend == "iwd") {
+    directory = "/var/lib/iwd";
+    mode = "0700";
+  };
+
+  systemd.services.iwd = mkIf (cfg.wireless.enable && cfg.wireless.backend == "iwd") {
+    preStart = ''
+      ${lib.concatMapStrings (network: ''
+        cp ${config.age.secrets."iwd-${network}".path} /var/lib/iwd/${network}
+      '') inputs.nix-resources.secrets.iwdNetworks}
+    '';
   };
 
   # To persist imperatively configured networks
@@ -289,7 +319,7 @@ in
   services.resolved.enable = cfg.resolved.enable;
 
   ns.userPackages =
-    optional cfg.wireless.enable (
+    optional (cfg.wireless.enable && cfg.wireless.backend == "wpa_supplicant") (
       pkgs.writeShellScriptBin "toggle-force-5ghz" ''
         net_id=$(wpa_cli -i "${cfg.wireless.interface}" list_networks | grep '\[CURRENT\]' | cut -f1)
 
@@ -309,7 +339,7 @@ in
         wpa_cli -i "${cfg.wireless.interface}" reassociate
       ''
     )
-    ++ optionals (cfg.wireless.enable && desktop.enable) [
+    ++ optionals (cfg.wireless.enable && cfg.wireless.backend == "wpa_supplicant" && desktop.enable) [
       # wpa_gui attempts to load the first interface it finds in
       # /var/run/wpa_supplicant. If this happens to be a p2p-dev-* interface,
       # wpa_gui goes into a fails with "Could not get status from
@@ -335,11 +365,13 @@ in
 
   ns.hm = mkIf home-manager.enable {
     ${ns}.desktop.hyprland.settings = {
-      windowrule = [
-        "float, class:^(wpa_gui)$"
-        "size 40% 60%, class:^(wpa_gui)$"
-        "center, class:^(wpa_gui)$"
-      ];
+      windowrule =
+        optionals (cfg.wireless.enable && cfg.wireless.backend == "wpa_supplicant" && desktop.enable)
+          [
+            "float, class:^(wpa_gui)$"
+            "size 40% 60%, class:^(wpa_gui)$"
+            "center, class:^(wpa_gui)$"
+          ];
     };
   };
 

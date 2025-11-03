@@ -323,6 +323,14 @@
       "url": "https://github.com/JManch/nvim/archive/558f11f9d85a40f2ad43a4a5a86f7f5af8eda2c5.tar.gz",
       "hash": "1l0f6rvy6jb94dvgzch3c2f02037fn9yg7fjivyyb94nwibp9xny"
     },
+    "qobuz-dl": {
+      "type": "PyPi",
+      "name": "qobuz-dl",
+      "version_upper_bound": null,
+      "version": "0.9.9.10",
+      "url": "https://files.pythonhosted.org/packages/8c/5b/ae62a2607b64134efcefccfb0b858b6017506c72738606c3b30e3bab3ea0/qobuz-dl-0.9.9.10.tar.gz",
+      "hash": "abb4d4977b1c83e8aca0b074c49bc92c2b6f254ecefa880c95fb6dd0eef7a9be"
+    },
     "recyclarr-templates": {
       "type": "Git",
       "repository": {

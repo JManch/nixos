@@ -29,6 +29,7 @@ in
   slskd-stats = pkgs.python3Packages.callPackage ./slskd-stats.nix args;
   yt-dlp = callPackage ./yt-dlp.nix args;
   comick-downloader = pkgs.python3Packages.callPackage ./comick-downloader.nix args;
+  qobuz-dl = pkgs.python3Packages.callPackage ./qobuz-dl.nix args;
 
   # Manual
   advanced-camera-card = callPackage ./advanced-camera-card.nix { };

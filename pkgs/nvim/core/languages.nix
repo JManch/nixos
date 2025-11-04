@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   vim.languages = {
     enableTreesitter = true;
@@ -51,7 +51,7 @@
       enable = true;
       lsp.enable = true;
       format.enable = true;
-      format.package = pkgs.typstyle;
+      format.type = "typstyle";
     };
 
     css = {
@@ -76,4 +76,7 @@
       cmd = { "${pkgs.nixd}/bin/nixd" },
     }
   '';
+
+  # Typstyle will not automatically wrap to the line width by default
+  vim.formatter.conform-nvim.setupOpts.formatters."typstyle".args = [ "--wrap-text" ];
 }

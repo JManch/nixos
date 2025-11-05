@@ -245,7 +245,7 @@ in
           format = "";
           format-on = optionalString (device.type == "laptop") "<span color='#${colors.base04}'>󰂯</span>";
           format-connected = "<span color='#${colors.base04}'>󰂱</span> {num_connections}";
-          on-click = "${app2unit} blueman-manager.desktop";
+          on-click = "${app2unit} bluetui.desktop";
           on-click-right = "${getExe' pkgs.bluez "bluetoothctl"} power off";
           tooltip-format = "{controller_alias}";
           tooltip-format-connected = "{device_enumerate}";

@@ -4,12 +4,7 @@
   config,
 }:
 let
-  inherit (lib)
-    ns
-    mkIf
-    hiPrio
-    mkForce
-    ;
+  inherit (lib) ns mkIf;
   inherit (config.${ns}.core) home-manager device;
 in
 {
@@ -18,46 +13,25 @@ in
     powerOnBoot = device.type != "laptop";
   };
 
-  services.blueman.enable = true;
-
-  systemd.user.services.blueman-applet = {
-    path = mkForce [ ];
-    after = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    requisite = [ "graphical-session.target" ];
-    serviceConfig.Slice = "session${lib.${ns}.sliceSuffix config}.slice";
-  };
-
-  environment.systemPackages = [
-    (hiPrio (
-      pkgs.runCommand "blueman-autostart-disable" { } ''
-        mkdir -p $out/etc/xdg/autostart
-        substitute ${pkgs.blueman}/etc/xdg/autostart/blueman.desktop $out/etc/xdg/autostart/blueman.desktop \
-          --replace-fail "Type=Application" "Type=Application
-        Hidden=true"
-      ''
-    ))
-
-    (hiPrio (
-      pkgs.runCommand "blueman-adapter-desktop-entry-disable" { } ''
-        mkdir -p $out/share/applications
-        substitute ${pkgs.blueman}/share/applications/blueman-adapters.desktop $out/share/applications/blueman-adapters.desktop \
-          --replace-fail "Type=Application" "Type=Application
-        Hidden=true"
-      ''
-    ))
-  ];
+  ns.userPackages = [ pkgs.bluetui ];
 
   ns.hm = mkIf home-manager.enable {
+    xdg.desktopEntries.bluetui = mkIf config.${ns}.hmNs.desktop.enable {
+      name = "bluetui";
+      genericName = "Bluetooth Manager";
+      exec = "xdg-terminal-exec --title=bluetui --app-id=bluetui bluetui";
+      terminal = false;
+      type = "Application";
+      icon = "application-x-generic";
+      categories = [ "System" ];
+    };
+
     ${ns}.desktop.hyprland.settings.windowrule = [
-      "float, class:^(.blueman-manager-wrapped)$"
-      "size 40% 40%, class:^(.blueman-manager-wrapped)$"
-      "center, class:^(.blueman-manager-wrapped)$"
+      "float, class:^(bluetui)$"
+      "size 60% 50%, class:^(bluetui)$"
+      "center, class:^(bluetui)$"
     ];
   };
 
-  ns.persistence.directories = [
-    "/var/lib/bluetooth"
-    "/var/lib/blueman"
-  ];
+  ns.persistence.directories = [ "/var/lib/bluetooth" ];
 }

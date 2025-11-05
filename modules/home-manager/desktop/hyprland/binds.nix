@@ -204,7 +204,7 @@ let
     ${brightnessctl} set -e4 "$1"
     if [ "$(loginctl show-session $XDG_SESSION_ID -p LockedHint --value)" = "no" ]; then
       brightness=$(${brightnessctl} get --percentage)
-      notify-send --urgency=low -t 2000 \
+      ${notifySend} --urgency=low -t 2000 \
         -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $brightness%"
     fi
   '';

@@ -26,4 +26,10 @@ in
     icon = "application-x-generic";
     categories = [ "System" ];
   };
+
+  ns.desktop.hyprland.settings.windowrule = [
+    "float, class:^(impala)$"
+    "size 60% 50%, class:^(impala)$"
+    "center, class:^(impala)$"
+  ];
 }

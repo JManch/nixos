@@ -83,7 +83,7 @@
       assert lib.assertMsg (pkgs.zfs.version == "2.3.4") "zfs should support newer kernel now";
       lib.mkForce
         (import (fetchTree "github:NixOS/nixpkgs/544961dfcce86422ba200ed9a0b00dd4b1486ec5") {
-          inherit (pkgs) system;
+          inherit (pkgs.stdenv.hostPlatform) system;
         }).linuxPackages_6_16;
     # kernelPackages = lib.mkForce pkgs.linuxPackages_6_16;
   };

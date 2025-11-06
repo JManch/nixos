@@ -24,7 +24,7 @@ in
     enable = true;
     package =
       (import (fetchTree "github:NixOS/nixpkgs/c6a788f552b7b7af703b1a29802a7233c0067908") {
-        inherit (pkgs) system;
+        inherit (pkgs.stdenv.hostPlatform) system;
       }).mealie;
     listenAddress = "127.0.0.1";
     port = cfg.port;

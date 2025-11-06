@@ -319,7 +319,7 @@ in
           pkgs.writeShellApplication {
             name = "agenix-fetch-key";
             runtimeInputs = [
-              self.packages.${pkgs.system}.bootstrap-kit
+              self.packages.${pkgs.stdenv.hostPlatform.system}.bootstrap-kit
             ];
             text = ''
               if [ -d /root/agenix ]; then

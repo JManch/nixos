@@ -44,7 +44,7 @@
     java = {
       enable = true;
       lsp.enable = true;
-      lsp.package = pkgs.jdt-language-server.override { jdk = pkgs.corretto21; };
+      lsp.package = pkgs.jdt-language-server;
     };
 
     typst = {

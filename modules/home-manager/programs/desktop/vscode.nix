@@ -12,7 +12,6 @@
     # use VSCode as my main editor though so not a big deal.
     package = pkgs.vscode.fhsWithPackages (
       ps: with ps; [
-        corretto21
         gdb
       ]
     );

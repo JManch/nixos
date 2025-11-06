@@ -10,7 +10,18 @@ in
 {
   home.packages = with pkgs; [
     discord
-    (vesktop.override { withMiddleClickScroll = true; })
+    ((vesktop.override { withMiddleClickScroll = true; }).overrideAttrs {
+      src =
+        assert lib.assertMsg (
+          pkgs.vesktop.version == "1.6.1"
+        ) "Check if https://github.com/Vencord/Vesktop/pull/1198 has been merged into vesktop";
+        fetchFromGitHub {
+          owner = "T1mbits";
+          repo = "Vesktop";
+          rev = "b391beebaed859865523c95378e479d0da947190";
+          hash = "sha256-O5ripbf/NW+MxJW6pfk5T+uQ3PqZ43+jCSgggbIpI94=";
+        };
+    })
   ];
 
   ns.desktop.hyprland.settings = {

@@ -133,7 +133,7 @@ in
       defaults = {
         default = mkOption {
           type = types.package;
-          default = inputs.nix-resources.packages.${pkgs.system}.wallpapers.rx7;
+          default = inputs.nix-resources.packages.${pkgs.stdenv.hostPlatform.system}.wallpapers.rx7;
           description = ''
             The default wallpaper to use if randomise is disabled.
           '';

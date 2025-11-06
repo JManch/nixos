@@ -12,7 +12,7 @@ let
     name: testHostOptions:
     let
       testHost =
-        (lib.${ns}.mkHost name "joshua" pkgs.system [
+        (lib.${ns}.mkHost name "joshua" pkgs.stdenv.hostPlatform.system [
           (modules.importApply ./test-host.nix testHostOptions)
         ]).value;
     in
@@ -40,7 +40,7 @@ let
 
           nixpkgs.overlays = singleton (
             _: _: {
-              ${ns}.bootstrap-kit = self.packages.${pkgs.system}.bootstrap-kit.override {
+              ${ns}.bootstrap-kit = self.packages.${pkgs.stdenv.hostPlatform.system}.bootstrap-kit.override {
                 bootstrapKit = "${self.inputs.nix-resources}/secrets/installer-test-bootstrap-kit.tar.age";
               };
             }
@@ -53,7 +53,7 @@ let
             {
               imports = [
                 (modules.importApply ../../hosts/installer {
-                  hostPath = "packages.${pkgs.system}.${installerName}.passthru.testHosts";
+                  hostPath = "packages.${pkgs.stdenv.hostPlatform.system}.${installerName}.passthru.testHosts";
                   vendorNixResources = true;
                 })
               ];

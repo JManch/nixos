@@ -56,7 +56,7 @@ in
 
   services.hypridle = {
     enable = true;
-    package = inputs.hypridle.packages.${pkgs.system}.default;
+    package = inputs.hypridle.packages.${pkgs.stdenv.hostPlatform.system}.default;
     settings = {
       general = {
         # Cmd triggered by `loginctl lock-session`

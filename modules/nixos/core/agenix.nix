@@ -11,7 +11,7 @@ let
   scriptInputs = [
     pkgs.fd
     pkgs.${ns}.bootstrap-kit
-    agenix.packages.${pkgs.system}.agenix
+    agenix.packages.${pkgs.stdenv.hostPlatform.system}.agenix
   ];
 
   setup = # bash
@@ -79,7 +79,7 @@ in
   enableOpt = false;
 
   ns.adminPackages = [
-    agenix.packages.${pkgs.system}.default
+    agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
     pkgs.${ns}.bootstrap-kit
     editSecretScript
     rekeySecretScript

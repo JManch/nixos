@@ -62,13 +62,15 @@ in
 
   nixpkgs.overlays = [
     (_: _: {
-      inherit (inputs.nixpkgs-broadcast-box.legacyPackages.${pkgs.system}) broadcast-box;
+      inherit (inputs.nixpkgs-broadcast-box.legacyPackages.${pkgs.stdenv.hostPlatform.system})
+        broadcast-box
+        ;
     })
   ];
 
   services.broadcast-box = {
     enable = true;
-    package = inputs.broadcast-box.packages.${pkgs.system}.default;
+    package = inputs.broadcast-box.packages.${pkgs.stdenv.hostPlatform.system}.default;
     openFirewall = true;
     web = {
       inherit (cfg) port;

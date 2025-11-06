@@ -32,7 +32,7 @@ let
 
   availablePlugins =
     (import ../../../pkgs/minecraft-plugins { inherit lib pkgs; }).minecraft-plugins
-    // inputs.nix-resources.packages.${pkgs.system}.minecraft-plugins;
+    // inputs.nix-resources.packages.${pkgs.stdenv.hostPlatform.system}.minecraft-plugins;
 
   serverIcon = pkgs.fetchurl {
     url = "https://i.imgur.com/ugQk6xn.png";

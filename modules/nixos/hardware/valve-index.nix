@@ -118,7 +118,7 @@ in
     enable = true;
     # Use this if package from nixpkgs-xr overlay every fails to build (the
     # overlay using our nixpkgs rather than nixpkgs-xr nixpkgs)
-    # package = inputs.nixpkgs-xr.packages.${pkgs.system}.monado;
+    # package = inputs.nixpkgs-xr.packages.${pkgs.stdenv.hostPlatform.system}.monado;
     forceDefaultRuntime = true;
     highPriority = true;
     defaultRuntime = true;

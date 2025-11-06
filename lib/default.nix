@@ -112,7 +112,8 @@ in
     # first layer of arguments if it is not explicitly added to the module
     # parameters.
     flakePkgs =
-      args: flake: args.inputs.${flake}.packages.${args.options._module.args.value.pkgs.system};
+      args: flake:
+      args.inputs.${flake}.packages.${args.options._module.args.value.pkgs.stdenv.hostPlatform.system};
 
     addPatches =
       pkg: patches:

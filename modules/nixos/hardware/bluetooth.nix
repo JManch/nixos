@@ -13,7 +13,26 @@ in
     powerOnBoot = device.type != "laptop";
   };
 
-  ns.userPackages = [ pkgs.bluetui ];
+  ns.userPackages = [
+    (
+      assert lib.assertMsg (pkgs.bluetui.version == "0.6") "Remove bluetui override";
+      pkgs.bluetui.overrideAttrs rec {
+        version = "0.7.2";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "pythops";
+          repo = "bluetui";
+          rev = "v${version}";
+          hash = "sha256-qryBx0Lezg98FzfAFZR6+j7byJTW7hMbGmKIQMkciec=";
+        };
+
+        cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+          inherit src;
+          hash = "sha256-CijMGqsfyoUV8TSy1dWUR//PCySgkxKGuhUMHp4Tn48=";
+        };
+      }
+    )
+  ];
 
   ns.hm = mkIf home-manager.enable {
     xdg.desktopEntries.bluetui = mkIf config.${ns}.hmNs.desktop.enable {

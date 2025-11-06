@@ -40,7 +40,7 @@ in
   asserts = [
     (cfg.runInRam -> impermanence.enable or false)
     "Firefox run in RAM option can only be used on hosts with impermanence enabled"
-    (cfg.hideToolbar -> !pkgs.hostPlatform.isDarwin)
+    (cfg.hideToolbar -> !pkgs.stdenv.hostPlatform.isDarwin)
     "Hide toolbar does not currently work on darwin because of how we hardcode the userChrome.css path to avoid IFD"
   ];
 

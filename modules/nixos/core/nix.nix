@@ -540,7 +540,7 @@ in
   programs.command-not-found.enable = false;
   programs.nix-index = {
     # Nix-index doesn't work with cross compilation
-    enable = with pkgs; hostPlatform == buildPlatform;
+    enable = with pkgs.stdenv; hostPlatform == buildPlatform;
     package = (flakePkgs args "nix-index-database").nix-index-with-db;
   };
 

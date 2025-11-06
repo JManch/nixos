@@ -211,6 +211,7 @@ in
           exec = "${getExe' pkgs.coreutils "cat"} /sys/class/drm/renderD128/device/gpu_busy_percent";
           interval = 5;
           tooltip = false;
+          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} btop.desktop";
         };
 
         # The upower module has less configuration
@@ -233,12 +234,14 @@ in
           tooltip = true;
           format-time = " {H}:{m}";
           tooltip-format = "{power:4.2f}W{time}";
+          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} btop.desktop";
         };
 
         memory = {
           format = "<span color='#${colors.base04}'></span> {used:0.1f}GiB";
           interval = 30;
           tooltip = false;
+          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} btop.desktop";
         };
 
         bluetooth = (mkIf bluetooth.enable) {

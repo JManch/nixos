@@ -19,7 +19,17 @@ let
   );
 in
 {
-  home.packages = [ package ];
+  home.packages = [
+    package
+    (lib.hiPrio (
+      pkgs.runCommand "btop-desktop-modify" { } ''
+        mkdir -p $out/share/applications
+        substitute ${pkgs.btop}/share/applications/btop.desktop $out/share/applications/btop.desktop \
+          --replace-fail "Exec=btop" "Exec=xdg-terminal-exec --title=btop --app-id=btop btop" \
+          --replace-fail "Terminal=true" "Terminal=false"
+      ''
+    ))
+  ];
 
   xdg.configFile."btop/btop.conf".text = ''
     color_theme = "custom"
@@ -81,7 +91,15 @@ in
     theme[process_end]="#${base09}"
   '';
 
-  ns.desktop.darkman.switchApps.btop = {
-    paths = [ ".config/${themePath}" ];
+  ns.desktop = {
+    darkman.switchApps.btop = {
+      paths = [ ".config/${themePath}" ];
+    };
+
+    hyprland.settings.windowrule = [
+      "float, class:^(btop)$"
+      "size 75% 75%, class:^(btop)$"
+      "center, class:^(btop)$"
+    ];
   };
 }

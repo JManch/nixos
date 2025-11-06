@@ -98,7 +98,11 @@
         };
 
         gaming = {
-          mangohud.enable = true;
+          mangohud = {
+            enable = true;
+            fontSize = 18;
+          };
+
           r2modman.enable = true;
           bottles.enable = true;
           prism-launcher.enable = true;

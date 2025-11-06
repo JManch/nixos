@@ -95,7 +95,13 @@
         };
 
         gaming = {
-          mangohud.enable = true;
+          mangohud = {
+            enable = true;
+            noShiftR = true;
+            cpuName = "HX 370";
+            gpuName = "890M";
+          };
+
           prism-launcher.enable = true;
           beamng.enable = true;
         };

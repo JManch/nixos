@@ -14,6 +14,6 @@ rclone.overrideAttrs (old: {
     "-X github.com/rclone/rclone/fs.Version=${sources.filen-rclone.revision}"
   ];
 
-  vendorHash = "sha256-5kzR9sREORBHolQgXpo/1CeITwel7GOczSYZCVl/SwA=";
+  vendorHash = "sha256-JXavjdcDE6L+6db5zQtIiS0KxY6wtaZyyvuN+UmCU+A=";
   dontVersionCheck = true;
 })

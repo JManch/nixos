@@ -86,9 +86,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "6e2f0cd6939093ff2792d88d56c453fd66ec4871",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/6e2f0cd6939093ff2792d88d56c453fd66ec4871.tar.gz",
-      "hash": "0mxzqp58cky1a69sznmbmcj4q8g264nwqaz28lvim7i69iv54fjy"
+      "revision": "4c165a98ac3f1d351cd2aeb36ba6df3104ca6b16",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/4c165a98ac3f1d351cd2aeb36ba6df3104ca6b16.tar.gz",
+      "hash": "1l1bnlay9zlmld4xwx74dkrdj2r3za7wzqqibd35l9kdy9r1yvzp"
     },
     "async-property": {
       "type": "PyPi",
@@ -166,9 +166,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "784979078ecd573af0d9809d2c5a07bafaad2c41",
-      "url": "https://github.com/FilenCloudDienste/filen-rclone/archive/784979078ecd573af0d9809d2c5a07bafaad2c41.tar.gz",
-      "hash": "1arpcpg48x9v3bizsg1p71c3ci88px4d8g202zaydaq0yp91q8ya"
+      "revision": "43ad6f40a1766ffb3407393c4e46ca7cdc22725b",
+      "url": "https://github.com/FilenCloudDienste/filen-rclone/archive/43ad6f40a1766ffb3407393c4e46ca7cdc22725b.tar.gz",
+      "hash": "11v7fcghsgarwa2shlakifbnfql25aqc935sqv84jy76404qibq5"
     },
     "firefox-csshacks": {
       "type": "Git",
@@ -179,9 +179,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "41d995ac7b79da88c2f6d91784aa511a9b3aea8d",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/41d995ac7b79da88c2f6d91784aa511a9b3aea8d.tar.gz",
-      "hash": "1xkdpgvp5lr502vnrf8lz3qnxs3j1wgfihq0ll46z1l85z8bz8v0"
+      "revision": "a7a29f9ac9b8dc5715df18251999d9a5f4db881b",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/a7a29f9ac9b8dc5715df18251999d9a5f4db881b.tar.gz",
+      "hash": "188sbdnm2yi50b6wm2k77hg0syyagqyc956k4sw8rwpyki1wxlwj"
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -194,10 +194,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v5.10.0",
-      "revision": "ff75e49fbb297aa66348f486ce692cadc30723d0",
-      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/v5.10.0",
-      "hash": "0jl1lma5nzygm4q2s4jjcl0kakkv4nvnlqxhfbgm5rzn0s2145mf"
+      "version": "v5.11.0",
+      "revision": "7b2eecee1f6f3faab1fcf256c4ba6a83784764a5",
+      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/v5.11.0",
+      "hash": "1sh8s7zlqaniga68gcvdz159lm6nifcrxwcd9g8lnvi0xvjxyy3i"
     },
     "hacs_waste_collection_schedule": {
       "type": "GitRelease",
@@ -395,9 +395,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "35b27432a5cf7dd3819ebe4f848b00f5247feea5",
-      "url": "https://github.com/dweymouth/supersonic/archive/35b27432a5cf7dd3819ebe4f848b00f5247feea5.tar.gz",
-      "hash": "0v10zwz3r5bykg13cjlnv3bf1wfm50nxqx9jm375l50v7188ij8q"
+      "revision": "360391e8326f6c32c352bd63da9502badfa24aa4",
+      "url": "https://github.com/dweymouth/supersonic/archive/360391e8326f6c32c352bd63da9502badfa24aa4.tar.gz",
+      "hash": "1qjfna7qm8csd7c6w5sb3amn7lz06ml07algsv5cc3x7l2wng38q"
     },
     "thermal_comfort": {
       "type": "GitRelease",

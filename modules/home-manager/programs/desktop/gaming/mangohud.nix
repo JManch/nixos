@@ -20,15 +20,16 @@ let
   shiftR = if cfg.noShiftR then "Shift_L" else "Shift_R";
 
   mkDeviceNameOption =
-    device:
+    type:
     mkOption {
-      default = device.${device}.name;
+      type = types.str;
+      default = device.${type}.name;
       apply =
         name:
         assert (
           assertMsg (
             stringLength name <= 10
-          ) "MangoHud ${toUpper device} name '${name}' length must be <= 10 chars otherwise it overlaps"
+          ) "MangoHud ${toUpper type} name '${name}' length must be <= 10 chars otherwise it overlaps"
         );
         name;
     };

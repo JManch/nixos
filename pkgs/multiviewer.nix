@@ -17,8 +17,6 @@ multiviewer-for-f1.overrideAttrs (
 
     # Add libglvnd to library path for hardware acceleration
     installPhase = ''
-      runHook preInstall
-
       mkdir -p $out/bin $out/share
       mv -t $out/share usr/share/* usr/lib/multiviewer
 
@@ -31,7 +29,10 @@ multiviewer-for-f1.overrideAttrs (
           ]
         }:\"$out/share/multiviewer\""
 
-      runHook postInstall
+      # For reasons I don't understand the icon does not work unless it's an
+      # absolute path. Apps like vscode don't have this issue for some reason?
+      substitute $out/share/applications/multiviewer.desktop $out/share/applications/multiviewer.desktop \
+        --replace-fail "Icon=multiviewer" "Icon=$out/share/pixmaps/multiviewer.png"
     '';
 
     meta = prev.meta // {

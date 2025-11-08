@@ -64,19 +64,27 @@ let
         # Load custom arguments from file that our wrapper wrote to
         profiles_file="/home/${username}/.gamemode-profiles"
         profiles=()
-        if [ -e "$profiles_file" ]; then
+        if [[ -e $profiles_file ]]; then
           IFS=',' read -r -a profiles <<< "$(<"$profiles_file")"
           ${optionalString (mode == "stop") "rm \"$profiles_file\""}
         else
+          # I think some applications like prismlauncher start gamemode using
+          # some library function, not the executable. This means our wrapper
+          # script doesn't get called and the script args file is not created.
+          # The workaround for prismlaunch is to disable the Tweaks > Feral
+          # Gamemode option and instead set the custom wrapper command to
+          # `gamemoderun`.
+
+          # If this message appears it's not a problem as long as we're not
+          # trying to use a custom profile.
           notify-send -e --urgency=critical -t 5000 \
-            'GameMode' '${toSentenceCase mode} script args file missing'
-          exit 1
+            'GameMode' '${toSentenceCase mode} script args file missing, read comment in config'
         fi
 
         profile_exists() {
           local profile="$1"
           for elem in "''${profiles[@]}"; do
-            if [[ "$elem" == "$profile" ]]; then
+            if [[ $elem == "$profile" ]]; then
               return 0
             fi
           done

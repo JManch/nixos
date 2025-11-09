@@ -366,17 +366,34 @@ in
             --replace-fail "Name=wpa_gui" "Name=WPA GUI"
         ''
       ))
-    ];
+    ]
+    ++ optional (cfg.wireless.enable && cfg.wireless.backend == "iwd") pkgs.impala;
 
   ns.hm = mkIf home-manager.enable {
+    xdg.desktopEntries.impala =
+      mkIf (cfg.wireless.enable && cfg.wireless.backend == "iwd" && desktop.enable)
+        {
+          name = "Impala";
+          genericName = "Wifi Manager";
+          exec = "xdg-terminal-exec --title=impala --app-id=impala impala";
+          terminal = false;
+          type = "Application";
+          icon = "nm-device-wireless";
+          categories = [ "System" ];
+        };
+
     ${ns}.desktop.hyprland.settings = {
       windowrule =
-        optionals (cfg.wireless.enable && cfg.wireless.backend == "wpa_supplicant" && desktop.enable)
-          [
-            "float, class:^(wpa_gui)$"
-            "size 40% 60%, class:^(wpa_gui)$"
-            "center, class:^(wpa_gui)$"
-          ];
+        optionals (cfg.wireless.enable && cfg.wireless.backend == "wpa_supplicant" && desktop.enable) [
+          "float, class:^(wpa_gui)$"
+          "size 40% 60%, class:^(wpa_gui)$"
+          "center, class:^(wpa_gui)$"
+        ]
+        ++ optionals (cfg.wireless.enable && cfg.wireless.backend == "iwd" && desktop.enable) [
+          "float, class:^(impala)$"
+          "size 60% 50%, class:^(impala)$"
+          "center, class:^(impala)$"
+        ];
     };
   };
 

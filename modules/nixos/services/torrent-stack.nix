@@ -477,7 +477,7 @@ in
       (pkgs.symlinkJoin {
         name = "beets-wrapped-config";
         paths = singleton (
-          pkgs.beets.override {
+          pkgs.python3Packages.beets.override {
             pluginOverrides = {
               replaygain.enable = true;
               autobpm.enable = true;

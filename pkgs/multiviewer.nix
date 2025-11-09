@@ -28,11 +28,6 @@ multiviewer-for-f1.overrideAttrs (
             libglvnd
           ]
         }:\"$out/share/multiviewer\""
-
-      # For reasons I don't understand the icon does not work unless it's an
-      # absolute path. Apps like vscode don't have this issue for some reason?
-      substitute $out/share/applications/multiviewer.desktop $out/share/applications/multiviewer.desktop \
-        --replace-fail "Icon=multiviewer" "Icon=$out/share/pixmaps/multiviewer.png"
     '';
 
     meta = prev.meta // {

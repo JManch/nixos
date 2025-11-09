@@ -1,0 +1,31 @@
+diff --git a/icon.c b/icon.c
+index 4209961..1a12271 100644
+--- a/icon.c
++++ b/icon.c
+@@ -284,6 +284,26 @@ get_icon_dirs(void)
+         }
+     }
+ 
++    xdg_data_dirs_t pixmap_base_dirs = xdg_data_dirs();
++
++    tll_foreach(pixmap_base_dirs, it) {
++        struct xdg_data_dir *d = &it->item;
++        int fd = openat(d->fd, "pixmaps", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
++        if (fd >= 0) {
++            struct xdg_data_dir pixmap_dir = {
++                .path = xasprintf("%s/pixmaps", d->path),
++                .fd = fd,
++            };
++            tll_push_back(dirs, pixmap_dir);
++        }
++    }
++
++    tll_foreach(pixmap_base_dirs, it) {
++        free(it->item.path);
++        close(it->item.fd);
++    }
++    tll_free(pixmap_base_dirs);
++
+     const char *home = getenv("HOME");
+     if (home != NULL) {
+         char *path = xasprintf("%s/%s", home, ".icons");

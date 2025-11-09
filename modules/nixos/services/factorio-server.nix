@@ -1,8 +1,4 @@
-{
-  lib,
-  cfg,
-  pkgs,
-}:
+{ lib, cfg }:
 let
   inherit (lib) genAttrs singleton;
 in
@@ -26,14 +22,6 @@ in
 
   services.factorio = {
     enable = true;
-    package = pkgs.factorio-headless.overrideAttrs rec {
-      version = "2.0.20";
-      src = pkgs.fetchurl {
-        name = "factorio_headless_x64-${version}.tar.xz";
-        url = "https://factorio.com/get-download/${version}/headless/linux64";
-        hash = "sha256-xKkB8vHb7btBZUVg20xvq2g6MMIDNOgF1O90DAQWUVo=";
-      };
-    };
     requireUserVerification = false;
     public = false;
     saveName = "default";

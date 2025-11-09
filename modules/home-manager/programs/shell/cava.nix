@@ -53,7 +53,7 @@
     exec = ''xdg-terminal-exec --title=Cava --app-id=cava -e zsh "-c" "alacritty msg config font.size=9 || true; cava"'';
     terminal = false;
     type = "Application";
-    icon = "audio-x-generic";
+    icon = "org.pulseaudio.pavucontrol";
     categories = [ "Audio" ];
   };
 

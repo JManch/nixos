@@ -57,6 +57,7 @@
         git.enable = true;
         fastfetch.enable = true;
         neovim.enable = true;
+        qobuz-dl.enable = true;
 
         taskwarrior = {
           enable = true;

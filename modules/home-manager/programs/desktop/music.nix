@@ -4,7 +4,7 @@
   config,
 }:
 let
-  inherit (lib) ns optional;
+  inherit (lib) ns;
   inherit (config.${ns}.desktop) style hyprland;
 
   unzipMusicHomelab = pkgs.writeShellApplication {
@@ -38,8 +38,10 @@ in
     pkgs.picard
     pkgs.spek
     pkgs.${ns}.resample-flacs
-  ]
-  ++ optional (config.home.username == "joshua") unzipMusicHomelab;
+    unzipMusicHomelab
+  ];
+
+  ns.programs.shell.qobuz-dl.enable = true;
 
   ns.desktop.hyprland.settings = {
     workspace = [

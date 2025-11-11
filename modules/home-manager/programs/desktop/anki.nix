@@ -1,7 +1,6 @@
 { pkgs }:
 {
-  home.packages = [ pkgs.anki-bin ];
-  systemd.user.sessionVariables.ANKI_WAYLAND = 1;
+  home.packages = [ pkgs.anki ];
 
   ns = {
     backups.anki = {

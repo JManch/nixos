@@ -338,8 +338,14 @@ in
                 "network.target"
                 "wg-quick-wg-${interface}.service"
               ];
-              partOf = [ "wg-quick-wg-${interface}.service" ];
-              requires = [ "wg-quick-wg-${interface}.service" ];
+              # Not using a Requires, BindsTo or PartOf dependency here
+              # because, on wg-quick unit failure, it causes the dnsmasq
+              # service to forcibly restart the wg-quick service, ignoring the
+              # RestartSec property. This causes the wg-quick unit to hit the
+              # restart burst limit and then never restart again. Frequently
+              # ran into this if the VPN attempted to start before name
+              # resolution was up.
+              wants = [ "wg-quick-wg-${interface}.service" ];
               wantedBy = [ "wg-quick-wg-${interface}.service" ];
 
               serviceConfig = baseline.serviceConfig // {

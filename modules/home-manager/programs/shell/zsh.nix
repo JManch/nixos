@@ -44,6 +44,9 @@ in
     shellAliases = {
       cat = "bat -pp --theme=base16";
       reload = "exec zsh";
+      dupe =
+        mkIf config.${lib.ns}.desktop.enable
+          "app2unit -t service -T -e zsh '-c' \"cd '$(pwd)'; zsh -i\"";
     };
 
     envExtra =

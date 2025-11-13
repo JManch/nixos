@@ -86,6 +86,7 @@
         zathura.enable = true;
         rnote.enable = true;
         vscode.enable = true;
+        anki.enable = true;
 
         firefox = {
           enable = true;

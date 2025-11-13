@@ -27,7 +27,7 @@ in
 
     settings = {
       main = {
-        launch-prefix = mkIf uwsm.enable "app2unit --fuzzel-compat --";
+        launch-prefix = mkIf uwsm.enable "app2unit -t service --fuzzel-compat --";
         terminal = "xdg-terminal-exec";
 
         font = "${desktopCfg.style.font.family}:size=${

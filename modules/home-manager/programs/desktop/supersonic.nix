@@ -12,6 +12,13 @@
       tags = old.tags ++ [ "migrated_fynedo" ];
       vendorHash = "sha256-FQmaxDIVWCxyFdgz03aNRXFyi8UeMeCqiVHNZOqq/8Q=";
 
+      nativeBuildInputs = old.nativeBuildInputs ++ [ pkgs.makeWrapper ];
+
+      postInstall = old.postInstall + ''
+        wrapProgram $out/bin/supersonic \
+          --prefix PATH : ${pkgs.libnotify}/bin
+      '';
+
       # desktopItems = lib.singleton (
       #   pkgs.makeDesktopItem {
       #     name = "supersonic";

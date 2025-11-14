@@ -179,5 +179,11 @@ in
       (categoryCfg.displayManager.name == "uwsm" -> config.programs.uwsm.enable)
       "Using UWSM as a display manager requires it to be enabled"
     ];
+
+    nixpkgs.overlays = [
+      (_: _: {
+        app2unit = pkgs.${ns}.app2unit;
+      })
+    ];
   }
 ]

@@ -4,7 +4,7 @@
   config,
 }:
 let
-  inherit (lib) ns mkIf;
+  inherit (lib) ns mkIf hiPrio;
   inherit (config.${ns}.core) home-manager device;
 in
 {
@@ -13,19 +13,21 @@ in
     powerOnBoot = device.type != "laptop";
   };
 
-  ns.userPackages = [ pkgs.bluetui ];
+  ns.userPackages = [
+    pkgs.bluetui
+    (hiPrio (
+      pkgs.runCommand "bluetui-desktop-modify" { } ''
+        mkdir -p $out/share/applications
+        substitute ${pkgs.bluetui}/share/applications/bluetui.desktop $out/share/applications/bluetui.desktop \
+          --replace-fail "Exec=bluetui" "Exec=xdg-terminal-exec --title=bluetui --app-id=bluetui bluetui
+        Icon=preferences-bluetooth" \
+          --replace-fail "Terminal=true" "Terminal=false" \
+          --replace-fail "Comment=Manage bluethooth device" "Comment=Manage bluetooth devices"
+      ''
+    ))
+  ];
 
   ns.hm = mkIf home-manager.enable {
-    xdg.desktopEntries.bluetui = mkIf config.${ns}.hmNs.desktop.enable {
-      name = "Bluetui";
-      genericName = "Bluetooth Manager";
-      exec = "xdg-terminal-exec --title=bluetui --app-id=bluetui bluetui";
-      terminal = false;
-      type = "Application";
-      icon = "preferences-bluetooth";
-      categories = [ "System" ];
-    };
-
     ${ns}.desktop.hyprland.settings.windowrule = [
       "float, class:^(bluetui)$"
       "size 60% 50%, class:^(bluetui)$"

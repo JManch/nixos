@@ -117,6 +117,13 @@
     hyprpaper.inputs.hyprlang.follows = "hyprland/hyprlang";
     hyprpaper.inputs.hyprwayland-scanner.follows = "hyprland/hyprwayland-scanner";
 
+    hyprsunset.url = "github:hyprwm/hyprsunset";
+    hyprsunset.inputs.nixpkgs.follows = "nixpkgs";
+    hyprsunset.inputs.hyprland-protocols.follows = "hyprland/hyprland-protocols";
+    hyprsunset.inputs.hyprutils.follows = "hyprland/hyprutils";
+    hyprsunset.inputs.hyprlang.follows = "hyprland/hyprlang";
+    hyprsunset.inputs.hyprwayland-scanner.follows = "hyprland/hyprwayland-scanner";
+
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";
 

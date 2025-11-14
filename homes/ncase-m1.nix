@@ -33,7 +33,7 @@
         hypridle.enable = true;
         wayvnc.enable = true;
         swww.enable = true;
-        wlsunset.enable = true;
+        hyprsunset.enable = true;
 
         wallpaper = {
           randomise.enable = true;

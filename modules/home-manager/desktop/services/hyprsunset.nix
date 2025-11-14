@@ -9,12 +9,37 @@ in
 {
   xdg.configFile."hypr/hyprsunset.conf".text = ''
     profile {
-      time = 7:30
+      time = 7:00
+      temperature = 4000
+    }
+
+    profile {
+      time = 8:00
+      temperature = 5000
+    }
+
+    profile {
+      time = 9:00
+      temperature = 6000
+    }
+
+    profile {
+      time = 10:00
       identity = true
     }
 
     profile {
+      time = 20:00
+      temperature = 6000
+    }
+
+    profile {
       time = 21:00
+      temperature = 5000
+    }
+
+    profile {
+      time = 22:00
       temperature = 4000
     }
 

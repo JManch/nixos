@@ -36,7 +36,7 @@
 
       services = {
         dunst.enable = true;
-        wlsunset.enable = true;
+        hyprsunset.enable = true;
         wluma.enable = false;
         hypridle.enable = true;
         hyprpaper.enable = true;

@@ -108,7 +108,6 @@
     hyprpolkitagent.url = "github:hyprwm/hyprpolkitagent";
     hyprpolkitagent.inputs.nixpkgs.follows = "nixpkgs";
     hyprpolkitagent.inputs.hyprutils.follows = "hyprland/hyprutils";
-    hyprpolkitagent.inputs.hyprland-qt-support.follows = "hyprland/hyprland-qtutils/hyprland-qt-support";
 
     hyprpaper.url = "github:hyprwm/hyprpaper";
     hyprpaper.inputs.nixpkgs.follows = "nixpkgs";

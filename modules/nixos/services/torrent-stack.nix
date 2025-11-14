@@ -574,11 +574,6 @@ in
 
     services.slskd = {
       enable = true;
-      package =
-        assert lib.assertMsg (pkgs.slskd.version == "0.23.2") "remove slskd override";
-        (import (fetchTree "github:NixOS/nixpkgs/c5ae371f1a6a7fd27823bc500d9390b38c05fa55") {
-          inherit (pkgs.stdenv.hostPlatform) system;
-        }).slskd;
       domain = null;
       environmentFile = slskdVars.path;
       openFirewall = false;

@@ -68,8 +68,8 @@ in
   xdg.configFile."ghostty/themes/base16-light".text = mkTheme "light";
 
   ns.desktop.hyprland.binds = mkIf (desktop.terminal == desktopId) [
-    "${desktop.hyprland.modKey}, Return, exec, app2unit ${desktopId}.desktop"
+    "${desktop.hyprland.modKey}, Return, exec, app2unit -t service ${desktopId}.desktop"
     "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
-    "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit ${desktopId}.desktop"
+    "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit -t service ${desktopId}.desktop"
   ];
 }

@@ -180,7 +180,7 @@ in
             "󰕾"
             "󰕾"
           ];
-          on-click = "${app2unit} com.saivert.pwvucontrol.desktop";
+          on-click = "${app2unit} -t service com.saivert.pwvucontrol.desktop";
           tooltip = true;
         };
 
@@ -203,7 +203,7 @@ in
           interval = 5;
           format = "<span color='#${colors.base04}'></span> {usage}%";
           tooltip = false;
-          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} btop.desktop";
+          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} -t service btop.desktop";
         };
 
         "custom/gpu" = mkIf gpuModuleEnabled {
@@ -211,7 +211,7 @@ in
           exec = "${getExe' pkgs.coreutils "cat"} /sys/class/drm/renderD128/device/gpu_busy_percent";
           interval = 5;
           tooltip = false;
-          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} btop.desktop";
+          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} -t service btop.desktop";
         };
 
         # The upower module has less configuration
@@ -234,21 +234,21 @@ in
           tooltip = true;
           format-time = " {H}:{m}";
           tooltip-format = "{power:4.2f}W{time}";
-          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} btop.desktop";
+          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} -t service btop.desktop";
         };
 
         memory = {
           format = "<span color='#${colors.base04}'></span> {used:0.1f}GiB";
           interval = 30;
           tooltip = false;
-          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} btop.desktop";
+          on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} -t service btop.desktop";
         };
 
         bluetooth = (mkIf bluetooth.enable) {
           format = "";
           format-on = optionalString (device.type == "laptop") "<span color='#${colors.base04}'>󰂯</span>";
           format-connected = "<span color='#${colors.base04}'>󰂱</span> {num_connections}";
-          on-click = "${app2unit} bluetui.desktop";
+          on-click = "${app2unit} -t service bluetui.desktop";
           on-click-right = "${getExe' pkgs.bluez "bluetoothctl"} power off";
           tooltip-format = "{controller_alias}";
           tooltip-format-connected = "{device_enumerate}";
@@ -273,9 +273,9 @@ in
           interface = networking.wireless.interface;
           on-click =
             if networking.wireless.backend == "wpa_supplicant" then
-              "${app2unit} wpa_gui.desktop"
+              "${app2unit} -t service wpa_gui.desktop"
             else
-              "${app2unit} impala.desktop";
+              "${app2unit} -t service impala.desktop";
         };
 
         tray = {

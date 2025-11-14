@@ -122,9 +122,9 @@ in
       settings.windowrule = [ "scrolltouchpad 0.6, class:^(Alacritty)$" ];
 
       binds = mkIf (desktop.terminal == "Alacritty") [
-        "${desktop.hyprland.modKey}, Return, exec, app2unit Alacritty.desktop"
+        "${desktop.hyprland.modKey}, Return, exec, app2unit -t service Alacritty.desktop"
         "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
-        "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit Alacritty.desktop"
+        "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit -t service Alacritty.desktop"
       ];
     };
   };

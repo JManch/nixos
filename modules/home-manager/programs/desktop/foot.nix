@@ -65,8 +65,8 @@ in
   ];
 
   ns.desktop.hyprland.binds = mkIf (desktop.terminal == "foot") [
-    "${desktop.hyprland.modKey}, Return, exec, app2unit foot.desktop"
+    "${desktop.hyprland.modKey}, Return, exec, app2unit -t service foot.desktop"
     "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
-    "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit foot.desktop"
+    "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit -t service foot.desktop"
   ];
 }

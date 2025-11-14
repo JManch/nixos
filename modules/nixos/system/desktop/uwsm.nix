@@ -19,15 +19,12 @@ let
     foldl'
     concatMapAttrs
     optionalString
-    concatStringsSep
     mkOption
     literalExpression
     types
-    optionals
     optionalAttrs
     ;
   inherit (config.${ns}.core) device home-manager;
-  inherit (lib.${ns}) addPatches;
   homeUwsm = config.${ns}.hmNs.desktop.uwsm;
 in
 [
@@ -60,17 +57,6 @@ in
         description = ''
           List of desktop names to create drop-in overrides for. Should be the
           exact case-sensitive name used in the .desktop file.
-        '';
-      };
-
-      serviceApps = mkOption {
-        type = with types; listOf str;
-        default = [ ];
-        apply = v: (optionals home-manager.enable homeUwsm.serviceApps) ++ v;
-        description = ''
-          List of application desktop entry IDs that should be started in
-          services instead of scopes. Useful for applications where we want to
-          define custom shutdown behaviour.
         '';
       };
 
@@ -110,6 +96,12 @@ in
     environment = {
       systemPackages = [ pkgs.app2unit ];
       sessionVariables.APP2UNIT_SLICES = "a=app-graphical.slice b=background-graphical.slice s=session-graphical.slice";
+      # Even though I use the -t service flag pretty much everywhere in my
+      # config still keep the default behaviour as scope because this is
+      # generally how apps should be launched if we interactively run `app2unit
+      # app.desktop` in a terminal. Launching with a keybind, launcher or
+      # script should run the the app in a service since there's no value in
+      # process or input/output inheritance in these cases.
       sessionVariables.APP2UNIT_TYPE = "scope";
     };
 
@@ -186,21 +178,6 @@ in
     asserts = [
       (categoryCfg.displayManager.name == "uwsm" -> config.programs.uwsm.enable)
       "Using UWSM as a display manager requires it to be enabled"
-    ];
-
-    nixpkgs.overlays = [
-      (final: prev: {
-        app2unit = addPatches pkgs.${ns}.app2unit [
-          (final.substitute {
-            src = ../../../../patches/app2unit-service-apps.patch;
-            substitutions = [
-              "--replace-fail"
-              "@SERVICE_APPS@"
-              (concatStringsSep " " cfg.serviceApps)
-            ];
-          })
-        ];
-      })
     ];
   }
 ]

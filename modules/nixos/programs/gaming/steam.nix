@@ -83,55 +83,52 @@ in
   # Steam doesn't close cleanly when SIGTERM is sent to the main process so we
   # have to send SIGTERM to a specific child process and wait for the
   # steamwebhelper which likes to hang around.
-  ns.system.desktop.uwsm = {
-    serviceApps = [ "steam" ];
-    appUnitOverrides."steam@.service" =
-      let
-        steamKiller = pkgs.writeShellApplication {
-          name = "steam-killer";
-          runtimeInputs = with pkgs; [
-            coreutils
-            systemd
-            gnugrep
-            gawk
-            gnused
-          ];
-          text = ''
-            processes=$(systemd-cgls --no-page --full --user-unit "$1")
+  ns.system.desktop.uwsm.appUnitOverrides."steam@.service" =
+    let
+      steamKiller = pkgs.writeShellApplication {
+        name = "steam-killer";
+        runtimeInputs = with pkgs; [
+          coreutils
+          systemd
+          gnugrep
+          gawk
+          gnused
+        ];
+        text = ''
+          processes=$(systemd-cgls --no-page --full --user-unit "$1")
 
-            get_pid() {
-              echo "$processes" | grep "$1" | awk '{print $1}' | sed 's/^[^0-9]*//'
-            }
+          get_pid() {
+            echo "$processes" | grep "$1" | awk '{print $1}' | sed 's/^[^0-9]*//'
+          }
 
-            pid_main=$(get_pid "steam -srt-logger-opened")
-            pid_helper=$(get_pid "./steamwebhelper -nocrashdialog -lang=en_US")
+          pid_main=$(get_pid "steam -srt-logger-opened")
+          pid_helper=$(get_pid "./steamwebhelper -nocrashdialog -lang=en_US")
 
-            if [ -z "$pid_main" ] || [ -z "$pid_helper" ]; then
-              echo "Could not find required Steam PIDs, aborting"
-              exit 1
-            fi
+          if [ -z "$pid_main" ] || [ -z "$pid_helper" ]; then
+            echo "Could not find required Steam PIDs, aborting"
+            exit 1
+          fi
 
-            if [ "$(echo "$pid_main$pid_helper" | wc -l)" -gt 1 ]; then
-              echo "Unexpectedly found multiple PIDs to kill, aborting"
-              exit 1
-            fi
+          if [ "$(echo "$pid_main$pid_helper" | wc -l)" -gt 1 ]; then
+            echo "Unexpectedly found multiple PIDs to kill, aborting"
+            exit 1
+          fi
 
-            echo "Sending SIGTERM to main Steam process..."
-            kill -s 15 "$pid_main"
-            while [ -e "/proc/$pid_main" ]; do sleep .5; done
-            echo "Main Steam process successfully killed"
+          echo "Sending SIGTERM to main Steam process..."
+          kill -s 15 "$pid_main"
+          while [ -e "/proc/$pid_main" ]; do sleep .5; done
+          echo "Main Steam process successfully killed"
 
-            echo "Waiting for steamwebhelper to exit..."
-            while [ -e "/proc/$pid_helper" ]; do sleep .5; done
-            echo "Steamwebhelper process successfully killed"
-          '';
-        };
-      in
-      ''
-        [Service]
-        ExecStop=-${getExe steamKiller} %n
-      '';
-  };
+          echo "Waiting for steamwebhelper to exit..."
+          while [ -e "/proc/$pid_helper" ]; do sleep .5; done
+          echo "Steamwebhelper process successfully killed"
+        '';
+      };
+    in
+    ''
+      [Service]
+      ExecStop=-${getExe steamKiller} %n
+    '';
 
   # https://github.com/BeamMP/BeamMP-Launcher/issues/186
   security.pki.certificateFiles =

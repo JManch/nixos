@@ -315,9 +315,6 @@ in
     };
   };
 
-  # In an attempt to fix failed session restores
-  ns.desktop.uwsm.serviceApps = [ "firefox" ];
-
   ns.persistence.directories = mkIf (!cfg.runInRam) [
     ".mozilla"
     ".cache/mozilla"
@@ -329,9 +326,9 @@ in
         inherit (desktop.hyprland) modKey;
       in
       [
-        "${modKey}, Backspace, exec, app2unit firefox.desktop"
+        "${modKey}, Backspace, exec, app2unit -t service firefox.desktop"
         "${modKey}SHIFT, Backspace, workspace, emptym"
-        "${modKey}SHIFT, Backspace, exec, app2unit firefox.desktop"
+        "${modKey}SHIFT, Backspace, exec, app2unit -t service firefox.desktop"
       ];
 
     settings.windowrule = [

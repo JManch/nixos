@@ -107,8 +107,8 @@ in
           # We can't use the [workspace id silent] exec dispatcher here
           # because firefox doesn't respect it. Instead we have to assume
           # that the TWITCH workspace is actively focused.
-          app2unit com.chatterino.chatterino.desktop &
-          app2unit firefox.desktop:new-window https://www.twitch.tv/directory
+          app2unit -t service com.chatterino.chatterino.desktop
+          app2unit -t service firefox.desktop:new-window https://www.twitch.tv/directory
         '';
       };
 

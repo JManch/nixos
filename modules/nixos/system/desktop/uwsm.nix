@@ -61,7 +61,7 @@ in
       };
 
       appUnitOverrides = mkOption {
-        type = types.attrs;
+        type = with types; attrsOf lines;
         default = { };
         apply = v: (optionalAttrs home-manager.enable homeUwsm.appUnitOverrides) // v;
         description = ''
@@ -69,6 +69,17 @@ in
           name without the app-''${desktop} prefix. Attribute value should be
           the multiline unit string.
         '';
+        example = {
+          "discord-.scope" = ''
+            [Scope]
+            KillMode=mixed
+          '';
+
+          "steam@.service" = ''
+            [Service]
+            ...
+          '';
+        };
       };
 
       fumon.enable = mkOption {

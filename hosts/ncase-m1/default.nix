@@ -89,13 +89,13 @@
     hardware = {
       secure-boot.enable = true;
       bluetooth.enable = true;
-      fanatec.enable = true;
+      fanatec.enable = false;
       tablet.enable = true;
-      scanner.enable = true;
+      scanner.enable = false;
       "8bitdo-ultimate-2".enable = true;
 
       valve-index = {
-        enable = true;
+        enable = false;
         audio = {
           card = "alsa_card.pci-0000_09_00.1";
           profile = "output:hdmi-stereo-extra1";
@@ -112,7 +112,7 @@
       };
 
       printing.client = {
-        enable = true;
+        enable = false;
         serverAddress = "homelab.lan";
       };
     };
@@ -121,7 +121,7 @@
       wine.enable = true;
       winbox.enable = true;
       matlab.enable = false;
-      adb.enable = true;
+      adb.enable = false;
 
       wireshark = {
         enable = true;

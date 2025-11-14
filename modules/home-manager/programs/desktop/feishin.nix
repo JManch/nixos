@@ -18,8 +18,8 @@
   ns.desktop = {
     services.playerctl.musicPlayers = lib.mkBefore [ "Feishin" ];
 
-    uwsm.appUnitOverrides."feishin-.scope" = ''
-      [Scope]
+    uwsm.appUnitOverrides."feishin@.service" = ''
+      [Service]
       KillMode=mixed
     '';
 

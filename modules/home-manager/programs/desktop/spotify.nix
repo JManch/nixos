@@ -25,8 +25,8 @@
 
     services.playerctl.musicPlayers = [ "spotify" ];
 
-    uwsm.appUnitOverrides."spotify-.scope" = ''
-      [Scope]
+    uwsm.appUnitOverrides."spotify@.service" = ''
+      [Service]
       KillMode=mixed
     '';
   };

@@ -1,0 +1,41 @@
+diff --git a/src/helpers/Monitor.cpp b/src/helpers/Monitor.cpp
+index 50a8c120..d04c38ab 100644
+--- a/src/helpers/Monitor.cpp
++++ b/src/helpers/Monitor.cpp
+@@ -331,6 +331,36 @@ void CMonitor::onConnect(bool noRule) {
+ 
+     PROTO::gamma->applyGammaToState(m_self.lock());
+ 
++    const auto gammaSize = m_output->getGammaSize();
++
++    if (m_name == "DP-1" && gammaSize > 0) {
++        std::vector<uint16_t> lut(gammaSize);
++        const double          max_input_value  = static_cast<double>(gammaSize - 1);
++        const double          max_output_value = 65535.0;
++        const double          gamma            = 1.0 / 0.75;
++
++        for (size_t i = 0; i < gammaSize; ++i) {
++            double normalized_input = static_cast<double>(i) / max_input_value;
++            double corrected_value  = std::pow(normalized_input, gamma);
++            lut[i]                  = static_cast<uint16_t>(std::round(corrected_value * max_output_value));
++        }
++
++        std::vector<uint16_t> final_table(gammaSize * 3);
++        for (size_t i = 0; i < gammaSize; ++i) {
++            final_table[i * 3]     = lut[i];
++            final_table[i * 3 + 1] = lut[i];
++            final_table[i * 3 + 2] = lut[i];
++        }
++
++        m_output->state->setGammaLut(final_table);
++        if (!m_state.test()) {
++            LOGM(LOG, "setting gamma to monitor {} failed", m_name);
++            m_output->state->setGammaLut({});
++        }
++
++        g_pHyprRenderer->damageMonitor(m_self.lock());
++    }
++
+     m_events.connect.emit();
+ 
+     g_pEventManager->postEvent(SHyprIPCEvent{"monitoradded", m_name});

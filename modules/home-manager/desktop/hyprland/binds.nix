@@ -267,13 +267,6 @@ let
           exit 1
         }
 
-        ${cfg.disableShaders}
-        enable_shaders() {
-          ${cfg.enableShaders}
-          :
-        }
-        trap enable_shaders EXIT
-
         if [[ $subject == "output" ]]; then
           output=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')
           grim -o "$output" "$output_file"
@@ -289,7 +282,6 @@ let
           grim -g "$geom" "$output_file" || die
         fi
 
-        enable_shaders
         pkill hyprpicker || true
         wl-copy --type image/png < "$output_file"
 

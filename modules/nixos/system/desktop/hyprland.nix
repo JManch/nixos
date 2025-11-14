@@ -2,9 +2,15 @@
   lib,
   args,
   config,
+  hostname,
 }:
 let
-  inherit (lib) ns mkForce replaceStrings;
+  inherit (lib)
+    ns
+    mkForce
+    replaceStrings
+    optional
+    ;
   inherit (lib.${ns}) isHyprland sliceSuffix flakePkgs;
 in
 [
@@ -49,31 +55,39 @@ in
             version = replaceStrings [ "+" "=" ] [ "-" "-" ] old.version;
             __intentionallyOverridingVersion = true;
 
-            patches = (old.patches or [ ]) ++ [
-              # Makes the togglespecialworkspace dispatcher always toggle instead
-              # of moving the open special workspace to the active monitor
-              ../../../../patches/hyprland-special-workspace-toggle.patch
-              ../../../../patches/hyprland-resize-params-floats.patch
-              # Fixes center and size/move window rules using the active monitor instead
-              # of the monitor that the window is on
-              ../../../../patches/hyprland-windowrule-monitor.patch
-              # Makes exact resizeparams in dispatchers relative to the window's current
-              # monitor instead of the last active monitor
-              ../../../../patches/hyprland-better-resize-args.patch
-              # Add always on top window rule and dispatching which is pinning
-              # but just for workspace that the window is on
-              ../../../../patches/hyprland-always-on-top.patch
-              # Always override the monitor in repeated windowrules. Allows us
-              # to change workspace monitors layouts in our external monitor
-              # layout scripts with `hyprctl keyword workspace x, monitor:`
-              ../../../../patches/hyprland-workspacerules-monitor.patch
-              # Add fullscreenMode to `hyprctl workspaces`
-              ../../../../patches/hyprland-hyprctl-workspace-fullscreen-mode.patch
-              # Adds dynamic mode to the resize gesture which moves the window
-              # if it's floating
-              ../../../../patches/hyprland-dynamic-resize-gesture.patch
-              ../../../../patches/hyprland-fullscreen-gesture-maximize-fix.patch
-            ];
+            patches =
+              (old.patches or [ ])
+              ++ [
+                # Makes the togglespecialworkspace dispatcher always toggle instead
+                # of moving the open special workspace to the active monitor
+                ../../../../patches/hyprland-special-workspace-toggle.patch
+                ../../../../patches/hyprland-resize-params-floats.patch
+                # Fixes center and size/move window rules using the active monitor instead
+                # of the monitor that the window is on
+                ../../../../patches/hyprland-windowrule-monitor.patch
+                # Makes exact resizeparams in dispatchers relative to the window's current
+                # monitor instead of the last active monitor
+                ../../../../patches/hyprland-better-resize-args.patch
+                # Add always on top window rule and dispatching which is pinning
+                # but just for workspace that the window is on
+                ../../../../patches/hyprland-always-on-top.patch
+                # Always override the monitor in repeated windowrules. Allows us
+                # to change workspace monitors layouts in our external monitor
+                # layout scripts with `hyprctl keyword workspace x, monitor:`
+                ../../../../patches/hyprland-workspacerules-monitor.patch
+                # Add fullscreenMode to `hyprctl workspaces`
+                ../../../../patches/hyprland-hyprctl-workspace-fullscreen-mode.patch
+                # Adds dynamic mode to the resize gesture which moves the window
+                # if it's floating
+                ../../../../patches/hyprland-dynamic-resize-gesture.patch
+                ../../../../patches/hyprland-fullscreen-gesture-maximize-fix.patch
+              ]
+              # This is scuffed but should hopefully have a better solution
+              # once GAMMA_LUT is implemented. Using a patch insted of wlsunset
+              # or gammastep because those programs have a bunch of features I
+              # don't need.
+              # https://github.com/hyprwm/Hyprland/issues/9064
+              ++ optional (hostname == "ncase-m1") ../../../../patches/hyprland-ncase-m1-monitor-gamma.patch;
           });
         })
       ];

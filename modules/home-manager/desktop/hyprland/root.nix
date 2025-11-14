@@ -116,12 +116,6 @@ in
       description = "Key to use for killing the active window";
     };
 
-    shaderDir = mkOption {
-      type = types.str;
-      readOnly = true;
-      default = "${config.xdg.configHome}/hypr/shaders";
-    };
-
     namedWorkspaces = mkOption {
       type = types.attrsOf types.str;
       default = { };

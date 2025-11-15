@@ -144,6 +144,7 @@ in
     hyprland.settings.layerrule = [
       "blur, notifications"
       "xray 0, notifications"
+      "ignorezero, notifications"
       "animation slide, notifications"
     ];
   };

@@ -408,11 +408,20 @@ in
     overlays = [
       (final: prev: {
         inherit (final.${ns}) xdg-terminal-exec brightnessctl;
+
         rnnoise-plugin = addPatches prev.rnnoise-plugin (
           optional (
             !final.stdenv.buildPlatform.canExecute final.stdenv.hostPlatform
           ) "rnnoise-plugin-cross.patch"
         );
+
+        impala =
+          assert (lib.assertMsg (!prev.impala.meta ? mainProgram) "upstream fixed mainProgram on impala");
+          prev.impala.overrideAttrs (old: {
+            meta = old.meta // {
+              mainProgram = "impala";
+            };
+          });
       })
     ];
   };

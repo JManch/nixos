@@ -23,6 +23,7 @@ let
     optional
     hiPrio
     ;
+  inherit (lib.${ns}) wrapHyprlandMoveToActive;
   inherit (config.${ns}.core) home-manager device;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.hardware) raspberry-pi;
@@ -69,7 +70,7 @@ in
     };
 
     ns.userPackages = mkIf desktop.enable [
-      (lib.${ns}.wrapHyprlandMoveToActive args pkgs.pwvucontrol "com.saivert.pwvucontrol" "")
+      (wrapHyprlandMoveToActive args pkgs.pwvucontrol "com.saivert.pwvucontrol" "")
       (hiPrio (
         pkgs.runCommand "pwvucontrol-desktop-modify" { } ''
           mkdir -p $out/share/applications
@@ -77,6 +78,13 @@ in
             --replace-fail "Name=pwvucontrol" "Name=Volume Control"
         ''
       ))
+      # Also installing pavucontrol because I've had multiple instances where
+      # pwvucontrol is unable to change the volume of devices. The UI changes
+      # but the volume change is not applied. Think it's something to do with
+      # the active profile. Also the project is in a bit of an uncertain state
+      # at the moment:
+      # https://github.com/saivert/pwvucontrol/issues/10
+      (wrapHyprlandMoveToActive args pkgs.pavucontrol "org.pulseaudio.pavucontrol" "")
       pkgs.qpwgraph
     ];
 
@@ -336,6 +344,10 @@ in
               "float, class:^(com\\.saivert\\.pwvucontrol)$"
               "size 60% 60%, class:^(com\\.saivert\\.pwvucontrol)$"
               "center, class:^(com\\.saivert\\.pwvucontrol)$"
+
+              "float, class:^(org\\.pulseaudio\\.pavucontrol)$"
+              "size 60% 60%, class:^(org\\.pulseaudio\\.pavucontrol)$"
+              "center, class:^(org\\.pulseaudio\\.pavucontrol)$"
             ];
 
             bind = [

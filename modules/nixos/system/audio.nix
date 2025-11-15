@@ -85,6 +85,13 @@ in
       # at the moment:
       # https://github.com/saivert/pwvucontrol/issues/10
       (wrapHyprlandMoveToActive args pkgs.pavucontrol "org.pulseaudio.pavucontrol" "")
+      (hiPrio (
+        pkgs.runCommand "pavucontrol-desktop-modify" { } ''
+          mkdir -p $out/share/applications
+          substitute ${pkgs.pavucontrol}/share/applications/org.pulseaudio.pavucontrol.desktop $out/share/applications/org.pulseaudio.pavucontrol.desktop \
+            --replace-fail "Name=Volume Control" "Name=Pavucontrol"
+        ''
+      ))
       pkgs.qpwgraph
     ];
 

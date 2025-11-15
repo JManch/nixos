@@ -106,7 +106,7 @@ in
       bar = {
         position = if cfg.bottom then "bottom" else "top";
         layer = "top";
-        height = 41;
+        height = 42; # ideally should be divisible by scaling factor to avoid an ugly line of pixels
         margin = if cfg.float then "${gapSize} ${gapSize} 0 ${gapSize}" else "0";
         spacing = 17;
 
@@ -325,7 +325,6 @@ in
         };
 
         modules-left = [
-          "custom/fullscreen"
           "hyprland/workspaces"
           "hyprland/submap"
           "hyprland/window"

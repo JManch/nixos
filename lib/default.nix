@@ -281,23 +281,27 @@ in
       args: package: class: extra:
       let
         inherit (args.options._module.args.value) pkgs;
+        isHyprland = lib.${ns}.isHyprland args.config;
       in
-      pkgs.symlinkJoin {
-        name = "${package.name}-hyprland-move-to-active";
-        paths = [ package ];
-        nativeBuildInputs = [ pkgs.makeWrapper ];
-        postBuild = ''
-          wrapProgram $out/bin/${package.meta.mainProgram} --run '
-            ${optionalString (lib.${ns}.isHyprland args.config) ''
-              address=$(${getExe' pkgs.hyprland "hyprctl"} clients -j | ${getExe pkgs.jaq} -r "(.[] | select(.class == \"${class}\")) | .address")
-              if [[ -n $address ]]; then
-                ${getExe' pkgs.hyprland "hyprctl"} dispatch movetoworkspacesilent e+0, address:"$address"
-                exit 0
-              fi
-            ''}
-          ' ${extra}
-        '';
-      };
+      if !isHyprland && extra == "" then
+        package
+      else
+        pkgs.symlinkJoin {
+          name = "${package.name}-hyprland-move-to-active";
+          paths = [ package ];
+          nativeBuildInputs = [ pkgs.makeWrapper ];
+          postBuild = ''
+            wrapProgram $out/bin/${package.meta.mainProgram} --run '
+              ${optionalString isHyprland ''
+                address=$(${getExe' pkgs.hyprland "hyprctl"} clients -j | ${getExe pkgs.jaq} -r "(.[] | select(.class == \"${class}\")) | .address")
+                if [[ -n $address ]]; then
+                  ${getExe' pkgs.hyprland "hyprctl"} dispatch movetoworkspacesilent e+0, address:"$address"
+                  exit 0
+                fi
+              ''}
+            ' ${extra}
+          '';
+        };
 
     wrapAlacrittyOpaque =
       args: package:

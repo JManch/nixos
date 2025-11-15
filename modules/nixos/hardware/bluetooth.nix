@@ -1,6 +1,7 @@
 {
   lib,
   pkgs,
+  args,
   config,
 }:
 let
@@ -14,7 +15,7 @@ in
   };
 
   ns.userPackages = [
-    pkgs.bluetui
+    (lib.${ns}.wrapHyprlandMoveToActive args pkgs.bluetui "bluetui" "")
     (hiPrio (
       pkgs.runCommand "bluetui-desktop-modify" { } ''
         mkdir -p $out/share/applications

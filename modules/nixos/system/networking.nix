@@ -30,7 +30,7 @@ let
     mkOption
     types
     ;
-  inherit (lib.${ns}) addPatches;
+  inherit (lib.${ns}) addPatches wrapHyprlandMoveToActive;
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system) desktop;
   homeFirewall = config.${ns}.hmNs.firewall;
@@ -350,7 +350,7 @@ in
       # wpa_gui goes into a fails with "Could not get status from
       # wpa_supplicant". Forcing the correct interface with -i fixes this.
       # (the -q flag disables the "running in tray" notification)
-      (lib.${ns}.wrapHyprlandMoveToActive args pkgs.wpa_supplicant_gui "wpa_gui" ''
+      (wrapHyprlandMoveToActive args pkgs.wpa_supplicant_gui "wpa_gui" ''
         --add-flags "-i ${cfg.wireless.interface} -q" \
         --run '
           if ${getExe' pkgs.procps "pidof"} wpa_gui > /dev/null; then
@@ -367,7 +367,9 @@ in
         ''
       ))
     ]
-    ++ optional (cfg.wireless.enable && cfg.wireless.backend == "iwd") pkgs.impala;
+    ++ optional (cfg.wireless.enable && cfg.wireless.backend == "iwd") (
+      wrapHyprlandMoveToActive args pkgs.impala "impala" ""
+    );
 
   ns.hm = mkIf home-manager.enable {
     xdg.desktopEntries.impala =

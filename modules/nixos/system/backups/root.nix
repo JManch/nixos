@@ -142,7 +142,11 @@ in
       nameValuePair "${value.backend}-backups-${name}" (
         mkIf cfg.${value.backend}.enable {
           preStart = mkOrder 0 ''
-            ${optionalString (cfg.ssidBlacklist != [ ]) (getExe ssidCheck)}
+            # Exiting successfully here isn't ideal as it means the backup will not be
+            # retried until the next scheduled run. I'd rather not be spammed with the
+            # OnFailure notifications everytime a backup is skipped though. Hopefully can
+            # find a better solution at some point
+            ${optionalString (cfg.ssidBlacklist != [ ]) "${getExe ssidCheck} || exit 0"}
             ${value.preBackupScript}
           '';
 

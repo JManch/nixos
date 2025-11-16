@@ -1409,11 +1409,11 @@
         "systems": "systems_10"
       },
       "locked": {
-        "lastModified": 1762393203,
-        "narHash": "sha256-jVEFoC99Rp629veV2WQti3G+Ls3rl1M+FKryKzK6w/E=",
+        "lastModified": 1763257298,
+        "narHash": "sha256-e2XNIloQ5Cmgr5YZ8LbcmMIoL6VQSEQ1K+Yckq219Y4=",
         "owner": "JManch",
         "repo": "nvf",
-        "rev": "15456f98f959b6dd5212518c552eabfcd533a9d1",
+        "rev": "e51b5664ee1e4b4f5ddb93b00737c4427b6de1ef",
         "type": "github"
       },
       "original": {

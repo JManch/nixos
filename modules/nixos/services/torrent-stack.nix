@@ -559,7 +559,6 @@ in
                           sox -G "$input_file" -b 16 --comment "" "$tmp_file" rate -v 44100
                           echo "Resampled $filename: $bitrate/''${sample_rate}Hz -> 16/44100Hz"
                         else
-                          echo "Skipping $filename: $bitrate/''${sample_rate}Hz"
                           exit 0
                         fi
 

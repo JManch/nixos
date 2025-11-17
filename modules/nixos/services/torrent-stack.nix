@@ -488,6 +488,7 @@ in
               missing.enable = true;
               permissions.enable = true;
               unimported.enable = true;
+              hook.enable = true;
             };
           }
         );
@@ -510,6 +511,7 @@ in
                 "missing"
                 "permissions"
                 "unimported"
+                "hook"
               ];
 
               incremental = false; # creates unwanted state.pickel file
@@ -526,6 +528,46 @@ in
                   "itunes"
                   "albumart"
                 ];
+              };
+
+              hook.hooks = singleton {
+                event = "write";
+                command = "${
+                  getExe (
+                    pkgs.writeShellApplication {
+                      name = "beets-resample-flac";
+                      runtimeInputs = [ pkgs.sox ];
+                      text = ''
+                        input_file="$1"
+                        filename=$(basename "$input_file")
+
+                        if [[ $filename != *.flac ]]; then
+                          exit 0
+                        fi
+
+                        if [[ -f /tmp/beets-disable-resample ]]; then
+                          echo "Beets resampling is disabled so skipping"
+                          exit 0
+                        fi
+
+                        sample_rate=$(soxi -r "$input_file")
+                        bitrate=$(soxi -b "$input_file")
+                        tmp_file=$(mktemp -p /tmp "resample-flac-tmp.XXXXXX.flac")
+                        trap 'rm -f "$tmp_file"' EXIT
+
+                        if [[ $sample_rate -gt 44100 || $bitrate -gt 16 ]]; then
+                          sox -G "$input_file" -b 16 --comment "" "$tmp_file" rate -v 44100
+                          echo "Resampled $filename: $bitrate/''${sample_rate}Hz -> 16/44100Hz"
+                        else
+                          echo "Skipping $filename: $bitrate/''${sample_rate}Hz"
+                          exit 0
+                        fi
+
+                        mv "$tmp_file" "$input_file"
+                      '';
+                    }
+                  )
+                } \"{item.path}\"";
               };
 
               match = {

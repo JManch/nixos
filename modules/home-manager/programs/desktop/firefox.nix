@@ -341,6 +341,7 @@ in
         # float bitwarden extension window
         if [[ "''${args[1]}" == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
           hyprctl --batch "\
+            dispatch focuswindow address:0x''${args[0]}; \
             dispatch setfloating address:0x''${args[0]}; \
             dispatch resizewindowpixel exact 20% 50%, address:0x''${args[0]}; \
             dispatch centerwindow; \

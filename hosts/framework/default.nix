@@ -163,7 +163,10 @@
           dns = {
             enable = true;
             address = "10.0.0.7";
-            domains.${inputs.nix-resources.secrets.tomFqDomain} = "";
+            domains = {
+              friends = "";
+              ${inputs.nix-resources.secrets.tomFqDomain} = "";
+            };
           };
         };
       };

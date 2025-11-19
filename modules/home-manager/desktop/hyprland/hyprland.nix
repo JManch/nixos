@@ -446,7 +446,7 @@ in
           [
             # Hide window border when there's only 1 window in a non-special
             # workspace
-            "noborder, onworkspace:w[t1]s[false]"
+            "noborder, floating:0, onworkspace:w[t1]s[false]"
           ]
       );
 

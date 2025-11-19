@@ -55,6 +55,6 @@ in
 
     gesture = [ "3, up, special, music" ];
 
-    windowrule = [ "float, class:^(spek)$" ];
+    windowrule = [ "match:class spek, float true" ];
   };
 }

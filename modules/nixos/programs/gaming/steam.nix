@@ -167,19 +167,30 @@ in
           ++ [ "factorio" ];
       };
 
-      desktop.hyprland.settings.windowrule = [
-        # Main steam window
-        "workspace emptym, class:^(steam)$, title:^(Steam)$"
+      desktop.hyprland.windowRules = {
+        "steam-main-window" = {
+          matchers.class = "steam";
+          matchers.title = "Steam";
+          params.workspace = "emptym";
+        };
 
-        # Steam sign-in window
-        "noinitialfocus, class:^(steam)$, title:^(Sign in to Steam)$"
-        "workspace special:special silent, class:^(steam)$, title:^(Sign in to Steam)$"
+        "steam-sign-in-window" = {
+          matchers.class = "steam";
+          matchers.title = "Sign in to Steam";
+          params.no_initial_focus = true;
+          params.workspace = "special:special silent";
+        };
 
-        # Friends list
-        "float, class:^(steam)$, title:^(Friends List)$"
-        "size 360 700, class:^(steam)$, title:^(Friends List)$"
-        "center, class:^(steam)$, title:^(Friends List)$"
-      ];
+        "steam-friends-list" = {
+          matchers.class = "steam";
+          matchers.title = "Friends List";
+          params = {
+            float = true;
+            size = "window_w*0.15 window_h*0.4";
+            center = true;
+          };
+        };
+      };
 
       persistence.directories = [
         ".factorio"

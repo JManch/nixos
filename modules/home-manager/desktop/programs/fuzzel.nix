@@ -135,6 +135,6 @@ in
       bind = [
         "${modKey}, Space, exec, ${getExe' pkgs.procps "pkill"} fuzzel || ${getExe hyprlandWindowSwitcher}"
       ];
-      layerrule = [ "animation slide, launcher" ];
+      layerrule = [ "match:namespace launcher, animation slide" ];
     };
 }

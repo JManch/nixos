@@ -11,6 +11,7 @@ let
   inherit (lib)
     ns
     mkIf
+    mkMerge
     mkForce
     mkVMOverride
     getExe
@@ -200,13 +201,44 @@ in
     "The os xdg portal must be disabled when using Hyprland as it is configured using home-manager"
   ];
 
-  # Optimise for performance in VM variant
-  categoryConfig = mkIf vmVariant (mkVMOverride {
-    tearing = false;
-    directScanout = false;
-    blur = false;
-    animations = false;
-  });
+  categoryConfig = mkMerge [
+    # Optimise for performance in VM variant
+    (mkIf vmVariant (mkVMOverride {
+      tearing = false;
+      directScanout = false;
+      blur = false;
+      animations = false;
+    }))
+    {
+      windowRules = {
+        # https://github.com/hyprwm/Hyprland/issues/6543
+        fix-xwayland-drags = {
+          matchers = {
+            xwayland = true;
+            class = "";
+            title = "";
+            float = true;
+            fullscreen = false;
+            pin = false;
+          };
+          params.no_focus = true;
+        };
+
+        no-gaps-when-only = mkIf cfg.noGapsWhenOnly {
+          matchers.workspace = "w[tv1]s[false]";
+          matchers.float = false;
+          params.border_size = 0;
+          params.rounding = 0;
+        };
+
+        single-window-hide-border = mkIf (!cfg.noGapsWhenOnly) {
+          matchers.float = false;
+          matchers.workspace = "w[t1]s[false]";
+          params.border_size = 0;
+        };
+      };
+    }
+  ];
 
   home.packages = [
     toggleMonitor
@@ -432,24 +464,6 @@ in
           "f[1]s[false], gapsout:0, gapsin:0"
         ];
 
-      windowrule = [
-        # https://github.com/hyprwm/Hyprland/issues/6543
-        "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0"
-      ]
-      ++ (
-        if cfg.noGapsWhenOnly then
-          [
-            "bordersize 0, floating:0, onworkspace:w[tv1]s[false]"
-            "rounding 0, floating:0, onworkspace:w[tv1]s[false]"
-          ]
-        else
-          [
-            # Hide window border when there's only 1 window in a non-special
-            # workspace
-            "noborder, floating:0, onworkspace:w[t1]s[false]"
-          ]
-      );
-
       plugin = mkIf cfg.plugins {
         hyprexpo = {
           columns = 3;
@@ -459,6 +473,23 @@ in
         };
       };
     };
+
+    # I don't think the home-manager module currently supports the new windowrule syntax
+    extraConfig = concatMapStringsSep "\n" (
+      name:
+      let
+        inherit (cfg.windowRules.${name}) matchers params;
+      in
+      ''
+        windowrule {
+          name = ${name}
+          ${concatMapStringsSep "\n  " (matcher: "match:${matcher} = ${toString matchers.${matcher}}") (
+            attrNames matchers
+          )}
+          ${concatMapStringsSep "\n  " (param: "${param} = ${toString params.${param}}") (attrNames params)}
+        }
+      ''
+    ) (attrNames cfg.windowRules);
   };
 
   ns.desktop.programs.locker = {

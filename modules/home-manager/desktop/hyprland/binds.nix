@@ -274,9 +274,6 @@ let
           hyprpicker --render-inactive --no-zoom &
           sleep 0.2
 
-          # fix black border around screenshots
-          hyprctl keyword layerrule "noanim,selection" >/dev/null
-
           geom=$(slurp -d)
           [[ -z $geom ]] && die
           grim -g "$geom" "$output_file" || die
@@ -413,6 +410,11 @@ in
       "4, swipe, mod: ALT, scale: 2, move"
       "3, pinch, fullscreen, maximize"
       "4, pinch, fullscreen"
+    ];
+
+    settings.layerrule = [
+      # fix black border around screenshots
+      "match:namespace selection, no_anim true"
     ];
 
     extraConfig = ''

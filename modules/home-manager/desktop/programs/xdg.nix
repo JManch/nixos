@@ -42,10 +42,7 @@ in
 
   xdg.mimeApps.enable = osConfig.${ns}.system.desktop.desktopEnvironment == null;
 
-  ns.desktop.hyprland.settings.windowrule = [
-    # Float the file picker
-    "float, class:^(xdg-desktop-portal-gtk)$"
-    "size 60% 60%, class:^(xdg-desktop-portal-gtk)$"
-    "center, class:^(xdg-desktop-portal-gtk)$"
-  ];
+  ns.desktop.hyprland.windowRules."xdg-portal-file-picker" =
+    lib.${ns}.mkHyprlandCenterFloatRule "xdg-desktop-portal-gtk" 60
+      60;
 }

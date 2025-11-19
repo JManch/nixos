@@ -140,7 +140,10 @@ in
       }
     '';
 
-  ns.desktop.hyprland.settings.windowrule = [ "workspace emptym, class:^(mpv)$" ];
+  ns.desktop.hyprland.windowRules."mpv" = {
+    matchers.class = "mpv";
+    params.workspace = "emptym";
+  };
 
   ns.persistence.directories = optional cfg.jellyfinShim.enable ".config/jellyfin-mpv-shim";
 }

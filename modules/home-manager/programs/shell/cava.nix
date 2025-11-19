@@ -57,9 +57,5 @@
     categories = [ "Audio" ];
   };
 
-  ns.desktop.hyprland.settings.windowrule = [
-    "float, class:^(cava)$"
-    "size 50% 20%, class:^(cava)$"
-    "center, class:^(cava)$"
-  ];
+  ns.desktop.hyprland.windowRules."cava" = lib.${lib.ns}.mkHyprlandCenterFloatRule "cava" 50 20;
 }

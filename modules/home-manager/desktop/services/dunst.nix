@@ -142,10 +142,7 @@ in
     };
 
     hyprland.settings.layerrule = [
-      "blur, notifications"
-      "xray 0, notifications"
-      "ignorezero, notifications"
-      "animation slide, notifications"
+      "match:namespace notifications, blur true, xray false, ignore_alpha 0, animation slide"
     ];
   };
 }

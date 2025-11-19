@@ -119,7 +119,7 @@ in
     };
 
     hyprland = {
-      settings.windowrule = [ "scrolltouchpad 0.6, class:^(Alacritty)$" ];
+      settings.windowrule = [ "match:class Alacritty, scroll_touchpad 0.6" ];
 
       binds = mkIf (desktop.terminal == "Alacritty") [
         "${desktop.hyprland.modKey}, Return, exec, app2unit -t service Alacritty.desktop"

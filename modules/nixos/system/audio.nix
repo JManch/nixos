@@ -23,7 +23,7 @@ let
     optional
     hiPrio
     ;
-  inherit (lib.${ns}) wrapHyprlandMoveToActive;
+  inherit (lib.${ns}) wrapHyprlandMoveToActive mkHyprlandCenterFloatRule;
   inherit (config.${ns}.core) home-manager device;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.hardware) raspberry-pi;
@@ -346,17 +346,12 @@ in
             '';
           };
 
+          hyprland.windowRules = {
+            pwvucontrol = mkHyprlandCenterFloatRule "com\\.saivert\\.pwvucontrol" 60 60;
+            pavucontrol = mkHyprlandCenterFloatRule "org\\.pulseaudio\\.pavucontrol" 60 60;
+          };
+
           hyprland.settings = {
-            windowrule = [
-              "float, class:^(com\\.saivert\\.pwvucontrol)$"
-              "size 60% 60%, class:^(com\\.saivert\\.pwvucontrol)$"
-              "center, class:^(com\\.saivert\\.pwvucontrol)$"
-
-              "float, class:^(org\\.pulseaudio\\.pavucontrol)$"
-              "size 60% 60%, class:^(org\\.pulseaudio\\.pavucontrol)$"
-              "center, class:^(org\\.pulseaudio\\.pavucontrol)$"
-            ];
-
             bind = [
               ", XF86AudioRaiseVolume, exec, ${modifyVolume} 5%+"
               ", XF86AudioLowerVolume, exec, ${modifyVolume} 5%-"

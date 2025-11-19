@@ -25,6 +25,7 @@ let
   inherit (config.${ns}.core) device;
   inherit (config.${ns}.system) audio;
   inherit (device) primaryMonitor gpu;
+  inherit (config.${ns}.core) home-manager;
   systemctl = getExe' pkgs.systemd "systemctl";
   lighthouse = getExe pkgs.lighthouse-steamvr;
 in
@@ -262,25 +263,28 @@ in
     };
   };
 
-  ns.hm = {
-    ${ns}.desktop = {
-      hyprland.namedWorkspaces.VR = "monitor:${primaryMonitor.name}";
+  ns.hm = mkIf home-manager.enable {
+    ${ns}.desktop =
+      let
+        inherit (config.${ns}.hmNs.desktop.hyprland) modKey namedWorkspaceIDs;
+      in
+      {
+        hyprland.namedWorkspaces.VR = "monitor:${primaryMonitor.name}";
 
-      hyprland.settings =
-        let
-          inherit (config.${ns}.hmNs.desktop.hyprland) modKey namedWorkspaceIDs;
-        in
-        {
+        hyprland.windowRules."monado-vr-mirror" = {
+          matchers.class = "monado-service";
+          params = {
+            workspace = "${namedWorkspaceIDs.VR} silent";
+            center = true;
+          };
+        };
+
+        hyprland.settings = {
           bind = [
             "${modKey}, Grave, workspace, ${namedWorkspaceIDs.VR}"
             "${modKey}SHIFT, Grave, movetoworkspace, ${namedWorkspaceIDs.VR}"
           ];
-
-          windowrule = [
-            "workspace ${namedWorkspaceIDs.VR} silent, class:^(monado-service)$"
-            "center, class:^(monado-service)$"
-          ];
         };
-    };
+      };
   };
 }

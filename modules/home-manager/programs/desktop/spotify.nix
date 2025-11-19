@@ -16,11 +16,10 @@
   ns.programs.desktop.music.enable = true;
 
   ns.desktop = {
-    hyprland.settings = {
-      windowrule = [
-        "bordercolor 0xff1ED760, initialTitle:^(Spotify( Premium)?)$"
-        "workspace special:music silent, title:^(Spotify( Premium)?)$"
-      ];
+    hyprland.windowRules."spotify" = {
+      matchers.initial_title = "Spotify( Premium)?";
+      params.border_color = "0xff1ED760";
+      params.workspace = "special:music silent";
     };
 
     services.playerctl.musicPlayers = [ "spotify" ];

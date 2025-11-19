@@ -29,11 +29,7 @@ in
   ];
 
   ns.hm = mkIf home-manager.enable {
-    ${ns}.desktop.hyprland.settings.windowrule = [
-      "float, class:^(bluetui)$"
-      "size 60% 50%, class:^(bluetui)$"
-      "center, class:^(bluetui)$"
-    ];
+    ${ns}.desktop.hyprland.windowRules."bluetui" = lib.${ns}.mkHyprlandCenterFloatRule "bluetui" 60 60;
   };
 
   ns.persistence.directories = [ "/var/lib/bluetooth" ];

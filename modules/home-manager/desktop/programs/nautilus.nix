@@ -5,9 +5,17 @@
 
   dconf.settings."org/gnome/nautilus/preferences".default-folder-viewer = "list-view";
 
-  ns.desktop.hyprland.settings.windowrule = [
-    "float, class:^(org.gnome.Nautilus)$"
-    "size 60% 60%, class:^(org.gnome.Nautilus)$, title:negative:Properties"
-    "center, class:^(org.gnome.Nautilus)$, title:negative:Properties"
-  ];
+  ns.desktop.hyprland.windowRules = {
+    "nautilus-float" = {
+      matchers.class = "org\\.gnome\\.Nautilus";
+      params.float = true;
+    };
+
+    "nautilus-resize" = {
+      matchers.class = "org\\.gnome\\.Nautilus";
+      matchers.title = "negative:Properties";
+      params.size = "monitor_w*0.6 monitor_h*0.6";
+      params.center = true;
+    };
+  };
 }

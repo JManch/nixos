@@ -30,7 +30,7 @@ let
     mkOption
     types
     ;
-  inherit (lib.${ns}) addPatches wrapHyprlandMoveToActive;
+  inherit (lib.${ns}) addPatches wrapHyprlandMoveToActive mkHyprlandCenterFloatRule;
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system) desktop;
   homeFirewall = config.${ns}.hmNs.firewall;
@@ -384,18 +384,13 @@ in
           categories = [ "System" ];
         };
 
-    ${ns}.desktop.hyprland.settings = {
-      windowrule =
-        optionals (cfg.wireless.enable && cfg.wireless.backend == "wpa_supplicant" && desktop.enable) [
-          "float, class:^(wpa_gui)$"
-          "size 40% 60%, class:^(wpa_gui)$"
-          "center, class:^(wpa_gui)$"
-        ]
-        ++ optionals (cfg.wireless.enable && cfg.wireless.backend == "iwd" && desktop.enable) [
-          "float, class:^(impala)$"
-          "size 60% 50%, class:^(impala)$"
-          "center, class:^(impala)$"
-        ];
+    ${ns}.desktop.hyprland.windowRules = {
+      wpa-gui = mkIf (cfg.wireless.enable && cfg.wireless.backend == "wpa_supplicant" && desktop.enable) (
+        mkHyprlandCenterFloatRule "wpa_gui" 40 60
+      );
+      impala = mkIf (cfg.wireless.enable && cfg.wireless.backend == "iwd" && desktop.enable) (
+        mkHyprlandCenterFloatRule "impala" 60 60
+      );
     };
   };
 

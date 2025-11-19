@@ -22,11 +22,14 @@ in
   );
 
   ns.hm = mkIf home-manager.enable {
-    ${ns}.desktop.hyprland.settings.windowrule = [
-      "float, class:^(Waydroid)$"
-      "center, class:^(Waydroid)$"
-      "keepaspectratio, class:^(Waydroid)$"
-    ];
+    ${ns}.desktop.hyprland.windowRules."waydroid" = {
+      matchers.class = "Waydroid";
+      params = {
+        float = true;
+        center = true;
+        keep_aspect_ratio = true;
+      };
+    };
   };
 
   ns.persistence.directories = [ "/var/lib/waydroid" ];

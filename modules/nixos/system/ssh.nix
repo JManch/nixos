@@ -160,9 +160,14 @@ in
   programs.zsh.shellAliases.ssh-forget = "ssh -o UserKnownHostsFile=/dev/null";
 
   ns.hm = mkIf home-manager.enable {
-    ${ns}.desktop.hyprland.settings.windowrule = [
-      "stayfocused, class:^(gcr-prompter)$"
-    ];
+    ${ns}.desktop.hyprland.windowRules."gnome-keyring-passphrase-prompt" = {
+      matchers.class = "gcr-prompter";
+      params = {
+        stay_focused = true;
+        no_screen_share = true;
+        suppress_event = "fullscreenoutput fullscreen maximize";
+      };
+    };
   };
 
   ns.persistence.files = [

@@ -11,6 +11,7 @@ let
     optional
     optionalString
     getExe
+    replaceStrings
     ;
   inherit (config.${ns}.programs.desktop) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
@@ -154,7 +155,7 @@ in
     in
     {
       services.waybar.autoHideWorkspaces = [ "TWITCH" ];
-      hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, decorate:false, rounding:false, border:false, gapsin:0, gapsout:0, on-created-empty:${getExe initWorkspace}";
+      hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, on-created-empty:${getExe initWorkspace}";
 
       hyprland.settings = {
         bind = [
@@ -162,42 +163,95 @@ in
           "${hyprland.modKey}SHIFT, T, exec, ${getExe (resetWorkspace true)}"
           "${hyprland.modKey}SHIFTCONTROL, T, exec, ${getExe (resetWorkspace false)}"
         ];
+      };
 
-        windowrule =
-          let
-            workspaceMatch = "workspace:${hyprland.namedWorkspaceIDs.TWITCH}";
-          in
-          [
-            "tag +twitch_remove, ${workspaceMatch}"
+      hyprland.windowRules = {
+        twitch-workspace = {
+          matchers.workspace = hyprland.namedWorkspaceIDs.TWITCH;
+          params = {
+            tag = "+twitch_unexpected";
+            float = true;
+          };
+        };
 
-            # Chatterino window opened on twitch workspace
-            "tag -twitch_remove, tag:twitch_remove, class:^(com\\.chatterino\\.)$"
-            "float, ${workspaceMatch}, class:^(com\\.chatterino\\.)$"
-            "move ${firefoxPercentage}% 0%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$, title:negative:^(Chatterino Settings)$"
-            "size ${chatterinoPercentage}% 100%, ${workspaceMatch}, class:^(com\\.chatterino\\.)$, title:negative:^(Chatterino Settings)$"
-            "prop xray 0, class:^(com\\.chatterino\\.)$"
-            "alwaysontop, class:^(com\\.chatterino\\.)$, title:^(Chatterino - Overlay)$"
-            "center, class:^(com\\.chatterino\\.)$, title:^(Chatterino Settings)$"
+        twitch-workspace-chatterino-main-window = {
+          matchers = {
+            workspace = hyprland.namedWorkspaceIDs.TWITCH;
+            class = "com\\.chatterino\\.";
+            title = "Chatterino (${replaceStrings [ "." ] [ "\\." ] pkgs.chatterino7.version} -.*|Overlay)";
+          };
 
-            # Firefox window opened on twitch workspace
-            "tag -twitch_remove, tag:twitch_remove, class:^(firefox)$"
-            "float, ${workspaceMatch}, class:^(firefox)$"
-            "move 0% 0%, ${workspaceMatch}, class:^(firefox)$"
-            "size ${firefoxPercentage}% 100%, ${workspaceMatch}, class:^(firefox)$"
+          params = {
+            border_size = 0;
+            rounding = 0;
+            tag = "-twitch_unexpected";
+            move = "(monitor_w*${firefoxPercentage}/100) 0";
+            size = "(monitor_w*${chatterinoPercentage}/100) monitor_h";
+          };
+        };
 
-            # Rules for mpv twitch streams opened on twitch workspace or other workspaces
-            "tag -twitch_remove, tag:twitch_remove, class:^(mpv)$, title:^(twitch\\.tv.*)$"
-            "workspace ${hyprland.namedWorkspaceIDs.TWITCH} silent, class:^(mpv)$, title:^(twitch\\.tv.*)$"
-            "float, class:^(mpv)$, title:^(twitch\\.tv.*)$"
-            "move 0% 0%, class:^(mpv)$, title:^(twitch\\.tv.*)$"
-            "size ${firefoxPercentage}% 100%, class:^(mpv)$, title:^(twitch\\.tv.*)$"
+        twitch-workspace-chatterino-usercard = {
+          matchers = {
+            workspace = hyprland.namedWorkspaceIDs.TWITCH;
+            class = "com\\.chatterino\\.";
+            title = ".* Usercard - .*";
+          };
 
-            # Float any non-twitch windows
-            "float, tag:twitch_remove"
-            "size 50% 50%, tag:twitch_remove"
-            "center, tag:twitch_remove"
-            "tag -twitch_remove, tag:twitch_remove"
-          ];
+          params = {
+            tag = "-twitch_unexpected";
+            always_on_top = true;
+            size = "(monitor_w*${chatterinoPercentage}/100) monitor_h*0.33";
+            center = true;
+          };
+        };
+
+        twitch-workspace-firefox = {
+          matchers = {
+            workspace = hyprland.namedWorkspaceIDs.TWITCH;
+            class = "firefox";
+          };
+
+          params = {
+            tag = "-twitch_unexpected";
+            border_size = 0;
+            rounding = 0;
+            move = "0 0";
+            size = "(monitor_w*${firefoxPercentage}/100) monitor_h";
+          };
+        };
+
+        mpv.matchers.title = "negative:twitch\\.tv.*";
+
+        twitch-mpv = {
+          matchers = {
+            class = "mpv";
+            title = "twitch\\.tv.*";
+          };
+
+          params = {
+            tag = "-twitch_unexpected";
+            border_size = 0;
+            rounding = 0;
+            workspace = "${hyprland.namedWorkspaceIDs.TWITCH} silent";
+            float = true;
+            move = "0 0";
+            size = "(monitor_w*${firefoxPercentage}/100) monitor_h";
+          };
+        };
+
+        twitch-unexpected = {
+          matchers = {
+            workspace = hyprland.namedWorkspaceIDs.TWITCH;
+            tag = "twitch_unexpected*";
+          };
+
+          params = {
+            always_on_top = true;
+            size = "(monitor_w*0.6) (monitor_h*0.6)";
+            center = true;
+            tag = "-twitch-unexpected";
+          };
+        };
       };
     };
 }

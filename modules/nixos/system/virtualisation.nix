@@ -310,28 +310,36 @@ in
     };
 
     ns.hm = mkIf home-manager.enable {
-      ${ns}.desktop.hyprland = {
-        namedWorkspaces.VM = "monitor:${primaryMonitor.name}";
+      ${ns}.desktop.hyprland =
 
-        settings =
-          let
-            inherit (hyprland) modKey namedWorkspaceIDs;
-          in
-          {
+        let
+          inherit (hyprland) modKey namedWorkspaceIDs;
+        in
+        {
+          namedWorkspaces.VM = "monitor:${primaryMonitor.name}";
+
+          windowRules."vm-window" = {
+            matchers.class = "\\.?qemu.*|\\.virt-manager-wrapped";
+            params = {
+              workspace = "${namedWorkspaceIDs.VM} silent";
+              float = true;
+              size = "window_w*0.8 window_h*0.8";
+              center = true;
+              keep_aspect_ratio = true;
+            };
+          };
+
+          settings = {
             bind = [
               "${modKey}, V, workspace, ${namedWorkspaceIDs.VM}"
               "${modKey}SHIFT, V, movetoworkspace, ${namedWorkspaceIDs.VM}"
             ];
 
             windowrule = [
-              "workspace ${namedWorkspaceIDs.VM} silent, class:^(\\.?qemu.*|aquamarine|\\.virt-manager-wrapped)$"
-              "float, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-              "size 80% 80%, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-              "center, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
-              "keepaspectratio, class:^(\\.?qemu.*|\\.virt-manager-wrapped)$"
+              "match:class aquamarine, workspace ${namedWorkspaceIDs.VM} silent"
             ];
           };
-      };
+        };
     };
 
     ns.adminPackages = optional desktop.enable runVMScript;

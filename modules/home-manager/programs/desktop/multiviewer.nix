@@ -341,22 +341,29 @@ in
     services.waybar.autoHideWorkspaces = [ "F1" ];
     hyprland.namedWorkspaces.F1 = "decorate:false, rounding:false, border:false";
 
-    hyprland.settings = {
-      bind = [
-        "${modKey}, F, workspace, ${namedWorkspaceIDs.F1}"
-        "${modKey}SHIFT, F, movetoworkspace, ${namedWorkspaceIDs.F1}"
-        "${modKey}SHIFTCONTROL, F, exec, systemctl restart --user hyprland-multiviewer-tiler"
-      ];
+    hyprland.windowRules = {
+      "multiviewer-windows" = {
+        matchers.class = "MultiViewer";
+        params.float = true;
+        params.workspace = namedWorkspaceIDs.F1;
+      };
 
-      windowrule = [
-        "float, class:^(MultiViewer)$"
-        "workspace ${namedWorkspaceIDs.F1}, class:^(MultiViewer)$"
-
-        "prop xray 0, class:^(MultiViewer)$, title:^(Track Map.*)$"
-        "prop noblur, class:^(MultiViewer)$, title:^(Track Map.*)$"
-        "prop noborder, class:^(MultiViewer)$, title:^(Track Map.*)$"
-      ];
+      "multiviewer-track-map" = {
+        matchers.class = "MultiViewer";
+        matchers.title = "Track Map.*";
+        params = {
+          xray = false;
+          no_blur = true;
+          border_size = 0;
+        };
+      };
     };
+
+    hyprland.settings.bind = [
+      "${modKey}, F, workspace, ${namedWorkspaceIDs.F1}"
+      "${modKey}SHIFT, F, movetoworkspace, ${namedWorkspaceIDs.F1}"
+      "${modKey}SHIFTCONTROL, F, exec, systemctl restart --user hyprland-multiviewer-tiler"
+    ];
   };
 
   ns.persistence.directories = [ ".config/MultiViewer" ];

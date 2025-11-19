@@ -50,7 +50,7 @@
     services.playerctl.musicPlayers = lib.mkBefore [ "Supersonic" ];
 
     hyprland.settings.windowrule = [
-      "workspace special:music silent, initialTitle:^(Supersonic)$"
+      "match:initial_title Supersonic, workspace special:music silent"
     ];
   };
 

@@ -71,7 +71,7 @@ in
                 # Add always on top window rule and dispatching which is pinning
                 # but just for workspace that the window is on
                 ../../../../patches/hyprland-always-on-top.patch
-                # Always override the monitor in repeated windowrules. Allows us
+                # Always override the monitor in repeated workspacerules. Allows us
                 # to change workspace monitors layouts in our external monitor
                 # layout scripts with `hyprctl keyword workspace x, monitor:`
                 ../../../../patches/hyprland-workspacerules-monitor.patch

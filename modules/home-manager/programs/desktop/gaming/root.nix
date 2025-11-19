@@ -9,6 +9,7 @@ let
     ns
     mkEnableOption
     mkOption
+    mkIf
     types
     concatStringsSep
     optional
@@ -76,29 +77,37 @@ in
 
   ns.programs.desktop.gaming.gameClasses = optional osGaming.gamescope.enable "\\.?gamescope.*";
 
-  ns.desktop.hyprland = {
-    namedWorkspaces.GAME = "monitor:${primaryMonitor.name}";
-    settings =
-      let
-        inherit (hyprland) modKey namedWorkspaceIDs;
-        concatRegex = regexes: "^(${concatStringsSep "|" regexes})$";
-        gameClassRegex = concatRegex cfg.gameClasses;
-      in
-      {
-        windowrule = [
-          "workspace ${namedWorkspaceIDs.GAME}, class:${gameClassRegex}"
-        ]
-        ++ optionals hyprland.tearing [
-          "tag +tear_game, class:${gameClassRegex}"
-          "tag -tear_game, tag:tear_game*, class:${concatRegex cfg.tearingExcludedClasses}"
-          "tag -tear_game, tag:tear_game*, title:${concatRegex cfg.tearingExcludedTitles}"
-          "prop immediate, tag:tear_game"
-        ];
+  ns.desktop.hyprland =
+    let
+      inherit (hyprland) modKey namedWorkspaceIDs;
+      concatRegex = regexes: "${concatStringsSep "|" regexes}";
+      gameClassRegex = concatRegex cfg.gameClasses;
+    in
+    {
+      namedWorkspaces.GAME = "monitor:${primaryMonitor.name}";
 
-        bind = [
-          "${modKey}, G, workspace, ${namedWorkspaceIDs.GAME}"
-          "${modKey}SHIFT, G, movetoworkspace, ${namedWorkspaceIDs.GAME}"
-        ];
+      windowRules = {
+        "game" = {
+          matchers.class = gameClassRegex;
+          params = {
+            workspace = namedWorkspaceIDs.GAME;
+            tag = "+game";
+          };
+        };
+
+        "game-tearing" = mkIf hyprland.tearing {
+          matchers = {
+            tag = "game*";
+            class = "negative:${concatRegex cfg.tearingExcludedClasses}";
+            title = "negative:${concatRegex cfg.tearingExcludedClasses}";
+          };
+          params.immediate = true;
+        };
       };
-  };
+
+      settings.bind = [
+        "${modKey}, G, workspace, ${namedWorkspaceIDs.GAME}"
+        "${modKey}SHIFT, G, movetoworkspace, ${namedWorkspaceIDs.GAME}"
+      ];
+    };
 }

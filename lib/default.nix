@@ -337,5 +337,14 @@ in
       name: rev:
       assert lib.assertMsg (self.inputs.nixpkgs.rev == rev) "Module ${name} can be re-enabled";
       false;
+
+    mkHyprlandCenterFloatRule = class: widthPercentage: heightPercentage: {
+      matchers.class = class;
+      params = {
+        float = true;
+        size = "(monitor_w*${toString widthPercentage}/100) (monitor_h*${toString heightPercentage}/100)";
+        center = true;
+      };
+    };
   };
 }

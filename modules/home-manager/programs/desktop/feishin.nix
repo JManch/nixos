@@ -24,7 +24,7 @@
     '';
 
     hyprland.settings.windowrule = [
-      "workspace special:music silent, class:^(feishin)$"
+      "match:class feishin, workspace special:music silent"
     ];
   };
 

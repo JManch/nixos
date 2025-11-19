@@ -30,7 +30,7 @@ in
     ];
 
     windowrule = [
-      "workspace special:discord silent, class:^(vesktop|discord)$"
+      "match:class vesktop|discord, workspace special:discord silent"
     ];
 
     bind = [

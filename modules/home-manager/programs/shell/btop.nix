@@ -92,14 +92,10 @@ in
   '';
 
   ns.desktop = {
-    darkman.switchApps.btop = {
+    darkman.switchApps."btop" = {
       paths = [ ".config/${themePath}" ];
     };
 
-    hyprland.settings.windowrule = [
-      "float, class:^(btop)$"
-      "size 75% 75%, class:^(btop)$"
-      "center, class:^(btop)$"
-    ];
+    hyprland.windowRules."btop" = lib.${ns}.mkHyprlandCenterFloatRule "btop" 75 75;
   };
 }

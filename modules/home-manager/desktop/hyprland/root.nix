@@ -162,5 +162,37 @@ in
         systemd service.
       '';
     };
+
+    windowRules = mkOption {
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            matchers = mkOption {
+              type = with types; attrsOf anything;
+              example = {
+                class = "gcr-prompter";
+              };
+              description = ''
+                Attribute set of matchers and their regex values for the window
+                rule.
+
+                Note that the regex does NOT need to be wrapped in ^$ since
+                Hyprland always uses the FullMatch method from the RE2 library
+                which implicitly does this.
+              '';
+            };
+
+            params = mkOption {
+              type = with types; attrsOf anything;
+            };
+          };
+        }
+      );
+      default = { };
+      description = ''
+        Attribute set of window rules which will use the extended window rule
+        syntax to set the name.
+      '';
+    };
   };
 }

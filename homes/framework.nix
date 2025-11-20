@@ -32,6 +32,14 @@
       programs = {
         hyprlock.enable = true;
         fuzzel.enable = true;
+
+        lan-mouse = {
+          enable = true;
+          interfaces = [
+            "wg-home"
+            "wg-home-minimal"
+          ];
+        };
       };
 
       services = {
@@ -52,14 +60,6 @@
         wallpaper = {
           randomise.enable = true;
           randomise.frequency = "*-*-* 05:00:00";
-        };
-
-        lan-mouse = {
-          enable = true;
-          interfaces = [
-            "wg-home"
-            "wg-home-minimal"
-          ];
         };
       };
     };

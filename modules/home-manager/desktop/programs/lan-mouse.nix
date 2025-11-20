@@ -6,13 +6,10 @@
   config,
   inputs,
   hostname,
-  osConfig,
 }:
 let
   inherit (lib)
     ns
-    getExe
-    mkIf
     mapAttrs'
     filterAttrs
     genAttrs
@@ -21,7 +18,11 @@ let
     types
     nameValuePair
     ;
-  inherit (lib.${ns}) sliceSuffix hostIps flakePkgs;
+  inherit (lib.${ns})
+    hostIps
+    flakePkgs
+    mkHyprlandCenterFloatRule
+    ;
   inherit (config.age.secrets) lanMouseCert;
   lan-mouse = (flakePkgs args "lan-mouse").default;
   otherFingerprints = filterAttrs (
@@ -48,25 +49,10 @@ in
       paths = [ lan-mouse ];
       nativeBuildInputs = [ pkgs.makeWrapper ];
       postBuild = ''
-        wrapProgram $out/bin/lan-mouse --run '
-          systemctl start --user lan-mouse.service
-        '
+        wrapProgram $out/bin/lan-mouse --add-flags '--cert-path ${lanMouseCert.path}'
       '';
     })
   ];
-
-  systemd.user.services."lan-mouse" = {
-    Unit = {
-      Description = "Lan Mouse";
-      After = [ "graphical-session.target" ];
-      Requisite = [ "graphical-session.target" ];
-    };
-
-    Service = {
-      Slice = "app${sliceSuffix osConfig}.slice";
-      ExecStart = "${getExe lan-mouse} --cert-path ${lanMouseCert.path} daemon";
-    };
-  };
 
   xdg.configFile."lan-mouse/config.toml".source = (pkgs.formats.toml { }).generate "config.toml" {
     port = cfg.port;
@@ -82,4 +68,8 @@ in
   ns.firewall.interfaces = genAttrs cfg.interfaces (_: {
     allowedUDPPorts = [ cfg.port ];
   });
+
+  ns.desktop.hyprland.windowRules."lan-mouse" =
+    mkHyprlandCenterFloatRule "de\\.feschber\\.LanMouse" 25
+      60;
 }

@@ -162,11 +162,8 @@ in
   ns.hm = mkIf home-manager.enable {
     ${ns}.desktop.hyprland.windowRules."gnome-keyring-passphrase-prompt" = {
       matchers.class = "gcr-prompter";
-      params = {
-        stay_focused = true;
-        no_screen_share = true;
-        suppress_event = "fullscreenoutput fullscreen maximize";
-      };
+      params.stay_focused = true;
+      params.no_screen_share = true;
     };
   };
 

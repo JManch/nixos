@@ -186,7 +186,7 @@ in
           matchers.title = "Friends List";
           params = {
             float = true;
-            size = "window_w*0.15 window_h*0.4";
+            size = "monitor_w*0.15 monitor_h*0.4";
             center = true;
           };
         };

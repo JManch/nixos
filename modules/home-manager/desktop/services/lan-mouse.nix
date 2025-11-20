@@ -5,11 +5,13 @@
   args,
   config,
   inputs,
+  osConfig,
   hostname,
 }:
 let
   inherit (lib)
     ns
+    getExe
     mapAttrs'
     filterAttrs
     genAttrs
@@ -17,12 +19,14 @@ let
     mkOption
     types
     nameValuePair
+    mkBefore
     ;
   inherit (lib.${ns})
     hostIps
     flakePkgs
     mkHyprlandCenterFloatRule
     wrapHyprlandMoveToActive
+    sliceSuffix
     ;
   inherit (config.age.secrets) lanMouseCert;
   lan-mouse = (flakePkgs args "lan-mouse").default;
@@ -46,9 +50,22 @@ in
 
   home.packages = [
     (wrapHyprlandMoveToActive args lan-mouse "de.feschber.LanMouse"
-      "--add-flags '--cert-path ${lanMouseCert.path}'"
+      "--run 'systemctl start --user lan-mouse'"
     )
   ];
+
+  systemd.user.services."lan-mouse" = {
+    Unit = {
+      Description = "Lan Mouse";
+      After = [ "graphical-session.target" ];
+      Requisite = [ "graphical-session.target" ];
+    };
+
+    Service = {
+      Slice = "app${sliceSuffix osConfig}.slice";
+      ExecStart = "${getExe lan-mouse} --cert-path ${lanMouseCert.path} daemon";
+    };
+  };
 
   xdg.configFile."lan-mouse/config.toml".source = (pkgs.formats.toml { }).generate "config.toml" {
     port = cfg.port;
@@ -68,4 +85,15 @@ in
   ns.desktop.hyprland.windowRules."lan-mouse" =
     mkHyprlandCenterFloatRule "de\\.feschber\\.LanMouse" 25
       60;
+
+  programs.waybar.settings.bar = {
+    modules-right = mkBefore [ "custom/lan-mouse" ];
+    "custom/lan-mouse" = {
+      format = "<span color='#${config.colorScheme.palette.base04}'>󰍽 </span> {}";
+      exec = "systemctl is-active --quiet --user lan-mouse && echo -n 'Lan Mouse' || echo -n ''";
+      interval = 30;
+      on-click = "systemctl stop --user lan-mouse && ${getExe pkgs.libnotify} --urgency=critical -t 5000 'Lan Mouse' 'Service stopped'";
+      tooltip = false;
+    };
+  };
 }

@@ -25,14 +25,6 @@
         swaylock.enable = false;
         hyprlock.enable = true;
         fuzzel.enable = true;
-
-        lan-mouse = {
-          enable = true;
-          interfaces = [
-            "wg-home"
-            "wg-home-minimal"
-          ];
-        };
       };
 
       services = {
@@ -52,6 +44,14 @@
           enable = true;
           # switchMethod = "hass";
           # hassEntity = "joshua_dark_mode_brightness_threshold";
+        };
+
+        lan-mouse = {
+          enable = true;
+          interfaces = [
+            "wg-home"
+            "wg-home-minimal"
+          ];
         };
       };
     };

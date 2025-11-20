@@ -22,6 +22,7 @@ let
     hostIps
     flakePkgs
     mkHyprlandCenterFloatRule
+    wrapHyprlandMoveToActive
     ;
   inherit (config.age.secrets) lanMouseCert;
   lan-mouse = (flakePkgs args "lan-mouse").default;
@@ -44,14 +45,9 @@ in
   };
 
   home.packages = [
-    (pkgs.symlinkJoin {
-      name = "lan-mouse-wrapped";
-      paths = [ lan-mouse ];
-      nativeBuildInputs = [ pkgs.makeWrapper ];
-      postBuild = ''
-        wrapProgram $out/bin/lan-mouse --add-flags '--cert-path ${lanMouseCert.path}'
-      '';
-    })
+    (wrapHyprlandMoveToActive args lan-mouse "de.feschber.LanMouse"
+      "--add-flags '--cert-path ${lanMouseCert.path}'"
+    )
   ];
 
   xdg.configFile."lan-mouse/config.toml".source = (pkgs.formats.toml { }).generate "config.toml" {

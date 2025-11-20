@@ -23,7 +23,6 @@ let
     ;
   inherit (lib.${ns}) addPatches sliceSuffix getMonitorByName;
   inherit (config.${ns}) desktop;
-  inherit (desktop.programs) locker;
   inherit (osConfig.${ns}.core) device;
   inherit (osConfig.${ns}.system) networking;
   inherit (osConfig.${ns}.hardware) bluetooth;
@@ -306,13 +305,6 @@ in
           on-click = "wgnord-down";
         };
 
-        "custom/locker" = mkIf (locker.package != null) {
-          format = "<span color='#${colors.base04}'>󰷛 </span> {}";
-          exec = ''${systemctl} is-active --quiet --user inhibit-lock && echo -n "Inhibited" || echo -n ""'';
-          interval = 30;
-          tooltip = false;
-        };
-
         gamemode = mkIf gamemode.enable {
           format = "{glyph} Gamemode";
           format-alt = "{glyph} Gamemode";
@@ -333,8 +325,7 @@ in
         modules-center = [ "clock" ];
 
         modules-right =
-          optional (locker.package != null) "custom/locker"
-          ++ optional (device.type != "laptop") "network"
+          optional (device.type != "laptop") "network"
           ++ optional wgnord.enable "custom/vpn"
           ++ [ "cpu" ]
           ++ optional gpuModuleEnabled "custom/gpu"

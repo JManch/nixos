@@ -14,6 +14,8 @@ let
     concatMapStringsSep
     mkOption
     types
+    mkBefore
+    mkIf
     ;
   # https://discourse.nixos.org/t/not-allowed-to-refer-to-a-store-path-error/5226
   lockerName = builtins.unsafeDiscardStringContext (builtins.baseNameOf (getExe cfg.package));
@@ -158,4 +160,14 @@ in
       "${modKey}, U, exec, ${toggleLockInhibit}"
       "${modKey}, Escape, exec, ${cfg.lockScript} --immediate"
     ];
+
+  programs.waybar.settings.bar = {
+    modules-right = mkBefore [ "custom/locker" ];
+    "custom/locker" = mkIf (cfg.package != null) {
+      format = "<span color='#${config.colorScheme.palette.base04}'>󰷛 </span> {}";
+      exec = ''systemctl is-active --quiet --user inhibit-lock && echo -n "Inhibited" || echo -n ""'';
+      interval = 30;
+      tooltip = false;
+    };
+  };
 }

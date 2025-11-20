@@ -45,6 +45,14 @@
           # switchMethod = "hass";
           # hassEntity = "joshua_dark_mode_brightness_threshold";
         };
+
+        lan-mouse = {
+          enable = true;
+          interfaces = [
+            "wg-home"
+            "wg-home-minimal"
+          ];
+        };
       };
     };
 

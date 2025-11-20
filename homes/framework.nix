@@ -53,6 +53,14 @@
           randomise.enable = true;
           randomise.frequency = "*-*-* 05:00:00";
         };
+
+        lan-mouse = {
+          enable = true;
+          interfaces = [
+            "wg-home"
+            "wg-home-minimal"
+          ];
+        };
       };
     };
 

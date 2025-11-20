@@ -1022,6 +1022,27 @@
         "type": "github"
       }
     },
+    "lan-mouse": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-overlay": "rust-overlay"
+      },
+      "locked": {
+        "lastModified": 1762189458,
+        "narHash": "sha256-y3TGE5tEq6+72AlfxG3ucGHWs3hoEpNyQwnHdwYR9lo=",
+        "owner": "feschber",
+        "repo": "lan-mouse",
+        "rev": "640fa995a4ae3c5a0aaaafe04857930979edc220",
+        "type": "github"
+      },
+      "original": {
+        "owner": "feschber",
+        "repo": "lan-mouse",
+        "type": "github"
+      }
+    },
     "lanzaboote": {
       "inputs": {
         "crane": "crane",
@@ -1031,7 +1052,7 @@
           "nixpkgs"
         ],
         "pre-commit-hooks-nix": [],
-        "rust-overlay": "rust-overlay"
+        "rust-overlay": "rust-overlay_2"
       },
       "locked": {
         "lastModified": 1762205063,
@@ -1050,7 +1071,7 @@
     "mint": {
       "inputs": {
         "nixpkgs": "nixpkgs",
-        "rust-overlay": "rust-overlay_2"
+        "rust-overlay": "rust-overlay_3"
       },
       "locked": {
         "lastModified": 1746344043,
@@ -1218,11 +1239,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1762735060,
-        "narHash": "sha256-4dLjuiFv4R81U72oJOuWqSN6Yasq5gtKwszM0AybkDs=",
+        "lastModified": 1763666832,
+        "narHash": "sha256-TBKiV0RxqsDWFDgBsJC7B7EOhgT2sy11N2lcB+tARn0=",
         "owner": "JManch",
         "repo": "nix-resources",
-        "rev": "512b09a2c215e6697bdc4ff99aa68b95a1106b72",
+        "rev": "54f32ae635fd51c6f438b3b78d621b42539dd78b",
         "type": "github"
       },
       "original": {
@@ -1462,6 +1483,7 @@
         "hyprpolkitagent": "hyprpolkitagent",
         "hyprsunset": "hyprsunset",
         "impermanence": "impermanence",
+        "lan-mouse": "lan-mouse",
         "lanzaboote": "lanzaboote",
         "mint": "mint",
         "nix-colors": "nix-colors",
@@ -1482,6 +1504,27 @@
     "rust-overlay": {
       "inputs": {
         "nixpkgs": [
+          "lan-mouse",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1752806774,
+        "narHash": "sha256-4cHeoR2roN7d/3J6gT+l6o7J2hTrBIUiCwVdDNMeXzE=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "3c90219b3ba1c9790c45a078eae121de48a39c55",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "rust-overlay_2": {
+      "inputs": {
+        "nixpkgs": [
           "lanzaboote",
           "nixpkgs"
         ]
@@ -1500,7 +1543,7 @@
         "type": "github"
       }
     },
-    "rust-overlay_2": {
+    "rust-overlay_3": {
       "inputs": {
         "nixpkgs": [
           "mint",

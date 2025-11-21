@@ -34,6 +34,7 @@
         wayvnc.enable = true;
         swww.enable = true;
         hyprsunset.enable = true;
+        lan-mouse.enable = true;
 
         wallpaper = {
           randomise.enable = true;
@@ -44,14 +45,6 @@
           enable = true;
           # switchMethod = "hass";
           # hassEntity = "joshua_dark_mode_brightness_threshold";
-        };
-
-        lan-mouse = {
-          enable = true;
-          interfaces = [
-            "wg-home"
-            "wg-home-minimal"
-          ];
         };
       };
     };

@@ -14,7 +14,6 @@ let
     getExe
     mapAttrs'
     filterAttrs
-    genAttrs
     mapAttrsToList
     mkOption
     types
@@ -35,17 +34,9 @@ let
   ) inputs.nix-resources.secrets.lanMouseAuthorizedFingerprints;
 in
 {
-  opts = {
-    port = mkOption {
-      type = types.port;
-      default = 4242;
-    };
-
-    interfaces = mkOption {
-      type = with types; listOf str;
-      default = [ ];
-      description = "Interfaces to expose the service on";
-    };
+  opts.port = mkOption {
+    type = types.port;
+    default = 4242;
   };
 
   home.packages = [
@@ -78,9 +69,7 @@ in
     }) otherFingerprints;
   };
 
-  ns.firewall.interfaces = genAttrs cfg.interfaces (_: {
-    allowedUDPPorts = [ cfg.port ];
-  });
+  ns.firewall.allowedUDPPorts = [ cfg.port ];
 
   ns.desktop.hyprland.windowRules."lan-mouse" =
     mkHyprlandCenterFloatRule "de\\.feschber\\.LanMouse" 25

@@ -42,6 +42,7 @@
         hyprpaper.enable = true;
         darkman.enable = true;
         poweralertd.chargeThreshold = 80;
+        lan-mouse.enable = true;
 
         waybar = {
           enable = true;
@@ -52,14 +53,6 @@
         wallpaper = {
           randomise.enable = true;
           randomise.frequency = "*-*-* 05:00:00";
-        };
-
-        lan-mouse = {
-          enable = true;
-          interfaces = [
-            "wg-home"
-            "wg-home-minimal"
-          ];
         };
       };
     };

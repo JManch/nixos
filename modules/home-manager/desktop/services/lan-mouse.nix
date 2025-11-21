@@ -71,6 +71,20 @@ in
 
   ns.firewall.allowedUDPPorts = [ cfg.port ];
 
+  ns.desktop.hyprland.binds =
+    let
+      inherit (config.${ns}.desktop.hyprland) modKey;
+      wlrctl = getExe pkgs.wlrctl;
+    in
+    [
+      # Hacky way to switch between hosts with keybinds
+      # https://github.com/feschber/lan-mouse/issues/260
+      "${modKey}SHIFTCONTROL, Left, exec, ${wlrctl} pointer move 10 0; ${wlrctl} pointer move -10000 0"
+      "${modKey}SHIFTCONTROL, Right, exec, ${wlrctl} pointer move -10 0; ${wlrctl} pointer move 10000 0"
+      "${modKey}SHIFTCONTROL, Up, exec, ${wlrctl} pointer move 0 -10; ${wlrctl} pointer move 0 10000"
+      "${modKey}SHIFTCONTROL, Down, exec, ${wlrctl} pointer move 0 10; ${wlrctl} pointer move 0 -10000"
+    ];
+
   ns.desktop.hyprland.windowRules."lan-mouse" =
     mkHyprlandCenterFloatRule "de\\.feschber\\.LanMouse" 25
       60;

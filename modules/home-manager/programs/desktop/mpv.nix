@@ -73,7 +73,7 @@ in
       # Quality
       profile = if cfg.highQuality then "high-quality" else "fast";
       hwdec = "auto-safe";
-      vo = "gpu-next";
+      vo = if device.type == "laptop" then "dmabuf-wayland" else "gpu-next";
       interpolation = cfg.interpolate;
       video-sync = mkIf cfg.interpolate "display-resample";
       tscale = "oversample";

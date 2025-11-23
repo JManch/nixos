@@ -20,16 +20,26 @@
   # As of kernel 6.13 the framework kmod isn't necessary
   hardware.framework.enableKmod = false;
 
+  nixpkgs.overlays =
+    # Supposedly 6.18rc5+ and latest microcode offer improved battery life
+    assert lib.assertMsg (
+      inputs.nixpkgs.rev == "c5ae371f1a6a7fd27823bc500d9390b38c05fa55"
+    ) "remove or update framework kernel fast-forward";
+    [
+      (_: _: {
+        inherit
+          (import (fetchTree "github:JManch/nixpkgs/af98bc070c697dc92f160f0242ab961f773ddc6c") {
+            inherit (pkgs.stdenv.hostPlatform) system;
+          })
+          linux-firmware
+          linuxPackages_testing
+          ;
+      })
+    ];
+
   boot = {
-    # Using latest in an attempt to fix suspend-then-hibernate issues
-    kernelPackages =
-      assert lib.assertMsg (
-        inputs.nixpkgs.rev == "c5ae371f1a6a7fd27823bc500d9390b38c05fa55"
-      ) "remove framework kernel fast-forward";
-      lib.mkForce
-        (import (fetchTree "github:NixOS/nixpkgs/89c2b2330e733d6cdb5eae7b899326930c2c0648") {
-          inherit (pkgs.stdenv.hostPlatform) system;
-        }).linuxPackages_latest;
+    # Using testing in an attempt to fix suspend-then-hibernate issues.
+    kernelPackages = pkgs.linuxPackages_testing;
     # kernelPackages = pkgs.linuxPackages_latest;
 
     kernelModules = [ "kvm-amd" ];

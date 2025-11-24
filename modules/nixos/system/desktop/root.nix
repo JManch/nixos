@@ -19,7 +19,6 @@ let
     ;
   inherit (config.${ns}.core) home-manager device;
   inherit (config.${ns}.hmNs.desktop.programs) locker;
-  inherit (config.${ns}.hmNs.desktop.services) poweralertd;
   homeDesktop = config.${ns}.hmNs.desktop;
 in
 {
@@ -145,7 +144,10 @@ in
   # the next notification attempt to fail as the service fails and restarts. We
   # do not want to miss the first notification so manually restart.
   environment.etc."systemd/system-sleep/post-sleep-restart-poweralertd" =
-    mkIf (home-manager.enable && homeDesktop.enable && poweralertd.enable)
+    mkIf
+      (
+        home-manager.enable && homeDesktop.enable && config.services.upower.enable && device.battery != null
+      )
       {
         source = pkgs.writeShellScript "post-sleep-restart-poweralertd" ''
           if [[ $1 == post* ]]; then

@@ -388,8 +388,6 @@ in
     settings.bindl = optionals (device.backlight != null) [
       ", XF86MonBrightnessUp, exec, ${modifyBrightness} 3%+"
       ", XF86MonBrightnessDown, exec, ${modifyBrightness} 3%-"
-      "${mod}, XF86MonBrightnessUp, exec, ${modifyBrightness} 1%+"
-      "${mod}, XF86MonBrightnessDown, exec, ${modifyBrightness} 1%-"
     ];
 
     settings.bindm = [

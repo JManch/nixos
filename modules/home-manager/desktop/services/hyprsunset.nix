@@ -85,17 +85,24 @@ in
           -h 'string:x-canonical-private-synchronous:hyprsunset' "Hyprsunset" "Gamma $new%"
       '';
 
+      resetGamma = pkgs.writeShellScript "hypr-reset-gamma" ''
+        hyprctl hyprsunset reset gamma
+        ${getExe pkgs.libnotify} --urgency=low -t 2000 \
+          -h 'string:x-canonical-private-synchronous:hyprsunset' "Hyprsunset" "Gamma reset to $(hyprctl hyprsunset gamma)%"
+      '';
+
       modifyTemperature = pkgs.writeShellScript "hypr-modify-temperature" ''
         hyprctl hyprsunset temperature "$1"
         ${getExe pkgs.libnotify} --urgency=low -t 2000 \
           -h 'string:x-canonical-private-synchronous:hyprsunset' "Hyprsunset" "Temperature $(hyprctl hyprsunset temperature)K"
       '';
 
-      resetTemperature = pkgs.writeShellScript "hypr-modify-temperature" ''
+      resetTemperature = pkgs.writeShellScript "hypr-reset-temperature" ''
         hyprctl hyprsunset reset temperature
         ${getExe pkgs.libnotify} --urgency=low -t 2000 \
           -h 'string:x-canonical-private-synchronous:hyprsunset' "Hyprsunset" "Temperature reset to $(hyprctl hyprsunset temperature)K"
       '';
+
     in
     {
       bind = [
@@ -106,9 +113,14 @@ in
       ];
 
       bindo = [
-        # Reset temperature with long press
+        # Reset with long press
+        "${modKey}, XF86MonBrightnessUp, exec, ${resetGamma}"
+        "${modKey}, XF86MonBrightnessDown, exec, ${resetGamma}"
         "${modKey}SHIFT, XF86MonBrightnessUp, exec, ${resetTemperature}"
         "${modKey}SHIFT, XF86MonBrightnessDown, exec, ${resetTemperature}"
       ];
     };
+
+  ns.desktop.programs.locker.postUnlockScript =
+    "${lib.getExe' pkgs.hyprland "hyprctl"} hyprsunset reset gamma";
 }

@@ -95,7 +95,8 @@ in
       format = "<span color='#${config.colorScheme.palette.base04}'>󰍽 </span> {}";
       exec = "systemctl is-active --quiet --user lan-mouse && echo -n 'Lan Mouse' || echo -n ''";
       interval = 30;
-      on-click = "systemctl stop --user lan-mouse && ${getExe pkgs.libnotify} --urgency=critical -t 5000 'Lan Mouse' 'Service stopped'";
+      on-click = "${getExe pkgs.app2unit} -t service de.feschber.LanMouse.desktop";
+      on-click-right = "systemctl stop --user lan-mouse && ${getExe pkgs.libnotify} --urgency=critical -t 5000 'Lan Mouse' 'Service stopped'";
       tooltip = false;
     };
   };

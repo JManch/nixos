@@ -140,25 +140,6 @@ in
         '';
       };
 
-  # Poweralertd's dbus connection breaks after sleep/suspend/hibernate. Causes
-  # the next notification attempt to fail as the service fails and restarts. We
-  # do not want to miss the first notification so manually restart.
-  environment.etc."systemd/system-sleep/post-sleep-restart-poweralertd" =
-    mkIf
-      (
-        home-manager.enable && homeDesktop.enable && config.services.upower.enable && device.battery != null
-      )
-      {
-        source = pkgs.writeShellScript "post-sleep-restart-poweralertd" ''
-          if [[ $1 == post* ]]; then
-            ${getExe' pkgs.systemd "systemctl"} \
-              --user \
-              --machine ${username}@.host \
-              restart poweralertd.service
-          fi
-        '';
-      };
-
   # Fix the session slice for home-manager services. I don't think it's
   # possible to do drop-in overrides like this with home-manager.
 

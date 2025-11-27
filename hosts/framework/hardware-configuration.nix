@@ -32,15 +32,19 @@
             inherit (pkgs.stdenv.hostPlatform) system;
           })
           linux-firmware
-          linuxPackages_testing
+          ;
+        inherit
+          (import (fetchTree "github:NixOS/nixpkgs/5ae3b07d8d6527c42f17c876e404993199144b6a") {
+            inherit (pkgs.stdenv.hostPlatform) system;
+          })
+          linuxPackages_latest
           ;
       })
     ];
 
   boot = {
-    # Using testing in an attempt to fix suspend-then-hibernate issues.
-    kernelPackages = pkgs.linuxPackages_testing;
-    # kernelPackages = pkgs.linuxPackages_latest;
+    # System frequently hangs after suspend on 6.18-rc7
+    kernelPackages = pkgs.linuxPackages_latest;
 
     kernelModules = [ "kvm-amd" ];
 

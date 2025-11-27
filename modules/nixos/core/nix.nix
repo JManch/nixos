@@ -19,6 +19,7 @@ let
     types
     isType
     optional
+    assertMsg
     optionals
     mapAttrsToList
     sort
@@ -416,12 +417,22 @@ in
         );
 
         impala =
-          assert (lib.assertMsg (!prev.impala.meta ? mainProgram) "upstream fixed mainProgram on impala");
+          assert (assertMsg (!prev.impala.meta ? mainProgram) "upstream fixed mainProgram on impala");
           prev.impala.overrideAttrs (old: {
             meta = old.meta // {
               mainProgram = "impala";
             };
           });
+
+        # https://github.com/novnc/noVNC/issues/1946
+        novnc =
+          assert (assertMsg (prev.novnc.version == "1.6.0") "novnc patch should be in stable now");
+          addPatches prev.novnc [
+            (final.fetchpatch2 {
+              url = "https://github.com/novnc/noVNC/commit/f0a39cd357a5995673149b95951d4c1261b69571.patch";
+              hash = "sha256-GTXFAK1T8LiCIuukYFIOqoXNbrXJF0smTzALBdry9eA=";
+            })
+          ];
       })
     ];
   };

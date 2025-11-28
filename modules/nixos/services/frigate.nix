@@ -1,9 +1,7 @@
 {
   lib,
   cfg,
-  pkgs,
   config,
-  inputs,
   hostname,
 }:
 let
@@ -104,14 +102,6 @@ in
 
   services.frigate = {
     enable = true;
-    package =
-      assert lib.assertMsg (
-        inputs.nixpkgs.rev == "c5ae371f1a6a7fd27823bc500d9390b38c05fa55"
-      ) "frigate build seg fault is hopefully fixed";
-      lib.mkForce
-        (import (fetchTree "github:NixOS/nixpkgs/b3d51a0365f6695e7dd5cdf3e180604530ed33b4") {
-          inherit (pkgs.stdenv.hostPlatform) system;
-        }).frigate;
 
     # Run check config for new versions as automatic migrations don't work on
     # NixOS. For the check to work we have to temporarily remove all custom

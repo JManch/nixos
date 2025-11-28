@@ -28,7 +28,13 @@ let
     sliceSuffix
     ;
   inherit (config.age.secrets) lanMouseCert;
-  lan-mouse = (flakePkgs args "lan-mouse").default;
+  lan-mouse =
+    assert (
+      lib.assertMsg (
+        pkgs.lan-mouse.version == "0.10.0"
+      ) "lan-mouse has a new release so I can remove the flake"
+    );
+    (flakePkgs args "lan-mouse").default;
   otherFingerprints = filterAttrs (
     h: _: h != hostname
   ) inputs.nix-resources.secrets.lanMouseAuthorizedFingerprints;

@@ -70,6 +70,7 @@ in
   ns.desktop.hyprland.settings =
     let
       inherit (config.${ns}.desktop.hyprland) modKey;
+
       modifyGamma = pkgs.writeShellScript "hypr-modify-gamma" ''
         current=$(hyprctl hyprsunset gamma)
         new=$(${getExe pkgs.gawk} -v num="$current" -v mod="$1" 'BEGIN {
@@ -107,17 +108,25 @@ in
     {
       bind = [
         "${modKey}, XF86MonBrightnessUp, exec, ${modifyGamma} 5"
+        "${modKey}, F8, exec, ${modifyGamma} 5"
         "${modKey}, XF86MonBrightnessDown, exec, ${modifyGamma} -5"
+        "${modKey}, F7, exec, ${modifyGamma} -5"
         "${modKey}SHIFT, XF86MonBrightnessUp, exec, ${modifyTemperature} +200"
+        "${modKey}SHIFT, F8, exec, ${modifyTemperature} +200"
         "${modKey}SHIFT, XF86MonBrightnessDown, exec, ${modifyTemperature} -200"
+        "${modKey}SHIFT, F7, exec, ${modifyTemperature} -200"
       ];
 
       bindo = [
         # Reset with long press
         "${modKey}, XF86MonBrightnessUp, exec, ${resetGamma}"
+        "${modKey}, F8, exec, ${resetGamma}"
         "${modKey}, XF86MonBrightnessDown, exec, ${resetGamma}"
+        "${modKey}, F7, exec, ${resetGamma}"
         "${modKey}SHIFT, XF86MonBrightnessUp, exec, ${resetTemperature}"
+        "${modKey}SHIFT, F8, exec, ${resetTemperature}"
         "${modKey}SHIFT, XF86MonBrightnessDown, exec, ${resetTemperature}"
+        "${modKey}SHIFT, F7, exec, ${resetTemperature}"
       ];
     };
 

@@ -1,6 +1,7 @@
 # Issues:
 # - https://github.com/openwrt/mt76/issues/548
 # - Userspace charge limiter has been broken since the 3.04 bios update https://github.com/tlvince/nixos-config/issues/309
+# - Front-right USB A adapter sometimes doesn't work https://community.frame.work/t/solved-usb-a-expansion-card-stops-working-until-unplugged/26579
 {
   lib,
   pkgs,

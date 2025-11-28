@@ -58,7 +58,7 @@
 
     lanzaboote.url = "github:nix-community/lanzaboote";
     lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
-    lanzaboote.inputs.pre-commit-hooks-nix.follows = "";
+    lanzaboote.inputs.pre-commit.follows = "";
 
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";

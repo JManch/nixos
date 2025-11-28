@@ -20,28 +20,6 @@
   # As of kernel 6.13 the framework kmod isn't necessary
   hardware.framework.enableKmod = false;
 
-  nixpkgs.overlays =
-    # Supposedly 6.18rc5+ and latest microcode offer improved battery life
-    assert lib.assertMsg (
-      inputs.nixpkgs.rev == "c5ae371f1a6a7fd27823bc500d9390b38c05fa55"
-    ) "remove or update framework kernel fast-forward";
-    [
-      (_: _: {
-        inherit
-          (import (fetchTree "github:JManch/nixpkgs/af98bc070c697dc92f160f0242ab961f773ddc6c") {
-            inherit (pkgs.stdenv.hostPlatform) system;
-          })
-          linux-firmware
-          ;
-        inherit
-          (import (fetchTree "github:NixOS/nixpkgs/5ae3b07d8d6527c42f17c876e404993199144b6a") {
-            inherit (pkgs.stdenv.hostPlatform) system;
-          })
-          linuxPackages_latest
-          ;
-      })
-    ];
-
   boot = {
     # System frequently hangs after suspend on 6.18-rc7
     kernelPackages = pkgs.linuxPackages_latest;

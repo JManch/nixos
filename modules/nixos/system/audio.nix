@@ -352,9 +352,12 @@ in
           };
 
           hyprland.settings = {
-            bind = [
+            binde = [
               ", XF86AudioRaiseVolume, exec, ${modifyVolume} 5%+"
               ", XF86AudioLowerVolume, exec, ${modifyVolume} 5%-"
+            ];
+
+            bind = [
               ", XF86AudioMute, exec, ${toggleAudioMute} sink"
               ", XF86AudioMicMute, exec, ${toggleAudioMute} source"
               "${hyprland.modKey}SHIFTCONTROL, XF86AudioRaiseVolume, exec, ${modifyFocusedWindowVolume} 5%+"

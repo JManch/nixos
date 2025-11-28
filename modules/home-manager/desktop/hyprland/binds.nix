@@ -202,11 +202,9 @@ let
 
   modifyBrightness = pkgs.writeShellScript "hypr-modify-brightness" ''
     ${brightnessctl} set -e4 "$1"
-    if [ "$(loginctl show-session $XDG_SESSION_ID -p LockedHint --value)" = "no" ]; then
-      brightness=$(${brightnessctl} get --percentage)
-      ${notifySend} --urgency=low -t 2000 \
-        -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $brightness%"
-    fi
+    brightness=$(${brightnessctl} get --percentage)
+    ${notifySend} --urgency=low -t 2000 \
+      -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $brightness%"
   '';
 
   zoom =
@@ -385,11 +383,6 @@ in
       "${mod}, Escape, hyprexpo:expo, toggle"
     ];
 
-    settings.bindl = optionals (device.backlight != null) [
-      ", XF86MonBrightnessUp, exec, ${modifyBrightness} 3%+"
-      ", XF86MonBrightnessDown, exec, ${modifyBrightness} 3%-"
-    ];
-
     settings.bindm = [
       "${mod}, mouse:272, movewindow"
       "${mod}, mouse:273, resizewindow"
@@ -400,6 +393,10 @@ in
       "${mod}, Left, resizeactive, -20 0"
       "${mod}, Up, resizeactive, 0 -20"
       "${mod}, Down, resizeactive, 0 20"
+    ]
+    ++ optionals (device.backlight != null) [
+      ", XF86MonBrightnessUp, exec, ${modifyBrightness} 3%+"
+      ", XF86MonBrightnessDown, exec, ${modifyBrightness} 3%-"
     ];
 
     settings.gesture = [

@@ -16,6 +16,8 @@ let
     mkAliasOptionModule
     concatMapStringsSep
     hasAttr
+    any
+    hasPrefix
     ;
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system.virtualisation) vmVariant;
@@ -137,6 +139,27 @@ in
 
       users.${username} = mkIf home-manager.enable homePersistence;
     };
+
+    # Workaround for ensuring that /var/lib/private is created with the correct
+    # permissions if a subdirectory is persisted
+    # https://github.com/nix-community/impermanence/issues/254#issuecomment-2683859091
+    system.activationScripts =
+      mkIf (any (p: hasPrefix "/var/lib/private" p.dirPath) config.${ns}.persistence.directories)
+        {
+          "createVarLibPrivate" = {
+            deps = [ "specialfs" ];
+            text = ''
+              mkdir -p /persist/var/lib/private
+              chmod 0700 /persist/var/lib/private
+            '';
+          };
+
+          "createPersistentStorageDirs".deps = [
+            "createVarLibPrivate"
+            "users"
+            "groups"
+          ];
+        };
   }
 
   (mkIf (!cfg.enable) {

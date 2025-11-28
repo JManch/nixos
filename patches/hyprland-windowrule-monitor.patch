@@ -1,8 +1,8 @@
 diff --git a/src/events/Windows.cpp b/src/events/Windows.cpp
-index dfbb9f2e..2601245e 100644
+index 9a1c07d9..b962d0e4 100644
 --- a/src/events/Windows.cpp
 +++ b/src/events/Windows.cpp
-@@ -313,6 +313,7 @@ void Events::listener_mapWindow(void* owner, void* data) {
+@@ -314,6 +314,7 @@ void Events::listener_mapWindow(void* owner, void* data) {
  
              PWINDOW->m_workspace = pWorkspace;
              PWINDOW->m_monitor   = pWorkspace->m_monitor;
@@ -10,12 +10,12 @@ index dfbb9f2e..2601245e 100644
  
              if (PWINDOW->m_monitor.lock()->m_activeSpecialWorkspace && !pWorkspace->m_isSpecialWorkspace)
                  workspaceSilent = true;
-@@ -322,8 +323,6 @@ void Events::listener_mapWindow(void* owner, void* data) {
+@@ -323,8 +324,6 @@ void Events::listener_mapWindow(void* owner, void* data) {
                      pWorkspace->m_monitor->setSpecialWorkspace(pWorkspace);
                  else if (PMONITOR->activeWorkspaceID() != requestedWorkspaceID && !PWINDOW->m_noInitialFocus)
                      g_pKeybindManager->m_dispatchers["workspace"](requestedWorkspaceName);
 -
--                PMONITOR = g_pCompositor->m_lastMonitor.lock();
+-                PMONITOR = Desktop::focusState()->monitor();
              }
  
              requestedFSMonitor = MONITOR_INVALID;

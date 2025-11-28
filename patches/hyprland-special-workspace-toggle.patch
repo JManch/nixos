@@ -1,25 +1,25 @@
 diff --git a/src/managers/KeybindManager.cpp b/src/managers/KeybindManager.cpp
-index 1bd7e1a2..e9ad6682 100644
+index 4423bbdb..fbfd5756 100644
 --- a/src/managers/KeybindManager.cpp
 +++ b/src/managers/KeybindManager.cpp
-@@ -2117,13 +2117,13 @@ SDispatchResult CKeybindManager::toggleSpecialWorkspace(std::string args) {
+@@ -2104,13 +2104,13 @@ SDispatchResult CKeybindManager::toggleSpecialWorkspace(std::string args) {
          return {.success = false, .error = "Invalid workspace passed to special"};
      }
  
 -    bool       requestedWorkspaceIsAlreadyOpen = false;
--    const auto PMONITOR                        = g_pCompositor->m_lastMonitor;
+-    const auto PMONITOR                        = Desktop::focusState()->monitor();
 -    auto       specialOpenOnMonitor            = PMONITOR->activeSpecialWorkspaceID();
 +    bool requestedWorkspaceIsAlreadyOpen = false;
-+    auto PMONITOR                        = g_pCompositor->m_lastMonitor.get();
++    auto PMONITOR                        = Desktop::focusState()->monitor();
  
      for (auto const& m : g_pCompositor->m_monitors) {
          if (m->activeSpecialWorkspaceID() == workspaceID) {
              requestedWorkspaceIsAlreadyOpen = true;
-+            PMONITOR                        = m.get();
++            PMONITOR                        = m;
              break;
          }
      }
-@@ -2132,8 +2132,7 @@ SDispatchResult CKeybindManager::toggleSpecialWorkspace(std::string args) {
+@@ -2119,8 +2119,7 @@ SDispatchResult CKeybindManager::toggleSpecialWorkspace(std::string args) {
  
      PHLWORKSPACEREF focusedWorkspace;
  

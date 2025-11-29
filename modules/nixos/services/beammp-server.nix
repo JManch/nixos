@@ -86,12 +86,6 @@ in
     };
   };
 
-  users.users.beammp = {
-    group = "beammp";
-    isSystemUser = true;
-  };
-  users.groups.beammp = { };
-
   systemd.services.beammp-server = {
     description = "BeamMP Server";
     after = [ "network.target" ];
@@ -126,9 +120,6 @@ in
       );
       ExecStart = "${getExe pkgs.${ns}.beammp-server} --working-directory=/var/lib/beammp-server";
       StateDirectory = "beammp-server";
-      DynamicUser = false;
-      User = "beammp";
-      Group = "beammp";
 
       SystemCallFilter = [
         "@system-service"
@@ -149,9 +140,9 @@ in
   };
 
   ns.persistence.directories = singleton {
-    directory = "/var/lib/beammp-server";
-    user = "beammp";
-    group = "beammp";
+    directory = "/var/lib/private/beammp-server";
+    user = "nobody";
+    group = "nogroup";
     mode = "0755";
   };
 }

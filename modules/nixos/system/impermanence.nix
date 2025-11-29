@@ -124,12 +124,14 @@ in
         "/var/lib/systemd"
         "/var/lib/nixos"
         "/var/db/sudo/lectured"
-        # WARN: Systemd services that use DynamicUser without defining a
-        # static User and Group cannot be persisted as it's impossible to
-        # preallocated the correct UID/GID. It should be possible to work
-        # around this by declaratively creating a user and group for the
-        # service and using them for User and Group in the service's exec
-        # config.
+        # Systemd services with DynamicUser=yes store state under
+        # /var/lib/private/<StateDirectory>. Because these services dynamically allocate a
+        # UID/GID every time they're started, we should create the persistent dir with
+        # ownership nobody:nogroup. This allows systemd to create id-mapped mounts that
+        # make the directory appear with correct ownership inside the service's
+        # namespace. I do not think this is strictly necessary as systemd will chown
+        # the dir if the ownership is incorrect but chowning can be an expensive
+        # operation if there are many files and we'd rather avoid this with id-mapping.
       ];
 
       files = [

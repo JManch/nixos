@@ -11,7 +11,6 @@ let
     ns
     mkIf
     toUpper
-    mkForce
     getExe'
     mkVMOverride
     ;
@@ -90,17 +89,7 @@ in
       };
     };
 
-    users.users.scrutiny = {
-      group = "scrutiny";
-      isSystemUser = true;
-    };
-
-    users.groups.scrutiny = { };
-
     systemd.services.scrutiny.serviceConfig = hardeningBaseline config {
-      User = "scrutiny";
-      Group = "scrutiny";
-      DynamicUser = mkForce false;
       SystemCallFilter = [
         "@system-service"
         "~@privileged"
@@ -134,7 +123,7 @@ in
 
       paths = [
         # Contains the sqlite DB
-        "/var/lib/scrutiny"
+        "/var/lib/private/scrutiny"
         "/var/backup/influxdb2/scrutiny"
       ];
 
@@ -149,9 +138,9 @@ in
           '';
 
         pathOwnership = {
-          "/var/lib/scrutiny" = {
-            user = "scrutiny";
-            group = "scrutiny";
+          "/var/lib/private/scrutiny" = {
+            user = "nobody";
+            group = "nogroup";
           };
           "/var/backup/influxdb2/scrutiny" = {
             user = "influxdb2";
@@ -172,10 +161,10 @@ in
 
     ns.persistence.directories = [
       {
-        directory = "/var/lib/scrutiny";
-        user = "scrutiny";
-        group = "scrutiny";
-        mode = "0750";
+        directory = "/var/lib/private/scrutiny";
+        user = "nobody";
+        group = "nogroup";
+        mode = config.systemd.services.scrutiny.serviceConfig.StateDirectoryMode;
       }
       {
         directory = "/var/lib/influxdb2";

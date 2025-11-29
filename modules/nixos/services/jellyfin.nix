@@ -234,26 +234,14 @@ in
       "Jellyseerr requires Jellyfin and the video torrent stack to be enabled"
     ];
 
-    users.groups.jellyseerr = { };
-    users.users.jellyseerr = {
-      group = "jellyseerr";
-      isSystemUser = true;
-    };
-
     services.jellyseerr = {
       enable = true;
       openFirewall = false;
       port = cfg.jellyseerr.port;
     };
 
-    systemd.services.jellyseerr = {
-      # Jellyseer scan runs every 5 mins and pollutes the journal
-      environment.LOG_LEVEL = "warning";
-      serviceConfig = {
-        User = "jellyseerr";
-        Group = "jellyseerr";
-      };
-    };
+    # Jellyseer scan runs every 5 mins and pollutes the journal
+    systemd.services.jellyseerr.environment.LOG_LEVEL = "warning";
 
     ns.services.caddy.virtualHosts.jellyseerr = {
       inherit (cfg.jellyseerr) extraAllowedAddresses;
@@ -264,9 +252,9 @@ in
 
     ns.persistence.directories = singleton {
       directory = "/var/lib/private/jellyseerr";
-      user = "jellyseerr";
-      group = "jellyseerr";
-      mode = "0750";
+      user = "nobody";
+      group = "nogroup";
+      mode = "0755";
     };
   })
 ]

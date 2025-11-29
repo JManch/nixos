@@ -106,6 +106,9 @@ in
       isSystemUser = true;
     };
 
+    # WARN: It's important I do not use DynamicUser for qbittorrent, sonnar or
+    # radarr as these services need to be able to create files/directories
+    # under /media and the ownership would be vulnerable to GID/UID recycling.
     systemd.services.qbittorrent-nox = {
       description = "qBittorrent-nox";
       after = [ "network.target" ];
@@ -158,12 +161,6 @@ in
       wantedBy = [ "multi-user.target" ];
     };
 
-    users.groups.prowlarr = { };
-    users.users.prowlarr = {
-      group = "prowlarr";
-      isSystemUser = true;
-    };
-
     systemd.services.prowlarr = {
       description = "Prowlarr";
       after = [ "network.target" ];
@@ -176,10 +173,8 @@ in
       };
 
       serviceConfig = hardeningBaseline config {
-        DynamicUser = false;
-        User = "prowlarr";
-        Group = "prowlarr";
-        ExecStart = "${getExe pkgs.prowlarr} -nobrowser -data=/var/lib/prowlarr";
+        DynamicUser = true;
+        ExecStart = "${getExe pkgs.prowlarr} -nobrowser -data=/var/lib/private/prowlarr";
         Restart = "on-failure";
         StateDirectory = "prowlarr";
         StateDirectoryMode = "750";
@@ -219,7 +214,17 @@ in
     };
 
     ns.backups = {
-      prowlarr = mkArrBackup "prowlarr";
+      prowlarr = {
+        backend = "restic";
+        paths = [ "/var/lib/private/prowlarr/Backups" ];
+        restore = {
+          preRestoreScript = "sudo systemctl stop prowlarr";
+          pathOwnership."/var/lib/private/prowlarr" = {
+            user = "nobody";
+            group = "nogroup";
+          };
+        };
+      };
       qbittorrent-nox = {
         backend = "restic";
         paths = [ "/var/lib/qbittorrent-nox/qBittorrent/config" ];
@@ -248,9 +253,9 @@ in
         mode = "0750";
       }
       {
-        directory = "/var/lib/prowlarr";
-        user = "prowlarr";
-        group = "prowlarr";
+        directory = "/var/lib/private/prowlarr";
+        user = "nobody";
+        group = "nogroup";
         mode = "0750";
       }
     ];
@@ -326,15 +331,9 @@ in
       };
     };
 
-    users.groups.recyclarr = { };
-    users.users.recyclarr = {
-      group = "recyclarr";
-      isSystemUser = true;
-    };
-
     systemd.services.recyclarr =
       let
-        dataDir = "/var/lib/recyclarr";
+        dataDir = "/var/lib/private/recyclarr";
 
         templates = pkgs.runCommand "recyclarr-merged-templates" { } ''
           mkdir $out
@@ -390,9 +389,7 @@ in
         ];
 
         serviceConfig = hardeningBaseline config {
-          DynamicUser = false;
-          User = "recyclarr";
-          Group = "recyclarr";
+          DynamicUser = true;
           ExecStartPre = getExe (
             pkgs.writeShellApplication {
               name = "recyclarr-setup";
@@ -450,9 +447,9 @@ in
         mode = "0750";
       }
       {
-        directory = "/var/lib/recyclarr";
-        user = "recyclarr";
-        group = "recyclarr";
+        directory = "/var/lib/private/recyclarr";
+        user = "nobody";
+        group = "nogroup";
         mode = "0750";
       }
     ];

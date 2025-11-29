@@ -103,12 +103,6 @@ in
     "The DNS stack requires the device to have a router IP address set"
   ];
 
-  users.users.ctrld = {
-    group = "ctrld";
-    isSystemUser = true;
-  };
-  users.groups.ctrld = { };
-
   systemd.services.ctrld =
     let
       # Patch Ctrld to enable loading endpoints from environment variables
@@ -182,14 +176,6 @@ in
         RestartSec = 10;
         EnvironmentFile = config.age.secrets.ctrldEndpoint.path;
 
-        # WARN: Running as a custom user breaks the ctrld 'controlServer'
-        # because ctrld tries to write a socket file to /var/run. The
-        # 'controlServer' provides the ctrld start, stop, reload etc...
-        # commands. Since we are running ctrld in a systemd service we don't
-        # need these anyway and would prefer the extra security.
-        User = "ctrld";
-        Group = "ctrld";
-
         RestrictAddressFamilies = [
           "AF_UNIX"
           "AF_INET"
@@ -214,11 +200,6 @@ in
   networking.hosts = mapAttrs (_: v: [ v ]) homeHosts;
 
   # We don't use the upstream dnsmasq module because it isn't very good
-  users.users.dnsmasq = {
-    isSystemUser = true;
-    group = "dnsmasq";
-  };
-  users.groups.dnsmasq = { };
 
   # Disable systemd-resolved to simplify DNS stack
   ns.system.networking.resolved.enable = mkForce false;
@@ -325,11 +306,10 @@ in
 
       serviceConfig = hardeningBaseline config {
         ExecStartPre = "${dnsmasq} -C ${configFile} --test";
-        ExecStart = "${dnsmasq} -k --user=dnsmasq -C ${configFile}";
+        ExecStart = "${dnsmasq} -k -C ${configFile}";
         ExecReload = "${kill} -HUP $MAINPID";
         Restart = "always";
 
-        DynamicUser = false;
         PrivateUsers = false;
         RestrictAddressFamilies = [
           "AF_UNIX"

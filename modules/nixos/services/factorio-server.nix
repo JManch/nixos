@@ -11,7 +11,7 @@ in
     };
 
     interfaces = mkOption {
-      type = types.listOf types.str;
+      type = with types; listOf str;
       default = [ ];
       description = ''
         List of additional interfaces for the Factorio server to be exposed
@@ -39,32 +39,20 @@ in
     allowedUDPPorts = [ cfg.port ];
   });
 
-  users.users.factorio = {
-    group = "factorio";
-    isSystemUser = true;
-  };
-  users.groups.factorio = { };
-
-  systemd.services.factorio.serviceConfig = {
-    User = "factorio";
-    Group = "factorio";
-  };
-
   ns.backups.factorio-server = {
     backend = "restic";
     paths = [ "/var/lib/private/factorio-server" ];
     restore.pathOwnership = {
       "/var/lib/private/factorio-server" = {
-        user = "factorio";
-        group = "factorio";
+        user = "nobody";
+        group = "nogroup";
       };
     };
   };
 
   ns.persistence.directories = singleton {
     directory = "/var/lib/private/factorio-server";
-    user = "factorio";
-    group = "factorio";
-    mode = "0755";
+    user = "nobody";
+    group = "nogroup";
   };
 }

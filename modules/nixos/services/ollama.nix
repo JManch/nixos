@@ -22,13 +22,11 @@ in
 
   asserts = [
     (hostname == "ncase-m1")
-    "Ollama is only intended to work on host 'ncase-m1'"
+    "Ollama is only configured to work on host 'ncase-m1'"
   ];
 
   services.ollama = {
     enable = true;
-    user = "ollama";
-    group = "ollama";
     host = "0.0.0.0";
     port = 11434;
     acceleration = "rocm";
@@ -57,33 +55,24 @@ in
     };
   };
 
-  users.groups.open-webui = { };
-  users.users.open-webui = {
-    group = "open-webui";
-    isSystemUser = true;
+  networking.firewall = {
+    allowedTCPPorts = optional cfg.openFirewall 11111;
+    interfaces = genAttrs cfg.interfaces (_: {
+      allowedTCPPorts = [ 11111 ];
+    });
   };
-
-  systemd.services.open-webui.serviceConfig = {
-    User = "open-webui";
-    Group = "open-webui";
-  };
-
-  networking.firewall.allowedTCPPorts = optional cfg.openFirewall 11111;
-  networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
-    allowedTCPPorts = [ 11111 ];
-  });
 
   ns.persistence.directories = [
     {
       directory = "/var/lib/private/ollama";
-      user = "ollama";
-      group = "ollama";
+      user = "nobody";
+      group = "nogroup";
       mode = "0755";
     }
     {
       directory = "/var/lib/private/open-webui";
-      user = "open-webui";
-      group = "open-webui";
+      user = "nobody";
+      group = "nogroup";
       mode = "0755";
     }
   ];

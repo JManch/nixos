@@ -37,14 +37,6 @@ in
     };
   };
 
-  users.users.satisfactory = {
-    isSystemUser = true;
-    home = dataDir;
-    createHome = true;
-    group = "satisfactory";
-  };
-  users.groups.satisfactory = { };
-
   networking.firewall = {
     allowedUDPPorts = mkIf cfg.openFirewall [ cfg.port ];
     allowedTCPPorts = mkIf cfg.openFirewall [ cfg.port ];
@@ -59,9 +51,7 @@ in
     wantedBy = mkIf cfg.autoStart [ "multi-user.target" ];
     after = [ "network.target" ];
     serviceConfig = lib.${ns}.hardeningBaseline config {
-      User = "satisfactory";
-      Group = "satisfactory";
-      DynamicUser = false;
+      DynamicUser = true;
       ExecStartPre = "${steamcmd} +force_install_dir ${dataDir} +login anonymous +app_update 1690800 validate +quit";
       ExecStart = "${steam-run} ${dataDir}/FactoryServer.sh";
       StateDirectory = "satisfactory-server";
@@ -78,17 +68,17 @@ in
 
   ns.backups.satisfactory = {
     backend = "restic";
-    paths = [ "/var/lib/satisfactory-server/.config/Epic/FactoryGame/Saved/SaveGames" ];
-    restore.pathOwnership."/var/lib/satisfactory-server" = {
-      user = "satisfactory";
-      group = "satisfactory";
+    paths = [ "/var/lib/private/satisfactory-server/.config/Epic/FactoryGame/Saved/SaveGames" ];
+    restore.pathOwnership."/var/lib/private/satisfactory-server" = {
+      user = "nobody";
+      group = "nogroup";
     };
   };
 
   ns.persistence.directories = singleton {
-    directory = "/var/lib/satisfactory-server";
-    user = "satisfactory";
-    group = "satisfactory";
+    directory = "/var/lib/private/satisfactory-server";
+    user = "nobody";
+    group = "nogroup";
     mode = "0750";
   };
 }

@@ -34,15 +34,7 @@ in
     };
   };
 
-  users.users.mealie = {
-    group = "mealie";
-    isSystemUser = true;
-  };
-  users.groups.mealie = { };
-
   systemd.services.mealie.serviceConfig = lib.${ns}.hardeningBaseline config {
-    User = "mealie";
-    Group = "mealie";
     SystemCallFilter = [
       "@system-service"
       "~@privileged"
@@ -55,8 +47,8 @@ in
 
   ns.persistence.directories = singleton {
     directory = "/var/lib/private/mealie";
-    user = "mealie";
-    group = "mealie";
+    user = "nobody";
+    group = "nogroup";
     mode = "0755";
   };
 }

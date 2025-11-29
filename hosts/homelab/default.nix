@@ -62,6 +62,7 @@ in
       taskchampion-server.enable = true;
       air-vpn.confinement.enable = true;
       atuin-server.enable = true;
+      anki-sync-server.enable = true;
 
       silverbullet = {
         enable = true;

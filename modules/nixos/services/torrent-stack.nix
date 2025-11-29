@@ -390,6 +390,7 @@ in
 
         serviceConfig = hardeningBaseline config {
           DynamicUser = true;
+          LoadCredential = "recyclarr-secrets:${recyclarrSecrets.path}";
           ExecStartPre = getExe (
             pkgs.writeShellApplication {
               name = "recyclarr-setup";
@@ -399,7 +400,7 @@ in
               ];
               text = ''
                 install -m644 "${recyclarrConfig}" "${dataDir}"/recyclarr.yaml
-                install -m644 "${recyclarrSecrets.path}" "${dataDir}"/secrets.yaml
+                install -m644 "$CREDENTIALS_DIRECTORY/recyclarr-secrets" "${dataDir}"/secrets.yaml
                 sed 's/sonarr_api_key/!secret sonarr_api_key/' -i "${dataDir}"/recyclarr.yaml
                 sed 's/radarr_api_key/!secret radarr_api_key/' -i "${dataDir}"/recyclarr.yaml
                 ln -sf "${templates}"/includes -t "${dataDir}"

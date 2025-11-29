@@ -1200,11 +1200,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1763674931,
-        "narHash": "sha256-TBKiV0RxqsDWFDgBsJC7B7EOhgT2sy11N2lcB+tARn0=",
+        "lastModified": 1764378038,
+        "narHash": "sha256-hznM+FQSlNzCyVlDmXsLsy5ghopmmYO5PwhX742iPvw=",
         "owner": "JManch",
         "repo": "nix-resources",
-        "rev": "c7ab7ba076cefcf3f9155226160a50df023dbf67",
+        "rev": "db491fb16fb541a1d32520e37f72289dddeede7f",
         "type": "github"
       },
       "original": {

@@ -16,7 +16,6 @@ let
     getExe
     ;
   configFile = pkgs.writers.writeTOML "ServerConfig.toml" settings;
-  authenticationKeyFile = config.age.secrets.beammpAuthKey.path;
 
   # The map can be changed by editing ServerConfig.toml. The chosen map will
   # persist between rebuilds.
@@ -94,15 +93,17 @@ in
     wantedBy = mkIf cfg.autoStart [ "multi-user.target" ];
 
     serviceConfig = lib.${ns}.hardeningBaseline config {
+      LoadCredential = "auth-key-file:${config.age.secrets.beammpAuthKey.path}";
       ExecStartPre = getExe (
         pkgs.writeShellApplication {
           name = "beammp-server-pre-start";
           runtimeInputs = with pkgs; [
             tomlq
             gnused
+            gawk
           ];
           text = ''
-            conf="/var/lib/beammp-server/ServerConfig.toml"
+            conf="/var/lib/private/beammp-server/ServerConfig.toml"
             # Retain the map configured in the existing file to allow changing the
             # server's map without nix rebuilds
             if [ -f "$conf" ]; then
@@ -114,11 +115,11 @@ in
             if [ -v map ]; then
               sed -i "s/^Map.*/Map = \"\/levels\/$map\/info.json\"/" "$conf"
             fi
-            sed -i "s/^AuthKey.*/AuthKey = \"$(<${authenticationKeyFile})\"/" "$conf"
+            sed -i "s/^AuthKey.*/AuthKey = \"$(<"$CREDENTIALS_DIRECTORY/auth-key-file")\"/" "$conf"
           '';
         }
       );
-      ExecStart = "${getExe pkgs.${ns}.beammp-server} --working-directory=/var/lib/beammp-server";
+      ExecStart = "${getExe pkgs.${ns}.beammp-server} --working-directory=/var/lib/private/beammp-server";
       StateDirectory = "beammp-server";
 
       SystemCallFilter = [

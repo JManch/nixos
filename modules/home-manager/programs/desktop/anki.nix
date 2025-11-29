@@ -16,5 +16,10 @@
       [Service]
       TimeoutStopSec=10
     '';
+
+    desktop.hyprland.settings.windowrule = [
+      "match:class anki, match:float true, center true"
+      "match:class anki, match:title Browse.*, float true, size monitor_w*0.75 monitor_h*0.75, center true"
+    ];
   };
 }

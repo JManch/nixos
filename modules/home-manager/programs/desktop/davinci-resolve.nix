@@ -9,8 +9,13 @@
     ".local/state/DaVinciResolve"
   ];
 
-  ns.desktop.hyprland.settings.windowrule = [
-    "size 40% 40%, floating:1, class:^(resolve)$, title:negative:^(resolve|Message)$"
-    "center, floating:1, class:^(resolve)$, title:negative:^(resolve|Message)$"
-  ];
+  ns.desktop.hyprland.windowRules."davinci-resolve" = {
+    matchers = {
+      class = "resolve";
+      title = "negative:resolve|Message";
+      float = true;
+    };
+    params.size = "monitor_w*0.4 monitor_h*0.4";
+    params.center = true;
+  };
 }

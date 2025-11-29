@@ -12,7 +12,6 @@ let
     all
     mapAttrs
     mapAttrs'
-    getExe
     attrNames
     mkVMOverride
     toUpper
@@ -20,7 +19,6 @@ let
     optionalString
     concatMapStrings
     nameValuePair
-    concatMapStringsSep
     genAttrs
     singleton
     mkOption
@@ -31,7 +29,6 @@ let
   inherit (lib.${ns}) hardeningBaseline;
   inherit (inputs.nix-resources.secrets) fqDomain;
   inherit (config.age.secrets) caddyPorkbunVars;
-  inherit (config.${ns}.system.virtualisation) vmVariant;
 
   generateCerts =
     let
@@ -113,15 +110,6 @@ in
       description = ''
         Caddy fail2ban filter addresses to trust in addition to trusted
         addresses. Does not affect virtual host access.
-      '';
-    };
-
-    goAccessExcludeIPRanges = mkOption {
-      type = with types; listOf str;
-      default = [ ];
-      description = ''
-        List of address ranges excluded from go access using their strange
-        format.
       '';
     };
 
@@ -240,17 +228,6 @@ in
     ) config.${ns}.services.caddy.virtualHosts;
   };
 
-  ns.services.caddy.virtualHosts.logs.extraConfig = ''
-    root * /var/lib/goaccess/
-    file_server * browse
-
-    @websockets {
-      header Connection *Upgrade*
-      header Upgrade websocket
-    }
-    reverse_proxy @websockets http://127.0.0.1:7890
-  '';
-
   networking.firewall.allowedUDPPorts = [ 443 ];
   networking.firewall.allowedTCPPorts = [
     443
@@ -282,49 +259,6 @@ in
       80
     ];
   };
-
-  systemd.services.goaccess =
-    let
-      runGoAccess = pkgs.writeShellScript "run-caddy-goaccess" ''
-        # Get list of all caddy access logs
-        logs=""
-        # shellcheck disable=SC2044
-        for file in $(${getExe pkgs.findutils} "/var/log/caddy" -type f -name "*.${fqDomain}.log"); do
-          logs+=" $file"
-        done
-
-        exec ${getExe pkgs.goaccess} $logs \
-          --log-format=CADDY \
-          --real-time-html \
-          --ws-url=logs.${fqDomain}:${if vmVariant then "50080" else "443"} \
-          --port=7890 \
-          --real-os \
-          ${concatMapStringsSep " " (ip: "--exclude-ip ${ip}") cfg.goAccessExcludeIPRanges} \
-          -o /var/lib/goaccess/index.html
-      '';
-    in
-    {
-      description = "GoAccess";
-      partOf = [ "caddy.service" ];
-      after = [
-        "caddy.service"
-        "network.target"
-      ];
-      wantedBy = [ "caddy.service" ];
-      startLimitBurst = 3;
-      startLimitIntervalSec = 30;
-
-      serviceConfig = hardeningBaseline config {
-        DynamicUser = false;
-        ExecStart = runGoAccess.outPath;
-        Restart = "on-failure";
-        RestartSec = 10;
-        User = "caddy";
-        Group = "caddy";
-        StateDirectory = [ "goaccess" ];
-        StateDirectoryMode = "0750";
-      };
-    };
 
   services.fail2ban.jails.caddy-status = {
     enabled = true;

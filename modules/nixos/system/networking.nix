@@ -414,17 +414,29 @@ in
     };
   };
 
-  programs.zsh.shellAliases = mkMerge [
-    (mkIf cfg.wireless.enable {
-      wifi-up = "sudo ${rfkill} unblock wifi";
-      wifi-down = "sudo ${rfkill} block wifi";
-    })
+  programs.zsh = {
+    shellAliases = mkMerge [
+      (mkIf cfg.wireless.enable {
+        wifi-up = "sudo ${rfkill} unblock wifi";
+        wifi-down = "sudo ${rfkill} block wifi";
+      })
 
-    (mkIf (cfg.wiredInterface != null) {
-      ethernet-up = "sudo ${ip} link set ${cfg.wiredInterface} up";
-      ethernet-down = "sudo ${ip} link set ${cfg.wiredInterface} down";
-    })
-  ];
+      (mkIf (cfg.wiredInterface != null) {
+        ethernet-up = "sudo ${ip} link set ${cfg.wiredInterface} up";
+        ethernet-down = "sudo ${ip} link set ${cfg.wiredInterface} down";
+      })
+    ];
+
+    interactiveShellInit = # bash
+      ''
+        open-captive-portal() {
+          echo "May have to manually switch DNS servers to the public wifi's DNS with \`resolvectl dns <interface> <dns_ip>\`"
+          echo "Remember to turn off VPNs"
+          echo "Opening 'http://captive.apple.com' in an attempt to force a captive portal redirect..."
+          xdg-open http://captive.apple.com >/dev/null
+        }
+      '';
+  };
 
   boot = {
     kernelModules = optional cfg.tcpOptimisations "tcp_bbr";

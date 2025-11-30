@@ -514,7 +514,7 @@ in
 
       optimise = {
         automatic = true;
-        dates = [ "Mon *-*-* 1:00:00" ];
+        dates = "Mon *-*-* 1:00:00";
       };
     };
 

@@ -23,7 +23,7 @@ let
     optional
     hiPrio
     ;
-  inherit (lib.${ns}) wrapHyprlandMoveToActive mkHyprlandCenterFloatRule;
+  inherit (lib.${ns}) wrapHyprlandMoveToActive mkHyprlandCenterFloatRule throttleHyprlandRepeatBind;
   inherit (config.${ns}.core) home-manager device;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.hardware) raspberry-pi;
@@ -279,6 +279,7 @@ in
         '';
 
         modifyVolume = pkgs.writeShellScript "modify-volume" ''
+          ${throttleHyprlandRepeatBind "volume" 10}
           ${wpctl} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "$1"
           output=$(${wpctl} get-volume @DEFAULT_AUDIO_SINK@)
           volume=$(echo "$output" | ${getExe pkgs.gawk} '{print $2}')

@@ -353,7 +353,7 @@ in
         sensitivity = 0;
 
         kb_layout = "us";
-        repeat_delay = 500;
+        repeat_delay = 200;
         repeat_rate = 30;
 
         tablet = {

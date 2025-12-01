@@ -2,6 +2,7 @@
   lib,
   cfg,
   pkgs,
+  args,
   config,
   osConfig,
   vmVariant,
@@ -16,7 +17,7 @@ let
     flatten
     concatMapStringsSep
     ;
-  inherit (lib.${ns}) getMonitorHyprlandCfgStr;
+  inherit (lib.${ns}) throttleHyprlandRepeatBind getMonitorHyprlandCfgStr;
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.core) device;
   mod = cfg.modKey;
@@ -201,6 +202,7 @@ let
   '';
 
   modifyBrightness = pkgs.writeShellScript "hypr-modify-brightness" ''
+    ${throttleHyprlandRepeatBind "brightness" 10}
     ${brightnessctl} set -e4 "$1"
     brightness=$(${brightnessctl} get --percentage)
     ${notifySend} --urgency=low -t 2000 \

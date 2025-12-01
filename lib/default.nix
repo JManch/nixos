@@ -23,6 +23,7 @@ let
     hasPrefix
     hasSuffix
     mkBefore
+    assertMsg
     ;
   sources = import ../npins;
 in
@@ -335,7 +336,7 @@ in
 
     revDisableCondition =
       name: rev:
-      assert lib.assertMsg (self.inputs.nixpkgs.rev == rev) "Module ${name} can be re-enabled";
+      assert assertMsg (self.inputs.nixpkgs.rev == rev) "Module ${name} can be re-enabled";
       false;
 
     mkHyprlandCenterFloatRule = class: widthPercentage: heightPercentage: {
@@ -346,5 +347,18 @@ in
         center = true;
       };
     };
+
+    throttleHyprlandRepeatBind =
+      name: targetRepeatRate:
+      # bash
+      ''
+        # Use /dev/shm to ensure that it'll use tmpfs
+        throttle_timestamp="/dev/shm/hypr-throttle-${name}"
+        throttle_current_time=$(date +%s%N)
+        throttle_last_time=$(<"$throttle_timestamp") 2>/dev/null || throttle_last_time=0
+        throttle_diff=$((throttle_current_time - throttle_last_time))
+        [[ $throttle_diff -lt ${toString (1000000000 / targetRepeatRate)} ]] && exit 0
+        echo "$throttle_current_time" > "$throttle_timestamp"
+      '';
   };
 }

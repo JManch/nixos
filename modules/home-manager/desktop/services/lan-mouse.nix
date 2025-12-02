@@ -87,8 +87,8 @@ in
       # https://github.com/feschber/lan-mouse/issues/260
       "${modKey}SHIFTCONTROL, Left, exec, ${wlrctl} pointer move 10 0; ${wlrctl} pointer move -10000 0"
       "${modKey}SHIFTCONTROL, Right, exec, ${wlrctl} pointer move -10 0; ${wlrctl} pointer move 10000 0"
-      "${modKey}SHIFTCONTROL, Up, exec, ${wlrctl} pointer move 0 -10; ${wlrctl} pointer move 0 10000"
-      "${modKey}SHIFTCONTROL, Down, exec, ${wlrctl} pointer move 0 10; ${wlrctl} pointer move 0 -10000"
+      "${modKey}SHIFTCONTROL, Up, exec, ${wlrctl} pointer move 0 10; ${wlrctl} pointer move 0 -10000"
+      "${modKey}SHIFTCONTROL, Down, exec, ${wlrctl} pointer move 0 -10; ${wlrctl} pointer move 0 10000"
     ];
 
   ns.desktop.hyprland.windowRules."lan-mouse" =

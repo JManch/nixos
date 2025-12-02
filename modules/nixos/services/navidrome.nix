@@ -11,29 +11,18 @@
 # - Press 'Write Changes'
 {
   lib,
-  cfg,
   args,
   pkgs,
   config,
 }:
 let
-  inherit (lib) ns optionalString hasPrefix;
-  inherit (config.${ns}.system) impermanence;
+  inherit (lib) ns;
+  inherit (config.${ns}.hardware.file-system) mediaDir;
   inherit (config.age.secrets) navidromeVars;
+  musicDir = mediaDir + "/music";
 in
 {
-  opts.musicDir =
-    with lib;
-    mkOption {
-      type = types.str;
-      description = "Absolute path to music library";
-    };
-
   requirements = [ "services.caddy" ];
-  asserts = [
-    (!hasPrefix "/persist" cfg.musicDir)
-    "Navidrome music dir should NOT be prefixed with /persist"
-  ];
 
   services.navidrome = {
     enable = true;
@@ -42,7 +31,7 @@ in
 
     settings = {
       Address = "127.0.0.1";
-      MusicFolder = (optionalString impermanence.enable "/persist") + cfg.musicDir;
+      MusicFolder = musicDir;
       Scanner.Enabled = false; # would rather manually trigger scans
       EnableInsightsCollector = false;
       ListenBrainz.Enabled = true;

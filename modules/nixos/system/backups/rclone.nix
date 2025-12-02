@@ -33,7 +33,6 @@ let
     concatMapStrings
     filterAttrs
     ;
-  inherit (config.${ns}.system) impermanence;
   backups = filterAttrs (_: backup: backup.backend == "rclone") categoryCfg.backups;
 in
 [
@@ -244,11 +243,9 @@ in
             else
               mapAttrs' (
                 name: value:
-                nameValuePair (
-                  optionalString impermanence.enable "/persist"
-                  + optionalString args.backupConfig.isHome "/home/${username}/"
-                  + name
-                ) value
+                nameValuePair (lib.${ns}.impermanencePrefix config (
+                  optionalString args.backupConfig.isHome "/home/${username}/" + name
+                )) value
               );
           description = ''
             Attribute set of paths and their remote backup paths relative to the

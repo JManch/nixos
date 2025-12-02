@@ -154,7 +154,6 @@
         openFirewall = true;
         autoStart = false;
         backup = false;
-        mediaDirs.shows = "/home/${username}/videos/shows";
       };
 
       wgnord = {

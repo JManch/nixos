@@ -18,22 +18,14 @@ let
     optional
     mkForce
     genAttrs
-    attrNames
-    attrValues
-    mapAttrsToList
-    optionalString
     singleton
-    length
-    hasPrefix
-    splitString
     concatLines
-    all
     mkEnableOption
     types
     mkOption
     ;
-  inherit (config.${ns}.system) impermanence;
-  inherit (config.${ns}.services) torrent-stack;
+  inherit (config.${ns}.services) arr-stack;
+  inherit (config.${ns}.hardware.file-system) mediaDir;
   inherit (config.services) jellyfin;
 in
 [
@@ -85,20 +77,6 @@ in
         '';
       };
 
-      mediaDirs = mkOption {
-        type = types.attrsOf types.str;
-        default = { };
-        example = {
-          shows = "/home/joshua/videos/shows";
-          movies = "/home/joshua/videos/movies";
-        };
-        description = ''
-          Attribute set of media directories that will be bind mount to
-          /var/lib/jellyfin/media. Attribute name is target bind path relative
-          to media dir and value is absolute source dir.
-        '';
-      };
-
       jellyseerr = {
         enable = mkEnableOption "Jellyseerr behind a reverse proxy";
 
@@ -120,12 +98,8 @@ in
     };
 
     asserts = [
-      (all (n: n != "") (attrNames cfg.mediaDirs))
-      "Jellyfin media dir target cannot be empty"
-      (all (n: (length (splitString "/" n)) == 1) (attrNames cfg.mediaDirs))
-      "Jellyfin media dir target cannot be a subdir"
-      (all (n: !hasPrefix "/persist" n) (attrValues cfg.mediaDirs))
-      "Jellyfin media dirs should NOT be prefixed with /persist"
+      (mediaDir != null)
+      "Jellyfin requires 'mediaDir' to be set"
     ];
 
     services.jellyfin = {
@@ -146,6 +120,7 @@ in
           '';
 
       serviceConfig = {
+        SupplementaryGroups = [ "media" ];
         StateDirectory = "jellyfin";
         CacheDirectory = "jellyfin";
         StateDirectoryMode = "0700";
@@ -153,20 +128,6 @@ in
       };
       wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
     };
-
-    systemd.mounts = mapAttrsToList (target: source: {
-      what = (optionalString impermanence.enable "/persist") + source;
-      where = "/var/lib/jellyfin/media/${target}";
-      bindsTo = [ "jellyfin.service" ];
-      requiredBy = [ "jellyfin.service" ];
-      before = [ "jellyfin.service" ];
-      options = "bind,ro";
-      mountConfig.DirectoryMode = "0700";
-    }) cfg.mediaDirs;
-
-    systemd.tmpfiles.rules = [
-      "d /var/lib/jellyfin/media 0700 jellyfin jellyfin - -"
-    ];
 
     networking.firewall.interfaces = genAttrs cfg.interfaces (_: {
       allowedTCPPorts = [
@@ -230,7 +191,7 @@ in
 
   (mkIf cfg.jellyseerr.enable {
     asserts = [
-      (cfg.enable && torrent-stack.video.enable)
+      (cfg.enable && arr-stack.enable)
       "Jellyseerr requires Jellyfin and the video torrent stack to be enabled"
     ];
 

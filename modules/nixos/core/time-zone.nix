@@ -47,7 +47,7 @@ in
       let
         # Activation runs in initrd before impermanence bind mounts so we need
         # to use persist path
-        coordsDir = optionalString impermanence.enable "/persist" + "/etc/coordinates";
+        coordsDir = lib.${ns}.impermanencePrefix config "/etc/coordinates";
       in
       # bash
       ''

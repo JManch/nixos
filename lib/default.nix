@@ -360,5 +360,12 @@ in
         [[ $throttle_diff -lt ${toString (1000000000 / targetRepeatRate)} ]] && exit 0
         echo "$throttle_current_time" > "$throttle_timestamp"
       '';
+
+    impermanencePrefix =
+      config: path:
+      assert assertMsg (
+        !hasPrefix "/persist" path
+      ) "Path '${path}' was manually prefixed with /persist, this is not allowed";
+      (optionalString config.${ns}.system.impermanence.enable "/persist") + path;
   };
 }

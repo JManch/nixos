@@ -1,13 +1,9 @@
 {
   lib,
   pkgs,
-  config,
   inputs,
+  config,
 }:
-let
-  inherit (lib) mkForce optionalString;
-  inherit (config.${lib.ns}.system) impermanence;
-in
 {
   # Requires manual initial setup
   # https://github.com/nix-community/lanzaboote/blob/master/docs/QUICK_START.md
@@ -25,11 +21,11 @@ in
   # NOTE: Lanzaboote replaces systemd-boot with it's own systemd-boot which
   # is configured here. Lanzaboote inherits most config from the standard
   # systemd-boot configuration.
-  boot.loader.systemd-boot.enable = mkForce false;
+  boot.loader.systemd-boot.enable = lib.mkForce false;
 
   boot.lanzaboote = {
     enable = true;
-    pkiBundle = "${optionalString impermanence.enable "/persist"}/var/lib/sbctl";
+    pkiBundle = lib.${lib.ns}.impermanencePrefix config "/var/lib/sbctl";
   };
 
   ns.persistence.directories = [ "/var/lib/sbctl" ];

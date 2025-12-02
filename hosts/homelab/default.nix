@@ -45,7 +45,12 @@ in
         extendedLoaderTimeout = true;
         zfs.trim = true;
         zfs.encryption.passphraseCred = inputs.nix-resources.secrets.zfsPassphrases.homelab;
+        mediaDir = "/media";
       };
+    };
+
+    profiles = {
+      music.enable = true;
     };
 
     services = {
@@ -63,6 +68,8 @@ in
       air-vpn.confinement.enable = true;
       atuin-server.enable = true;
       anki-sync-server.enable = true;
+      arr-stack.enable = true;
+      qbittorrent-nox.enable = true;
 
       silverbullet = {
         enable = true;
@@ -96,12 +103,6 @@ in
           "10.20.20.0/24"
           "10.0.0.2/32" # NCASE-M1 on friends VPN
         ];
-      };
-
-      torrent-stack = {
-        video.enable = true;
-        music.enable = true;
-        mediaDir = "/media";
       };
 
       dns-stack = {
@@ -223,11 +224,6 @@ in
           "10.30.30.6/32"
           "${address}/${toString subnet}"
         ];
-      };
-
-      navidrome = {
-        enable = true;
-        musicDir = "/media/music";
       };
 
       beammp-server = {

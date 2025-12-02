@@ -13,6 +13,7 @@
   pkgs,
   config,
   inputs,
+  username,
   hostname,
 }:
 let
@@ -26,11 +27,12 @@ let
     unique
     splitString
     getExe
+    mkBefore
+    head
     getExe'
     mkForce
     listToAttrs
     singleton
-    optionalString
     replaceStrings
     mkEnableOption
     mkOption
@@ -39,8 +41,9 @@ let
     hasAttr
     any
     attrValues
+    assertMsg
+    stringToCharacters
     ;
-  inherit (config.${ns}.system) impermanence;
   inherit (config.${ns}.hardware) raspberry-pi;
 in
 [
@@ -123,6 +126,25 @@ in
             description = "Size of swap file in megabytes";
           };
         };
+
+      mediaDir = mkOption {
+        type = with types; nullOr str;
+        default = null;
+        example = "/data/media";
+        apply =
+          path:
+          if (path != null) then
+            assert assertMsg (path != "" && path != "/") "Media dir must not be empty or root";
+            assert assertMsg (head (stringToCharacters path) == "/") "Media dir must be an absolute path";
+            lib.${ns}.impermanencePrefix config path
+          else
+            null;
+        description = ''
+          Absolute path to directory where media will be stored on this host.
+          The directory along with movies, shows, books and music
+          subdirectories are automatically created if the value is not null.
+        '';
+      };
     };
 
     asserts = [
@@ -134,7 +156,7 @@ in
 
     zramSwap.enable = true;
     swapDevices = mkIf cfg.swap.enable (singleton {
-      device = "${optionalString impermanence.enable "/persist"}/var/lib/swapfile";
+      device = lib.${ns}.impermanencePrefix config "/var/lib/swapfile";
       size = cfg.swap.size;
     });
 
@@ -156,6 +178,19 @@ in
 
     programs.zsh.shellAliases = {
       boot-bios = "systemctl reboot --firmware-setup";
+    };
+
+    systemd.tmpfiles.rules = mkIf (cfg.mediaDir != null) (mkBefore [
+      "d ${cfg.mediaDir} 0770 root media - -"
+      "d ${cfg.mediaDir}/movies 0775 root media - -"
+      "d ${cfg.mediaDir}/shows 0775 root media - -"
+      "d ${cfg.mediaDir}/books 0775 root media - -"
+      "d ${cfg.mediaDir}/music 0775 root media - -"
+    ]);
+
+    users = mkIf (cfg.mediaDir != null) {
+      users.${username}.extraGroups = [ "media" ];
+      groups.media = { };
     };
   }
 

@@ -50,7 +50,7 @@ in
 
     noShiftR = mkOption {
       type = types.bool;
-      default = false;
+      default = osConfig.${ns}.hardware.keyd.hhkbArrowLayer;
       description = ''
         Whether to only use Shift_L binds instead of Shift_R. Useful on hosts
         where Shift_R doesn't work if keyd is used for example.

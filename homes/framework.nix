@@ -99,7 +99,6 @@
         gaming = {
           mangohud = {
             enable = true;
-            noShiftR = true;
             cpuName = "HX 370";
             gpuName = "890M";
           };

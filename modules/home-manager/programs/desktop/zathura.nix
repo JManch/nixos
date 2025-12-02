@@ -48,9 +48,13 @@ in
       database = "null"; # don't store history
     };
     mappings = {
-      # Map smooth scroll to j and k
-      "j feedkeys" = "<C-Down>";
-      "k feedkeys" = "<C-Up>";
+      "j" = "navigate next";
+      "k" = "navigate previous";
+
+      # Map smooth scroll to J and K
+      "J feedkeys" = "<C-Down>";
+      "K feedkeys" = "<C-Up>";
+
       # Toggle dark theme
       "<C-l>" = "recolor";
     };

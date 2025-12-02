@@ -91,10 +91,8 @@ in
       sub-auto = "fuzzy";
 
       # Screenshots
-      screenshot-format = "webp";
-      screenshot-webp-lossless = true;
+      screenshot-format = "png";
       screenshot-high-bit-depth = true;
-      screenshot-sw = false;
       screenshot-directory = "${config.xdg.userDirs.pictures}/screenshots/mpv";
       screenshot-template = "%f-%wH.%wM.%wS.%wT-#%#00n";
     };

@@ -19,6 +19,15 @@ let
     ;
   # https://discourse.nixos.org/t/not-allowed-to-refer-to-a-store-path-error/5226
   lockerName = builtins.unsafeDiscardStringContext (builtins.baseNameOf (getExe cfg.package));
+  toggleLockInhibit = pkgs.writeShellScript "toggle-lock-inhibit" ''
+    systemctl is-active --quiet --user inhibit-lock && {
+      systemctl stop --quiet --user inhibit-lock
+      ${getExe pkgs.libnotify} -e --urgency=critical -t 2000 'Locker' 'Locking uninhibited'
+    } || {
+      systemctl start --quiet --user inhibit-lock
+      ${getExe pkgs.libnotify} -e --urgency=critical -t 2000 'Locker' 'Locking inhibited'
+    }
+  '';
 in
 {
   enableOpt = false;
@@ -145,16 +154,6 @@ in
   wayland.windowManager.hyprland.settings.bind =
     let
       inherit (config.${ns}.desktop.hyprland) modKey;
-      notifySend = getExe pkgs.libnotify;
-      toggleLockInhibit = pkgs.writeShellScript "toggle-lock-inhibit" ''
-        systemctl is-active --quiet --user inhibit-lock && {
-          systemctl stop --quiet --user inhibit-lock
-          ${notifySend} -e --urgency=low -t 2000 'Locker' 'Locking uninhibited'
-        } || {
-          systemctl start --quiet --user inhibit-lock
-          ${notifySend} -e --urgency=low -t 2000 'Locker' 'Locking inhibited'
-        }
-      '';
     in
     [
       "${modKey}, U, exec, ${toggleLockInhibit}"
@@ -168,6 +167,7 @@ in
       exec = ''systemctl is-active --quiet --user inhibit-lock && echo -n "Inhibited" || echo -n ""'';
       interval = 30;
       tooltip = false;
+      on-click-right = toggleLockInhibit;
     };
   };
 }

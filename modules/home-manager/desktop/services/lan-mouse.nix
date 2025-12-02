@@ -16,9 +16,12 @@ let
     filterAttrs
     mapAttrsToList
     mkOption
+    elem
     types
     nameValuePair
     mkBefore
+    optionalAttrs
+    hasAttr
     ;
   inherit (lib.${ns})
     hostIps
@@ -40,9 +43,34 @@ let
   ) inputs.nix-resources.secrets.lanMouseAuthorizedFingerprints;
 in
 {
-  opts.port = mkOption {
-    type = types.port;
-    default = 4242;
+  opts = {
+    port = mkOption {
+      type = types.port;
+      default = 4242;
+    };
+
+    defaultHosts = mkOption {
+      type = with types; listOf str;
+      default = [ ];
+      description = "Others hosts to activate on start-up.";
+    };
+
+    defaultPositions = mkOption {
+      type =
+        with types;
+        nullOr (
+          attrsOf (enum [
+            "left"
+            "right"
+            "top"
+            "bottom"
+          ])
+        );
+      example = {
+        "ncase-m1" = "right";
+      };
+      description = "Default position of other hosts relative to this host.";
+    };
   };
 
   home.packages = [
@@ -69,10 +97,19 @@ in
 
     authorized_fingerprints = mapAttrs' (h: fingerprint: nameValuePair fingerprint h) otherFingerprints;
 
-    clients = mapAttrsToList (h: _: {
-      hostname = h;
-      ips = hostIps h;
-    }) otherFingerprints;
+    clients = mapAttrsToList (
+      h: _:
+      {
+        hostname = h;
+        ips = hostIps h;
+      }
+      // optionalAttrs (cfg.defaultPositions != null && hasAttr h cfg.defaultPositions) {
+        position = cfg.defaultPositions.${h};
+      }
+      // optionalAttrs (elem h cfg.defaultHosts) {
+        activate_on_startup = true;
+      }
+    ) otherFingerprints;
   };
 
   ns.firewall.allowedUDPPorts = [ cfg.port ];

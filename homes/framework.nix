@@ -42,7 +42,12 @@
         hyprpaper.enable = true;
         darkman.enable = true;
         poweralertd.chargeThreshold = 80;
-        lan-mouse.enable = true;
+
+        lan-mouse = {
+          enable = true;
+          defaultHosts = [ "ncase-m1" ];
+          defaultPositions."ncase-m1" = "top";
+        };
 
         waybar = {
           enable = true;

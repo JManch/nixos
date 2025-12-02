@@ -34,7 +34,12 @@
         wayvnc.enable = true;
         swww.enable = true;
         hyprsunset.enable = true;
-        lan-mouse.enable = true;
+
+        lan-mouse = {
+          enable = true;
+          defaultHosts = [ "framework" ];
+          defaultPositions."framework" = "bottom";
+        };
 
         wallpaper = {
           randomise.enable = true;

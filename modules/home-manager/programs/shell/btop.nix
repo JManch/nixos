@@ -9,13 +9,17 @@ let
   inherit (lib) ns concatStringsSep optionalString;
   inherit (osConfig.${ns}) persistence;
   inherit (osConfig.${ns}.core) device;
-
   themePath = "btop/themes/custom.theme";
+
   package = lib.${ns}.wrapAlacrittyOpaque args (
-    pkgs.btop.override {
-      cudaSupport = device.gpu.type == "nvidia";
-      rocmSupport = device.gpu.type == "amd";
-    }
+    if (osConfig != null) then
+      # Create a derivation wrapping the set-cap wrapper so that we can pass it
+      # to our wrapAlacrittyOpague function
+      pkgs.writeShellScriptBin "btop" ''
+        exec /run/wrappers/bin/setcap-btop "$@"
+      ''
+    else
+      pkgs.btop
   );
 in
 {

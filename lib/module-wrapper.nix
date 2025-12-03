@@ -129,6 +129,9 @@ let
     # For example, conditions = [ "osConfig.programs.desktop.gaming"
     # "programs.alacritty" ]; would pass if `osConfig.${ns}.programs.desktop.gaming.enable`
     # and `${ns}.programs.alacritty.enable` are enabled
+    #
+    # Also supports a "hmConfig" prefix in NixOS modules which ensures that
+    # home-manager is enabled for the condition to evaluate to `true`.
     conditions = [ ];
 
     # List of strings in the same form as conditions. An assertion is created
@@ -491,6 +494,21 @@ in
               !hasPrefix "osConfigStrict" condition
             else
               getAttrFromPath ([ ns ] ++ (tail (splitString "." condition)) ++ [ "enable" ]) args.osConfig
+          else if hasPrefix "hmConfig" condition then
+            if isHomeManager then
+              throw "${throwMsg} contains a condition using 'hmConfig'. This is only supported in NixOS modules."
+            else if !args.config.${ns}.core.home-manager.enable then
+              false # might want to add a hmConfigStrict variant
+            else
+              getAttrFromPath (
+                [
+                  ns
+                  "hm"
+                  ns
+                ]
+                ++ (tail (splitString "." condition))
+                ++ [ "enable" ]
+              ) args.config
           else
             getAttrFromPath ([ ns ] ++ (splitString "." condition) ++ [ "enable" ]) args.config
         else if isBool condition then

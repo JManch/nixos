@@ -29,7 +29,7 @@ let
   inherit (config.${ns}.hardware) raspberry-pi;
   wpctl = getExe' pkgs.wireplumber "wpctl";
   pactl = getExe' pkgs.pulseaudio "pactl";
-  notifySend = getExe pkgs.libnotify;
+  notify-send = getExe pkgs.libnotify;
 in
 [
   {
@@ -262,7 +262,7 @@ in
           # @DEFAULT_AUDIO_SOURCE@ can resolve to a sink if no sources exist
           # https://gitlab.freedesktop.org/pipewire/wireplumber/-/issues/509
           if [[ "Audio/''${class^}" != $(echo "$inspect_data" | grep 'media\.class' | cut -d '"' -f 2) ]]; then
-            ${notifySend} -e -u critical -t 2000 \
+            ${notify-send} --transient -u critical -t 2000 \
               -h 'string:x-canonical-private-synchronous:pipewire-volume' 'Toggle Mute' "''${class^} device does not exist"
             exit 0
           fi
@@ -274,7 +274,7 @@ in
             message="Microphone $message"
           fi
           description=$(echo "$inspect_data" | grep 'node\.description' | cut -d '"' -f 2)
-          ${notifySend} -e -u critical -t 2000 \
+          ${notify-send} --transient -u critical -t 2000 \
             -h 'string:x-canonical-private-synchronous:pipewire-volume' "$description" "$message"
         '';
 
@@ -285,7 +285,7 @@ in
           volume=$(echo "$output" | ${getExe pkgs.gawk} '{print $2}')
           percentage="$(echo "$volume * 100" | ${getExe pkgs.bc})"
           description=$(${wpctl} inspect @DEFAULT_AUDIO_SINK@ | grep 'node\.description' | cut -d '"' -f 2)
-          ${notifySend} --urgency=low -t 2000 \
+          ${notify-send} --urgency=low -t 2000 \
             -h 'string:x-canonical-private-synchronous:pipewire-volume' "$description" "Volume ''${percentage%.*}%"
         '';
 
@@ -294,7 +294,7 @@ in
           node=$(${getExe' pkgs.pipewire "pw-dump"} | ${jaq} -r \
             "[.[] | select((.type == \"PipeWire:Interface:Node\") and (.info?.props?[\"application.process.id\"]? == "$pid"))] | sort_by(if .info?.state? == \"running\" then 0 else 1 end) | first")
           if [ "$node" == "null" ]; then
-            ${notifySend} -e --urgency=critical -t 2000 \
+            ${notify-send} --transient --urgency=critical -t 2000 \
               'Pipewire' "Active window does not have an interface node"
             exit 1
           fi
@@ -307,7 +307,7 @@ in
           output=$(${wpctl} get-volume "$id")
           volume=''${output#Volume: }
           percentage="$(echo "$volume * 100" | ${getExe pkgs.bc})"
-          ${notifySend} -e --urgency=low -t 2000 \
+          ${notify-send} --transient --urgency=low -t 2000 \
             -h 'string:x-canonical-private-synchronous:pipewire-volume' "''${name^} - $media" "Volume ''${percentage%.*}%"
         '';
       in

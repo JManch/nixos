@@ -70,6 +70,7 @@ in
   ns.desktop.hyprland.settings =
     let
       inherit (config.${ns}.desktop.hyprland) modKey;
+      notify-send = getExe pkgs.libnotify;
 
       modifyGamma = pkgs.writeShellScript "hypr-modify-gamma" ''
         current=$(hyprctl hyprsunset gamma)
@@ -82,25 +83,25 @@ in
         }')
         # Not using the hyprsunset increment/decrement functionality because it has rounding issues
         hyprctl hyprsunset gamma "$new"
-        ${getExe pkgs.libnotify} --urgency=low -t 2000 \
+        ${notify-send} --transient --urgency=low -t 2000 \
           -h 'string:x-canonical-private-synchronous:hyprsunset' "Hyprsunset" "Gamma $new%"
       '';
 
       resetGamma = pkgs.writeShellScript "hypr-reset-gamma" ''
         hyprctl hyprsunset reset gamma
-        ${getExe pkgs.libnotify} --urgency=low -t 2000 \
+        ${notify-send} --transient --urgency=low -t 2000 \
           -h 'string:x-canonical-private-synchronous:hyprsunset' "Hyprsunset" "Gamma reset to $(hyprctl hyprsunset gamma)%"
       '';
 
       modifyTemperature = pkgs.writeShellScript "hypr-modify-temperature" ''
         hyprctl hyprsunset temperature "$1"
-        ${getExe pkgs.libnotify} --urgency=low -t 2000 \
+        ${notify-send} --transient --urgency=low -t 2000 \
           -h 'string:x-canonical-private-synchronous:hyprsunset' "Hyprsunset" "Temperature $(hyprctl hyprsunset temperature)K"
       '';
 
       resetTemperature = pkgs.writeShellScript "hypr-reset-temperature" ''
         hyprctl hyprsunset reset temperature
-        ${getExe pkgs.libnotify} --urgency=low -t 2000 \
+        ${notify-send} --transient --urgency=low -t 2000 \
           -h 'string:x-canonical-private-synchronous:hyprsunset' "Hyprsunset" "Temperature reset to $(hyprctl hyprsunset temperature)K"
       '';
 

@@ -2,7 +2,6 @@
   lib,
   cfg,
   pkgs,
-  args,
   config,
   osConfig,
   vmVariant,
@@ -38,7 +37,7 @@ let
         new_value=$(($(${hyprctl} getoption -j dwindle:no_gaps_when_only | ${jaq} -r '.int') ^ 1))
         ${hyprctl} keyword dwindle:no_gaps_when_only $new_value
         message=$([[ $new_value == "1" ]] && echo "Dwindle gaps disabled" || echo "Dwindle gaps enabled")
-        ${notifySend} -e --urgency=low -t 2000 -h \
+        ${notifySend} --transient --urgency=low -t 2000 -h \
           'string:x-canonical-private-synchronous:hypr-dwindle-gaps' 'Hyprland' "$message"
       '';
 
@@ -55,10 +54,10 @@ let
   toggleAnimations = pkgs.writeShellScript "hypr-toggle-animations" ''
     if [[ $(${hyprctl} getoption -j animations:enabled | ${jaq} -r '.int') == "1" ]]; then
       hyprctl keyword animations:enabled false
-      ${notifySend} -e --urgency=low -t 2000 'Hyprland' 'Animations disabled'
+      ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Animations disabled'
     else
       hyprctl keyword animations:enabled true
-      ${notifySend} -e --urgency=low -t 2000 'Hyprland' 'Animations enabled'
+      ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Animations enabled'
     fi
   '';
 
@@ -71,7 +70,7 @@ let
         else
           message="disabled"
         fi
-        ${notifySend} -e --urgency=low -t 2000 -h \
+        ${notifySend} --transient --urgency=low -t 2000 -h \
           'string:x-canonical-private-synchronous:hypr-always-on-top' 'Hyprland' "Always on top $message"
       '';
 
@@ -119,7 +118,7 @@ let
           "
           message="Gaps disabled"
         fi
-        ${notifySend} -e --urgency=low -t 2000 -h \
+        ${notifySend} --transient --urgency=low -t 2000 -h \
           'string:x-canonical-private-synchronous:hypr-toggle-gaps' 'Hyprland' "$message"
       '';
 
@@ -161,7 +160,7 @@ let
           keyword input:tablet:absolute_region_position true; \
           keyword input:tablet:region_position $region_pos_x $region_pos_y \
         "
-        ${notifySend} -e --urgency=low -t 2000 -h \
+        ${notifySend} --transient --urgency=low -t 2000 -h \
           'string:x-canonical-private-synchronous:hypr-scale-tablet' 'Hyprland' 'Scaled tablet to active window'
       '';
 
@@ -176,8 +175,8 @@ let
       ''
         set -o pipefail
         echo -n "$(${getExe' pkgs.wl-clipboard "wl-paste"} -n)" | ${getExe pkgs.xclip} -selection clipboard && \
-          ${notifySend} -e --urgency=low -t 2000 'Hyprland' 'Synced Wayland clipboard with X11' || \
-          ${notifySend} -e --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
+          ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Synced Wayland clipboard with X11' || \
+          ${notifySend} --transient --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
       '';
 
   copyScreenshotText = pkgs.writeShellScript "hypr-copy-screenshot-text" ''
@@ -186,9 +185,9 @@ let
     exit=$?
     if [ $exit -eq 0 ]; then
       echo "$text" | ${getExe' pkgs.wl-clipboard "wl-copy"}
-      ${notifySend} -e -t 5000 Screenshot "Text Copied" "$text"
+      ${notifySend} --transient -t 5000 Screenshot "Text Copied" "$text"
     else
-      ${notifySend} -e --urgency=critical -t 5000 "Screenshot" "Failed to copy text"
+      ${notifySend} --transient --urgency=critical -t 5000 "Screenshot" "Failed to copy text"
     fi
   '';
 
@@ -205,7 +204,7 @@ let
     ${throttleHyprlandRepeatBind "brightness" 10}
     ${brightnessctl} set -e4 "$1"
     brightness=$(${brightnessctl} get --percentage)
-    ${notifySend} --urgency=low -t 2000 \
+    ${notifySend} --transient --urgency=low -t 2000 \
       -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $brightness%"
   '';
 

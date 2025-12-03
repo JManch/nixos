@@ -19,8 +19,6 @@ let
     tail
     head
     all
-    assertMsg
-    stringToCharacters
     ;
   inherit (cfg) monitors vpnNamespace;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -269,20 +267,6 @@ in
       type = types.nullOr types.str;
       default = null;
       description = "The default confinement VPN namespace to use";
-    };
-
-    mediaDir = mkOption {
-      type = types.str;
-      example = "/data/media";
-      apply =
-        path:
-        assert assertMsg (path != "" && path != "/") "Media dir must not be empty or root";
-        assert assertMsg (head (stringToCharacters path) == "/") "Media dir must be an absolute path";
-        lib.${ns}.impermanencePrefix config path;
-      description = ''
-        Absolute path to directory where media will be stored on this host.
-        Does not have a default to ensure it gets manually set.
-      '';
     };
   };
 

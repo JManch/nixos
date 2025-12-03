@@ -5,7 +5,13 @@
   config,
 }:
 let
-  inherit (lib) ns mkIf hiPrio;
+  inherit (lib)
+    ns
+    mkIf
+    hiPrio
+    getExe
+    getExe'
+    ;
   inherit (config.${ns}.core) home-manager device;
 in
 {
@@ -15,7 +21,13 @@ in
   };
 
   ns.userPackages = [
-    (lib.${ns}.wrapHyprlandMoveToActive args pkgs.bluetui "bluetui" "")
+    (lib.${ns}.wrapHyprlandMoveToActive args pkgs.bluetui "bluetui" ''
+      --run '
+        if [[ $(${getExe' pkgs.bluez "bluetoothctl"} show | ${getExe pkgs.gnugrep} "Powered:" | ${getExe pkgs.gawk} "{print \$2}") == "no" ]]; then
+          (${getExe' pkgs.bluez "bluetoothctl"} power on && ${getExe pkgs.libnotify} --transient --urgency=critical -t 5000 "Bluetooth" "Powered on") >/dev/null &
+        fi
+      '
+    '')
     (hiPrio (
       pkgs.runCommand "bluetui-desktop-modify" { } ''
         mkdir -p $out/share/applications

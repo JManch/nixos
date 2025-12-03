@@ -42,6 +42,7 @@ let
   gamemode = osConfig.${ns}.programs.gaming.gamemode;
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
 
+  notify-send = getExe pkgs.libnotify;
   systemctl = getExe' pkgs.systemd "systemctl";
   hyprctl = getExe' pkgs.hyprland "hyprctl";
   jaq = getExe pkgs.jaq;
@@ -248,7 +249,7 @@ in
           format-on = optionalString (device.type == "laptop") "<span color='#${colors.base04}'>󰂯</span>";
           format-connected = "<span color='#${colors.base04}'>󰂱</span> {num_connections}";
           on-click = "${app2unit} -t service bluetui.desktop";
-          on-click-right = "${getExe' pkgs.bluez "bluetoothctl"} power off";
+          on-click-right = "${getExe' pkgs.bluez "bluetoothctl"} power off && ${notify-send} --transient --urgency=critical -t 5000 'Bluetooth' 'Powered off'";
           tooltip-format = "{controller_alias}";
           tooltip-format-connected = "{device_enumerate}";
           tooltip-format-enumerate-connected = "{device_alias}";

@@ -185,7 +185,7 @@ let
     exit=$?
     if [ $exit -eq 0 ]; then
       echo "$text" | ${getExe' pkgs.wl-clipboard "wl-copy"}
-      ${notifySend} --transient -t 5000 Screenshot "Text Copied" "$text"
+      ${notifySend} --transient -t 5000 "Text Copied" "$text"
     else
       ${notifySend} --transient --urgency=critical -t 5000 "Screenshot" "Failed to copy text"
     fi
@@ -279,10 +279,11 @@ let
         fi
 
         pkill hyprpicker || true
-        wl-copy --type image/png < "$output_file"
 
         if [[ $output_file == "-" ]]; then
           exit 0
+        else
+          wl-copy --type image/png < "$output_file"
         fi
 
         notify_action=$(notify-send --action 'default=Edit image' --icon "$output_file" Screenshot "$message")

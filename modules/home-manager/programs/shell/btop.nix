@@ -1,12 +1,19 @@
 {
   lib,
+  cfg,
   pkgs,
   args,
   config,
   osConfig,
 }:
 let
-  inherit (lib) ns concatStringsSep optionalString;
+  inherit (lib)
+    ns
+    concatStringsSep
+    optionalString
+    mkOption
+    types
+    ;
   inherit (osConfig.${ns}) persistence;
   inherit (osConfig.${ns}.core) device;
   themePath = "btop/themes/custom.theme";
@@ -23,6 +30,14 @@ let
   );
 in
 {
+  opts.showGpuByDefault = mkOption {
+    type = types.bool;
+    default = device.type != "laptop";
+    description = ''
+      Whether to show the GPU box by default. Can be toggled by pressing 5.
+    '';
+  };
+
   home.packages = [
     package
     (lib.hiPrio (
@@ -38,8 +53,7 @@ in
   xdg.configFile."btop/btop.conf".text = ''
     color_theme = "custom"
     custom_gpu_name0 = "${device.gpu.name}"
-    show_gpu_info = "off"
-    shown_boxes = "cpu mem net proc gpu0"
+    shown_boxes = "cpu mem net proc${optionalString cfg.showGpuByDefault " gpu0"}"
     vim_keys = True
     ${optionalString persistence.enable ''
       disks_filter = "exclude=${

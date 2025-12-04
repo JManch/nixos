@@ -327,7 +327,7 @@ in
               trap reset EXIT
 
               ${getExe pkgs.alacritty} msg config window.opacity=1
-              exec ${getExe package} "$@"
+              ${getExe package} "$@"
             ''} $out/bin/${package.meta.mainProgram}
           '';
         })

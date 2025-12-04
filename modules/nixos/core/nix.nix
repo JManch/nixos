@@ -518,7 +518,7 @@ in
       gc = {
         automatic = true;
         dates = "Mon *-*-* 00:00:00";
-        options = "--delete-older-than 7d";
+        options = "--delete-older-than 3w";
       };
 
       optimise = {

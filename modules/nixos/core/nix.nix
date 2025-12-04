@@ -489,7 +489,12 @@ in
         substituters = [
           "https://nix-community.cachix.org"
           "https://nix-on-droid.cachix.org"
-        ];
+
+        ]
+        ++ (
+          assert lib.assertMsg (pkgs.lan-mouse.version == "0.10.0") "Remove lan-mouse substituter";
+          [ "https://lan-mouse.cachix.org/" ]
+        );
         # We need to sign our store contents for reliable `nix copy` usage
         # https://github.com/NixOS/nix/issues/2127
         secret-key-files = mkIf cfg.builder.enable [ "/etc/nix/nix_store_ed25519_key" ];
@@ -497,7 +502,11 @@ in
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU="
         ]
-        ++ attrValues keys.nix-store;
+        ++ attrValues keys.nix-store
+        ++ (
+          assert lib.assertMsg (pkgs.lan-mouse.version == "0.10.0") "Remove lan-mouse public key";
+          [ "lan-mouse.cachix.org-1:KlE2AEZUgkzNKM7BIzMQo8w9yJYqUpor1CAUNRY6OyM=" ]
+        );
         build-dir = mkIf impermanence.enable "/var/nix-tmp";
       };
 

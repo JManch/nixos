@@ -124,7 +124,6 @@
     hyprsunset.inputs.hyprwayland-scanner.follows = "hyprland/hyprwayland-scanner";
 
     lan-mouse.url = "github:feschber/lan-mouse";
-    lan-mouse.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";

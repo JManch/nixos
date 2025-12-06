@@ -1,0 +1,13 @@
+diff --git a/example/hyprland.desktop b/example/hyprland.desktop
+index c81e0216..bb2801a9 100644
+--- a/example/hyprland.desktop
++++ b/example/hyprland.desktop
+@@ -1,7 +1,7 @@
+ [Desktop Entry]
+ Name=Hyprland
+ Comment=An intelligent dynamic tiling Wayland compositor
+-Exec=start-hyprland
++Exec=Hyprland
+ Type=Application
+ DesktopNames=Hyprland
+ Keywords=tiling;wayland;compositor;

@@ -81,6 +81,9 @@ in
                 # if it's floating
                 ../../../../patches/hyprland-dynamic-resize-gesture.patch
                 ../../../../patches/hyprland-fullscreen-gesture-maximize-fix.patch
+                # Do not want any of the features this offers and can't be
+                # bothered to get it properly working with uwsm
+                ../../../../patches/hyprland-no-watchdog.patch
               ]
               # This is scuffed but should hopefully have a better solution
               # once GAMMA_LUT is implemented. Using a patch insted of wlsunset

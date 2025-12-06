@@ -12,9 +12,7 @@ in
   categoryConfig.wallpaper = {
     wallpaperUnit = "hyprpaper.service";
     setWallpaperScript = ''
-      ${hyprctl} hyprpaper preload "$1"
       ${hyprctl} hyprpaper wallpaper ",$1"
-      ${hyprctl} hyprpaper unload unused
     '';
   };
 

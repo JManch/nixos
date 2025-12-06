@@ -72,10 +72,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.26.0",
-      "revision": "a8e35ae216bb777b21084670aef601e41def0007",
-      "url": "https://api.github.com/repos/basnijholt/adaptive-lighting/tarball/v1.26.0",
-      "hash": "0wp91h22vyib0hia0vbdlzkj6dss3awh8khc7lwav3qncz5mmji3"
+      "version": "v1.28.0",
+      "revision": "1968e1a9a697a1713022dabf28f65d347d4d5417",
+      "url": "https://api.github.com/repos/basnijholt/adaptive-lighting/tarball/v1.28.0",
+      "hash": "0j8psnq2y1kx07gj5l2galkf8rlqqdgapr8x59wvi4yj1ykyq80p"
     },
     "app2unit": {
       "type": "Git",
@@ -86,9 +86,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "4c165a98ac3f1d351cd2aeb36ba6df3104ca6b16",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/4c165a98ac3f1d351cd2aeb36ba6df3104ca6b16.tar.gz",
-      "hash": "1l1bnlay9zlmld4xwx74dkrdj2r3za7wzqqibd35l9kdy9r1yvzp"
+      "revision": "83e2656fb8d39ad71e2f8a5ba113a9cedc90841f",
+      "url": "https://github.com/Vladimir-csp/app2unit/archive/83e2656fb8d39ad71e2f8a5ba113a9cedc90841f.tar.gz",
+      "hash": "0sismfz5wpjy8cx01mm90kx59bglab42ngpd42iljfd05knid78d"
     },
     "async-property": {
       "type": "PyPi",
@@ -121,9 +121,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "4a48f62fd9d76143a9ba9c1035ce87111b324f6c",
-      "url": "https://github.com/zzyil/comick.io-Downloader/archive/4a48f62fd9d76143a9ba9c1035ce87111b324f6c.tar.gz",
-      "hash": "1bc2073fx7fmkr5nh5mfs435nfny43jz2fgk10vmzqc9z8b8p4y2"
+      "revision": "af8e660fd11584fed46240061025812cd731fdfb",
+      "url": "https://github.com/zzyil/comick.io-Downloader/archive/af8e660fd11584fed46240061025812cd731fdfb.tar.gz",
+      "hash": "18qx207y98gmgyh0pd39xmj1zpxp0b7nhymyz7lr3jprvflsgxxg"
     },
     "ctrld": {
       "type": "GitRelease",
@@ -136,10 +136,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.4.7",
-      "revision": "b5785a2a3d381b03d367d2d5a919c12c53ab4020",
-      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.7",
-      "hash": "15dbm1qb5jyjx7rsh40nyknazhmip859xz5dd0km4iqk8afmn08n"
+      "version": "v1.4.8",
+      "revision": "3001ec81f196cbb12b13467d70fc6df41035746a",
+      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.8",
+      "hash": "15zwx9awpvjd7ljd7n99n528a3lxpicjmswryii2x5kwv971qh75"
     },
     "daikin_onecta": {
       "type": "GitRelease",
@@ -152,10 +152,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v4.2.9",
-      "revision": "2277fd367c60c193c45a51fb5e7afdc8c4143ce3",
-      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/v4.2.9",
-      "hash": "1bbjc14b2c24nl1c9a99rs2dim11mnqdx1nn0nas9dk16jfvhpvd"
+      "version": "v4.4.1",
+      "revision": "51eb58eba0e58439a0ec66402479d4970a86364e",
+      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/v4.4.1",
+      "hash": "0nwysw35g3148simcg22af80kk3wkwiby3fvcr0ymdv9m3zxqqq8"
     },
     "filen-rclone": {
       "type": "Git",
@@ -239,10 +239,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v3.2.2",
-      "revision": "2dc88f25a9ba14b310a8292653f6266fd1e2e244",
-      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/v3.2.2",
-      "hash": "0dzkavh815mm4awl7bqxj2lhhx4xn148zpj283ky4r7bh0n491gg"
+      "version": "v3.3.1",
+      "revision": "01fa7b04c572ac488bc2c7065d92ae08ad1224aa",
+      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/v3.3.1",
+      "hash": "0sv8y012davq2vqyd8jvxsr89vsacdpmw2nc23z2qissj2dqyg9f"
     },
     "hyprpy": {
       "type": "GitRelease",
@@ -395,9 +395,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "a884795a78dd4eb34775a58e9c1de741c40573d1",
-      "url": "https://github.com/dweymouth/supersonic/archive/a884795a78dd4eb34775a58e9c1de741c40573d1.tar.gz",
-      "hash": "0ynxcdbrhw2a5z05dzvwkclb9m34n3i9dwcx9xhij5nks60xmk33"
+      "revision": "abccac87671bfa585dc5c621b1ba02ad201deb74",
+      "url": "https://github.com/dweymouth/supersonic/archive/abccac87671bfa585dc5c621b1ba02ad201deb74.tar.gz",
+      "hash": "07121rxm21dsp88ljprjv8zxypwd389xy9dnkdwhp9y4zlw9yh4r"
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -455,10 +455,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.24.2",
-      "revision": "9fae82c1b86b904e002c1a2b2b23dacccc498ca7",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.24.2",
-      "hash": "1cp8f89f1xyjyxbkzniacm33r5gzdnjrmcp2lv26jxp7v5yblzw1"
+      "version": "v0.24.3",
+      "revision": "3b08fed296f51fa38da256e224f749f0900daceb",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.24.3",
+      "hash": "0pzhrw2kzdg2ydb75glqq11ixqhkvf7n0x3ab62ypchf1lkm5rm3"
     },
     "workspaces.nvim": {
       "type": "GitRelease",
@@ -487,10 +487,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.13.3",
-      "revision": "363db91851b5a83d67603556b2da690125ac05f4",
-      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.13.3",
-      "hash": "1736fgf2y3js113x39jj9psinzqxd4682lxymgqm3iliyjbh6l5w"
+      "version": "v0.14.0",
+      "revision": "3040888390df1c7ff1bb12c8aa84c4d4ae2e8e0f",
+      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.14.0",
+      "hash": "006hilrr77zgifdnb7ks84j4kr454xidywayb8qh4ym9qjxr9h0q"
     },
     "yt-dlp": {
       "type": "GitRelease",

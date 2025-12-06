@@ -82,10 +82,10 @@
     # kernelPackages =
     # assert lib.assertMsg (pkgs.zfs.version == "2.3.4") "zfs should support newer kernel now";
     # lib.mkForce
-    #   (import (fetchTree "github:NixOS/nixpkgs/544961dfcce86422ba200ed9a0b00dd4b1486ec5") {
+    #   (import (fetchTree "github:NixOS/nixpkgs/2fad6eac6077f03fe109c4d4eb171cf96791faa4") {
     #     inherit (pkgs.stdenv.hostPlatform) system;
-    #   }).linuxPackages_6_16;
-    kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
+    #   }).linuxPackages_6_17;
+    kernelPackages = lib.mkForce pkgs.linuxPackages_6_17;
   };
 
   programs.ryzen-monitor-ng.enable = true;

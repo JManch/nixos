@@ -1,7 +1,14 @@
-{ sox, writeShellApplication }:
+{
+  sox,
+  flac,
+  writeShellApplication,
+}:
 writeShellApplication {
   name = "resample-flacs";
-  runtimeInputs = [ sox ];
+  runtimeInputs = [
+    sox
+    flac
+  ];
   text = ''
     # Resamples flacs to 16 bit 44.1khz with minimal quality loss
     if [[ $# -eq 0 ]]; then
@@ -39,14 +46,19 @@ writeShellApplication {
           bitrate=$(soxi -b "$input_file")
 
           if [[ $sample_rate -gt 44100 || $bitrate -gt 16 ]]; then
-            sox -G "$input_file" -b 16 --comment "" "$tmp_dir/$filename" rate -v 44100
+            output_file="$tmp_dir/$filename"
+            tags_file="$tmp_dir/$filename.tags"
+            metaflac --export-tags-to="$tags_file" "$input_file"
+            sox -G "$input_file" -b 16 --comment "" "$output_file" rate -v 44100
+            metaflac --import-tags-from="$tags_file" "$output_file"
+            rm "$tags_file"
             echo "Resampled $filename: $bitrate/''${sample_rate}Hz -> 16/44100Hz"
           else
             echo "Skipping $filename: $bitrate/''${sample_rate}Hz"
           fi
         done
 
-        for resampled_file in "$tmp_dir"/*; do
+        for resampled_file in "$tmp_dir"/*.flac; do
           filename=$(basename "$resampled_file")
           mv "$resampled_file" "$source/$filename"
         done

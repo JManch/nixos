@@ -31,7 +31,7 @@
           {
             name = "placeholder";
             number = 1;
-            refreshRate = 60;
+            refreshRate = 60.0;
             width = 1920;
             height = 1080;
             position.x = 0;

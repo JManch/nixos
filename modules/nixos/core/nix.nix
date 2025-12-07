@@ -37,7 +37,7 @@ let
     ;
   inherit (inputs.nix-resources.secrets) keys;
   inherit (config.${ns}.system) impermanence;
-  inherit (config.${ns}.core) home-manager;
+  inherit (config.${ns}.core) home-manager device;
   configDir = "/home/${adminUsername}/.config/nixos";
 
   rebuildCmds = [
@@ -535,13 +535,19 @@ in
     randomizedDelaySec = "2hours";
   };
 
-  systemd.services.nix-optimise.after = [ "nix-gc.service" ];
+  systemd.services."nix-gc".serviceConfig.ConditionACPower = mkIf (device.type == "laptop") true;
 
-  systemd.services.nixos-upgrade = mkIf cfg.autoUpgrade {
+  systemd.services."nix-optimise" = {
+    after = [ "nix-gc.service" ];
+    serviceConfig.ConditionACPower = mkIf (device.type == "laptop") true;
+  };
+
+  systemd.services."nixos-upgrade" = mkIf cfg.autoUpgrade {
     after = [
       "nix-optimise.service"
       "nix-gc.service"
     ];
+    serviceConfig.ConditionACPower = mkIf (device.type == "laptop") true;
   };
 
   ns.services = mkIf cfg.autoUpgrade {

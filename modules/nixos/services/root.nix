@@ -207,17 +207,18 @@ in
       ]
     );
 
-  services.udev.extraRules = mkIf (device.type == "laptop") ''
+  # Disabling for now until I have a use for these targets
+  services.udev.extraRules = mkIf (false && device.type == "laptop") ''
     SUBSYSTEM=="power_supply", KERNEL=="${device.ac}", ATTR{online}=="0", TAG+="systemd", ENV{SYSTEMD_WANTS}="battery.target", ENV{SYSTEMD_USER_WANTS}="battery.target"
     SUBSYSTEM=="power_supply", KERNEL=="${device.ac}", ATTR{online}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}="ac.target", ENV{SYSTEMD_USER_WANTS}="ac.target"
   '';
 
-  systemd.targets = mkIf (device.type == "laptop") {
+  systemd.targets = mkIf (false && device.type == "laptop") {
     ac = mkLaptopPowerTarget "AC";
     battery = mkLaptopPowerTarget "Battery";
   };
 
-  systemd.user.targets = mkIf (device.type == "laptop") {
+  systemd.user.targets = mkIf (false && device.type == "laptop") {
     ac = mkLaptopPowerTarget "AC";
     battery = mkLaptopPowerTarget "Battery";
   };

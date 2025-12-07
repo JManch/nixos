@@ -3,6 +3,7 @@
 
   programs.tealdeer = {
     enable = true;
+    enableAutoUpdates = false;
     settings.style = {
       command_name.foreground = "red";
       example_variable.foreground = "blue";

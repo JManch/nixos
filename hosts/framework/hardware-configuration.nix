@@ -118,7 +118,9 @@
     HandleLidSwitch = "suspend-then-hibernate";
   };
 
-  services.fwupd.enable = lib.mkForce false; # enable when necessary
+  services.fwupd.enable = true;
+  systemd.timers."fwupd-refresh".enable = false;
+
   services.power-profiles-daemon.enable = false;
   services.tlp = {
     enable = true;

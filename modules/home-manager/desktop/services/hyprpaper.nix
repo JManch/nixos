@@ -19,6 +19,7 @@ in
   # Hyprpaper needs a config file otherwise it core dumps
   xdg.configFile."hypr/hyprpaper.conf".text = ''
     ipc=true
+    splash=false
   '';
 
   systemd.user.services.hyprpaper = {

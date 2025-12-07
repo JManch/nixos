@@ -411,6 +411,7 @@ in
         disable_autoreload = true;
         disable_hyprland_logo = true;
         disable_watchdog_warning = true;
+        disable_splash_rendering = true;
         focus_on_activate = false;
         mouse_move_enables_dpms = true;
         # To enable using keybinds when screen has been manually turned off

@@ -3,7 +3,6 @@
   cfg,
   pkgs,
   config,
-  username,
 }:
 let
   inherit (lib)
@@ -15,7 +14,6 @@ let
     mkOption
     singleton
     mkEnableOption
-    getExe'
     ;
   inherit (config.${ns}.core) home-manager device;
   inherit (config.${ns}.hmNs.desktop.programs) locker;

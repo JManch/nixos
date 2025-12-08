@@ -6,6 +6,7 @@
   args,
   config,
   inputs,
+  sources,
   hostname,
   username,
   adminUsername,
@@ -408,7 +409,12 @@ in
 
     overlays = [
       (final: prev: {
-        inherit (final.${ns}) xdg-terminal-exec brightnessctl;
+        inherit (final.${ns}) brightnessctl;
+
+        xdg-terminal-exec = prev.xdg-terminal-exec.overrideAttrs {
+          version = "0-unstable-${sources.xdg-terminal-exec.revision}";
+          src = sources.xdg-terminal-exec;
+        };
 
         rnnoise-plugin = addPatches prev.rnnoise-plugin (
           optional (

@@ -78,16 +78,19 @@
       "hash": "0j8psnq2y1kx07gj5l2galkf8rlqqdgapr8x59wvi4yj1ykyq80p"
     },
     "app2unit": {
-      "type": "Git",
+      "type": "GitRelease",
       "repository": {
         "type": "GitHub",
         "owner": "Vladimir-csp",
         "repo": "app2unit"
       },
-      "branch": "master",
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
       "submodules": false,
+      "version": "v1.2.1",
       "revision": "83e2656fb8d39ad71e2f8a5ba113a9cedc90841f",
-      "url": "https://github.com/Vladimir-csp/app2unit/archive/83e2656fb8d39ad71e2f8a5ba113a9cedc90841f.tar.gz",
+      "url": "https://api.github.com/repos/Vladimir-csp/app2unit/tarball/v1.2.1",
       "hash": "0sismfz5wpjy8cx01mm90kx59bglab42ngpd42iljfd05knid78d"
     },
     "async-property": {
@@ -445,16 +448,19 @@
       "hash": "1bigj5gshnn79vdi1rrxzy5npn23wxyvs6w7aybw81953zjg0v80"
     },
     "uwsm": {
-      "type": "Git",
+      "type": "GitRelease",
       "repository": {
         "type": "GitHub",
         "owner": "Vladimir-csp",
         "repo": "uwsm"
       },
-      "branch": "master",
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
       "submodules": false,
+      "version": "v0.25.0",
       "revision": "b68cf0601beeb7c1ae5e3e6f4f6b6e776e314239",
-      "url": "https://github.com/Vladimir-csp/uwsm/archive/b68cf0601beeb7c1ae5e3e6f4f6b6e776e314239.tar.gz",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.25.0",
       "hash": "14g6rpms7liq4n1478n5nrw8zwim6w33s14rabhdqmiyfl3giwx9"
     },
     "workspaces.nvim": {

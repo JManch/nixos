@@ -195,12 +195,12 @@ in
     nixpkgs.overlays = [
       (_: prev: {
         uwsm = prev.uwsm.overrideAttrs {
-          version = "0-unstable-${sources.uwsm.revision}";
+          inherit (sources.uwsm) version;
           src = sources.uwsm;
         };
 
         app2unit = prev.app2unit.overrideAttrs {
-          version = "0-unstable-${sources.app2unit.revision}";
+          inherit (sources.app2unit) version;
           src = sources.app2unit;
         };
       })

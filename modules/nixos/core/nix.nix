@@ -412,7 +412,7 @@ in
         inherit (final.${ns}) brightnessctl;
 
         xdg-terminal-exec = prev.xdg-terminal-exec.overrideAttrs {
-          version = "0-unstable-${sources.xdg-terminal-exec.revision}";
+          inherit (sources.xdg-terminal-exec) version;
           src = sources.xdg-terminal-exec;
         };
 

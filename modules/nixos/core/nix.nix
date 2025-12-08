@@ -409,6 +409,15 @@ in
 
     overlays = [
       (final: prev: {
+        inherit
+          (
+            assert assertMsg (prev.zigbee2mqtt.version == "2.7.0") "Remove zigbee2mqtt overlay";
+            import (fetchTree "github:NixOS/nixpkgs/a937d80b7c3b330849fd2159bbe0a5303970c9f0") {
+              inherit (prev.stdenv.hostPlatform) system;
+            }
+          )
+          zigbee2mqtt
+          ;
         inherit (final.${ns}) brightnessctl;
 
         xdg-terminal-exec = prev.xdg-terminal-exec.overrideAttrs {

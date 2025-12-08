@@ -56,7 +56,7 @@ in
     enable = true;
     package = inputs.hyprlock.packages.${pkgs.stdenv.hostPlatform.system}.default;
     settings = {
-      general.hide_cursor = true;
+      general.hide_cursor = false;
       animations.enabled = !hasFingerprint; # because of our fingerprint present patch
 
       auth = {

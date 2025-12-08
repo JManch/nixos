@@ -12,7 +12,6 @@ in
   beammp-launcher = callPackage ./beammp-launcher.nix args;
   hyprpy = pkgs.python3Packages.callPackage ./hyprpy.nix args;
   soularr = pkgs.python3Packages.callPackage ./soularr.nix args;
-  xdg-terminal-exec = callPackage ./xdg-terminal-exec.nix args;
   jellyfin-plugin-listenbrainz = callPackage ./jellyfin-plugin-listenbrainz args;
   filen-rclone = callPackage ./filen-rclone.nix args;
   frigate-blueprint = callPackage ./frigate-blueprint.nix args;

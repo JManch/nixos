@@ -77,6 +77,31 @@ in
     (wrapHyprlandMoveToActive args lan-mouse "de.feschber.LanMouse"
       "--run 'systemctl start --user lan-mouse'"
     )
+    (pkgs.writeShellScriptBin "start-lan-mouse" ''
+      set -e
+      if [[ $# -eq 0 ]]; then
+        echo "Usage: start-lan-mouse <hostname>"
+        exit 1
+      fi
+
+      hostname=$1
+      if [[ "$hostname" == "${hostname}" ]]; then
+        echo "Error: Cannot start-lan-mouse on local host"
+        exit 1
+      fi
+
+      if ping -c 1 -W 1 "$hostname.lan" >/dev/null; then
+        host_address="$hostname.lan"
+      elif ping -c 1 -W 1 "$hostname-vpn.lan" >/dev/null; then
+        host_address="$hostname-vpn.lan"
+      else
+        echo "Host '$hostname' is not up"
+        exit 1
+      fi
+
+      ssh "${config.home.username}@$host_address" systemctl start --user lan-mouse.service
+      echo "Started lan-mouse on host $hostname"
+    '')
   ];
 
   systemd.user.services."lan-mouse" = {

@@ -15,17 +15,22 @@ in
     (device.type == "laptop")
   ];
 
-  systemd.user.services.low-battery-notify = {
+  systemd.user.timers."low-battery-notify" = {
+    timerConfig.OnBootSec = "2m";
+    timerConfig.OnUnitInactiveSec = "2m";
+    wantedBy = [ "timers.target" ];
+  };
+
+  systemd.user.services."low-battery-notify" = {
     requisite = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
     path = lib.mkForce [ ]; # inherit user session env vars
-    startAt = "*:0/2"; # every 2 mins
     script = ''
       cap=$(cat /sys/class/power_supply/${device.battery}/capacity)
       status=$(cat /sys/class/power_supply/${device.battery}/status)
 
       if [[ $cap -le 10 && $status == "Discharging" ]]; then
-        ${lib.getExe pkgs.libnotify} --urgency=critical -t 5000 "Battery Low" "$cap% remaining";
+        ${lib.getExe pkgs.libnotify} --transient --urgency=critical -t 5000 "Battery Low" "$cap% remaining";
       fi
     '';
   };

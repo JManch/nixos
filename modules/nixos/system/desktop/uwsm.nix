@@ -3,6 +3,7 @@
   cfg,
   pkgs,
   config,
+  sources,
   username,
   categoryCfg,
 }:
@@ -192,8 +193,16 @@ in
     ];
 
     nixpkgs.overlays = [
-      (_: _: {
-        app2unit = pkgs.${ns}.app2unit;
+      (_: prev: {
+        uwsm = prev.uwsm.overrideAttrs {
+          version = "0-unstable-${sources.uwsm.revision}";
+          src = sources.uwsm;
+        };
+
+        app2unit = prev.app2unit.overrideAttrs {
+          version = "0-unstable-${sources.app2unit.revision}";
+          src = sources.app2unit;
+        };
       })
     ];
   }

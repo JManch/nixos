@@ -445,20 +445,17 @@
       "hash": "1bigj5gshnn79vdi1rrxzy5npn23wxyvs6w7aybw81953zjg0v80"
     },
     "uwsm": {
-      "type": "GitRelease",
+      "type": "Git",
       "repository": {
         "type": "GitHub",
         "owner": "Vladimir-csp",
         "repo": "uwsm"
       },
-      "pre_releases": false,
-      "version_upper_bound": null,
-      "release_prefix": null,
+      "branch": "master",
       "submodules": false,
-      "version": "v0.24.3",
-      "revision": "3b08fed296f51fa38da256e224f749f0900daceb",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.24.3",
-      "hash": "0pzhrw2kzdg2ydb75glqq11ixqhkvf7n0x3ab62ypchf1lkm5rm3"
+      "revision": "b68cf0601beeb7c1ae5e3e6f4f6b6e776e314239",
+      "url": "https://github.com/Vladimir-csp/uwsm/archive/b68cf0601beeb7c1ae5e3e6f4f6b6e776e314239.tar.gz",
+      "hash": "14g6rpms7liq4n1478n5nrw8zwim6w33s14rabhdqmiyfl3giwx9"
     },
     "workspaces.nvim": {
       "type": "GitRelease",

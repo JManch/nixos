@@ -64,7 +64,10 @@ in
       Requisite = [ "graphical-session.target" ];
     };
 
-    Service.ExecStart = "${getExe tomat} daemon run";
+    Service = {
+      ExecStart = "${getExe tomat} daemon run";
+      ExecStop = "${getExe tomat} daemon stop";
+    };
   };
 
   programs.waybar.settings.bar = {

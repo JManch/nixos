@@ -1,0 +1,36 @@
+diff --git a/src/timer.rs b/src/timer.rs
+index 2c1509c..f79a4ac 100644
+--- a/src/timer.rs
++++ b/src/timer.rs
+@@ -144,6 +144,7 @@ pub enum StatusOutput {
+         tooltip: String,
+         class: String,
+         percentage: f64,
++        alt: String,
+     },
+     I3statusRs {
+         text: String,
+@@ -549,6 +550,7 @@ impl TimerState {
+                 tooltip,
+                 class: class.to_string(),
+                 percentage,
++                alt: class.to_string(),
+             },
+             Format::I3statusRs => {
+                 // Map timer states to i3status-rs states
+@@ -803,6 +805,7 @@ mod tests {
+                 class,
+                 tooltip,
+                 percentage,
++                alt,
+             } => {
+                 assert_eq!(text, "🍅 25:00 ⏸");
+                 assert_eq!(class, "work-paused");
+@@ -829,6 +832,7 @@ mod tests {
+                 class,
+                 tooltip,
+                 percentage,
++                alt,
+             } => {
+                 assert!(text.starts_with("🍅"));
+                 assert!(text.ends_with("▶"));

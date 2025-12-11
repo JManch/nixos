@@ -1,0 +1,25 @@
+diff --git a/src/timer.rs b/src/timer.rs
+index 2c1509c..349c3c9 100644
+--- a/src/timer.rs
++++ b/src/timer.rs
+@@ -381,20 +381,6 @@ impl TimerState {
+             .body(message)
+             .timeout(config.timeout as i32);
+ 
+-        // Use configured icon
+-        match get_notification_icon(config) {
+-            Ok(icon) => {
+-                notification.icon(&icon);
+-            }
+-            Err(e) => {
+-                eprintln!(
+-                    "Warning: Failed to get notification icon: {}, falling back to 'timer'",
+-                    e
+-                );
+-                notification.icon("timer");
+-            }
+-        }
+-
+         if let Err(e) = notification.show() {
+             eprintln!("Failed to send notification: {}", e);
+         }

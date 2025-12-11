@@ -1,0 +1,36 @@
+diff --git a/src/timer.rs b/src/timer.rs
+index 2c1509c..67bfec1 100644
+--- a/src/timer.rs
++++ b/src/timer.rs
+@@ -493,23 +493,15 @@ impl TimerState {
+             status.remaining_seconds % 60
+         );
+ 
+-        let session_str = if matches!(status.phase, Phase::Work) {
+-            format!(
+-                "{}/{}",
+-                status.current_session, status.sessions_until_long_break
+-            )
+-        } else {
+-            String::new()
+-        };
++        let session_str = format!(
++            "{}/{}",
++            status.current_session, status.sessions_until_long_break
++        );
+ 
+-        let sessions_info = if matches!(status.phase, Phase::Work) {
+-            format!(
+-                " ({}/{})",
+-                status.current_session, status.sessions_until_long_break
+-            )
+-        } else {
+-            String::new()
+-        };
++        let sessions_info = format!(
++            " ({}/{})",
++            status.current_session, status.sessions_until_long_break
++        );
+ 
+         // Calculate percentage for progress bars
+         let total_duration = (status.duration_minutes * 60.0) as i64;

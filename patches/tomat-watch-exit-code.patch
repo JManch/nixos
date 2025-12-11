@@ -1,0 +1,13 @@
+diff --git a/src/main.rs b/src/main.rs
+index 34708c6..2c9c639 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -151,7 +151,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
+                     Err(e) => {
+                         eprintln!("Failed to connect to daemon: {}", e);
+                         // Exit on error (daemon might be stopped)
+-                        break;
++                        std::process::exit(1);
+                     }
+                 }
+ 

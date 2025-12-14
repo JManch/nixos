@@ -1,8 +1,8 @@
 diff --git a/src/modules/wireplumber.cpp b/src/modules/wireplumber.cpp
-index 106ca403..9f2bd2b7 100644
+index a43ad29b..f24a02da 100644
 --- a/src/modules/wireplumber.cpp
 +++ b/src/modules/wireplumber.cpp
-@@ -74,7 +74,8 @@ void waybar::modules::Wireplumber::updateNodeName(waybar::modules::Wireplumber*
+@@ -79,7 +79,8 @@ void waybar::modules::Wireplumber::updateNodeName(waybar::modules::Wireplumber*
    if (proxy == nullptr) {
      auto err = fmt::format("Object '{}' not found\n", id);
      spdlog::error("[{}]: {}", self->name_, err);
@@ -12,7 +12,7 @@ index 106ca403..9f2bd2b7 100644
    }
  
    g_autoptr(WpProperties) properties =
-@@ -85,12 +86,9 @@ void waybar::modules::Wireplumber::updateNodeName(waybar::modules::Wireplumber*
+@@ -90,12 +91,9 @@ void waybar::modules::Wireplumber::updateNodeName(waybar::modules::Wireplumber*
    properties = wp_properties_ensure_unique_owner(properties);
    wp_properties_add(properties, globalP);
    wp_properties_set(properties, "object.id", nullptr);
@@ -26,8 +26,27 @@ index 106ca403..9f2bd2b7 100644
    spdlog::debug("[{}]: Updating '{}' node name to: {}", self->name_, self->type_, self->node_name_);
  }
  
-@@ -339,6 +337,12 @@ auto waybar::modules::Wireplumber::update() -> void {
-     label_.get_style_context()->remove_class("muted");
+@@ -192,18 +190,6 @@ void waybar::modules::Wireplumber::onMixerChanged(waybar::modules::Wireplumber*
+       self->om_, WP_TYPE_NODE, WP_CONSTRAINT_TYPE_G_PROPERTY, "bound-id", "=u", id, nullptr));
+ 
+   if (node == nullptr) {
+-    // log a warning only if no other widget is targeting the id.
+-    // this reduces log spam when multiple instances of the module are used on different node types.
+-    if (id != self->node_id_ && id != self->source_node_id_) {
+-      for (auto const& module : waybar::modules::Wireplumber::modules) {
+-        if (module->node_id_ == id || module->source_node_id_ == id) {
+-          return;
+-        }
+-      }
+-    }
+-
+-    spdlog::warn("[{}]: (onMixerChanged: {}) - Object with id {} not found", self->name_,
+-                 self->type_, id);
+     return;
+   }
+ 
+@@ -436,6 +422,12 @@ auto waybar::modules::Wireplumber::update() -> void {
+     label_.get_style_context()->remove_class("source-muted");
    }
  
 +  if (format.empty() || node_name_.empty()) {
@@ -37,5 +56,5 @@ index 106ca403..9f2bd2b7 100644
 +  event_box_.show();
 +
    int vol = round(volume_ * 100.0);
-   std::string markup = fmt::format(fmt::runtime(format), fmt::arg("node_name", node_name_),
-                                    fmt::arg("volume", vol), fmt::arg("icon", getIcon(vol)));
+   int source_vol = round(source_volume_ * 100.0);
+ 

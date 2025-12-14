@@ -88,6 +88,9 @@ in
         # Forces use of device description instead of nick name in tooltip
         # Hides the module instead of crashing when no source device exists
         "waybar-wireplumber-improvements.patch"
+        # Removes constant logging when our `tomat watch` commands fails if the
+        # service is not running
+        "waybar-disable-stopped-log.patch"
       ]).override
         {
           cavaSupport = false;

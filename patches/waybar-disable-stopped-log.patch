@@ -1,0 +1,12 @@
+diff --git a/src/modules/custom.cpp b/src/modules/custom.cpp
+index d75633e9..a190312f 100644
+--- a/src/modules/custom.cpp
++++ b/src/modules/custom.cpp
+@@ -87,7 +87,6 @@ void waybar::modules::Custom::continuousWorker() {
+       if (exit_code != 0) {
+         output_ = {exit_code, ""};
+         dp.emit();
+-        spdlog::error("{} stopped unexpectedly, is it endless?", name_);
+       }
+       if (config_["restart-interval"].isNumeric()) {
+         pid_ = -1;

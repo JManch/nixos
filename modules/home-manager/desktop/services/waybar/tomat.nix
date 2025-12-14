@@ -50,7 +50,7 @@ in
 
     notification = {
       enable = true;
-      timeout = 5000;
+      timeout = 10000;
     };
 
     display.text_format = "{phase} {session} {time}";

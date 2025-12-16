@@ -22,8 +22,13 @@
   hardware.framework.enableKmod = false;
 
   boot = {
-    # System frequently hangs after suspend on 6.18-rc7
-    kernelPackages = pkgs.linuxPackages_latest;
+    # kernelPackages = pkgs.linuxPackages_6_17;
+
+    # Do not use 6.18 in attempt to fix not resuming after suspend
+    kernelPackages =
+      (import (fetchTree "github:NixOS/nixpkgs/1306659b587dc277866c7b69eb97e5f07864d8c4") {
+        inherit (pkgs.stdenv.hostPlatform) system;
+      }).linuxPackages_6_17;
 
     kernelModules = [ "kvm-amd" ];
 

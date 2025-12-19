@@ -48,8 +48,8 @@
 
         darkman = {
           enable = true;
-          # switchMethod = "hass";
-          # hassEntity = "joshua_dark_mode_brightness_threshold";
+          switchMethod = "hass";
+          hassEntity = "joshua_dark_mode_brightness_threshold";
         };
       };
     };

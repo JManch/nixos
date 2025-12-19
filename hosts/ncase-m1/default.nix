@@ -3,13 +3,13 @@
   pkgs,
   inputs,
   config,
-  username,
   ...
 }:
 {
   imports = [
     ./hardware-configuration.nix
     ./disko.nix
+    # ./uni.nix
   ];
 
   ${lib.ns} = {
@@ -19,12 +19,11 @@
       device = {
         type = "desktop";
         address = "192.168.88.254";
-        vpnAddress = "192.168.100.12";
         altAddresses = [
           "10.20.20.11" # wireless interface
         ];
         memory = 1024 * 64;
-        # hassIntegration.enable = true;
+        hassIntegration.enable = true;
 
         cpu = {
           name = "R7 3700x";
@@ -51,32 +50,31 @@
             height = 1440;
             position.x = 2560;
             position.y = 0;
-            workspaces = builtins.genList (i: i + 1) 25;
-            # workspaces = builtins.genList (i: (i * 2) + 1) 25;
+            workspaces = builtins.genList (i: (i * 2) + 1) 25;
           }
-          # {
-          #   name = "HDMI-A-1";
-          #   number = 2;
-          #   refreshRate = 59.951;
-          #   width = 2560;
-          #   height = 1440;
-          #   position.x = 0;
-          #   position.y = 0;
-          #   workspaces = builtins.genList (i: (i * 2) + 2) 25;
-          # }
-          # {
-          #   # Enabled on-demand for sim racing
-          #   enabled = false;
-          #   name = "DP-2";
-          #   mirror = "DP-1";
-          #   number = 3;
-          #   refreshRate = 59.951;
-          #   width = 2560;
-          #   height = 1440;
-          #   position.x = -2560;
-          #   position.y = 0;
-          #   transform = 2;
-          # }
+          {
+            name = "HDMI-A-1";
+            number = 2;
+            refreshRate = 59.951;
+            width = 2560;
+            height = 1440;
+            position.x = 0;
+            position.y = 0;
+            workspaces = builtins.genList (i: (i * 2) + 2) 25;
+          }
+          {
+            # Enabled on-demand for sim racing
+            enabled = false;
+            name = "DP-2";
+            mirror = "DP-1";
+            number = 3;
+            refreshRate = 59.951;
+            width = 2560;
+            height = 1440;
+            position.x = -2560;
+            position.y = 0;
+            transform = 2;
+          }
         ];
       };
 
@@ -89,13 +87,13 @@
     hardware = {
       secure-boot.enable = true;
       bluetooth.enable = true;
-      fanatec.enable = false;
+      fanatec.enable = true;
       tablet.enable = true;
-      scanner.enable = false;
+      scanner.enable = true;
       "8bitdo-ultimate-2".enable = true;
 
       valve-index = {
-        enable = false;
+        enable = true;
         audio = {
           card = "alsa_card.pci-0000_09_00.1";
           profile = "output:hdmi-stereo-extra1";
@@ -112,7 +110,7 @@
       };
 
       printing.client = {
-        enable = false;
+        enable = true;
         serverAddress = "homelab.lan";
       };
     };
@@ -131,7 +129,7 @@
       gaming = {
         enable = true;
         steam.enable = true;
-        steam.lanTransfer = false;
+        steam.lanTransfer = true;
         gamescope.enable = true;
         gamemode.enable = true;
       };
@@ -161,66 +159,25 @@
         excludeSubnets = [ "192.168.89.2/32" ];
       };
 
-      wireguard = {
-        home-minimal = {
-          enable = true;
-          autoStart = true;
-          address = "192.168.100.12";
-          subnet = 24;
+      wireguard.friends = {
+        enable = true;
+        autoStart = true;
+        address = "10.0.0.2";
+        subnet = 24;
 
-          peers = lib.singleton {
-            publicKey = "4kLZt3aTWUbqSZhz5Q64izTwA4qrDfnkso0z8gRfJ1Q=";
-            presharedKeyFile = config.age.secrets.wg-home-router-psk.path;
-            allowedIPs = [ "192.168.0.0/16" ];
-            endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.homeWgRouterPort}";
-          };
-
-          dns = {
-            enable = true;
-            address = "192.168.100.1";
-          };
+        peers = lib.singleton {
+          publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
+          presharedKeyFile = config.age.secrets.wg-friends-router-psk.path;
+          allowedIPs = [ "10.0.0.0/24" ];
+          endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.friendsWgRouterPort}";
         };
 
-        home = {
+        dns = {
           enable = true;
-          autoStart = false;
-          address = "192.168.100.12";
-          subnet = 24;
-          conflicts = [ "home-minimal" ];
-
-          peers = lib.singleton {
-            publicKey = "4kLZt3aTWUbqSZhz5Q64izTwA4qrDfnkso0z8gRfJ1Q=";
-            presharedKeyFile = config.age.secrets.wg-home-router-psk.path;
-            allowedIPs = [ "0.0.0.0/0" ];
-            endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.homeWgRouterPort}";
-          };
-
-          dns = {
-            enable = true;
-            address = "192.168.100.1";
-          };
-        };
-
-        friends = {
-          enable = true;
-          autoStart = true;
-          address = "10.0.0.2";
-          subnet = 24;
-
-          peers = lib.singleton {
-            publicKey = "PbFraM0QgSnR1h+mGwqeAl6e7zrwGuNBdAmxbnSxtms=";
-            presharedKeyFile = config.age.secrets.wg-friends-router-psk.path;
-            allowedIPs = [ "10.0.0.0/24" ];
-            endpoint = "${inputs.nix-resources.secrets.mikrotikDDNS}:${toString inputs.nix-resources.secrets.friendsWgRouterPort}";
-          };
-
-          dns = {
-            enable = true;
-            address = "10.0.0.7";
-            domains = {
-              friends = "";
-              ${inputs.nix-resources.secrets.tomFqDomain} = "";
-            };
+          address = "10.0.0.7";
+          domains = {
+            friends = "";
+            ${inputs.nix-resources.secrets.tomFqDomain} = "";
           };
         };
       };
@@ -280,7 +237,7 @@
         wireless = {
           enable = true;
           interface = "wlan0";
-          disableOnBoot = false;
+          disableOnBoot = true;
         };
       };
 

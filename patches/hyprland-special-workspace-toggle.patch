@@ -1,8 +1,8 @@
 diff --git a/src/managers/KeybindManager.cpp b/src/managers/KeybindManager.cpp
-index 4423bbdb..fbfd5756 100644
+index c4d8734e..5584cd13 100644
 --- a/src/managers/KeybindManager.cpp
 +++ b/src/managers/KeybindManager.cpp
-@@ -2104,13 +2104,13 @@ SDispatchResult CKeybindManager::toggleSpecialWorkspace(std::string args) {
+@@ -2093,13 +2093,13 @@ SDispatchResult CKeybindManager::toggleSpecialWorkspace(std::string args) {
          return {.success = false, .error = "Invalid workspace passed to special"};
      }
  
@@ -19,13 +19,12 @@ index 4423bbdb..fbfd5756 100644
              break;
          }
      }
-@@ -2119,8 +2119,7 @@ SDispatchResult CKeybindManager::toggleSpecialWorkspace(std::string args) {
+@@ -2108,7 +2108,7 @@ SDispatchResult CKeybindManager::toggleSpecialWorkspace(std::string args) {
  
      PHLWORKSPACEREF focusedWorkspace;
  
 -    if (requestedWorkspaceIsAlreadyOpen && specialOpenOnMonitor == workspaceID) {
--        // already open on this monitor
 +    if (requestedWorkspaceIsAlreadyOpen) {
-         Debug::log(LOG, "Toggling special workspace {} to closed", workspaceID);
+         // already open on this monitor
+         Log::logger->log(Log::DEBUG, "Toggling special workspace {} to closed", workspaceID);
          PMONITOR->setSpecialWorkspace(nullptr);
- 

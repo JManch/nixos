@@ -1,18 +1,18 @@
-diff --git a/src/events/Windows.cpp b/src/events/Windows.cpp
-index 9a1c07d9..b962d0e4 100644
---- a/src/events/Windows.cpp
-+++ b/src/events/Windows.cpp
-@@ -314,6 +314,7 @@ void Events::listener_mapWindow(void* owner, void* data) {
+diff --git a/src/desktop/view/Window.cpp b/src/desktop/view/Window.cpp
+index 32a0086e..3fa78cb8 100644
+--- a/src/desktop/view/Window.cpp
++++ b/src/desktop/view/Window.cpp
+@@ -2173,6 +2173,7 @@ void CWindow::mapWindow() {
  
-             PWINDOW->m_workspace = pWorkspace;
-             PWINDOW->m_monitor   = pWorkspace->m_monitor;
-+            PMONITOR             = PWINDOW->m_monitor.lock();
+             m_workspace = pWorkspace;
+             m_monitor   = pWorkspace->m_monitor;
++            PMONITOR    = m_monitor.lock();
  
-             if (PWINDOW->m_monitor.lock()->m_activeSpecialWorkspace && !pWorkspace->m_isSpecialWorkspace)
+             if (m_monitor.lock()->m_activeSpecialWorkspace && !pWorkspace->m_isSpecialWorkspace)
                  workspaceSilent = true;
-@@ -323,8 +324,6 @@ void Events::listener_mapWindow(void* owner, void* data) {
+@@ -2182,8 +2183,6 @@ void CWindow::mapWindow() {
                      pWorkspace->m_monitor->setSpecialWorkspace(pWorkspace);
-                 else if (PMONITOR->activeWorkspaceID() != requestedWorkspaceID && !PWINDOW->m_noInitialFocus)
+                 else if (PMONITOR->activeWorkspaceID() != requestedWorkspaceID && !m_noInitialFocus)
                      g_pKeybindManager->m_dispatchers["workspace"](requestedWorkspaceName);
 -
 -                PMONITOR = Desktop::focusState()->monitor();

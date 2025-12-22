@@ -1,13 +1,13 @@
 diff --git a/src/Compositor.cpp b/src/Compositor.cpp
-index da659654..c00d268a 100644
+index 9c806fdd..ae6b8a8f 100644
 --- a/src/Compositor.cpp
 +++ b/src/Compositor.cpp
-@@ -2604,7 +2604,7 @@ Vector2D CCompositor::parseWindowVectorArgsRelative(const std::string& args, con
+@@ -2404,7 +2404,7 @@ Vector2D CCompositor::parseWindowVectorArgsRelative(const std::string& args, con
          y          = y.substr(0, y.length() - 1);
      }
  
 -    if (!isNumber(x) || !isNumber(y)) {
 +    if (!isNumber(x, xIsPercent) || !isNumber(y, yIsPercent)) {
-         Debug::log(ERR, "parseWindowVectorArgsRelative: args not numbers");
+         Log::logger->log(Log::ERR, "parseWindowVectorArgsRelative: args not numbers");
          return relativeTo;
      }

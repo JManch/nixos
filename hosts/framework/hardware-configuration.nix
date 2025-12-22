@@ -3,7 +3,6 @@
 # - Userspace charge limiter has been broken since the 3.04 bios update https://github.com/tlvince/nixos-config/issues/309
 # - Front-right USB A adapter sometimes doesn't work https://community.frame.work/t/solved-usb-a-expansion-card-stops-working-until-unplugged/26579
 {
-  lib,
   pkgs,
   inputs,
   modulesPath,
@@ -22,9 +21,9 @@
   hardware.framework.enableKmod = false;
 
   boot = {
-    # kernelPackages = pkgs.linuxPackages_6_17;
-
-    # Do not use 6.18 in attempt to fix not resuming after suspend
+    # Pin to 6.17 in an attempt to fix suspend issues with 6.18
+    # 6.19 is seems broken atm, wifi interface does not come up
+    # https://community.frame.work/t/significant-suspend-regressions-on-framework-13-amd-linux-6-18-2-arch/79057
     kernelPackages =
       (import (fetchTree "github:NixOS/nixpkgs/1306659b587dc277866c7b69eb97e5f07864d8c4") {
         inherit (pkgs.stdenv.hostPlatform) system;

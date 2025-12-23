@@ -63,6 +63,19 @@
     })
   ];
 
+  # Lazygit config for usable performance in large repos e.g. nixpkgs
+  # https://github.com/NixOS/nixpkgs/issues/423262#issuecomment-3053002428
+  # Copy this file to the local repo in .git/lazygit.yml
+  xdg.configFile."lazygit/large-repo.yml".text = # yaml
+    ''
+      git:
+        branchLogCmd: git log --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --
+        allBranchesLogCmds:
+          - git log --all --color=always --abbrev-commit --decorate --date=relative  --pretty=medium
+        log:
+          order: default
+    '';
+
   programs.zsh.shellAliases.lg = "lazygit";
 
   ns.persistence.directories = [ ".local/state/lazygit" ];

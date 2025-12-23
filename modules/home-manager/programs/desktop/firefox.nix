@@ -333,7 +333,7 @@ in
 
     settings.windowrule = [
       "match:class firefox, scroll_touchpad 0.6"
-      "match:class firefox, match:float true, center true"
+      "match:class firefox, match:float true, center true, size monitor_w*0.75 monitor_h*0.75"
       "match:class firefox, match:title Extension: \\(Bitwarden Password Manager\\) - Bitwarden — Mozilla Firefox, no_screen_share true"
     ];
 

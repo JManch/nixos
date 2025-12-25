@@ -1,8 +1,8 @@
 diff --git a/src/helpers/Monitor.cpp b/src/helpers/Monitor.cpp
-index 50a8c120..d04c38ab 100644
+index cbb02118..2ab9cd7d 100644
 --- a/src/helpers/Monitor.cpp
 +++ b/src/helpers/Monitor.cpp
-@@ -331,6 +331,36 @@ void CMonitor::onConnect(bool noRule) {
+@@ -337,6 +337,36 @@ void CMonitor::onConnect(bool noRule) {
  
      PROTO::gamma->applyGammaToState(m_self.lock());
  
@@ -29,7 +29,7 @@ index 50a8c120..d04c38ab 100644
 +
 +        m_output->state->setGammaLut(final_table);
 +        if (!m_state.test()) {
-+            LOGM(LOG, "setting gamma to monitor {} failed", m_name);
++            Log::logger->log(Log::ERR, "Setting gamma to monitor {} failed", m_name);
 +            m_output->state->setGammaLut({});
 +        }
 +

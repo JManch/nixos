@@ -314,6 +314,7 @@ in
             let
               # Use dns-stack dnsmsaq config as baseline
               settings = dns-stack.dnsmasqConfig // {
+                listen-address = cfg.address;
                 port = cfg.dns.port;
 
                 address = flatten (
@@ -345,8 +346,16 @@ in
               # restart burst limit and then never restart again. Frequently
               # ran into this if the VPN attempted to start before name
               # resolution was up.
-              wants = [ "wg-quick-wg-${interface}.service" ];
-              wantedBy = [ "wg-quick-wg-${interface}.service" ];
+
+              # UPDATE: Turns out this is still an issue even with Wants. Just
+              # going to not bind the DNS and VPN service and bind the DNS
+              # service to the VPN interfaces listen-address (this hopefully
+              # ensures that the service will bind correctly even if dnsmasq
+              # starts before the VPN interface is up)
+
+              # wants = [ "wg-quick-wg-${interface}.service" ];
+              # wantedBy = [ "wg-quick-wg-${interface}.service" ];
+              wantedBy = [ "multi-user.target" ];
 
               serviceConfig = baseline.serviceConfig // {
                 ExecStartPre = "${dnsmasq} -C ${configFile} --test";

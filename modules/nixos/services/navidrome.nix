@@ -27,37 +27,7 @@ in
   services.navidrome = {
     enable = true;
     openFirewall = false;
-    # package = lib.${ns}.addPatches pkgs.navidrome [ "navidrome-lastfm-apostrophe.patch" ];
-
-    package = pkgs.navidrome.overrideAttrs (
-      final: prev:
-      assert lib.assertMsg (prev.version == "0.58.5") "Remove navidrome override";
-      {
-        version = "0.59.0";
-        src = pkgs.fetchFromGitHub {
-          owner = "navidrome";
-          repo = "navidrome";
-          tag = "v${final.version}";
-          hash = "sha256-YXyNnjaLgu4FXvgsbbzCOZRIuN96h+KDrXmJe1607JI=";
-        };
-
-        patches = prev.patches or [ ] ++ [ ../../../patches/navidrome-lastfm-apostrophe.patch ];
-
-        vendorHash = "sha256-FFtTQuXb5GYxZmUiNjZNO6K8QYF0TLH4JU2JmAzZhqQ=";
-
-        npmDeps = pkgs.fetchNpmDeps {
-          inherit (final) src;
-          sourceRoot = "${final.src.name}/ui";
-          hash = "sha256-RTye1ZbxLqfkZUvV0NLN7wcRnri3sC5Lfi8RXVG1bLM=";
-
-        };
-
-        ldflags = [
-          "-X github.com/navidrome/navidrome/consts.gitSha=${final.src.rev}"
-          "-X github.com/navidrome/navidrome/consts.gitTag=v${final.version}"
-        ];
-      }
-    );
+    package = lib.${ns}.addPatches pkgs.navidrome [ "navidrome-lastfm-apostrophe.patch" ];
 
     settings = {
       Address = "127.0.0.1";

@@ -124,7 +124,7 @@ in
         StateDirectory = "jellyfin";
         CacheDirectory = "jellyfin";
         StateDirectoryMode = "0700";
-        ProtectSystem = "strict";
+        ProtectSystem = mkForce "strict";
       };
       wantedBy = mkForce (optional cfg.autoStart "multi-user.target");
     };

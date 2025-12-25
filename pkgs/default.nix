@@ -32,6 +32,7 @@ in
   # Manual
   advanced-camera-card = callPackage ./advanced-camera-card.nix { };
   multiviewer = callPackage ./multiviewer.nix { };
+  balatro-mobile-maker = callPackage ./balatro-mobile-maker.nix { };
 
   # Other
   bootstrap-kit = callPackage ./bootstrap-kit.nix { inherit (self.inputs) nix-resources; };

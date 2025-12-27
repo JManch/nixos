@@ -39,7 +39,7 @@
     # Critical inputs that provide imported NixOS modules or overlays. Ideally
     # should review changes after updating.
 
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:JManch/nixpkgs/nixos-unstable-tlp-1.9.0";
 
     impermanence.url = "github:nix-community/impermanence";
 

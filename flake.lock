@@ -1338,11 +1338,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1766081723,
-        "narHash": "sha256-YkiViRaHygxESJ0ZJsYSU/Uh8lSE7zU0LE2inZNz57A=",
+        "lastModified": 1766482535,
+        "narHash": "sha256-QqG/577P/iOEJ5IFssLX00pCIH92KUGbYXO86AVq+UQ=",
         "owner": "JManch",
         "repo": "nix-resources",
-        "rev": "02c818ba7493312f2d06b1daceee3b68097d9ad7",
+        "rev": "f7b30f78de1573fc89f0289505c59631936843f9",
         "type": "github"
       },
       "original": {
@@ -1468,16 +1468,16 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1766309749,
-        "narHash": "sha256-3xY8CZ4rSnQ0NqGhMKAy5vgC+2IVK0NoVEzDoOh4DA4=",
-        "owner": "NixOS",
+        "lastModified": 1766508863,
+        "narHash": "sha256-bf306dfT5dFbYWEpoHuK7QvyBuhVtW/Skz9r3cnIrWQ=",
+        "owner": "JManch",
         "repo": "nixpkgs",
-        "rev": "a6531044f6d0bef691ea18d4d4ce44d0daa6e816",
+        "rev": "e85edacd7454d90125bd67d2ae58c49ab873ab0f",
         "type": "github"
       },
       "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable",
+        "owner": "JManch",
+        "ref": "nixos-unstable-tlp-1.9.0",
         "repo": "nixpkgs",
         "type": "github"
       }

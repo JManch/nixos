@@ -122,7 +122,7 @@ in
           color: @red;
       }
 
-      #custom-hostname {
+      #custom-hostname, #power-profiles-daemon {
           margin: 5px ${if cfg.float then "5" else toString gapSize}px 5px 0px;
           padding: 0px 7px;
           border-radius: ${halfCornerRadius}px;

@@ -41,6 +41,8 @@ let
   wgnord = osConfig.${ns}.services.wgnord;
   gamemode = osConfig.${ns}.programs.gaming.gamemode;
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
+  powerProfilesEnabled =
+    osConfig.services.tlp.enable || osConfig.services.power-profiles-daemon.enable;
 
   notify-send = getExe pkgs.libnotify;
   systemctl = getExe' pkgs.systemd "systemctl";
@@ -287,7 +289,13 @@ in
           spacing = 17;
         };
 
-        "custom/hostname" = {
+        power-profiles-daemon = mkIf powerProfilesEnabled {
+          format = toUpper hostname;
+          tooltip-format = "Power profile: {profile}";
+          tooltip = true;
+        };
+
+        "custom/hostname" = mkIf (!powerProfilesEnabled) {
           format = toUpper hostname;
           tooltip = false;
         };
@@ -346,8 +354,8 @@ in
           ++ [
             "tray"
             "custom/poweroff"
-            "custom/hostname"
-          ];
+          ]
+          ++ [ (if powerProfilesEnabled then "power-profiles-daemon" else "custom/hostname") ];
       };
     };
   };

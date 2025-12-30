@@ -173,10 +173,15 @@
     };
   };
 
-  # Set minimum initial brightness to 50% so we can see TTY outdoors
-  # https://www.man7.org/linux/man-pages/man8/systemd-backlight.8.html
   services.udev.extraRules = ''
+    # Set minimum initial brightness to 50% so we can see TTY outdoors
+    # https://www.man7.org/linux/man-pages/man8/systemd-backlight.8.html
     ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="amdgpu_bl1", ENV{ID_BACKLIGHT_CLAMP}="50%%"
+
+    # Do not wake from suspend from keyboard or touchpad interaction as these
+    # may accidentally be triggered in a backpack
+    ACTION=="add", SUBSYSTEM=="serio", DRIVER=="atkbd", ATTR{power/wakeup}="disabled"
+    ACTION=="add", SUBSYSTEM=="i2c", DRIVER=="i2c_hid_acpi", ATTR{name}=="PIXA3854:00", ATTR{power/wakeup}="disabled"
   '';
 
   # Disable the airplane mode key

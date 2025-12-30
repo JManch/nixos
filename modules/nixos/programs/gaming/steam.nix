@@ -26,6 +26,10 @@ let
     Noita = 881100;
     iRacing = 266410;
     BONELAB = 1592190;
+    # WARN: For these games it's important to disable steam input otherwise our
+    # TX15 gets detected as an xbox 360 controller and gets deadzones
+    Liftoff = 410340;
+    "Liftoff: Micro Drones" = 1432320;
   };
 in
 {
@@ -157,6 +161,8 @@ in
           "hl2_linux"
           "discovery\\.exe" # the finals
           "STRAFTAT\\.x86_64"
+          "Liftoff\\.x86_64"
+          "Liftoff Micro Drones\\.x86_64"
         ];
 
         tearingExcludedClasses =

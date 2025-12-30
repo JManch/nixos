@@ -26,20 +26,28 @@
 # whilst turning back on.
 
 # Currently seems to be bugged though: https://steamcommunity.com/app/1675200/discussions/0/603032812101052230/
+{ pkgs }:
 {
-  services.udev.extraRules = ''
-    # XInput mode
-    SUBSYSTEM=="hidraw", ATTRS{idProduct}=="310b", ATTRS{idVendor}=="2dc8", TAG+="uaccess"
-    # DInput mode (hold B whilst turning on controller)
-    SUBSYSTEM=="hidraw", ATTRS{idProduct}=="6012", ATTRS{idVendor}=="2dc8", TAG+="uaccess"
+  # Not using services.udev.extraRules due to https://github.com/NixOS/nixpkgs/issues/308681
+  services.udev.packages = [
+    (pkgs.writeTextFile {
+      name = "8bitdo-ultimate-2-udev-rules";
+      destination = "/etc/udev/rules.d/70-8bitdo-ultimate-2.rules";
+      text = ''
+        # XInput mode
+        SUBSYSTEM=="hidraw", ATTRS{idProduct}=="310b", ATTRS{idVendor}=="2dc8", TAG+="uaccess"
+        # DInput mode (hold B whilst turning on controller)
+        SUBSYSTEM=="hidraw", ATTRS{idProduct}=="6012", ATTRS{idVendor}=="2dc8", TAG+="uaccess"
 
-    # Next two aren't actually necessary but might come in handy in the future
-    # if the "Ultimate Software V2" tool becomes useable in Wine enabling
-    # firmware updates without a VM
+        # Next two aren't actually necessary but might come in handy in the future
+        # if the "Ultimate Software V2" tool becomes useable in Wine enabling
+        # firmware updates without a VM
 
-    # bootloader mode
-    SUBSYSTEM=="hidraw", ATTRS{idProduct}=="3208", ATTRS{idVendor}=="2dc8", TAG+="uaccess"
-    # dongle mode
-    SUBSYSTEM=="hidraw", ATTRS{idProduct}=="6013", ATTRS{idVendor}=="2dc8", TAG+="uaccess"
-  '';
+        # bootloader mode
+        SUBSYSTEM=="hidraw", ATTRS{idProduct}=="3208", ATTRS{idVendor}=="2dc8", TAG+="uaccess"
+        # dongle mode
+        SUBSYSTEM=="hidraw", ATTRS{idProduct}=="6013", ATTRS{idVendor}=="2dc8", TAG+="uaccess"
+      '';
+    })
+  ];
 }

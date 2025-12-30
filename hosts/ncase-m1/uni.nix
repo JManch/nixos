@@ -88,7 +88,10 @@ in
 
     system = {
       networking = {
-        firewall.defaultInterfaces = mkForce [ "wg-home" ];
+        firewall.defaultInterfaces = mkForce [
+          "wg-home"
+          "wg-home-minimal"
+        ];
         wireless.disableOnBoot = mkForce false;
       };
     };

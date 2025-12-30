@@ -229,8 +229,8 @@
         firewall = {
           enable = true;
           defaultInterfaces = [
-            "wg-home"
-            "wg-home-minimal"
+            "eno1"
+            "wlp6s0"
           ];
         };
 

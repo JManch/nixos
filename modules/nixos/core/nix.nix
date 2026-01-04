@@ -439,6 +439,14 @@ in
               hash = "sha256-GTXFAK1T8LiCIuukYFIOqoXNbrXJF0smTzALBdry9eA=";
             })
           ];
+
+        libedgetpu =
+          assert assertMsg (
+            inputs.nixpkgs.rev == "fb7944c166a3b630f177938e478f0378e64ce108"
+          ) "libedgetpu package may be fixed by now";
+          (import (fetchTree "github:NixOS/nixpkgs/e85edacd7454d90125bd67d2ae58c49ab873ab0f") {
+            inherit (pkgs.stdenv.hostPlatform) system;
+          }).libedgetpu;
       })
     ];
   };

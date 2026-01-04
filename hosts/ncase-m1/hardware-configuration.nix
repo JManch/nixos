@@ -85,7 +85,7 @@
     #   (import (fetchTree "github:NixOS/nixpkgs/2fad6eac6077f03fe109c4d4eb171cf96791faa4") {
     #     inherit (pkgs.stdenv.hostPlatform) system;
     #   }).linuxPackages_6_17;
-    kernelPackages = lib.mkForce pkgs.linuxPackages_6_17;
+    kernelPackages = lib.mkForce pkgs.linuxPackages_6_18;
   };
 
   programs.ryzen-monitor-ng.enable = true;

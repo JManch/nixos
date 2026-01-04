@@ -1,21 +1,22 @@
 diff --git a/src/config/ConfigManager.cpp b/src/config/ConfigManager.cpp
-index 3e75f2ab..19cc4a60 100644
+index 5b6dee02..20707936 100644
 --- a/src/config/ConfigManager.cpp
 +++ b/src/config/ConfigManager.cpp
-@@ -3223,7 +3223,7 @@ std::optional<std::string> CConfigManager::handleGesture(const std::string& comm
+@@ -2882,7 +2882,8 @@ std::optional<std::string> CConfigManager::handleGesture(const std::string& comm
      else if (data[startDataIdx] == "workspace")
-         result = g_pTrackpadGestures->addGesture(makeUnique<CWorkspaceSwipeGesture>(), fingerCount, direction, modMask, deltaScale);
+         result = g_pTrackpadGestures->addGesture(makeUnique<CWorkspaceSwipeGesture>(), fingerCount, direction, modMask, deltaScale, disableInhibit);
      else if (data[startDataIdx] == "resize")
--        result = g_pTrackpadGestures->addGesture(makeUnique<CResizeTrackpadGesture>(), fingerCount, direction, modMask, deltaScale);
-+        result = g_pTrackpadGestures->addGesture(makeUnique<CResizeTrackpadGesture>(std::string{data[startDataIdx + 1]}), fingerCount, direction, modMask, deltaScale);
+-        result = g_pTrackpadGestures->addGesture(makeUnique<CResizeTrackpadGesture>(), fingerCount, direction, modMask, deltaScale, disableInhibit);
++        result =
++            g_pTrackpadGestures->addGesture(makeUnique<CResizeTrackpadGesture>(std::string{data[startDataIdx + 2]}), fingerCount, direction, modMask, deltaScale, disableInhibit);
      else if (data[startDataIdx] == "move")
-         result = g_pTrackpadGestures->addGesture(makeUnique<CMoveTrackpadGesture>(), fingerCount, direction, modMask, deltaScale);
+         result = g_pTrackpadGestures->addGesture(makeUnique<CMoveTrackpadGesture>(), fingerCount, direction, modMask, deltaScale, disableInhibit);
      else if (data[startDataIdx] == "special")
 diff --git a/src/managers/input/trackpad/gestures/ResizeGesture.cpp b/src/managers/input/trackpad/gestures/ResizeGesture.cpp
-index d788257a..856b3068 100644
+index 33f018cd..7bc8b055 100644
 --- a/src/managers/input/trackpad/gestures/ResizeGesture.cpp
 +++ b/src/managers/input/trackpad/gestures/ResizeGesture.cpp
-@@ -4,6 +4,18 @@
+@@ -5,6 +5,18 @@
  #include "../../../../managers/LayoutManager.hpp"
  #include "../../../../render/Renderer.hpp"
  
@@ -34,7 +35,7 @@ index d788257a..856b3068 100644
  void CResizeTrackpadGesture::begin(const ITrackpadGesture::STrackpadGestureBegin& e) {
      ITrackpadGesture::begin(e);
  
-@@ -14,10 +26,18 @@ void CResizeTrackpadGesture::update(const ITrackpadGesture::STrackpadGestureUpda
+@@ -15,10 +27,18 @@ void CResizeTrackpadGesture::update(const ITrackpadGesture::STrackpadGestureUpda
      if (!m_window)
          return;
  

@@ -1,13 +1,13 @@
-diff --git a/example/hyprland.desktop b/example/hyprland.desktop
-index c81e0216..bb2801a9 100644
---- a/example/hyprland.desktop
-+++ b/example/hyprland.desktop
+diff --git a/example/hyprland.desktop.in b/example/hyprland.desktop.in
+index d8e87d60..a3509a9b 100644
+--- a/example/hyprland.desktop.in
++++ b/example/hyprland.desktop.in
 @@ -1,7 +1,7 @@
  [Desktop Entry]
  Name=Hyprland
  Comment=An intelligent dynamic tiling Wayland compositor
--Exec=start-hyprland
-+Exec=Hyprland
+-Exec=@PREFIX@/@CMAKE_INSTALL_BINDIR@/start-hyprland
++Exec=@PREFIX@/@CMAKE_INSTALL_BINDIR@/Hyprland
  Type=Application
  DesktopNames=Hyprland
  Keywords=tiling;wayland;compositor;

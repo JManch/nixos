@@ -13,7 +13,7 @@ in
     ((vesktop.override { withMiddleClickScroll = true; }).overrideAttrs {
       src =
         assert lib.assertMsg (
-          pkgs.vesktop.version == "1.6.1"
+          pkgs.vesktop.version == "1.6.3"
         ) "Check if https://github.com/Vencord/Vesktop/pull/1198 has been merged into vesktop";
         fetchFromGitHub {
           owner = "T1mbits";

@@ -1,6 +1,8 @@
 {
   lib,
   cfg,
+  pkgs,
+  inputs,
   config,
   hostname,
 }:
@@ -102,12 +104,16 @@ in
 
   services.frigate = {
     enable = true;
-
-    # Run check config for new versions as automatic migrations don't work on
-    # NixOS. For the check to work we have to temporarily remove all custom
-    # FRIGATE_ env vars in our config as they break the check for some reason.
-    checkConfig = config.services.frigate.package.version != "0.16.3";
     hostname = "frigate.internal.com";
+    checkConfig = true;
+
+    # https://github.com/NixOS/nixpkgs/pull/433539
+    preCheckConfig = ''
+      export FRIGATE_RTSP_USER=rtsp-user
+      export FRIGATE_RTSP_PASSWORD=rtsp-password
+      export FRIGATE_MQTT_USER=mqtt-user
+      export FRIGATE_MQTT_PASSWORD=mqtt-password
+    '';
 
     settings = {
       auth.enabled = false;

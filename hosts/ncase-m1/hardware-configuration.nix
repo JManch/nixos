@@ -86,6 +86,8 @@
     #     inherit (pkgs.stdenv.hostPlatform) system;
     #   }).linuxPackages_6_17;
     kernelPackages = lib.mkForce pkgs.linuxPackages_6_18;
+    # Not sure why 2.4 uses a new package?
+    zfs.package = pkgs.zfs_2_4;
   };
 
   programs.ryzen-monitor-ng.enable = true;

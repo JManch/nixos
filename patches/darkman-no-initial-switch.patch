@@ -1,108 +1,38 @@
-diff --git a/dbus.go b/dbus.go
-index 66af8a2..3616c5e 100644
---- a/dbus.go
-+++ b/dbus.go
-@@ -24,7 +24,7 @@ func (handle *DBusHandle) emitChangeSignal() error {
- 
- // Changes the current mode to `Mode`. This function is to be called when the
- // mode is changed by another / subsystem.
--func (handle *DBusHandle) ChangeMode(newMode Mode) error {
-+func (handle *DBusHandle) ChangeMode(newMode Mode, currentMode Mode,) error {
- 	if handle.conn == nil {
- 		return fmt.Errorf("cannot emit dbus signal; no connection to dbus")
- 	}
-diff --git a/portal.go b/portal.go
-index 192ee9d..77ff5d5 100644
---- a/portal.go
-+++ b/portal.go
-@@ -42,7 +42,7 @@ func modeToPortalValue(mode Mode) uint {
- 	return 255
- }
- 
--func (portal *PortalHandle) ChangeMode(newMode Mode) error {
-+func (portal *PortalHandle) ChangeMode(newMode Mode, currentMode Mode) error {
- 	if portal.conn == nil {
- 		return fmt.Errorf("cannot emit portal signal; no connection to dbus")
- 	}
-diff --git a/scripts.go b/scripts.go
-index 3543da7..931d738 100644
---- a/scripts.go
-+++ b/scripts.go
-@@ -16,7 +16,12 @@ var scriptsRunning sync.Mutex
- // Run transition scripts for a given mode.
- //
- // Fires up all scripts asyncrhonously and returns immediately.
--func RunScripts(mode Mode) error {
-+func RunScripts(mode Mode, currentMode Mode) error {
-+	if currentMode == "null" && mode == "dark" {
-+		log.Println("Skipping scripts for the first dark mode transition.")
-+		return nil
-+	}
-+
- 	executables := make(map[string]string)
- 	directories := make([]string, len(xdg.DataDirs)+1)
- 
 diff --git a/service.go b/service.go
-index 5ee8590..4853285 100644
+index 112ddb2..d58cf53 100644
 --- a/service.go
 +++ b/service.go
-@@ -17,7 +17,7 @@ import (
- type Mode string
- type Service struct {
- 	currentMode Mode
--	listeners   *[]func(Mode) error
-+	listeners   *[]func(Mode, Mode) error
- }
- 
- const (
-@@ -30,39 +30,41 @@ const (
- func NewService(initialMode Mode) Service {
- 	return Service{
- 		currentMode: initialMode,
--		listeners:   &[]func(Mode) error{},
-+		listeners:   &[]func(Mode, Mode) error{},
- 	}
- }
- 
- // Add a callback to be run each time the current mode changes.
--func (service *Service) AddListener(listener func(Mode) error) {
-+func (service *Service) AddListener(listener func(Mode, Mode) error) {
+@@ -41,6 +41,24 @@ func NewService(initialMode Mode) Service {
+ // AddListener adds a new callback to be run each time the current mode changes.
+ func (service *Service) AddListener(listener ModeListener) {
  	*service.listeners = append(*service.listeners, listener)
++
++	// Apply once with the initial mode.
++	if err := listener.OnModeChanged(service.currentMode); err != nil {
++		fmt.Println("error applying initial mode:", err)
++	}
++}
++
++// Custom method for adding the script listener so we can skip the transition
++// if the initial mode is dark
++// (I made a new method for the sake of easy patching)
++func (service *Service) AddScriptListener(listener ModeListener) {
++	*service.listeners = append(*service.listeners, listener)
++
++	if (service.currentMode == "dark") {
++		log.Println("Skipping script listener initial OnModeChanged as initial mode is dark")
++		return
++	}
++
  	// Apply once with the initial mode.
--	if err := listener(service.currentMode); err != nil {
-+	if err := listener(service.currentMode, NULL); err != nil {
+ 	if err := listener.OnModeChanged(service.currentMode); err != nil {
  		fmt.Println("error applying initial mode:", err)
- 	}
- }
+@@ -222,7 +240,7 @@ func ExecuteService(ctx context.Context, config *Config, readyFd *os.File) error
+ 	log.Println("Initial mode set to:", initialMode)
  
- // Change the current mode (and run all callbacks).
- func (service *Service) ChangeMode(mode Mode) {
--	log.Printf("Wanted mode is: %v mode.\n", mode)
-+	log.Printf("Wanted mode is: %v mode. Current mode is: %v mode.\n", mode, service.currentMode)
- 	if mode == service.currentMode {
- 		log.Println("No transition necessary")
- 		return
- 	}
+ 	service := NewService(initialMode)
+-	service.AddListener(&ScriptRunner{})
++	service.AddScriptListener(&ScriptRunner{})
+ 	service.AddListener(CacheSaver{})
  
- 	log.Println("Notifying all transition handlers of new mode.")
--	service.currentMode = mode
-+
- 	for _, listener := range *service.listeners {
--		go func(listener func(Mode) error, mode Mode) {
--			if err := listener(mode); err != nil {
-+		go func(listener func(Mode, Mode) error, mode Mode, currentMode Mode) {
-+			if err := listener(mode, currentMode); err != nil {
- 				fmt.Println("Error notifying listener:", err)
- 			}
--		}(listener, mode)
-+		}(listener, mode, service.currentMode)
- 	}
-+
-+	service.currentMode = mode
- }
- 
--func saveModeToCache(mode Mode) error {
-+func saveModeToCache(mode Mode, currentMode Mode) error {
- 	cacheFilePath, err := xdg.CacheFile("darkman/mode.txt")
- 	if err != nil {
- 		return fmt.Errorf("failed determine location for mode cache file: %v", err)
+ 	if err := setupListeners(&service, config, ctx, initialMode, initialLocation); err != nil {

@@ -227,7 +227,7 @@ in
       };
 
       beammp-server = {
-        enable = true;
+        enable = false;
         autoStart = false;
         openFirewall = true;
         interfaces = [ "wg-friends" ];

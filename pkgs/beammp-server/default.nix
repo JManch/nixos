@@ -69,5 +69,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = [ lib.licenses.agpl3Only ];
     maintainers = with lib.maintainers; [ JManch ];
     mainProgram = "BeamMP-Server";
+    broken = true;
   };
 })

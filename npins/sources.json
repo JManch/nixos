@@ -458,10 +458,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.26.0+git.1",
-      "revision": "dba5e4b8c3bbd8fc93e16346adba050a09a9fe42",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.26.0+git.1",
-      "hash": "1zzb7jj762d31aar66r1fq72adk35nl5y664lh264fs7qa6vykcd"
+      "version": "v0.26.0",
+      "revision": "433174c297ef858cc370f143657781ad4856263e",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.26.0",
+      "hash": "0fqqjccc3wfd5vf2wj6lyq1zr6a223zk8avd1ngwwg7imx1vg28a"
     },
     "workspaces.nvim": {
       "type": "GitRelease",

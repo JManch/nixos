@@ -370,6 +370,7 @@ in
       };
 
       cursor = {
+        default_monitor = device.primaryMonitor.name;
         inactive_timeout = 0;
         enable_hyprcursor = cfg.hyprcursor.package != null;
         hide_on_key_press = false;

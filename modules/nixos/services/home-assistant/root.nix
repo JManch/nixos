@@ -151,29 +151,7 @@ in
       pkgs.${ns}.thermal-comfort
       pkgs.${ns}.daikin-onecta
     ]
-    ++ optional frigate.enable (
-      let
-        hass-web-proxy-lib = pkgs.python313Packages.buildPythonPackage {
-          pname = "hass-web-proxy-lib";
-          version = "0-unstable-${sources.hass-web-proxy-lib.revision}";
-          src = sources.hass-web-proxy-lib;
-          pyproject = true;
-          build-system = [
-            pkgs.python313Packages.setuptools
-            pkgs.python313Packages.poetry-core
-          ];
-        };
-      in
-      pkgs.home-assistant-custom-components.frigate.overridePythonAttrs {
-        inherit (sources.frigate-hass-integration) version;
-        src = sources.frigate-hass-integration;
-
-        dependencies = [
-          pkgs.python313Packages.pytz
-          hass-web-proxy-lib
-        ];
-      }
-    );
+    ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;
 
     configWritable = false;
     config = {

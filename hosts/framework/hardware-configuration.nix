@@ -137,6 +137,7 @@
   services.power-profiles-daemon.enable = false;
   services.tlp = {
     enable = true;
+    pd.enable = true;
     settings = {
       # Battery
       # `tlp fullcharge` to disable threshold until AC is unplugged

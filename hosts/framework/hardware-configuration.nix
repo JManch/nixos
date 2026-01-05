@@ -3,7 +3,9 @@
 # - Userspace charge limiter has been broken since the 3.04 bios update https://github.com/tlvince/nixos-config/issues/309
 # - Front-right USB A adapter sometimes doesn't work https://community.frame.work/t/solved-usb-a-expansion-card-stops-working-until-unplugged/26579
 {
+  lib,
   pkgs,
+  config,
   inputs,
   modulesPath,
   ...
@@ -24,18 +26,22 @@
     kernelPackages = pkgs.linuxPackages_latest;
 
     kernelPatches = [
-      {
-        # Suspend is currently broken in 6.18 due to [1] The commit has been reverted
-        # in 6.19 but the wifi driver is broken in the current pre-release (6.19rc3)
-        # Patching 6.18 with the revert.
-        # [1] https://github.com/torvalds/linux/commit/2a6c826cfeedd7714611ac115371a959ead55bda
-        # https://community.frame.work/t/significant-suspend-regressions-on-framework-13-amd-linux-6-18-2-arch/79057
-        name = "suspend-fix";
-        patch = pkgs.fetchpatch2 {
-          url = "https://github.com/torvalds/linux/commit/3925683515e93844be204381d2d5a1df5de34f31.patch";
-          hash = "sha256-UFJODLpTG6LoES/SvUJZmJrwPw1jNHGy42DZEZYl/zQ=";
-        };
-      }
+      (
+        assert lib.assertMsg (lib.hasPrefix "6.18" config.boot.kernelPackages.kernel.version)
+          "Framework kernel patch is no longer needed for 6.19";
+        {
+          # Suspend is currently broken in 6.18 due to [1] The commit has been reverted
+          # in 6.19 but the wifi driver is broken in the current pre-release (6.19rc3)
+          # Patching 6.18 with the revert.
+          # [1] https://github.com/torvalds/linux/commit/2a6c826cfeedd7714611ac115371a959ead55bda
+          # https://community.frame.work/t/significant-suspend-regressions-on-framework-13-amd-linux-6-18-2-arch/79057
+          name = "suspend-fix";
+          patch = pkgs.fetchpatch2 {
+            url = "https://github.com/torvalds/linux/commit/3925683515e93844be204381d2d5a1df5de34f31.patch";
+            hash = "sha256-UFJODLpTG6LoES/SvUJZmJrwPw1jNHGy42DZEZYl/zQ=";
+          };
+        }
+      )
     ];
 
     kernelModules = [ "kvm-amd" ];

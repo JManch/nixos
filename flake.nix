@@ -43,7 +43,7 @@
 
     impermanence.url = "github:nix-community/impermanence";
 
-    vpn-confinement.url = "github:Maroka-chan/VPN-Confinement?ref=pull/39/head";
+    vpn-confinement.url = "github:Maroka-chan/VPN-Confinement";
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";

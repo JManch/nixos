@@ -22,6 +22,7 @@ let
     attrNames
     optionalString
     optionals
+    head
     mapAttrsToList
     ;
   inherit (lib.${ns})
@@ -314,6 +315,10 @@ in
     portalPackage = null; # we configure the portal ourselves above
 
     settings = {
+      # cursor:default_monitor does not work. For some reason the cursor warps
+      # to a position between our two monitors.
+      exec-once = [ "hyprctl dispatch workspace ${toString (head device.primaryMonitor.workspaces)}" ];
+
       monitor =
         (map (m: if !m.enabled then "${m.name},disable" else getMonitorHyprlandCfgStr m) device.monitors)
         ++ [

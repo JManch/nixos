@@ -78,7 +78,18 @@ let
         wallpaper="${cfg.defaults.default}"
       fi
 
-      exec ${cfg.setWallpaperScript} "$wallpaper"
+      # Sometimes the wallpaper daemon has not yet initialised even though the
+      # service is "up"
+      attempt=0
+      while ! ${cfg.setWallpaperScript} "$wallpaper"; do
+        if (( attempt >= 5 )); then
+          echo "Failed to set wallpaper after 5 attempts"
+          exit 1
+        fi
+        echo "Waiting for wallpaper daemon..."
+        sleep 0.5
+        attempt=$((attempt + 1))
+      done
     '';
   };
 
@@ -205,7 +216,6 @@ in
 
       Service = {
         Type = "oneshot";
-        ExecStartPre = "${lib.getExe' pkgs.coreutils "sleep"} 2";
         ExecStart = getExe setWallpaper;
       };
 

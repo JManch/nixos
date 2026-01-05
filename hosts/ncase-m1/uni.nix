@@ -25,7 +25,7 @@ in
           gamma = 0.75;
           width = 2560;
           height = 1440;
-          position.x = 2560;
+          position.x = 0;
           position.y = 0;
           workspaces = builtins.genList (i: i + 1) 25;
         }

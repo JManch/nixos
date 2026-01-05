@@ -48,7 +48,7 @@
             gamma = 0.75;
             width = 2560;
             height = 1440;
-            position.x = 2560;
+            position.x = 0;
             position.y = 0;
             workspaces = builtins.genList (i: (i * 2) + 1) 25;
           }
@@ -58,7 +58,7 @@
             refreshRate = 59.951;
             width = 2560;
             height = 1440;
-            position.x = 0;
+            position.x = -2560;
             position.y = 0;
             workspaces = builtins.genList (i: (i * 2) + 2) 25;
           }
@@ -71,7 +71,7 @@
             refreshRate = 59.951;
             width = 2560;
             height = 1440;
-            position.x = -2560;
+            position.x = -5120;
             position.y = 0;
             transform = 2;
           }

@@ -1893,15 +1893,16 @@
     },
     "vpn-confinement": {
       "locked": {
-        "lastModified": 1765634578,
-        "narHash": "sha256-Fujb9sn1cj+u/bzfo2RbQkcAvJ7Ch1pimJzFie4ptb4=",
+        "lastModified": 1767578335,
+        "narHash": "sha256-FddhMxnc99KYOZ/S3YNqtDSoxisIhVtJ7L4s8XD2u0A=",
         "owner": "Maroka-chan",
         "repo": "VPN-Confinement",
-        "rev": "f2989e1e3cb06c7185939e9ddc368f88b998616a",
+        "rev": "bd6511a5c2c7067608943e4738db9b5eab234f77",
         "type": "github"
       },
       "original": {
         "owner": "Maroka-chan",
+        "ref": "pull/39/head",
         "repo": "VPN-Confinement",
         "type": "github"
       }

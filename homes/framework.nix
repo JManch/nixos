@@ -97,7 +97,9 @@
         firefox = {
           enable = true;
           backup = true;
-          runInRam = true;
+          # don't think it makes much sense on laptops as it causes excessive
+          # reads/writes during suspend and boot
+          runInRam = false;
           hideToolbar = true;
         };
 

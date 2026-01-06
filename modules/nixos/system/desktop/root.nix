@@ -74,6 +74,11 @@ in
   services.xserver.excludePackages = [ pkgs.xterm ];
   hardware.graphics.enable = true;
 
+  # We do not need these accessibility services
+  # https://github.com/NixOS/nixpkgs/pull/329658
+  services.speechd.enable = false;
+  services.orca.enable = false;
+
   # Some apps may use this to optimise for power savings
   services.upower = {
     enable = mkDefault (device.type == "laptop");

@@ -1,4 +1,8 @@
-{ lib, pkgs }:
+{
+  lib,
+  pkgs,
+  config,
+}:
 {
   conditions = [ "osConfig.system.audio" ];
 
@@ -24,8 +28,15 @@
 
     services.playerctl.musicPlayers = [ "spotify" ];
 
-    uwsm.appUnitOverrides."spotify@.service" = ''
+    # For some reason spotify ignores SIGTERM sent to the main PID. On Hyprland
+    # we can send a dispatcher to cleanly close the window (and process). Have
+    # to used KillMode=mixed to avoid a coredump from attempting to close all
+    # processes at once.
+    uwsm.appUnitOverrides."spotify@.service" = lib.mkIf (lib.${lib.ns}.isHyprland config) ''
       [Service]
+      ExecStop=-${pkgs.writeShellScript "hypr-close-spotify" ''
+        ${lib.getExe' pkgs.hyprland "hyprctl"} dispatch closewindow pid:$MAINPID &>/dev/null
+      ''}
       KillMode=mixed
     '';
   };

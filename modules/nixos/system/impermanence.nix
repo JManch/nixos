@@ -19,9 +19,7 @@ let
     any
     hasPrefix
     ;
-  inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.system.virtualisation) vmVariant;
-  homePersistence = config.${ns}.hmNs.persistence;
   fd = getExe pkgs.fd;
 
   # Print all files in the tmpfs file system that will be lost on shutdown
@@ -138,8 +136,6 @@ in
         "/etc/machine-id"
         "/etc/adjtime"
       ];
-
-      users.${username} = mkIf home-manager.enable homePersistence;
     };
 
     # Workaround for ensuring that /var/lib/private is created with the correct

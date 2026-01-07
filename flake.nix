@@ -42,6 +42,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     impermanence.url = "github:nix-community/impermanence";
+    impermanence.inputs.nixpkgs.follows = "nixpkgs";
+    impermanence.inputs.home-manager.follows = "home-manager";
 
     vpn-confinement.url = "github:Maroka-chan/VPN-Confinement";
 

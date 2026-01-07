@@ -3,9 +3,7 @@
 # - Userspace charge limiter has been broken since the 3.04 bios update https://github.com/tlvince/nixos-config/issues/309
 # - Front-right USB A adapter sometimes doesn't work https://community.frame.work/t/solved-usb-a-expansion-card-stops-working-until-unplugged/26579
 {
-  lib,
   pkgs,
-  config,
   inputs,
   modulesPath,
   ...
@@ -22,26 +20,40 @@
   # As of kernel 6.13 the framework kmod isn't necessary
   hardware.framework.enableKmod = false;
 
+  nixpkgs.overlays = [
+    (
+      final: _:
+      let
+        latestKernel = import (fetchTree "github:JManch/nixpkgs/bc10ee274ddf70a9137141faaaa80b4c0001f644") {
+          inherit (final.stdenv.hostPlatform) system;
+        };
+      in
+      {
+        inherit (latestKernel) linux-firmware linuxPackages_testing;
+      }
+    )
+  ];
+
   boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
+    kernelPackages = pkgs.linuxPackages_testing;
 
     kernelPatches = [
-      (
-        assert lib.assertMsg (lib.hasPrefix "6.18" config.boot.kernelPackages.kernel.version)
-          "Framework kernel patch is no longer needed for 6.19";
-        {
-          # Suspend is currently broken in 6.18 due to [1] The commit has been reverted
-          # in 6.19 but the wifi driver is broken in the current pre-release (6.19rc3)
-          # Patching 6.18 with the revert.
-          # [1] https://github.com/torvalds/linux/commit/2a6c826cfeedd7714611ac115371a959ead55bda
-          # https://community.frame.work/t/significant-suspend-regressions-on-framework-13-amd-linux-6-18-2-arch/79057
-          name = "suspend-fix";
-          patch = pkgs.fetchpatch2 {
-            url = "https://github.com/torvalds/linux/commit/3925683515e93844be204381d2d5a1df5de34f31.patch";
-            hash = "sha256-UFJODLpTG6LoES/SvUJZmJrwPw1jNHGy42DZEZYl/zQ=";
-          };
-        }
-      )
+      {
+        name = "mt7925-fixes";
+        patch =
+          pkgs.runCommand "combine-mt7925-patches"
+            {
+              patchSource = pkgs.fetchFromGitHub {
+                owner = "zbowling";
+                repo = "mt7925";
+                rev = "1f8f22006c59683f219fc3e9e3cd2b2f7775ad10";
+                hash = "sha256-RY67noK8w3XXFAdyciyNBG3m0fwcDDGgCxx6VkXDezU=";
+              };
+            }
+            ''
+              cat $patchSource/linux-6.19-rc4/*.patch > $out
+            '';
+      }
     ];
 
     kernelModules = [ "kvm-amd" ];

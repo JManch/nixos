@@ -148,7 +148,7 @@ in
             name = "Control D Main Profile";
             # The actual endpoint is loaded from an environment variable
             endpoint = "https://dns.controld.com/secret";
-            bootstrap_ip = "76.76.2.22";
+            bootstrap_ip = "";
             timeout = 3000;
             type = "doh3";
           };
@@ -156,7 +156,7 @@ in
           "1" = {
             name = "Google";
             endpoint = "https://dns.google/dns-query";
-            bootstrap_ip = "8.8.8.8";
+            bootstrap_ip = "";
             type = "doh";
           };
         };

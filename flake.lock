@@ -1346,11 +1346,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1766482535,
-        "narHash": "sha256-QqG/577P/iOEJ5IFssLX00pCIH92KUGbYXO86AVq+UQ=",
+        "lastModified": 1767891486,
+        "narHash": "sha256-CpdfAeP3Q+FVmZViJq1s4q36v0K8MgT6da7w0d/HqQg=",
         "owner": "JManch",
         "repo": "nix-resources",
-        "rev": "f7b30f78de1573fc89f0289505c59631936843f9",
+        "rev": "37a40d442b5ab9ca704fdc6d3f4ffbbccc12d319",
         "type": "github"
       },
       "original": {

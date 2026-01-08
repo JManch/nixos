@@ -171,6 +171,7 @@ in
       startLimitBurst = 10;
 
       serviceConfig = hardeningBaseline config {
+        LoadCredential = "secret-endpoint:${config.age.secrets.ctrldEndpoint.path}";
         ExecStart = "${getExe ctrld} run --config ${configFile}";
         Restart = "always";
         RestartSec = 10;

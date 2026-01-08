@@ -14,7 +14,7 @@
       "version": "v2.7.0",
       "revision": "a2789a852462b1c0cbe9d3a5c7d584f22b96f21b",
       "url": null,
-      "hash": "0w7np9hk88k6smrh508jyapf36kw510501fdh8f1a135b4nw490y"
+      "hash": "sha256-HiTCLVllBBUcgs0FUEAofJrhrvISgQJz1WYiNGG69nA="
     },
     "BeamMP-Server": {
       "type": "GitRelease",
@@ -30,7 +30,7 @@
       "version": "v3.9.0",
       "revision": "0c10df2407dc557418ee498537379f2f9476a869",
       "url": null,
-      "hash": "12359r8x949rsvsiz1vzz0kb81cgx3g8xf1yyy0hxp4rsbbk9gn1"
+      "hash": "sha256-wb4019KZ3A6B9z64jt7ojwW0Jvh/hx/11jmR1FFOZYg="
     },
     "HA_blueprints": {
       "type": "Git",
@@ -43,7 +43,7 @@
       "submodules": false,
       "revision": "6cffba9676ccfe58c5686bd96bf15a8237e1a3f9",
       "url": "https://github.com/SgtBatten/HA_blueprints/archive/6cffba9676ccfe58c5686bd96bf15a8237e1a3f9.tar.gz",
-      "hash": "0r021ggq8l3sapawdc7dfz8wl98l7cn5kmcrh5l0lwjkryva741v"
+      "hash": "sha256-O5Cjts9TcgpogZnVWSw7FCXK0XftsMbVVXpQhN8LAmQ="
     },
     "ModernX": {
       "type": "GitRelease",
@@ -59,7 +59,7 @@
       "version": "0.4.4",
       "revision": "1702b0f328044c60d2900668125eecedc4d4b0ab",
       "url": "https://api.github.com/repos/zydezu/ModernX/tarball/0.4.4",
-      "hash": "015aw0xb3bdc1v5gds8026c9am3xxz7vjf3afabadjqf3qgc9r5k"
+      "hash": "sha256-s+TEHh4Oy6aWcmo4uc/vfVSVmBEA6fbKDqytsTrgqgQ="
     },
     "adaptive-lighting": {
       "type": "GitRelease",
@@ -75,7 +75,7 @@
       "version": "v1.29.0",
       "revision": "0180fa4a937cede4c86eef344358ede83f81f337",
       "url": "https://api.github.com/repos/basnijholt/adaptive-lighting/tarball/v1.29.0",
-      "hash": "1bryqyrl43y7k09d5pjj7s3cyjd0cg41q51dk0yisj7crynhqpdz"
+      "hash": "sha256-v10Mrc/sSB09mC0UHMhjoEnPhj5S3tISmMcPQrPHPq8="
     },
     "app2unit": {
       "type": "GitRelease",
@@ -91,7 +91,7 @@
       "version": "v1.2.1",
       "revision": "83e2656fb8d39ad71e2f8a5ba113a9cedc90841f",
       "url": "https://api.github.com/repos/Vladimir-csp/app2unit/tarball/v1.2.1",
-      "hash": "0sismfz5wpjy8cx01mm90kx59bglab42ngpd42iljfd05knid78d"
+      "hash": "sha256-DZ0W7SygOUmjIO0+K8hS9K1U+gSp1gA6Q15eXr6rOmo="
     },
     "async-property": {
       "type": "PyPi",
@@ -99,7 +99,7 @@
       "version_upper_bound": null,
       "version": "0.2.2",
       "url": "https://files.pythonhosted.org/packages/a7/12/900eb34b3af75c11b69d6b78b74ec0fd1ba489376eceb3785f787d1a0a1d/async_property-0.2.2.tar.gz",
-      "hash": "17d9bd6ca67e27915a75d92549df64b5c7174e9dc806b30a3934dc4ff0506380"
+      "hash": "sha256-F9m9bKZ+J5FaddklSd9ktccXTp3IBrMKOTTcT/BQY4A="
     },
     "brightnessctl": {
       "type": "Git",
@@ -112,7 +112,7 @@
       "submodules": false,
       "revision": "e70bc55cf053caa285695ac77507e009b5508ee3",
       "url": "https://github.com/Hummer12007/brightnessctl/archive/e70bc55cf053caa285695ac77507e009b5508ee3.tar.gz",
-      "hash": "0kfi1az2hm1ayiphl72vxiimh1d77kyz828wy53kk58gyqzmw2va",
+      "hash": "sha256-agteP/YPlTlH8RwJ9P08pwVYY+xbHApv9CpUKL4K0U0=",
       "frozen": true
     },
     "comick_downloader": {
@@ -126,7 +126,7 @@
       "submodules": false,
       "revision": "af8e660fd11584fed46240061025812cd731fdfb",
       "url": "https://github.com/zzyil/comick.io-Downloader/archive/af8e660fd11584fed46240061025812cd731fdfb.tar.gz",
-      "hash": "18qx207y98gmgyh0pd39xmj1zpxp0b7nhymyz7lr3jprvflsgxxg"
+      "hash": "sha256-r/enqdv5ypHp+b56aM8Ct98fZO1ptAugf/Wh5A8QHaM="
     },
     "ctrld": {
       "type": "GitRelease",
@@ -142,7 +142,7 @@
       "version": "v1.4.8",
       "revision": "3001ec81f196cbb12b13467d70fc6df41035746a",
       "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.8",
-      "hash": "15zwx9awpvjd7ljd7n99n528a3lxpicjmswryii2x5kwv971qh75"
+      "hash": "sha256-5UAcTtp8li5i9JnrKlm8nQ6FRLEp2dMkPU3uy1Xq/Jc="
     },
     "daikin_onecta": {
       "type": "GitRelease",
@@ -158,7 +158,7 @@
       "version": "v4.4.4",
       "revision": "63918299cfde134c6bb0c0b5b3ad05f4597750d4",
       "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/v4.4.4",
-      "hash": "0r5alw7jwyircc8pxqnwz74dxrwb31dlmxl68w223phsxbwlzbpi"
+      "hash": "sha256-8a5P+eoa3iEER4b2SlsYi+feyPnc4n4RYzl6Lg+nqmQ="
     },
     "filen-rclone": {
       "type": "Git",
@@ -171,7 +171,7 @@
       "submodules": false,
       "revision": "43ad6f40a1766ffb3407393c4e46ca7cdc22725b",
       "url": "https://github.com/FilenCloudDienste/filen-rclone/archive/43ad6f40a1766ffb3407393c4e46ca7cdc22725b.tar.gz",
-      "hash": "11v7fcghsgarwa2shlakifbnfql25aqc935sqv84jy76404qibq5"
+      "hash": "sha256-Ba+ICSDmeEnQxrqMxLAqgmJnl4tTUaiF4lk9DR9zZ4c="
     },
     "firefox-csshacks": {
       "type": "Git",
@@ -184,7 +184,7 @@
       "submodules": false,
       "revision": "1a3b86bff806571f5f235a779263a2c9c7b7419b",
       "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/1a3b86bff806571f5f235a779263a2c9c7b7419b.tar.gz",
-      "hash": "14q16dhlijny5sqpn94sikwms5w196md8gj8hhd55irr13qagbis"
+      "hash": "sha256-Oq6n8Ag5x1IahEg+1KpJgRdd+YyaJHuxLt7KSGEzAZM="
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -200,7 +200,7 @@
       "version": "v5.14.1",
       "revision": "fc345dcb1429438ce53ea7c85ede730f453743aa",
       "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/v5.14.1",
-      "hash": "06s7ldz94dxqhn9yimlhvxm9gyx77hp6i58ypby7mni2z0dvab3y"
+      "hash": "sha256-fiy1G/gi2nr8uh6VaC48p/uXat+Q1uiThbg3kn6jRxs="
     },
     "hacs_waste_collection_schedule": {
       "type": "GitRelease",
@@ -216,7 +216,7 @@
       "version": "2.11.0",
       "revision": "2378c8b5bfccd024b06cb94e0c8277513ab8ef8b",
       "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.11.0",
-      "hash": "1dq39n0qv53r1bknbwj8ggnrglax6ynqzqxf76dzmy8m6n97lazv"
+      "hash": "sha256-+yt6kjUV+fqbOa7jj603XdGX7XtI8mXnCnmUjYFNA7c="
     },
     "hass-web-proxy-lib": {
       "type": "Git",
@@ -229,7 +229,7 @@
       "submodules": false,
       "revision": "c79c202d43c4e5a5ebf23986a1374975ece4ac3f",
       "url": "https://github.com/dermotduffy/hass-web-proxy-lib/archive/c79c202d43c4e5a5ebf23986a1374975ece4ac3f.tar.gz",
-      "hash": "0l9b8lcpabvhdybb1jbp59k1zc3691y8km6m378gy1cjf98nxrmm"
+      "hash": "sha256-teZuUXKSBf/QGdXUiXxIZrAfZip3ybCWb3AvdRlFK1E="
     },
     "heatmiser-for-home-assistant": {
       "type": "GitRelease",
@@ -245,7 +245,7 @@
       "version": "v3.3.1",
       "revision": "01fa7b04c572ac488bc2c7065d92ae08ad1224aa",
       "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/v3.3.1",
-      "hash": "0sv8y012davq2vqyd8jvxsr89vsacdpmw2nc23z2qissj2dqyg9f"
+      "hash": "sha256-Lj2Pm5BaRyz+EMwKXm9jSu+Esu5boubxFnirJgLwaGs="
     },
     "hyprpy": {
       "type": "GitRelease",
@@ -261,7 +261,7 @@
       "version": "v0.2.0",
       "revision": "530cd8b34f17349511e14073a7cfaa9a68ebd534",
       "url": "https://api.github.com/repos/ulinja/hyprpy/tarball/v0.2.0",
-      "hash": "1i2m6ymm44bb68hksw4bdnb9ac40afby9gfy1vwz8m38c8z7czbg"
+      "hash": "sha256-b312PmJoVPT5Dt695JdTgDCVlm2LcD0hMmsRUqs3VcQ="
     },
     "indentmini.nvim": {
       "type": "Git",
@@ -274,7 +274,7 @@
       "submodules": false,
       "revision": "38572ce5a7a064a5deb89d6d861b7c40fc929ab1",
       "url": "https://github.com/nvimdev/indentmini.nvim/archive/38572ce5a7a064a5deb89d6d861b7c40fc929ab1.tar.gz",
-      "hash": "06i8i5dbp8p2g35sp6r8rcv52z0y7ww9rr0af8662cn5pcv03jjx"
+      "hash": "sha256-XcoBNrvFMmEMcgrknDg/HnxRNssom6vLeOKiu1qJKBo="
     },
     "jellyfin-plugin-listenbrainz": {
       "type": "GitRelease",
@@ -290,7 +290,7 @@
       "version": "6.0.1.1",
       "revision": "971318be806f0ae5bb8ab74d8386825bf418ae90",
       "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/6.0.1.1",
-      "hash": "15i5jchpnknv68mj1caz4w2zx92zj5dkmbfkvsf6s6v7k85rv0xy"
+      "hash": "sha256-voOdC5pnG22c3tOtOluRX6T+BSdfsSArMttOeyGTJZY="
     },
     "neohubapi": {
       "type": "PyPi",
@@ -298,7 +298,7 @@
       "version_upper_bound": null,
       "version": "3.1",
       "url": "https://files.pythonhosted.org/packages/8b/16/af8642c21fe276938b4fa7f7264f358ae12b41c9a1f7a3a49dd51b431e37/neohubapi-3.1.tar.gz",
-      "hash": "e547166b108b7219993f56b1becdc74bd049c16a07ed5f58eaa799f4ea42e87c"
+      "hash": "sha256-5UcWaxCLchmZP1axvs3HS9BJwWoH7V9Y6qeZ9OpC6Hw="
     },
     "neovim-ayu": {
       "type": "Git",
@@ -311,7 +311,7 @@
       "submodules": false,
       "revision": "38caa8b5b969010b1dcae8ab1a569d7669a643d5",
       "url": "https://github.com/Shatur/neovim-ayu/archive/38caa8b5b969010b1dcae8ab1a569d7669a643d5.tar.gz",
-      "hash": "18a7gj7l6ahhbb1hpsmb9gh21dmcd0fkjzgl4cncq42rjby7ysyq"
+      "hash": "sha256-2Gt//JJZEMwsI/R9OR1orLYg4Eur6gvDWhAqQ498R6E="
     },
     "neovim-config": {
       "type": "Git",
@@ -324,7 +324,7 @@
       "submodules": false,
       "revision": "558f11f9d85a40f2ad43a4a5a86f7f5af8eda2c5",
       "url": "https://github.com/JManch/nvim/archive/558f11f9d85a40f2ad43a4a5a86f7f5af8eda2c5.tar.gz",
-      "hash": "1l0f6rvy6jb94dvgzch3c2f02037fn9yg7fjivyyb94nwibp9xny"
+      "hash": "sha256-3vZ0V+SWpOX9jtKd55N1ZwABnGADsv92I2lJ43c2DtA="
     },
     "qobuz-dl": {
       "type": "PyPi",
@@ -332,7 +332,7 @@
       "version_upper_bound": null,
       "version": "0.9.9.10",
       "url": "https://files.pythonhosted.org/packages/8c/5b/ae62a2607b64134efcefccfb0b858b6017506c72738606c3b30e3bab3ea0/qobuz-dl-0.9.9.10.tar.gz",
-      "hash": "abb4d4977b1c83e8aca0b074c49bc92c2b6f254ecefa880c95fb6dd0eef7a9be"
+      "hash": "sha256-q7TUl3scg+isoLB0xJvJLCtvJU7O+ogMlftt0O73qb4="
     },
     "recyclarr-templates": {
       "type": "Git",
@@ -345,7 +345,7 @@
       "submodules": false,
       "revision": "d58b0e99c75138c2caf15d72b6fe17e3bf10fb11",
       "url": "https://github.com/recyclarr/config-templates/archive/d58b0e99c75138c2caf15d72b6fe17e3bf10fb11.tar.gz",
-      "hash": "1r0z4qrm48rwz2l5imk4mabg2q6wagd2xb0939a1zi71i1f5i3v5"
+      "hash": "sha256-ZY9YXIjhxB9UGgmsLtpT3GDxlqpk1lio+DwjUjMmH+Q="
     },
     "slskd-stats": {
       "type": "GitRelease",
@@ -361,7 +361,7 @@
       "version": "v0.1.2",
       "revision": "dbb8588e39bf93cae0dcf11316e50e3759268724",
       "url": "https://api.github.com/repos/Arairon/slskd-stats/tarball/v0.1.2",
-      "hash": "15lz81zhrilkgz8p7svlfjhl454w7cxrjlq4vwhw2h6y6ffr9lif"
+      "hash": "sha256-LtKUnTPeQMEh3wRTmTs7nBRCoXR063PRf5PGDH9An5Y="
     },
     "soularr": {
       "type": "Git",
@@ -374,7 +374,7 @@
       "submodules": false,
       "revision": "c5420c0d03a7d7a1a3eb42ebad47236b7230ecda",
       "url": "https://github.com/mrusse/soularr/archive/c5420c0d03a7d7a1a3eb42ebad47236b7230ecda.tar.gz",
-      "hash": "09f7ph4y2plaasmvg58l0985skm3pr09ijbzrkb14jpy1qvlpb2h"
+      "hash": "sha256-UKxLNw7+ShLWzH/JmEC+o05dUAIUlberVope4Qm8xyU="
     },
     "sunset.nvim": {
       "type": "Git",
@@ -387,7 +387,7 @@
       "submodules": false,
       "revision": "36cd595dd77f3f5a71d430d6e465ee1a890010f4",
       "url": "https://github.com/JManch/sunset.nvim/archive/36cd595dd77f3f5a71d430d6e465ee1a890010f4.tar.gz",
-      "hash": "0nffbsbv11mfrad6np7m7xc67rxcjas61f2hbn0310qc94aihdi9"
+      "hash": "sha256-KTYYFUkMgzCAXVC4YLSSrOdjWD/1XGuayq6GsJdezlk="
     },
     "supersonic": {
       "type": "Git",
@@ -400,7 +400,7 @@
       "submodules": false,
       "revision": "2d3bf907e387b7e3e364929aa3daab1d887e5e47",
       "url": "https://github.com/dweymouth/supersonic/archive/2d3bf907e387b7e3e364929aa3daab1d887e5e47.tar.gz",
-      "hash": "118xchj5xy9s3m8wm10w4rbdqh33530c0h3hv5k7lpw3035jdb72"
+      "hash": "sha256-4qwmywCDX3pm2XBAwMAoY0DcViYchMpRHTr5XiRkHYU="
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -416,7 +416,7 @@
       "version": "2.2.5",
       "revision": "d7a81bbcd38110742124d46e7c0d2a7e5d011831",
       "url": "https://api.github.com/repos/dolezsa/thermal_comfort/tarball/2.2.5",
-      "hash": "060cvmplgpllmdy2zs0rbl0k5bb858z4wwffzxnwkd0vdd10fgym"
+      "hash": "sha256-1T8HQmsbtMlt/85xTj4qaK0yAV0Z6C98q5TeR2/dDBg="
     },
     "thermal_comfort_icons": {
       "type": "GitRelease",
@@ -432,7 +432,7 @@
       "version": "1.3.0",
       "revision": "2f47f8b9a0a81a875b42c2f6ca6ae0ed8c4e7611",
       "url": "https://api.github.com/repos/rautesamtr/thermal_comfort_icons/tarball/1.3.0",
-      "hash": "0pz2gnaxfqacp49dnz5k3cnlxfwcmy08zcg141n1aaxf97pqc353"
+      "hash": "sha256-owyG70muKxVsIOGxj4CvjLtOLRuzfNsSuUxh15V94l8="
     },
     "thumbfast-vanilla-osc": {
       "type": "Git",
@@ -445,7 +445,7 @@
       "submodules": false,
       "revision": "9d78edc167553ccea6290832982d0bc15838b4ac",
       "url": "https://github.com/po5/thumbfast/archive/9d78edc167553ccea6290832982d0bc15838b4ac.tar.gz",
-      "hash": "1bigj5gshnn79vdi1rrxzy5npn23wxyvs6w7aybw81953zjg0v80"
+      "hash": "sha256-AG3w5B8lBcSXV4cbvX3nQ9hri/895xDbTsdaqF+RL64="
     },
     "uwsm": {
       "type": "GitRelease",
@@ -461,7 +461,7 @@
       "version": "v0.26.0",
       "revision": "433174c297ef858cc370f143657781ad4856263e",
       "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.26.0",
-      "hash": "0fqqjccc3wfd5vf2wj6lyq1zr6a223zk8avd1ngwwg7imx1vg28a"
+      "hash": "sha256-Com3Q6/xPM6fDW0rNP8QQpn8A/bUSC7cLs3xwRiTGDs="
     },
     "workspaces.nvim": {
       "type": "GitRelease",
@@ -477,7 +477,7 @@
       "version": "1.0",
       "revision": "8f2a49449e07e5ccf0099bfe9b27ba7ccc759202",
       "url": "https://api.github.com/repos/natecraddock/workspaces.nvim/tarball/1.0",
-      "hash": "1040bfyi2a5isx7hqdvqn9x3lwlklf2hlsyp6qglc0nk4kymc1ic"
+      "hash": "sha256-LAZW/STTAkYfNtdrCoWjk3I6erJ4NwxP17EoEb1bgIA="
     },
     "xdg-terminal-exec": {
       "type": "GitRelease",
@@ -493,7 +493,7 @@
       "version": "v0.14.1",
       "revision": "aeb3ef9360eda035b80e44baa2e74fb46fc691e3",
       "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.14.1",
-      "hash": "0i6l0w7q10zbbqr6is9p27wl4lsipgmm5m4r3v7gb224n9v9f326"
+      "hash": "sha256-RgyXdrJEiPXOHpnUUuu7UVNC+RE36WgyXuuDgA8H1EQ="
     },
     "yt-dlp": {
       "type": "GitRelease",
@@ -509,8 +509,8 @@
       "version": "2025.12.08",
       "revision": "aa220d0aaac0f1562af658e34a28de72ec0ecb9f",
       "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/2025.12.08",
-      "hash": "1s4gbf49y6mpnfqy7n0lz2klfs9q1cbzcrg9mp353bl2zw68qknb"
+      "hash": "sha256-y06MDP+CrlHGrell9hcLOGlHp/gU2OOxs7can4hbj+g="
     }
   },
-  "version": 5
+  "version": 7
 }

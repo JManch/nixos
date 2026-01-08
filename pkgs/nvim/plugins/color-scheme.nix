@@ -7,8 +7,14 @@
 {
   vim.startPlugins = [
     (pkgs.vimPlugins.neovim-ayu.overrideAttrs {
-      version = "0-unstable-${sources.neovim-ayu.revision}";
-      src = sources.neovim-ayu;
+      # Pinning as I do not like how the recently added native blink.cmp highlights look
+      version = "0-unstable-2025-10-21";
+      src = pkgs.fetchFromGitHub {
+        owner = "Shatur";
+        repo = "neovim-ayu";
+        rev = "38caa8b5b969010b1dcae8ab1a569d7669a643d5";
+        hash = "sha256-2Gt//JJZEMwsI/R9OR1orLYg4Eur6gvDWhAqQ498R6E=";
+      };
       patches = [ ../../../patches/neovim-ayu-colors.patch ];
     })
 

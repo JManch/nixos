@@ -300,19 +300,6 @@
       "url": "https://files.pythonhosted.org/packages/8b/16/af8642c21fe276938b4fa7f7264f358ae12b41c9a1f7a3a49dd51b431e37/neohubapi-3.1.tar.gz",
       "hash": "sha256-5UcWaxCLchmZP1axvs3HS9BJwWoH7V9Y6qeZ9OpC6Hw="
     },
-    "neovim-ayu": {
-      "type": "Git",
-      "repository": {
-        "type": "GitHub",
-        "owner": "Shatur",
-        "repo": "neovim-ayu"
-      },
-      "branch": "master",
-      "submodules": false,
-      "revision": "38caa8b5b969010b1dcae8ab1a569d7669a643d5",
-      "url": "https://github.com/Shatur/neovim-ayu/archive/38caa8b5b969010b1dcae8ab1a569d7669a643d5.tar.gz",
-      "hash": "sha256-2Gt//JJZEMwsI/R9OR1orLYg4Eur6gvDWhAqQ498R6E="
-    },
     "neovim-config": {
       "type": "Git",
       "repository": {

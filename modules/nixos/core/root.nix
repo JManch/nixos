@@ -16,10 +16,6 @@
   programs.zsh.enable = true;
   environment.defaultPackages = [ ];
 
-  # Can use a lot of disk space and can be slow to generate
-  # https://wiki.archlinux.org/title/Core_dump#Disabling_automatic_core_dumps
-  systemd.coredump.enable = false;
-
   environment.systemPackages = with pkgs; [
     gitMinimal
     fd

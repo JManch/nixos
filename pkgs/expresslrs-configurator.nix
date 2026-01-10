@@ -11,6 +11,8 @@
   python3,
   nodejs,
   git,
+  platformio,
+  makeDesktopItem,
 }:
 let
   electron =
@@ -91,6 +93,14 @@ stdenv.mkDerivation (finalAttrs: {
   nativeInstallCheckInputs = [ udevCheckHook ];
   doInstallCheck = true;
 
+  desktopItem = makeDesktopItem {
+    name = finalAttrs.pname;
+    desktopName = "ExpressLRS Configurator";
+    type = "Application";
+    exec = finalAttrs.pname;
+    icon = finalAttrs.src + "/assets/icon.png";
+  };
+
   installPhase = ''
     mkdir -p $out/bin $out/share/expresslrs-configurator
     cp -r release/linux-unpacked/{resources,dependencies} $out/share/expresslrs-configurator
@@ -102,6 +112,7 @@ stdenv.mkDerivation (finalAttrs: {
         lib.makeBinPath [
           git
           python3
+          platformio
         ]
       }"
 
@@ -109,6 +120,7 @@ stdenv.mkDerivation (finalAttrs: {
       # --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}" \
 
     install -m444 -D ${udevRules} -t $out/lib/udev/rules.d
+    install -m444 -D $desktopItem/share/applications/*.desktop -t $out/share/applications
   '';
 
   meta = {

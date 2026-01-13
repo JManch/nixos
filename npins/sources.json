@@ -139,10 +139,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.4.8",
-      "revision": "3001ec81f196cbb12b13467d70fc6df41035746a",
-      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/v1.4.8",
-      "hash": "sha256-5UAcTtp8li5i9JnrKlm8nQ6FRLEp2dMkPU3uy1Xq/Jc="
+      "version": "v1.4.9",
+      "revision": "cee2d251292317c23c1747163abc95b0e4af9244",
+      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/refs/tags/v1.4.9",
+      "hash": "sha256-DKnQ4xtn1XHeu+1fm6g/qRyS6twbChEsw17gz8mv1xU="
     },
     "daikin_onecta": {
       "type": "GitRelease",

@@ -13,6 +13,12 @@ in
   ];
 
   ns.userPackages = [
+    (
+      assert lib.assertMsg (
+        pkgs.edgetx.version == "2.11.3"
+      ) "Remove edgetx override if 2.12 has released";
+      pkgs.${ns}.edgetx-unstable
+    )
     pkgs.${ns}.expresslrs-configurator
     (pkgs.makeDesktopItem {
       name = "betaflight";
@@ -28,4 +34,6 @@ in
 
   # We use wifi
   # services.udev.packages = [ pkgs.${ns}.expresslrs-configurator ];
+
+  ns.persistenceHome.directories = [ ".config/EdgeTX" ];
 }

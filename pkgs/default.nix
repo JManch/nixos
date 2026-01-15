@@ -33,6 +33,7 @@ in
   advanced-camera-card = callPackage ./advanced-camera-card.nix { };
   multiviewer = callPackage ./multiviewer.nix { };
   expresslrs-configurator = callPackage ./expresslrs-configurator.nix { };
+  edgetx-unstable = callPackage ./edgetx-unstable { };
 
   # Other
   bootstrap-kit = callPackage ./bootstrap-kit.nix { inherit (self.inputs) nix-resources; };

@@ -32,8 +32,8 @@ in
     })
   ];
 
-  # We use wifi
-  # services.udev.packages = [ pkgs.${ns}.expresslrs-configurator ];
+  # This udev rules are also required for betaflight connectivity
+  services.udev.packages = [ pkgs.${ns}.expresslrs-configurator ];
 
   ns.persistenceHome.directories = [ ".config/EdgeTX" ];
 }

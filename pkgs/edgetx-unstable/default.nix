@@ -32,6 +32,8 @@ edgetx.overrideAttrs (old: {
     hash = "sha256-+H5eJ1XoiCv/fPzWzZqswXGVI4ku+5jUdUQfnZr8aOU=";
   };
 
+  patches = old.patches ++ [ ./install-desktop-files.patch ];
+
   postPatch = ''
     sed -i "/include(FetchRsDfu)/d" cmake/NativeTargets.cmake
     sed -i "/include(FetchImgui)/d" radio/src/targets/simu/CMakeLists.txt
@@ -39,7 +41,9 @@ edgetx.overrideAttrs (old: {
   '';
 
   cmakeFlags =
-    (lib.filter (x: !lib.hasInfix "FETCHCONTENT_SOURCE_DIR_MAXLIBQT" x) old.cmakeFlags)
+    (lib.filter (
+      x: !lib.hasInfix "FETCHCONTENT_SOURCE_DIR_MAXLIBQT" x && !lib.hasInfix "DFU_UTIL_ROOT_DIR" x
+    ) old.cmakeFlags)
     ++ [
       (lib.cmakeFeature "FETCHCONTENT_SOURCE_DIR_MAXLIBQT" "${maxlibqt}")
       (lib.cmakeFeature "CMAKE_INSTALL_BINDIR" "bin")

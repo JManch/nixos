@@ -1,0 +1,14 @@
+diff --git a/companion/src/CMakeLists.txt b/companion/src/CMakeLists.txt
+index e9149d2e6..10b1f3331 100644
+--- a/companion/src/CMakeLists.txt
++++ b/companion/src/CMakeLists.txt
+@@ -332,6 +332,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+   set(SIMULATOR_DESKTOP_FILE ${CMAKE_CURRENT_BINARY_DIR}/${SIMULATOR_NAME}.desktop)
+   configure_file(${COMPANION_TARGETS_DIR}/simulator.desktop.in ${SIMULATOR_DESKTOP_FILE} @ONLY)
+ 
++  install(FILES ${COMPANION_DESKTOP_FILE} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
++  install(FILES ${SIMULATOR_DESKTOP_FILE} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
++
+   # libsim*.so files
+   install(DIRECTORY ${CMAKE_BINARY_DIR}/plugins/
+           DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${COMPANION_NAME})

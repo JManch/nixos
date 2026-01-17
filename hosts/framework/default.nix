@@ -56,6 +56,8 @@
     hardware = {
       secure-boot.enable = true;
       bluetooth.enable = true;
+      fpv.enable = true;
+
       printing.client = {
         enable = true;
         serverAddress = "homelab.lan";

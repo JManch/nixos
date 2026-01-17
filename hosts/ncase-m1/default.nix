@@ -9,7 +9,7 @@
   imports = [
     ./hardware-configuration.nix
     ./disko.nix
-    # ./uni.nix
+    ./uni.nix
   ];
 
   ${lib.ns} = {

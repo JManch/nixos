@@ -10,7 +10,7 @@ let
 in
 {
   ${ns} = {
-    device = {
+    core.device = {
       address = mkForce null;
       vpnAddress = "192.168.100.12";
       altAddresses = mkForce [ ];
@@ -97,11 +97,5 @@ in
     };
   };
 
-  home-manager.users.${username} = {
-    ${ns} = {
-      desktop.services.darkman = {
-        switchMethod = mkForce "coordinates";
-      };
-    };
-  };
+  home-manager.users.${username}.${ns}.desktop.services.darkman.switchMethod = mkForce "coordinates";
 }

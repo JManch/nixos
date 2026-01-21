@@ -345,7 +345,7 @@ in
       "${modShift}, L, focusmonitor, r"
       "${mod}, TAB, focusmonitor, +1"
       "${modShift}, TAB, movecurrentworkspacetomonitor, +1"
-      ", XF86AudioMedia, exec, sleep 1 && hyprctl dispatch dpms toggle"
+      ", XF86AudioMedia, exec, sleep 1 && hyprctl dispatch dpms toggle ${device.primaryMonitor.name}"
       "${mod}, XF86AudioMedia, exec, ${resetMonitors}"
 
       # Dwindle

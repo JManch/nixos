@@ -422,14 +422,6 @@ in
           ) "rnnoise-plugin-cross.patch"
         );
 
-        impala =
-          assert (assertMsg (!prev.impala.meta ? mainProgram) "upstream fixed mainProgram on impala");
-          prev.impala.overrideAttrs (old: {
-            meta = old.meta // {
-              mainProgram = "impala";
-            };
-          });
-
         # https://github.com/novnc/noVNC/issues/1946
         novnc =
           assert (assertMsg (prev.novnc.version == "1.6.0") "novnc patch should be in stable now");

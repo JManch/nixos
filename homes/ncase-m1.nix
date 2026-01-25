@@ -93,7 +93,7 @@
         foliate.enable = true;
         rnote.enable = true;
         jellyfin-media-player.enable = true;
-        davinci-resolve.enable = false;
+        davinci-resolve.enable = true;
 
         firefox = {
           enable = true;

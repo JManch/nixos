@@ -28,6 +28,7 @@ in
   yt-dlp = callPackage ./yt-dlp.nix args;
   comick-downloader = pkgs.python3Packages.callPackage ./comick-downloader.nix args;
   qobuz-dl = pkgs.python3Packages.callPackage ./qobuz-dl.nix args;
+  scdl = callPackage ./scdl.nix args;
 
   # Manual
   advanced-camera-card = callPackage ./advanced-camera-card.nix { };

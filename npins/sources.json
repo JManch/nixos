@@ -334,6 +334,14 @@
       "url": "https://github.com/recyclarr/config-templates/archive/d58b0e99c75138c2caf15d72b6fe17e3bf10fb11.tar.gz",
       "hash": "sha256-ZY9YXIjhxB9UGgmsLtpT3GDxlqpk1lio+DwjUjMmH+Q="
     },
+    "scdl": {
+      "type": "PyPi",
+      "name": "scdl",
+      "version_upper_bound": null,
+      "version": "3.0.2",
+      "url": "https://files.pythonhosted.org/packages/b8/7e/a96edba727832f06d513975f0f791c6c085d7e6fde4402b79e7ac3302606/scdl-3.0.2.tar.gz",
+      "hash": "sha256-uJv53X4eKSqaU0pmix3wxn3mo/6C3GpSdYma6jJBQKM="
+    },
     "slskd-stats": {
       "type": "GitRelease",
       "repository": {

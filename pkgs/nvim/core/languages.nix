@@ -72,6 +72,15 @@ in
       lsp.enable = true;
       format.enable = true;
     };
+
+    haskell = {
+      enable = true;
+      lsp.enable = true;
+      lsp.cmd = [
+        "haskell-language-server-wrapper"
+        "--lsp"
+      ];
+    };
   };
 
   # Typstyle will not automatically wrap to the line width by default

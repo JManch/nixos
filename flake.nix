@@ -141,7 +141,7 @@
     xdg-override.url = "github:koiuo/xdg-override";
     xdg-override.inputs.nixpkgs.follows = "nixpkgs";
 
-    nvf.url = "github:NotAShelf/nvf"; # do not override nixpkgs input for stability
+    nvf.url = "github:JManch/nvf/lsp-package-options"; # do not override nixpkgs input for stability
     nvf.inputs.ndg.follows = "";
 
     # Personal inputs

@@ -1569,15 +1569,16 @@
         "systems": "systems_10"
       },
       "locked": {
-        "lastModified": 1769195674,
-        "narHash": "sha256-SBmkSDg5+2MvTklDAgIhPACdgXdZoSleBY/nIPUXHfU=",
-        "owner": "NotAShelf",
+        "lastModified": 1769446764,
+        "narHash": "sha256-KDcRa5hSfdfkg7JMJNSDTtiXK7MZTDQHzpXEe9itD/A=",
+        "owner": "JManch",
         "repo": "nvf",
-        "rev": "385c49d93dd93fc745b954b4bd777ce458f01948",
+        "rev": "00e4b434ff761da74585ce738f7c4eb3c14293fc",
         "type": "github"
       },
       "original": {
-        "owner": "NotAShelf",
+        "owner": "JManch",
+        "ref": "lsp-package-options",
         "repo": "nvf",
         "type": "github"
       }

@@ -32,8 +32,20 @@ in
     })
   ];
 
-  # This udev rules are also required for betaflight connectivity
-  services.udev.packages = [ pkgs.${ns}.expresslrs-configurator ];
+  services.udev.packages = [
+    # These udev rules are also required for betaflight connectivity
+    pkgs.${ns}.expresslrs-configurator
+
+    # For giving direct access to TX15 HID devices in sims running through proton. Also needs
+    # PROTON_ENABLE_HIDRAW=0x1209/0x4f54 in the launch options
+    (pkgs.writeTextFile {
+      name = "tx15-udev-rules";
+      destination = "/etc/udev/rules.d/70-tx15.rules";
+      text = ''
+        SUBSYSTEM=="hidraw", ATTRS{idProduct}=="4f54", ATTRS{idVendor}=="1209", TAG+="uaccess"
+      '';
+    })
+  ];
 
   ns.persistenceHome.directories = [ ".config/EdgeTX" ];
 }

@@ -1207,6 +1207,22 @@
         "type": "github"
       }
     },
+    "mt7925-patches": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769405088,
+        "narHash": "sha256-AFh/8jpzyybVmePlLnCN5Orbm6TfN+T1WiZdg3KrshI=",
+        "owner": "zbowling",
+        "repo": "mt7925",
+        "rev": "fba6c697a0f56a56c6f28c566e5c4e5450137173",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zbowling",
+        "repo": "mt7925",
+        "type": "github"
+      }
+    },
     "nix-colors": {
       "inputs": {
         "base16-schemes": "base16-schemes",
@@ -1655,6 +1671,7 @@
         "lan-mouse": "lan-mouse",
         "lanzaboote": "lanzaboote",
         "mint": "mint",
+        "mt7925-patches": "mt7925-patches",
         "nix-colors": "nix-colors",
         "nix-flatpak": "nix-flatpak",
         "nix-index-database": "nix-index-database",

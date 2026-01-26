@@ -3,9 +3,7 @@
 # - Userspace charge limiter has been broken since the 3.04 bios update https://github.com/tlvince/nixos-config/issues/309
 # - Front-right USB A adapter sometimes doesn't work https://community.frame.work/t/solved-usb-a-expansion-card-stops-working-until-unplugged/26579
 {
-  lib,
   pkgs,
-  config,
   inputs,
   modulesPath,
   ...
@@ -26,6 +24,15 @@
     kernelPackages = pkgs.linuxPackages_latest;
 
     kernelModules = [ "kvm-amd" ];
+
+    kernelPatches = [
+      {
+        name = "mt7925-fixes";
+        patch = pkgs.runCommand "combine-mt7925-patches" { } ''
+          cat ${inputs.mt7925-patches}/kernels/6.18/*.patch > $out
+        '';
+      }
+    ];
 
     initrd.availableKernelModules = [
       "nvme"

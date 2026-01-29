@@ -15,7 +15,12 @@
         rev = "38caa8b5b969010b1dcae8ab1a569d7669a643d5";
         hash = "sha256-2Gt//JJZEMwsI/R9OR1orLYg4Eur6gvDWhAqQ498R6E=";
       };
-      patches = [ ../../../patches/neovim-ayu-colors.patch ];
+      patches = [
+        ../../../patches/neovim-ayu-colors.patch
+        # as haskell-tools.nvim uses code lenses instead of inlay hints
+        # https://github.com/mrcjkb/haskell-tools.nvim/issues/364
+        ../../../patches/neovim-ayu-code-lens.patch
+      ];
     })
 
     (pkgs.vimUtils.buildVimPlugin {

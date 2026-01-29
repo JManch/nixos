@@ -1,0 +1,13 @@
+diff --git a/lua/ayu/init.lua b/lua/ayu/init.lua
+index ca915c1..4edc950 100644
+--- a/lua/ayu/init.lua
++++ b/lua/ayu/init.lua
+@@ -242,6 +242,8 @@ local function set_groups()
+ 
+     -- LSP Inlay Hints.
+     LspInlayHint = { fg = colors.lsp_inlay_hint },
++    LspCodeLens = { fg = colors.lsp_inlay_hint },
++    LspCodeLensSeparator = { fg = colors.lsp_inlay_hint },
+ 
+     -- LSP Signature.
+     LspSignatureActiveParameter = { italic = true },

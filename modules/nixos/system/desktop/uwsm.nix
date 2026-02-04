@@ -48,6 +48,8 @@ in
         description = ''
           If set, UWSM will automatically launch the set desktop without
           prompting for selection.
+
+          Needs to be a full path for now: https://github.com/NixOS/nixpkgs/pull/474174#pullrequestreview-3618212377
         '';
       };
 

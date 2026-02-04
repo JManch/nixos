@@ -37,7 +37,7 @@ index 91e49a64..e5c64c5c 100644
      }
      for (auto const& ls : m_layers) {
 diff --git a/src/debug/HyprCtl.cpp b/src/debug/HyprCtl.cpp
-index 8dbe3a1d..56664646 100644
+index 8dbe3a1d..5c8144df 100644
 --- a/src/debug/HyprCtl.cpp
 +++ b/src/debug/HyprCtl.cpp
 @@ -385,6 +385,7 @@ std::string CHyprCtl::getWindowData(PHLWINDOW w, eHyprCtlOutputFormat format) {
@@ -57,32 +57,23 @@ index 8dbe3a1d..56664646 100644
              (w->m_createdOverFullscreen ? "true" : "false"), getGroupedData(w, format), getTagsData(w, format), rc<uintptr_t>(w->m_swallowed.get()), getFocusHistoryID(w),
              (g_pInputManager->isWindowInhibiting(w, false) ? "true" : "false"), escapeJSONStrings(w->xdgTag().value_or("")), escapeJSONStrings(w->xdgDescription().value_or("")),
              escapeJSONStrings(NContentType::toString(w->getContentType())));
-@@ -409,14 +410,13 @@ std::string CHyprCtl::getWindowData(PHLWINDOW w, eHyprCtlOutputFormat format) {
+@@ -409,14 +410,14 @@ std::string CHyprCtl::getWindowData(PHLWINDOW w, eHyprCtlOutputFormat format) {
          return std::format(
              "Window {:x} -> {}:\n\tmapped: {}\n\thidden: {}\n\tat: {},{}\n\tsize: {},{}\n\tworkspace: {} ({})\n\tfloating: {}\n\tpseudo: {}\n\tmonitor: {}\n\tclass: {}\n\ttitle: "
              "{}\n\tinitialClass: {}\n\tinitialTitle: {}\n\tpid: "
 -            "{}\n\txwayland: {}\n\tpinned: "
--            "{}\n\tfullscreen: {}\n\tfullscreenClient: {}\n\toverFullscreen: {}\n\tgrouped: {}\n\ttags: {}\n\tswallowing: {:x}\n\tfocusHistoryID: {}\n\tinhibitingIdle: "
--            "{}\n\txdgTag: "
 +            "{}\n\txwayland: {}\n\tpinned: {}\n\talwaysOnTop: "
-+            "{}\n\tfullscreen: {}\n\tfullscreenClient: {}\n\tgrouped: {}\n\ttags: {}\n\tswallowing: {:x}\n\tfocusHistoryID: {}\n\tinhibitingIdle: {}\n\txdgTag: "
+             "{}\n\tfullscreen: {}\n\tfullscreenClient: {}\n\toverFullscreen: {}\n\tgrouped: {}\n\ttags: {}\n\tswallowing: {:x}\n\tfocusHistoryID: {}\n\tinhibitingIdle: "
+             "{}\n\txdgTag: "
              "{}\n\txdgDescription: {}\n\tcontentType: {}\n\n",
              rc<uintptr_t>(w.get()), w->m_title, sc<int>(w->m_isMapped), sc<int>(w->isHidden()), sc<int>(w->m_realPosition->goal().x), sc<int>(w->m_realPosition->goal().y),
              sc<int>(w->m_realSize->goal().x), sc<int>(w->m_realSize->goal().y), w->m_workspace ? w->workspaceID() : WORKSPACE_INVALID,
              (!w->m_workspace ? "" : w->m_workspace->m_name), sc<int>(w->m_isFloating), sc<int>(w->m_isPseudotiled), w->monitorID(), w->m_class, w->m_title, w->m_initialClass,
 -            w->m_initialTitle, w->getPID(), sc<int>(w->m_isX11), sc<int>(w->m_pinned), sc<uint8_t>(w->m_fullscreenState.internal), sc<uint8_t>(w->m_fullscreenState.client),
-+            w->m_initialTitle, w->getPID(), sc<int>(w->m_isX11), sc<int>(w->m_pinned), (int)w->m_alwaysOnTop, sc<uint8_t>(w->m_fullscreenState.internal), sc<uint8_t>(w->m_fullscreenState.client),
++            w->m_initialTitle, w->getPID(), sc<int>(w->m_isX11), sc<int>(w->m_pinned), sc<int>(w->m_alwaysOnTop), sc<uint8_t>(w->m_fullscreenState.internal), sc<uint8_t>(w->m_fullscreenState.client),
              sc<int>(w->m_createdOverFullscreen), getGroupedData(w, format), getTagsData(w, format), rc<uintptr_t>(w->m_swallowed.get()), getFocusHistoryID(w),
              sc<int>(g_pInputManager->isWindowInhibiting(w, false)), w->xdgTag().value_or(""), w->xdgDescription().value_or(""), NContentType::toString(w->getContentType()));
      }
-@@ -928,7 +928,6 @@ static std::string animationsRequest(eHyprCtlOutputFormat format, std::string re
-     "style": "{}"
- }},)#",
-                                ac.first, ac.second->overridden ? "true" : "false", escapeJSONStrings(ac.second->internalBezier), ac.second->internalEnabled ? "true" : "false",
--                               ac.second->internalSpeed, escapeJSONStrings(ac.second->internalStyle));
-         }
- 
-         ret[ret.length() - 1] = ']';
 diff --git a/src/desktop/rule/Rule.cpp b/src/desktop/rule/Rule.cpp
 index 3d981587..4921299e 100644
 --- a/src/desktop/rule/Rule.cpp

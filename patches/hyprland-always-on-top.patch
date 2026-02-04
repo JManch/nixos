@@ -1,8 +1,8 @@
 diff --git a/src/Compositor.cpp b/src/Compositor.cpp
-index 9c806fdd..be1b40de 100644
+index 91e49a64..e5c64c5c 100644
 --- a/src/Compositor.cpp
 +++ b/src/Compositor.cpp
-@@ -921,9 +921,23 @@ PHLWINDOW CCompositor::vectorToWindowUnified(const Vector2D& pos, uint8_t proper
+@@ -925,9 +925,23 @@ PHLWINDOW CCompositor::vectorToWindowUnified(const Vector2D& pos, uint8_t proper
          }
      }
  
@@ -27,7 +27,7 @@ index 9c806fdd..be1b40de 100644
  
                  if (special && !w->onSpecialWorkspace()) // because special floating may creep up into regular
                      continue;
-@@ -2153,7 +2167,7 @@ void CCompositor::setWindowFullscreenState(const PHLWINDOW PWINDOW, Desktop::Vie
+@@ -2159,7 +2173,7 @@ void CCompositor::setWindowFullscreenState(const PHLWINDOW PWINDOW, Desktop::Vie
  
      // make all windows and layers on the same workspace under the fullscreen window
      for (auto const& w : m_windows) {
@@ -37,7 +37,7 @@ index 9c806fdd..be1b40de 100644
      }
      for (auto const& ls : m_layers) {
 diff --git a/src/debug/HyprCtl.cpp b/src/debug/HyprCtl.cpp
-index 41b34e8a..27591ed6 100644
+index 8dbe3a1d..56664646 100644
 --- a/src/debug/HyprCtl.cpp
 +++ b/src/debug/HyprCtl.cpp
 @@ -385,6 +385,7 @@ std::string CHyprCtl::getWindowData(PHLWINDOW w, eHyprCtlOutputFormat format) {
@@ -47,37 +47,42 @@ index 41b34e8a..27591ed6 100644
 +    "alwaysOnTop": {},
      "fullscreen": {},
      "fullscreenClient": {},
-     "grouped": [{}],
-@@ -400,23 +401,23 @@ std::string CHyprCtl::getWindowData(PHLWINDOW w, eHyprCtlOutputFormat format) {
+     "overFullscreen": {},
+@@ -401,7 +402,7 @@ std::string CHyprCtl::getWindowData(PHLWINDOW w, eHyprCtlOutputFormat format) {
              sc<int>(w->m_realPosition->goal().y), sc<int>(w->m_realSize->goal().x), sc<int>(w->m_realSize->goal().y), w->m_workspace ? w->workspaceID() : WORKSPACE_INVALID,
              escapeJSONStrings(!w->m_workspace ? "" : w->m_workspace->m_name), (sc<int>(w->m_isFloating) == 1 ? "true" : "false"), (w->m_isPseudotiled ? "true" : "false"),
              w->monitorID(), escapeJSONStrings(w->m_class), escapeJSONStrings(w->m_title), escapeJSONStrings(w->m_initialClass), escapeJSONStrings(w->m_initialTitle), w->getPID(),
 -            (sc<int>(w->m_isX11) == 1 ? "true" : "false"), (w->m_pinned ? "true" : "false"), sc<uint8_t>(w->m_fullscreenState.internal), sc<uint8_t>(w->m_fullscreenState.client),
--            getGroupedData(w, format), getTagsData(w, format), rc<uintptr_t>(w->m_swallowed.get()), getFocusHistoryID(w),
-+            (sc<int>(w->m_isX11) == 1 ? "true" : "false"), (w->m_pinned ? "true" : "false"), (w->m_alwaysOnTop ? "true" : "false"), sc<uint8_t>(w->m_fullscreenState.internal),
-+            sc<uint8_t>(w->m_fullscreenState.client), getGroupedData(w, format), getTagsData(w, format), rc<uintptr_t>(w->m_swallowed.get()), getFocusHistoryID(w),
++            (sc<int>(w->m_isX11) == 1 ? "true" : "false"), (w->m_pinned ? "true" : "false"), (w->m_alwaysOnTop ? "true" : "false"), sc<uint8_t>(w->m_fullscreenState.internal), sc<uint8_t>(w->m_fullscreenState.client),
+             (w->m_createdOverFullscreen ? "true" : "false"), getGroupedData(w, format), getTagsData(w, format), rc<uintptr_t>(w->m_swallowed.get()), getFocusHistoryID(w),
              (g_pInputManager->isWindowInhibiting(w, false) ? "true" : "false"), escapeJSONStrings(w->xdgTag().value_or("")), escapeJSONStrings(w->xdgDescription().value_or("")),
              escapeJSONStrings(NContentType::toString(w->getContentType())));
-     } else {
+@@ -409,14 +410,13 @@ std::string CHyprCtl::getWindowData(PHLWINDOW w, eHyprCtlOutputFormat format) {
          return std::format(
              "Window {:x} -> {}:\n\tmapped: {}\n\thidden: {}\n\tat: {},{}\n\tsize: {},{}\n\tworkspace: {} ({})\n\tfloating: {}\n\tpseudo: {}\n\tmonitor: {}\n\tclass: {}\n\ttitle: "
              "{}\n\tinitialClass: {}\n\tinitialTitle: {}\n\tpid: "
 -            "{}\n\txwayland: {}\n\tpinned: "
+-            "{}\n\tfullscreen: {}\n\tfullscreenClient: {}\n\toverFullscreen: {}\n\tgrouped: {}\n\ttags: {}\n\tswallowing: {:x}\n\tfocusHistoryID: {}\n\tinhibitingIdle: "
+-            "{}\n\txdgTag: "
 +            "{}\n\txwayland: {}\n\tpinned: {}\n\talwaysOnTop: "
-             "{}\n\tfullscreen: {}\n\tfullscreenClient: {}\n\tgrouped: {}\n\ttags: {}\n\tswallowing: {:x}\n\tfocusHistoryID: {}\n\tinhibitingIdle: {}\n\txdgTag: "
++            "{}\n\tfullscreen: {}\n\tfullscreenClient: {}\n\tgrouped: {}\n\ttags: {}\n\tswallowing: {:x}\n\tfocusHistoryID: {}\n\tinhibitingIdle: {}\n\txdgTag: "
              "{}\n\txdgDescription: {}\n\tcontentType: {}\n\n",
              rc<uintptr_t>(w.get()), w->m_title, sc<int>(w->m_isMapped), sc<int>(w->isHidden()), sc<int>(w->m_realPosition->goal().x), sc<int>(w->m_realPosition->goal().y),
              sc<int>(w->m_realSize->goal().x), sc<int>(w->m_realSize->goal().y), w->m_workspace ? w->workspaceID() : WORKSPACE_INVALID,
              (!w->m_workspace ? "" : w->m_workspace->m_name), sc<int>(w->m_isFloating), sc<int>(w->m_isPseudotiled), w->monitorID(), w->m_class, w->m_title, w->m_initialClass,
 -            w->m_initialTitle, w->getPID(), sc<int>(w->m_isX11), sc<int>(w->m_pinned), sc<uint8_t>(w->m_fullscreenState.internal), sc<uint8_t>(w->m_fullscreenState.client),
--            getGroupedData(w, format), getTagsData(w, format), rc<uintptr_t>(w->m_swallowed.get()), getFocusHistoryID(w), sc<int>(g_pInputManager->isWindowInhibiting(w, false)),
--            w->xdgTag().value_or(""), w->xdgDescription().value_or(""), NContentType::toString(w->getContentType()));
-+            w->m_initialTitle, w->getPID(), sc<int>(w->m_isX11), sc<int>(w->m_pinned), (int)w->m_alwaysOnTop, sc<uint8_t>(w->m_fullscreenState.internal),
-+            sc<uint8_t>(w->m_fullscreenState.client), getGroupedData(w, format), getTagsData(w, format), rc<uintptr_t>(w->m_swallowed.get()), getFocusHistoryID(w),
-+            sc<int>(g_pInputManager->isWindowInhibiting(w, false)), w->xdgTag().value_or(""), w->xdgDescription().value_or(""), NContentType::toString(w->getContentType()));
++            w->m_initialTitle, w->getPID(), sc<int>(w->m_isX11), sc<int>(w->m_pinned), (int)w->m_alwaysOnTop, sc<uint8_t>(w->m_fullscreenState.internal), sc<uint8_t>(w->m_fullscreenState.client),
+             sc<int>(w->m_createdOverFullscreen), getGroupedData(w, format), getTagsData(w, format), rc<uintptr_t>(w->m_swallowed.get()), getFocusHistoryID(w),
+             sc<int>(g_pInputManager->isWindowInhibiting(w, false)), w->xdgTag().value_or(""), w->xdgDescription().value_or(""), NContentType::toString(w->getContentType()));
      }
- }
+@@ -928,7 +928,6 @@ static std::string animationsRequest(eHyprCtlOutputFormat format, std::string re
+     "style": "{}"
+ }},)#",
+                                ac.first, ac.second->overridden ? "true" : "false", escapeJSONStrings(ac.second->internalBezier), ac.second->internalEnabled ? "true" : "false",
+-                               ac.second->internalSpeed, escapeJSONStrings(ac.second->internalStyle));
+         }
  
+         ret[ret.length() - 1] = ']';
 diff --git a/src/desktop/rule/Rule.cpp b/src/desktop/rule/Rule.cpp
 index 3d981587..4921299e 100644
 --- a/src/desktop/rule/Rule.cpp
@@ -133,10 +138,10 @@ index d1994d2e..2ec061b5 100644
                  if (!engine->match(Desktop::focusState()->window() == w))
                      return false;
 diff --git a/src/desktop/rule/windowRule/WindowRuleApplicator.cpp b/src/desktop/rule/windowRule/WindowRuleApplicator.cpp
-index ab1c2a14..1c75cf92 100644
+index 037f8938..76472a11 100644
 --- a/src/desktop/rule/windowRule/WindowRuleApplicator.cpp
 +++ b/src/desktop/rule/windowRule/WindowRuleApplicator.cpp
-@@ -514,6 +514,10 @@ CWindowRuleApplicator::SRuleResult CWindowRuleApplicator::applyStaticRule(const
+@@ -519,6 +519,10 @@ CWindowRuleApplicator::SRuleResult CWindowRuleApplicator::applyStaticRule(const
                  static_.pin = truthy(effect);
                  break;
              }
@@ -148,10 +153,10 @@ index ab1c2a14..1c75cf92 100644
                  static_.group = effect;
                  break;
 diff --git a/src/desktop/rule/windowRule/WindowRuleApplicator.hpp b/src/desktop/rule/windowRule/WindowRuleApplicator.hpp
-index 121de727..7afd8060 100644
+index 5c1d4fd1..3046db58 100644
 --- a/src/desktop/rule/windowRule/WindowRuleApplicator.hpp
 +++ b/src/desktop/rule/windowRule/WindowRuleApplicator.hpp
-@@ -45,6 +45,7 @@ namespace Desktop::Rule {
+@@ -44,6 +44,7 @@ namespace Desktop::Rule {
              std::optional<bool>      maximize;
              std::optional<bool>      pseudo;
              std::optional<bool>      pin;
@@ -200,10 +205,10 @@ index 0827d462..edce3e9a 100644
 \ No newline at end of file
 +};
 diff --git a/src/desktop/view/Window.cpp b/src/desktop/view/Window.cpp
-index 32a0086e..62ef52be 100644
+index a0947f67..1b1e99b3 100644
 --- a/src/desktop/view/Window.cpp
 +++ b/src/desktop/view/Window.cpp
-@@ -2057,6 +2057,7 @@ void CWindow::mapWindow() {
+@@ -2052,6 +2052,7 @@ void CWindow::mapWindow() {
          m_isPseudotiled  = m_ruleApplicator->static_.pseudo.value_or(m_isPseudotiled);
          m_noInitialFocus = m_ruleApplicator->static_.noInitialFocus.value_or(m_noInitialFocus);
          m_pinned         = m_ruleApplicator->static_.pin.value_or(m_pinned);
@@ -211,7 +216,7 @@ index 32a0086e..62ef52be 100644
  
          if (m_ruleApplicator->static_.fullscreenStateClient || m_ruleApplicator->static_.fullscreenStateInternal) {
              requestedFSState = Desktop::View::SFullscreenState{
-@@ -2146,6 +2147,9 @@ void CWindow::mapWindow() {
+@@ -2141,6 +2142,9 @@ void CWindow::mapWindow() {
      if (m_pinned && !m_isFloating)
          m_pinned = false;
  
@@ -222,7 +227,7 @@ index 32a0086e..62ef52be 100644
  
      if (!WORKSPACEARGS[0].empty()) {
 diff --git a/src/desktop/view/Window.hpp b/src/desktop/view/Window.hpp
-index d5c86aac..460c923e 100644
+index 294da721..aed8b480 100644
 --- a/src/desktop/view/Window.hpp
 +++ b/src/desktop/view/Window.hpp
 @@ -183,6 +183,9 @@ namespace Desktop::View {
@@ -236,10 +241,10 @@ index d5c86aac..460c923e 100644
          bool m_pinFullscreened = false;
  
 diff --git a/src/layout/IHyprLayout.cpp b/src/layout/IHyprLayout.cpp
-index 8a33928b..408fd2c7 100644
+index f434b580..4dcae0ff 100644
 --- a/src/layout/IHyprLayout.cpp
 +++ b/src/layout/IHyprLayout.cpp
-@@ -749,7 +749,8 @@ void IHyprLayout::changeWindowFloatingMode(PHLWINDOW pWindow) {
+@@ -745,7 +745,8 @@ void IHyprLayout::changeWindowFloatingMode(PHLWINDOW pWindow) {
          g_pCompositor->setWindowFullscreenInternal(pWindow, FSMODE_NONE);
      }
  
@@ -250,7 +255,7 @@ index 8a33928b..408fd2c7 100644
      g_pHyprRenderer->damageWindow(pWindow, true);
  
 diff --git a/src/managers/KeybindManager.cpp b/src/managers/KeybindManager.cpp
-index c4d8734e..33202db3 100644
+index 74da3572..54e2c1dd 100644
 --- a/src/managers/KeybindManager.cpp
 +++ b/src/managers/KeybindManager.cpp
 @@ -134,6 +134,7 @@ CKeybindManager::CKeybindManager() {
@@ -261,7 +266,7 @@ index c4d8734e..33202db3 100644
      m_dispatchers["mouse"]                          = mouse;
      m_dispatchers["bringactivetotop"]               = bringActiveToTop;
      m_dispatchers["alterzorder"]                    = alterZOrder;
-@@ -2727,6 +2728,30 @@ SDispatchResult CKeybindManager::pinActive(std::string args) {
+@@ -2737,6 +2738,30 @@ SDispatchResult CKeybindManager::pinActive(std::string args) {
      return {};
  }
  
@@ -305,7 +310,7 @@ index d4b1bf66..dd9a5745 100644
      static SDispatchResult bringActiveToTop(std::string);
      static SDispatchResult alterZOrder(std::string);
 diff --git a/src/render/Renderer.cpp b/src/render/Renderer.cpp
-index 1ee65a0f..7f06f0db 100644
+index c4375be4..41360d08 100644
 --- a/src/render/Renderer.cpp
 +++ b/src/render/Renderer.cpp
 @@ -363,8 +363,8 @@ void CHyprRenderer::renderWorkspaceWindowsFullscreen(PHLMONITOR pMonitor, PHLWOR

@@ -1,4 +1,4 @@
-{ pkgs, categoryCfg }:
+{ pkgs }:
 {
   # New native linux version
   ns.userPackages = [ pkgs.winbox4 ];
@@ -7,7 +7,6 @@
   # directory tends to fix it
   programs.winbox = {
     enable = true;
-    package = pkgs.winbox.override { wine = categoryCfg.wine.package; };
     openFirewall = true;
   };
 

@@ -217,6 +217,7 @@ in
       Service = {
         Type = "oneshot";
         ExecStart = getExe setWallpaper;
+        StartLimitIntervalSec = 0;
       };
 
       Install.WantedBy = [ cfg.wallpaperUnit ];
@@ -247,6 +248,7 @@ in
         Service = {
           Type = "oneshot";
           ExecStart = [ (getExe randomiseWallpaper) ];
+          StartLimitIntervalSec = 0;
         };
       };
 

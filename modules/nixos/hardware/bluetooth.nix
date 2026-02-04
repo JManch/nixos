@@ -8,7 +8,6 @@ let
   inherit (lib)
     ns
     mkIf
-    hiPrio
     getExe
     getExe'
     ;
@@ -28,16 +27,21 @@ in
         fi
       '
     '')
-    (hiPrio (
-      pkgs.runCommand "bluetui-desktop-modify" { } ''
-        mkdir -p $out/share/applications
-        substitute ${pkgs.bluetui}/share/applications/bluetui.desktop $out/share/applications/bluetui.desktop \
-          --replace-fail "Exec=bluetui" "Exec=xdg-terminal-exec --title=bluetui --app-id=bluetui bluetui
-        Icon=preferences-bluetooth" \
-          --replace-fail "Terminal=true" "Terminal=false" \
-          --replace-fail "Comment=Manage bluethooth device" "Comment=Manage bluetooth devices"
-      ''
-    ))
+    (pkgs.makeDesktopItem {
+      name = "bluetui";
+      desktopName = "Bluetui";
+      genericName = "Bluetooth Manager";
+      type = "Application";
+      exec = "xdg-terminal-exec --title=bluetui --app-id=bluetui bluetui";
+      comment = "Manage bluetooth devices";
+      keywords = [ "bluetooth" ];
+      categories = [
+        "Utility"
+        "Settings"
+        "ConsoleOnly"
+      ];
+      startupNotify = false;
+    })
   ];
 
   ns.hm = mkIf home-manager.enable {

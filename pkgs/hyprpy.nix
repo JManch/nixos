@@ -1,11 +1,8 @@
 {
-  buildPythonPackage,
-  setuptools,
-  pydantic,
+  python3Packages,
   sources,
-  ...
 }:
-buildPythonPackage {
+python3Packages.buildPythonPackage {
   pname = "hyprpy";
   inherit (sources.hyprpy) version;
   src = sources.hyprpy;
@@ -13,6 +10,6 @@ buildPythonPackage {
   patches = [ ../patches/hyprpy-always-on-top.patch ];
 
   pyproject = true;
-  build-system = [ setuptools ];
-  dependencies = [ pydantic ];
+  build-system = [ python3Packages.setuptools ];
+  dependencies = [ python3Packages.pydantic ];
 }

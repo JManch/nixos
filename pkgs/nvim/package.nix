@@ -3,7 +3,7 @@
   pkgs,
   sources,
 }:
-self.inputs.nvf.lib.neovimConfiguration {
+(self.inputs.nvf.lib.neovimConfiguration {
   # For maximum stability, rather than using our flake's primary nixpkgs pin,
   # use the nixpkgs revision pinned to nvf. This way we avoid breakages when
   # nixpkgs-unstable changes something e.g.
@@ -19,4 +19,4 @@ self.inputs.nvf.lib.neovimConfiguration {
     ./core
     ./plugins
   ];
-}
+}).neovim

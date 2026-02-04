@@ -1,18 +1,22 @@
 {
   lib,
-  buildHomeAssistantComponent,
+  home-assistant,
   sources,
-  ...
 }:
-buildHomeAssistantComponent {
-  owner = "jwillemsen";
-  domain = "daikin_onecta";
-  inherit (sources.daikin_onecta) version;
-  src = sources.daikin_onecta;
+home-assistant.python.pkgs.callPackage (
+  {
+    buildHomeAssistantComponent,
+  }:
+  buildHomeAssistantComponent {
+    owner = "jwillemsen";
+    domain = "daikin_onecta";
+    inherit (sources.daikin_onecta) version;
+    src = sources.daikin_onecta;
 
-  meta = {
-    description = "Home Assistant Integration for devices supported by the Daikin Onecta App";
-    homepage = "https://github.com/jwillemsen/daikin_onecta";
-    license = lib.licenses.mit;
-  };
-}
+    meta = {
+      description = "Home Assistant Integration for devices supported by the Daikin Onecta App";
+      homepage = "https://github.com/jwillemsen/daikin_onecta";
+      license = lib.licenses.mit;
+    };
+  }
+) { }

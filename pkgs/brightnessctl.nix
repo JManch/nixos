@@ -1,9 +1,9 @@
 {
-  brightnessctl,
+  prev,
   coreutils,
   sources,
 }:
-brightnessctl.overrideAttrs {
+prev.brightnessctl.overrideAttrs {
   version = "0-unstable-${sources.brightnessctl.revision}";
   src = sources.brightnessctl;
 

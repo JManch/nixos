@@ -4,12 +4,13 @@
   outputs =
     { self, nixpkgs, ... }:
     let
+      inherit (lib) ns;
+      inherit (lib.${ns}) forEachSystem mkHost mkDroidHost;
       lib = nixpkgs.lib.extend (final: _: import ./lib self final "JManch");
-      inherit (lib.${lib.ns}) forEachSystem mkHost mkDroidHost;
     in
     {
       templates = import ./templates;
-      packages = forEachSystem (pkgs: import ./pkgs self lib pkgs);
+      packages = forEachSystem lib.${ns}.flakePackages;
       formatter = forEachSystem (pkgs: pkgs.nixfmt-tree);
 
       nixosConfigurations = lib.listToAttrs [

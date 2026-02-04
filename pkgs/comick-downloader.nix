@@ -1,36 +1,37 @@
-{
-  buildPythonApplication,
-  installShellFiles,
-  sources,
-  beautifulsoup4,
-  cloudscraper,
-  lxml,
-  pillow,
-  pypdf,
-  requests,
-  ...
-}:
-buildPythonApplication {
-  pname = "comick-downloader";
-  version = "0-unstable-${sources.comick_downloader.revision}";
-  src = sources.comick_downloader;
-  pyproject = false;
+{ python3Packages, sources }:
+python3Packages.callPackage (
+  {
+    buildPythonApplication,
+    installShellFiles,
+    beautifulsoup4,
+    cloudscraper,
+    lxml,
+    pillow,
+    pypdf,
+    requests,
+  }:
+  buildPythonApplication {
+    pname = "comick-downloader";
+    version = "0-unstable-${sources.comick_downloader.revision}";
+    src = sources.comick_downloader;
+    pyproject = false;
 
-  dependencies = [
-    beautifulsoup4
-    cloudscraper
-    lxml
-    pillow
-    pypdf
-    requests
-  ];
+    dependencies = [
+      beautifulsoup4
+      cloudscraper
+      lxml
+      pillow
+      pypdf
+      requests
+    ];
 
-  nativeBuildInputs = [ installShellFiles ];
+    nativeBuildInputs = [ installShellFiles ];
 
-  installPhase = ''
-    mv comick_downloader.py comick_downloader
-    installBin comick_downloader
-  '';
+    installPhase = ''
+      mv comick_downloader.py comick_downloader
+      installBin comick_downloader
+    '';
 
-  meta.mainProgram = "comick_downloader";
-}
+    meta.mainProgram = "comick_downloader";
+  }
+) { }

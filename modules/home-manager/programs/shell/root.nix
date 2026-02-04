@@ -32,7 +32,7 @@
       rsync
       sd
     ])
-    ++ lib.optional (osConfig != null) pkgs.${lib.ns}.microfetch;
+    ++ lib.optional (osConfig != null) pkgs.microfetch;
 
   home.sessionVariables.COLORTERM = "truecolor";
 }

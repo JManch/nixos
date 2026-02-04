@@ -24,8 +24,32 @@ let
     hasSuffix
     mkBefore
     assertMsg
+    isDerivation
     ;
   sources = import ../npins;
+
+  nsPackages =
+    final: prev:
+    let
+      inherit (final.lib) callPackageWith makeScope packagesFromDirectoryRecursive;
+      newScope =
+        # Because both `prev.callPackage` and `final.callPackage` always pass `final`
+        # packages as arguments we need to manually pass in the `prev` package set so
+        # that we can avoid infinite recursion for packages like `brightnessctl` where
+        # we want to overlay our custom package back into primary package set scope
+        # https://discourse.nixos.org/t/why-does-prev-callpackage-use-packages-from-final/25263
+
+        # The arg here is the packages defined in the scope. In the future
+        # might find it useful to add // { ${ns} = scopePkgs; }
+        _: callPackageWith (final // { inherit self sources prev; });
+    in
+    makeScope newScope (
+      scopeFinal:
+      packagesFromDirectoryRecursive {
+        inherit (scopeFinal) callPackage; # use the `callPackage` we defined for the scope
+        directory = ../pkgs;
+      }
+    );
 in
 {
   inherit ns;
@@ -46,7 +70,11 @@ in
           {
             nixpkgs.hostPlatform = system;
             nixpkgs.buildPlatform = "x86_64-linux";
-            nixpkgs.overlays = mkBefore [ (_: prev: { ${ns} = import ../pkgs self lib prev; }) ];
+            nixpkgs.overlays = mkBefore [
+              (final: prev: {
+                ${ns} = nsPackages final prev;
+              })
+            ];
           }
           ../modules/nixos
         ]
@@ -101,10 +129,12 @@ in
         f (
           import self.inputs.nixpkgs {
             inherit system;
-            config = {
-              allowUnfree = true;
-              overlays = [ (_: prev: { ${ns} = import ../pkgs self lib prev; }) ];
-            };
+            config.allowUnfree = true;
+            overlays = [
+              (final: prev: {
+                ${ns} = nsPackages final prev;
+              })
+            ];
           }
         )
       );
@@ -115,6 +145,9 @@ in
     flakePkgs =
       args: flake:
       args.inputs.${flake}.packages.${args.options._module.args.value.pkgs.stdenv.hostPlatform.system};
+
+    # Packages our flake exposes
+    flakePackages = pkgs: filterAttrs (_: v: isDerivation v) pkgs.${ns};
 
     addPatches =
       pkg: patches:

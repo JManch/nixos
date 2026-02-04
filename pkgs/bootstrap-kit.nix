@@ -1,10 +1,10 @@
 {
-  nix-resources,
+  self,
   writeShellApplication,
   tree,
   gnutar,
   age,
-  bootstrapKit ? "${nix-resources}/secrets/bootstrap-kit.tar.age",
+  bootstrapKit ? "${self.inputs.nix-resources}/secrets/bootstrap-kit.tar.age",
 }:
 writeShellApplication {
   name = "bootstrap-kit";

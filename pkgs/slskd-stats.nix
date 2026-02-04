@@ -1,9 +1,9 @@
 {
-  buildPythonApplication,
+  python3Packages,
   sources,
   installShellFiles,
 }:
-buildPythonApplication {
+python3Packages.buildPythonApplication {
   pname = "slskd-stats";
   inherit (sources.slskd-stats) version;
   src = sources.slskd-stats;

@@ -410,6 +410,7 @@ in
     overlays = [
       (final: prev: {
         inherit (final.${ns}) brightnessctl;
+        microfetch = addPatches prev.microfetch [ "microfetch-icon.patch" ];
 
         xdg-terminal-exec = prev.xdg-terminal-exec.overrideAttrs {
           inherit (sources.xdg-terminal-exec) version;

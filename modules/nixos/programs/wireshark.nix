@@ -15,7 +15,7 @@
 
   programs.wireshark = {
     enable = true;
-    package = if cfg.graphical then pkgs.wireshark-qt else pkgs.wireshark-cli;
+    package = if cfg.graphical then pkgs.wireshark else pkgs.wireshark-cli;
   };
 
   users.users.${username}.extraGroups = [ "wireshark" ];

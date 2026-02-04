@@ -1,23 +1,26 @@
 diff --git a/hyprpy/components/windows.py b/hyprpy/components/windows.py
-index 755488e..b3c4bca 100644
+index 2b09489..5ea2c61 100644
 --- a/hyprpy/components/windows.py
 +++ b/hyprpy/components/windows.py
-@@ -49,6 +49,7 @@ class Window:
-         self.is_pinned: bool = data.is_pinned
-         #: Whether or not the window is in fullscreen mode.
-         self.is_fullscreen: int = data.is_fullscreen
+@@ -64,6 +64,8 @@ class Window:
+         self.xdg_tag: str = data.xdg_tag
+         #: Unknown.
+         self.xdg_description: str = data.xdg_description
++        #: Unknown.
 +        self.is_always_on_top: int = data.is_always_on_top
  
          #: The :class:`~hyprpy.components.instances.Instance` managing this window.
          self._instance = instance
 diff --git a/hyprpy/data/models.py b/hyprpy/data/models.py
-index 93dd674..608d1fa 100644
+index 344c793..13ed517 100644
 --- a/hyprpy/data/models.py
 +++ b/hyprpy/data/models.py
-@@ -56,6 +56,7 @@ class WindowData(BaseModel):
-     is_pinned: bool = Field(..., alias="pinned")
-     #: Whether or not the window is in fullscreen mode.
-     is_fullscreen: int = Field(..., alias="fullscreen")
+@@ -71,7 +71,8 @@ class WindowData(BaseModel):
+     xdg_tag: str = Field(..., alias="xdgTag")
+     #: Unknown.
+     xdg_description: str = Field(..., alias="xdgDescription")
+-
++    #: Unknown.
 +    is_always_on_top: bool = Field(..., alias="alwaysOnTop")
  
  class WorkspaceData(BaseModel):

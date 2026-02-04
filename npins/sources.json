@@ -56,10 +56,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "0.4.4",
-      "revision": "1702b0f328044c60d2900668125eecedc4d4b0ab",
-      "url": "https://api.github.com/repos/zydezu/ModernX/tarball/0.4.4",
-      "hash": "sha256-s+TEHh4Oy6aWcmo4uc/vfVSVmBEA6fbKDqytsTrgqgQ="
+      "version": "0.4.5",
+      "revision": "db080f0b680f830e633e017fe9e746d8009bc836",
+      "url": "https://api.github.com/repos/zydezu/ModernX/tarball/refs/tags/0.4.5",
+      "hash": "sha256-a+StfEYQwt5NuELvanvZllrD2RQ0g9JBpCznMdSDM5Y="
     },
     "adaptive-lighting": {
       "type": "GitRelease",
@@ -72,10 +72,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.29.0",
-      "revision": "0180fa4a937cede4c86eef344358ede83f81f337",
-      "url": "https://api.github.com/repos/basnijholt/adaptive-lighting/tarball/v1.29.0",
-      "hash": "sha256-v10Mrc/sSB09mC0UHMhjoEnPhj5S3tISmMcPQrPHPq8="
+      "version": "v1.30.1",
+      "revision": "e0f812d406ffa8ec9309ef2d1bfd27529c67c4ec",
+      "url": "https://api.github.com/repos/basnijholt/adaptive-lighting/tarball/refs/tags/v1.30.1",
+      "hash": "sha256-pmI0jZxIjSiA9P5+0hRCujHE53WprvkAo6jp/IOpJ88="
     },
     "app2unit": {
       "type": "GitRelease",
@@ -155,10 +155,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v4.4.4",
-      "revision": "63918299cfde134c6bb0c0b5b3ad05f4597750d4",
-      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/v4.4.4",
-      "hash": "sha256-8a5P+eoa3iEER4b2SlsYi+feyPnc4n4RYzl6Lg+nqmQ="
+      "version": "v4.4.8",
+      "revision": "86bb38d633e703fe2e10a3011423fbbfc6991b4e",
+      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/refs/tags/v4.4.8",
+      "hash": "sha256-NbMZGX2MchjoNwsUxs6CjQzkz1bJEucRHgpuFyVU3u0="
     },
     "filen-rclone": {
       "type": "Git",
@@ -169,9 +169,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "43ad6f40a1766ffb3407393c4e46ca7cdc22725b",
-      "url": "https://github.com/FilenCloudDienste/filen-rclone/archive/43ad6f40a1766ffb3407393c4e46ca7cdc22725b.tar.gz",
-      "hash": "sha256-Ba+ICSDmeEnQxrqMxLAqgmJnl4tTUaiF4lk9DR9zZ4c="
+      "revision": "79032250983108a251fae75d0abfba83b077b475",
+      "url": "https://github.com/FilenCloudDienste/filen-rclone/archive/79032250983108a251fae75d0abfba83b077b475.tar.gz",
+      "hash": "sha256-1EqtjBU0GV3+zhOYBQGtfFNox0xI+6uuMITWxz/wlyM="
     },
     "firefox-csshacks": {
       "type": "Git",
@@ -182,9 +182,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "1a3b86bff806571f5f235a779263a2c9c7b7419b",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/1a3b86bff806571f5f235a779263a2c9c7b7419b.tar.gz",
-      "hash": "sha256-Oq6n8Ag5x1IahEg+1KpJgRdd+YyaJHuxLt7KSGEzAZM="
+      "revision": "bcb85f04764802557fc1d1dff6f53461065e4893",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/bcb85f04764802557fc1d1dff6f53461065e4893.tar.gz",
+      "hash": "sha256-VlxdEeMqgRclKQqnKDhBXQ+19ce35ZFdC6SaKg2skUk="
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -242,10 +242,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v3.3.1",
-      "revision": "01fa7b04c572ac488bc2c7065d92ae08ad1224aa",
-      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/v3.3.1",
-      "hash": "sha256-Lj2Pm5BaRyz+EMwKXm9jSu+Esu5boubxFnirJgLwaGs="
+      "version": "v3.3.2",
+      "revision": "fe8cc242af9d4b3ac276c2027a5a9afc4a595885",
+      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/refs/tags/v3.3.2",
+      "hash": "sha256-Lqe0kCkJoX+YhkpA7Q+a49NSLEI3K18GciK2kCfVnGo="
     },
     "hyprpy": {
       "type": "GitRelease",
@@ -258,10 +258,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.2.0",
-      "revision": "530cd8b34f17349511e14073a7cfaa9a68ebd534",
-      "url": "https://api.github.com/repos/ulinja/hyprpy/tarball/v0.2.0",
-      "hash": "sha256-b312PmJoVPT5Dt695JdTgDCVlm2LcD0hMmsRUqs3VcQ="
+      "version": "v0.2.1",
+      "revision": "5804146fe2d1a0d5d8b1ddbae96f561039742a47",
+      "url": "https://api.github.com/repos/ulinja/hyprpy/tarball/refs/tags/v0.2.1",
+      "hash": "sha256-wwF6szBD2dQ7zKkIa32MtjtUbg3C1Jx8wfHvBDrAGCo="
     },
     "indentmini.nvim": {
       "type": "Git",
@@ -287,10 +287,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "6.0.1.1",
-      "revision": "971318be806f0ae5bb8ab74d8386825bf418ae90",
-      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/6.0.1.1",
-      "hash": "sha256-voOdC5pnG22c3tOtOluRX6T+BSdfsSArMttOeyGTJZY="
+      "version": "6.0.4.0",
+      "revision": "b247ac4d898e2ec87f6213ca6269250dfd82ee5d",
+      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/refs/tags/6.0.4.0",
+      "hash": "sha256-YJfcSBnxISWkp6A0wJWpSZ6l9dUlToU5YzP+rHXqqhY="
     },
     "neohubapi": {
       "type": "PyPi",
@@ -330,17 +330,17 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "d58b0e99c75138c2caf15d72b6fe17e3bf10fb11",
-      "url": "https://github.com/recyclarr/config-templates/archive/d58b0e99c75138c2caf15d72b6fe17e3bf10fb11.tar.gz",
-      "hash": "sha256-ZY9YXIjhxB9UGgmsLtpT3GDxlqpk1lio+DwjUjMmH+Q="
+      "revision": "b58b57c43ef62519201781eb52e0acb7ce73345c",
+      "url": "https://github.com/recyclarr/config-templates/archive/b58b57c43ef62519201781eb52e0acb7ce73345c.tar.gz",
+      "hash": "sha256-/SgYmF3w9cPJ6mT65NdUU8vnkwac3xoHJJkCwLtNmhQ="
     },
     "scdl": {
       "type": "PyPi",
       "name": "scdl",
       "version_upper_bound": null,
-      "version": "3.0.2",
-      "url": "https://files.pythonhosted.org/packages/b8/7e/a96edba727832f06d513975f0f791c6c085d7e6fde4402b79e7ac3302606/scdl-3.0.2.tar.gz",
-      "hash": "sha256-uJv53X4eKSqaU0pmix3wxn3mo/6C3GpSdYma6jJBQKM="
+      "version": "3.0.3",
+      "url": "https://files.pythonhosted.org/packages/1f/0f/48fbebdf53bb5a82a55a424aef30d929bbe4a2fa01804339b690393e05e7/scdl-3.0.3.tar.gz",
+      "hash": "sha256-CHIgoQ1aMDiPSnybknr49tDdy30MP9FUeI6UffexXOM="
     },
     "slskd-stats": {
       "type": "GitRelease",
@@ -367,9 +367,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "c5420c0d03a7d7a1a3eb42ebad47236b7230ecda",
-      "url": "https://github.com/mrusse/soularr/archive/c5420c0d03a7d7a1a3eb42ebad47236b7230ecda.tar.gz",
-      "hash": "sha256-UKxLNw7+ShLWzH/JmEC+o05dUAIUlberVope4Qm8xyU="
+      "revision": "233ff0a9d05b5d40ee0f62ec4c7928b28a9c8f48",
+      "url": "https://github.com/mrusse/soularr/archive/233ff0a9d05b5d40ee0f62ec4c7928b28a9c8f48.tar.gz",
+      "hash": "sha256-StSxTB3jqtXhpoQcSmyYU3Kf0gKu3LyGHzipJ0CZTEY="
     },
     "sunset.nvim": {
       "type": "Git",
@@ -393,9 +393,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "2d3bf907e387b7e3e364929aa3daab1d887e5e47",
-      "url": "https://github.com/dweymouth/supersonic/archive/2d3bf907e387b7e3e364929aa3daab1d887e5e47.tar.gz",
-      "hash": "sha256-4qwmywCDX3pm2XBAwMAoY0DcViYchMpRHTr5XiRkHYU="
+      "revision": "2e33b81914b9c5ae873f10ac59dc671dae47c72f",
+      "url": "https://github.com/dweymouth/supersonic/archive/2e33b81914b9c5ae873f10ac59dc671dae47c72f.tar.gz",
+      "hash": "sha256-bWWvfb/EIY/+jLxZAHCvisH4/8lQQww7gs+jm2HdExA="
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -453,10 +453,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.26.0",
-      "revision": "433174c297ef858cc370f143657781ad4856263e",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/v0.26.0",
-      "hash": "sha256-Com3Q6/xPM6fDW0rNP8QQpn8A/bUSC7cLs3xwRiTGDs="
+      "version": "v0.26.1",
+      "revision": "9c3f28beabda78f15330fa4d5c75a9ab190aaf2b",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/refs/tags/v0.26.1",
+      "hash": "sha256-HyclcItaSsBhzyYM9sgloSG6TBWvsUkRs+oIPezvO0E="
     },
     "workspaces.nvim": {
       "type": "GitRelease",
@@ -501,10 +501,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2025.12.08",
-      "revision": "aa220d0aaac0f1562af658e34a28de72ec0ecb9f",
-      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/2025.12.08",
-      "hash": "sha256-y06MDP+CrlHGrell9hcLOGlHp/gU2OOxs7can4hbj+g="
+      "version": "2026.02.04",
+      "revision": "bb3af7e6d5373c1a9c11bd5db9a6ebbbdfe55a98",
+      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/refs/tags/2026.02.04",
+      "hash": "sha256-KXnz/ocHBftenDUkCiFoBRBxi6yWt0fNuRX+vKFWDQw="
     }
   },
   "version": 7

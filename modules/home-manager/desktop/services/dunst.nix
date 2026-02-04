@@ -30,24 +30,6 @@ in
   services.dunst = {
     enable = true;
 
-    package =
-      assert (
-        lib.assertMsg (
-          pkgs.dunst.version == "1.13.0"
-        ) "Hopefully https://github.com/dunst-project/dunst/issues/1471 is fixed by now"
-      );
-      pkgs.dunst.overrideAttrs {
-        version = "0-unstable-2025-11-13";
-        # Fixes an issue with icons not updating when performing stack tag
-        # replacements
-        src = pkgs.fetchFromGitHub {
-          owner = "fedang";
-          repo = "dunst";
-          rev = "ca42a0a14e672c7ee079731124f2965fa1bb34d3";
-          hash = "sha256-zO+ZDFpadf6Mn4cUKewZGLrOj5LOME+R1gb3+jVGQz0=";
-        };
-      };
-
     settings = {
       global =
         let

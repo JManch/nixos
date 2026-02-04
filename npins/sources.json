@@ -292,6 +292,22 @@
       "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/refs/tags/6.0.4.0",
       "hash": "sha256-YJfcSBnxISWkp6A0wJWpSZ6l9dUlToU5YzP+rHXqqhY="
     },
+    "mt7925-patches": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "zbowling",
+        "repo": "mt7925"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v1.5.0",
+      "revision": "6edf23baa3e966feaf818b10a82015e61bcb6cd6",
+      "url": "https://api.github.com/repos/zbowling/mt7925/tarball/refs/tags/v1.5.0",
+      "hash": "sha256-bqTPnSR2vIJhvdpb7VYv84exoOA7SHTTAxEuMytJjQ4="
+    },
     "neohubapi": {
       "type": "PyPi",
       "name": "neohubapi",

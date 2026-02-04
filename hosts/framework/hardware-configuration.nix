@@ -5,6 +5,7 @@
 {
   pkgs,
   inputs,
+  sources,
   modulesPath,
   ...
 }:
@@ -29,7 +30,7 @@
       {
         name = "mt7925-fixes";
         patch = pkgs.runCommand "combine-mt7925-patches" { } ''
-          cat ${inputs.mt7925-patches}/kernels/6.18/*.patch > $out
+          cat ${sources.mt7925-patches}/kernels/6.18/*.patch > $out
         '';
       }
     ];

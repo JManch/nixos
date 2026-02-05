@@ -212,12 +212,12 @@ in
         ]
         ++ optional cfg.randomise.enable "randomise-wallpaper.service"
         ++ optional darkman.enable "darkman.service";
+        StartLimitIntervalSec = 0;
       };
 
       Service = {
         Type = "oneshot";
         ExecStart = getExe setWallpaper;
-        StartLimitIntervalSec = 0;
       };
 
       Install.WantedBy = [ cfg.wallpaperUnit ];
@@ -243,12 +243,12 @@ in
           Before = [ "set-wallpaper.service" ];
           Wants = [ "set-wallpaper.service" ];
           X-SwitchMethod = "keep-old";
+          StartLimitIntervalSec = 0;
         };
 
         Service = {
           Type = "oneshot";
           ExecStart = [ (getExe randomiseWallpaper) ];
-          StartLimitIntervalSec = 0;
         };
       };
 

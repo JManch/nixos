@@ -11,7 +11,6 @@
 # - Press 'Write Changes'
 {
   lib,
-  args,
   pkgs,
   config,
 }:
@@ -37,7 +36,7 @@ in
       ListenBrainz.Enabled = true;
       LastFM.Enabled = true;
       LastFM.ScrobbleFirstArtistOnly = true; # lastfm doesn't support multiple artists very well
-      UILoginBackgroundUrl = (lib.${ns}.flakePkgs args "nix-resources").wallpapers.bw-mountains.url;
+      UILoginBackgroundUrl = pkgs.${ns}.wallpapers.bw-mountains.url;
 
       Backup = {
         Path = "/var/backup/navidrome";

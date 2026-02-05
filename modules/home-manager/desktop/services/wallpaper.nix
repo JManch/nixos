@@ -1,7 +1,6 @@
 {
   lib,
   cfg,
-  args,
   pkgs,
   config,
   inputs,
@@ -19,7 +18,7 @@ let
     ;
   inherit (config.${ns}.desktop.services) darkman;
   wallpaperCache = "${config.xdg.cacheHome}/wallpaper";
-  wallpapers = type: (lib.${ns}.flakePkgs args "nix-resources").wallpapers."${type}-wallpapers";
+  wallpapers = type: pkgs.${ns}.wallpapers."${type}-wallpapers";
 
   setWallpaper = pkgs.writeShellApplication {
     name = "set-wallpaper";
@@ -144,7 +143,7 @@ in
       defaults = {
         default = mkOption {
           type = types.package;
-          default = inputs.nix-resources.packages.${pkgs.stdenv.hostPlatform.system}.wallpapers.rx7;
+          default = pkgs.${ns}.wallpapers.rx7;
           description = ''
             The default wallpaper to use if randomise is disabled.
           '';

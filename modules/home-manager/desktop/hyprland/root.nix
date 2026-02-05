@@ -2,6 +2,7 @@
   lib,
   cfg,
   args,
+  pkgs,
   config,
 }:
 let
@@ -76,7 +77,7 @@ in
 
       package = mkOption {
         type = with types; nullOr package;
-        default = (flakePkgs args "nix-resources").bibata-hyprcursors;
+        default = pkgs.${ns}.bibata-hyprcursors;
         description = ''
           A Hyprcursor compatible cursor package. Set to null to disable Hyprcursor.
         '';

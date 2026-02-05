@@ -115,7 +115,7 @@ in
 
     terminal = {
       font =
-        (lib.${ns}.flakePkgs args "nix-resources").berkeley-mono-nerdfont
+        pkgs.${ns}.berkeley-mono-nerd-font
         + "/share/fonts/truetype/NerdFonts/BerkeleyMono/BerkeleyMonoNerdFont-Regular.ttf";
 
       colors = with config.home-manager.config.colorScheme.palette; {

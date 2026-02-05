@@ -54,7 +54,7 @@ in
 
         package = mkOption {
           type = types.package;
-          default = (lib.${ns}.flakePkgs args "nix-resources").berkeley-mono-nerdfont;
+          default = pkgs.${ns}.berkeley-mono-nerd-font;
           description = "Font package";
           example = literalExpression "pkgs.fira-code";
         };

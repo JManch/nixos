@@ -46,6 +46,7 @@ let
     makeScope newScope (
       scopeFinal:
       packagesFromDirectoryRecursive {
+        inherit newScope;
         inherit (scopeFinal) callPackage; # use the `callPackage` we defined for the scope
         directory = ../pkgs;
       }
@@ -74,6 +75,27 @@ in
               (final: prev: {
                 ${ns} = nsPackages final prev;
               })
+
+              # Merge our packages from nix-resources flake
+              (
+                final: prev:
+                let
+                  inherit (self.inputs.nix-resources.overlays) nsPackages minecraftPlugins;
+                in
+                {
+                  ${ns} = prev.${ns}.overrideScope (
+                    scopeFinal: scopePrev:
+                    (nsPackages final scopeFinal)
+                    // {
+                      # Have to manually merge the sub-scopes. Wish there was a
+                      # nicer way to do all of this...
+                      minecraft-plugins = scopePrev.minecraft-plugins.overrideScope (
+                        scopeFinal': _: minecraftPlugins final scopeFinal'
+                      );
+                    }
+                  );
+                }
+              )
             ];
           }
           ../modules/nixos
@@ -101,7 +123,9 @@ in
             config = {
               allowUnfree = true;
               overlays = mkBefore [
-                (_: prev: { ${ns} = import ../pkgs self lib prev; })
+                (final: prev: {
+                  ${ns} = nsPackages final prev;
+                })
                 nix-on-droid.overlays.default
               ];
             };

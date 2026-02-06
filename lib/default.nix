@@ -24,6 +24,7 @@ let
     hasSuffix
     mkBefore
     assertMsg
+    isAttrs
     isDerivation
     ;
   sources = import ../npins;
@@ -171,7 +172,8 @@ in
       args.inputs.${flake}.packages.${args.options._module.args.value.pkgs.stdenv.hostPlatform.system};
 
     # Packages our flake exposes
-    flakePackages = pkgs: filterAttrs (_: v: isDerivation v) pkgs.${ns};
+    # Allowing attrs here breaks `nix flake show` but I don't care
+    flakePackages = pkgs: filterAttrs (_: v: isDerivation v || isAttrs v) pkgs.${ns};
 
     addPatches =
       pkg: patches:

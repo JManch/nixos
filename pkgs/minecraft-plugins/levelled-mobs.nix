@@ -3,31 +3,29 @@
   fetchurl,
   fetchFromGitHub,
   stdenvNoCC,
-  ...
 }:
-let
+stdenvNoCC.mkDerivation (finalAttrs: {
+  pname = "levelled-mobs";
+  version = "4.5.1";
+
+  src = fetchurl {
+    url = "https://github.com/ArcanePlugins/LevelledMobs/releases/download/v4.5.1/LevelledMobs-4.5.1.b143.jar";
+    hash = "sha256-6LWNwtTksBNTK6nGs1BykC1hVprMxPb6Hh5PwdNlqcE=";
+  };
+
   srcRepo = fetchFromGitHub {
     owner = "ArcanePlugins";
     repo = "LevelledMobs";
-    rev = "a85cf9da01c23c0cb655bb34e7c5a81c75a19a23";
-    sha256 = "sha256-TQHNKAlgSBoYb5NHiDpww12gD8mYTC7QceFK7CdT8+A=";
-  };
-in
-stdenvNoCC.mkDerivation rec {
-  pname = "levelled-mobs";
-  version = "3.15.4";
-
-  src = fetchurl {
-    url = "https://hangarcdn.papermc.io/plugins/ArcanePlugins/LevelledMobs/versions/3.15.4-b841/PAPER/LevelledMobs-3.15.4%20b841.jar";
-    sha256 = "sha256-5pKFr5OGM7K2RcjjOBgwRnyE1/5GVaV6aYdp8/RFVCs=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-8uZx/RVUhnql/tOxyS2kn36NgjmtFQJEgaq1Z3XfI1o=";
   };
 
   dontBuild = true;
   dontUnpack = true;
 
   installPhase = ''
-    install -m555 -D ${src} -t "$out"
-    install -m444 -D ${srcRepo}/src/main/resources/* -t "$out/config"
+    install -m444 -D $src -t $out
+    install -m444 -D $srcRepo/levelledmobs-plugin/src/main/resources/* -t $out/config
   '';
 
   meta = with lib; {
@@ -36,4 +34,4 @@ stdenvNoCC.mkDerivation rec {
     license = licenses.agpl3Only;
     maintainers = with maintainers; [ JManch ];
   };
-}
+})

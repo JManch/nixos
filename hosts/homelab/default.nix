@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   config,
   inputs,
   ...
@@ -103,6 +104,18 @@ in
           "10.20.20.0/24"
           "10.0.0.2/32" # NCASE-M1 on friends VPN
         ];
+
+        virtualHosts = {
+          squaremap = {
+            extraAllowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
+            extraConfig = ''
+              reverse_proxy http://127.0.0.1:25566
+              handle_errors {
+                respond "Minecraft server is hibernating or offline" 503
+              }
+            '';
+          };
+        };
       };
 
       dns-stack = {
@@ -191,19 +204,96 @@ in
 
       minecraft-server = {
         enable = true;
-        memory = 2000;
+        package = pkgs.papermcServers.papermc-1_21_11;
         interfaces = [ "wg-friends" ];
-        extraAllowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
-        plugins = [
-          "vivecraft"
-          "squaremap"
-          "aura-skills"
-          "levelled-mobs"
-          "tab-tps"
-          "luck-perms"
-          "gsit"
-          "play-times"
+
+        plugins = with pkgs.${ns}.minecraft-plugins; [
+          vivecraft
+          squaremap
+          aura-skills
+          levelled-mobs
+          tab-tps
+          luck-perms
+          gsit
+          play-times
         ];
+
+        files = {
+          "spigot.yml".value = # yaml
+            ''
+              world-settings:
+                default:
+                  entity-tracking-range:
+                    players: 128
+                    animals: 64
+                    monsters: 64
+                  merge-radius:
+                    exp: 0
+                    item: 0
+            '';
+
+          "plugins/AuraSkills/config.yml".value = # yaml
+            ''
+              on_death:
+                reset_xp: true
+            '';
+
+          "plugins/Vivecraft-Spigot-Extensions/config.yml".value = # yaml
+            ''
+              bow:
+                standingmultiplier: 1
+                seatedheadshotmultiplier: 2
+              welcomemsg:
+                enabled: true
+                welcomeVanilla: '&player has joined with non-VR!'
+              crawling:
+                enabled: true
+              teleport:
+                enable: false
+            '';
+
+          "plugins/squaremap/config.yml".value = # yaml
+            ''
+              settings:
+                web-address: https://squaremap.${fqDomain}
+                internal-webserver:
+                  bind: 127.0.0.1
+                  port: 25566
+            '';
+
+          "plugins/LevelledMobs/rules.yml" = {
+            reference = "${pkgs.${ns}.minecraft-plugins.levelled-mobs}/config/rules.yml";
+            diff = ''
+              --- rules.yml	2026-02-06 21:57:37.533978751 +0000
+              +++ rules-custom.yml	2026-02-06 21:56:43.769471945 +0000
+              @@ -283,9 +283,9 @@
+               default-rule:
+                 use-preset:
+                   #===== Choose a Challenge =====
+              -    #- challenge-vanilla
+              +    - challenge-vanilla
+                   #- challenge-bronze
+              -    - challenge-silver
+              +    #- challenge-silver
+                   #- challenge-gold
+                   #- challenge-platinum
+                   #- challenge-formula
+              @@ -301,10 +301,10 @@
+                   - lvlmodifier-custom-formula
+               
+                   #===== Choose Additional Options =====
+              -    - nametag-using-numbers
+              +    #- nametag-using-numbers
+                   #- nametag-using-indicator
+                   #- nametag-minimized
+              -    #- nametag-disabled
+              +    - nametag-disabled
+                   #- custom-death-messages
+               
+               
+            '';
+          };
+        };
       };
 
       jellyfin = {

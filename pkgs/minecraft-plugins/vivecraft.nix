@@ -1,22 +1,22 @@
 {
   lib,
-  fetchzip,
+  fetchurl,
   stdenvNoCC,
-  ...
 }:
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "vivecraft";
-  version = "120r1";
+  version = "1.3.5-0";
 
-  src = fetchzip {
-    url = "https://github.com/jrbudda/Vivecraft_Spigot_Extensions/releases/download/${version}/Vivecraft_Spigot_Extensions.1.20.4r1.zip";
-    sha256 = "sha256-4TS6oG7/BegYC/9yvsoYk8eYRmXDA3k8b9KJa3b4VJ4=";
+  src = fetchurl {
+    url = "https://github.com/Vivecraft/Vivecraft-Spigot-Extension/releases/download/${finalAttrs.version}/Vivecraft-Spigot-Extension-${finalAttrs.version}.jar";
+    hash = "sha256-f8UA6H3q9a6qT1rL7fpaF4hVFzM4p9N2UcBUXyENhfw=";
   };
 
+  dontUnpack = true;
   dontBuild = true;
 
   installPhase = ''
-    install -m555 -D Vivecraft_Spigot_Extensions.jar -t "$out"
+    install -m444 -D $src -t $out
   '';
 
   meta = with lib; {
@@ -25,4 +25,4 @@ stdenvNoCC.mkDerivation rec {
     license = licenses.gpl3Only;
     maintainers = with maintainers; [ JManch ];
   };
-}
+})

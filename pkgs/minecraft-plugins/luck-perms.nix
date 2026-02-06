@@ -2,22 +2,21 @@
   lib,
   fetchurl,
   stdenvNoCC,
-  ...
 }:
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "luck-perms";
-  version = "5.4.128";
+  version = "5.5.32";
 
   src = fetchurl {
-    url = "https://download.luckperms.net/1541/bukkit/loader/LuckPerms-Bukkit-${version}.jar";
-    sha256 = "sha256-ZALbcMwsAzlq1pR1hwsY9akGWgWRao74t8FAbiDwd0A=";
+    url = "https://download.luckperms.net/1620/bukkit/loader/LuckPerms-Bukkit-${finalAttrs.version}.jar";
+    hash = "sha256-0AkeHZlcRtKDz9IBZ4GhlRjLm7VqNj2QIEaXDSvwf/c=";
   };
 
   dontBuild = true;
   dontUnpack = true;
 
   installPhase = ''
-    install -m555 -D ${src} -t "$out"
+    install -m444 -D $src -t $out
   '';
 
   meta = with lib; {
@@ -26,4 +25,4 @@ stdenvNoCC.mkDerivation rec {
     license = licenses.mit;
     maintainers = with maintainers; [ JManch ];
   };
-}
+})

@@ -2,22 +2,21 @@
   lib,
   fetchurl,
   stdenvNoCC,
-  ...
 }:
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation {
   pname = "tab-tps";
-  version = "1.3.22";
+  version = "1.3.30";
 
   src = fetchurl {
-    url = "https://github.com/jpenilla/TabTPS/releases/download/v${version}/tabtps-spigot-${version}.jar";
-    sha256 = "sha256-3Dwj10HNgPG+Bc2V2jRwHiQBDiQMOJcPdmz+JMPtuaM=";
+    url = "https://cdn.modrinth.com/data/cUhi3iB2/versions/Jpi3Z1lp/tabtps-paper-1.3.30.jar";
+    hash = "sha256-zeH1CH0TC0DziZnMazLEo5pBSsEJFhMSAb+wCUliKBA=";
   };
 
   dontBuild = true;
   dontUnpack = true;
 
   installPhase = ''
-    install -m555 -D ${src} -t "$out"
+    install -m444 -D $src -t $out
   '';
 
   meta = with lib; {

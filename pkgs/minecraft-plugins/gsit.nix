@@ -4,20 +4,20 @@
   stdenvNoCC,
   ...
 }:
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "gsit";
-  version = "1.9.1";
+  version = "3.2.0";
 
   src = fetchurl {
-    url = "https://hangarcdn.papermc.io/plugins/Gecolay/GSit/versions/${version}/PAPER/GSit-${version}.jar";
-    sha256 = "sha256-6JZMJ7f2dKd/uHLzbm2pVI4q/yfbSaCDSewTtyH8SG4=";
+    url = "https://github.com/gecolay/GSit/releases/download/${finalAttrs.version}/GSit-${finalAttrs.version}.jar";
+    hash = "sha256-igwmppjrmTe1tk05T2nMRfAd/e/QpLX0b9YykgXv9i4=";
   };
 
   dontBuild = true;
   dontUnpack = true;
 
   installPhase = ''
-    install -m555 -D ${src} -t "$out"
+    install -m444 -D $src -t $out
   '';
 
   meta = with lib; {
@@ -26,4 +26,4 @@ stdenvNoCC.mkDerivation rec {
     license = licenses.gpl3Only;
     maintainers = with maintainers; [ JManch ];
   };
-}
+})

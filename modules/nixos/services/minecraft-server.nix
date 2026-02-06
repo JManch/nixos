@@ -3,72 +3,104 @@
   cfg,
   pkgs,
   config,
-  inputs,
 }:
 let
   inherit (lib)
-    mkIf
-    mkMerge
+    ns
     escapeShellArg
     concatStringsSep
     concatMapStringsSep
     concatLines
     mkAfter
     genAttrs
-    elem
     mapAttrsToList
     getExe
     mkForce
     singleton
     mkOption
-    attrNames
+    attrValues
     types
+    literalExpression
     ;
   inherit (config.services.minecraft-server) dataDir;
-  inherit (inputs.nix-resources.secrets) fqDomain;
-  serverPackage = pkgs.papermcServers.papermc-1_20_4;
-  pluginEnabled = p: elem p cfg.plugins;
   jsonFormat = pkgs.formats.json { };
-
-  availablePlugins =
-    (import ../../../pkgs/minecraft-plugins { inherit lib pkgs; }).minecraft-plugins
-    // inputs.nix-resources.packages.${pkgs.stdenv.hostPlatform.system}.minecraft-plugins;
 
   serverIcon = pkgs.fetchurl {
     url = "https://i.imgur.com/ugQk6xn.png";
     sha256 = "sha256-rU+Lg9EQGlSiXT5TQ7A7TITSwLRT5RpsbE3JdFDtot8=";
   };
+
+  mshConfig = jsonFormat.generate "msh-config.json" {
+    Server = {
+      Folder = "${dataDir}";
+      FileName = "minecraft-server";
+    };
+
+    Commands = {
+      StopServer = "stop";
+      StopServerAllowKill = 30;
+
+      # https://docs.papermc.io/paper/aikars-flags/
+      StartServer = concatStringsSep " " [
+        "${getExe cfg.package}"
+        "-Xmx${toString cfg.memory}M"
+        "-Xms${toString cfg.memory}M"
+        "-XX:+AlwaysPreTouch"
+        "-XX:+DisableExplicitGC"
+        "-XX:+ParallelRefProcEnabled"
+        "-XX:+PerfDisableSharedMem"
+        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UseG1GC"
+        "-XX:G1HeapRegionSize=8M"
+        "-XX:G1HeapWastePercent=5"
+        "-XX:G1MaxNewSizePercent=40"
+        "-XX:G1MixedGCCountTarget=4"
+        "-XX:G1MixedGCLiveThresholdPercent=90"
+        "-XX:G1NewSizePercent=30"
+        "-XX:G1RSetUpdatingPauseTimePercent=5"
+        "-XX:G1ReservePercent=20"
+        "-XX:InitiatingHeapOccupancyPercent=15"
+        "-XX:MaxGCPauseMillis=200"
+        "-XX:MaxTenuringThreshold=1"
+        "-XX:SurvivorRatio=32"
+        "-Dusing.aikars.flags=https://mcflags.emc.gs"
+        "-Daikars.new.flags=true"
+      ];
+    };
+
+    Msh = {
+      Debug = 2;
+      MshPort = cfg.port;
+      MshPortQuery = cfg.port;
+      EnableQuery = true;
+      TimeBeforeStoppingEmptyServer = 3600;
+      SuspendAllow = false;
+      SuspendRefresh = -1;
+      InfoHibernation = "                   §fserver status:\n                   §b§lHIBERNATING";
+      InfoStarting = "                   §fserver status:\n                    §6§lWARMING UP";
+      NotifyUpdate = false;
+      NotifyMessage = true;
+    };
+  };
 in
 {
   opts = {
-    mshConfig = mkOption {
-      type = jsonFormat.type;
-      apply = jsonFormat.generate "msh-config.json";
-      description = "Minecraft server hibernation config";
+    package = mkOption {
+      type = types.package;
+      example = literalExpression "pkgs.papermcServers.papermc-1_21_11";
+      description = "Server package";
     };
 
     memory = mkOption {
       type = types.int;
-      default = 4000;
-      description = "Memory allocation in megabytes for the Minecraft server";
+      default = 1024 * 6;
+      description = "Memory allocation in megabytes";
     };
 
     interfaces = mkOption {
       type = with types; listOf str;
       default = [ ];
-      description = ''
-        List of additional interfaces for the Minecraft server to be
-        exposed on.
-      '';
-    };
-
-    extraAllowedAddresses = mkOption {
-      type = with types; listOf str;
-      default = [ ];
-      description = ''
-        List of address to give access to virtual hosts in addition to the
-        trusted list.
-      '';
+      description = "List of additional interfaces to expose the server on.";
     };
 
     port = mkOption {
@@ -81,9 +113,9 @@ in
     };
 
     plugins = mkOption {
-      type = types.listOf (types.enum (attrNames availablePlugins));
+      type = types.listOf (types.enum (attrValues pkgs.${ns}.minecraft-plugins));
       default = [ ];
-      description = "List of plugin packages to install on the server";
+      description = "List of plugins to install on the server";
     };
 
     files = mkOption {
@@ -161,139 +193,6 @@ in
     };
   };
 
-  ns.services.minecraft-server = {
-    mshConfig = {
-      Server = {
-        Folder = "${dataDir}";
-        FileName = "minecraft-server";
-      };
-      Commands = {
-        StartServer = concatStringsSep " " [
-          "${getExe serverPackage}"
-          "-Xmx${toString cfg.memory}M"
-          "-Xms${toString cfg.memory}M"
-          "-XX:+AlwaysPreTouch"
-          "-XX:+DisableExplicitGC"
-          "-XX:+ParallelRefProcEnabled"
-          "-XX:+PerfDisableSharedMem"
-          "-XX:+UnlockExperimentalVMOptions"
-          "-XX:+UseG1GC"
-          "-XX:G1HeapRegionSize=8M"
-          "-XX:G1HeapWastePercent=5"
-          "-XX:G1MaxNewSizePercent=40"
-          "-XX:G1MixedGCCountTarget=4"
-          "-XX:G1MixedGCLiveThresholdPercent=90"
-          "-XX:G1NewSizePercent=30"
-          "-XX:G1RSetUpdatingPauseTimePercent=5"
-          "-XX:G1ReservePercent=20"
-          "-XX:InitiatingHeapOccupancyPercent=15"
-          "-XX:MaxGCPauseMillis=200"
-          "-XX:MaxTenuringThreshold=1"
-          "-XX:SurvivorRatio=32"
-          "-Dusing.aikars.flags=https://mcflags.emc.gs"
-          "-Daikars.new.flags=true"
-        ];
-        StopServer = "stop";
-        StopServerAllowKill = 30;
-      };
-      Msh = {
-        Debug = 2;
-        MshPort = cfg.port;
-        MshPortQuery = cfg.port;
-        EnableQuery = true;
-        TimeBeforeStoppingEmptyServer = 3600;
-        SuspendAllow = false;
-        SuspendRefresh = -1;
-        InfoHibernation = "                   §fserver status:\n                   §b§lHIBERNATING";
-        InfoStarting = "                   §fserver status:\n                    §6§lWARMING UP";
-        NotifyUpdate = false;
-        NotifyMessage = true;
-      };
-    };
-
-    files = mkMerge [
-      {
-        "spigot.yml".value = # yaml
-          ''
-            world-settings:
-              default:
-                entity-tracking-range:
-                  players: 128
-                  animals: 64
-                  monsters: 64
-                merge-radius:
-                  exp: 0
-                  item: 0
-          '';
-      }
-
-      (mkIf (pluginEnabled "aura-skills") {
-        "plugins/AuraSkills/config.yml".value = # yaml
-          ''
-            on_death:
-              reset_xp: true
-          '';
-      })
-
-      (mkIf (pluginEnabled "vivecraft") {
-        "plugins/Vivecraft-Spigot-Extensions/config.yml".value = # yaml
-          ''
-            bow:
-              standingmultiplier: 1
-              seatedheadshotmultiplier: 2
-            welcomemsg:
-              enabled: true
-              welcomeVanilla: '&player has joined with non-VR!'
-            crawling:
-              enabled: true
-            teleport:
-              enable: false
-          '';
-      })
-
-      (mkIf (pluginEnabled "squaremap") {
-        "plugins/squaremap/config.yml".value = # yaml
-          ''
-            settings:
-              web-address: https://squaremap.${fqDomain}
-              internal-webserver:
-                bind: 127.0.0.1
-                port: 25566
-          '';
-      })
-
-      # Some plugins need config to be applied in context of the default config.
-      # To avoid copying the entire default config file into our nix config we
-      # generate a diff and apply it to the reference config file sourced
-      # upstream.
-      (mkIf (pluginEnabled "levelled-mobs") {
-        "plugins/LevelledMobs/rules.yml" = {
-          reference = "${availablePlugins.levelled-mobs}/config/rules.yml";
-          diff = ''
-            --- rules.yml	2024-05-12 11:34:55.911349601 +0100
-            +++ rules-custom.yml	2024-05-12 11:36:51.519976466 +0100
-            @@ -426,11 +426,14 @@
-             custom-rules:
-               - enabled: true
-                 name: 'No Stat Change for Specific Entities'
-            -    use-preset: vanilla_challenge, nametag_no_level
-            +    use-preset: vanilla_challenge
-                 conditions:
-                   entities:
-                     allowed-groups: [ 'all_passive_mobs' ]
-                     allowed-list: [ 'BABY_', 'WANDERING_TRADER', 'VILLAGER', 'ZOMBIE_VILLAGER', 'BAT' ]
-            +    apply-settings:
-            +      nametag: disabled
-            +      nametag-visibility-method: DISABLED
-
-               - enabled: true
-                 name: 'Custom Nether Levelling'
-          '';
-        };
-      })
-    ];
-  };
-
   systemd.services.minecraft-server = {
     path = [ pkgs.jre ]; # Msh needs java in path
     serviceConfig = {
@@ -306,8 +205,8 @@ in
       # bash
       mkAfter ''
         # Msh setup
-        install -m 640 "${cfg.mshConfig}" "${dataDir}/msh-config.json"
-        ln -fs "${getExe serverPackage}" "${dataDir}/minecraft-server"
+        install -m 640 "${mshConfig}" "${dataDir}/msh-config.json"
+        ln -fs "${getExe cfg.package}" "${dataDir}/minecraft-server"
         ln -fs "${serverIcon}" "${dataDir}/server-icon-frozen.png"
 
         # Remove existing plugins
@@ -323,7 +222,7 @@ in
         ${concatMapStringsSep "\n" (
           plugin: # bash
           ''
-            ln -fs "${availablePlugins.${plugin}}"/*.jar "${dataDir}/plugins"
+            ln -fs "${plugin}"/*.jar "${dataDir}/plugins"
           '') cfg.plugins}
 
         # Install config files
@@ -360,18 +259,6 @@ in
       allowedUDPPorts = [ cfg.port ];
     })
   );
-
-  ns.services.caddy.virtualHosts = mkIf (pluginEnabled "squaremap") {
-    squaremap = {
-      inherit (cfg) extraAllowedAddresses;
-      extraConfig = ''
-        reverse_proxy http://127.0.0.1:25566
-        handle_errors {
-          respond "Minecraft server is hibernating or offline" 503
-        }
-      '';
-    };
-  };
 
   ns.backups.minecraft-server =
     let

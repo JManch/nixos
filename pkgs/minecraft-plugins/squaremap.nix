@@ -2,29 +2,27 @@
   lib,
   fetchurl,
   stdenvNoCC,
-  ...
 }:
-let
-  squaremarker = fetchurl {
-    url = "https://github.com/SentixDev/squaremarker/releases/download/1.20.2-v1.0.5/squaremarker-paper-1.0.5.jar";
-    sha256 = "sha256-AVbHM+i4IT9ZoVWjl3I2e88onDMfY36VfRp+jLFPCUA=";
-  };
-in
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "squaremap";
-  version = "1.2.3";
+  version = "1.3.12";
 
   src = fetchurl {
-    url = "https://github.com/jpenilla/squaremap/releases/download/v${version}/squaremap-paper-mc1.20.4-${version}.jar";
-    sha256 = "sha256-DNRPdTngzNw4FmGxXxUs7wLNevRxBnhpcIv7XxttzHA=";
+    url = "https://github.com/jpenilla/squaremap/releases/download/v${finalAttrs.version}/squaremap-paper-mc1.21.11-${finalAttrs.version}.jar";
+    hash = "sha256-M3WZS7F0v8V/y05lDSx9a+RcczjHQRh9R+EhZnrTLR4=";
+  };
+
+  squaremarker = fetchurl {
+    url = "https://github.com/SentixDev/squaremarker/releases/download/1.21.11-v1.0.8/squaremarker-paper-1.0.8.jar";
+    hash = "sha256-bITume9ORmp5M74MzO/7GVIAQXcHcubexm1nRkcnVyg=";
   };
 
   dontBuild = true;
   dontUnpack = true;
 
   installPhase = ''
-    install -m555 -D ${src} -t "$out"
-    install -m555 ${squaremarker} -t "$out"
+    install -m444 -D $src -t $out
+    install -m444 $squaremarker -t $out
   '';
 
   meta = with lib; {
@@ -33,4 +31,4 @@ stdenvNoCC.mkDerivation rec {
     license = licenses.mit;
     maintainers = with maintainers; [ JManch ];
   };
-}
+})

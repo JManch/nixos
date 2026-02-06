@@ -46,7 +46,7 @@
     impermanence.inputs.nixpkgs.follows = "nixpkgs";
     impermanence.inputs.home-manager.follows = "home-manager";
 
-    vpn-confinement.url = "github:Maroka-chan/VPN-Confinement";
+    vpn-confinement.url = "github:JManch/VPN-Confinement/recovery";
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";

@@ -412,6 +412,12 @@ in
         inherit (final.${ns}) brightnessctl;
         microfetch = addPatches prev.microfetch [ "microfetch-icon.patch" ];
 
+        # Uses the emblem-default-symbolic icon which has been removed from the
+        # adwaita icon theme
+        # https://gitlab.gnome.org/GNOME/gnome-terminal/-/issues/8126
+        # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1109086
+        pwvucontrol = addPatches prev.pwvucontrol [ "pwvucontrol-icon-fix.patch" ];
+
         xdg-terminal-exec = prev.xdg-terminal-exec.overrideAttrs {
           inherit (sources.xdg-terminal-exec) version;
           src = sources.xdg-terminal-exec;

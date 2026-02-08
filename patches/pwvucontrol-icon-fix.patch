@@ -1,0 +1,13 @@
+diff --git a/data/resources/ui/sinkbox.ui b/data/resources/ui/sinkbox.ui
+index fe98b39..48db89c 100644
+--- a/data/resources/ui/sinkbox.ui
++++ b/data/resources/ui/sinkbox.ui
+@@ -27,7 +27,7 @@
+                   <class name="suffixes" />
+                   <class name="expander-row-arrow" />
+                 </style>
+-                <property name="icon-name">emblem-default-symbolic</property>
++                <property name="icon-name">object-select-symbolic</property>
+               </object>
+             </child>
+           </object>

@@ -212,6 +212,7 @@ in
           bluetooth.enable = mkVMOverride false;
           printing.client.enable = mkVMOverride false;
           valve-index.enable = mkVMOverride false;
+          keyd.rebinds = mkVMOverride { };
         };
 
         system = {

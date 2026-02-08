@@ -32,6 +32,7 @@ in
       desktopName = "Bluetui";
       genericName = "Bluetooth Manager";
       type = "Application";
+      icon = "preferences-bluetooth";
       exec = "xdg-terminal-exec --title=bluetui --app-id=bluetui bluetui";
       comment = "Manage bluetooth devices";
       keywords = [ "bluetooth" ];

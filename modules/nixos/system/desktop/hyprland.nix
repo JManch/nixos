@@ -80,6 +80,7 @@ in
                 # Adds dynamic mode to the resize gesture which moves the window
                 # if it's floating
                 ../../../../patches/hyprland-dynamic-resize-gesture.patch
+                ../../../../patches/hyprland-fullscreen-gesture-maximize-fix.patch
                 # Do not want any of the features this offers and can't be
                 # bothered to get it properly working with uwsm
                 ../../../../patches/hyprland-no-watchdog.patch

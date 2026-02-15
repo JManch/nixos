@@ -93,6 +93,7 @@
         rnote.enable = true;
         vscode.enable = true;
         anki.enable = true;
+        signal.enable = true;
 
         firefox = {
           enable = true;

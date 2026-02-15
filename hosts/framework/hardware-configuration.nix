@@ -1,8 +1,8 @@
 # Issues:
-# - https://github.com/openwrt/mt76/issues/548
 # - Userspace charge limiter has been broken since the 3.04 bios update https://github.com/tlvince/nixos-config/issues/309
 # - Front-right USB A adapter sometimes doesn't work https://community.frame.work/t/solved-usb-a-expansion-card-stops-working-until-unplugged/26579
 {
+  lib,
   pkgs,
   inputs,
   sources,
@@ -20,6 +20,14 @@
 
   # As of kernel 6.13 the framework kmod isn't necessary
   hardware.framework.enableKmod = false;
+
+  ${lib.ns}.hardware.graphics.amd.kernelPatches = [
+    # Fix for https://gitlab.freedesktop.org/drm/amd/-/issues/4463
+    (pkgs.fetchpatch2 {
+      url = "https://gitlab.freedesktop.org/agd5f/linux/-/commit/318917e1d8ecc89f820f4fabf79935f4fed718cd.diff";
+      hash = "sha256-WFAp18QU1Rr09K2Gnsvke/UngKZOeSZb68g1PgoJ7Xc=";
+    })
+  ];
 
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;

@@ -4,7 +4,7 @@
   pkgs,
 }:
 {
-  opts.package = lib.mkPackageOption pkgs.wineWowPackages "stable" { };
+  opts.package = lib.mkPackageOption pkgs.wineWow64Packages "stable" { };
 
   ns.userPackages = [
     cfg.package

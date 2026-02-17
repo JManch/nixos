@@ -46,5 +46,5 @@ in
   #   ))
   # ];
 
-  programs.zsh.shellAliases."xdg-open" = "app2unit-open -t service";
+  programs.zsh.shellAliases."xdg-open" = "app2unit-open-service";
 }

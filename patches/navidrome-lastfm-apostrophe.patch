@@ -1,25 +1,25 @@
-diff --git a/core/agents/lastfm/agent.go b/core/agents/lastfm/agent.go
-index e3e53b23..3b943788 100644
---- a/core/agents/lastfm/agent.go
-+++ b/core/agents/lastfm/agent.go
-@@ -305,8 +305,8 @@ func (l *lastfmAgent) NowPlaying(ctx context.Context, userId string, track *mode
+diff --git a/adapters/lastfm/agent.go b/adapters/lastfm/agent.go
+index b3e89a9d..a13aef01 100644
+--- a/adapters/lastfm/agent.go
++++ b/adapters/lastfm/agent.go
+@@ -362,8 +362,8 @@ func (l *lastfmAgent) NowPlaying(ctx context.Context, userId string, track *mode
  
  	err = l.client.updateNowPlaying(ctx, sk, ScrobbleInfo{
  		artist:      l.getArtistForScrobble(track, model.RoleArtist, track.Artist),
 -		track:       track.Title,
 -		album:       track.Album,
-+		track:       strings.ReplaceAll(track.Title, "’" , "'"),
++		track:       strings.ReplaceAll(track.Title, "’", "'"),
 +		album:       strings.ReplaceAll(track.Album, "’" , "'"),
  		trackNumber: track.TrackNumber,
  		mbid:        track.MbzRecordingID,
  		duration:    int(track.Duration),
-@@ -331,8 +331,8 @@ func (l *lastfmAgent) Scrobble(ctx context.Context, userId string, s scrobbler.S
+@@ -388,8 +388,8 @@ func (l *lastfmAgent) Scrobble(ctx context.Context, userId string, s scrobbler.S
  	}
  	err = l.client.scrobble(ctx, sk, ScrobbleInfo{
  		artist:      l.getArtistForScrobble(&s.MediaFile, model.RoleArtist, s.Artist),
 -		track:       s.Title,
 -		album:       s.Album,
-+		track:       strings.ReplaceAll(s.Title, "’" , "'"),
++		track:       strings.ReplaceAll(s.Title, "’", "'"),
 +		album:       strings.ReplaceAll(s.Album, "’" , "'"),
  		trackNumber: s.TrackNumber,
  		mbid:        s.MbzRecordingID,

@@ -1,29 +1,29 @@
 diff --git a/src/main.rs b/src/main.rs
-index 41a1818..0a922a5 100644
+index caa58ec..413bff5 100644
 --- a/src/main.rs
 +++ b/src/main.rs
-@@ -68,15 +68,15 @@ fn print_system_info(fields: &Fields) -> Result<(), Box<dyn std::error::Error>>
-     let blue = COLORS.blue;
-     let reset = COLORS.reset;
-     let system_info = format!("
--    {cyan}     ▟█▖    {blue}▝█▙ ▗█▛          {user_info} ~{reset}
--    {cyan}  ▗▄▄▟██▄▄▄▄▄{blue}▝█▙█▛  {cyan}▖        {cyan}  {blue}System{reset}        {os_name}
--    {cyan}  ▀▀▀▀▀▀▀▀▀▀▀▘{blue}▝██  {cyan}▟█▖       {cyan}  {blue}Kernel{reset}        {kernel_version}
--    {blue}     ▟█▛       {blue}▝█▘{cyan}▟█▛        {cyan}  {blue}Shell{reset}         {shell}
--    {blue}▟█████▛          {cyan}▟█████▛     {cyan}  {blue}Uptime{reset}        {uptime}
--    {blue}   ▟█▛{cyan}▗█▖       {cyan}▟█▛          {cyan}  {blue}Desktop{reset}       {desktop}
--    {blue}  ▝█▛  {cyan}██▖{blue}▗▄▄▄▄▄▄▄▄▄▄▄       {cyan}  {blue}Memory{reset}        {memory_usage}
--    {blue}   ▝  {cyan}▟█▜█▖{blue}▀▀▀▀▀██▛▀▀▘       {cyan}󱥎  {blue}Storage (/){reset}   {storage}
--    {cyan}     ▟█▘ ▜█▖    {blue}▝█▛          {cyan}  {blue}Colors{reset}        {colors}\n");
-+ {cyan}    ▟█▖   {blue}▝█▙ ▗█▛       {user_info} ~{reset}
-+ {cyan}  ▗▄▟██▄▄▄▄{blue}▝█▙█▛  {cyan}▖     {cyan}  {blue}System{reset}        {os_name}
-+ {cyan}  ▀▀▀▀▀▀▀▀▀▘{blue}▝██  {cyan}▟█▖    {cyan}  {blue}Kernel{reset}        {kernel_version}
-+ {blue}    ▟█▛      {blue}▝█▘{cyan}▟█▛     {cyan}  {blue}Shell{reset}         {shell}
-+ {blue}▟████▛         {cyan}▟████▛   {cyan}  {blue}Uptime{reset}        {uptime}
-+ {blue}  ▟█▛{cyan}▗█▖      {cyan}▟█▛       {cyan}  {blue}Desktop{reset}       {desktop}
-+ {blue} ▝█▛  {cyan}██▖{blue}▗▄▄▄▄▄▄▄▄▄     {cyan}  {blue}Memory{reset}        {memory_usage}
-+ {blue}  ▝  {cyan}▟█▜█▖{blue}▀▀▀▀██▛▀▘     {cyan}󱥎  {blue}Storage (/){reset}   {storage}
-+ {cyan}    ▟█▘ ▜█▖   {blue}▝█▛       {cyan}  {blue}Colors{reset}        {colors}");
+@@ -88,15 +88,15 @@ fn print_system_info(
+   write!(
+     cursor,
+     "
+-    {blue}     ▟█▖    {cyan}▝█▙ ▗█▛         {user_info} ~{reset}
+-    {blue}  ▗▄▄▟██▄▄▄▄▄{cyan}▝█▙█▛  {blue}▖       {cyan}  {blue}System{reset}        {os_name}
+-    {blue}  ▀▀▀▀▀▀▀▀▀▀▀▘{cyan}▝██  {blue}▟█▖      {cyan}  {blue}Kernel{reset}        {kernel_version}
+-    {cyan}     ▟█▛       {cyan}▝█▘{blue}▟█▛       {cyan}  {blue}Shell{reset}         {shell}
+-    {cyan}▟█████▛          {blue}▟█████▛    {cyan}  {blue}Uptime{reset}        {uptime}
+-    {cyan}   ▟█▛{blue}▗█▖       {blue}▟█▛         {cyan}  {blue}Desktop{reset}       {desktop}
+-    {cyan}  ▝█▛  {blue}██▖{cyan}▗▄▄▄▄▄▄▄▄▄▄▄      {cyan}󰍛  {blue}Memory{reset}        {memory_usage}
+-    {cyan}   ▝  {blue}▟█▜█▖{cyan}▀▀▀▀▀██▛▀▀▘      {cyan}󱥎  {blue}Storage (/){reset}   {storage}
+-    {blue}     ▟█▘ ▜█▖    {cyan}▝█▛         {cyan}  {blue}Colors{reset}        {colors}\n\n"
++    {blue}    ▟█▖   {cyan}▝█▙ ▗█▛       {user_info} ~{reset}
++    {blue}  ▗▄▟██▄▄▄▄{cyan}▝█▙█▛  {blue}▖     {cyan}  {cyan}System{reset}        {os_name}
++    {blue}  ▀▀▀▀▀▀▀▀▀▘{cyan}▝██  {blue}▟█▖    {cyan}  {cyan}Kernel{reset}        {kernel_version}
++    {cyan}    ▟█▛      {cyan}▝█▘{blue}▟█▛     {cyan}  {cyan}Shell{reset}         {shell}
++    {cyan}▟████▛         {blue}▟████▛   {cyan}  {blue}Uptime{reset}        {uptime}
++    {cyan}  ▟█▛{blue}▗█▖      {blue}▟█▛       {cyan}  {cyan}Desktop{reset}       {desktop}
++    {cyan} ▝█▛  {blue}██▖{cyan}▗▄▄▄▄▄▄▄▄▄     {cyan}  {cyan}Memory{reset}        {memory_usage}
++    {cyan}  ▝  {blue}▟█▜█▖{cyan}▀▀▀▀██▛▀▘     {cyan}󱥎  {cyan}Storage (/){reset}   {storage}
++    {blue}    ▟█▘ ▜█▖   {cyan}▝█▛       {cyan}  {cyan}Colors{reset}        {colors}\n\n"
+   )?;
  
-     Ok(stdout().write_all(system_info.as_bytes())?)
- }
+   let len = cursor.position() as usize;

@@ -10,7 +10,7 @@
       src = sources.supersonic;
       patches = [ ../../../../patches/supersonic-large-volume-slider.patch ];
       tags = old.tags ++ [ "migrated_fynedo" ];
-      vendorHash = "sha256-x8eq1ZGitBoq+N1QOIYLZRLIta3gbfpn2xZsqkj4cGo=";
+      vendorHash = "sha256-dek1jF9IYWPa9I/b7XgG+8UMWvCepfZs4CGIdp6X8/c=";
 
       nativeBuildInputs = old.nativeBuildInputs ++ [ pkgs.makeWrapper ];
 

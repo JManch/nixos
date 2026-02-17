@@ -1,5 +1,5 @@
 diff --git a/src/main.rs b/src/main.rs
-index caa58ec..413bff5 100644
+index caa58ec..3f9f3b7 100644
 --- a/src/main.rs
 +++ b/src/main.rs
 @@ -88,15 +88,15 @@ fn print_system_info(
@@ -16,14 +16,14 @@ index caa58ec..413bff5 100644
 -    {cyan}   ▝  {blue}▟█▜█▖{cyan}▀▀▀▀▀██▛▀▀▘      {cyan}󱥎  {blue}Storage (/){reset}   {storage}
 -    {blue}     ▟█▘ ▜█▖    {cyan}▝█▛         {cyan}  {blue}Colors{reset}        {colors}\n\n"
 +    {blue}    ▟█▖   {cyan}▝█▙ ▗█▛       {user_info} ~{reset}
-+    {blue}  ▗▄▟██▄▄▄▄{cyan}▝█▙█▛  {blue}▖     {cyan}  {cyan}System{reset}        {os_name}
-+    {blue}  ▀▀▀▀▀▀▀▀▀▘{cyan}▝██  {blue}▟█▖    {cyan}  {cyan}Kernel{reset}        {kernel_version}
-+    {cyan}    ▟█▛      {cyan}▝█▘{blue}▟█▛     {cyan}  {cyan}Shell{reset}         {shell}
++    {blue}  ▗▄▟██▄▄▄▄{cyan}▝█▙█▛  {blue}▖     {cyan}  {blue}System{reset}        {os_name}
++    {blue}  ▀▀▀▀▀▀▀▀▀▘{cyan}▝██  {blue}▟█▖    {cyan}  {blue}Kernel{reset}        {kernel_version}
++    {cyan}    ▟█▛      {cyan}▝█▘{blue}▟█▛     {cyan}  {blue}Shell{reset}         {shell}
 +    {cyan}▟████▛         {blue}▟████▛   {cyan}  {blue}Uptime{reset}        {uptime}
-+    {cyan}  ▟█▛{blue}▗█▖      {blue}▟█▛       {cyan}  {cyan}Desktop{reset}       {desktop}
-+    {cyan} ▝█▛  {blue}██▖{cyan}▗▄▄▄▄▄▄▄▄▄     {cyan}  {cyan}Memory{reset}        {memory_usage}
-+    {cyan}  ▝  {blue}▟█▜█▖{cyan}▀▀▀▀██▛▀▘     {cyan}󱥎  {cyan}Storage (/){reset}   {storage}
-+    {blue}    ▟█▘ ▜█▖   {cyan}▝█▛       {cyan}  {cyan}Colors{reset}        {colors}\n\n"
++    {cyan}  ▟█▛{blue}▗█▖      {blue}▟█▛       {cyan}  {blue}Desktop{reset}       {desktop}
++    {cyan} ▝█▛  {blue}██▖{cyan}▗▄▄▄▄▄▄▄▄▄     {cyan}  {blue}Memory{reset}        {memory_usage}
++    {cyan}  ▝  {blue}▟█▜█▖{cyan}▀▀▀▀██▛▀▘     {cyan}󱥎  {blue}Storage (/){reset}   {storage}
++    {blue}    ▟█▘ ▜█▖   {cyan}▝█▛       {cyan}  {blue}Colors{reset}        {colors}\n\n"
    )?;
  
    let len = cursor.position() as usize;

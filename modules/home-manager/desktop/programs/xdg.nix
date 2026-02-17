@@ -37,7 +37,7 @@ in
     videos = "${home}/videos";
     templates = "${home}/templates";
     publicShare = "${home}/public";
-    extraConfig.XDG_SCREENSHOTS_DIR = "${home}/pictures/screenshots";
+    extraConfig.SCREENSHOTS = "${home}/pictures/screenshots";
   };
 
   xdg.mimeApps.enable = osConfig.${ns}.system.desktop.desktopEnvironment == null;

@@ -289,7 +289,7 @@ let
         notify_action=$(notify-send --action 'default=Edit image' --icon "$output_file" Screenshot "$message")
         if [[ $notify_action = "default" ]]; then
           [[ $action == "copy" ]] && output_edit_file="$output_dir/$date.png" || output_edit_file="$output_dir/$date-edit.png"
-          app2unit satty --filename "$output_file" --output-filename "$output_edit_file" --font-family "${desktop.style.font.family}" &
+          app2unit -t service satty --filename "$output_file" --output-filename "$output_edit_file" --font-family "${desktop.style.font.family}" &
         elif [[ $action == "copy" ]]; then
           rm "$output_file"
         fi

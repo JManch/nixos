@@ -30,7 +30,8 @@
   ];
 
   boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
+    # 6.19 cause a white flash on boot and completely breaks suspend
+    kernelPackages = pkgs.linuxPackages_6_18;
 
     kernelModules = [ "kvm-amd" ];
 
@@ -38,7 +39,7 @@
       {
         name = "mt7925-fixes";
         patch = pkgs.runCommand "combine-mt7925-patches" { } ''
-          cat ${sources.mt7925-patches}/kernels/6.19-rc/*.patch > $out
+          cat ${sources.mt7925-patches}/kernels/6.18/*.patch > $out
         '';
       }
     ];

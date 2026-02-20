@@ -1,0 +1,17 @@
+diff --git a/configure b/configure
+index 554aff4a6..ddff812db 100755
+--- a/configure
++++ b/configure
+@@ -7311,12 +7311,10 @@ then :
+   withval=$with_tmpdir;
+ printf "%s\n" "#define TMPDIR \"$withval\"" >>confdefs.h
+ 
+-		TMPDIR="$withval"
+ else case e in #(
+   e)
+ printf "%s\n" "#define TMPDIR \"$HOME/unrealircd/tmp\"" >>confdefs.h
+ 
+-		TMPDIR="$HOME/unrealircd/tmp" ;;
+ esac
+ fi
+ 

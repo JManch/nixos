@@ -1,0 +1,13 @@
+diff --git a/Makefile.in b/Makefile.in
+index 36628a58c..041b3fbba 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -205,8 +205,6 @@ install: all
+ 	@rm -f $(DESTDIR)@MODULESDIR@/third/*.so 1>/dev/null 2>&1
+ 	@#This step can fail with zero files, so we ignore exit status:
+ 	-$(INSTALL) -m 0700 src/modules/third/*.so $(DESTDIR)@MODULESDIR@/third
+-	@rm -f $(DESTDIR)@SCRIPTDIR@/source
+-	ln -s @BUILDDIR@ $(DESTDIR)@SCRIPTDIR@/source
+ 	@echo ''
+ 	@echo '* UnrealIRCd is now installed.'
+ 	

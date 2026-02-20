@@ -71,6 +71,7 @@ in
       anki-sync-server.enable = true;
       arr-stack.enable = true;
       qbittorrent-nox.enable = true;
+      unrealircd.enable = true;
 
       silverbullet = {
         enable = true;

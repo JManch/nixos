@@ -409,9 +409,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "497c61e7249887f9bff056476148e452cae021ea",
-      "url": "https://github.com/dweymouth/supersonic/archive/497c61e7249887f9bff056476148e452cae021ea.tar.gz",
-      "hash": "sha256-By8oP9OG/oAdn5kXKAAjMf/lBop1r+gCwYqd7h1vMF0="
+      "revision": "9dd606ce73642cdab4398df90dac5711ea4fa84f",
+      "url": "https://github.com/dweymouth/supersonic/archive/9dd606ce73642cdab4398df90dac5711ea4fa84f.tar.gz",
+      "hash": "sha256-hfP+DGnG2EGZu6//fB7yXkPUNtXSoljuQlLm78m3KFM="
     },
     "thermal_comfort": {
       "type": "GitRelease",

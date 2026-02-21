@@ -1,0 +1,63 @@
+diff --git a/src-tauri/src/lib.rs b/src-tauri/src/lib.rs
+index 20c38f1..422667d 100644
+--- a/src-tauri/src/lib.rs
++++ b/src-tauri/src/lib.rs
+@@ -7,6 +7,16 @@ use socket::{connect, disconnect, listen, send, SocketState};
+ 
+ // use tauri_plugin_deep_link::DeepLinkExt;
+ 
++#[tauri::command]
++fn get_api_key(provider: String) -> Result<String, String> {
++    let var_name = match provider.as_str() {
++        "giphy" => "GIPHY_API_KEY",
++        "tenor" => "TENOR_API_KEY",
++        _ => return Err("Unknown provider".into()),
++    };
++    std::env::var(var_name).map_err(|_| format!("{} not set", var_name))
++}
++
+ #[cfg_attr(mobile, tauri::mobile_entry_point)]
+ pub fn run() {
+     let mut builder = tauri::Builder::default();
+@@ -41,7 +51,7 @@ pub fn run() {
+             Ok(())
+         })
+         .manage(SocketState(Arc::new(Mutex::new(HashMap::new()))))
+-        .invoke_handler(tauri::generate_handler![connect, disconnect, listen, send])
++        .invoke_handler(tauri::generate_handler![connect, disconnect, listen, send, get_api_key])
+         .run(tauri::generate_context!())
+         .expect("error while running tauri application");
+ }
+diff --git a/src/components/ui/GifSelector.tsx b/src/components/ui/GifSelector.tsx
+index cc7595d..c895635 100644
+--- a/src/components/ui/GifSelector.tsx
++++ b/src/components/ui/GifSelector.tsx
+@@ -2,6 +2,7 @@ import type * as React from "react";
+ import { useEffect, useState } from "react";
+ import { createPortal } from "react-dom";
+ import { FaTimes } from "react-icons/fa";
++import { invoke } from "@tauri-apps/api/core";
+ 
+ interface GifSelectorProps {
+   isOpen: boolean;
+@@ -60,13 +61,16 @@ const GifSelector: React.FC<GifSelectorProps> = ({
+       let apiUrl = "";
+       let apiKey = "";
+ 
++      try {
++        apiKey = await invoke<string>("get_api_key", { provider: activeProvider });
++      } catch (e) {
++        console.warn(`No API key set for ${activeProvider}:`, e);
++        throw new Error(`Missing API key for ${activeProvider}`);
++      }
++
+       if (activeProvider === "giphy") {
+-        // GIPHY API
+-        apiKey = import.meta.env.VITE_GIPHY_API_KEY || ""; // You'll need to set this
+         apiUrl = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(searchQuery)}&limit=20&rating=g`;
+       } else {
+-        // Tenor API
+-        apiKey = import.meta.env.VITE_TENOR_API_KEY || ""; // You'll need to set this
+         apiUrl = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(searchQuery)}&key=${apiKey}&limit=20&contentfilter=medium`;
+       }
+ 

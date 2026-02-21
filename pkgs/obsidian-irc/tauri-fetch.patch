@@ -1,0 +1,581 @@
+diff --git a/package-lock.json b/package-lock.json
+index 517acfa..1312370 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11,6 +11,7 @@
+         "@heroicons/react": "^2.2.0",
+         "@tauri-apps/api": "^2.0.0",
+         "@tauri-apps/plugin-deep-link": "^2.3.0",
++        "@tauri-apps/plugin-http": "2.4",
+         "@tauri-apps/plugin-notification": "^2.2.2",
+         "@tauri-apps/plugin-os": "^2.2.1",
+         "@types/uuid": "^10.0.0",
+@@ -2076,6 +2077,15 @@
+         "@tauri-apps/api": "^2.8.0"
+       }
+     },
++    "node_modules/@tauri-apps/plugin-http": {
++      "version": "2.4.4",
++      "resolved": "https://registry.npmjs.org/@tauri-apps/plugin-http/-/plugin-http-2.4.4.tgz",
++      "integrity": "sha512-IjlaaS4z8ybB10qnh6djZ2FIaHdWVs/U1D1C56udKcjX1f+jAmR8/s7qBV5cv/OmcGkOIzet3LWuH70LKf4J2A==",
++      "license": "MIT OR Apache-2.0",
++      "dependencies": {
++        "@tauri-apps/api": "^2.0.0"
++      }
++    },
+     "node_modules/@tauri-apps/plugin-notification": {
+       "version": "2.3.3",
+       "resolved": "https://registry.npmjs.org/@tauri-apps/plugin-notification/-/plugin-notification-2.3.3.tgz",
+diff --git a/package.json b/package.json
+index 688168e..0d24bbf 100644
+--- a/package.json
++++ b/package.json
+@@ -26,6 +26,7 @@
+     "@heroicons/react": "^2.2.0",
+     "@tauri-apps/api": "^2.0.0",
+     "@tauri-apps/plugin-deep-link": "^2.3.0",
++    "@tauri-apps/plugin-http": "2.4",
+     "@tauri-apps/plugin-notification": "^2.2.2",
+     "@tauri-apps/plugin-os": "^2.2.1",
+     "@types/uuid": "^10.0.0",
+diff --git a/src-tauri/Cargo.lock b/src-tauri/Cargo.lock
+index 7a82cc5..ae3ccc4 100644
+--- a/src-tauri/Cargo.lock
++++ b/src-tauri/Cargo.lock
+@@ -15,6 +15,7 @@ dependencies = [
+  "tauri",
+  "tauri-build",
+  "tauri-plugin-deep-link",
++ "tauri-plugin-http",
+  "tauri-plugin-log",
+  "tauri-plugin-notification",
+  "tauri-plugin-os",
+@@ -632,10 +633,29 @@ version = "0.18.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "4ddef33a339a91ea89fb53151bd0a4689cfce27055c291dfa69945475d22c747"
+ dependencies = [
++ "percent-encoding",
+  "time",
+  "version_check",
+ ]
+ 
++[[package]]
++name = "cookie_store"
++version = "0.21.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "2eac901828f88a5241ee0600950ab981148a18f2f756900ffba1b125ca6a3ef9"
++dependencies = [
++ "cookie",
++ "document-features",
++ "idna",
++ "log",
++ "publicsuffix",
++ "serde",
++ "serde_derive",
++ "serde_json",
++ "time",
++ "url",
++]
++
+ [[package]]
+ name = "core-foundation"
+ version = "0.9.4"
+@@ -807,6 +827,12 @@ dependencies = [
+  "syn 2.0.110",
+ ]
+ 
++[[package]]
++name = "data-url"
++version = "0.3.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "be1e0bca6c3637f992fc1cc7cbc52a78c1ef6db076dbf1059c4323d6a2048376"
++
+ [[package]]
+ name = "deranged"
+ version = "0.5.5"
+@@ -920,6 +946,15 @@ dependencies = [
+  "const-random",
+ ]
+ 
++[[package]]
++name = "document-features"
++version = "0.2.12"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "d4b8a88685455ed29a21542a33abd9cb6510b6b129abadabdcef0f4c55bc8f61"
++dependencies = [
++ "litrs",
++]
++
+ [[package]]
+ name = "dpi"
+ version = "0.1.2"
+@@ -976,6 +1011,15 @@ version = "1.2.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "4ef6b89e5b37196644d8796de5268852ff179b44e96276cf4290264843743bb7"
+ 
++[[package]]
++name = "encoding_rs"
++version = "0.8.35"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "75030f3c4f45dafd7586dd6780965a8c7e8e285a5ecb86713e63a79c5b2766f3"
++dependencies = [
++ "cfg-if",
++]
++
+ [[package]]
+ name = "endi"
+ version = "1.1.0"
+@@ -1415,8 +1459,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "335ff9f135e4384c8150d6f27c6daed433577f86b4750418338c01a1a2528592"
+ dependencies = [
+  "cfg-if",
++ "js-sys",
+  "libc",
+  "wasi 0.11.1+wasi-snapshot-preview1",
++ "wasm-bindgen",
+ ]
+ 
+ [[package]]
+@@ -1426,9 +1472,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd"
+ dependencies = [
+  "cfg-if",
++ "js-sys",
+  "libc",
+  "r-efi",
+  "wasip2",
++ "wasm-bindgen",
+ ]
+ 
+ [[package]]
+@@ -1579,6 +1627,25 @@ dependencies = [
+  "syn 2.0.110",
+ ]
+ 
++[[package]]
++name = "h2"
++version = "0.4.13"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "2f44da3a8150a6703ed5d34e164b875fd14c2cdab9af1252a9a1020bde2bdc54"
++dependencies = [
++ "atomic-waker",
++ "bytes",
++ "fnv",
++ "futures-core",
++ "futures-sink",
++ "http",
++ "indexmap 2.12.0",
++ "slab",
++ "tokio",
++ "tokio-util",
++ "tracing",
++]
++
+ [[package]]
+ name = "hashbrown"
+ version = "0.12.3"
+@@ -1686,6 +1753,7 @@ dependencies = [
+  "bytes",
+  "futures-channel",
+  "futures-core",
++ "h2",
+  "http",
+  "http-body",
+  "httparse",
+@@ -1697,6 +1765,23 @@ dependencies = [
+  "want",
+ ]
+ 
++[[package]]
++name = "hyper-rustls"
++version = "0.27.7"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e3c93eb611681b207e1fe55d5a71ecf91572ec8a6705cdb6857f7d8d5242cf58"
++dependencies = [
++ "http",
++ "hyper",
++ "hyper-util",
++ "rustls",
++ "rustls-pki-types",
++ "tokio",
++ "tokio-rustls",
++ "tower-service",
++ "webpki-roots 1.0.4",
++]
++
+ [[package]]
+ name = "hyper-util"
+ version = "0.1.18"
+@@ -1716,9 +1801,11 @@ dependencies = [
+  "percent-encoding",
+  "pin-project-lite",
+  "socket2",
++ "system-configuration",
+  "tokio",
+  "tower-service",
+  "tracing",
++ "windows-registry",
+ ]
+ 
+ [[package]]
+@@ -2085,6 +2172,12 @@ version = "0.8.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "6373607a59f0be73a39b6fe456b8192fcc3585f602af20751600e974dd455e77"
+ 
++[[package]]
++name = "litrs"
++version = "1.0.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "11d3d7f243d5c5a8b9bb5d6dd2b1602c0cb0b9db1621bafc7ed66e35ff9fe092"
++
+ [[package]]
+ name = "lock_api"
+ version = "0.4.14"
+@@ -2103,6 +2196,12 @@ dependencies = [
+  "value-bag",
+ ]
+ 
++[[package]]
++name = "lru-slab"
++version = "0.1.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "112b39cec0b298b6c1999fee3e31427f74f676e4cb9879ed1a121b43661a4154"
++
+ [[package]]
+ name = "mac"
+ version = "0.1.1"
+@@ -3094,6 +3193,12 @@ dependencies = [
+  "unicode-ident",
+ ]
+ 
++[[package]]
++name = "psl-types"
++version = "2.0.11"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "33cb294fe86a74cbcf50d4445b37da762029549ebeea341421c7c70370f86cac"
++
+ [[package]]
+ name = "ptr_meta"
+ version = "0.1.4"
+@@ -3114,6 +3219,16 @@ dependencies = [
+  "syn 1.0.109",
+ ]
+ 
++[[package]]
++name = "publicsuffix"
++version = "2.3.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "6f42ea446cab60335f76979ec15e12619a2165b5ae2c12166bef27d283a9fadf"
++dependencies = [
++ "idna",
++ "psl-types",
++]
++
+ [[package]]
+ name = "quick-xml"
+ version = "0.37.5"
+@@ -3132,6 +3247,61 @@ dependencies = [
+  "memchr",
+ ]
+ 
++[[package]]
++name = "quinn"
++version = "0.11.9"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b9e20a958963c291dc322d98411f541009df2ced7b5a4f2bd52337638cfccf20"
++dependencies = [
++ "bytes",
++ "cfg_aliases",
++ "pin-project-lite",
++ "quinn-proto",
++ "quinn-udp",
++ "rustc-hash",
++ "rustls",
++ "socket2",
++ "thiserror 2.0.17",
++ "tokio",
++ "tracing",
++ "web-time",
++]
++
++[[package]]
++name = "quinn-proto"
++version = "0.11.13"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f1906b49b0c3bc04b5fe5d86a77925ae6524a19b816ae38ce1e426255f1d8a31"
++dependencies = [
++ "bytes",
++ "getrandom 0.3.4",
++ "lru-slab",
++ "rand 0.9.2",
++ "ring",
++ "rustc-hash",
++ "rustls",
++ "rustls-pki-types",
++ "slab",
++ "thiserror 2.0.17",
++ "tinyvec",
++ "tracing",
++ "web-time",
++]
++
++[[package]]
++name = "quinn-udp"
++version = "0.5.14"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "addec6a0dcad8a8d96a771f815f0eaf55f9d1805756410b39f5fa81332574cbd"
++dependencies = [
++ "cfg_aliases",
++ "libc",
++ "once_cell",
++ "socket2",
++ "tracing",
++ "windows-sys 0.60.2",
++]
++
+ [[package]]
+ name = "quote"
+ version = "1.0.42"
+@@ -3355,22 +3525,32 @@ checksum = "9d0946410b9f7b082a427e4ef5c8ff541a88b357bc6c637c40db3a68ac70a36f"
+ dependencies = [
+  "base64 0.22.1",
+  "bytes",
++ "cookie",
++ "cookie_store",
++ "encoding_rs",
+  "futures-core",
+  "futures-util",
++ "h2",
+  "http",
+  "http-body",
+  "http-body-util",
+  "hyper",
++ "hyper-rustls",
+  "hyper-util",
+  "js-sys",
+  "log",
++ "mime",
+  "percent-encoding",
+  "pin-project-lite",
++ "quinn",
++ "rustls",
++ "rustls-pki-types",
+  "serde",
+  "serde_json",
+  "serde_urlencoded",
+  "sync_wrapper",
+  "tokio",
++ "tokio-rustls",
+  "tokio-util",
+  "tower",
+  "tower-http",
+@@ -3380,6 +3560,7 @@ dependencies = [
+  "wasm-bindgen-futures",
+  "wasm-streams",
+  "web-sys",
++ "webpki-roots 1.0.4",
+ ]
+ 
+ [[package]]
+@@ -3451,6 +3632,12 @@ dependencies = [
+  "serde_json",
+ ]
+ 
++[[package]]
++name = "rustc-hash"
++version = "2.1.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "357703d41365b4b27c590e3ed91eabb1b663f07c4c084095e60cbed4362dff0d"
++
+ [[package]]
+ name = "rustc_version"
+ version = "0.4.1"
+@@ -3493,6 +3680,7 @@ version = "1.13.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "94182ad936a0c91c324cd46c6511b9510ed16af436d7b5bab34beab0afd55f7a"
+ dependencies = [
++ "web-time",
+  "zeroize",
+ ]
+ 
+@@ -4052,6 +4240,27 @@ dependencies = [
+  "libc",
+ ]
+ 
++[[package]]
++name = "system-configuration"
++version = "0.6.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "3c879d448e9d986b661742763247d3693ed13609438cf3d006f51f5368a5ba6b"
++dependencies = [
++ "bitflags 2.10.0",
++ "core-foundation 0.9.4",
++ "system-configuration-sys",
++]
++
++[[package]]
++name = "system-configuration-sys"
++version = "0.6.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "8e1d1b10ced5ca923a1fcb8d03e96b8d3268065d724548c0211415ff6ac6bac4"
++dependencies = [
++ "core-foundation-sys",
++ "libc",
++]
++
+ [[package]]
+ name = "system-deps"
+ version = "6.2.2"
+@@ -4280,6 +4489,52 @@ dependencies = [
+  "windows-result 0.3.4",
+ ]
+ 
++[[package]]
++name = "tauri-plugin-fs"
++version = "2.4.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ed390cc669f937afeb8b28032ce837bac8ea023d975a2e207375ec05afaf1804"
++dependencies = [
++ "anyhow",
++ "dunce",
++ "glob",
++ "percent-encoding",
++ "schemars 0.8.22",
++ "serde",
++ "serde_json",
++ "serde_repr",
++ "tauri",
++ "tauri-plugin",
++ "tauri-utils",
++ "thiserror 2.0.17",
++ "toml 0.9.8",
++ "url",
++]
++
++[[package]]
++name = "tauri-plugin-http"
++version = "2.4.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a673d9df72d3f3c797b8edd5950a7ab014d2bdeb7079b6588395b25242d5dffd"
++dependencies = [
++ "bytes",
++ "cookie_store",
++ "data-url",
++ "http",
++ "regex",
++ "reqwest",
++ "schemars 0.8.22",
++ "serde",
++ "serde_json",
++ "tauri",
++ "tauri-plugin",
++ "tauri-plugin-fs",
++ "thiserror 2.0.17",
++ "tokio",
++ "url",
++ "urlpattern",
++]
++
+ [[package]]
+ name = "tauri-plugin-log"
+ version = "2.7.1"
+@@ -5159,6 +5414,16 @@ dependencies = [
+  "wasm-bindgen",
+ ]
+ 
++[[package]]
++name = "web-time"
++version = "1.1.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "5a6580f308b1fad9207618087a65c04e7a10bc77e02c8e84e9b00dd4b12fa0bb"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++]
++
+ [[package]]
+ name = "webkit2gtk"
+ version = "2.0.1"
+diff --git a/src-tauri/Cargo.toml b/src-tauri/Cargo.toml
+index 75e30d9..a315353 100644
+--- a/src-tauri/Cargo.toml
++++ b/src-tauri/Cargo.toml
+@@ -28,6 +28,7 @@ tauri-plugin-os = "2.3"
+ tauri-plugin-deep-link = "2.4"
+ tokio = { version = "1.45.1", features = ["rt-multi-thread", "macros", "net", "io-util", "time"] }
+ base64 = "0.22"
++tauri-plugin-http = "~2.4"
+ 
+ # Use rustls for Android, native-tls for other platforms
+ [target.'cfg(not(target_os = "android"))'.dependencies]
+diff --git a/src-tauri/capabilities/default.json b/src-tauri/capabilities/default.json
+index 127e4d1..febca23 100644
+--- a/src-tauri/capabilities/default.json
++++ b/src-tauri/capabilities/default.json
+@@ -9,6 +9,7 @@
+     "core:default",
+     "notification:default",
+     "os:default",
+-    "deep-link:default"
++    "deep-link:default",
++    "http:default"
+   ]
+ }
+diff --git a/src-tauri/src/lib.rs b/src-tauri/src/lib.rs
+index 20c38f1..6a53dd2 100644
+--- a/src-tauri/src/lib.rs
++++ b/src-tauri/src/lib.rs
+@@ -22,6 +22,7 @@ pub fn run() {
+         .plugin(tauri_plugin_deep_link::init())
+         .plugin(tauri_plugin_os::init())
+         .plugin(tauri_plugin_notification::init())
++        .plugin(tauri_plugin_http::init())
+         .setup(|app| {
+             if cfg!(debug_assertions) {
+                 app.handle().plugin(
+diff --git a/src/components/layout/ChatArea.tsx b/src/components/layout/ChatArea.tsx
+index 6be36e8..35710b1 100644
+--- a/src/components/layout/ChatArea.tsx
++++ b/src/components/layout/ChatArea.tsx
+@@ -1,3 +1,4 @@
++import { fetch } from "@tauri-apps/plugin-http";
+ import { platform } from "@tauri-apps/plugin-os";
+ import type { EmojiClickData } from "emoji-picker-react";
+ import type * as React from "react";
+diff --git a/src/components/message/MessageItem.tsx b/src/components/message/MessageItem.tsx
+index 9f1c4e0..91c16aa 100644
+--- a/src/components/message/MessageItem.tsx
++++ b/src/components/message/MessageItem.tsx
+@@ -1,3 +1,4 @@
++import { fetch } from "@tauri-apps/plugin-http";
+ import exifr from "exifr";
+ import type * as React from "react";
+ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+diff --git a/src/components/ui/AvatarUpload.tsx b/src/components/ui/AvatarUpload.tsx
+index 44c3a01..2f1ed8a 100644
+--- a/src/components/ui/AvatarUpload.tsx
++++ b/src/components/ui/AvatarUpload.tsx
+@@ -1,3 +1,4 @@
++import { fetch } from "@tauri-apps/plugin-http";
+ import type React from "react";
+ import { useRef, useState } from "react";
+ import { FaSpinner, FaTimes, FaUpload } from "react-icons/fa";
+diff --git a/src/components/ui/GifSelector.tsx b/src/components/ui/GifSelector.tsx
+index cc7595d..5ae71a4 100644
+--- a/src/components/ui/GifSelector.tsx
++++ b/src/components/ui/GifSelector.tsx
+@@ -1,4 +1,5 @@
+ import type * as React from "react";
++import { fetch } from "@tauri-apps/plugin-http";
+ import { useEffect, useState } from "react";
+ import { createPortal } from "react-dom";
+ import { FaTimes } from "react-icons/fa";
+diff --git a/src/components/ui/HomeScreen.tsx b/src/components/ui/HomeScreen.tsx
+index b7ab0f5..74b6a61 100644
+--- a/src/components/ui/HomeScreen.tsx
++++ b/src/components/ui/HomeScreen.tsx
+@@ -1,3 +1,4 @@
++import { fetch } from "@tauri-apps/plugin-http";
+ import { useEffect, useState } from "react";
+ import { FaPlus } from "react-icons/fa";
+ import useStore from "../../store";

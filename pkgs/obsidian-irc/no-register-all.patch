@@ -1,0 +1,16 @@
+diff --git a/src-tauri/src/lib.rs b/src-tauri/src/lib.rs
+index 20c38f1..164b806 100644
+--- a/src-tauri/src/lib.rs
++++ b/src-tauri/src/lib.rs
+@@ -33,11 +33,6 @@ pub fn run() {
+             // Register deep links at runtime for Linux and Windows (debug)
+             // This enables AppImage support and development testing
+             // Note: macOS doesn't support runtime registration
+-            #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
+-            {
+-                use tauri_plugin_deep_link::DeepLinkExt;
+-                app.deep_link().register_all()?;
+-            }
+             Ok(())
+         })
+         .manage(SocketState(Arc::new(Mutex::new(HashMap::new()))))

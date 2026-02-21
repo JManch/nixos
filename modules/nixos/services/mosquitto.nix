@@ -71,8 +71,7 @@ in
       ];
     };
 
-    users.groups.acme.members = [ "mosquitto" ];
-    security.acme.certs."mqtt.${fqDomain}" = { };
+    security.acme.certs."mqtt.${fqDomain}".group = "mosquitto";
 
     networking.firewall.allowedTCPPorts = [
       1883

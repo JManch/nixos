@@ -1,5 +1,6 @@
 {
   lib,
+  cfg,
   args,
   config,
   hostname,
@@ -10,6 +11,7 @@ let
     mkForce
     replaceStrings
     optional
+    mkEnableOption
     ;
   inherit (lib.${ns}) isHyprland sliceSuffix flakePkgs;
 in
@@ -18,6 +20,7 @@ in
     guardType = "first";
     enableOpt = false;
     conditions = [ (isHyprland config) ];
+    opts.alwaysOnTopPatch = mkEnableOption "always on top patch";
 
     ns.system.desktop.uwsm.desktopNames = [ "Hyprland" ];
 
@@ -68,9 +71,6 @@ in
                 # Makes exact resizeparams in dispatchers relative to the window's current
                 # monitor instead of the last active monitor
                 ../../../../patches/hyprland-better-resize-args.patch
-                # Add always on top window rule and dispatching which is pinning
-                # but just for workspace that the window is on
-                ../../../../patches/hyprland-always-on-top.patch
                 # Always override the monitor in repeated workspacerules. Allows us
                 # to change workspace monitors layouts in our external monitor
                 # layout scripts with `hyprctl keyword workspace x, monitor:`
@@ -85,6 +85,10 @@ in
                 # bothered to get it properly working with uwsm
                 ../../../../patches/hyprland-no-watchdog.patch
               ]
+              # Add always on top window rule and dispatching which is pinning
+              # but just for workspace that the window is on
+              # TODO: Need to rebase this
+              ++ optional cfg.alwaysOnTopPatch ../../../../patches/hyprland-always-on-top.patch
               # This is scuffed but should hopefully have a better solution
               # once GAMMA_LUT is implemented. Using a patch insted of wlsunset
               # or gammastep because those programs have a bunch of features I

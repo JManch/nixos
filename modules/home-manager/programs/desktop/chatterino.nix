@@ -16,6 +16,7 @@ let
   inherit (config.${ns}.programs.desktop) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
   inherit (config.${ns}.desktop) hyprland;
+  inherit (osConfig.${ns}.system.desktop.hyprland) alwaysOnTopPatch;
   secondMonitor = lib.${ns}.getMonitorByNumber osConfig 2;
   chatterinoPercentage = "17.5";
   firefoxPercentage = "82.5";
@@ -199,7 +200,7 @@ in
 
           params = {
             tag = "-twitch_unexpected";
-            always_on_top = true;
+            always_on_top = mkIf alwaysOnTopPatch true;
             size = "(monitor_w*${chatterinoPercentage}/100) monitor_h*0.33";
             center = true;
           };
@@ -246,7 +247,7 @@ in
           };
 
           params = {
-            always_on_top = true;
+            always_on_top = mkIf alwaysOnTopPatch true;
             size = "(monitor_w*0.6) (monitor_h*0.6)";
             center = true;
             tag = "-twitch-unexpected";

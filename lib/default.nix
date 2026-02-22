@@ -337,6 +337,9 @@ in
       optionalString (config.programs.uwsm.enable or false) "-graphical";
 
     # For applications that only allow a single instance to be open
+    # FIX: Doesn't work with applications launched with xdg-terminal-exec as
+    # the terminal with the target class exists before the application is
+    # started. Currently using workarounds for bluetui and impala but need to find a nicer solution.
     wrapHyprlandMoveToActive =
       args: package: class: extra:
       let

@@ -369,9 +369,7 @@ in
         ''
       ))
     ]
-    ++ optional (cfg.wireless.enable && cfg.wireless.backend == "iwd") (
-      wrapHyprlandMoveToActive args pkgs.impala "impala" ""
-    );
+    ++ optional (cfg.wireless.enable && cfg.wireless.backend == "iwd") pkgs.impala;
 
   ns.hm = mkIf home-manager.enable {
     xdg.desktopEntries.impala =
@@ -379,7 +377,14 @@ in
         {
           name = "Impala";
           genericName = "Wifi Manager";
-          exec = "xdg-terminal-exec --title=impala --app-id=impala impala";
+          exec = "${pkgs.writeShellScript "impala-desktop-launch" ''
+            address=$(hyprctl clients -j | ${getExe pkgs.jaq} -r "(.[] | select(.class == \"impala\")) | .address")
+            if [[ -n $address ]]; then
+              hyprctl dispatch movetoworkspacesilent e+0, address:"$address"
+              exit 0
+            fi
+            xdg-terminal-exec --title=impala --app-id=impala impala
+          ''}";
           terminal = false;
           type = "Application";
           icon = "nm-device-wireless";

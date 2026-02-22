@@ -1,7 +1,6 @@
 {
   lib,
   pkgs,
-  args,
   config,
 }:
 let
@@ -20,20 +19,32 @@ in
   };
 
   ns.userPackages = [
-    (lib.${ns}.wrapHyprlandMoveToActive args pkgs.bluetui "bluetui" ''
-      --run '
-        if [[ $(${getExe' pkgs.bluez "bluetoothctl"} show | ${getExe pkgs.gnugrep} "Powered:" | ${getExe pkgs.gawk} "{print \$2}") == "no" ]]; then
-          (${getExe' pkgs.bluez "bluetoothctl"} power on && ${getExe pkgs.libnotify} --transient --urgency=critical -t 5000 "Bluetooth" "Powered on") >/dev/null &
-        fi
-      '
-    '')
+    (pkgs.symlinkJoin {
+      name = "bluetui-wrapped";
+      paths = [ pkgs.bluetui ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/bluetui --run '
+          if [[ $(${getExe' pkgs.bluez "bluetoothctl"} show | ${getExe pkgs.gnugrep} "Powered:" | ${getExe pkgs.gawk} "{print \$2}") == "no" ]]; then
+            (${getExe' pkgs.bluez "bluetoothctl"} power on && ${getExe pkgs.libnotify} --transient --urgency=critical -t 5000 "Bluetooth" "Powered on") >/dev/null &
+          fi
+        '
+      '';
+    })
     (pkgs.makeDesktopItem {
       name = "bluetui";
       desktopName = "Bluetui";
       genericName = "Bluetooth Manager";
       type = "Application";
       icon = "preferences-bluetooth";
-      exec = "xdg-terminal-exec --title=bluetui --app-id=bluetui bluetui";
+      exec = "${pkgs.writeShellScript "bluetui-desktop-launch" ''
+        address=$(hyprctl clients -j | ${getExe pkgs.jaq} -r "(.[] | select(.class == \"bluetui\")) | .address")
+        if [[ -n $address ]]; then
+          hyprctl dispatch movetoworkspacesilent e+0, address:"$address"
+          exit 0
+        fi
+        xdg-terminal-exec --title=bluetui --app-id=bluetui bluetui
+      ''}";
       comment = "Manage bluetooth devices";
       keywords = [ "bluetooth" ];
       categories = [

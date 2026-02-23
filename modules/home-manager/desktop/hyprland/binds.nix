@@ -273,7 +273,7 @@ let
           hyprpicker --render-inactive --no-zoom &
           sleep 0.2
 
-          geom=$(slurp -d)
+          geom=$(slurp -d || die)
           [[ -z $geom ]] && die
           grim -g "$geom" "$output_file" || die
         fi

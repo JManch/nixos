@@ -1,29 +1,28 @@
 diff --git a/src/debug/HyprCtl.cpp b/src/debug/HyprCtl.cpp
-index 758138fd..eab085b5 100644
+index f3a9402d..6763eb5e 100644
 --- a/src/debug/HyprCtl.cpp
 +++ b/src/debug/HyprCtl.cpp
-@@ -353,18 +353,19 @@ std::string CHyprCtl::getWorkspaceData(PHLWORKSPACE w, eHyprCtlOutputFormat form
+@@ -468,6 +468,7 @@ std::string CHyprCtl::getWorkspaceData(PHLWORKSPACE w, eHyprCtlOutputFormat form
      "monitorID": {},
      "windows": {},
      "hasfullscreen": {},
 +    "fullscreenMode": {},
      "lastwindow": "0x{:x}",
      "lastwindowtitle": "{}",
-     "ispersistent": {}
+     "ispersistent": {},
+@@ -475,12 +476,12 @@ std::string CHyprCtl::getWorkspaceData(PHLWORKSPACE w, eHyprCtlOutputFormat form
  }})#",
                             w->m_id, escapeJSONStrings(w->m_name), escapeJSONStrings(PMONITOR ? PMONITOR->m_name : "?"),
                             escapeJSONStrings(PMONITOR ? std::to_string(PMONITOR->m_id) : "null"), w->getWindows(), w->m_hasFullscreenWindow ? "true" : "false",
--                           rc<uintptr_t>(PLASTW.get()), PLASTW ? escapeJSONStrings(PLASTW->m_title) : "", w->isPersistent() ? "true" : "false");
-+                           (uint8_t)w->m_fullscreenMode, rc<uintptr_t>(PLASTW.get()), PLASTW ? escapeJSONStrings(PLASTW->m_title) : "", w->isPersistent() ? "true" : "false");
+-                           rc<uintptr_t>(PLASTW.get()), PLASTW ? escapeJSONStrings(PLASTW->m_title) : "", w->isPersistent() ? "true" : "false", escapeJSONStrings(layoutName));
++                           (uint8_t)w->m_fullscreenMode, rc<uintptr_t>(PLASTW.get()), PLASTW ? escapeJSONStrings(PLASTW->m_title) : "", w->isPersistent() ? "true" : "false", escapeJSONStrings(layoutName));
      } else {
--        return std::format(
--            "workspace ID {} ({}) on monitor {}:\n\tmonitorID: {}\n\twindows: {}\n\thasfullscreen: {}\n\tlastwindow: 0x{:x}\n\tlastwindowtitle: {}\n\tispersistent: {}\n\n",
--            w->m_id, w->m_name, PMONITOR ? PMONITOR->m_name : "?", PMONITOR ? std::to_string(PMONITOR->m_id) : "null", w->getWindows(), sc<int>(w->m_hasFullscreenWindow),
--            rc<uintptr_t>(PLASTW.get()), PLASTW ? PLASTW->m_title : "", sc<int>(w->isPersistent()));
-+        return std::format("workspace ID {} ({}) on monitor {}:\n\tmonitorID: {}\n\twindows: {}\n\thasfullscreen: {}\n\tfullscreenMode: {}\n\tlastwindow: "
-+                           "0x{:x}\n\tlastwindowtitle: {}\n\tispersistent: {}\n\n",
-+                           w->m_id, w->m_name, PMONITOR ? PMONITOR->m_name : "?", PMONITOR ? std::to_string(PMONITOR->m_id) : "null", w->getWindows(),
-+                           sc<int>(w->m_hasFullscreenWindow), (uint8_t)w->m_fullscreenMode, rc<uintptr_t>(PLASTW.get()), PLASTW ? PLASTW->m_title : "", sc<int>(w->isPersistent()));
+-        return std::format("workspace ID {} ({}) on monitor {}:\n\tmonitorID: {}\n\twindows: {}\n\thasfullscreen: {}\n\tlastwindow: 0x{:x}\n\tlastwindowtitle: {}\n\tispersistent: "
++        return std::format("workspace ID {} ({}) on monitor {}:\n\tmonitorID: {}\n\twindows: {}\n\thasfullscreen: {}\n\tfullscreenMode: {}\n\tlastwindow: 0x{:x}\n\tlastwindowtitle: {}\n\tispersistent: "
+                            "{}\n\ttiledLayout: {}\n\n",
+                            w->m_id, w->m_name, PMONITOR ? PMONITOR->m_name : "?", PMONITOR ? std::to_string(PMONITOR->m_id) : "null", w->getWindows(),
+-                           sc<int>(w->m_hasFullscreenWindow), rc<uintptr_t>(PLASTW.get()), PLASTW ? PLASTW->m_title : "", sc<int>(w->isPersistent()), layoutName);
++                           sc<int>(w->m_hasFullscreenWindow), (uint8_t)w->m_fullscreenMode, rc<uintptr_t>(PLASTW.get()), PLASTW ? PLASTW->m_title : "", sc<int>(w->isPersistent()), layoutName);
      }
  }
  

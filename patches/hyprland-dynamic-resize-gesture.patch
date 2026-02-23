@@ -1,8 +1,8 @@
 diff --git a/src/config/ConfigManager.cpp b/src/config/ConfigManager.cpp
-index 5b6dee02..20707936 100644
+index cd5b0ec8..7a89f681 100644
 --- a/src/config/ConfigManager.cpp
 +++ b/src/config/ConfigManager.cpp
-@@ -2882,7 +2882,8 @@ std::optional<std::string> CConfigManager::handleGesture(const std::string& comm
+@@ -2944,7 +2944,8 @@ std::optional<std::string> CConfigManager::handleGesture(const std::string& comm
      else if (data[startDataIdx] == "workspace")
          result = g_pTrackpadGestures->addGesture(makeUnique<CWorkspaceSwipeGesture>(), fingerCount, direction, modMask, deltaScale, disableInhibit);
      else if (data[startDataIdx] == "resize")
@@ -13,12 +13,12 @@ index 5b6dee02..20707936 100644
          result = g_pTrackpadGestures->addGesture(makeUnique<CMoveTrackpadGesture>(), fingerCount, direction, modMask, deltaScale, disableInhibit);
      else if (data[startDataIdx] == "special")
 diff --git a/src/managers/input/trackpad/gestures/ResizeGesture.cpp b/src/managers/input/trackpad/gestures/ResizeGesture.cpp
-index 33f018cd..7bc8b055 100644
+index ffc7704b..cdd71412 100644
 --- a/src/managers/input/trackpad/gestures/ResizeGesture.cpp
 +++ b/src/managers/input/trackpad/gestures/ResizeGesture.cpp
 @@ -5,6 +5,18 @@
- #include "../../../../managers/LayoutManager.hpp"
  #include "../../../../render/Renderer.hpp"
+ #include "../../../../layout/LayoutManager.hpp"
  
 +CResizeTrackpadGesture::CResizeTrackpadGesture(const std::string_view& mode) {
 +    std::string lc = std::string{mode};
@@ -35,14 +35,14 @@ index 33f018cd..7bc8b055 100644
  void CResizeTrackpadGesture::begin(const ITrackpadGesture::STrackpadGestureBegin& e) {
      ITrackpadGesture::begin(e);
  
-@@ -15,10 +27,18 @@ void CResizeTrackpadGesture::update(const ITrackpadGesture::STrackpadGestureUpda
+@@ -15,6 +27,15 @@ void CResizeTrackpadGesture::update(const ITrackpadGesture::STrackpadGestureUpda
      if (!m_window)
          return;
  
 +    const auto DELTA = e.swipe ? e.swipe->delta : e.pinch->delta;
 +
 +    if (m_mode == MODE_DYNAMIC && m_window->m_isFloating) {
-+        g_pLayoutManager->getCurrentLayout()->moveActiveWindow(DELTA, m_window.lock());
++        g_layoutManager->moveTarget(e.swipe ? e.swipe->delta : e.pinch->delta, m_window->layoutTarget());
 +        m_window->m_realSize->warp();
 +        m_window->m_realPosition->warp();
 +        return;
@@ -50,12 +50,7 @@ index 33f018cd..7bc8b055 100644
 +
      g_pHyprRenderer->damageWindow(m_window.lock());
  
--    g_pLayoutManager->getCurrentLayout()->resizeActiveWindow((e.swipe ? e.swipe->delta : e.pinch->delta),
--                                                             cornerFromBox(m_window->getWindowMainSurfaceBox(), g_pInputManager->getMouseCoordsInternal()), m_window.lock());
-+    g_pLayoutManager->getCurrentLayout()->resizeActiveWindow(DELTA, cornerFromBox(m_window->getWindowMainSurfaceBox(), g_pInputManager->getMouseCoordsInternal()), m_window.lock());
-     m_window->m_realSize->warp();
-     m_window->m_realPosition->warp();
- 
+     g_layoutManager->resizeTarget((e.swipe ? e.swipe->delta : e.pinch->delta), m_window->layoutTarget(),
 diff --git a/src/managers/input/trackpad/gestures/ResizeGesture.hpp b/src/managers/input/trackpad/gestures/ResizeGesture.hpp
 index 0b47a224..bd30f5b6 100644
 --- a/src/managers/input/trackpad/gestures/ResizeGesture.hpp

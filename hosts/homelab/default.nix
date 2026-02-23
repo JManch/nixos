@@ -71,7 +71,6 @@ in
       anki-sync-server.enable = true;
       arr-stack.enable = true;
       qbittorrent-nox.enable = true;
-      unrealircd.enable = true;
 
       silverbullet = {
         enable = true;
@@ -147,6 +146,11 @@ in
             "192.168.100.2/32" # pixel 9 VPN
           ]
           ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
+      };
+
+      unrealircd = {
+        enable = true;
+        interfaces = [ "wg-friends" ];
       };
 
       factorio-server = {

@@ -1569,11 +1569,11 @@
         "systems": "systems_10"
       },
       "locked": {
-        "lastModified": 1771506682,
-        "narHash": "sha256-kBmcZSMUWtZlugaDxMkrb5PCTvx0WL6YjkKsyVSW7X4=",
+        "lastModified": 1771888242,
+        "narHash": "sha256-l4AA41qTEUhLd7cjrTDEx474CPzguUkL59EPJ4c/13I=",
         "owner": "JManch",
         "repo": "nvf",
-        "rev": "af87ca4844871c12b1fc6afa2b04a66fa7b90aa6",
+        "rev": "4bd843ec72ae9e00c81bb03174483c7db07feff8",
         "type": "github"
       },
       "original": {

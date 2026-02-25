@@ -79,7 +79,8 @@
         discord.enable = true;
         spotify.enable = true;
         chatterino.enable = true;
-        supersonic.enable = true;
+        supersonic.enable = false;
+        feishin.enable = true;
         chromium.enable = true;
         multiviewer.enable = true;
         obs.enable = true;

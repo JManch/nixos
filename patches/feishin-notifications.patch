@@ -1,0 +1,103 @@
+diff --git a/src/main/index.ts b/src/main/index.ts
+index 711d3e20..66ce5144 100644
+--- a/src/main/index.ts
++++ b/src/main/index.ts
+@@ -21,9 +21,11 @@ import {
+ import electronLocalShortcut from 'electron-localshortcut';
+ import log from 'electron-log/main';
+ import { AppImageUpdater, autoUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
+-import { access, constants } from 'fs';
++import { access, constants, createWriteStream } from 'fs';
+ import path, { join } from 'path';
+ import semver from 'semver';
++import { execFile } from 'child_process';
++import { tmpdir } from 'os';
+ 
+ import packageJson from '../../package.json';
+ import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
+@@ -804,6 +806,45 @@ ipcMain.on(
+     },
+ );
+ 
++ipcMain.on('notify-send', (_event, args: string[]) => {
++    const iconIndex = args.findIndex((a) => a.startsWith('--icon='));
++
++    if (iconIndex === -1) {
++        execFile('notify-send', args, (error) => {
++            if (error) {
++                createLog({ message: `notify-send failed: ${error.message}`, type: 'error' });
++            }
++        });
++        return;
++    }
++
++    const iconUrl = args[iconIndex].replace('--icon=', '');
++    const iconPath = path.join(tmpdir(), 'feishin-notify-icon');
++
++    const request = net.request(iconUrl);
++    request.on('response', (response) => {
++        const file = createWriteStream(iconPath);
++        response.on('data', (chunk) => file.write(chunk));
++        response.on('end', () => {
++            file.end(() => {
++                const newArgs = [...args];
++                newArgs[iconIndex] = `--icon=${iconPath}`;
++                execFile('notify-send', newArgs, (error) => {
++                    if (error) {
++                        createLog({ message: `notify-send failed: ${error.message}`, type: 'error' });
++                    }
++                });
++            });
++        });
++    });
++    request.on('error', (error) => {
++        createLog({ message: `Failed to fetch notification icon: ${error.message}`, type: 'error' });
++        const newArgs = args.filter((_, i) => i !== iconIndex);
++        execFile('notify-send', newArgs);
++    });
++    request.end();
++});
++
+ ipcMain.handle('power-save-blocker-start', () => {
+     if (powerSaveBlockerId !== null) {
+         return powerSaveBlockerId;
+diff --git a/src/renderer/features/player/hooks/use-scrobble.ts b/src/renderer/features/player/hooks/use-scrobble.ts
+index 3601f3ea..81c3c1f8 100644
+--- a/src/renderer/features/player/hooks/use-scrobble.ts
++++ b/src/renderer/features/player/hooks/use-scrobble.ts
+@@ -216,14 +216,29 @@ export const useScrobble = () => {
+                     ) {
+                         const artists =
+                             currentSong.artists?.length > 0
+-                                ? currentSong.artists.map((artist) => artist.name).join(' · ')
++                                ? currentSong.artists.map((artist) => artist.name).join(', ')
+                                 : currentSong.artistName;
+ 
+-                        new Notification(`${currentSong.name}`, {
+-                            body: `${artists}\n${currentSong.album}`,
+-                            icon: imageUrlRef.current || undefined,
+-                            silent: true,
+-                        });
++                        const args = [
++                            '--app-name=feishin',
++                            '--urgency=low',
++                            '--expire-time=10000',
++                            '--hint=string:x-canonical-private-synchronous:feishin-track',
++                            ...(imageUrlRef.current ? [`--icon=${imageUrlRef.current}`] : []),
++                            currentSong.name,
++                            `${artists} – ${currentSong.album}`,
++                        ];
++
++                        try {
++                            window.electron.ipcRenderer.send('notify-send', args);
++                        } catch (error) {
++                            logFn.error('an error occurred while sending a desktop notification', {
++                                category: LogCategory.SCROBBLE,
++                                meta: {
++                                    error: error as Error,
++                                },
++                            });
++                        }
+                     }
+                 }, 1000);
+             }

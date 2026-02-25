@@ -438,6 +438,16 @@ in
               hash = "sha256-GTXFAK1T8LiCIuukYFIOqoXNbrXJF0smTzALBdry9eA=";
             })
           ];
+
+        inherit
+          (
+            assert lib.assertMsg (prev.navidrome.version == "0.60.0") "Remove navidrome overlay";
+            import (fetchTree "github:tebriel/nixpkgs/1a13ff7aaa65cee4271854cfb41f01f006b20864") {
+              inherit (pkgs.stdenv.hostPlatform) system;
+            }
+          )
+          navidrome
+          ;
       })
     ];
   };

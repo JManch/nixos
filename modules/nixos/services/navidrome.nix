@@ -9,6 +9,33 @@
 # - Update data with:
 #   UPDATE annotation SET starred_at = '<new_starred_at>' WHERE item_id = '<item_id>';
 # - Press 'Write Changes'
+
+# SQL for copying annotation table data from old item_ids to new. All
+# annotation columns for record with the left item_id will be copied to a new
+# record (or update the existing record) for record with the right item_id.
+
+# WARN: Remember to also copy the item_id for the album itself
+
+# CREATE TEMP TABLE pair_map (source_id TEXT, target_id TEXT);
+#
+# INSERT INTO pair_map VALUES
+#   ('1ac504f64791bcc97f70c0c84ceae1cc', 'VhnGUWj9DEYNUcBpEUndnd'),
+#   ('ce72aad6c70a55462da61ced7686cebe', 'jT1vuPB4egCCOf6PPujERn'),
+#   ('397f5eb79ee115699f2495ddddace20b', 'vDzBSUe1bzlUkNwqsTsua8');
+#
+# INSERT INTO annotation (user_id, item_id, item_type, play_count, play_date, rating, starred, starred_at, rated_at)
+# SELECT a.user_id, p.target_id, a.item_type, a.play_count, a.play_date, a.rating, a.starred, a.starred_at, a.rated_at
+# FROM annotation a
+# JOIN pair_map p ON a.item_id = p.source_id
+# ON CONFLICT (user_id, item_id, item_type) DO UPDATE SET
+#   play_count = excluded.play_count,
+#   play_date  = excluded.play_date,
+#   rating     = excluded.rating,
+#   starred    = excluded.starred,
+#   starred_at = excluded.starred_at,
+#   rated_at   = excluded.rated_at;
+#
+# DROP TABLE pair_map;
 {
   lib,
   pkgs,

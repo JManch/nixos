@@ -382,7 +382,7 @@ in
       ".config/waybar/config"
       ".config/waybar/style.css"
     ];
-    reloadScript = "${systemctl} restart --user waybar";
+    reloadScript = "${systemctl} restart --user --no-block waybar";
   };
 
   ns.desktop.hyprland = {

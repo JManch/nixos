@@ -108,7 +108,7 @@ in
   ns.desktop = {
     darkman.switchApps.dunst = {
       paths = [ ".config/dunst/dunstrc" ];
-      reloadScript = "${systemctl} restart --user dunst";
+      reloadScript = "${systemctl} restart --user --no-block dunst";
 
       colorOverrides = {
         base00 = {

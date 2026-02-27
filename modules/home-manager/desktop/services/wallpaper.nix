@@ -217,6 +217,7 @@ in
       Service = {
         Type = "oneshot";
         ExecStart = getExe setWallpaper;
+        TimeoutStartSec = 5;
       };
 
       Install.WantedBy = [ cfg.wallpaperUnit ];
@@ -232,7 +233,7 @@ in
     };
 
     ns.desktop.darkman.switchScripts.wallpaper = _: ''
-      systemctl start --user set-wallpaper
+      systemctl start --user --no-block set-wallpaper
     '';
 
     systemd.user = {

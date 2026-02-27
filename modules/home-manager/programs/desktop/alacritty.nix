@@ -11,6 +11,7 @@ let
     hiPrio
     ;
   inherit (config.${ns}) desktop;
+  inherit (config.${ns}.programs.shell) zellij;
   colors = config.colorScheme.palette;
 in
 {
@@ -68,7 +69,7 @@ in
         };
       };
 
-      keyboard.bindings = [
+      keyboard.bindings = mkIf (!zellij.enable) [
         {
           key = "K";
           mods = "Alt";

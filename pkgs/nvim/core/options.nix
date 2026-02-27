@@ -32,7 +32,7 @@
     breakindent = true;
     ruler = false;
     title = true;
-    titlestring = "%{fnamemodify(getcwd(), ':t')}: %t%(\ %m%) — Nvim";
+    titlestring = "nvim: %{fnamemodify(getcwd(), ':t')} — %t%(\ %m%)";
   };
 
   vim.globals = {

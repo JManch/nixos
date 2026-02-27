@@ -67,6 +67,29 @@ in
           blinking = "On";
         };
       };
+
+      keyboard.bindings = [
+        {
+          key = "K";
+          mods = "Shift|Alt";
+          action = "ScrollLineUp";
+        }
+        {
+          key = "J";
+          mods = "Shift|Alt";
+          action = "ScrollLineDown";
+        }
+        {
+          key = "D";
+          mods = "Shift|Alt";
+          action = "ScrollHalfPageDown";
+        }
+        {
+          key = "U";
+          mods = "Shift|Alt";
+          action = "ScrollHalfPageUp";
+        }
+      ];
     };
   };
 

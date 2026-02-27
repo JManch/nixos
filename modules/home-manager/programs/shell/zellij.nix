@@ -1,27 +1,67 @@
-# Waiting for features:
+# Waiting for:
 # - [ ] https://github.com/zellij-org/zellij/issues/865
 # - [ ] https://github.com/zellij-org/zellij/issues/3090
+# - [ ] https://github.com/zellij-org/zellij/issues/4641
 {
   lib,
+  cfg,
   config,
   inputs,
+  osConfig,
 }:
 let
-  inherit (lib) ns singleton concatLines;
+  inherit (lib)
+    ns
+    mkIf
+    mkOrder
+    singleton
+    concatLines
+    mkOption
+    types
+    ;
+  inherit (osConfig.${ns}.core) device;
 in
 {
   enableOpt = false;
 
+  opts.autoStart = mkOption {
+    type = types.bool;
+    default = device.type == "server";
+    description = "Whether to auto start zellij in new shells";
+  };
+
   programs.zellij = {
     enable = true;
-    enableZshIntegration = true;
+    # We define our own below
+    enableZshIntegration = false;
+  };
+
+  programs.zsh = {
+    # When starting interactively prompt prompt for a session name
+    shellAliases."z" = "zellij --layout welcome";
+    # The default integration is bad cause of `zellij attach -c` behaviour
+    # https://github.com/zellij-org/zellij/issues/3773
+    initContent = mkIf cfg.autoStart (
+      mkOrder 200
+        # bash
+        ''
+          if [[ -z "$ZELLIJ" ]]; then
+            if [[ $(zellij list-sessions 2>/dev/null | grep -cv 'EXITED.*attach to resurrect') -gt 1 ]]; then
+              zellij attach -c
+            else
+              zellij attach -c && exit
+            fi
+          fi
+        ''
+    );
   };
 
   xdg.configFile."zellij/config.kdl".text = # kdl
     ''
       keybinds clear-defaults=true {    
         shared_except "locked" {
-          bind "Alt q" { Quit; }
+          bind "Alt q" { Detach; }
+          bind "Alt Shift q" { Quit; }
           bind "Alt Shift j" { GoToPreviousTab; }
           bind "Alt Shift k" { GoToNextTab; }
           bind "Alt j" { MoveFocus "down"; }
@@ -240,15 +280,15 @@ in
       theme "dark-theme"
       mouse_mode true
       copy_on_select false
-      advanced_mouse_actions false
+      advanced_mouse_actions true
       pane_frames false
       mirror_session false
       on_force_close "detach"
       scroll_buffer_size 10000
       copy_clipboard "system"
       auto_layout true
-      session_serialization false
-      serialize_pane_viewport false
+      session_serialization true
+      serialize_pane_viewport true
       styled_underlines true
       stacked_resize true
       show_startup_tips false
@@ -472,4 +512,6 @@ in
       light = ''theme "light-theme"'';
     };
   };
+
+  ns.persistence.directories = [ ".cache/zellij" ];
 }

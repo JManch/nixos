@@ -30,7 +30,7 @@
 # base0A: "#F2AE49"
 # base0B: "#86B300"
 # base0C: "#4CBF99"
-# base0D: "#36A3D9"
+# base0D: "#399EE6"
 # base0E: "#A37ACC"
 # base0F: "#E6BA7E"
 {
@@ -79,7 +79,11 @@ in
 
     light = mkOption {
       type = types.attrs;
-      default = inputs.nix-colors.colorSchemes.ayu-light;
+      default = inputs.nix-colors.colorSchemes.ayu-light // {
+        palette = inputs.nix-colors.colorSchemes.ayu-light.palette // {
+          base0D = "399EE6";
+        };
+      };
       description = ''
         Light color scheme. Uses first eight from dark color scheme.
       '';

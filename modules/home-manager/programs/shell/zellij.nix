@@ -21,6 +21,7 @@ in
     ''
       keybinds clear-defaults=true {    
         shared_except "locked" {
+          bind "Alt q" { Quit; }
           bind "Alt Shift j" { GoToPreviousTab; }
           bind "Alt Shift k" { GoToNextTab; }
           bind "Alt j" { MoveFocus "down"; }
@@ -339,6 +340,14 @@ in
                       emphasis_3 ${getColor "base0E"}
                     }
                     frame_selected {
+                      base ${getColor "base05"}
+                      background 0
+                      emphasis_0 ${getColor "base0A"}
+                      emphasis_1 ${getColor "base0C"}
+                      emphasis_2 ${getColor "base0E"}
+                      emphasis_3 0
+                    }
+                    frame_unselected {
                       base ${getColor "base03"}
                       background 0
                       emphasis_0 ${getColor "base0A"}
@@ -347,7 +356,7 @@ in
                       emphasis_3 0
                     }
                     frame_highlight {
-                      base ${getColor "base0A"}
+                      base ${getColor "base0B"}
                       background 0
                       emphasis_0 ${getColor "base0E"}
                       emphasis_1 ${getColor "base0A"}

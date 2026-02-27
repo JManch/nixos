@@ -54,6 +54,7 @@
           # temporarily close everytime we make a commit.
           if [[ -z $SSH_CONNECTION && -z $SSH_CLIENT && -z $SSH_TTY ]]; then
             exec ${lib.getExe pkgs.lazygit} --use-config-file ${pkgs.writeText "lazygit-override-gpg-config" ''
+              notARepository: skip
               git:
                 overrideGpg: true
             ''} "$@"
@@ -74,6 +75,11 @@
           - git log --all --color=always --abbrev-commit --decorate --date=relative  --pretty=medium
         log:
           order: default
+    '';
+
+  xdg.configFile."lazygit/config.yml".text = # yaml
+    ''
+      notARepository: skip
     '';
 
   programs.zsh.shellAliases.lg = "lazygit";

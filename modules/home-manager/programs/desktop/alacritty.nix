@@ -11,7 +11,6 @@ let
     hiPrio
     ;
   inherit (config.${ns}) desktop;
-  inherit (config.${ns}.programs.shell) zellij;
   colors = config.colorScheme.palette;
 in
 {
@@ -68,29 +67,6 @@ in
           blinking = "On";
         };
       };
-
-      keyboard.bindings = mkIf (!zellij.enable) [
-        {
-          key = "K";
-          mods = "Alt";
-          action = "ScrollLineUp";
-        }
-        {
-          key = "J";
-          mods = "Alt";
-          action = "ScrollLineDown";
-        }
-        {
-          key = "D";
-          mods = "Alt";
-          action = "ScrollHalfPageDown";
-        }
-        {
-          key = "U";
-          mods = "Alt";
-          action = "ScrollHalfPageUp";
-        }
-      ];
     };
   };
 

@@ -5,6 +5,7 @@
 {
   lib,
   cfg,
+  pkgs,
   config,
   inputs,
   osConfig,
@@ -12,14 +13,18 @@
 let
   inherit (lib)
     ns
-    mkIf
     mkOrder
     singleton
     concatLines
+    getExe
     mkOption
     types
+    optionalString
     ;
   inherit (osConfig.${ns}.core) device;
+  inherit (config.${ns}.programs.desktop) alacritty;
+  inherit (config.${ns}.desktop.services) darkman;
+  inherit (config.xdg) configHome dataHome;
 in
 {
   enableOpt = false;
@@ -30,24 +35,51 @@ in
     description = "Whether to auto start zellij in new shells";
   };
 
-  programs.zellij = {
-    enable = true;
-    # We define our own below
-    enableZshIntegration = false;
-  };
+  home.packages = [
+    (pkgs.symlinkJoin {
+      name = "zellij-wrapped";
+      paths = [ pkgs.zellij ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        # Match zellij theme to client theme when SSHing into remote hosts. SSH
+        # is configured to forward DARKMAN_THEME and we have a zsh wrapper
+        # around `ssh` setting the variable.
+        wrapProgram $out/bin/${pkgs.zellij.meta.mainProgram} --run '
+        if [[ (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -n $DARKMAN_THEME ]]; then
+          ${
+            if darkman.enable then
+              ''
+                exec ${getExe pkgs.zellij} --config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME" "$@"
+              ''
+            else
+              ''
+                if [[ $DARKMAN_THEME == "light" ]]; then
+                  ${getExe pkgs.gnused} "s/theme \"dark-theme\"/theme \"light-theme\"/" ${configHome}/zellij/config.kdl > /tmp/zellij-light-config.kdl
+                  exec ${getExe pkgs.zellij} --config /tmp/zellij-light-config.kdl "$@"
+                fi
+              ''
+          } 
+        fi
+        '
+      '';
+    })
+  ];
 
   programs.zsh = {
     shellAliases."z" = "zellij";
     # The default integration is bad cause of `zellij attach -c` behaviour
     # https://github.com/zellij-org/zellij/issues/3773
-    initContent = mkIf cfg.autoStart (
-      mkOrder 200
-        # bash
-        ''
-          if [[ -z "$ZELLIJ" ]]; then
-            zellij && exit
-          fi
-        ''
+    initContent = mkOrder 200 (
+      optionalString cfg.autoStart ''
+        if [[ -z $ZELLIJ ]]; then
+          zellij && exit
+        fi
+      ''
+      + optionalString alacritty.enable ''
+        if [[ -n $ZELLIJ && $TERM == "alacritty" && (-n $DISPLAY || -n $WAYLAND_DISPLAY) ]]; then
+          alacritty msg config window.opacity=1
+        fi
+      ''
     );
   };
 

@@ -379,7 +379,7 @@ in
           paths = [ package ];
           postBuild = ''
             ln -fs ${pkgs.writeShellScript "${package.name}-alacritty-opaque-wrapped" ''
-              if [[ -z $DISPLAY && -z $WAYLAND_DISPLAY ]] || [[ $TERM != "alacritty" ]]; then
+              if [[ (-z $DISPLAY && -z $WAYLAND_DISPLAY) || -n $ZELLIJ || $TERM != "alacritty" ]]; then
                 exec ${getExe package} "$@"
               fi
 

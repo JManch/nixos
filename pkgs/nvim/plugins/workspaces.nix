@@ -23,7 +23,7 @@ in
         -- https://github.com/zellij-org/zellij/issues/3090
         local update_zellij_tab = function(name)
           if not vim.env.ZELLIJ then return end
-          vim.fn.jobstart({ "zellij", "action", "rename-tab", name }, { detach = true })
+          vim.system({ "zellij", "action", "rename-tab", name })
         end
         update_zellij_tab("nvim")
 

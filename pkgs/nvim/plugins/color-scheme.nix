@@ -88,12 +88,17 @@
           sunset_offset = -1800,
         }
 
-        if os.getenv("NIX_NEOVIM_DARKMAN") == "1" and (os.getenv("DISPLAY") ~= nil or os.getenv("WAYLAND_DISPLAY") ~= nil) then
+        if vim.env.NIX_NEOVIM_DARKMAN == "1" or vim.env.DARKMAN_THEME ~= nil then
           sunset_opts.custom_switch = function(tbl)
             if not tbl.init then return end
 
-            local result = vim.system({ "darkman", "get" }, { text = true }):wait()
-            if vim.trim(result.stdout) == "light" then
+            local theme = vim.env.DARKMAN_THEME
+            if (vim.env.NIX_NEOVIM_DARKMAN == "1" and (vim.env.DISPLAY ~= nil or vim.env.WAYLAND_DISPLAY ~= nil)) then
+              local result = vim.system({ "darkman", "get" }, { text = true }):wait()
+              theme = vim.trim(result.stdout)
+            end
+
+            if theme == "light" then
               tbl.trigger_day()
             else
               tbl.trigger_night()

@@ -2,6 +2,7 @@
   lib,
   cfg,
   pkgs,
+  args,
   config,
   osConfig,
   vmVariant,
@@ -29,7 +30,7 @@ let
     types
     mkAliasOptionModule
     ;
-  inherit (lib.${ns}) addPatches sliceSuffix;
+  inherit (lib.${ns}) addPatches sliceSuffix wrapAlacrittyOpaque;
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.core.device) hassIntegration;
   inherit (osConfig.${ns}.core.time-zone) coordinates;
@@ -392,6 +393,12 @@ in
         )
       )
     ) cfg.switchApps;
+
+  programs.zsh.initContent = ''
+    ssh() {
+      DARKMAN_THEME=$(darkman get) ${wrapAlacrittyOpaque args pkgs.openssh}/bin/ssh "$@"
+    }
+  '';
 
   # Create a switch script for this app that swaps our out of store
   # symlink config file with the new theme and executes the reload script

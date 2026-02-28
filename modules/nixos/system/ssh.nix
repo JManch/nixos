@@ -21,6 +21,8 @@ let
     types
     optional
     optionalString
+    elem
+    attrNames
     optionals
     attrValues
     singleton
@@ -61,6 +63,7 @@ in
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
+      AcceptEnv = [ "DARKMAN_THEME" ];
       AllowUsers = [
         "root"
         adminUsername
@@ -101,20 +104,21 @@ in
             # The server is misconfigured and doesn't advertise ed25519 cert support
             PubkeyAcceptedAlgorithms +ssh-ed25519-cert-v01@openssh.com
         ''
-        # Enable agent forwarding on specific personal hosts
-        +
-          concatMapStrings
-            (
-              host:
-              optionalString (host != hostname && cfg.agent.enable) ''
-                Host ${host}*.lan
-                  ForwardAgent yes
-              ''
-            )
-            [
+        + concatMapStrings (
+          let
+            # Enable agent forwarding on specific personal hosts
+            forwardAgentHosts = [
               "ncase-m1"
               "framework"
-            ]
+            ];
+          in
+          host: ''
+            Host ${host}*
+              User joshua
+              ForwardAgent ${if elem host forwardAgentHosts then "Yes" else "No"}
+              SendEnv DARKMAN_THEME
+          ''
+        ) (attrNames self.nixosConfigurations)
       );
 
     knownHosts =

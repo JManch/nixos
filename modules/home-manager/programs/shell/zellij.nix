@@ -37,8 +37,7 @@ in
   };
 
   programs.zsh = {
-    # When starting interactively prompt prompt for a session name
-    shellAliases."z" = "zellij --layout welcome";
+    shellAliases."z" = "zellij";
     # The default integration is bad cause of `zellij attach -c` behaviour
     # https://github.com/zellij-org/zellij/issues/3773
     initContent = mkIf cfg.autoStart (
@@ -46,11 +45,7 @@ in
         # bash
         ''
           if [[ -z "$ZELLIJ" ]]; then
-            if [[ $(zellij list-sessions 2>/dev/null | grep -cv 'EXITED.*attach to resurrect') -gt 1 ]]; then
-              zellij attach -c
-            else
-              zellij attach -c && exit
-            fi
+            zellij && exit
           fi
         ''
     );
@@ -275,6 +270,9 @@ in
         font "monospace"
       }
 
+      // these two options are undocumented for some reason
+      session_name "main"
+      attach_to_session true
       default_layout "compact-top-bar"
       simplified_ui false
       theme "dark-theme"

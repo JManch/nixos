@@ -13,7 +13,7 @@
   imgui,
 }:
 let
-  version = "2.12.0-rc3";
+  version = "2.12.0-rc4";
 
   maxlibqt = fetchFromGitHub {
     owner = "edgetx";
@@ -29,7 +29,7 @@ edgetx.overrideAttrs (old: {
     repo = "edgetx";
     tag = "v${version}";
     fetchSubmodules = true;
-    hash = "sha256-FtrhpXKDTJDMo15r25p8kuyLlAGnnyvKcxwBvcJ7DyY=";
+    hash = "sha256-Fike8da7yQgDNUG7HAJWB3/RFxfT/EPb8Ud8q3RMMqA=";
   };
 
   patches = old.patches ++ [ ./install-desktop-files.patch ];

@@ -4,11 +4,9 @@
 # - [ ] https://github.com/zellij-org/zellij/issues/4641
 {
   lib,
-  cfg,
   pkgs,
   config,
   inputs,
-  osConfig,
 }:
 let
   inherit (lib)
@@ -17,23 +15,14 @@ let
     singleton
     concatLines
     getExe
-    mkOption
-    types
     optionalString
     ;
-  inherit (osConfig.${ns}.core) device;
   inherit (config.${ns}.programs.desktop) alacritty;
   inherit (config.${ns}.desktop.services) darkman;
   inherit (config.xdg) configHome dataHome;
 in
 {
   enableOpt = false;
-
-  opts.autoStart = mkOption {
-    type = types.bool;
-    default = device.type == "server";
-    description = "Whether to auto start zellij in new shells";
-  };
 
   home.packages = [
     (pkgs.symlinkJoin {
@@ -70,8 +59,8 @@ in
     # The default integration is bad cause of `zellij attach -c` behaviour
     # https://github.com/zellij-org/zellij/issues/3773
     initContent = mkOrder 200 (
-      optionalString cfg.autoStart ''
-        if [[ -z $ZELLIJ ]]; then
+      ''
+        if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -z $DISPLAY && -z $WAYLAND_DISPLAY ]]; then
           zellij && exit
         fi
       ''

@@ -24,52 +24,51 @@ in
 {
   enableOpt = false;
 
-  home.packages = [
-    (pkgs.symlinkJoin {
-      name = "zellij-wrapped";
-      paths = [ pkgs.zellij ];
-      nativeBuildInputs = [ pkgs.makeWrapper ];
-      postBuild = ''
-        # Match zellij theme to client theme when SSHing into remote hosts. SSH
-        # is configured to forward DARKMAN_THEME and we have a zsh wrapper
-        # around `ssh` setting the variable.
-        wrapProgram $out/bin/${pkgs.zellij.meta.mainProgram} --run '
-        if [[ (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -n $DARKMAN_THEME ]]; then
-          ${
-            if darkman.enable then
-              ''
-                exec ${getExe pkgs.zellij} --config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME" "$@"
-              ''
-            else
-              ''
-                if [[ $DARKMAN_THEME == "light" ]]; then
-                  ${getExe pkgs.gnused} "s/theme \"dark-theme\"/theme \"light-theme\"/" ${configHome}/zellij/config.kdl > /tmp/zellij-light-config.kdl
-                  exec ${getExe pkgs.zellij} --config /tmp/zellij-light-config.kdl "$@"
-                fi
-              ''
-          } 
-        fi
-        '
-      '';
-    })
-  ];
+  home.packages = [ pkgs.zellij ];
 
   programs.zsh = {
     shellAliases."z" = "zellij";
     # The default integration is bad cause of `zellij attach -c` behaviour
     # https://github.com/zellij-org/zellij/issues/3773
-    initContent = mkOrder 200 (
-      ''
-        if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -z $DISPLAY && -z $WAYLAND_DISPLAY ]]; then
-          zellij && exit
-        fi
-      ''
-      + optionalString alacritty.enable ''
-        if [[ -n $ZELLIJ && $TERM == "alacritty" && (-n $DISPLAY || -n $WAYLAND_DISPLAY) ]]; then
-          alacritty msg config window.opacity=1
-        fi
-      ''
-    );
+    initContent =
+      mkOrder 200
+        # bash
+        ''
+          # Wrapping with zsh function because we only want this wrapper applying
+          # to interactive calls
+          zellij() {
+            # Match zellij theme to client theme when SSHing into remote hosts. SSH
+            # is configured to forward DARKMAN_THEME and we have a zsh wrapper
+            # around `ssh` setting the variable.
+            if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -n $DARKMAN_THEME ]]; then
+              ${
+                if darkman.enable then
+                  ''
+                    exec command zellij --config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME" "$@"
+                  ''
+                else
+                  ''
+                    if [[ $DARKMAN_THEME == "light" ]]; then
+                      ${getExe pkgs.gnused} "s/theme \"dark-theme\"/theme \"light-theme\"/" ${configHome}/zellij/config.kdl > /tmp/zellij-light-config.kdl
+                      exec command zellij --config /tmp/zellij-light-config.kdl "$@"
+                    f
+                  ''
+              } 
+            ${optionalString alacritty.enable ''
+              elif [[ -z $ZELLIJ && (-n $DISPLAY || -n $WAYLAND_DISPLAY) && $TERM == "alacritty" ]]; then
+                alacritty msg config window.opacity=1
+                command zellij "$@"
+                alacritty msg config --reset
+                return 0
+            ''}
+            fi
+            exec command zellij "$@"
+          }
+
+          if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -z $DISPLAY && -z $WAYLAND_DISPLAY ]]; then
+            zellij && exit
+          fi
+        '';
   };
 
   xdg.configFile."zellij/config.kdl".text = # kdl
@@ -91,6 +90,7 @@ in
           bind "Alt v" { NewPane "right"; }
           bind "Alt Shift r" { SwitchToMode "renametab"; TabNameInput 0; }
           bind "Alt c" { Copy; }
+          bind "Ctrl Shift c" { Copy; }
           bind "Alt m" { NewTab; }
           bind "Alt Enter" { NewPane; }
           bind "Alt Shift Enter" { NewTab; }

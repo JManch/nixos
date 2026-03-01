@@ -70,7 +70,7 @@ in
             if (( zellij_show_cwd )); then
               local dir="''${PWD##*/}"
               [[ "$PWD" == "$HOME" ]] && dir="~"
-              zellij action rename-tab "$dir" &>/dev/null &!
+              zellij action rename-tab "''${dir}/" &>/dev/null &!
               zellij_show_cwd=0
             fi
           }

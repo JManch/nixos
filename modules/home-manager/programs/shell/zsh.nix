@@ -59,41 +59,56 @@ in
     initContent =
       lib.mkBefore # bash
         ''
-          function set_term_title() {
-            print -Pn "\e]2;$1\a"
-          }
+          if [[ -z $ZELLIJ ]]; then
+            function set_term_title() {
+              print -Pn "\e]2;$1\a"
+            }
 
-          local -a zellij_cwd_cmds=(ls ll la lll cd pwd)
-          zellij_show_cwd=0
-
-          function precmd_zellij_tab_name() {
-            if (( zellij_show_cwd )); then
-              local dir="''${PWD##*/}"
-              [[ "$PWD" == "$HOME" ]] && dir="~"
-              zellij action rename-tab "''${dir}/" &>/dev/null &!
-              zellij_show_cwd=0
-            fi
-          }
-
-          function preexec_update_title() {
-            if [[ -n $ZELLIJ ]]; then
-              local -a cmd=(''${(z)1})
-              local process_name=$cmd[1]
-              if [[ -n $process_name ]]; then
-                if (( ''${zellij_cwd_cmds[(Ie)$process_name]} )); then
-                  zellij_show_cwd=1
-                else
-                  zellij_show_cwd=0
-                  command zellij action rename-tab "$process_name" &>/dev/null &!
-                fi
-              fi
-            else
+            function preexec_update_title() {
               set_term_title "%~: $1"
-            fi
-          }
+            }
 
-          add-zsh-hook preexec preexec_update_title
-          [[ -n $ZELLIJ ]] && add-zsh-hook precmd precmd_zellij_tab_name
+            add-zsh-hook preexec preexec_update_title
+          else
+            local -a zellij_cwd_cmds=(ls ll la lll cd pwd)
+            local -a zellij_ignore_cmds=(clear exit)
+            local zellij_show_cwd=0
+
+            function precmd_zellij_cwd_title() {
+              if (( zellij_show_cwd )); then
+                local dir="''${PWD##*/}/"
+                [[ "$PWD" == "$HOME" ]] && dir="~"
+                zellij action rename-tab "$dir" &>/dev/null &!
+                zellij_show_cwd=0
+              fi
+            }
+
+            function preexec_zellij_process_title() {
+              if [[ -n $ZELLIJ ]]; then
+                local -a cmd=(''${(z)1})
+                local process_name=$cmd[1]
+                if [[ -n $process_name ]]; then
+                  if (( ''${zellij_ignore_cmds[(Ie)$process_name]} )); then
+                    return
+                  elif (( ''${zellij_cwd_cmds[(Ie)$process_name]} )); then
+                    zellij_show_cwd=1
+                  else
+                    zellij_show_cwd=0
+                    command zellij action rename-tab "$process_name" &>/dev/null &!
+                  fi
+                fi
+              else
+                set_term_title "%~: $1"
+              fi
+            }
+
+            add-zsh-hook preexec preexec_zellij_process_title
+            add-zsh-hook precmd precmd_zellij_cwd_title
+
+            # Set the initial tab name to the cwd
+            zellij_show_cwd=1
+            precmd_zellij_cwd_title
+          fi
 
           function zvm_config() {
             ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT

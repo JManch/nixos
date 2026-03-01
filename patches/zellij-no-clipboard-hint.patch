@@ -1,0 +1,15 @@
+diff --git a/default-plugins/compact-bar/src/main.rs b/default-plugins/compact-bar/src/main.rs
+index 074e5181..7ffa9820 100644
+--- a/default-plugins/compact-bar/src/main.rs
++++ b/default-plugins/compact-bar/src/main.rs
+@@ -455,9 +455,7 @@ impl State {
+     }
+ 
+     fn render_tab_line(&mut self, cols: usize) {
+-        if let Some(copy_destination) = self.text_copy_destination {
+-            self.render_clipboard_hint(copy_destination);
+-        } else if self.display_system_clipboard_failure {
++        if self.display_system_clipboard_failure {
+             self.render_clipboard_error();
+         } else {
+             self.render_tabs(cols);

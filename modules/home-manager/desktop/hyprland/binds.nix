@@ -164,21 +164,6 @@ let
           'string:x-canonical-private-synchronous:hypr-scale-tablet' 'Hyprland' 'Scaled tablet to active window'
       '';
 
-  # By design, the wayland clipboard does not sync with unfocused x clients.
-  # It's possible to workaround this but constantly syncing the X clipboard but
-  # in my experience the workaround is quite buggy and breaks basic clipboard
-  # functionality. Since I don't paste into wine applications very frequently,
-  # having a bind to manually sync is an acceptable workaround.
-  # https://github.com/hyprwm/Hyprland/issues/2319
-  syncClipboard =
-    pkgs.writeShellScript "hypr-sync-clipboard" # bash
-      ''
-        set -o pipefail
-        echo -n "$(${getExe' pkgs.wl-clipboard "wl-paste"} -n)" | ${getExe pkgs.xclip} -selection clipboard && \
-          ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Synced Wayland clipboard with X11' || \
-          ${notifySend} --transient --urgency=critical -t 2000 'Hyprland' 'Clipboard sync failed'
-      '';
-
   copyScreenshotText = pkgs.writeShellScript "hypr-copy-screenshot-text" ''
     set -o pipefail
     text=$(${takeScreenshot} copy area - | ${getExe pkgs.tesseract} stdin stdout)
@@ -315,7 +300,7 @@ in
       "${modShift}, R, exec, ${make16By9}"
       "${mod}, A, exec, ${toggleAnimations}"
       "${modShift}, A, exec, ${toggleGaps}"
-      "${modShiftCtrl}, V, exec, ${syncClipboard}"
+      "${mod}, V, exec, hyprctl dispatch sendshortcut SHIFT,Insert," # paste from primary clipboard
       "${mod}, Y, exec, ${scaleTabletToWindow}"
 
       # Movement

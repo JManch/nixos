@@ -332,8 +332,8 @@ in
 
           settings = {
             bind = [
-              "${modKey}, V, workspace, ${namedWorkspaceIDs.VM}"
-              "${modKey}SHIFT, V, movetoworkspace, ${namedWorkspaceIDs.VM}"
+              "${modKey}SHIFT, V, workspace, ${namedWorkspaceIDs.VM}"
+              "${modKey}SHIFTCONTROL, V, movetoworkspace, ${namedWorkspaceIDs.VM}"
             ];
 
             windowrule = [

@@ -90,7 +90,6 @@ in
           bind "Alt v" { NewPane "right"; }
           bind "Alt Shift r" { SwitchToMode "renametab"; TabNameInput 0; }
           bind "Alt c" { Copy; }
-          bind "Ctrl Shift c" { Copy; }
           bind "Alt m" { NewTab; }
           bind "Alt Enter" { NewPane; }
           bind "Alt Shift Enter" { NewTab; }
@@ -298,13 +297,13 @@ in
       simplified_ui false
       theme "dark-theme"
       mouse_mode true
-      copy_on_select false
+      copy_on_select true
       advanced_mouse_actions true
       pane_frames false
       mirror_session false
       on_force_close "detach"
       scroll_buffer_size 10000
-      copy_clipboard "system"
+      copy_clipboard "primary" // wish I could configure selection copy to primary and keybind copy to system
       auto_layout true
       session_serialization true
       serialize_pane_viewport true

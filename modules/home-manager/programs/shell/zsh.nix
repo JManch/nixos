@@ -63,11 +63,37 @@ in
             print -Pn "\e]2;$1\a"
           }
 
+          local -a zellij_cwd_cmds=(ls ll la lll cd pwd)
+          zellij_show_cwd=0
+
+          function precmd_zellij_tab_name() {
+            if (( zellij_show_cwd )); then
+              local dir="''${PWD##*/}"
+              [[ "$PWD" == "$HOME" ]] && dir="~"
+              zellij action rename-tab "$dir" &>/dev/null &!
+              zellij_show_cwd=0
+            fi
+          }
+
           function preexec_update_title() {
-            set_term_title "%~: $1"
+            if [[ -n $ZELLIJ ]]; then
+              local -a cmd=(''${(z)1})
+              local process_name=$cmd[1]
+              if [[ -n $process_name ]]; then
+                if (( ''${zellij_cwd_cmds[(Ie)$process_name]} )); then
+                  zellij_show_cwd=1
+                else
+                  zellij_show_cwd=0
+                  command zellij action rename-tab "$process_name" &>/dev/null &!
+                fi
+              fi
+            else
+              set_term_title "%~: $1"
+            fi
           }
 
           add-zsh-hook preexec preexec_update_title
+          [[ -n $ZELLIJ ]] && add-zsh-hook precmd precmd_zellij_tab_name
 
           function zvm_config() {
             ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT

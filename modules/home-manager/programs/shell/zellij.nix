@@ -128,10 +128,10 @@ in
           bind "Alt 8" { GoToTab 8; }
           bind "Alt 9" { GoToTab 9; }
 
-          bind "Alt left" { MoveFocus "left"; }
-          bind "Alt down" { MoveFocus "down"; }
-          bind "Alt up" { MoveFocus "up"; }
-          bind "Alt right" { MoveFocus "right"; }
+          bind "Alt left" { Resize "Increase left"; }
+          bind "Alt down" { Resize "Increase down"; }
+          bind "Alt up" { Resize "Increase up"; }
+          bind "Alt right" { Resize "Increase right"; }
 
           bind "Alt +" { Resize "Increase"; }
           bind "Alt -" { Resize "Decrease"; }

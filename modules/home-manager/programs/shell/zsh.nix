@@ -70,7 +70,7 @@ in
 
             add-zsh-hook preexec preexec_update_title
           else
-            local -a zellij_cwd_cmds=(ls ll la lll cd pwd rm)
+            local -a zellij_cwd_cmds=(l ls ll la lll cd pwd rm)
             local -a zellij_ignore_cmds=(clear exit)
             local zellij_show_cwd=0
 

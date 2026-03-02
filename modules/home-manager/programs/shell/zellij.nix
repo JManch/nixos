@@ -8,6 +8,7 @@
   pkgs,
   config,
   inputs,
+  hostname,
 }:
 let
   inherit (lib)
@@ -292,7 +293,7 @@ in
       }
 
       // these two options are undocumented for some reason
-      session_name "main"
+      session_name "${hostname}"
       attach_to_session true
       default_layout "compact-top-bar"
       simplified_ui false

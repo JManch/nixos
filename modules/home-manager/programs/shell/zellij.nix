@@ -1,8 +1,6 @@
-# - [ ] https://github.com/zellij-org/zellij/issues/865
-# - [ ] https://github.com/zellij-org/zellij/issues/3090
-# - [ ] https://github.com/zellij-org/zellij/issues/4641
-# - Sometimes zellij refuses to exit causes our graphical-session exit to hang.
-# Haven't found a way to reproduce yet.
+# https://github.com/zellij-org/zellij/issues/865
+# https://github.com/zellij-org/zellij/issues/3090
+# https://github.com/zellij-org/zellij/issues/4641
 {
   lib,
   pkgs,
@@ -39,6 +37,8 @@ in
           # Wrapping with zsh function because we only want this wrapper applying
           # to interactive calls
           zellij() {
+            config_flag=()
+            wrap_opaque=""
             # Match zellij theme to client theme when SSHing into remote hosts. SSH
             # is configured to forward DARKMAN_THEME and we have a zsh wrapper
             # around `ssh` setting the variable.
@@ -46,25 +46,37 @@ in
               ${
                 if darkman.enable then
                   ''
-                    command zellij --config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME" "$@"
+                    config_flag=(--config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME")
                   ''
                 else
                   ''
                     if [[ $DARKMAN_THEME == "light" ]]; then
                       ${getExe pkgs.gnused} "s/theme \"dark-theme\"/theme \"light-theme\"/" ${configHome}/zellij/config.kdl > /tmp/zellij-light-config.kdl
-                      command zellij --config /tmp/zellij-light-config.kdl "$@"
+                      config_flag=(--config /tmp/zellij-light-config.kdl)
                     fi
                   ''
               } 
             ${optionalString alacritty.enable ''
               elif [[ -z $ZELLIJ && ($# -eq 0 || $1 == "attach" || $1 == "a") && (-n $DISPLAY || -n $WAYLAND_DISPLAY) && $TERM == "alacritty" ]]; then
-                alacritty msg config window.opacity=1
-                command zellij "$@"
-                alacritty msg config --reset
-                return 0
+                wrap_opaque=true
             ''}
             fi
-            command zellij "$@"
+
+            [[ $wrap_opaque ]] && alacritty msg config window.opacity=1
+
+            # If the command has no arguments attach to the default session. We
+            # have to do this instead of relying on the session_name option
+            # because session_name fails to resurrect sessions, it just creates
+            # a new one with the same name (likely a bug)
+            if [[ $# -eq 0 ]]; then
+              command zellij "''${config_flag[@]}" attach --create "${hostname}"
+            else
+              command zellij "''${config_flag[@]}" "$@"
+            fi
+            local zellij_exit=$?
+
+            [[ $wrap_opaque ]] && alacritty msg config --reset
+            return $zellij_exit
           }
 
           if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -z $DISPLAY && -z $WAYLAND_DISPLAY ]]; then
@@ -292,9 +304,10 @@ in
         font "monospace"
       }
 
-      // these two options are undocumented for some reason
-      session_name "${hostname}"
-      attach_to_session true
+      // Wish these options worked but attach_to_session fails to resurrect
+      // sessions. I've instead scripted this behaviour above.
+      // session_name "${hostname}"
+      // attach_to_session true
       default_layout "compact-top-bar"
       simplified_ui false
       theme "dark-theme"
@@ -303,7 +316,11 @@ in
       advanced_mouse_actions true
       pane_frames false
       mirror_session false
-      on_force_close "detach"
+      // If zellij has a bunch of panes and processes it sometimes hangs in
+      // response to SIGTERM and delays our compositor exit until the SIGKILL
+      // timeout is reached. Have to set on_force_close to "quit" to workaround
+      // it.
+      on_force_close "quit"
       scroll_buffer_size 10000
       copy_clipboard "system" // wish I could configure selection copy to primary and keybind copy to system
       auto_layout true

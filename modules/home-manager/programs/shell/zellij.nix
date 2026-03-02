@@ -1,7 +1,8 @@
-# Waiting for:
 # - [ ] https://github.com/zellij-org/zellij/issues/865
 # - [ ] https://github.com/zellij-org/zellij/issues/3090
 # - [ ] https://github.com/zellij-org/zellij/issues/4641
+# - Sometimes zellij refuses to exit causes our graphical-session exit to hang.
+# Haven't found a way to reproduce yet.
 {
   lib,
   pkgs,
@@ -44,25 +45,25 @@ in
               ${
                 if darkman.enable then
                   ''
-                    exec command zellij --config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME" "$@"
+                    command zellij --config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME" "$@"
                   ''
                 else
                   ''
                     if [[ $DARKMAN_THEME == "light" ]]; then
                       ${getExe pkgs.gnused} "s/theme \"dark-theme\"/theme \"light-theme\"/" ${configHome}/zellij/config.kdl > /tmp/zellij-light-config.kdl
-                      exec command zellij --config /tmp/zellij-light-config.kdl "$@"
-                    f
+                      command zellij --config /tmp/zellij-light-config.kdl "$@"
+                    fi
                   ''
               } 
             ${optionalString alacritty.enable ''
-              elif [[ -z $ZELLIJ && (-n $DISPLAY || -n $WAYLAND_DISPLAY) && $TERM == "alacritty" ]]; then
+              elif [[ -z $ZELLIJ && ($# -eq 0 || $1 == "attach" || $1 == "a") && (-n $DISPLAY || -n $WAYLAND_DISPLAY) && $TERM == "alacritty" ]]; then
                 alacritty msg config window.opacity=1
                 command zellij "$@"
                 alacritty msg config --reset
                 return 0
             ''}
             fi
-            exec command zellij "$@"
+            command zellij "$@"
           }
 
           if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -z $DISPLAY && -z $WAYLAND_DISPLAY ]]; then
@@ -89,7 +90,7 @@ in
           bind "Alt x" { NewPane "down"; }
           bind "Alt v" { NewPane "right"; }
           bind "Alt Shift r" { SwitchToMode "renametab"; TabNameInput 0; }
-          bind "Alt c" { Copy; }
+          bind "Alt c" { TogglePaneEmbedOrFloating; }
           bind "Alt m" { NewTab; }
           bind "Alt Enter" { NewPane; }
           bind "Alt Shift Enter" { NewTab; }
@@ -102,7 +103,7 @@ in
           bind "Alt g" { SwitchToMode "locked"; }
           bind "Alt ." { MoveTab "right"; }
           bind "Alt ," { MoveTab "left"; }
-          bind "Alt p" { TogglePaneInGroup; }
+          bind "Alt p" { TogglePanePinned; }
           bind "Alt Shift p" { ToggleGroupMarking; }
           bind "Alt u" { HalfPageScrollUp; }
           bind "Alt d" { HalfPageScrollDown; }
@@ -303,7 +304,7 @@ in
       mirror_session false
       on_force_close "detach"
       scroll_buffer_size 10000
-      copy_clipboard "primary" // wish I could configure selection copy to primary and keybind copy to system
+      copy_clipboard "system" // wish I could configure selection copy to primary and keybind copy to system
       auto_layout true
       session_serialization true
       serialize_pane_viewport true
@@ -478,6 +479,12 @@ in
            plugin location="compact-bar"
          }
          children
+      }
+
+      swap_floating_layout name="floating" {
+        floating_panes {
+          pane x="10%" y="10%" width="80%" height="80%"
+        }
       }
 
       swap_tiled_layout name="vertical" {

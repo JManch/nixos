@@ -173,7 +173,17 @@ in
           ''
       );
 
-    systemd.user.units = concatMapAttrs (
+    systemd.user.units = {
+      # Chromium apps randomly deploy scopes in app.slice
+      "app-org.chromium.Chromium-.scope" = {
+        overrideStrategy = "asDropin";
+        text = ''
+          [Scope]
+          Slice=app${lib.${ns}.sliceSuffix config}.slice
+        '';
+      };
+    }
+    // concatMapAttrs (
       unitName: text:
       foldl' (
         acc: desktop:

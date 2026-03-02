@@ -1,12 +1,15 @@
 # https://github.com/zellij-org/zellij/issues/865
 # https://github.com/zellij-org/zellij/issues/3090
 # https://github.com/zellij-org/zellij/issues/4641
+# https://github.com/zellij-org/zellij/issues/4130
+# https://github.com/zellij-org/zellij/issues/3357
 {
   lib,
   pkgs,
   config,
   inputs,
   hostname,
+  osConfig,
 }:
 let
   inherit (lib)
@@ -24,21 +27,25 @@ in
 {
   enableOpt = false;
 
-  home.packages = [ pkgs.zellij ];
-
-  programs.zsh = {
-    shellAliases."z" = "zellij";
-    # The default integration is bad cause of `zellij attach -c` behaviour
-    # https://github.com/zellij-org/zellij/issues/3773
-    initContent =
-      mkOrder 200
-        # bash
+  home.packages = [
+    (pkgs.symlinkJoin {
+      name = "zellij-wrapped";
+      paths = [ pkgs.zellij ];
+      postBuild =
+        let
+          app2unit =
+            if osConfig.${ns}.system.desktop.uwsm.enable then "app2unit -t scope -s app.slice -- " else "";
+        in
         ''
-          # Wrapping with zsh function because we only want this wrapper applying
-          # to interactive calls
-          zellij() {
+          ln -fs ${pkgs.writeShellScript "zellij-wrapper" ''
             config_flag=()
             wrap_opaque=""
+            long_running=""
+
+            if [[ $# -eq 0 || $1 == "attach" || $1 = "a" ]]; then
+              long_running=true
+            fi
+
             # Match zellij theme to client theme when SSHing into remote hosts. SSH
             # is configured to forward DARKMAN_THEME and we have a zsh wrapper
             # around `ssh` setting the variable.
@@ -57,28 +64,72 @@ in
                   ''
               } 
             ${optionalString alacritty.enable ''
-              elif [[ -z $ZELLIJ && ($# -eq 0 || $1 == "attach" || $1 == "a") && (-n $DISPLAY || -n $WAYLAND_DISPLAY) && $TERM == "alacritty" ]]; then
+              elif [[ -z $ZELLIJ && $long_running && (-n $DISPLAY || -n $WAYLAND_DISPLAY) && $TERM == "alacritty" ]]; then
                 wrap_opaque=true
             ''}
             fi
 
-            [[ $wrap_opaque ]] && alacritty msg config window.opacity=1
+            maybe_exec="exec"
+            if [[ $wrap_opaque ]]; then
+              maybe_exec=""
+              reset() {
+                alacritty msg config --reset
+              }
+              trap reset EXIT
+              alacritty msg config window.opacity=1
+            fi
 
             # If the command has no arguments attach to the default session. We
             # have to do this instead of relying on the session_name option
             # because session_name fails to resurrect sessions, it just creates
             # a new one with the same name (likely a bug)
             if [[ $# -eq 0 ]]; then
-              command zellij "''${config_flag[@]}" attach --create "${hostname}"
+              $maybe_exec ${app2unit}${getExe pkgs.zellij} "''${config_flag[@]}" attach --create "${hostname}"
+            elif [[ $long_running ]]; then
+              $maybe_exec ${app2unit}${getExe pkgs.zellij} "''${config_flag[@]}" "$@"
             else
-              command zellij "''${config_flag[@]}" "$@"
+              ${getExe pkgs.zellij} "''${config_flag[@]}" "$@"
             fi
-            local zellij_exit=$?
+          ''} $out/bin/${pkgs.zellij.meta.mainProgram}
+        '';
+    })
+  ];
 
-            [[ $wrap_opaque ]] && alacritty msg config --reset
-            return $zellij_exit
-          }
+  # With `on_force_close="detach"`, if zellij has a bunch of panes and
+  # processes it sometimes hangs in response to SIGTERM and delays our
+  # compositor exit until the SIGKILL timeout is reached. I suspect it's
+  # something to do with zellij not liking the default KillMode=control-group
+  # it inherits from our terminals service. Fix is to run zellij in it's own
+  # scope will KillMode=mixed. It now cleanly shuts down in all scenarios and
+  # session resurrection works as expected.
 
+  # When running zellij as a scope it seems like the server runs in a
+  # persistent scope and a new scope is created whenever we attach (these
+  # scopes get killed with the terminal). Might want to run zellij like this on
+  # my server as well, not sure yet.
+  ns.desktop.uwsm.appUnitOverrides."zellij-.scope" = ''
+    [Scope]
+    KillMode=mixed
+  '';
+
+  ns.desktop.darkman.switchApps."zellij" = {
+    paths = [ ".config/zellij/config.kdl" ];
+    extraReplacements = singleton {
+      dark = ''theme "dark-theme"'';
+      light = ''theme "light-theme"'';
+    };
+  };
+
+  ns.persistence.directories = [ ".cache/zellij" ];
+
+  programs.zsh = {
+    shellAliases."z" = "zellij";
+    # The default integration is bad cause of `zellij attach -c` behaviour
+    # https://github.com/zellij-org/zellij/issues/3773
+    initContent =
+      mkOrder 200
+        # bash
+        ''
           if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -z $DISPLAY && -z $WAYLAND_DISPLAY ]]; then
             zellij && exit
           fi
@@ -316,11 +367,7 @@ in
       advanced_mouse_actions true
       pane_frames false
       mirror_session false
-      // If zellij has a bunch of panes and processes it sometimes hangs in
-      // response to SIGTERM and delays our compositor exit until the SIGKILL
-      // timeout is reached. Have to set on_force_close to "quit" to workaround
-      // it.
-      on_force_close "quit"
+      on_force_close "detach"
       scroll_buffer_size 10000
       copy_clipboard "system" // wish I could configure selection copy to primary and keybind copy to system
       auto_layout true
@@ -547,14 +594,4 @@ in
         }
       }
     '';
-
-  ns.desktop.darkman.switchApps."zellij" = {
-    paths = [ ".config/zellij/config.kdl" ];
-    extraReplacements = singleton {
-      dark = ''theme "dark-theme"'';
-      light = ''theme "light-theme"'';
-    };
-  };
-
-  ns.persistence.directories = [ ".cache/zellij" ];
 }

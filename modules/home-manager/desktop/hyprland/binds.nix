@@ -311,7 +311,7 @@ in
       "${modShift}, E, fullscreen, 0"
       "${mod}, Z, exec, ${toggleAlwaysOnTop}"
       "${mod}Shift, Z, pin, active"
-      "${mod}, R, exec, ${hyprctl} dispatch splitratio exact 1"
+      "${mod}, R, exec, ${hyprctl} dispatch layoutmsg splitratio 1 exact"
       "${modShift}, R, exec, ${make16By9}"
       "${mod}, A, exec, ${toggleAnimations}"
       "${modShift}, A, exec, ${toggleGaps}"

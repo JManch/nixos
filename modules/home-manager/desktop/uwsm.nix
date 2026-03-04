@@ -46,5 +46,14 @@ in
   #   ))
   # ];
 
-  programs.zsh.shellAliases."xdg-open" = "app2unit-open-service";
+  programs.zsh = {
+    shellAliases."xdg-open" = "app2unit-open-service";
+
+    initContent = # bash
+      ''
+        function nix-run-app() {
+          app2unit -t service "$(nix build n#$1 --print-out-paths | head)/bin/$(nix eval --raw n#$1.meta.mainProgram)"
+        }
+      '';
+  };
 }

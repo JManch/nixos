@@ -1,8 +1,6 @@
 {
   lib,
   cfg,
-  pkgs,
-  inputs,
   config,
   hostname,
 }:
@@ -256,8 +254,6 @@ in
 
   systemd.services.frigate.serviceConfig = hardeningBaseline config {
     DynamicUser = false;
-    ProtectProc = "default";
-    ProcSubset = "all";
     SystemCallFilter = [
       "@system-service"
       "~@privileged"

@@ -77,9 +77,10 @@ stdenv.mkDerivation (finalAttrs: {
     makeWrapper
     yarnConfigHook
     yarnBuildHook
-
     nodejs
-    python3
+    (python3.withPackages (p: [
+      p.setuptools
+    ]))
   ];
 
   yarnBuildScript = "package";

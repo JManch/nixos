@@ -4,6 +4,7 @@
   vim.preventJunkFiles = false;
 
   vim.options = {
+    cmdheight = 0;
     winborder = "rounded";
     timeoutlen = 600;
     mouse = "a";

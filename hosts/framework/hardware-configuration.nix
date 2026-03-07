@@ -21,14 +21,6 @@
   # As of kernel 6.13 the framework kmod isn't necessary
   hardware.framework.enableKmod = false;
 
-  ${lib.ns}.hardware.graphics.amd.kernelPatches = [
-    # Fix for https://gitlab.freedesktop.org/drm/amd/-/issues/4463
-    (pkgs.fetchpatch2 {
-      url = "https://gitlab.freedesktop.org/agd5f/linux/-/commit/318917e1d8ecc89f820f4fabf79935f4fed718cd.diff";
-      hash = "sha256-WFAp18QU1Rr09K2Gnsvke/UngKZOeSZb68g1PgoJ7Xc=";
-    })
-  ];
-
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
 

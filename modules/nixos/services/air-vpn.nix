@@ -52,10 +52,21 @@ in
   }
 
   (lib.mkIf cfg.confinement.enable {
-    vpnNamespaces.air-vpn = {
+    vpnNamespaces."air-vpn" = {
       enable = true;
       wireguardConfigFile = airVpnConfig.path;
       accessibleFrom = [ "127.0.0.1" ];
+    };
+
+    # Attempt to fix VPN failing to start on boot due to temporary network
+    # issues then never retrying. May need to add a WantedBy=air-vpn.service
+    # rule to all services that depend on the VPN so they recover.
+    systemd.services."air-vpn" = {
+      startLimitIntervalSec = 0;
+      serviceConfig = {
+        Restart = "on-failure";
+        RestartSec = 30;
+      };
     };
   })
 ]

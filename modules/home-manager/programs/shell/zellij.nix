@@ -41,6 +41,8 @@ in
             config_flag=()
             wrap_opaque=""
             long_running=""
+            session="${hostname}"
+            graphical="''${DISPLAY-}''${WAYLAND_DISPLAY-}"
 
             if [[ $# -eq 0 || $1 == "attach" || $1 = "a" ]]; then
               long_running=true
@@ -51,20 +53,35 @@ in
             # around `ssh` setting the variable.
             if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -n $DARKMAN_THEME ]]; then
               ${
-                if darkman.enable then
-                  ''
-                    config_flag=(--config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME")
-                  ''
-                else
-                  ''
-                    if [[ $DARKMAN_THEME == "light" ]]; then
-                      ${getExe pkgs.gnused} "s/theme \"dark-theme\"/theme \"light-theme\"/" ${configHome}/zellij/config.kdl > /tmp/zellij-light-config.kdl
-                      config_flag=(--config /tmp/zellij-light-config.kdl)
-                    fi
-                  ''
+                # Every new zellij session creates a `zellij --server` process. Future zellij
+                # instances attaching to this session will use the environment variables of the
+                # original server process. This causes issues if the session happened to be
+                # created in a headless environment (in which case app2unit puts it in a
+                # NoDesktop scope) then we later attach to it in a graphical environment. Stuff
+                # like the clipboard and graphical keyring breaks. The solution is keep a
+                # separate sesssion for `tty`, `ssh` and `desktop/local` (hostname without a
+                # suffix).
+                ''
+                  session="''${session}-ssh"
+                ''
+                + (
+                  if darkman.enable then
+                    ''
+                      config_flag=(--config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME")
+                    ''
+                  else
+                    ''
+                      if [[ $DARKMAN_THEME == "light" ]]; then
+                        ${getExe pkgs.gnused} "s/theme \"dark-theme\"/theme \"light-theme\"/" ${configHome}/zellij/config.kdl > /tmp/zellij-light-config.kdl
+                        config_flag=(--config /tmp/zellij-light-config.kdl)
+                      fi
+                    ''
+                )
               } 
+            elif [[ -z $ZELLIJ && -z $graphical ]]; then
+              session="''${session}-tty"
             ${optionalString alacritty.enable ''
-              elif [[ -z $ZELLIJ && $long_running && (-n $DISPLAY || -n $WAYLAND_DISPLAY) && $TERM == "alacritty" ]]; then
+              elif [[ -z $ZELLIJ && -n $graphical && -n $long_running && $TERM == "alacritty" ]]; then
                 wrap_opaque=true
             ''}
             fi
@@ -84,10 +101,10 @@ in
             # because session_name fails to resurrect sessions, it just creates
             # a new one with the same name (likely a bug)
             if [[ $# -eq 0 ]]; then
-              $maybe_exec ${app2unit}${getExe pkgs.zellij} "''${config_flag[@]}" attach --create "${hostname}"
-            elif [[ $long_running ]]; then
+              $maybe_exec ${app2unit}${getExe pkgs.zellij} "''${config_flag[@]}" attach --create "$session"
+            elif [[ $long_running ]]; then # this means we're attaching to a specific session with `attach <session>`
               $maybe_exec ${app2unit}${getExe pkgs.zellij} "''${config_flag[@]}" "$@"
-            else
+            else # IPC, config, and other short running commands
               ${getExe pkgs.zellij} "''${config_flag[@]}" "$@"
             fi
           ''} $out/bin/${pkgs.zellij.meta.mainProgram}

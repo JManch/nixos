@@ -57,6 +57,7 @@ in
         type = with types; listOf str;
         internal = true;
         default = [ ];
+        apply = v: v ++ [ "NoDesktop" ];
         description = ''
           List of desktop names to create drop-in overrides for. Should be the
           exact case-sensitive name used in the .desktop file.

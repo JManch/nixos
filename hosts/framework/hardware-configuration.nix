@@ -121,13 +121,13 @@
   };
 
   # https://www.freedesktop.org/software/systemd/man/latest/sleep.conf.d.html
-  systemd.sleep.extraConfig = ''
-    HibernateDelaySec=2h
-    HibernateOnACPower=no
-    SuspendState=mem
+  systemd.sleep.settings.Sleep = {
+    HibernateDelaySec = "2h";
+    HibernateOnACPower = "no";
+    SuspendState = "mem";
     # deep sleep is not supported sadly
-    MemorySleepMode=s2idle
-  '';
+    MemorySleepMode = "s2idle";
+  };
 
   services.logind.settings.Login = {
     HandlePowerKey = "poweroff";

@@ -42,4 +42,6 @@ in
       .direnv
       .envrc
     '').outPath;
+
+  ns.persistence.directories = [ ".local/share/direnv" ];
 }

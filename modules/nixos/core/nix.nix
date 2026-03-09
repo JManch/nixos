@@ -63,7 +63,7 @@ let
 
         nh os ${
           if (cmd == "diff") then "build" else cmd
-        } "$flake" --hostname ${hostname} --out-link ~/result-${hostname} "$@"
+        } "$flake" --hostname ${hostname} --out-link ~/result-${hostname} --show-activation-logs "$@"
       '';
     }
   ) rebuildCmds;
@@ -209,7 +209,7 @@ let
             ''
           else
             ''
-              nh os ${cmd} "$flake" --hostname "$hostname" --out-link "$remote_builds/result-$hostname" --target-host "root@$host_address" "''${@:2}"
+              nh os ${cmd} "$flake" --elevation-program=none --hostname "$hostname" --out-link "$remote_builds/result-$hostname" --target-host "root@$host_address" "''${@:2}"
             ''
         );
     }
@@ -370,6 +370,7 @@ in
   };
 
   ns.adminPackages = [
+    pkgs.nh
     pkgs.dix
     pkgs.npins
   ]

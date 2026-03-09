@@ -51,33 +51,35 @@ in
             # Match zellij theme to client theme when SSHing into remote hosts. SSH
             # is configured to forward DARKMAN_THEME and we have a zsh wrapper
             # around `ssh` setting the variable.
-            if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -n $DARKMAN_THEME ]]; then
+            if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) ]]; then
               ${
-                # Every new zellij session creates a `zellij --server` process. Future zellij
-                # instances attaching to this session will use the environment variables of the
-                # original server process. This causes issues if the session happened to be
-                # created in a headless environment (in which case app2unit puts it in a
-                # NoDesktop scope) then we later attach to it in a graphical environment. Stuff
-                # like the clipboard and graphical keyring breaks. The solution is keep a
-                # separate sesssion for `tty`, `ssh` and `desktop/local` (hostname without a
-                # suffix).
-                ''
-                  session="''${session}-ssh"
-                ''
-                + (
-                  if darkman.enable then
-                    ''
-                      config_flag=(--config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME")
-                    ''
-                  else
-                    ''
-                      if [[ $DARKMAN_THEME == "light" ]]; then
-                        ${getExe pkgs.gnused} "s/theme \"dark-theme\"/theme \"light-theme\"/" ${configHome}/zellij/config.kdl > /tmp/zellij-light-config.kdl
-                        config_flag=(--config /tmp/zellij-light-config.kdl)
-                      fi
-                    ''
-                )
-              } 
+              # Every new zellij session creates a `zellij --server` process. Future zellij
+              # instances attaching to this session will use the environment variables of the
+              # original server process. This causes issues if the session happened to be
+              # created in a headless environment (in which case app2unit puts it in a
+              # NoDesktop scope) then we later attach to it in a graphical environment. Stuff
+              # like the clipboard and graphical keyring breaks. The solution is keep a
+              # separate sesssion for `tty`, `ssh` and `desktop/local` (hostname without a
+              # suffix).
+              ''
+                session="''${session}-ssh"
+
+                if [[ -n $DARKMAN_THEME ]]; then
+                  ${
+                    if darkman.enable then
+                      ''
+                        config_flag=(--config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME")
+                      ''
+                    else
+                      ''
+                        if [[ $DARKMAN_THEME == "light" ]]; then
+                          ${getExe pkgs.gnused} "s/theme \"dark-theme\"/theme \"light-theme\"/" ${configHome}/zellij/config.kdl > /tmp/zellij-light-config.kdl
+                          config_flag=(--config /tmp/zellij-light-config.kdl)
+                        fi
+                      ''
+                  }
+                fi
+              ''} 
             elif [[ -z $ZELLIJ && -z $graphical ]]; then
               session="''${session}-tty"
             ${optionalString alacritty.enable ''

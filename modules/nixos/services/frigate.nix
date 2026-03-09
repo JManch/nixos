@@ -260,6 +260,8 @@ in
     ];
     # Device access for hw accel
     PrivateDevices = false;
+    # As of 0.17.0 needs access to /proc/cpuinfo
+    ProcSubset = "all";
     DeviceAllow = [ ];
     UMask = "0027";
     EnvironmentFile = cctvVars.path;

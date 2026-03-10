@@ -27,6 +27,7 @@
   hardware.cpu.amd.updateMicrocode = true;
 
   boot = {
+    initrd.systemd.tpm2.enable = false;
     initrd.availableKernelModules = [
       "xhci_pci"
       "ahci"
@@ -36,6 +37,10 @@
 
     kernelModules = [ "kvm-amd" ];
   };
+
+  # Support for TPM 1.2 was removed in systemd 259 so disable otherwise
+  # `systemd-tpm2-setup.service` keeps failing
+  systemd.tpm2.enable = false;
 
   system.stateVersion = "24.05";
 }

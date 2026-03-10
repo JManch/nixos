@@ -63,7 +63,7 @@ let
 
         nh os ${
           if (cmd == "diff") then "build" else cmd
-        } "$flake" --hostname ${hostname} --out-link ~/result-${hostname} ${
+        } "$flake" --hostname ${hostname} --out-link ~/result-${hostname} --diff always ${
           optionalString (cmd != "diff" && cmd != "build") "--show-activation-logs "
         }"$@"
       '';

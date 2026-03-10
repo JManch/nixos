@@ -390,8 +390,8 @@ in
       scroll_buffer_size 10000
       copy_clipboard "system" // wish I could configure selection copy to primary and keybind copy to system
       auto_layout true
-      session_serialization true
-      serialize_pane_viewport true
+      session_serialization false
+      serialize_pane_viewport false
       styled_underlines true
       stacked_resize true
       show_startup_tips false

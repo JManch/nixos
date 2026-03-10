@@ -27,10 +27,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v3.9.0",
-      "revision": "0c10df2407dc557418ee498537379f2f9476a869",
+      "version": "v3.9.1",
+      "revision": "25da2b2e912e681be800dac9cc55e33abe936cab",
       "url": null,
-      "hash": "sha256-wb4019KZ3A6B9z64jt7ojwW0Jvh/hx/11jmR1FFOZYg="
+      "hash": "sha256-H8jMl/mvnV9vCFCvoXHjCnoiY/t0YT5Iy1I2RPqLbkg="
     },
     "HA_blueprints": {
       "type": "Git",
@@ -41,9 +41,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "5e5bafdf57d0dfb22a98c4be76ddc115a4129338",
-      "url": "https://github.com/SgtBatten/HA_blueprints/archive/5e5bafdf57d0dfb22a98c4be76ddc115a4129338.tar.gz",
-      "hash": "sha256-Yvkz+54x3y8yxQl20gVfSmzBfmc3lvXiIyNmsIOkxK4="
+      "revision": "a73f180de68e524cc0885adda64b853eaa8f4841",
+      "url": "https://github.com/SgtBatten/HA_blueprints/archive/a73f180de68e524cc0885adda64b853eaa8f4841.tar.gz",
+      "hash": "sha256-V9GAepgSKaGkTRWdheRvilGVFp8EWVYxGkAg77fx1bo="
     },
     "ModernX": {
       "type": "GitRelease",
@@ -124,9 +124,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "af8e660fd11584fed46240061025812cd731fdfb",
-      "url": "https://github.com/zzyil/comick.io-Downloader/archive/af8e660fd11584fed46240061025812cd731fdfb.tar.gz",
-      "hash": "sha256-r/enqdv5ypHp+b56aM8Ct98fZO1ptAugf/Wh5A8QHaM="
+      "revision": "4c5f9319eae8a81646db433d1de2861f0c993d39",
+      "url": "https://github.com/zzyil/comick.io-Downloader/archive/4c5f9319eae8a81646db433d1de2861f0c993d39.tar.gz",
+      "hash": "sha256-mjeCM6CyeknwVgmAweCv/Ej/8vBCHE8+Rb8xfC5ItCU="
     },
     "ctrld": {
       "type": "GitRelease",

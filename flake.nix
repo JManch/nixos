@@ -133,9 +133,6 @@
 
     mint.url = "github:trumank/mint";
 
-    direnv-instant.url = "github:Mic92/direnv-instant";
-    direnv-instant.inputs.nixpkgs.follows = "nixpkgs";
-
     broadcast-box.url = "github:JManch/broadcast-box/discord";
     broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
 

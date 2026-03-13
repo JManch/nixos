@@ -156,7 +156,7 @@
       };
 
       wgnord = {
-        enable = true;
+        enable = false;
         excludeSubnets = [ "192.168.89.2/32" ];
       };
 

@@ -105,7 +105,8 @@
 
     services = {
       udisks.enable = true;
-      wgnord.enable = true;
+      wgnord.enable = false;
+      air-vpn.enable = true;
       mosquitto.explorer.enable = true;
 
       wireguard = {

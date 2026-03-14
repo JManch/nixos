@@ -14,7 +14,6 @@ let
     ns
     mkIf
     getExe
-    getExe'
     genAttrs
     mapAttrs
     hasAttr
@@ -31,8 +30,13 @@ let
     mkEnableOption
     concatMapStrings
     ;
-  inherit (config.${ns}.system) virtualisation networking;
-  inherit (inputs.nix-resources.secrets) keys;
+  inherit (config.${ns}.system) virtualisation;
+  inherit (inputs.nix-resources.secrets)
+    keys
+    uniSSHHostname
+    uniUsername
+    uniSSHJumpHostname
+    ;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.core) home-manager;
 in
@@ -101,20 +105,18 @@ in
       + optionalString (username == "joshua") (
         ''
           Host uni
-            HostName ${inputs.nix-resources.secrets.uniSSHHostname}
-            User ${inputs.nix-resources.secrets.uniUsername}
+            HostName ${uniSSHHostname}
+            User ${uniUsername}
             # The server is misconfigured and doesn't advertise ed25519 cert support
             PubkeyAcceptedAlgorithms +ssh-ed25519-cert-v01@openssh.com
 
           Host uni-jump
-            HostName ${inputs.nix-resources.secrets.uniSSHJumpHostname}
-            User ${inputs.nix-resources.secrets.uniUsername}
+            HostName ${uniSSHJumpHostname}
+            User ${uniUsername}
             # Has the same issue
             PubkeyAcceptedAlgorithms +ssh-ed25519-cert-v01@openssh.com
 
-          Match originalhost uni exec ${pkgs.writeShellScript "check-ssid-not-eduroam" ''
-            ${getExe' pkgs.systemd "networkctl"} status "${networking.wireless.interface}" --json short | ${getExe pkgs.jaq} -r '.SSID' | ${getExe pkgs.gnugrep} -vq "eduroam"
-          ''}
+          Match originalhost uni exec "! ${getExe pkgs.netcat} -z -w 1 ${uniSSHHostname} 22"
             ProxyJump uni-jump
         ''
         + concatMapStrings (

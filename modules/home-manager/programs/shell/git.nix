@@ -13,7 +13,6 @@
       init.defaultBranch = "main";
       pull.rebase = true;
       rebase.autoStash = true;
-      gpg.format = "ssh";
       sendemail = {
         # Protonmail is bad for sending git patches so use gmail for this.
         # Remember to use correct email in commit author attribute.
@@ -29,6 +28,7 @@
     };
 
     signing = {
+      format = "ssh";
       key = "${config.home.homeDirectory}/.ssh/id_ed25519";
       signByDefault = true;
     };

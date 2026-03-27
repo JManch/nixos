@@ -41,9 +41,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "a73f180de68e524cc0885adda64b853eaa8f4841",
-      "url": "https://github.com/SgtBatten/HA_blueprints/archive/a73f180de68e524cc0885adda64b853eaa8f4841.tar.gz",
-      "hash": "sha256-V9GAepgSKaGkTRWdheRvilGVFp8EWVYxGkAg77fx1bo="
+      "revision": "d137fb1b1b46fc14d98fc6767d1e99556cad5829",
+      "url": "https://github.com/SgtBatten/HA_blueprints/archive/d137fb1b1b46fc14d98fc6767d1e99556cad5829.tar.gz",
+      "hash": "sha256-zdsyWEJw+dmgAsYeKoDraYrDvUkpN7hFFkBgFXS/j/k="
     },
     "ModernX": {
       "type": "GitRelease",
@@ -124,9 +124,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "4c5f9319eae8a81646db433d1de2861f0c993d39",
-      "url": "https://github.com/zzyil/comick.io-Downloader/archive/4c5f9319eae8a81646db433d1de2861f0c993d39.tar.gz",
-      "hash": "sha256-mjeCM6CyeknwVgmAweCv/Ej/8vBCHE8+Rb8xfC5ItCU="
+      "revision": "bb2f19808d2a12f7b46c1a89b79fe0bf1d0d5cec",
+      "url": "https://github.com/zzyil/comick.io-Downloader/archive/bb2f19808d2a12f7b46c1a89b79fe0bf1d0d5cec.tar.gz",
+      "hash": "sha256-Lm5WJCf6baBukSoaWM1zui/wnxwv8IVZ2n4fznoupwA="
     },
     "ctrld": {
       "type": "GitRelease",
@@ -182,9 +182,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "9f0c29638cd8bc5a4c245db6515b05e928f76c4e",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/9f0c29638cd8bc5a4c245db6515b05e928f76c4e.tar.gz",
-      "hash": "sha256-KoTgN9PS/8MaLKh30/UkdChJR6mGoHHC7Ba///AHY68="
+      "revision": "d7b50d6c973dc2de9ce6dd2ed26a83341600c8a2",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/d7b50d6c973dc2de9ce6dd2ed26a83341600c8a2.tar.gz",
+      "hash": "sha256-4gU/AaMC37BSZAyIG5/7e5KPp52uz6xGM7z2zJMtd+U="
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -197,10 +197,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v5.14.2",
-      "revision": "ebfe86dd5738e88a7cd4cf1c6b0ea45ccd016ab8",
-      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/refs/tags/v5.14.2",
-      "hash": "sha256-fgsYznTqJrEh4niyGfksnflRp1PpljrlzJBvs8gKn54="
+      "version": "v5.15.2",
+      "revision": "1884593403bab2ebefcdd0b57565966ad458e716",
+      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/refs/tags/v5.15.2",
+      "hash": "sha256-ynsdUER64LYoWKiVkBVX586w+ONU+SI5dppsgZv3iPk="
     },
     "hacs_waste_collection_schedule": {
       "type": "GitRelease",
@@ -393,9 +393,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "577cdcf97a34ca316d747428797e3abd0ed513bf",
-      "url": "https://github.com/dweymouth/supersonic/archive/577cdcf97a34ca316d747428797e3abd0ed513bf.tar.gz",
-      "hash": "sha256-T147FWhdE79SbRbWe6zd9zuRYokRZstwLpo9ls3+4HM="
+      "revision": "bb37bee16c9e7ecf01661a36ece12c41876ef78c",
+      "url": "https://github.com/dweymouth/supersonic/archive/bb37bee16c9e7ecf01661a36ece12c41876ef78c.tar.gz",
+      "hash": "sha256-iFdYkGC+GyZ+0GDfj2ofx89DWWMGh095z7YEm/6ZoU4="
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -485,10 +485,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.14.1",
-      "revision": "aeb3ef9360eda035b80e44baa2e74fb46fc691e3",
-      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/v0.14.1",
-      "hash": "sha256-RgyXdrJEiPXOHpnUUuu7UVNC+RE36WgyXuuDgA8H1EQ="
+      "version": "v0.14.2",
+      "revision": "e675f61c1fa1175b1295f9d2ed5338f73a2cb679",
+      "url": "https://api.github.com/repos/Vladimir-csp/xdg-terminal-exec/tarball/refs/tags/v0.14.2",
+      "hash": "sha256-dS0uvh9xGv5Sp8zd57Sb6VB1OAjgl5S9MQyHKmz6ae0="
     },
     "yt-dlp": {
       "type": "GitRelease",
@@ -501,10 +501,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2026.03.03",
-      "revision": "b8058cdf378cbbf60669b665dea146fb7dc90117",
-      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/refs/tags/2026.03.03",
-      "hash": "sha256-BPZzMT1IrZvgva/m5tYMaDYoUaP3VmpmcYeOUOwuoUY="
+      "version": "2026.03.17",
+      "revision": "7fd74d10097833ebce0cb162e0ccf7825de9b768",
+      "url": "https://api.github.com/repos/yt-dlp/yt-dlp/tarball/refs/tags/2026.03.17",
+      "hash": "sha256-A4LUCuKCjpVAOJ8jNoYaC3mRCiKH0/wtcsle0YfZyTA="
     }
   },
   "version": 7

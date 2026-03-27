@@ -144,8 +144,11 @@
       air-vpn.enable = true;
 
       ollama = {
-        enable = false; # open-webui build failure
-        openFirewall = true;
+        enable = true;
+        openWebUI = {
+          enable = false;
+          openFirewall = true;
+        };
       };
 
       jellyfin = {

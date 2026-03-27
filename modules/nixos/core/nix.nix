@@ -434,7 +434,7 @@ in
 
         # https://github.com/novnc/noVNC/issues/1946
         novnc =
-          assert (assertMsg (prev.novnc.version == "1.6.0") "novnc patch should be in stable now");
+          assert assertMsg (prev.novnc.version == "1.6.0") "novnc patch should be in stable now";
           addPatches prev.novnc [
             (final.fetchpatch2 {
               url = "https://github.com/novnc/noVNC/commit/f0a39cd357a5995673149b95951d4c1261b69571.patch";
@@ -451,6 +451,14 @@ in
         #   )
         #   navidrome
         #   ;
+
+        calibre-web =
+          assert assertMsg (
+            inputs.nixpkgs.rev == "46db2e09e1d3f113a13c0d7b81e2f221c63b8ce9"
+          ) "Remove calibre-web overlay";
+          prev.calibre-web.overrideAttrs (old: {
+            pythonRelaxDeps = old.pythonRelaxDeps ++ [ "wand" ];
+          });
       })
     ];
   };

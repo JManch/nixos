@@ -143,18 +143,23 @@ in
         assert lib.assertMsg (
           sources.hacs_waste_collection_schedule.version == "2.11.0"
         ) "Remove hacs waste collection schedule override ";
-        pkgs.home-assistant-custom-components.waste_collection_schedule.overrideAttrs (old: {
+        pkgs.buildHomeAssistantComponent {
           version = "0-unstable-2026-02-24";
           src = pkgs.fetchFromGitHub {
             owner = "mampfes";
             repo = "hacs_waste_collection_schedule";
-            rev = "e1116c79810b88e2f100a6e41ca987e42be91634";
-            hash = "sha256-oYSTCF58zbTh3s2S0sILvrnppibUsJeEJE6RjWXHCSw=";
+            rev = "27e4c494bec42910bd2fc4b12bfc67dab7a31434";
+            hash = "sha256-1Z5Gp+d1aBMJAt2meLJOWZVqjtoppPYWD75qlA9SdM4=";
           };
-          buildInputs = old.buildInputs ++ [ pkgs.python3Packages.pymupdf ];
-          # inherit (sources.hacs_waste_collection_schedule) version;
-          # src = sources.hacs_waste_collection_schedule;
-        })
+          owner = "mampfes";
+          domain = "waste_collection_schedule";
+          dependencies =
+            with pkgs;
+            home-assistant-custom-components.waste_collection_schedule.dependencies
+            ++ [
+              python314Packages.pymupdf
+            ];
+        }
       )
       (pkgs.home-assistant-custom-components.adaptive_lighting.overrideAttrs {
         inherit (sources.adaptive-lighting) version;

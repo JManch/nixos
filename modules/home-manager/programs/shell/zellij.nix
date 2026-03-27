@@ -370,6 +370,7 @@ in
 
       load_plugins {
       }
+
       web_client {
         font "monospace"
       }
@@ -395,6 +396,7 @@ in
       styled_underlines true
       stacked_resize true
       show_startup_tips false
+      focus_follows_mouse true
 
       themes {
         ${concatLines (

@@ -1,5 +1,5 @@
 diff --git a/src/main/index.ts b/src/main/index.ts
-index 711d3e20..66ce5144 100644
+index ec3aa87d..300f2b7e 100644
 --- a/src/main/index.ts
 +++ b/src/main/index.ts
 @@ -21,9 +21,11 @@ import {
@@ -15,7 +15,7 @@ index 711d3e20..66ce5144 100644
  
  import packageJson from '../../package.json';
  import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
-@@ -804,6 +806,45 @@ ipcMain.on(
+@@ -853,6 +855,45 @@ ipcMain.on(
      },
  );
  
@@ -62,10 +62,10 @@ index 711d3e20..66ce5144 100644
      if (powerSaveBlockerId !== null) {
          return powerSaveBlockerId;
 diff --git a/src/renderer/features/player/hooks/use-scrobble.ts b/src/renderer/features/player/hooks/use-scrobble.ts
-index 3601f3ea..81c3c1f8 100644
+index 2e16f67e..81c3c1f8 100644
 --- a/src/renderer/features/player/hooks/use-scrobble.ts
 +++ b/src/renderer/features/player/hooks/use-scrobble.ts
-@@ -216,14 +216,29 @@ export const useScrobble = () => {
+@@ -216,15 +216,21 @@ export const useScrobble = () => {
                      ) {
                          const artists =
                              currentSong.artists?.length > 0
@@ -73,11 +73,6 @@ index 3601f3ea..81c3c1f8 100644
 +                                ? currentSong.artists.map((artist) => artist.name).join(', ')
                                  : currentSong.artistName;
  
--                        new Notification(`${currentSong.name}`, {
--                            body: `${artists}\n${currentSong.album}`,
--                            icon: imageUrlRef.current || undefined,
--                            silent: true,
--                        });
 +                        const args = [
 +                            '--app-name=feishin',
 +                            '--urgency=low',
@@ -88,16 +83,13 @@ index 3601f3ea..81c3c1f8 100644
 +                            `${artists} – ${currentSong.album}`,
 +                        ];
 +
-+                        try {
+                         try {
+-                            new Notification(`${currentSong.name}`, {
+-                                body: `${artists}\n${currentSong.album}`,
+-                                icon: imageUrlRef.current || undefined,
+-                                silent: true,
+-                            });
 +                            window.electron.ipcRenderer.send('notify-send', args);
-+                        } catch (error) {
-+                            logFn.error('an error occurred while sending a desktop notification', {
-+                                category: LogCategory.SCROBBLE,
-+                                meta: {
-+                                    error: error as Error,
-+                                },
-+                            });
-+                        }
-                     }
-                 }, 1000);
-             }
+                         } catch (error) {
+                             logFn.error('an error occurred while sending a desktop notification', {
+                                 category: LogCategory.SCROBBLE,

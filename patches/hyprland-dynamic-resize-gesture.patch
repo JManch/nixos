@@ -1,13 +1,14 @@
-diff --git a/src/config/legacy/ConfigManager.cpp b/src/config/legacy/ConfigManager.cpp
-index 70a15754..780586be 100644
---- a/src/config/legacy/ConfigManager.cpp
-+++ b/src/config/legacy/ConfigManager.cpp
-@@ -2242,7 +2242,7 @@ std::optional<std::string> CConfigManager::handleGesture(const std::string& comm
+diff --git a/src/config/ConfigManager.cpp b/src/config/ConfigManager.cpp
+index cd5b0ec8..7a89f681 100644
+--- a/src/config/ConfigManager.cpp
++++ b/src/config/ConfigManager.cpp
+@@ -2944,7 +2944,8 @@ std::optional<std::string> CConfigManager::handleGesture(const std::string& comm
      else if (data[startDataIdx] == "workspace")
          result = g_pTrackpadGestures->addGesture(makeUnique<CWorkspaceSwipeGesture>(), fingerCount, direction, modMask, deltaScale, disableInhibit);
      else if (data[startDataIdx] == "resize")
 -        result = g_pTrackpadGestures->addGesture(makeUnique<CResizeTrackpadGesture>(), fingerCount, direction, modMask, deltaScale, disableInhibit);
-+        result = g_pTrackpadGestures->addGesture(makeUnique<CResizeTrackpadGesture>(std::string{data[startDataIdx + 2]}), fingerCount, direction, modMask, deltaScale, disableInhibit);
++        result =
++            g_pTrackpadGestures->addGesture(makeUnique<CResizeTrackpadGesture>(std::string{data[startDataIdx + 2]}), fingerCount, direction, modMask, deltaScale, disableInhibit);
      else if (data[startDataIdx] == "move")
          result = g_pTrackpadGestures->addGesture(makeUnique<CMoveTrackpadGesture>(), fingerCount, direction, modMask, deltaScale, disableInhibit);
      else if (data[startDataIdx] == "special")

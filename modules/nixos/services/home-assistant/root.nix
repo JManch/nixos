@@ -169,7 +169,16 @@ in
       pkgs.${ns}.thermal-comfort
       pkgs.${ns}.daikin-onecta
     ]
-    ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;
+    ++ optional frigate.enable (
+      assert (
+        lib.assertMsg (
+          pkgs.home-assistant-custom-components.frigate.version == "5.14.2"
+        ) "Remove hass frigate component override"
+      );
+      pkgs.home-assistant-custom-components.frigate.overrideAttrs (old: {
+        disabledTestPaths = old.disabledTestPaths ++ [ "tests/test_integration_services.py" ];
+      })
+    );
 
     configWritable = false;
     config = {

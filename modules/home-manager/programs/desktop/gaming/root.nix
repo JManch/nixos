@@ -13,7 +13,6 @@ let
     types
     concatStringsSep
     optional
-    optionals
     ;
   inherit (config.${ns}.desktop) hyprland;
   inherit (osConfig.${ns}.core.device) primaryMonitor;
@@ -91,13 +90,13 @@ in
           matchers.class = gameClassRegex;
           params = {
             workspace = namedWorkspaceIDs.GAME;
-            tag = "+game";
+            content = "game";
           };
         };
 
         "game-tearing" = mkIf hyprland.tearing {
           matchers = {
-            tag = "game*";
+            content = 3; # 3 is game
             class = "negative:${concatRegex cfg.tearingExcludedClasses}";
             title = "negative:${concatRegex cfg.tearingExcludedClasses}";
           };

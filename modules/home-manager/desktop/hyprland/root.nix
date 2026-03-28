@@ -1,7 +1,6 @@
 {
   lib,
   cfg,
-  args,
   pkgs,
   config,
 }:
@@ -18,7 +17,7 @@ let
     imap0
     listToAttrs
     ;
-  inherit (lib.${ns}) isHyprland flakePkgs;
+  inherit (lib.${ns}) isHyprland;
 in
 {
   noChildren = true;
@@ -63,10 +62,14 @@ in
     plugins = mkEnableOption "plugins";
     noGapsWhenOnly = mkEnableOption "no gaps when only";
     vrr = mkEnableOption "vrr";
-    directScanout = mkEnableOption ''
-      enable direct scanout. Direct scanout reduces input lag for fullscreen
-      applications however might cause graphical glitches.
-    '';
+
+    directScanout = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Whether to enable direct scanout with gamemode.
+      '';
+    };
 
     hyprcursor = {
       name = mkOption {

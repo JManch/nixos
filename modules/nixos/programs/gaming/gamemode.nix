@@ -201,6 +201,7 @@ in
           }; \
           ${killActiveRebind true}; \
           keyword decoration:blur:enabled false; \
+          keyword render:direct_scanout ${if hyprland.directScanout then "1" else "0"}; \
         "
       '';
 
@@ -209,6 +210,7 @@ in
           keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
           ${killActiveRebind false}; \
           keyword decoration:blur:enabled ${boolToString hyprland.blur}; \
+          keyword render:direct_scanout 0; \
         "
       '';
     };

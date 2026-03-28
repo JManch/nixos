@@ -15,8 +15,7 @@
       hyprland = {
         plugins = false;
         tearing = true;
-        # Causes artifacting https://github.com/hyprwm/Hyprland/issues/6994
-        directScanout = false;
+        directScanout = true;
         logging = false;
         hyprcursor.package = null;
       };

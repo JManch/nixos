@@ -432,7 +432,10 @@ in
 
       render = {
         new_render_scheduling = true;
-        direct_scanout = cfg.directScanout;
+        # We enable direct scanout when gamemode is active. Having it on all
+        # the time causes unwanted flickering when switching between fullscreen
+        # workspaces.
+        direct_scanout = false;
         expand_undersized_textures = false;
       };
 

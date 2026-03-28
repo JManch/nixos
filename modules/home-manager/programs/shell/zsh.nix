@@ -5,7 +5,7 @@
   osConfig,
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkIf singleton;
 in
 {
   enableOpt = false;
@@ -16,18 +16,11 @@ in
     enableCompletion = true;
     dotDir = "${config.xdg.configHome}/zsh";
 
-    plugins = [
-      {
-        name = "zsh-vi-mode";
-        file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
-        src = pkgs.zsh-vi-mode;
-      }
-      {
-        name = "zsh-completion-sync";
-        file = "share/zsh-completion-sync/zsh-completion-sync.plugin.zsh";
-        src = pkgs.zsh-completion-sync;
-      }
-    ];
+    plugins = singleton {
+      name = "zsh-vi-mode";
+      file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
+      src = pkgs.zsh-vi-mode;
+    };
 
     syntaxHighlighting = {
       enable = true;

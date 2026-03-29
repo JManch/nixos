@@ -561,11 +561,11 @@ in
     randomizedDelaySec = "2hours";
   };
 
-  systemd.services."nix-gc".serviceConfig.ConditionACPower = mkIf (device.type == "laptop") true;
+  systemd.services."nix-gc".unitConfig.ConditionACPower = mkIf (device.type == "laptop") true;
 
   systemd.services."nix-optimise" = {
     after = [ "nix-gc.service" ];
-    serviceConfig.ConditionACPower = mkIf (device.type == "laptop") true;
+    unitConfig.ConditionACPower = mkIf (device.type == "laptop") true;
   };
 
   systemd.services."nixos-upgrade" = mkIf cfg.autoUpgrade {
@@ -573,7 +573,7 @@ in
       "nix-optimise.service"
       "nix-gc.service"
     ];
-    serviceConfig.ConditionACPower = mkIf (device.type == "laptop") true;
+    unitConfig.ConditionACPower = mkIf (device.type == "laptop") true;
   };
 
   ns.services = mkIf cfg.autoUpgrade {

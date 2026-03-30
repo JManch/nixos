@@ -14,6 +14,7 @@ in
   # - Add non-steam game pointing to .local/share/Steam/steamapps/common/BeamNG.drive/BinLinux/BeamNG.drive.x64
   # - Set compatibilty tool to steam linux runtime 3.0
   categoryConfig = {
+    steamAppIDs."BeamNG.drive" = 284160;
     gameClasses = [ "BeamNG\\.drive\\.x64" ];
     # Disable tearing in both the steam and linux version as it causes flashing
     # in the UI

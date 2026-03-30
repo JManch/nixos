@@ -22,6 +22,14 @@ in
   conditions = [ "osConfigStrict.programs.gaming" ];
 
   opts = {
+    steamAppIDs = mkOption {
+      type = with types; attrsOf int;
+      default = { };
+      description = ''
+        Attribute set mapping Steam games to their IDs
+      '';
+    };
+
     gamemode.profiles = mkOption {
       type = types.attrsOf (
         types.submodule {

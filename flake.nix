@@ -133,6 +133,8 @@
 
     mint.url = "github:trumank/mint";
 
+    noita-entangled-worlds.url = "github:IntQuant/noita_entangled_worlds";
+
     broadcast-box.url = "github:JManch/broadcast-box/discord";
     broadcast-box.inputs.nixpkgs.follows = "nixpkgs";
 

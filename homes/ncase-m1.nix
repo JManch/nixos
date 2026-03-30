@@ -115,6 +115,7 @@
           mint.enable = false;
           osu.enable = true;
           beamng.enable = true;
+          noita.enable = true;
         };
       };
     };

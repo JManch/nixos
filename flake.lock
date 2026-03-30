@@ -1494,6 +1494,22 @@
     },
     "nixpkgs_4": {
       "locked": {
+        "lastModified": 1759070547,
+        "narHash": "sha256-JVZl8NaVRYb0+381nl7LvPE+A774/dRpif01FKLrYFQ=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "647e5c14cbd5067f44ac86b74f014962df460840",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_5": {
+      "locked": {
         "lastModified": 1774386573,
         "narHash": "sha256-4hAV26quOxdC6iyG7kYaZcM3VOskcPUrdCQd/nx8obc=",
         "owner": "nixos",
@@ -1546,14 +1562,34 @@
         "type": "gitlab"
       }
     },
+    "noita-entangled-worlds": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_4",
+        "rust-overlay": "rust-overlay_4",
+        "systems": "systems_10"
+      },
+      "locked": {
+        "lastModified": 1774205961,
+        "narHash": "sha256-FBtI04msHcdVx9zri3CFcARxifiDPefTg6p8nTsXPj4=",
+        "owner": "IntQuant",
+        "repo": "noita_entangled_worlds",
+        "rev": "5a5155b62c73a01f2307bbd385a6bd766be66b9c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "IntQuant",
+        "repo": "noita_entangled_worlds",
+        "type": "github"
+      }
+    },
     "nvf": {
       "inputs": {
         "flake-compat": "flake-compat_4",
         "flake-parts": "flake-parts",
         "mnw": "mnw",
         "ndg": [],
-        "nixpkgs": "nixpkgs_4",
-        "systems": "systems_10"
+        "nixpkgs": "nixpkgs_5",
+        "systems": "systems_11"
       },
       "locked": {
         "lastModified": 1774732893,
@@ -1651,6 +1687,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-xr": "nixpkgs-xr",
+        "noita-entangled-worlds": "noita-entangled-worlds",
         "nvf": "nvf",
         "vmInstall": "vmInstall",
         "vpn-confinement": "vpn-confinement",
@@ -1720,6 +1757,27 @@
         "type": "github"
       }
     },
+    "rust-overlay_4": {
+      "inputs": {
+        "nixpkgs": [
+          "noita-entangled-worlds",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1759199574,
+        "narHash": "sha256-w24RYly3VSVKp98rVfCI1nFYfQ0VoWmShtKPCbXgK6A=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "381776b12d0d125edd7c1930c2041a1471e586c0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
     "scss-reset": {
       "flake": false,
       "locked": {
@@ -1752,6 +1810,22 @@
       }
     },
     "systems_10": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_11": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",

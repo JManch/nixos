@@ -37,7 +37,10 @@ in
     # (mkKeymap "n" "<C-i>" "<C-i>zz" { desc = "Go to next marker and centre cursor"; })
 
     (mkKeymap "n" "<LEADER>v" "<CMD>vsplit<CR><C-l>" { desc = "Vertical split current buffer"; })
-    (mkKeymap "n" "<S-x>" "<CMD>Bwipeout<CR>" { desc = "Close current buffer"; })
+    (mkKeymap "n" "<S-x>" "MiniBufremove.wipeout" {
+      lua = true;
+      desc = "Close current buffer";
+    })
 
     (mkKeymap "n" "<LEADER>y" "\"+y" { desc = "Yank to system register"; })
     (mkKeymap "n" "<LEADER>Y" "\"+y$" { desc = "Yank till end of line to system register"; })

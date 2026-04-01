@@ -15,6 +15,7 @@
 
   vim = {
     mini.pairs.enable = true;
+    mini.bufremove.enable = true;
     visuals.fidget-nvim.enable = true;
     visuals.nvim-web-devicons.enable = true;
 

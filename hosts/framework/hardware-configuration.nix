@@ -2,7 +2,9 @@
 # - Userspace charge limiter has been broken since the 3.04 bios update https://github.com/tlvince/nixos-config/issues/309
 # - Front-right USB A adapter sometimes doesn't work https://community.frame.work/t/solved-usb-a-expansion-card-stops-working-until-unplugged/26579
 {
+  lib,
   pkgs,
+  config,
   inputs,
   modulesPath,
   ...
@@ -20,7 +22,7 @@
   hardware.framework.enableKmod = false;
 
   boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
+    kernelPackages = config.${lib.ns}.hardware.cachy-kernel.package "zen4";
 
     kernelModules = [ "kvm-amd" ];
 

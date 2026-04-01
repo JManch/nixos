@@ -47,6 +47,7 @@
 {
   lib,
   pkgs,
+  config,
   modulesPath,
   ...
 }:
@@ -85,10 +86,14 @@
     #   (import (fetchTree "github:NixOS/nixpkgs/2fad6eac6077f03fe109c4d4eb171cf96791faa4") {
     #     inherit (pkgs.stdenv.hostPlatform) system;
     #   }).linuxPackages_6_17;
-    kernelPackages = lib.mkForce pkgs.linuxPackages_6_19;
+
+    kernelPackages = lib.mkForce config.${lib.ns}.hardware.cachy-kernel.package "x86_64-v3";
+
+    zfs.package = lib.mkForce pkgs.zfs;
   };
 
-  programs.ryzen-monitor-ng.enable = true;
+  # Does not build with lto kernel
+  # programs.ryzen-monitor-ng.enable = true;
 
   system.stateVersion = "24.05";
 }

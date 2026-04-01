@@ -88,6 +88,8 @@
 
     # Inputs that provide packages
 
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+
     hyprland.url = "github:hyprwm/Hyprland/v0.54.3";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
 

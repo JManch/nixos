@@ -132,11 +132,12 @@ in
       io_read
       io_write
 
+      vulkan_driver
       fsr
       gamemode
       resolution
       refresh_rate
-      vulkan_driver
+      winesync
       histogram
 
       show_fps_limit

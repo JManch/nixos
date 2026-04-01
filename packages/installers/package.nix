@@ -27,7 +27,7 @@ let
               {
                 nixpkgs.hostPlatform = system;
                 nixpkgs.buildPlatform = "x86_64-linux";
-                nixpkgs.overlays = mkBefore [ (_: prev: { ${ns} = import ../../pkgs self lib prev; }) ];
+                nixpkgs.overlays = mkBefore [ (_: prev: { ${ns} = import ../../packages self lib prev; }) ];
               }
               (modules.importApply ../../hosts/installer { })
               extraConfig

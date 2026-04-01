@@ -49,7 +49,7 @@ let
       packagesFromDirectoryRecursive {
         inherit newScope;
         inherit (scopeFinal) callPackage; # use the `callPackage` we defined for the scope
-        directory = ../pkgs;
+        directory = ../packages;
       }
     );
 in

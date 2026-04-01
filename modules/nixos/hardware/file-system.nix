@@ -71,7 +71,6 @@ in
       ext4.trim = removeAttrs (mkEnableOption "ext4 automatic trimming") [ "default" ];
 
       zfs = {
-        unstable = mkEnableOption "unstable ZFS";
         trim = removeAttrs (mkEnableOption "ZFS automatic trimming") [ "default" ];
 
         encryption = {
@@ -216,9 +215,9 @@ in
       # for hardware support it should be overriden in their hardware
       # configuration.
       kernelPackages = pkgs.linuxPackages;
+      zfs.package = pkgs.zfs;
 
       supportedFilesystems.zfs = true;
-      zfs.package = mkIf cfg.zfs.unstable pkgs.zfs_unstable;
 
       # Set zfs devNodes to "/dev/disk/by-path" for VM installs to fix zpool
       # import failure. Make sure the disks in disko have VM install overrides

@@ -27,10 +27,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v3.9.1",
-      "revision": "25da2b2e912e681be800dac9cc55e33abe936cab",
+      "version": "v3.9.2",
+      "revision": "d45a80216061438384c3d1303e057470a623fa7c",
       "url": null,
-      "hash": "sha256-H8jMl/mvnV9vCFCvoXHjCnoiY/t0YT5Iy1I2RPqLbkg="
+      "hash": "sha256-NreSUqqtL0uJY/VJ24sXZhZC5KqpYZVyvvGmh2kGyFc="
     },
     "HA_blueprints": {
       "type": "Git",

@@ -57,6 +57,9 @@ stdenv.mkDerivation (finalAttrs: {
     lua5_3
   ];
 
+  # Fix build with gcc 15
+  env.NIX_CFLAGS_COMPILE = "-Wno-error=template-body";
+
   enableParallelBuilding = true;
 
   installPhase = ''
@@ -69,6 +72,5 @@ stdenv.mkDerivation (finalAttrs: {
     license = [ lib.licenses.agpl3Only ];
     maintainers = with lib.maintainers; [ JManch ];
     mainProgram = "BeamMP-Server";
-    broken = true;
   };
 })

@@ -50,7 +50,10 @@ in
     (mkKeymap "n" "<LEADER>o" "o<ESC>" { desc = "Create new line below"; })
     (mkKeymap "n" "<LEADER>O" "O<ESC>" { desc = "Create new line above"; })
 
-    (mkKeymap "n" "<LEADER>c" "<CMD>nohl<CR>" { desc = "Clear search highlighting"; })
+    # Redraw status so that heirline search component immediately clears
+    (mkKeymap "n" "<LEADER>c" "<CMD>nohl<CR><CMD>redrawstatus<CR>" {
+      desc = "Clear search highlighting";
+    })
     (mkKeymap "n" "<LEADER>n" "<CMD>ToggleCMDHeight<CR>" { desc = "Toggle cmdheight"; })
 
     (mkKeymap "n" "die" "diwx" { desc = "Extended deleted inner word"; })

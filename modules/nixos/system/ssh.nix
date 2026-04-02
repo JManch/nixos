@@ -29,6 +29,7 @@ let
     singleton
     mkEnableOption
     concatMapStrings
+    concatStringsSep
     ;
   inherit (config.${ns}.system) virtualisation;
   inherit (inputs.nix-resources.secrets)
@@ -39,6 +40,12 @@ let
     ;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.core) home-manager;
+
+  # Session variables shared over SSH between personal hosts
+  sharedVariables = [
+    "ZELLIJ" # to avoid nested zellij sessions
+    "DARKMAN_THEME" # so ssh sessions can match local light/dark theme
+  ];
 in
 {
   enableOpt = false;
@@ -69,10 +76,7 @@ in
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
-      AcceptEnv = [
-        "DARKMAN_THEME"
-        "ZELLIJ"
-      ];
+      AcceptEnv = sharedVariables;
       AllowUsers = [
         "root"
         adminUsername
@@ -134,7 +138,7 @@ in
             Host ${host}*
               User joshua
               ForwardAgent ${if elem host forwardAgentHosts then "Yes" else "No"}
-              SendEnv DARKMAN_THEME
+              SendEnv ${concatStringsSep " " sharedVariables}
           ''
         ) (attrNames self.nixosConfigurations)
       );

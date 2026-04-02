@@ -37,6 +37,7 @@ let
     uniSSHHostname
     uniUsername
     uniSSHJumpHostname
+    uniAddressRange
     ;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.core) home-manager;
@@ -123,7 +124,7 @@ in
             # Has the same issue
             PubkeyAcceptedAlgorithms +ssh-ed25519-cert-v01@openssh.com
 
-          Match originalhost uni exec "! ${getExe pkgs.netcat} -z -w 1 ${uniSSHHostname} 22"
+          Match originalhost uni exec "${getExe pkgs.curl} -s ifconfig.me | ${getExe pkgs.grepcidr} -v ${uniAddressRange} >/dev/null"
             ProxyJump uni-jump
         ''
         + concatMapStrings (

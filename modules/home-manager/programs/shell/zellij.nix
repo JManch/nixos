@@ -573,6 +573,26 @@ in
         }
       }
 
+      swap_tiled_layout name="horizontal" {
+        ui max_panes=3 {
+          pane
+          pane
+        }
+        ui max_panes=7 {
+          pane {
+            pane split_direction="vertical" { children; }
+            pane split_direction="vertical" { pane; pane; pane; pane; }
+          }
+        }
+        ui max_panes=11 {
+          pane {
+            pane split_direction="vertical" { children; }
+            pane split_direction="vertical" { pane; pane; pane; pane; }
+            pane split_direction="vertical" { pane; pane; pane; pane; }
+          }
+        }
+      }
+
       swap_tiled_layout name="vertical" {
         ui max_panes=4 {
           pane split_direction="vertical" {
@@ -591,26 +611,6 @@ in
             pane { children; }
             pane { pane; pane; pane; pane; }
             pane { pane; pane; pane; pane; }
-          }
-        }
-      }
-
-      swap_tiled_layout name="horizontal" {
-        ui max_panes=3 {
-          pane
-          pane
-        }
-        ui max_panes=7 {
-          pane {
-            pane split_direction="vertical" { children; }
-            pane split_direction="vertical" { pane; pane; pane; pane; }
-          }
-        }
-        ui max_panes=11 {
-          pane {
-            pane split_direction="vertical" { children; }
-            pane split_direction="vertical" { pane; pane; pane; pane; }
-            pane split_direction="vertical" { pane; pane; pane; pane; }
           }
         }
       }

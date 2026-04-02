@@ -1,24 +1,31 @@
 diff --git a/lua/ayu/colors.lua b/lua/ayu/colors.lua
-index a152737..9b5d275 100644
+index a152737..306734e 100644
 --- a/lua/ayu/colors.lua
 +++ b/lua/ayu/colors.lua
-@@ -12,8 +12,8 @@ function colors.generate(mirage)
+@@ -12,7 +12,7 @@ function colors.generate(mirage)
    if vim.o.background == 'dark' then
      if mirage then
        colors.accent = '#FFCC66'
 -      colors.bg = '#1F2430'
-       colors.fg = '#CCCAC2'
 +      colors.bg = '#171B24'
+       colors.fg = '#CCCAC2'
        colors.ui = '#707A8C'
  
-       colors.tag = '#5CCFE6'
-@@ -95,8 +95,8 @@ function colors.generate(mirage)
+@@ -30,7 +30,7 @@ function colors.generate(mirage)
+       colors.error = '#FF6666'
+       colors.lsp_parameter = '#D3B8F9'
+ 
+-      colors.line = '#171B24'
++      colors.line = '#1F2430'
+       colors.panel_bg = '#1C212B'
+       colors.panel_shadow = '#161922'
+       colors.panel_border = '#101521'
+@@ -95,7 +95,7 @@ function colors.generate(mirage)
      end
    else
      colors.accent = '#FFAA33'
 -    colors.bg = '#F8F9FA'
-     colors.fg = '#5C6166'
 +    colors.bg = '#F3F4F5'
+     colors.fg = '#5C6166'
      colors.ui = '#8A9199'
  
-     colors.tag = '#55B4D4'

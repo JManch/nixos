@@ -514,8 +514,7 @@ in
             username;
         substituters = [
           "https://nix-community.cachix.org"
-          "https://nix-on-droid.cachix.org"
-
+          # "https://nix-on-droid.cachix.org"
         ]
         ++ (
           assert lib.assertMsg (pkgs.lan-mouse.version == "0.10.0") "Remove lan-mouse substituter";

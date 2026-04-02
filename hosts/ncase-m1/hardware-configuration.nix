@@ -87,7 +87,7 @@
     #     inherit (pkgs.stdenv.hostPlatform) system;
     #   }).linuxPackages_6_17;
 
-    kernelPackages = lib.mkForce config.${lib.ns}.hardware.cachy-kernel.package "x86_64-v3";
+    kernelPackages = lib.mkForce (config.${lib.ns}.hardware.cachy-kernel.package "x86_64-v3");
 
     zfs.package = lib.mkForce pkgs.zfs;
   };

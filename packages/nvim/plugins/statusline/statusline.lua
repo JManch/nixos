@@ -1,5 +1,3 @@
--- TODO:
--- Fix searchcount update when clearing search
 local setup_colors = function() return require("ayu.colors") end
 local conditions = require("heirline.conditions")
 local utils = require("heirline.utils")
@@ -12,6 +10,23 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 })
 
 local left_char_count = {}
+
+-- All components on the left side of the bar needs to use `count_condition`
+-- and `count_provider` so we can calculate padding to center the filename
+
+local count_condition = function(names, condition)
+  return function(self)
+    local result = condition(self)
+    if not result then
+      if type(names) == "string" then
+        left_char_count[names] = 0
+      else
+        for _, v in pairs(names) do left_char_count[v] = 0 end
+      end
+    end
+    return result
+  end
+end
 
 local count_provider = function(name, provider)
   return function(self)
@@ -26,20 +41,6 @@ local count_provider = function(name, provider)
       left_char_count[name] = 0
     else
       left_char_count[name] = utils.count_chars(result)
-    end
-    return result
-  end
-end
-
-local count_condition = function(names, condition)
-  return function(self)
-    local result = condition(self)
-    if not result then
-      if type(names) == "string" then
-        left_char_count[names] = 0
-      else
-        for _, v in pairs(names) do left_char_count[v] = 0 end
-      end
     end
     return result
   end
@@ -135,6 +136,16 @@ local git = {
     end),
     hl = {fg = "vcs_modified"}
   }
+}
+
+local macro_rec = {
+  condition = count_condition("macro_rec", function() return vim.fn.reg_recording() ~= "" end),
+  hl = { fg = "vcs_added" },
+  provider = count_provider("macro_rec", function() return " recording @" .. vim.fn.reg_recording() end),
+  update = {
+    "RecordingEnter",
+    "RecordingLeave",
+   }
 }
 
 local filename_block = {
@@ -272,6 +283,7 @@ local statusline = {
     end
   },
   mode,
+  macro_rec,
   git,
   filename_block,
   {provider = "%="},

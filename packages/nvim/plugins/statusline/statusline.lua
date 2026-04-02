@@ -140,7 +140,7 @@ local git = {
 
 local macro_rec = {
   condition = count_condition("macro_rec", function() return vim.fn.reg_recording() ~= "" end),
-  hl = { fg = "vcs_added" },
+  hl = { fg = "string" },
   provider = count_provider("macro_rec", function() return " recording @" .. vim.fn.reg_recording() end),
   update = {
     "RecordingEnter",

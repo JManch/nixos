@@ -69,7 +69,10 @@ in
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
-      AcceptEnv = [ "DARKMAN_THEME" ];
+      AcceptEnv = [
+        "DARKMAN_THEME"
+        "ZELLIJ"
+      ];
       AllowUsers = [
         "root"
         adminUsername

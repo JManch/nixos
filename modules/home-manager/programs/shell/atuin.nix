@@ -65,7 +65,7 @@ in
   programs.zsh.initContent = # bash
     ''
       if [[ $options[zle] = on ]]; then
-        eval "$(${lib.getExe pkgs.atuin} init zsh --disable-up-arrow)"
+        eval "$(${lib.getExe pkgs.atuin} init zsh --disable-up-arrow --disable-ai)"
       fi
 
       # Disable zsh history

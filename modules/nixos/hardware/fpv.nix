@@ -17,7 +17,7 @@ in
       assert lib.assertMsg (
         pkgs.edgetx.version == "2.11.3"
       ) "Remove edgetx override if 2.12 has released";
-      pkgs.${ns}.edgetx-unstable
+      pkgs.${ns}.edgetx
     )
     pkgs.${ns}.expresslrs-configurator
     (pkgs.makeDesktopItem {

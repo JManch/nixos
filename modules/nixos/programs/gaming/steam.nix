@@ -139,7 +139,8 @@ in
         ];
 
         tearingExcludedClasses = [
-          "rdr2\\.exe"
+          "teardown\\.exe"
+          "rdr2\\.exe" # half v-sync without tearing is preferable
           "factorio"
         ];
       };

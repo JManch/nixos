@@ -68,10 +68,7 @@
     })
   ];
 
-  categoryConfig = {
-    steamAppIDs."Noita" = 881100;
-    tearingExcludedClasses = [ "steam_app_881100" ]; # tearing lags cursor
-  };
+  categoryConfig.tearingExcludedClasses = [ "noita\\.exe" ]; # tearing lags cursor
 
   ns.backups."noita" = {
     backend = "restic";

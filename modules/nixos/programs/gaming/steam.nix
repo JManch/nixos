@@ -9,14 +9,11 @@ let
     ns
     mkIf
     getExe
-    mapAttrs'
-    nameValuePair
     singleton
     mkEnableOption
     ;
   inherit (config.${ns}.core) home-manager;
   inherit (config.${ns}.core) device;
-  inherit (config.${ns}.hm.xdg) dataHome;
 in
 {
   # WARN: If steam fails to launch with "couldn't setup Steam data" on a fresh
@@ -52,12 +49,21 @@ in
   # 3 after content manager has already launched. I suspect it's a hyprland bug
   # but needs further investigation.
 
+  # Liftoff and Liftoff: Micro Drones
+  # It's important to disable steam input otherwise our TX15 gets detected as
+  # an xbox 360 controller and gets deadzones
+
   opts.lanTransfer = mkEnableOption "opening port for Steam LAN game transfer";
 
   ns.userPackages = [ pkgs.steam-run ];
 
   programs.steam = {
     enable = true;
+    package = pkgs.steam.override {
+      # Prefer wayland as clients automatically have their content type set to
+      # "game" for our game-specific workspace and window rules
+      extraEnv.PROTON_ENABLE_WAYLAND = 1;
+    };
     protontricks.enable = true;
     extraCompatPackages = [ pkgs.proton-ge-bin ];
   };
@@ -128,34 +134,14 @@ in
   ns.hm = mkIf home-manager.enable {
     ${ns} = {
       programs.desktop.gaming = {
-        steamAppIDs = {
-          "Red Dead Redemption 2" = 1174180;
-          "Deep Rock Galactic" = 548430;
-          "No Man's Sky" = 275850;
-          iRacing = 266410;
-          BONELAB = 1592190;
-          # WARN: For these games it's important to disable steam input otherwise our
-          # TX15 gets detected as an xbox 360 controller and gets deadzones
-          Liftoff = 410340;
-          "Liftoff: Micro Drones" = 1432320;
-        };
-
         gameClasses = [
-          "steam_app_.*"
-          "cs2"
-          "factorio"
-          "hl2_linux"
-          "discovery\\.exe" # the finals
-          "STRAFTAT\\.x86_64"
-          "Liftoff\\.x86_64"
-          "Liftoff Micro Drones\\.x86_64"
+          "steam_app_.*" # x11 proton games do not automatically get assigned the "game" content type
         ];
 
-        tearingExcludedClasses =
-          map (game: "steam_app_" + toString config.${ns}.hmNs.programs.desktop.gaming.steamAppIDs.${game}) [
-            "Red Dead Redemption 2" # half-vsync without tearing is preferrable
-          ]
-          ++ [ "factorio" ];
+        tearingExcludedClasses = [
+          "rdr2\\.exe"
+          "factorio"
+        ];
       };
 
       desktop.hyprland.windowRules = {
@@ -195,15 +181,5 @@ in
       @nClientDownloadEnableHTTP2PlatformLinux 0
       unShaderBackgroundProcessingThreads ${toString device.cpu.threads}
     '';
-
-    # Create compatdata symlinks to make finding proton prefixes easier
-    xdg.dataFile = mapAttrs' (
-      gameName: appID:
-      nameValuePair "Steam/steamapps/compatdata/${gameName}" {
-        source =
-          config.${ns}.hm.lib.file.mkOutOfStoreSymlink
-            "${dataHome}/Steam/steamapps/compatdata/${toString appID}";
-      }
-    ) config.${ns}.hmNs.programs.desktop.gaming.steamAppIDs;
   };
 }

@@ -22,14 +22,6 @@ in
   conditions = [ "osConfigStrict.programs.gaming" ];
 
   opts = {
-    steamAppIDs = mkOption {
-      type = with types; attrsOf int;
-      default = { };
-      description = ''
-        Attribute set mapping Steam games to their IDs
-      '';
-    };
-
     gamemode.profiles = mkOption {
       type = types.attrsOf (
         types.submodule {
@@ -59,9 +51,13 @@ in
       type = with types; listOf str;
       default = [ ];
       description = ''
-        List of game window classes that will be automatically moved to the
+        List of X11 game window classes that will be automatically moved to the
         gaming workspace and have tearing enabled. To exclude a game from
         tearing add it to tearingExcludedClasses or tearingExcludedTitles.
+
+        Should only be used for games that do NOT support proton wayland as
+        these clients do not get automatically assigned the "game" content
+        type.
       '';
     };
 
@@ -94,12 +90,17 @@ in
       namedWorkspaces.GAME = "monitor:${primaryMonitor.name}";
 
       windowRules = {
-        "game" = {
+        "x11-game-workspace" = {
           matchers.class = gameClassRegex;
           params = {
             workspace = namedWorkspaceIDs.GAME;
             content = "game";
           };
+        };
+
+        "game-workspace" = {
+          matchers.content = 3;
+          params.workspace = namedWorkspaceIDs.GAME;
         };
 
         "game-tearing" = mkIf hyprland.tearing {

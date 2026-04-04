@@ -51,13 +51,13 @@ in
       type = with types; listOf str;
       default = [ ];
       description = ''
-        List of X11 game window classes that will be automatically moved to the
+        List of game window classes that will be automatically moved to the
         gaming workspace and have tearing enabled. To exclude a game from
         tearing add it to tearingExcludedClasses or tearingExcludedTitles.
 
-        Should only be used for games that do NOT support proton wayland as
-        these clients do not get automatically assigned the "game" content
-        type.
+        Should only be used for native games or games that do NOT support
+        proton wayland as these clients do not get automatically assigned the
+        "game" content type.
       '';
     };
 

@@ -135,7 +135,8 @@ in
     ${ns} = {
       programs.desktop.gaming = {
         gameClasses = [
-          "steam_app_.*" # x11 proton games do not automatically get assigned the "game" content type
+          "steam_app_.*" # xwayland proton games do not automatically get assigned the "game" content type
+          "factorio"
         ];
 
         tearingExcludedClasses = [

@@ -40,7 +40,7 @@ let
     uniAddressRange
     ;
   inherit (config.${ns}.system) desktop;
-  inherit (config.${ns}.core) home-manager;
+  inherit (config.${ns}.core) home-manager nix;
 
   # Session variables shared over SSH between personal hosts
   sharedVariables = [
@@ -81,7 +81,8 @@ in
       AllowUsers = [
         "root"
         adminUsername
-      ];
+      ]
+      ++ optional (nix.builder.enable && nix.builder.shareStore) "nix-ssh";
     };
 
     hostKeys = singleton {

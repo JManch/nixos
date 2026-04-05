@@ -534,7 +534,8 @@ in
             # Home manager user needs access to the nix daemon for some reason
             # https://github.com/nix-community/home-manager/issues/5704
             # https://github.com/nix-community/home-manager/issues/4014
-            username;
+            username
+        ++ optional (cfg.builder.enable && cfg.builder.shareStore) "nix-ssh";
 
         substituters = [
           "https://nix-community.cachix.org"

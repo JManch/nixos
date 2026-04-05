@@ -1,5 +1,5 @@
 diff --git a/src/auth/Fingerprint.cpp b/src/auth/Fingerprint.cpp
-index db4bba7..f24364d 100644
+index 780c079..5e9b73b 100644
 --- a/src/auth/Fingerprint.cpp
 +++ b/src/auth/Fingerprint.cpp
 @@ -92,7 +92,7 @@ std::optional<std::string> CFingerprint::getLastPrompt() {
@@ -11,7 +11,7 @@ index db4bba7..f24364d 100644
  }
  
  void CFingerprint::terminate() {
-@@ -131,8 +131,10 @@ bool CFingerprint::createDeviceProxy() {
+@@ -133,8 +133,10 @@ bool CFingerprint::createDeviceProxy() {
                  bool       isPresent      = presentVariant.get<bool>();
                  if (!isPresent)
                      return;
@@ -23,7 +23,7 @@ index db4bba7..f24364d 100644
              } catch (std::out_of_range& e) {}
          });
  
-@@ -193,6 +195,8 @@ void CFingerprint::handleVerifyStatus(const std::string& result, bool done) {
+@@ -195,6 +197,8 @@ void CFingerprint::handleVerifyStatus(const std::string& result, bool done) {
              break;
      }
  
@@ -45,15 +45,15 @@ index 404a5ca..93a3b09 100644
  
      std::string m_sFingerprintReady;
 diff --git a/src/renderer/widgets/PasswordInputField.cpp b/src/renderer/widgets/PasswordInputField.cpp
-index e7f63ee..411292c 100644
+index 67f05b4..b0314b6 100644
 --- a/src/renderer/widgets/PasswordInputField.cpp
 +++ b/src/renderer/widgets/PasswordInputField.cpp
-@@ -299,7 +299,7 @@ bool CPasswordInputField::draw(const SRenderData& data) {
-         }
-     }
+@@ -302,7 +302,7 @@ bool CPasswordInputField::draw(const SRenderData& data) {
  
--    if (passwordLength == 0 && !checkWaiting && placeholder.resourceID > 0) {
-+    if (passwordLength == 0 && (!checkWaiting || g_pAuth->getImpl(AUTH_IMPL_FINGERPRINT)->checkWaiting()) && placeholder.resourceID > 0) {
+     bool placeholderPasswordCondition = (passwordLength == 0 && placeholder.resourceID > 0);
+ 
+-    if (placeholderPasswordCondition && (!checkWaiting || (checkWaiting && !configCheckText.empty()))) {
++    if (placeholderPasswordCondition && (!checkWaiting || g_pAuth->getImpl(AUTH_IMPL_FINGERPRINT)->checkWaiting() ||  (checkWaiting && !configCheckText.empty()))) {
          ASP<CTexture> currAsset = nullptr;
  
          if (!placeholder.asset)

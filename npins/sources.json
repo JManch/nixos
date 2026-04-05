@@ -300,19 +300,6 @@
       "url": "https://files.pythonhosted.org/packages/8b/16/af8642c21fe276938b4fa7f7264f358ae12b41c9a1f7a3a49dd51b431e37/neohubapi-3.1.tar.gz",
       "hash": "sha256-5UcWaxCLchmZP1axvs3HS9BJwWoH7V9Y6qeZ9OpC6Hw="
     },
-    "neovim-config": {
-      "type": "Git",
-      "repository": {
-        "type": "GitHub",
-        "owner": "JManch",
-        "repo": "nvim"
-      },
-      "branch": "main",
-      "submodules": false,
-      "revision": "558f11f9d85a40f2ad43a4a5a86f7f5af8eda2c5",
-      "url": "https://github.com/JManch/nvim/archive/558f11f9d85a40f2ad43a4a5a86f7f5af8eda2c5.tar.gz",
-      "hash": "sha256-3vZ0V+SWpOX9jtKd55N1ZwABnGADsv92I2lJ43c2DtA="
-    },
     "qobuz-dl": {
       "type": "PyPi",
       "name": "qobuz-dl",

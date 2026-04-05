@@ -16,17 +16,17 @@ in
 {
   asserts = [
     (lib.all (monitor: monitor.scale == 1) monitors)
-    "swww doesn't work for monitors with scale != 1 as it requires `swww img` to be called twice for the wallpaper to set after boot"
+    "awww doesn't work for monitors with scale != 1 as it requires `awww img` to be called twice for the wallpaper to set after boot"
   ];
 
   categoryConfig.wallpaper = {
-    wallpaperUnit = "swww.service";
-    setWallpaperScript = "${getExe pkgs.swww} img ${transition} \"$1\"";
+    wallpaperUnit = "awww.service";
+    setWallpaperScript = "${getExe pkgs.awww} img ${transition} \"$1\"";
   };
 
-  systemd.user.services.swww = {
+  systemd.user.services.awww = {
     Unit = {
-      Description = "Swww Wallpaper Daemon";
+      Description = "Awww Wallpaper Daemon";
       Before = [ "set-wallpaper.service" ];
       PartOf = [ "graphical-session.target" ];
       Requisite = [ "graphical-session.target" ];
@@ -35,7 +35,7 @@ in
 
     Service = {
       Slice = "background${lib.${ns}.sliceSuffix osConfig}.slice";
-      ExecStart = "${getExe' pkgs.swww "swww-daemon"} --quiet --no-cache";
+      ExecStart = "${getExe' pkgs.awww "awww-daemon"} --quiet --no-cache";
     };
 
     Install.WantedBy = [ "graphical-session.target" ];

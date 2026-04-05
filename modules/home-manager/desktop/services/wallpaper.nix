@@ -170,7 +170,7 @@ in
 
       wallpaperUnit = mkOption {
         type = types.str;
-        example = "swww.service";
+        example = "awww.service";
         description = ''
           Unit of the wallpaper managager.
         '';

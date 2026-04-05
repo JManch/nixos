@@ -71,7 +71,7 @@ let
       if ! hyprctl monitors all -j | jaq -e 'first(.[] | select((.name == "'"$monitor_name"'") and (.disabled == false)))' &>/dev/null; then
         hyprctl keyword monitor "''${monitor_name_to_cfg[$monitor_name]}" > /dev/null
         echo "Enabled monitor $monitor_name"
-        # Some wallpapers programs such as swww do not reload the wallpaper for
+        # Some wallpapers programs such as awww do not reload the wallpaper for
         # toggled monitors. Also if scaling changes then the wallpaper is often
         # broken and needs to be reset
         ${optionalString wallpaper.enable "systemctl start --user set-wallpaper || true"}

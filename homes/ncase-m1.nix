@@ -31,7 +31,7 @@
         dunst.enable = true;
         hypridle.enable = true;
         wayvnc.enable = true;
-        swww.enable = true;
+        awww.enable = true;
         hyprsunset.enable = true;
 
         lan-mouse = {

@@ -18,8 +18,15 @@
   networking.hostId = "549d3e08";
   hardware.cpu.amd.updateMicrocode = true;
 
-  # As of kernel 6.13 the framework kmod isn't necessary
-  hardware.framework.enableKmod = false;
+  hardware.framework = {
+    # As of kernel 6.13 the framework kmod isn't necessary
+    enableKmod = false;
+    laptop13.audioEnhancement = {
+      enable = true;
+      hideRawDevice = false;
+      rawDeviceName = "alsa_output.pci-0000_c1_00.6.analog-stereo";
+    };
+  };
 
   boot = {
     kernelPackages = config.${lib.ns}.hardware.cachy-kernel.package "zen4";

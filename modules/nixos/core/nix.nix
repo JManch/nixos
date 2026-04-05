@@ -25,6 +25,9 @@ let
     mapAttrsToList
     sort
     optionalString
+    concatMap
+    attrNames
+    boolToString
     attrValues
     mkForce
     singleton
@@ -35,6 +38,8 @@ let
   inherit (lib.${ns})
     addPatches
     flakePkgs
+    hostIps
+    hostVPNIp
     ;
   inherit (inputs.nix-resources.secrets) keys;
   inherit (config.${ns}.system) impermanence;
@@ -88,7 +93,7 @@ let
             fi
             hostname=$1
 
-            droid_hosts=(${concatStringsSep " " (builtins.attrNames self.nixOnDroidConfigurations)})
+            droid_hosts=(${concatStringsSep " " (attrNames self.nixOnDroidConfigurations)})
             for host in "''${droid_hosts[@]}"; do
               if [[ $host = "$hostname" ]]; then
                 match=1
@@ -148,7 +153,7 @@ let
             exit 1
           fi
 
-          hosts=(${concatStringsSep " " (builtins.attrNames self.nixosConfigurations)})
+          hosts=(${concatStringsSep " " (attrNames self.nixosConfigurations)})
           match=0
           for host in "''${hosts[@]}"; do
             if [[ $host = "$hostname" ]]; then
@@ -360,6 +365,14 @@ in
         description = "Whether this host is a high-performance nix builder";
       };
 
+      shareStore = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether to share this host's Nix store over SSH. All others hosts will have this host added as a substituter.
+        '';
+      };
+
       emulatedSystems = mkOption {
         type = with types; listOf str;
         default = [ ];
@@ -484,6 +497,16 @@ in
       # like how <nixpkgs> can be referenced.
       nixPath = mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
 
+      # https://nix.dev/manual/nix/2.26/package-management/ssh-substituter
+      sshServe = mkIf cfg.builder.shareStore {
+        enable = true;
+        trusted = false;
+        protocol = "ssh-ng";
+        # The nix-ssh user is only capable of running `nix serve` and ssh substituters
+        # do not support passphrase encrypted keys so just use host keys
+        keys = [ keys.ssh-host.framework ]; # should really be attrValues keys.ssh-host; but don't need that right now
+      };
+
       settings = {
         experimental-features = [
           "flakes"
@@ -512,6 +535,7 @@ in
             # https://github.com/nix-community/home-manager/issues/5704
             # https://github.com/nix-community/home-manager/issues/4014
             username;
+
         substituters = [
           "https://nix-community.cachix.org"
           # "https://nix-on-droid.cachix.org"
@@ -519,10 +543,27 @@ in
         ++ (
           assert lib.assertMsg (pkgs.lan-mouse.version == "0.10.0") "Remove lan-mouse substituter";
           [ "https://lan-mouse.cachix.org/" ]
-        );
+        )
+        ++ (concatMap (
+          host:
+          let
+            builderConfig = self.nixosConfigurations.${host}.config.${ns}.core.nix.builder;
+          in
+          optionals (host != hostname && builderConfig.enable && builderConfig.shareStore) (
+            # Give this substituter low priority and compress on VPN connections because upload speed will likely be slow
+            map (
+              ip:
+              "ssh-ng://nix-ssh@${ip}?compress=${
+                boolToString (ip == hostVPNIp host)
+              }&priority=100&ssh-key=/etc/ssh/ssh_host_ed25519_key&base64-ssh-public-host-key=${keys.base64-ssh-host.${host}}"
+            ) (hostIps host)
+          )
+        ) (attrNames self.nixosConfigurations));
+
         # We need to sign our store contents for reliable `nix copy` usage
         # https://github.com/NixOS/nix/issues/2127
         secret-key-files = mkIf cfg.builder.enable [ "/etc/nix/nix_store_ed25519_key" ];
+
         trusted-public-keys = [
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU="
@@ -532,6 +573,7 @@ in
           assert lib.assertMsg (pkgs.lan-mouse.version == "0.10.0") "Remove lan-mouse public key";
           [ "lan-mouse.cachix.org-1:KlE2AEZUgkzNKM7BIzMQo8w9yJYqUpor1CAUNRY6OyM=" ]
         );
+
         build-dir = mkIf impermanence.enable "/var/nix-tmp";
       };
 

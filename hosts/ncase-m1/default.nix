@@ -80,6 +80,7 @@
 
       nix.builder = {
         enable = true;
+        shareStore = true;
         emulatedSystems = [ "aarch64-linux" ];
       };
     };

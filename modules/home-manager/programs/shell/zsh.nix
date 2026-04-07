@@ -159,6 +159,35 @@ in
             cat "$file_path" > "$copy_path" && rm "$file_path" && mv "$copy_path" "$file_path"
             $EDITOR "$file_path"
           }
+
+          edit-script() {
+            if [[ $# -lt 1 ]]; then
+              echo "edit-script <command>"
+              return 1
+            fi
+
+            local cmd="$1"
+            local src
+            if ! src=$(command -v "$cmd" 2>/dev/null); then
+              echo "error: command '$cmd' does not exist"
+              return 1
+            fi
+
+            local real=$(readlink -f "$src")
+            if [[ ! -f "$real" ]]; then
+              echo "error: '$real' is not a file"
+              return 1
+            fi
+
+            if [[ -f "$cmd" ]]; then
+              echo "error: file with name '$cmd' already exists in cwd"
+              return 1
+            fi
+
+            cp "$real" "$cmd"
+            chmod u+rwx "$cmd"
+            $EDITOR "$cmd"
+          }
         '';
   };
 

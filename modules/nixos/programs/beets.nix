@@ -38,6 +38,7 @@ in
             permissions.enable = true;
             unimported.enable = true;
             hook.enable = true;
+            fromfilename.enable = true;
           };
         }
       );
@@ -61,6 +62,7 @@ in
               "permissions"
               "unimported"
               "hook"
+              "fromfilename"
             ];
 
             incremental = false; # creates unwanted state.pickel file

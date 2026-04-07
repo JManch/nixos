@@ -1,14 +1,15 @@
 diff --git a/src/helpers/Monitor.cpp b/src/helpers/Monitor.cpp
-index cbb02118..2ab9cd7d 100644
+index 6e88357e..5c4c9f3b 100644
 --- a/src/helpers/Monitor.cpp
 +++ b/src/helpers/Monitor.cpp
-@@ -337,6 +337,36 @@ void CMonitor::onConnect(bool noRule) {
+@@ -365,6 +365,37 @@ void CMonitor::onConnect(bool noRule) {
  
      PROTO::gamma->applyGammaToState(m_self.lock());
  
 +    const auto gammaSize = m_output->getGammaSize();
 +
-+    if (m_name == "DP-1" && gammaSize > 0) {
++    char hostname[256];
++    if (gethostname(hostname, sizeof(hostname)) == 0 && strcmp(hostname, "ncase-m1") == 0 && m_name == "DP-1" && gammaSize > 0) {
 +        std::vector<uint16_t> lut(gammaSize);
 +        const double          max_input_value  = static_cast<double>(gammaSize - 1);
 +        const double          max_output_value = 65535.0;

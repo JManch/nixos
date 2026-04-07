@@ -3,7 +3,6 @@
   cfg,
   args,
   config,
-  hostname,
 }:
 let
   inherit (lib)
@@ -84,17 +83,17 @@ in
                 # Do not want any of the features this offers and can't be
                 # bothered to get it properly working with uwsm
                 ../../../../patches/hyprland-no-watchdog.patch
+                # This is scuffed but should hopefully have a better solution
+                # once GAMMA_LUT is implemented. Using a patch insted of wlsunset
+                # or gammastep because those programs have a bunch of features I
+                # don't need.
+                # https://github.com/hyprwm/Hyprland/issues/9064
+                ../../../../patches/hyprland-ncase-m1-monitor-gamma.patch
               ]
               # Add always on top window rule and dispatching which is pinning
               # but just for workspace that the window is on
               # TODO: Need to rebase this
-              ++ optional cfg.alwaysOnTopPatch ../../../../patches/hyprland-always-on-top.patch
-              # This is scuffed but should hopefully have a better solution
-              # once GAMMA_LUT is implemented. Using a patch insted of wlsunset
-              # or gammastep because those programs have a bunch of features I
-              # don't need.
-              # https://github.com/hyprwm/Hyprland/issues/9064
-              ++ optional (hostname == "ncase-m1") ../../../../patches/hyprland-ncase-m1-monitor-gamma.patch;
+              ++ optional cfg.alwaysOnTopPatch ../../../../patches/hyprland-always-on-top.patch;
           });
         })
       ];

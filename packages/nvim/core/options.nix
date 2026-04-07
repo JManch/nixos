@@ -59,6 +59,9 @@
           tab = '  ',
         })
 
+        -- :h ui2
+        require('vim._core.ui2').enable({})
+
         -- TODO: Figure out if this is works. Ideally would fetch the dictionary in a Nix derivation
         -- local dict_path = vim.fs.normalize(vim.fn.stdpath('data') .. '/en.dict')
         -- if vim.loop.fs_stat(dict_path) ~= nil then

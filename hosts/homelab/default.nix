@@ -307,7 +307,7 @@ in
         autoStart = true;
         reverseProxy.enable = true;
 
-        jellyseerr = {
+        seerr = {
           enable = true;
           extraAllowedAddresses = with wireguard.friends; [
             "${address}/${toString subnet}"

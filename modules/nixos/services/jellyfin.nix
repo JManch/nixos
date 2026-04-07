@@ -77,20 +77,20 @@ in
         '';
       };
 
-      jellyseerr = {
-        enable = mkEnableOption "Jellyseerr behind a reverse proxy";
+      seerr = {
+        enable = mkEnableOption "Seerr behind a reverse proxy";
 
         port = mkOption {
           type = types.port;
           default = 5055;
-          description = "Jellyseerr listening port";
+          description = "Seerr listening port";
         };
 
         extraAllowedAddresses = mkOption {
           type = with types; listOf str;
           default = [ ];
           description = ''
-            List of address to give access to Jellyseerr in addition to the trusted
+            List of address to give access to Seerr in addition to the trusted
             list.
           '';
         };
@@ -115,7 +115,7 @@ in
             ${getExe pkgs.fd} --base-directory /var/lib/jellyfin/plugins --exclude configurations --max-depth 1 --type dir --exec rm -r
             ${concatLines (
               # Jellyfin needs write access to create meta.json
-              map (plugin: ''cp --no-preserve=mode -r ${plugin}/* /var/lib/jellyfin/plugins '') cfg.plugins
+              map (plugin: "cp --no-preserve=mode -r ${plugin}/* /var/lib/jellyfin/plugins ") cfg.plugins
             )}
           '';
 
@@ -189,30 +189,40 @@ in
     };
   })
 
-  (mkIf cfg.jellyseerr.enable {
+  (mkIf cfg.seerr.enable {
     asserts = [
       (cfg.enable && arr-stack.enable)
-      "Jellyseerr requires Jellyfin and the video torrent stack to be enabled"
+      "Seerr requires Jellyfin and the video torrent stack to be enabled"
     ];
 
-    services.jellyseerr = {
+    services.seerr = {
       enable = true;
       openFirewall = false;
-      port = cfg.jellyseerr.port;
+      configDir =
+        assert (
+          lib.assertMsg (lib.versionOlder config.system.stateVersion "26.05") "Remove Seer config location override"
+        );
+        "/var/lib/seerr";
+      port = cfg.seerr.port;
     };
 
-    # Jellyseer scan runs every 5 mins and pollutes the journal
-    systemd.services.jellyseerr.environment.LOG_LEVEL = "warning";
+    # Seer scan runs every 5 mins and pollutes the journal
+    systemd.services.seerr.environment.LOG_LEVEL = "warning";
+    systemd.services.seerr.serviceConfig.StateDirectory =
+      assert (
+        lib.assertMsg (lib.versionOlder config.system.stateVersion "26.05") "Remove Seer config location override"
+      );
+      mkForce "seerr";
 
-    ns.services.caddy.virtualHosts.jellyseerr = {
-      inherit (cfg.jellyseerr) extraAllowedAddresses;
+    ns.services.caddy.virtualHosts.seerr = {
+      inherit (cfg.seerr) extraAllowedAddresses;
       extraConfig = ''
-        reverse_proxy http://127.0.0.1:${toString cfg.jellyseerr.port}
+        reverse_proxy http://127.0.0.1:${toString cfg.seerr.port}
       '';
     };
 
     ns.persistence.directories = singleton {
-      directory = "/var/lib/private/jellyseerr";
+      directory = "/var/lib/private/seerr";
       user = "nobody";
       group = "nogroup";
       mode = "0755";

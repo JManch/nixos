@@ -50,6 +50,9 @@ writeShellApplication {
             tags_file="$tmp_dir/$filename.tags"
             metaflac --export-tags-to="$tags_file" "$input_file"
             sox -G "$input_file" -b 16 --comment "" "$output_file" rate -v 44100
+            # metaflac import does not support multi-line lyric tags so strip
+            # them. we add them back when importing with beets anyway.
+            sed -i '/=/!d' "$tags_file"
             metaflac --import-tags-from="$tags_file" "$output_file"
             rm "$tags_file"
             echo "Resampled $filename: $bitrate/''${sample_rate}Hz -> 16/44100Hz"

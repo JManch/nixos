@@ -11,10 +11,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v2.7.0",
-      "revision": "a2789a852462b1c0cbe9d3a5c7d584f22b96f21b",
+      "version": "v2.8.0",
+      "revision": "f30a88e76e0f23680d2651fbd749d20f001733e1",
       "url": null,
-      "hash": "sha256-HiTCLVllBBUcgs0FUEAofJrhrvISgQJz1WYiNGG69nA="
+      "hash": "sha256-d8aovi5+B0ZQQFtV85qUKohpvQNFvf71P0IDSHp5Fh4="
     },
     "BeamMP-Server": {
       "type": "GitRelease",
@@ -124,9 +124,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "bb2f19808d2a12f7b46c1a89b79fe0bf1d0d5cec",
-      "url": "https://github.com/zzyil/comick.io-Downloader/archive/bb2f19808d2a12f7b46c1a89b79fe0bf1d0d5cec.tar.gz",
-      "hash": "sha256-Lm5WJCf6baBukSoaWM1zui/wnxwv8IVZ2n4fznoupwA="
+      "revision": "53ba29dcfff1c17e65f5c118c98168ee089e99ec",
+      "url": "https://github.com/zzyil/comick.io-Downloader/archive/53ba29dcfff1c17e65f5c118c98168ee089e99ec.tar.gz",
+      "hash": "sha256-PHo3PNDfGgfcCCvvUNhTeY7XKK7NFcZJLabtZeAn/cg="
     },
     "ctrld": {
       "type": "GitRelease",
@@ -182,9 +182,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "d7b50d6c973dc2de9ce6dd2ed26a83341600c8a2",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/d7b50d6c973dc2de9ce6dd2ed26a83341600c8a2.tar.gz",
-      "hash": "sha256-4gU/AaMC37BSZAyIG5/7e5KPp52uz6xGM7z2zJMtd+U="
+      "revision": "d02c1a92fa86777f3ae52f19e0c338a67eabe908",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/d02c1a92fa86777f3ae52f19e0c338a67eabe908.tar.gz",
+      "hash": "sha256-TCbdj6ZedgPSDQWJWFBPzDlLdgRcnsby3DWNHxmQ+b4="
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -213,10 +213,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2.11.0",
-      "revision": "2378c8b5bfccd024b06cb94e0c8277513ab8ef8b",
-      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/2.11.0",
-      "hash": "sha256-+yt6kjUV+fqbOa7jj603XdGX7XtI8mXnCnmUjYFNA7c="
+      "version": "v2.18.0",
+      "revision": "16a2a15135229ea438d14a3020aed0dadf9c8363",
+      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/refs/tags/v2.18.0",
+      "hash": "sha256-KFsh//PjB+BWVuI5JWCTpO0Ra08+hJPM+/m+hpX77wE="
     },
     "hass-web-proxy-lib": {
       "type": "Git",
@@ -242,10 +242,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v3.3.2",
-      "revision": "fe8cc242af9d4b3ac276c2027a5a9afc4a595885",
-      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/refs/tags/v3.3.2",
-      "hash": "sha256-Lqe0kCkJoX+YhkpA7Q+a49NSLEI3K18GciK2kCfVnGo="
+      "version": "v3.3.3",
+      "revision": "f300a76f7024ef955ae12a1acbf2e5bf44b5faf5",
+      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/refs/tags/v3.3.3",
+      "hash": "sha256-h3+CC/hlBsNwi2qtLhZd97GgNhaVO07mVGDHJpMrl2w="
     },
     "hyprpy": {
       "type": "GitRelease",
@@ -380,9 +380,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "bb37bee16c9e7ecf01661a36ece12c41876ef78c",
-      "url": "https://github.com/dweymouth/supersonic/archive/bb37bee16c9e7ecf01661a36ece12c41876ef78c.tar.gz",
-      "hash": "sha256-iFdYkGC+GyZ+0GDfj2ofx89DWWMGh095z7YEm/6ZoU4="
+      "revision": "d98515406245bbdcd940e38cb3c87453d2a8b70d",
+      "url": "https://github.com/dweymouth/supersonic/archive/d98515406245bbdcd940e38cb3c87453d2a8b70d.tar.gz",
+      "hash": "sha256-ZXN4tQOX6q/DmOC2uou8+ffWP9j0qGMVDqeDlM4wD34="
     },
     "thermal_comfort": {
       "type": "GitRelease",

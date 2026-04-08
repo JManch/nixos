@@ -79,21 +79,32 @@ in
     # number. Actions are hide(0), show(1), toggle(2). This patch disables the
     # custom module signal functionality that I don't use.
     package =
-      (addPatches pkgs.waybar [
-        "waybar-disable-reload.patch"
-        (pkgs.replaceVars ../../../../../patches/waybar-signal-toggle.patch {
-          sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
-            sort (a: b: a.number < b.number) monitors
-          );
-        })
-        # Hides the module if the format string is empty
-        # Forces use of device description instead of nick name in tooltip
-        # Hides the module instead of crashing when no source device exists
-        "waybar-wireplumber-improvements.patch"
-        # Removes constant logging when our `tomat watch` commands fails if the
-        # service is not running
-        "waybar-disable-stopped-log.patch"
-      ]).override
+      (addPatches pkgs.waybar (
+        [
+          "waybar-disable-reload.patch"
+          (pkgs.replaceVars ../../../../../patches/waybar-signal-toggle.patch {
+            sortedMonitors = concatMapStringsSep ", " (m: "\"${m.name}\"") (
+              sort (a: b: a.number < b.number) monitors
+            );
+          })
+          # Hides the module if the format string is empty
+          # Forces use of device description instead of nick name in tooltip
+          # Hides the module instead of crashing when no source device exists
+          "waybar-wireplumber-improvements.patch"
+          # Removes constant logging when our `tomat watch` commands fails if the
+          # service is not running
+          "waybar-disable-stopped-log.patch"
+          # Waybar updates component widgets every interval, regardless of
+          # whether their values have changed. This triggers a redraw and damages
+          # the bar in the compositor. On my laptop this causes my GPU to jump
+          # into S1 state every interval. Doesn't seem to affect powerdraw but it
+          # slightly bumps clock speed and probably isn't optimal. This patch
+          # removes the unnecessary redraws.
+          "waybar-reduce-redraws.patch"
+        ]
+        # Do not update CPU usage value if it is <= 3% to reduce redraws
+        ++ optional (device.type == "laptop") "waybar-less-cpu-updates.patch"
+      )).override
         {
           cavaSupport = false;
           inputSupport = false;
@@ -198,14 +209,14 @@ in
 
         # not enough space on laptops for this
         network = mkIf (device.type != "laptop") {
-          interval = 30;
+          interval = 5;
           format = "<span color='#${colors.base04}'>󰈀</span> {bandwidthTotalBytes}";
           tooltip-format = "<span color='#${colors.base04}'>󰇚</span>{bandwidthDownBytes:>} <span color='#${colors.base04}'>󰕒</span>{bandwidthUpBytes:>}";
           max-length = 50;
         };
 
         cpu = {
-          interval = 30;
+          interval = 5;
           format = "<span color='#${colors.base04}'></span> {usage}%";
           tooltip = false;
           on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} -t service btop.desktop";
@@ -213,8 +224,13 @@ in
 
         "custom/gpu" = mkIf gpuModuleEnabled {
           format = "<span color='#${colors.base04}'>󰾲</span> {}%";
-          exec = "${getExe' pkgs.coreutils "cat"} /sys/class/drm/renderD128/device/gpu_busy_percent";
-          interval = 30;
+          exec =
+            # Reduce redraws on laptops
+            if (device.type == "laptop") then
+              "val=$(cat /sys/class/drm/renderD128/device/gpu_busy_percent); [[ $val -le 3 ]] && echo 0 || echo $val"
+            else
+              "cat /sys/class/drm/renderD128/device/gpu_busy_percent";
+          interval = 5;
           tooltip = false;
           on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} -t service btop.desktop";
         };

@@ -1,0 +1,23 @@
+diff --git a/include/ALabel.hpp b/include/ALabel.hpp
+index b3852877..f93e4693 100644
+--- a/include/ALabel.hpp
++++ b/include/ALabel.hpp
+@@ -19,7 +19,17 @@ class ALabel : public AModule {
+   virtual std::string getIcon(uint16_t, const std::vector<std::string>& alts, uint16_t max = 0);
+ 
+  protected:
+-  Gtk::Label label_;
++  class Label : public Gtk::Label {
++   public:
++    void set_markup(const Glib::ustring& str) {
++      if (str != get_label()) Gtk::Label::set_markup(str);
++    }
++    void set_text(const Glib::ustring& str) {
++      if (str != get_text()) Gtk::Label::set_text(str);
++    }
++  };
++
++  Label label_;
+   std::string format_;
+   const std::chrono::milliseconds interval_;
+   bool alt_ = false;

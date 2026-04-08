@@ -1,0 +1,20 @@
+diff --git a/src/modules/cpu_usage/common.cpp b/src/modules/cpu_usage/common.cpp
+index e3947967..93a80dbf 100644
+--- a/src/modules/cpu_usage/common.cpp
++++ b/src/modules/cpu_usage/common.cpp
+@@ -72,6 +72,7 @@ std::tuple<std::vector<uint16_t>, std::string> waybar::modules::CpuUsage::getCpu
+       const float delta_idle = curr_idle - prev_idle;
+       const float delta_total = curr_total - prev_total;
+       uint16_t tmp = 100 * (1 - delta_idle / delta_total);
++      if (tmp <= 3) tmp = 0;
+       tooltip = fmt::format("Total: {}%\nCores: (pending)", tmp);
+       usage.push_back(tmp);
+     } else {
+@@ -94,6 +95,7 @@ std::tuple<std::vector<uint16_t>, std::string> waybar::modules::CpuUsage::getCpu
+     const float delta_idle = curr_idle - prev_idle;
+     const float delta_total = curr_total - prev_total;
+     uint16_t tmp = 100 * (1 - delta_idle / delta_total);
++    if (tmp <= 3) tmp = 0;
+     if (i == 0) {
+       tooltip = fmt::format("Total: {}%", tmp);
+     } else {

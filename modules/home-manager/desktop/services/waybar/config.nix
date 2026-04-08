@@ -198,14 +198,14 @@ in
 
         # not enough space on laptops for this
         network = mkIf (device.type != "laptop") {
-          interval = 5;
+          interval = 30;
           format = "<span color='#${colors.base04}'>󰈀</span> {bandwidthTotalBytes}";
           tooltip-format = "<span color='#${colors.base04}'>󰇚</span>{bandwidthDownBytes:>} <span color='#${colors.base04}'>󰕒</span>{bandwidthUpBytes:>}";
           max-length = 50;
         };
 
         cpu = {
-          interval = 5;
+          interval = 30;
           format = "<span color='#${colors.base04}'></span> {usage}%";
           tooltip = false;
           on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} -t service btop.desktop";
@@ -214,7 +214,7 @@ in
         "custom/gpu" = mkIf gpuModuleEnabled {
           format = "<span color='#${colors.base04}'>󰾲</span> {}%";
           exec = "${getExe' pkgs.coreutils "cat"} /sys/class/drm/renderD128/device/gpu_busy_percent";
-          interval = 5;
+          interval = 30;
           tooltip = false;
           on-click = mkIf (config.${ns}.programs.shell.btop.enable) "${app2unit} -t service btop.desktop";
         };

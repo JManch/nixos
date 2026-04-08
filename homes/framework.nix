@@ -30,7 +30,8 @@
       };
 
       programs = {
-        hyprlock.enable = true;
+        hyprlock.enable = false;
+        waylock.enable = true;
         fuzzel.enable = true;
       };
 

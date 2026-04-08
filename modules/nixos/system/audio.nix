@@ -97,8 +97,20 @@ in
 
     services.pulseaudio.enable = mkForce false;
 
-    # Make pipewire realtime-capable
-    security.rtkit.enable = true;
+    # Instead of using rtkit, adding our user to the pipewire group gives our
+    # user a ulimit of 95 [1] which enables pipewire to acquire priority
+    # itself. According to [2], it sounds like this is actually preferrable to
+    # using rtkit.
+
+    # Our user having ulimit 95 has the added benefit of Hyprland being able
+    # acquire a RR scheduling policy [3]. Might eventually be solved with a
+    # security wrapper? [4]
+    # [1] https://github.com/NixOS/nixpkgs/blob/68d8aa3d661f0e6bd5862291b5bb263b2a6595c9/nixos/modules/services/desktops/pipewire/pipewire.nix#L428
+    # [2] https://gitlab.freedesktop.org/pipewire/pipewire/-/commit/b4be094be8d9367c559692aac4d39d19f0c47b73
+    # [3] https://github.com/hyprwm/Hyprland/blob/fb46d16fc2bedea96b6b2a4d005ec66d701431aa/src/init/initHelpers.cpp#L8
+    # [4] https://github.com/NixOS/nixpkgs/pull/507419
+    security.rtkit.enable = false;
+    users.users.${username}.extraGroups = [ "pipewire" ];
 
     services.pipewire =
       let

@@ -1,23 +1,23 @@
-diff --git a/src/config/ConfigManager.cpp b/src/config/ConfigManager.cpp
-index d1f7fcd8..799500fa 100644
---- a/src/config/ConfigManager.cpp
-+++ b/src/config/ConfigManager.cpp
-@@ -1298,7 +1298,7 @@ SWorkspaceRule CConfigManager::getWorkspaceRuleFor(PHLWORKSPACE pWorkspace) {
- SWorkspaceRule CConfigManager::mergeWorkspaceRules(const SWorkspaceRule& rule1, const SWorkspaceRule& rule2) {
-     SWorkspaceRule mergedRule = rule1;
+diff --git a/src/config/shared/workspace/WorkspaceRule.cpp b/src/config/shared/workspace/WorkspaceRule.cpp
+index 28d5fcab..73755414 100644
+--- a/src/config/shared/workspace/WorkspaceRule.cpp
++++ b/src/config/shared/workspace/WorkspaceRule.cpp
+@@ -3,7 +3,7 @@
+ using namespace Config;
  
--    if (rule1.monitor.empty())
-+    if (!rule2.monitor.empty())
-         mergedRule.monitor = rule2.monitor;
-     if (rule1.workspaceString.empty())
-         mergedRule.workspaceString = rule2.workspaceString;
-@@ -1309,8 +1309,7 @@ SWorkspaceRule CConfigManager::mergeWorkspaceRules(const SWorkspaceRule& rule1,
+ void CWorkspaceRule::mergeLeft(const CWorkspaceRule& other) {
+-    if (m_monitor.empty())
++    if (!other.m_monitor.empty())
+         m_monitor = other.m_monitor;
+     if (m_workspaceString.empty())
+         m_workspaceString = other.m_workspaceString;
+@@ -14,8 +14,7 @@ void CWorkspaceRule::mergeLeft(const CWorkspaceRule& other) {
  
-     if (rule2.isDefault)
-         mergedRule.isDefault = true;
--    if (rule2.isPersistent)
--        mergedRule.isPersistent = true;
-+    mergedRule.isPersistent = rule2.isPersistent;
-     if (rule2.gapsIn.has_value())
-         mergedRule.gapsIn = rule2.gapsIn;
-     if (rule2.gapsOut.has_value())
+     if (other.m_isDefault)
+         m_isDefault = true;
+-    if (other.m_isPersistent)
+-        m_isPersistent = true;
++    m_isPersistent = other.m_isPersistent;
+     if (other.m_gapsIn.has_value())
+         m_gapsIn = other.m_gapsIn;
+     if (other.m_gapsOut.has_value())

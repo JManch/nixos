@@ -31,6 +31,7 @@
       man-pages
       rsync
       sd
+      procs
     ])
     ++ lib.optional (osConfig != null) pkgs.microfetch;
 

@@ -15,6 +15,7 @@ let
     literalExpression
     mkEnableOption
     ;
+  inherit (lib.${ns}) modulesInDir;
   osDesktop = osConfig.${ns}.system.desktop;
 in
 {
@@ -41,6 +42,18 @@ in
       type = types.nullOr (types.enum [ "hyprland" ]);
       default = null;
       description = "Window manager to use";
+    };
+
+    locker = mkOption {
+      type = with types; nullOr (enum (modulesInDir ./programs/locker));
+      default = null;
+      description = "The locker to use";
+    };
+
+    launcher = mkOption {
+      type = with types; nullOr (enum (modulesInDir ./programs/launcher));
+      default = null;
+      description = "The launcher to use";
     };
 
     style = {
@@ -108,9 +121,11 @@ in
     osDesktop.enable
     "You cannot enable home-manager desktop if NixOS desktop is not enabled"
     (cfg.windowManager != null -> osDesktop.desktopEnvironment == null)
-    "You cannot use a desktop environment with a window manager"
+    "You cannot use a window manager with a desktop environment"
     (cfg.windowManager != null -> length osConfig.${ns}.core.device.monitors != 0)
     "Device monitors must be configured to use a window manager"
+    (cfg.locker != null -> osDesktop.desktopEnvironment == null)
+    "You cannot use a locker with a desktop environment"
   ];
 
   home.packages = with pkgs; [

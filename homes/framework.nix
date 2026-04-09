@@ -10,6 +10,8 @@
       enable = true;
       terminal = "Alacritty";
       windowManager = "hyprland";
+      locker = "waylock"; # using waylock because hyprlock does not let our GPU idle so +1W power usage
+      launcher = "fuzzel";
       xdg.lowercaseUserDirs = true;
 
       style = {
@@ -27,12 +29,6 @@
           name = "pixa3854:00-093a:0274-touchpad";
           accel_profile = "adaptive";
         };
-      };
-
-      programs = {
-        hyprlock.enable = false;
-        waylock.enable = true;
-        fuzzel.enable = true;
       };
 
       services = {

@@ -21,13 +21,14 @@ let
     types
     ;
   inherit (lib.${ns}) isHyprland sliceSuffix;
-  inherit (config.${ns}.desktop.programs) locker;
+  inherit (config.${ns}) desktop;
+  inherit (desktop.programs) locker;
   systemctl = getExe' pkgs.systemd "systemctl";
   loginctl = getExe' pkgs.systemd "loginctl";
 in
 {
   asserts = [
-    (locker.package != null)
+    (desktop.locker != null)
     "Hypridle requires a locker to be set"
   ];
 

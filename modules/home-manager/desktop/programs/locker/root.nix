@@ -16,9 +16,10 @@ let
     types
     mkBefore
     mkIf
+    mkAliasOptionModule
     ;
   # https://discourse.nixos.org/t/not-allowed-to-refer-to-a-store-path-error/5226
-  lockerName = builtins.unsafeDiscardStringContext (builtins.baseNameOf (getExe cfg.package));
+  lockerName = builtins.unsafeDiscardStringContext (baseNameOf (getExe cfg.package));
   toggleLockInhibit = pkgs.writeShellScript "toggle-lock-inhibit" ''
     systemctl is-active --quiet --user inhibit-lock && {
       systemctl stop --quiet --user inhibit-lock
@@ -31,7 +32,23 @@ let
 in
 {
   enableOpt = false;
-  conditions = [ (cfg.package != null) ];
+  conditions = [ (cfg.locker != null) ];
+  imports = [
+    (mkAliasOptionModule
+      [
+        ns
+        "desktop"
+        "programs"
+        "locker"
+        "locker"
+      ]
+      [
+        ns
+        "desktop"
+        "locker"
+      ]
+    )
+  ];
 
   asserts = [
     osConfig.programs.uwsm.enable
@@ -41,7 +58,6 @@ in
   opts = {
     package = mkOption {
       type = with types; nullOr package;
-      default = null;
       description = "The package to use for locking";
     };
 
@@ -117,7 +133,7 @@ in
           done
 
           # Exit if locker is already running
-          systemctl --quiet --user is-active app-*-${builtins.baseNameOf (getExe cfg.package)}@*.service && exit 1
+          systemctl --quiet --user is-active app-*-${baseNameOf (getExe cfg.package)}@*.service && exit 1
 
           lockArgs=(${concatMapStringsSep " " (s: "\"${s}\"") cfg.defaultArgs})
 

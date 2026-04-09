@@ -4,6 +4,7 @@
   inputs,
   config,
   osConfig,
+  categoryCfg,
 }:
 let
   inherit (lib)
@@ -21,7 +22,10 @@ let
   hasFingerprint = osConfig.services.fprintd.enable;
 in
 {
-  categoryConfig.locker = {
+  enableOpt = false;
+  conditions = [ (categoryCfg.locker == "hyprlock") ];
+
+  categoryConfig = {
     package = lib.${ns}.addPatches config.programs.hyprlock.package (
       optionals hasFingerprint [
         # Allows unlocking with fingerprint when display is off but breaks fade-in animation
@@ -36,6 +40,7 @@ in
         "hyprlock-fingerprint-present-fix.patch"
       ]
     );
+
     unlockCmd = "${getExe' pkgs.procps "pkill"} -USR1 hyprlock";
 
     defaultArgs = [

@@ -17,12 +17,15 @@ let
   colors = config.colorScheme.palette;
 in
 {
+  enableOpt = false;
+  conditions = [ (config.${ns}.desktop.launcher == "fuzzel") ];
+
   programs.fuzzel = {
     enable = true;
     package = lib.${ns}.addPatches pkgs.fuzzel [
       # Fixes icons for apps that only package an icon in share/pixmaps
       # https://codeberg.org/dnkl/fuzzel/issues/692
-      ../../../../patches/fuzzel-fix-pixmap-icons.patch
+      "fuzzel-fix-pixmap-icons.patch"
     ];
 
     settings = {

@@ -10,6 +10,8 @@
       enable = true;
       terminal = "Alacritty";
       windowManager = "hyprland";
+      locker = "hyprlock";
+      launcher = "fuzzel";
       xdg.lowercaseUserDirs = true;
 
       hyprland = {
@@ -18,12 +20,6 @@
         directScanout = true;
         logging = false;
         hyprcursor.package = null;
-      };
-
-      programs = {
-        swaylock.enable = false;
-        hyprlock.enable = true;
-        fuzzel.enable = true;
       };
 
       services = {

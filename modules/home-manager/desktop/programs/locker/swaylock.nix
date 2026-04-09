@@ -3,28 +3,18 @@
   pkgs,
   config,
   osConfig,
+  categoryCfg,
 }:
 let
-  inherit (lib) ns mkIf getExe';
+  inherit (lib) ns;
   inherit (osConfig.${ns}.core.device) primaryMonitor;
   desktopCfg = config.${ns}.desktop;
   colors = config.colorScheme.palette;
-  isHyprland = lib.${ns}.isHyprland config;
 in
 {
-  categoryConfig.locker = {
-    package = config.programs.swaylock.package;
-
-    # Temporarily disable hyprland shader so that screenshot doesn't get shader
-    # applied twice
-    preLockScript = mkIf isHyprland ''
-      ${config.${ns}.desktop.hyprland.disableShaders}
-    '';
-
-    postLockScript = mkIf isHyprland ''
-      (${getExe' pkgs.coreutils "sleep"} 0.1; ${config.${ns}.desktop.hyprland.enableShaders}) &
-    '';
-  };
+  enableOpt = false;
+  conditions = [ (categoryCfg.locker == "swaylock") ];
+  categoryConfig.package = config.programs.swaylock.package;
 
   programs.swaylock = {
     enable = true;

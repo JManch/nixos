@@ -10,7 +10,6 @@ let
     mkIf
     mkMerge
     mkEnableOption
-    removeAttrs
     functionArgs
     mapAttrs
     isAttrs
@@ -356,7 +355,7 @@ in
                   filterAttrs (
                     path: type:
                     type == "regular"
-                    && (path != "root.nix")
+                    && path != "root.nix"
                     && hasSuffix ".nix" path
                     && !elem (concatStringsSep "/" (categoryPath ++ [ path ])) exclude
                     && !elem path rootModule.categoryOpts.exclude

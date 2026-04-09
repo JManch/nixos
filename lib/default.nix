@@ -23,9 +23,11 @@ let
     hasPrefix
     hasSuffix
     mkBefore
+    removeSuffix
     assertMsg
     isAttrs
     isDerivation
+    mapAttrsToList
     ;
   sources = import ../npins;
 
@@ -430,5 +432,13 @@ in
         !hasPrefix "/persist" path
       ) "Path '${path}' was manually prefixed with /persist, this is not allowed";
       (optionalString config.${ns}.system.impermanence.enable "/persist") + path;
+
+    modulesInDir =
+      path:
+      mapAttrsToList (path: _: removeSuffix ".nix" path) (
+        filterAttrs (path: type: type == "regular" && hasSuffix ".nix" path && path != "root.nix") (
+          builtins.readDir path
+        )
+      );
   };
 }

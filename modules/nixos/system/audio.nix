@@ -114,17 +114,16 @@ in
 
     services.pipewire =
       let
+        # Pipewire 1.6 has currently has the following ldac issue. It also
+        # causes OBS to crash when screensharing so use 1.4.2 for now.
+        # https://github.com/NixOS/nixpkgs/pull/502690
         pipewireOverride =
-          # https://github.com/NixOS/nixpkgs/pull/502690
-          assert (lib.assertMsg (pkgs.libldac-dec.patches == [ ]) "Remove pipewire override");
-          pkgs.pipewire.override {
-            libldac-dec = lib.${ns}.addPatches pkgs.libldac-dec [
-              (pkgs.fetchpatch2 {
-                url = "https://raw.githubusercontent.com/qweered/nixpkgs/392ecf3352b23bf82576026296798372ed2ec595/pkgs/by-name/li/libldac-dec/fix-decode-init.patch";
-                hash = "sha256-xup8gjgFy00zsKChf5czlBWcdYDTkGrM82Jr4q7GAWc=";
-              })
-            ];
-          };
+          assert (
+            lib.assertMsg (pkgs.libldac-dec.patches == [ ]) "Remove pipewire override if OBS crash is fixed"
+          );
+          (import (fetchTree "github:NixOS/nixpkgs/e6f23dc08d3624daab7094b701aa3954923c6bbb") {
+            inherit (pkgs.stdenv.hostPlatform) system;
+          }).pipewire;
       in
       {
         enable = true;

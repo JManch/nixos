@@ -78,30 +78,36 @@ in
 
   services.playerctld.enable = true;
 
-  ns.desktop.hyprland.settings =
-    let
-      inherit (config.${ns}.desktop.hyprland) modKey;
-    in
-    {
-      bindr = [
-        "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause --player ${musicPlayers}"
-        "${modKey}SHIFT, ${modKey}_R, exec, ${playerctl} play-pause --ignore-player ${musicPlayers}"
-      ];
+  ns.desktop = {
+    programs.locker.postLockScript = ''
+      (sleep 30 && playerctl --all-players pause) &
+    '';
 
-      bind = [
-        "${modKey}, Period, exec, ${playerctl} next --player ${musicPlayers}"
-        "${modKey}, Comma, exec, ${playerctl} previous --player ${musicPlayers}"
-        ", XF86AudioNext, exec, ${playerctl} next"
-        ", XF86AudioPrev, exec, ${playerctl} previous"
-        ", XF86AudioPlay, exec, ${playerctl} play-pause"
-        ", XF86AudioPause, exec, ${playerctl} pause"
-      ];
+    hyprland.settings =
+      let
+        inherit (config.${ns}.desktop.hyprland) modKey;
+      in
+      {
+        bindr = [
+          "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause --player ${musicPlayers}"
+          "${modKey}SHIFT, ${modKey}_R, exec, ${playerctl} play-pause --ignore-player ${musicPlayers}"
+        ];
 
-      binde = [
-        "${modKey}, XF86AudioRaiseVolume, exec, ${getExe (modifyPlayerVolume true)} 5"
-        "${modKey}, XF86AudioLowerVolume, exec, ${getExe (modifyPlayerVolume true)} -5"
-        "${modKey}SHIFT, XF86AudioRaiseVolume, exec, ${getExe (modifyPlayerVolume false)} 5"
-        "${modKey}SHIFT, XF86AudioLowerVolume, exec, ${getExe (modifyPlayerVolume false)} -5"
-      ];
-    };
+        bind = [
+          "${modKey}, Period, exec, ${playerctl} next --player ${musicPlayers}"
+          "${modKey}, Comma, exec, ${playerctl} previous --player ${musicPlayers}"
+          ", XF86AudioNext, exec, ${playerctl} next"
+          ", XF86AudioPrev, exec, ${playerctl} previous"
+          ", XF86AudioPlay, exec, ${playerctl} play-pause"
+          ", XF86AudioPause, exec, ${playerctl} pause"
+        ];
+
+        binde = [
+          "${modKey}, XF86AudioRaiseVolume, exec, ${getExe (modifyPlayerVolume true)} 5"
+          "${modKey}, XF86AudioLowerVolume, exec, ${getExe (modifyPlayerVolume true)} -5"
+          "${modKey}SHIFT, XF86AudioRaiseVolume, exec, ${getExe (modifyPlayerVolume false)} 5"
+          "${modKey}SHIFT, XF86AudioLowerVolume, exec, ${getExe (modifyPlayerVolume false)} -5"
+        ];
+      };
+  };
 }

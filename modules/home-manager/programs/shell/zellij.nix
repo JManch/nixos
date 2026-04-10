@@ -167,6 +167,7 @@ in
           bind "Alt k" { MoveFocus "up"; }
           bind "Alt l" { MoveFocus "right"; }
           bind "Alt h" { MoveFocus "left"; }
+          bind "Alt Shift m" { BreakPane; }
           bind "Alt Shift h" { BreakPaneLeft; }
           bind "Alt Shift l" { BreakPaneRight; }
           bind "Alt e" { ToggleFocusFullscreen; }

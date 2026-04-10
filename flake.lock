@@ -1711,11 +1711,11 @@
         "systems": "systems_11"
       },
       "locked": {
-        "lastModified": 1774732893,
-        "narHash": "sha256-fZV4x7tjD5w7zG2SXhrp7WA510lkpuDnsO1mPP3zmYk=",
+        "lastModified": 1775864357,
+        "narHash": "sha256-QrVBC3d85aEk+g7Kb2UOkW68Nl7WdGx3e5vAdya/Fa8=",
         "owner": "JManch",
         "repo": "nvf",
-        "rev": "43f31217afc929c3aaf2103656ae7beda4abb05a",
+        "rev": "f8451061aca3fc5657af792ee8204782e2ae30db",
         "type": "github"
       },
       "original": {

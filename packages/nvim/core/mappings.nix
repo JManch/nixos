@@ -3,6 +3,8 @@ let
   inherit (lib.nvim.binds) mkKeymap;
 in
 {
+  vim.vendoredKeymaps.enable = false;
+
   vim.keymaps = [
     (mkKeymap "i" "jk" "<ESC>" { desc = "Exit insert mode"; })
     (mkKeymap "i" "<C-b>" "<ESC>^i" { desc = "Jump to beginning of line"; })

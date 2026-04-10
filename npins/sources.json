@@ -124,9 +124,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "53ba29dcfff1c17e65f5c118c98168ee089e99ec",
-      "url": "https://github.com/zzyil/comick.io-Downloader/archive/53ba29dcfff1c17e65f5c118c98168ee089e99ec.tar.gz",
-      "hash": "sha256-PHo3PNDfGgfcCCvvUNhTeY7XKK7NFcZJLabtZeAn/cg="
+      "revision": "dbc37e8ef12b48b9e7e83c7914da3ba9edd3f670",
+      "url": "https://github.com/zzyil/comick.io-Downloader/archive/dbc37e8ef12b48b9e7e83c7914da3ba9edd3f670.tar.gz",
+      "hash": "sha256-AALYFWzAnPn/+Mh3sQJ2qFukh1YLxjm/O2eRAiIg+b4="
     },
     "ctrld": {
       "type": "GitRelease",
@@ -380,9 +380,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "d98515406245bbdcd940e38cb3c87453d2a8b70d",
-      "url": "https://github.com/dweymouth/supersonic/archive/d98515406245bbdcd940e38cb3c87453d2a8b70d.tar.gz",
-      "hash": "sha256-ZXN4tQOX6q/DmOC2uou8+ffWP9j0qGMVDqeDlM4wD34="
+      "revision": "84440f9935454800c47f7e62323a4a86b85b485e",
+      "url": "https://github.com/dweymouth/supersonic/archive/84440f9935454800c47f7e62323a4a86b85b485e.tar.gz",
+      "hash": "sha256-TOMGGfxxtybOVrW3jxFzBgyqguYzd4rV5mbjWXMIMO4="
     },
     "thermal_comfort": {
       "type": "GitRelease",

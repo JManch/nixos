@@ -60,6 +60,21 @@ in
 
     (mkKeymap "n" "die" "diwx" { desc = "Extended deleted inner word"; })
 
+    # https://stackoverflow.com/a/41935707
+    (mkKeymap "n" "*"
+      ''
+        function()
+          local word = vim.fn.expand("<cword>")
+          vim.fn.setreg("/", "\\<" .. word .. "\\>")
+          vim.o.hlsearch = true
+        end
+      ''
+      {
+        lua = true;
+        desc = "Search and highlight without jump";
+      }
+    )
+
     (mkKeymap "v" "<LEADER>y" "\"+y" { desc = "Yank to system register"; })
     (mkKeymap "v" "<LEADER>p" "\"+p" { desc = "Put from system register"; })
     (mkKeymap "v" "<LEADER>P" "\"+P" { desc = "Put before from system register"; })

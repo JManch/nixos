@@ -356,7 +356,14 @@ in
               ${resticExe} cat config --no-cache --no-lock > /dev/null || ${resticExe} init
             '';
 
-            serviceConfig.CacheDirectory = mkForce "";
+            serviceConfig = {
+              # There is no point in restarting Restic backups as we would only ever want to
+              # restart after network errors and restic has a built-in incremental retry
+              # mechanism that cannot currently be disabled
+              # https://github.com/restic/restic/issues/5463
+              Restart = mkForce "no";
+              CacheDirectory = mkForce "";
+            };
           }
         ) backups)
       ]

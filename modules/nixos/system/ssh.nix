@@ -105,11 +105,11 @@ in
 
   programs.ssh = {
     startAgent = cfg.agent.enable && !desktop.enable;
-    agentTimeout = null;
+    agentTimeout = "12h";
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
     extraConfig =
       optionalString cfg.agent.enable ''
-        AddKeysToAgent yes
+        AddKeysToAgent 12h
       ''
       + optionalString (username == "joshua") (
         ''

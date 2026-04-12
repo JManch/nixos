@@ -1,19 +1,22 @@
 diff --git a/include/ALabel.hpp b/include/ALabel.hpp
-index b3852877..f93e4693 100644
+index b3852877..83a451c7 100644
 --- a/include/ALabel.hpp
 +++ b/include/ALabel.hpp
-@@ -19,7 +19,17 @@ class ALabel : public AModule {
+@@ -19,7 +19,20 @@ class ALabel : public AModule {
    virtual std::string getIcon(uint16_t, const std::vector<std::string>& alts, uint16_t max = 0);
  
   protected:
 -  Gtk::Label label_;
 +  class Label : public Gtk::Label {
++    bool skip_redundant_ = true;
++
 +   public:
++    void set_skip_redundant(bool skip) { skip_redundant_ = skip; }
 +    void set_markup(const Glib::ustring& str) {
-+      if (str != get_label()) Gtk::Label::set_markup(str);
++      if (!skip_redundant_ || str != get_label()) Gtk::Label::set_markup(str);
 +    }
 +    void set_text(const Glib::ustring& str) {
-+      if (str != get_text()) Gtk::Label::set_text(str);
++      if (!skip_redundant_ || str != get_text()) Gtk::Label::set_text(str);
 +    }
 +  };
 +
@@ -21,3 +24,39 @@ index b3852877..f93e4693 100644
    std::string format_;
    const std::chrono::milliseconds interval_;
    bool alt_ = false;
+diff --git a/src/modules/bluetooth.cpp b/src/modules/bluetooth.cpp
+index f491f19b..db3acc7f 100644
+--- a/src/modules/bluetooth.cpp
++++ b/src/modules/bluetooth.cpp
+@@ -91,6 +91,7 @@ waybar::modules::Bluetooth::Bluetooth(const std::string& id, const Json::Value&
+       rfkill_{RFKILL_TYPE_BLUETOOTH},
+ #endif
+       manager_(generateManager()) {
++  label_.set_skip_redundant(false);
+ 
+   if (config_["format-device-preference"].isArray()) {
+     std::transform(config_["format-device-preference"].begin(),
+diff --git a/src/modules/network.cpp b/src/modules/network.cpp
+index c33e750d..061ebc8f 100644
+--- a/src/modules/network.cpp
++++ b/src/modules/network.cpp
+@@ -84,6 +84,7 @@ waybar::modules::Network::readBandwidthUsage() {
+ 
+ waybar::modules::Network::Network(const std::string& id, const Json::Value& config)
+     : ALabel(config, "network", id, DEFAULT_FORMAT, 60) {
++  label_.set_skip_redundant(false);
+   // Start with some "text" in the module's label_. update() will then
+   // update it. Since the text should be different, update() will be able
+   // to show or hide the event_box_. This is to work around the case where
+diff --git a/src/modules/wireplumber.cpp b/src/modules/wireplumber.cpp
+index bb3005bd..ab682429 100644
+--- a/src/modules/wireplumber.cpp
++++ b/src/modules/wireplumber.cpp
+@@ -26,6 +26,7 @@ waybar::modules::Wireplumber::Wireplumber(const std::string& id, const Json::Val
+       source_muted_(false),
+       source_volume_(0.0),
+       default_source_name_(nullptr) {
++  label_.set_skip_redundant(false);
+   waybar::modules::Wireplumber::modules.push_back(this);
+ 
+   wp_init(WP_INIT_PIPEWIRE);

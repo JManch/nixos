@@ -22,7 +22,7 @@
       hyprland = {
         vrr = true;
         tearing = true;
-        animations = true;
+        animations = false;
         directScanout = true;
         secondaryModKey = "SUPER"; # for some reason VMs ignore keyd remaps
         settings.device = lib.singleton {

@@ -19,7 +19,6 @@ let
     intersectAttrs
     assertMsg
     any
-    optionalString
     concatMapStringsSep
     concatStringsSep
     singleton
@@ -142,11 +141,6 @@ in
       nameValuePair "${value.backend}-backups-${name}" (
         mkIf cfg.${value.backend}.enable {
           preStart = mkOrder 0 ''
-            # Exiting successfully here isn't ideal as it means the backup will not be
-            # retried until the next scheduled run. I'd rather not be spammed with the
-            # OnFailure notifications everytime a backup is skipped though. Hopefully can
-            # find a better solution at some point
-            ${optionalString (cfg.ssidBlacklist != [ ]) "${getExe ssidCheck} || exit 0"}
             ${value.preBackupScript}
           '';
 
@@ -160,6 +154,13 @@ in
           };
 
           serviceConfig = {
+            # If the SSID check fails the remaining service commands are skipped and the
+            # unit is NOT marked as failed. This isn't ideal as it means the backup will
+            # not be retried until the next scheduled run. I'd rather not be spammed with
+            # the OnFailure notifications everytime a backup is skipped though. Hopefully
+            # can find a better solution at some point.
+            ExecCondition = mkIf (cfg.ssidBlacklist != [ ]) "${getExe ssidCheck}";
+
             Restart = "on-failure";
             RestartSec = "5m";
             RestartMaxDelaySec = "30m";

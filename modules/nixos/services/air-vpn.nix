@@ -61,11 +61,15 @@ in
     # Attempt to fix VPN failing to start on boot due to temporary network
     # issues then never retrying. May need to add a WantedBy=air-vpn.service
     # rule to all services that depend on the VPN so they recover.
+
+    # Turns out this is due to https://github.com/systemd/systemd/issues/1312#issuecomment-1711831769
+    # as dependent services do not restart on dependency failure.
     systemd.services."air-vpn" = {
       startLimitIntervalSec = 0;
       serviceConfig = {
         Restart = "on-failure";
         RestartSec = 30;
+        RestartMode = "direct";
       };
     };
   })

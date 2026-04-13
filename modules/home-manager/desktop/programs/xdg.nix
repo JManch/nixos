@@ -28,7 +28,7 @@ in
     # https://github.com/nix-community/home-manager/pull/7937/changes#issuecomment-3372232126
     setSessionVariables = false;
     createDirectories = true;
-    extraConfig.XDG_SCREENSHOTS_DIR = "${home}/Pictures/Screenshots";
+    extraConfig.SCREENSHOTS = "${home}/Pictures/Screenshots";
   }
   // optionalAttrs cfg.lowercaseUserDirs {
     desktop = "${home}/desktop";

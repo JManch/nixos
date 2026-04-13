@@ -382,7 +382,7 @@ in
       };
 
       animations = {
-        enabled = cfg.animations;
+        enabled = true;
 
         bezier = [
           "easeInOutQuart,0.76,0,0.24,1"
@@ -401,8 +401,8 @@ in
           "fadeOut, 1, 1.7, easeOutCubic"
           "fadeSwitch, 0, 1, easeOutCirc"
           "fadeDim, 1, 4, fluentDecel"
-          "workspaces, 1, 3, easeOutCubic, slide"
-          "specialWorkspace, 1, 3, easeOutCubic, slidevert"
+          "workspaces, ${if cfg.animations then "1, 3, easeOutCubic, slide" else "0"}"
+          "specialWorkspace, ${if cfg.animations then "1, 3, easeOutCubic, slide" else "0"}"
           "layers, 1, 4, easeOutQuint"
         ];
       };

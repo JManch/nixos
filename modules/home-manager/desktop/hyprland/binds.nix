@@ -52,12 +52,12 @@ let
       '';
 
   toggleAnimations = pkgs.writeShellScript "hypr-toggle-animations" ''
-    if [[ $(${hyprctl} getoption -j animations:enabled | ${jaq} -r '.int') == "1" ]]; then
-      hyprctl keyword animations:enabled false
-      ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Animations disabled'
+    if [ "$(hyprctl -j animations | ${jaq} '.[0][] | select(.name == "workspaces") | .enabled')" = "true" ]; then
+      hyprctl --batch "keyword animation workspaces,0 ; keyword animation specialWorkspace,0"
+      ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Workspace animations disabled'
     else
-      hyprctl keyword animations:enabled true
-      ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Animations enabled'
+      hyprctl --batch "keyword animation workspaces,1,3,easeOutCubic,slide ; keyword animation specialWorkspace,1,3,easeOutCubic,slide"
+      ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Workspace animations enabled'
     fi
   '';
 

@@ -96,7 +96,7 @@ in
     animations = mkOption {
       type = types.bool;
       default = true;
-      description = "Whether to enable animations";
+      description = "Whether to enable workspace animations";
     };
 
     modKey = mkOption {

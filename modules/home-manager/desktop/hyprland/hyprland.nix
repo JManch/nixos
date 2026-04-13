@@ -294,18 +294,21 @@ in
     configPackages = [ pkgs.hyprland ];
   };
 
-  xdg.configFile."uwsm/env-hyprland".text =
-    optionalString (cfg.hyprcursor.package != null) ''
-      export HYPRCURSOR_THEME=${cfg.hyprcursor.name}
-      export HYPRCURSOR_SIZE=${toString config.${ns}.desktop.style.cursor.size}
-    ''
-    + optionalString (osConfig.${ns}.core.device.gpu.type == "nvidia") ''
-      export LIBVA_DRIVER_NAME=nvidia
-      export GBM_BACKEND=nvidia-drm
-      export __GLX_VENDOR_LIBRARY_NAME=nvidia
-      export __GL_GSYNC_ALLOWED=0
-      export __GL_VRR_ALLOWED=0
-    '';
+  xdg.configFile."uwsm/env-hyprland".text = ''
+    # fix for Java applications in tiling WMs
+    export _JAVA_AWT_WM_NONREPARENTING=1
+  ''
+  + optionalString (cfg.hyprcursor.package != null) ''
+    export HYPRCURSOR_THEME=${cfg.hyprcursor.name}
+    export HYPRCURSOR_SIZE=${toString config.${ns}.desktop.style.cursor.size}
+  ''
+  + optionalString (osConfig.${ns}.core.device.gpu.type == "nvidia") ''
+    export LIBVA_DRIVER_NAME=nvidia
+    export GBM_BACKEND=nvidia-drm
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    export __GL_GSYNC_ALLOWED=0
+    export __GL_VRR_ALLOWED=0
+  '';
 
   wayland.windowManager.hyprland = {
     enable = true;

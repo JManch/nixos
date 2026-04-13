@@ -10,7 +10,9 @@
     in
     {
       templates = import ./templates;
-      packages = forEachSystem lib.${ns}.flakePackages;
+      # Use legacyPackages as our packages contain nested attrsets which are
+      # not supported by `nix flake check`
+      legacyPackages = forEachSystem lib.${ns}.flakePackages;
       formatter = forEachSystem (pkgs: pkgs.nixfmt-tree);
 
       nixosConfigurations = lib.listToAttrs [

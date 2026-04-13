@@ -37,6 +37,4 @@ in
   vim.keymaps = [
     (mkKeymap "n" "<LEADER>w" "<CMD>WorkspacesOpen<CR>" { desc = "Open workspace"; })
   ];
-
-  vim.lazy.plugins.fzf-lua.cmd = [ "WorkspacesOpen" ];
 }

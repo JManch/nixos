@@ -2,7 +2,6 @@
 {
   imports = [
     ./completion.nix
-    ./fzf-lua.nix
     ./oil.nix
     ./color-scheme.nix
     ./dashboard.nix
@@ -10,6 +9,7 @@
     ./gitsigns.nix
     ./textobjs.nix
     ./terminal.nix
+    ./fzf-lua
   ];
 
   vim = {

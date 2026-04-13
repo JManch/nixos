@@ -9,7 +9,6 @@
     ./workspaces.nix
     ./gitsigns.nix
     ./textobjs.nix
-    ./statusline
     ./terminal.nix
   ];
 
@@ -74,6 +73,11 @@
           })
           require("indentmini").setup()
         '';
+    };
+
+    extraPlugins."heirline-nvim" = {
+      package = pkgs.vimPlugins.heirline-nvim;
+      setup = "dofile('${./statusline.lua}')";
     };
 
     lazy.plugins."tabular" = {

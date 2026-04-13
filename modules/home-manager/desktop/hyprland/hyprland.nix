@@ -405,7 +405,7 @@ in
           "fadeSwitch, 0, 1, easeOutCirc"
           "fadeDim, 1, 4, fluentDecel"
           "workspaces, ${if cfg.animations then "1, 3, easeOutCubic, slide" else "0"}"
-          "specialWorkspace, ${if cfg.animations then "1, 3, easeOutCubic, slide" else "0"}"
+          "specialWorkspace, ${if cfg.animations then "1, 3, easeOutCubic, slidevert" else "0"}"
           "layers, 1, 4, easeOutQuint"
         ];
       };

@@ -56,7 +56,7 @@ let
       hyprctl --batch "keyword animation workspaces,0 ; keyword animation specialWorkspace,0"
       ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Workspace animations disabled'
     else
-      hyprctl --batch "keyword animation workspaces,1,3,easeOutCubic,slide ; keyword animation specialWorkspace,1,3,easeOutCubic,slide"
+      hyprctl --batch "keyword animation workspaces,1,3,easeOutCubic,slide ; keyword animation specialWorkspace,1,3,easeOutCubic,slidevert"
       ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Workspace animations enabled'
     fi
   '';

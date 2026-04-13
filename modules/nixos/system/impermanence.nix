@@ -11,7 +11,7 @@ let
   inherit (lib)
     ns
     mkIf
-    mkForce
+    singleton
     getExe
     mkAliasOptionModule
     concatMapStringsSep
@@ -161,11 +161,9 @@ in
   }
 
   (mkIf (!cfg.enable) {
-    ns.persistence = {
-      enable = false;
-      directories = mkForce [ ];
-      files = mkForce [ ];
-      users.${username} = mkForce { };
-    };
+    ns.persistence.enable = false;
+    # Impermance imports the hm module for all hm users by putting it in
+    # `sharedModules` so we need to disable for all hm users as well
+    home-manager.sharedModules = singleton { home.persistence."/persist".enable = false; };
   })
 ]

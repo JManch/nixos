@@ -84,7 +84,7 @@ in
 
       label = {
         monitor = "";
-        text = "$TIME";
+        text = "cmd[update:60000] echo $TIME";
         color = "0xff${colors.base07}";
         font_size = builtins.ceil (0.046875 * primaryMonitor.width * primaryMonitor.scale);
         font_family = desktop.style.font.family;

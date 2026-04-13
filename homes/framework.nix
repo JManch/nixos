@@ -10,7 +10,7 @@
       enable = true;
       terminal = "Alacritty";
       windowManager = "hyprland";
-      locker = "waylock"; # using waylock because hyprlock does not let our GPU idle so +1W power usage
+      locker = "hyprlock";
       launcher = "fuzzel";
       xdg.lowercaseUserDirs = true;
 

@@ -31,10 +31,10 @@ in
     (mkKeymap "n" "<LEADER>fk" "<CMD>FzfLua keymaps<CR>" { desc = "fzf-lua keymaps"; })
     (mkKeymap "n" "<LEADER>fs" "<CMD>FzfLua spell_suggest<CR>" { desc = "fzf-lua spell suggest"; })
     (mkKeymap "n" "<LEADER>f<LEADER>" "<CMD>FzfLua resume<CR>" { desc = "fzf-lua resume last search"; })
-    (mkKeymap "n" "<LEADER>fr<LEADER>" "<CMD>FzfLua registers<CR>" { desc = "fzf-lua registers"; })
-    (mkKeymap "n" "<LEADER>fj<LEADER>" "<CMD>FzfLua jumps<CR>" { desc = "fzf-lua jumps"; })
-    (mkKeymap "n" "<LEADER>fu<LEADER>" "<CMD>FzfLua undotree<CR>" { desc = "fzf-lua undotree"; })
-    (mkKeymap "n" "<LEADER>fp<LEADER>" "<CMD>FzfLua complete_path<CR>" {
+    (mkKeymap "n" "<LEADER>fr" "<CMD>FzfLua registers<CR>" { desc = "fzf-lua registers"; })
+    (mkKeymap "n" "<LEADER>fj" "<CMD>FzfLua jumps<CR>" { desc = "fzf-lua jumps"; })
+    (mkKeymap "n" "<LEADER>fu" "<CMD>FzfLua undotree<CR>" { desc = "fzf-lua undotree"; })
+    (mkKeymap "n" "<LEADER>fp" "<CMD>FzfLua complete_path<CR>" {
       desc = "fzf-lua complete path";
     })
 

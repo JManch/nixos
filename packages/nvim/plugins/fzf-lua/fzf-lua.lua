@@ -1,5 +1,12 @@
 local actions = require("fzf-lua").actions
 
+local copy_hash = function(selected, opts)
+  local commit_hash = match_commit_hash(selected[1], opts)
+  vim.fn.setreg([[+]], commit_hash)
+  vim.fn.setreg([["]], commit_hash)
+  vim.fn.setreg([[0]], commit_hash)
+end
+
 vim.env.FZF_DEFAULT_OPTS = nil
 
 require("fzf-lua").setup { "default",
@@ -50,6 +57,8 @@ require("fzf-lua").setup { "default",
   },
 
   git = {
+    commits = { actions = {  ['ctrl-y'] = copy_hash } },
+    bcommits = { actions = {  ['ctrl-y'] = copy_hash } },
     blame = {
       winopts = {
         preview = {

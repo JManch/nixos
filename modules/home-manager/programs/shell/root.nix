@@ -32,6 +32,7 @@
       rsync
       sd
       procs
+      termdown
     ])
     ++ lib.optional (osConfig != null) pkgs.microfetch;
 

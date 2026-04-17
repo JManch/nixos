@@ -369,7 +369,43 @@ in
         ''
       ))
     ]
-    ++ optional (cfg.wireless.enable && cfg.wireless.backend == "iwd") pkgs.impala;
+    ++ optionals (cfg.wireless.enable && cfg.wireless.backend == "iwd") [
+      pkgs.impala
+      # This is useful when sharing wifi with linux-wifi-hotspot. When both
+      # sharing and receiving internet on a single interface, on some devices
+      # the AP channel must match the channel of the network we're connected
+      # to. Linx wifi hotspot only allows manually choose 2.4ghz channels.
+      # Also some devices like smart watch only join 2.4ghz networks.
+      (pkgs.writeShellApplication {
+        name = "toggle-force-2.4ghz";
+        runtimeInputs = with pkgs; [ gnugrep ];
+        text = # bash
+          ''
+            if [[ $(id -u) != "0" ]]; then
+               echo "This script must be run as root" >&2
+               exit 1
+            fi
+
+            if grep -qF "[Rank]" /etc/iwd/main.conf; then
+              rm /etc/iwd/main.conf
+              ln -s /etc/static/iwd/main.conf /etc/iwd/main.conf
+              echo "Force 2.4ghz disabled"
+            else
+              cp --remove-destination "$(readlink -f /etc/iwd/main.conf)" /etc/iwd/main.conf
+              cat << EOF >> /etc/iwd/main.conf
+            [Rank]
+            BandModifier2_4GHz=1.0
+            BandModifier5GHz=0.0
+            BandModifier6GHz=0.0
+            EOF
+              echo "Force 2.4ghz enabled"
+            fi
+
+            systemctl restart iwd.service
+          '';
+      })
+    ]
+    ++ optional cfg.wireless.enable pkgs.linux-wifi-hotspot;
 
   ns.hm = mkIf home-manager.enable {
     xdg.desktopEntries.impala =

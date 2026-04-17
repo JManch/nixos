@@ -55,17 +55,6 @@ in
     ];
 
     postUnlockScript = optionalString hasFingerprint "${hyprctl} dispatch dpms on";
-
-    postLockScript = ''
-      (
-        sleep 1; # SIGUSR2 kills hyprlock if ran too early
-        while true; do
-          # Refresh labels every **:00 minute
-          ${getExe' pkgs.coreutils "kill"} -SIGUSR2 $MAINPID
-          sleep $(( 60 - $(date +%S) ))
-        done
-      ) &
-    '';
   };
 
   programs.hyprlock = {
@@ -95,7 +84,7 @@ in
 
       label = {
         monitor = "";
-        text = "cmd[update:0:true] echo $TIME";
+        text = "cmd[update:60000] echo $TIME";
         color = "0xff${colors.base07}";
         font_size = builtins.ceil (0.046875 * primaryMonitor.width * primaryMonitor.scale);
         font_family = desktop.style.font.family;

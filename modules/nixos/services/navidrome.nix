@@ -64,6 +64,7 @@ in
       LastFM.Enabled = true;
       LastFM.ScrobbleFirstArtistOnly = true; # lastfm doesn't support multiple artists very well
       UILoginBackgroundUrl = pkgs.${ns}.wallpapers.bw-mountains.url;
+      Subsonic.MinimalClients = "SubMusic-v0.2.11-icarius"; # garmin forerunner
 
       Backup = {
         Path = "/var/backup/navidrome";

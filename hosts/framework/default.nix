@@ -42,6 +42,7 @@
             name = "eDP-1";
             number = 1;
             refreshRate = 120.0;
+            iccProfile = pkgs.${lib.ns}.framework-icc;
             width = 2880;
             height = 1920;
             scale = 1.5;

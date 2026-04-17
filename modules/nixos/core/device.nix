@@ -70,6 +70,12 @@ let
         '';
       };
 
+      iccProfile = mkOption {
+        type = with types; nullOr path;
+        default = null;
+        description = "Monitor ICC profile";
+      };
+
       gamma = mkOption {
         type = types.float;
         default = 1.0;

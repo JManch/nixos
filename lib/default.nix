@@ -18,6 +18,7 @@ let
     elemAt
     concatMap
     singleton
+    concatStringsSep
     nixosSystem
     optionals
     hasPrefix
@@ -233,9 +234,17 @@ in
 
     getMonitorHyprlandCfgStr =
       m:
-      "${m.name},${toString m.width}x${toString m.height}@${toString m.refreshRate},${toString m.position.x}x${toString m.position.y},${toString m.scale},transform,${toString m.transform}${
-        optionalString (m.mirror != null) ",mirror,${m.mirror}"
-      }";
+      concatStringsSep "," (
+        [
+          m.name
+          "${toString m.width}x${toString m.height}@${toString m.refreshRate}"
+          "${toString m.position.x}x${toString m.position.y}"
+          (toString m.scale)
+          "transform,${toString m.transform}"
+        ]
+        ++ optional (m.iccProfile != null) "icc,${m.iccProfile}"
+        ++ optional (m.mirror != null) "mirror,${m.mirror}"
+      );
 
     asserts =
       asserts:

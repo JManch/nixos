@@ -47,12 +47,13 @@
       # the future
       postBuild = ''
         wrapProgram $out/bin/${pkgs.lazygit.meta.mainProgram} --run '
-          # If we are NOT in an SSH session override lazygit config to enable overrideGpg. 
-          # Doing this because overrideGpg causes commit signing to hang over
-          # SSH as the SSH passphrase prompts breaks. I do not want to disable
-          # overrideGpg all the time because it causes the lazygit window to
-          # temporarily close everytime we make a commit.
-          if [[ -z $SSH_CONNECTION && -z $SSH_CLIENT && -z $SSH_TTY ]]; then
+          # If we are in a graphical session override lazygit config to enable
+          # overrideGpg. Doing this because overrideGpg causes commit signing to
+          # hang in non-graphical sessions as the graphical SSH passphrase prompt
+          # breaks. I do not want to disable overrideGpg all the time because it
+          # causes the lazygit window to temporarily close everytime we make a
+          # commit.
+          if [[ -n $DISPLAY || -n $WAYLAND_DISPLAY ]]; then
             exec ${lib.getExe pkgs.lazygit} --use-config-file ${pkgs.writeText "lazygit-override-gpg-config" ''
               notARepository: skip
               git:

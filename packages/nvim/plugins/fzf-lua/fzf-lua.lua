@@ -1,3 +1,4 @@
+local fzf = require("fzf-lua")
 local actions = require("fzf-lua").actions
 
 local copy_hash = function(selected, opts)
@@ -5,6 +6,16 @@ local copy_hash = function(selected, opts)
   vim.fn.setreg([[+]], commit_hash)
   vim.fn.setreg([["]], commit_hash)
   vim.fn.setreg([[0]], commit_hash)
+end
+
+local edit_or_oil = function(selected, opts)
+  local entry = fzf.path.entry_to_file(selected[1], opts)
+  local path  = entry.path
+  if path and vim.fn.isdirectory(vim.fn.expand(path)) == 1 then
+    require("oil").open_float(path, { preview = {} })
+  else
+    actions.file_edit_or_qf(selected, opts)
+  end
 end
 
 vim.env.FZF_DEFAULT_OPTS = nil
@@ -22,7 +33,7 @@ require("fzf-lua").setup { "default",
 
   actions = {
     files = {
-      ["enter"]  = actions.file_edit_or_qf,
+      ["enter"]  = edit_or_oil,
       ["ctrl-x"] = actions.file_split,
       ["ctrl-v"] = actions.file_vsplit,
       ["ctrl-t"] = actions.file_tabedit,

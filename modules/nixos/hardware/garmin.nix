@@ -4,7 +4,7 @@
 {
   ns.userPackages = [
     (pkgs.buildFHSEnv {
-      name = "sdkmanager-fhs";
+      name = "garmin-sdkmanager";
       targetPkgs =
         p:
         with p;
@@ -31,7 +31,7 @@
           curlMinimal
         ]
         ++ (
-          with import (fetchTree "github:NixOS/nixpkgs/release-25.05") {
+          with import (fetchTree "github:NixOS/nixpkgs/ac62194c3917d5f474c1a844b6fd6da2db95077d") {
             inherit (pkgs.stdenv.hostPlatform) system;
           }; [
             webkitgtk_4_0

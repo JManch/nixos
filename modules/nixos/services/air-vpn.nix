@@ -24,9 +24,11 @@ in
       air-vpn-up = "sudo systemctl start wg-quick-air-vpn";
       air-vpn-down = "sudo systemctl stop wg-quick-air-vpn";
     };
+  }
 
-    ns.userPackages = [
-      (pkgs.writeShellApplication {
+  (lib.mkIf (cfg.confinement.enable || cfg.enable) {
+    ns.userPackages = lib.singleton (
+      pkgs.writeShellApplication {
         name = "air-vpn-switch-endpoint";
         runtimeInputs = [ pkgs.gnused ];
         text = ''
@@ -41,15 +43,11 @@ in
           fi
 
           sed -i "s/^Endpoint = .*:/Endpoint = $1:/" ${airVpnConfig.path}
-          if systemctl restart air-vpn.service; then
-            echo "Endpoint successfully switched to '$1'"
-          else
-            echo "VPN failed to start with endpoint '$1'"
-          fi
+          echo "Config endpoint updated. Now restart either air-vpn.service or wg-quick-air-vpn.service."
         '';
-      })
-    ];
-  }
+      }
+    );
+  })
 
   (lib.mkIf cfg.confinement.enable {
     vpnNamespaces."air-vpn" = {

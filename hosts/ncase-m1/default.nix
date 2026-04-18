@@ -93,6 +93,7 @@
       scanner.enable = true;
       "8bitdo-ultimate-2".enable = true;
       fpv.enable = true;
+      garmin.enable = true;
 
       valve-index = {
         enable = true;

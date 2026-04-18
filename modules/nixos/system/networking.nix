@@ -405,6 +405,8 @@ in
           '';
       })
     ]
+    # When sharing from the same wireless interface, run `iw wlan0 info` to get the
+    # channel and set the channel in linux-wifi-hotspot to the same.
     ++ optional cfg.wireless.enable pkgs.linux-wifi-hotspot;
 
   ns.hm = mkIf home-manager.enable {

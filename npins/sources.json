@@ -61,6 +61,22 @@
       "url": "https://api.github.com/repos/zydezu/ModernX/tarball/refs/tags/0.4.5",
       "hash": "sha256-a+StfEYQwt5NuELvanvZllrD2RQ0g9JBpCznMdSDM5Y="
     },
+    "Wolvenkit": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "Wolvenkit",
+        "repo": "Wolvenkit"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "8.17.4",
+      "revision": "cfef52fc2684de49f4c6243c7f330c5349538f7c",
+      "url": "https://api.github.com/repos/Wolvenkit/Wolvenkit/tarball/refs/tags/8.17.4",
+      "hash": "sha256-R2JKYVVpgOJCF5VsQ/xSmGa1P9HWiBY5YAR5WsC/xLA="
+    },
     "adaptive-lighting": {
       "type": "GitRelease",
       "repository": {

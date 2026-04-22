@@ -23,6 +23,10 @@ in
     };
 
   conditions = [
+    # disable cause, as of 0.3.0, the service constantly fails with "transport
+    # endpoint not connected". We have our low-battery-notify service anyway.
+    false
+
     osConfig.services.upower.enable
     (device.battery != null)
   ];

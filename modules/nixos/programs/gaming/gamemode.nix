@@ -96,7 +96,7 @@ let
           return 1
         }
 
-        # If no custom args were provided, load the default profile
+        # If no profile was specified, load the default profile
         if (( ! ''${#profiles[@]} )); then
           : # to avoid empty if statement
           ${profiles.default.${mode}}
@@ -105,12 +105,12 @@ let
         # Load a profile if its name is one of the args
         ${concatLines (
           mapAttrsToList (
-            profile: cfg': # bash
+            profile: profileCfg: # bash
             ''
               if profile_exists "${profile}"; then
                 : # to avoid empty if statement
-                ${optionalString cfg'.includeDefaultProfile profiles.default.${mode}}
-                ${cfg'.${mode}}
+                ${optionalString profileCfg.includeDefaultProfile profiles.default.${mode}}
+                ${profileCfg.${mode}}
               fi
             '') profiles
         )}
@@ -128,21 +128,34 @@ in
   opts = {
     profiles = mkOption {
       type = types.attrsOf (
-        types.submodule {
-          options = {
-            includeDefaultProfile = mkEnableOption "the default profile scripts in this profile";
+        types.submodule (
+          { name, ... }:
+          {
+            options = {
+              includeDefaultProfile = mkEnableOption "the default profile scripts in this profile";
 
-            start = mkOption {
-              type = types.lines;
-              default = "";
-            };
+              start = mkOption {
+                type = with types; attrsOf lines;
+                default = { };
+                apply =
+                  v:
+                  concatLines (
+                    mapAttrsToList (name': script: pkgs.writeShellScript "gamemode-${name}-start-${name'}" script) v
+                  );
+              };
 
-            stop = mkOption {
-              type = types.lines;
-              default = "";
+              stop = mkOption {
+                type = with types; attrsOf lines;
+                default = { };
+                apply =
+                  v:
+                  concatLines (
+                    mapAttrsToList (name': script: pkgs.writeShellScript "gamemode-${name}-stop-${name'}" script) v
+                  );
+              };
             };
-          };
-        }
+          }
+        )
       );
       default = { };
       description = ''

@@ -5,10 +5,9 @@
   osConfig,
 }:
 let
-  inherit (lib) ns mkIf getExe';
+  inherit (lib) ns mkIf;
   inherit (lib.${ns}) isHyprland getMonitorHyprlandCfgStr;
   inherit (osConfig.${ns}.core.device) primaryMonitor;
-  hyprctl = getExe' pkgs.hyprland "hyprctl";
 in
 {
   home.packages = [
@@ -30,8 +29,8 @@ in
   categoryConfig = {
     gameClasses = [ "osu!" ];
     gamemode.profiles.osu = mkIf (isHyprland config) {
-      start = ''
-        ${hyprctl} --instance 0 --batch "\
+      start."tablet" = ''
+        hyprctl --instance 0 --batch "\
           keyword monitor ${
             getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
           }; \
@@ -44,8 +43,8 @@ in
       '';
 
       # FIX: Hyprland bug: active_area_size cannot be reset by setting it to 0 0
-      stop = ''
-        ${hyprctl} --instance 0 --batch "\
+      stop."tablet" = ''
+        hyprctl --instance 0 --batch "\
           keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
           keyword input:tablet:active_area_size 152 95; \
           keyword input:tablet:active_area_position 0 0; \

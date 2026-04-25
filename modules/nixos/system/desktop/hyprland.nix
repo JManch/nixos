@@ -2,6 +2,7 @@
   lib,
   cfg,
   args,
+  pkgs,
   config,
 }:
 let
@@ -58,7 +59,7 @@ in
           keyword bind ${hyprland.modKey}${optionalString isStart "SHIFTCONTROL"}, W, killactive'';
       in
       {
-        start =
+        start."hyprland" =
           # bash
           ''
             hyprctl --instance 0 --batch "\
@@ -67,18 +68,17 @@ in
               }; \
               ${killActiveRebind true}; \
               keyword decoration:blur:enabled false; \
-              keyword render:direct_scanout ${if hyprland.directScanout then "1" else "0"}; \
-            "
+              keyword render:direct_scanout ${if hyprland.directScanout then "1" else "0"}"
           '';
 
-        stop = # bash
+        stop."hyprland" =
+          # bash
           ''
             hyprctl --instance 0 --batch "\
               keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
               ${killActiveRebind false}; \
               keyword decoration:blur:enabled ${boolToString hyprland.blur}; \
-              keyword render:direct_scanout 0; \
-            "
+              keyword render:direct_scanout 0"
           '';
       };
   }

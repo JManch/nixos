@@ -127,26 +127,26 @@ in
     {
       # Default gamemode behaviour is to just change the power profile to
       # 3D_FULL_SCREEN
-      default = {
-        start = ''
+      "default" = {
+        start."lact" = ''
           id=$(${getId})
           ${setPowerProfile 1}
         '';
 
-        stop = ''
+        stop."lact" = ''
           id=$(${getId})
           ${setPowerProfile 0}
         '';
       };
 
-      vr = {
-        start = ''
+      "vr" = {
+        start."lact" = ''
           id=$(${getId})
           ${setPowerProfile 4}
           ${setPowerCap 257}
         '';
 
-        stop = ''
+        stop."lact" = ''
           id=$(${getId})
           ${setPowerProfile 0}
           ${setPowerCap 231}
@@ -159,8 +159,8 @@ in
       # worse though, with a ~200rpm fan increase.
       high_perf = {
         includeDefaultProfile = true;
-        start = "${setPowerCap 257}";
-        stop = "${setPowerCap 231}";
+        start."lact" = "${setPowerCap 257}";
+        stop."lact" = "${setPowerCap 231}";
       };
     };
 }

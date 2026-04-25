@@ -218,10 +218,10 @@ in
       modules-right = mkBefore [ "custom/gamemode" ];
       "custom/gamemode" = {
         format = "<span color='#${config.${ns}.hm.colorScheme.palette.base04}'>󰊴 </span> {}";
-        exec = ''systemctl is-active --quiet --user inhibit-lock && echo -n "GameMode" || echo -n ""'';
+        exec = "systemctl is-active --quiet --user gamemode.service && echo -n 'GameMode' || echo -n ''";
         interval = 30;
         tooltip = false;
-        on-click-right = "systemctl stop --user gamemode";
+        on-click-right = "systemctl stop --user gamemode.service";
       };
     };
   };

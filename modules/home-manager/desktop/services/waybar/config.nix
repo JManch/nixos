@@ -39,7 +39,6 @@ let
 
   audio = osConfig.${ns}.system.audio;
   wgnord = osConfig.${ns}.services.wgnord;
-  gamemode = osConfig.${ns}.programs.gaming.gamemode;
   gpuModuleEnabled = (gpu.type == "amd") && (gpu.hwmonId != null);
   powerProfilesEnabled =
     osConfig.services.tlp.enable || osConfig.services.power-profiles-daemon.enable;

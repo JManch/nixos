@@ -1,3 +1,15 @@
+# GameMode is bloated and not necessary with good kernel schedulers. The only
+# feature I was really using was the start/stop script. Gamemode also switches
+# the power governer by default which I already do myself in lact and would
+# rather control manually on laptops with TLP.
+
+# This is my own "gamemode" implementation that:
+# - Launches games in their own scope. This gives the game a dedicated cgroup
+#   (normally the game ends up in the same cgroup as Steam which isn't ideal)
+# - Gives the game resource priority over other applications in the graphical
+#   desktop slice by setting the scope's CPUWeight property.
+# - Runs a start/stop script from a simple "gamemode" user service that is
+#   bound to whatever game activated it.
 {
   lib,
   cfg,
@@ -9,46 +21,57 @@ let
   inherit (lib)
     ns
     mkOption
+    mkBefore
+    mkIf
     mkEnableOption
     types
     all
     hasAttr
     getExe
     getExe'
-    hiPrio
     boolToString
     mapAttrsToList
     optionalString
     concatLines
-    toSentenceCase
     ;
   inherit (lib.${ns})
     getMonitorHyprlandCfgStr
     isHyprland
     ;
-  inherit (config.${ns}.system) desktop;
+  inherit (config.${ns}.core) home-manager;
   profiles = (config.${ns}.hmNs.programs.gaming.gamemode.profiles or { }) // cfg.profiles;
 
-  gamemodeWrapped = pkgs.symlinkJoin {
-    name = "gamemode-wrapped-profiles";
-    paths = [ pkgs.gamemode ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      # Have to write the profiles to a file so that the gamemode start script
-      # can read them from the file. I'm not aware of any other way to pass
-      # custom arguments to the start script (and it does not inherit env vars)
+  gamemoderun = pkgs.writeShellApplication {
+    name = "gamemoderun";
+    runtimeInputs = with pkgs; [
+      app2unit
+      systemd
+    ];
+    # Have to write the profiles to a file so our gamemode service can read
+    # them.
 
-      # We can't write to /tmp because steam runs in a chroot with its own
-      # tmp dir. Any files we write there will not be accessible from our
-      # gamemoderun start script. Our home directory is bind mounted in the
-      # chroot so that is accessible.
-      wrapProgram $out/bin/gamemoderun --run '
-        if [ -e "/home/${username}/.gamemode-profiles" ]; then
-          ${getExe pkgs.libnotify} --urgency=critical -t 5000 "GameMode" "Profiles file already exists"
-          exit 1
+    # We can't write to /tmp because steam runs in a chroot with its own tmp
+    # dir. Any files we write there will not be accessible from our gamemode
+    # service. Our home directory is bind mounted in the chroot so that is
+    # accessible.
+    text = ''
+      props=(-p CPUWeight=200)
+
+      # Gamemode start/stop is only bound to the first game that activates it.
+      if ! systemctl is-active --user --quiet gamemode.service; then
+        props+=(-p Wants=gamemode.service -p PropagatesStopTo=gamemode.service)
+        rm -f "/home/${username}/.gamemode-profiles"
+        if [[ -n ''${GAMEMODE_PROFILES:-} ]]; then
+          echo "$GAMEMODE_PROFILES" > "/home/${username}/.gamemode-profiles"
         fi
-        echo "$GAMEMODE_PROFILES" > "/home/${username}/.gamemode-profiles"
-      '
+      fi
+
+      exec app2unit \
+        -a game \
+        -t scope \
+        "''${props[@]}" \
+        -- "$@"
+
     '';
   };
 
@@ -66,19 +89,6 @@ let
         profiles=()
         if [[ -e $profiles_file ]]; then
           IFS=',' read -r -a profiles <<< "$(<"$profiles_file")"
-          ${optionalString (mode == "stop") "rm \"$profiles_file\""}
-        else
-          # I think some applications like prismlauncher start gamemode using
-          # some library function, not the executable. This means our wrapper
-          # script doesn't get called and the script args file is not created.
-          # The workaround for prismlaunch is to disable the Tweaks > Feral
-          # Gamemode option and instead set the custom wrapper command to
-          # `gamemoderun`.
-
-          # If this message appears it's not a problem as long as we're not
-          # trying to use a custom profile.
-          notify-send -e --urgency=critical -t 5000 \
-            'GameMode' '${toSentenceCase mode} script args file missing, read comment in config'
         fi
 
         profile_exists() {
@@ -110,28 +120,17 @@ let
             '') profiles
         )}
 
-        ${optionalString (desktop.desktopEnvironment == null) # bash
-          ''
-            message="${if mode == "stop" then "Stopped" else "Started"}"
-            if (( ''${#profiles[@]} )); then
-              message="$message with profile(s) $(IFS=', '; echo "''${profiles[*]}")"
-            fi
-            notify-send -e --urgency=critical -t 5000 'GameMode' "$message"
-          ''
-        }
+        message="${if mode == "stop" then "Stopped" else "Started"}"
+        if (( ''${#profiles[@]} )); then
+          message="$message with profile(s) $(IFS=', '; echo "''${profiles[*]}")"
+        fi
+        notify-send -e --urgency=critical -t 5000 'GameMode' "$message"
       '';
     };
 
 in
 {
   opts = {
-    wrappedPackage = mkOption {
-      type = types.package;
-      readOnly = true;
-      default = gamemodeWrapped;
-      description = "Wrapped gamemode package with profile functionality";
-    };
-
     profiles = mkOption {
       type = types.attrsOf (
         types.submodule {
@@ -168,21 +167,9 @@ in
     "Home manager and NixOS must not define the same gamemode profiles"
   ];
 
-  # Do not start gamemoded for system users. This prevents gamemoded starting
-  # during login when greetd temporarily runs as the greeter user.
-  systemd.user.services.gamemoded.unitConfig.ConditionUser = "!@system";
+  ns.userPackages = [ gamemoderun ];
 
-  # Since version 1.8 gamemode requires the user to be in the gamemode group
-  # https://github.com/FeralInteractive/gamemode/issues/452
-  users.users.${username}.extraGroups = [ "gamemode" ];
-
-  # This allows us to pass a comma seperated list of profiles to gamemode start
-  # and stop scripts with the GAMEMODE_PROFILES env var. For example, setting
-  # GAMEMODE_PROFILES=vr sets a higher GPU power cap in our start script and
-  # enables the VR profile on our GPU.
-  environment.systemPackages = [ (hiPrio gamemodeWrapped) ];
-
-  ns.programs.gaming.gamemode.profiles.default =
+  ns.programs.gaming.gamemode.profiles."default" =
     let
       inherit (config.${ns}.hmNs.desktop) hyprland;
       inherit (config.${ns}.core.device) primaryMonitor;
@@ -215,14 +202,27 @@ in
       '';
     };
 
-  programs.gamemode = {
-    enable = true;
+  systemd.user.services."gamemode" = {
+    path = lib.mkForce [ ];
 
-    settings.custom = {
-      # WARN: For gamemode script changes to be applied the user service must
-      # be manually restarted with `systemctl restart --user gamemoded`
-      start = getExe (startStopScript "start");
-      end = getExe (startStopScript "stop");
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = getExe (startStopScript "start");
+      ExecStop = getExe (startStopScript "stop");
+    };
+  };
+
+  ns.hm = mkIf home-manager.enable {
+    programs.waybar.settings.bar = {
+      modules-right = mkBefore [ "custom/gamemode" ];
+      "custom/gamemode" = {
+        format = "<span color='#${config.${ns}.hm.colorScheme.palette.base04}'>󰊴 </span> {}";
+        exec = ''systemctl is-active --quiet --user inhibit-lock && echo -n "GameMode" || echo -n ""'';
+        interval = 30;
+        tooltip = false;
+        on-click-right = "systemctl stop --user gamemode";
+      };
     };
   };
 }

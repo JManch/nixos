@@ -333,17 +333,6 @@ in
           on-click = "wgnord-down";
         };
 
-        gamemode = mkIf gamemode.enable {
-          format = "{glyph} Gamemode";
-          format-alt = "{glyph} Gamemode";
-          glyph = "<span color='#${colors.base04}'>󰊴</span>";
-          hide-not-running = true;
-          use-icon = false;
-          icon-size = 0;
-          icon-spacing = 0;
-          tooltip = false;
-        };
-
         modules-left = [
           "hyprland/workspaces"
           "hyprland/submap"
@@ -357,7 +346,6 @@ in
           ++ optional wgnord.enable "custom/vpn"
           ++ [ "cpu" ]
           ++ optional gpuModuleEnabled "custom/gpu"
-          ++ optional gamemode.enable "gamemode"
           ++ [ "memory" ]
           ++ optional (backlight != null) "backlight"
           ++ optionals audio.enable [

@@ -15,7 +15,6 @@ let
     mkOption
     types
     mkBefore
-    mkIf
     mkAliasOptionModule
     ;
   # https://discourse.nixos.org/t/not-allowed-to-refer-to-a-store-path-error/5226
@@ -178,7 +177,7 @@ in
 
   programs.waybar.settings.bar = {
     modules-right = mkBefore [ "custom/locker" ];
-    "custom/locker" = mkIf (cfg.package != null) {
+    "custom/locker" = {
       format = "<span color='#${config.colorScheme.palette.base04}'>󰷛 </span> {}";
       exec = ''systemctl is-active --quiet --user inhibit-lock && echo -n "Inhibited" || echo -n ""'';
       interval = 30;

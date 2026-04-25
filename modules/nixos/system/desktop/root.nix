@@ -158,7 +158,7 @@ in
   # of units provided in packages; not those declared with Nix.
 
   # We workaround this by instead defining plain unit files containing just
-  # the set text. Setting `systemd.user.services.<name>.paths = mkForce []`
+  # the set text. Setting `systemd.user.services.<name>.path = mkForce []`
   # also works (it still adds extra Environment= vars however).
   systemd.user.units =
     genAttrs

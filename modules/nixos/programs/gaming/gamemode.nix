@@ -29,14 +29,9 @@ let
     hasAttr
     getExe
     getExe'
-    boolToString
     mapAttrsToList
     optionalString
     concatLines
-    ;
-  inherit (lib.${ns})
-    getMonitorHyprlandCfgStr
-    isHyprland
     ;
   inherit (config.${ns}.core) home-manager;
   profiles = (config.${ns}.hmNs.programs.gaming.gamemode.profiles or { }) // cfg.profiles;
@@ -169,46 +164,19 @@ in
 
   ns.userPackages = [ gamemoderun ];
 
-  ns.programs.gaming.gamemode.profiles."default" =
-    let
-      inherit (config.${ns}.hmNs.desktop) hyprland;
-      inherit (config.${ns}.core.device) primaryMonitor;
-      hyprctl = getExe' pkgs.hyprland "hyprctl";
-
-      # Remap the killactive key to use the shift modifier
-      killActiveRebind = isStart: ''
-        keyword unbind ${hyprland.modKey}${optionalString (!isStart) "SHIFTCONTROL"}, W; \
-        keyword bind ${hyprland.modKey}${optionalString isStart "SHIFTCONTROL"}, W, killactive'';
-    in
-    {
-      start = optionalString (isHyprland config) ''
-        ${hyprctl} --instance 0 --batch "\
-          keyword monitor ${
-            getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
-          }; \
-          ${killActiveRebind true}; \
-          keyword decoration:blur:enabled false; \
-          keyword render:direct_scanout ${if hyprland.directScanout then "1" else "0"}; \
-        "
-      '';
-
-      stop = optionalString (isHyprland config) ''
-        ${hyprctl} --instance 0 --batch "\
-          keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
-          ${killActiveRebind false}; \
-          keyword decoration:blur:enabled ${boolToString hyprland.blur}; \
-          keyword render:direct_scanout 0; \
-        "
-      '';
-    };
-
   systemd.user.services."gamemode" = {
     path = lib.mkForce [ ];
 
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = getExe (startStopScript "start");
+      # Delay profile start because sometimes a game fails to launch and
+      # immediately stops (such as when a proton prefix is not selected). In
+      # these cases we don't want to do an unnecessary monitor mode switch or
+      # GPU profile change. ExecStop is NOT ran if the service is stopped
+      # within 10 seconds.
+      ExecStartPre = "${getExe' pkgs.coreutils "sleep"} 10";
+      ExecStart = (getExe (startStopScript "start"));
       ExecStop = getExe (startStopScript "stop");
     };
   };

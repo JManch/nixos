@@ -10,9 +10,16 @@ let
     mkForce
     replaceStrings
     optional
+    optionalString
+    boolToString
     mkEnableOption
     ;
-  inherit (lib.${ns}) isHyprland sliceSuffix flakePkgs;
+  inherit (lib.${ns})
+    isHyprland
+    sliceSuffix
+    flakePkgs
+    getMonitorHyprlandCfgStr
+    ;
 in
 [
   {
@@ -39,6 +46,41 @@ in
       serviceConfig.Slice = "session${sliceSuffix config}.slice";
       wantedBy = [ "graphical-session.target" ];
     };
+
+    ns.programs.gaming.gamemode.profiles."default" =
+      let
+        inherit (config.${ns}.hmNs.desktop) hyprland;
+        inherit (config.${ns}.core.device) primaryMonitor;
+
+        # Remap the killactive key to use the shift modifier
+        killActiveRebind = isStart: ''
+          keyword unbind ${hyprland.modKey}${optionalString (!isStart) "SHIFTCONTROL"}, W; \
+          keyword bind ${hyprland.modKey}${optionalString isStart "SHIFTCONTROL"}, W, killactive'';
+      in
+      {
+        start =
+          # bash
+          ''
+            hyprctl --instance 0 --batch "\
+              keyword monitor ${
+                getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
+              }; \
+              ${killActiveRebind true}; \
+              keyword decoration:blur:enabled false; \
+              keyword render:direct_scanout ${if hyprland.directScanout then "1" else "0"}; \
+            "
+          '';
+
+        stop = # bash
+          ''
+            hyprctl --instance 0 --batch "\
+              keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
+              ${killActiveRebind false}; \
+              keyword decoration:blur:enabled ${boolToString hyprland.blur}; \
+              keyword render:direct_scanout 0; \
+            "
+          '';
+      };
   }
 
   {

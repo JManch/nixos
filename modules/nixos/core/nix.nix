@@ -529,6 +529,21 @@ in
             username
         ++ optional (cfg.builder.enable && cfg.builder.shareStore) "nix-ssh";
 
+        min-free = 128000000; # 128MB
+        max-free = 1000000000; # 1GB
+
+        # Default is 300 seconds is not ideal for our ssh-ng substituters which may be offline
+        # Also nix crashes... https://github.com/NixOS/nix/issues/3768
+        # Per-substituter timeout would be nice https://github.com/NixOS/nix/issues/3768
+        connect-timeout = 5;
+
+        # Try to build from source instead of failing when a substituter is
+        # down. Basically a necessity for our host binary caches which may be
+        # offline. Should also improve offline build experience.
+        # (I assume substituter paths are cached so even when offline, nix
+        # knows if a substituter has a path?)
+        fallback = true;
+
         substituters = [
           "https://nix-community.cachix.org"
           # "https://nix-on-droid.cachix.org"

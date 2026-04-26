@@ -96,7 +96,9 @@
     kernelPackages = lib.mkForce (
       config.${lib.ns}.hardware.cachy-kernel.package {
         arch = "x86_64-v3";
-        flake = builtins.getFlake "github:xddxdd/nix-cachyos-kernel/beaf7a533ae106c2681de2624da94707f9857f1f";
+        flake =
+          assert (lib.assertMsg (pkgs.zfs.version == "2.4.1") "ncase-m1 kernel can be updated");
+          builtins.getFlake "github:xddxdd/nix-cachyos-kernel/beaf7a533ae106c2681de2624da94707f9857f1f";
       }
     );
 

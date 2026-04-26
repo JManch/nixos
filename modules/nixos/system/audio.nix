@@ -112,95 +112,78 @@ in
     security.rtkit.enable = false;
     users.users.${username}.extraGroups = [ "pipewire" ];
 
-    services.pipewire =
-      let
-        # Pipewire 1.6 has currently has the following ldac issue. It also
-        # causes OBS to crash when screensharing so use 1.4.2 for now.
-        # https://github.com/NixOS/nixpkgs/pull/502690
-        pipewireOverride =
-          assert (
-            lib.assertMsg (pkgs.libldac-dec.patches == [ ]) "Remove pipewire override if OBS crash is fixed"
-          );
-          (import (fetchTree "github:NixOS/nixpkgs/e6f23dc08d3624daab7094b701aa3954923c6bbb") {
-            inherit (pkgs.stdenv.hostPlatform) system;
-          }).pipewire;
-      in
-      {
-        enable = true;
-        package = pipewireOverride;
-        alsa.enable = true;
-        jack.enable = true;
-        pulse.enable = true;
-        wireplumber.enable = true;
-        wireplumber.package = pkgs.wireplumber.override {
-          pipewire = pipewireOverride;
-        };
+    services.pipewire = {
+      enable = true;
+      alsa.enable = true;
+      jack.enable = true;
+      pulse.enable = true;
+      wireplumber.enable = true;
 
-        wireplumber.extraConfig = mkMerge [
-          {
-            "99-disable-restore-props"."stream.rules" = singleton {
-              matches = [
-                # A lot of different applications fall under the "mpv" audio application so
-                # always having the audio level get restored can be pretty annoying. Also we
-                # should prefer adjusting soft volume over ao-volume.
-                { "application.name" = "mpv"; }
-                # Some Music apps (e.g. Spotify) adjust application audio level whilst others
-                # (e.g. supersonic) adjust the soft audio level inside MPV. We want the
-                # application audio level of apps like supersonic to always stay at 100 rather
-                # than syncing with apps like Spotify. Doesn't seem to have any downsides since
-                # Spotify remembers its own audio level.
-                { "media.role" = "Music"; }
-                # Would rather have Movie apps restore their own volume instead of grouping
-                { "media.role" = "Movie"; }
-              ];
-              # https://pipewire.pages.freedesktop.org/wireplumber/daemon/configuration/settings.html
-              actions.update-props."state.restore-props" = false;
+      wireplumber.extraConfig = mkMerge [
+        {
+          "99-disable-restore-props"."stream.rules" = singleton {
+            matches = [
+              # A lot of different applications fall under the "mpv" audio application so
+              # always having the audio level get restored can be pretty annoying. Also we
+              # should prefer adjusting soft volume over ao-volume.
+              { "application.name" = "mpv"; }
+              # Some Music apps (e.g. Spotify) adjust application audio level whilst others
+              # (e.g. supersonic) adjust the soft audio level inside MPV. We want the
+              # application audio level of apps like supersonic to always stay at 100 rather
+              # than syncing with apps like Spotify. Doesn't seem to have any downsides since
+              # Spotify remembers its own audio level.
+              { "media.role" = "Music"; }
+              # Would rather have Movie apps restore their own volume instead of grouping
+              { "media.role" = "Movie"; }
+            ];
+            # https://pipewire.pages.freedesktop.org/wireplumber/daemon/configuration/settings.html
+            actions.update-props."state.restore-props" = false;
+          };
+        }
+
+        (mkIf (cfg.alsaDeviceAliases != { }) {
+          "99-alsa-device-aliases"."monitor.alsa.rules" = mapAttrsToList (old: new: {
+            matches = singleton {
+              "node.name" = old;
             };
-          }
+            actions.update-props."node.description" = new;
+          }) cfg.alsaDeviceAliases;
+        })
+      ];
 
-          (mkIf (cfg.alsaDeviceAliases != { }) {
-            "99-alsa-device-aliases"."monitor.alsa.rules" = mapAttrsToList (old: new: {
-              matches = singleton {
-                "node.name" = old;
-              };
-              actions.update-props."node.description" = new;
-            }) cfg.alsaDeviceAliases;
-          })
-        ];
-
-        extraConfig.pipewire."99-input-denoising.conf" = mkIf cfg.inputNoiseSuppression {
-          "context.modules" = singleton {
-            name = "libpipewire-module-filter-chain";
-            args = {
-              "node.description" = "Noise Canceling source";
-              "media.name" = "Noise Canceling source";
-              "filter.graph" = {
-                nodes = singleton {
-                  type = "ladspa";
-                  name = "rnnoise";
-                  plugin = "${pkgs.rnnoise-plugin}/lib/ladspa/librnnoise_ladspa.so";
-                  label = "noise_suppressor_mono";
-                  control = {
-                    "VAD Threshold (%)" = 50.0;
-                    "VAD Grace Period (ms)" = 200;
-                    "Retroactive VAD Grace (ms)" = 0;
-                  };
+      extraConfig.pipewire."99-input-denoising.conf" = mkIf cfg.inputNoiseSuppression {
+        "context.modules" = singleton {
+          name = "libpipewire-module-filter-chain";
+          args = {
+            "node.description" = "Noise Canceling source";
+            "media.name" = "Noise Canceling source";
+            "filter.graph" = {
+              nodes = singleton {
+                type = "ladspa";
+                name = "rnnoise";
+                plugin = "${pkgs.rnnoise-plugin}/lib/ladspa/librnnoise_ladspa.so";
+                label = "noise_suppressor_mono";
+                control = {
+                  "VAD Threshold (%)" = 50.0;
+                  "VAD Grace Period (ms)" = 200;
+                  "Retroactive VAD Grace (ms)" = 0;
                 };
               };
-              "capture.props" = {
-                "node.name" = "capture.rnnoise_source";
-                "node.passive" = true;
-                "audio.rate" = 48000;
-              };
-              "playback.props" = {
-                "node.name" = "rnnoise_source";
-                "media.class" = "Audio/Source";
-                "audio.rate" = 48000;
-              };
+            };
+            "capture.props" = {
+              "node.name" = "capture.rnnoise_source";
+              "node.passive" = true;
+              "audio.rate" = 48000;
+            };
+            "playback.props" = {
+              "node.name" = "rnnoise_source";
+              "media.class" = "Audio/Source";
+              "audio.rate" = 48000;
             };
           };
         };
       };
+    };
 
     # On Nix systemd user services are enabled for all users by default.
     # Pretty much all of the units in /etc/systemd/user/*.wants/* should have

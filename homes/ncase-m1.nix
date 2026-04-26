@@ -88,7 +88,7 @@
         foliate.enable = true;
         rnote.enable = true;
         jellyfin-media-player.enable = true;
-        davinci-resolve.enable = true;
+        davinci-resolve.enable = false;
         signal.enable = true;
 
         firefox = {
@@ -106,7 +106,7 @@
           };
 
           r2modman.enable = true;
-          bottles.enable = true;
+          bottles.enable = false;
           prism-launcher.enable = true;
           mint.enable = false;
           osu.enable = true;

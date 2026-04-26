@@ -455,6 +455,23 @@ in
             })
           ];
 
+        lact =
+          assert assertMsg (prev.lact.version == "0.8.4") "remove lact overlay";
+          prev.lact.overrideAttrs (old: rec {
+            version = "0.9.0";
+            src = final.fetchFromGitHub {
+              owner = "ilya-zlobintsev";
+              repo = "LACT";
+              tag = "v0.9.0";
+              hash = "sha256-c5GJf8AYgaAN3O6AVSEbJybEYb6lSHf7R24/1PKYhyM=";
+            };
+            cargoDeps = final.rustPlatform.fetchCargoVendor {
+              inherit src;
+              hash = "sha256-Y+XdCmaDXdP7x22bYm//Ov7+IzlCr8GpFOgCXGFCfbA=";
+            };
+            buildInputs = old.buildInputs ++ [ final.libadwaita ];
+          });
+
         # inherit
         #   (
         #     assert lib.assertMsg (prev.navidrome.version == "0.60.0") "Remove navidrome overlay";

@@ -6,25 +6,25 @@
 {
   home.packages = [
     # Remove override once 1.7 releases
-    ((lib.${lib.ns}.flakePkgs args "noita-entangled-worlds").default.overrideAttrs (
-      final: prev: {
-        version = "1.6.2";
-
-        src = pkgs.fetchFromGitHub {
-          owner = "intquant";
-          repo = "noita_entangled_worlds";
-          rev = "v${final.version}";
-          hash = "sha256-DAGLpGo8K6qSfxMwTELSU9HLHRX2lp5qbmmq/tL08JM=";
-        };
-
-        cargoLock = null;
-
-        cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
-          inherit (final) src sourceRoot;
-          hash = "sha256-VIOr/3inwP79756UD6JIImk7rOuiHK1QiZBoqW5cSTo=";
-        };
-      }
-    ))
+    # ((lib.${lib.ns}.flakePkgs args "noita-entangled-worlds").default.overrideAttrs (
+    #   final: prev: {
+    #     version = "1.6.2";
+    #
+    #     src = pkgs.fetchFromGitHub {
+    #       owner = "intquant";
+    #       repo = "noita_entangled_worlds";
+    #       rev = "v${final.version}";
+    #       hash = "sha256-DAGLpGo8K6qSfxMwTELSU9HLHRX2lp5qbmmq/tL08JM=";
+    #     };
+    #
+    #     cargoLock = null;
+    #
+    #     cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+    #       inherit (final) src sourceRoot;
+    #       hash = "sha256-VIOr/3inwP79756UD6JIImk7rOuiHK1QiZBoqW5cSTo=";
+    #     };
+    #   }
+    # ))
 
     (pkgs.writeShellApplication {
       name = "noita-switch-save";

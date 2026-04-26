@@ -17,7 +17,7 @@
       hyprland = {
         plugins = false;
         tearing = true;
-        directScanout = true;
+        directScanout = false;
         logging = false;
         hyprcursor.package = null;
       };

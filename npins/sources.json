@@ -104,10 +104,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.4.0",
-      "revision": "87dd9cd14e020b199256854c84f31b62680d1b21",
-      "url": "https://api.github.com/repos/Vladimir-csp/app2unit/tarball/refs/tags/v1.4.0",
-      "hash": "sha256-G2V6Scdw5m9/2Jr4QMcpBSlR0IUnlOAwMFIcsxbZLMk="
+      "version": "v1.4.1",
+      "revision": "fc2f7250fa1419204211c531612395427c660d01",
+      "url": "https://api.github.com/repos/Vladimir-csp/app2unit/tarball/refs/tags/v1.4.1",
+      "hash": "sha256-upYW+aTJ6LCHrI0+IOYnA98uDLKPxu/wCi7uUWe/Geg="
     },
     "async-property": {
       "type": "PyPi",
@@ -140,9 +140,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "dbc37e8ef12b48b9e7e83c7914da3ba9edd3f670",
-      "url": "https://github.com/zzyil/comick.io-Downloader/archive/dbc37e8ef12b48b9e7e83c7914da3ba9edd3f670.tar.gz",
-      "hash": "sha256-AALYFWzAnPn/+Mh3sQJ2qFukh1YLxjm/O2eRAiIg+b4="
+      "revision": "7b58aa604a8e897e3eba8ef10efc9cdd9ce48d54",
+      "url": "https://github.com/zzyil/comick.io-Downloader/archive/7b58aa604a8e897e3eba8ef10efc9cdd9ce48d54.tar.gz",
+      "hash": "sha256-Tw8nlFqnz/mXoOXobRbZPx53+Tn7m/1NrXgvh5x5fvY="
     },
     "ctrld": {
       "type": "GitRelease",
@@ -198,9 +198,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "d02c1a92fa86777f3ae52f19e0c338a67eabe908",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/d02c1a92fa86777f3ae52f19e0c338a67eabe908.tar.gz",
-      "hash": "sha256-TCbdj6ZedgPSDQWJWFBPzDlLdgRcnsby3DWNHxmQ+b4="
+      "revision": "a060daf10876435036508466ca5e9469c3b275d5",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/a060daf10876435036508466ca5e9469c3b275d5.tar.gz",
+      "hash": "sha256-peEfQ+QNWm49M5MqO4MGpA9g/IeH03MOlAuNeMaAdHU="
     },
     "frigate-hass-integration": {
       "type": "GitRelease",
@@ -229,10 +229,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v2.18.0",
-      "revision": "16a2a15135229ea438d14a3020aed0dadf9c8363",
-      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/refs/tags/v2.18.0",
-      "hash": "sha256-KFsh//PjB+BWVuI5JWCTpO0Ra08+hJPM+/m+hpX77wE="
+      "version": "v2.21.0",
+      "revision": "45e082caf4a218368684093754a3fb28fcaf6c99",
+      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/refs/tags/v2.21.0",
+      "hash": "sha256-QUXtozk5FIUsXDJfb1GHGYa1LKh+CCARAsPKkX9ok34="
     },
     "hass-web-proxy-lib": {
       "type": "Git",
@@ -370,9 +370,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "d57b1eee106595c1fca5b65bf8e9320de7d86412",
-      "url": "https://github.com/mrusse/soularr/archive/d57b1eee106595c1fca5b65bf8e9320de7d86412.tar.gz",
-      "hash": "sha256-aA1qeyHcIIiJnSHEWwPpU5n97T7f+YuWfgsCVAKYv9Y="
+      "revision": "30dad669e25dcce53b453ed19c8f3b7b321e29cc",
+      "url": "https://github.com/mrusse/soularr/archive/30dad669e25dcce53b453ed19c8f3b7b321e29cc.tar.gz",
+      "hash": "sha256-93r11zR32buViOOEqdL5XBPmCwd1adkZI00Zh8Dyt6E="
     },
     "sunset.nvim": {
       "type": "Git",
@@ -396,9 +396,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "84440f9935454800c47f7e62323a4a86b85b485e",
-      "url": "https://github.com/dweymouth/supersonic/archive/84440f9935454800c47f7e62323a4a86b85b485e.tar.gz",
-      "hash": "sha256-TOMGGfxxtybOVrW3jxFzBgyqguYzd4rV5mbjWXMIMO4="
+      "revision": "08e5197066c5b8ff09439a9576df82b4ea27b66f",
+      "url": "https://github.com/dweymouth/supersonic/archive/08e5197066c5b8ff09439a9576df82b4ea27b66f.tar.gz",
+      "hash": "sha256-mErtzaD1D5XX6ok21eMcBrl5ut5t34uYNNY92jb2N7U="
     },
     "thermal_comfort": {
       "type": "GitRelease",

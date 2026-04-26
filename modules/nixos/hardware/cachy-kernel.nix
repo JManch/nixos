@@ -7,15 +7,17 @@
 {
   enableOpt = false;
 
-  nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.default ];
-
   opts.package = lib.mkOption {
     readOnly = true;
     default =
-      arch:
-      (pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { }).kernelModuleLLVMOverride (
+      {
+        arch,
+        flake ? inputs.nix-cachyos-kernel,
+      }:
+      (pkgs.callPackage "${flake.outPath}/helpers.nix" { }).kernelModuleLLVMOverride (
         pkgs.linuxKernel.packagesFor (
-          pkgs.cachyosKernels.linux-cachyos-latest.override {
+          # pkgs.cachyosKernels.linux-cachyos-latest.override {
+          flake.packages.${pkgs.stdenv.hostPlatform.system}.linux-cachyos-latest.override {
             lto = "thin"; # basically same performance as full with better build time
             processorOpt = arch;
             cpusched = "bore";

@@ -139,7 +139,6 @@
 
     services = {
       udisks.enable = true;
-      lact.enable = true;
       scrutiny.collector.enable = true;
       mosquitto.explorer.enable = true;
       air-vpn.enable = true;

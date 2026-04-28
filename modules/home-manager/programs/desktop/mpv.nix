@@ -102,6 +102,7 @@ in
       WHEEL_DOWN = "add volume -5";
       "Ctrl+WHEEL_UP" = "add speed 0.1";
       "Ctrl+WHEEL_DOWN" = "add speed -0.1";
+      "Alt+r" = "cycle-values video-rotate 90 180 270 0";
       "MBTN_MID" = "cycle mute";
       F1 = "af toggle acompressor=ratio=4; af toggle loudnorm";
       E = "add panscan -0.1"; # because jellyfin shim overrides w

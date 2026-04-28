@@ -29,7 +29,7 @@
   };
 
   boot = {
-    kernelPackages = config.${lib.ns}.hardware.cachy-kernel.package "zen4";
+    kernelPackages = config.${lib.ns}.hardware.cachy-kernel.package { arch = "zen4"; };
 
     kernelModules = [ "kvm-amd" ];
 

@@ -38,6 +38,8 @@
 
   ns.services.caddy.virtualHosts.unifi.extraConfig = ''
     reverse_proxy https://127.0.0.1:8443 {
+      # https://github.com/NixOS/nixpkgs/issues/498025#issuecomment-4092094085
+      header_up Host {hostport}
       # We have to allow insecure HTTPS because unifi forcefully enables TLS
       # with an invalid cert.
       transport http {

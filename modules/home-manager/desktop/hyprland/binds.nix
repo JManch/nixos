@@ -122,6 +122,35 @@ let
           'string:x-canonical-private-synchronous:hypr-toggle-gaps' 'Hyprland' "$message"
       '';
 
+  toggleFreeze =
+    assert osConfig.${ns}.system.desktop.uwsm.enable;
+    pkgs.writeShellScript "hypr-toggle-freeze"
+      # bash
+      ''
+        pid=$(${hyprctl} activewindow -j | ${jaq} -r .pid)
+
+        if [[ ! -f /proc/$pid/cgroup ]]; then
+          ${notifySend} --transient --urgency=critical -t 5000 "$unit" "Unit does not have a cgroup"
+          exit 1
+        fi
+
+        unit=$(basename $(<"/proc/$pid/cgroup"))
+
+        # This check assume apps were launched with app2unit
+        if [[ $unit != "app-"* ]]; then
+          ${notifySend} --transient --urgency=critical -t 5000 "$unit" "Unit is not app so cannot freeze"
+          exit 1
+        fi
+
+        if [[ "$(systemctl show --user --property=FreezerState --value "$unit")" == "frozen" ]]; then
+          systemctl thaw --user "$unit"
+          ${notifySend} --transient --urgency=critical -t 5000 "$unit" "Thawed"
+        else
+          systemctl freeze --user "$unit"
+          ${notifySend} --transient --urgency=critical -t 5000 "$unit" "Frozen"
+        fi
+      '';
+
   make16By9 =
     pkgs.writeShellScript "hypr-16-by-9" # bash
       ''
@@ -317,6 +346,7 @@ in
       "${modShift}, A, exec, ${toggleGaps}"
       "${modShiftCtrl}, V, exec, ${syncClipboard}"
       "${mod}, Y, exec, ${scaleTabletToWindow}"
+      "${mod}, P, exec, ${toggleFreeze}"
 
       # Movement
       "${mod}, H, movefocus, l"
@@ -349,7 +379,6 @@ in
       "${mod}, XF86AudioMedia, exec, ${resetMonitors}"
 
       # Dwindle
-      "${mod}, P, pseudo,"
       "${modShiftCtrl}, G, exec, ${toggleDwindleGaps}"
       "${mod}, X, layoutmsg, togglesplit"
       "${modShift}, X, layoutmsg, swapsplit"

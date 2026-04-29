@@ -206,7 +206,7 @@ let
         + (
           if (cmd == "build" || cmd == "diff") then
             ''
-              nh os build "$flake" --hostname "$hostname" --out-link "$remote_builds/result-$hostname" "''${@:2}"
+              nh os build "$flake" --diff never --hostname "$hostname" --out-link "$remote_builds/result-$hostname" "''${@:2}"
               ${optionalString (cmd == "diff") ''
                 remote_system=$(ssh "${adminUsername}@$host_address" readlink /run/current-system)
                 built_system=$(readlink "$remote_builds/result-$hostname")

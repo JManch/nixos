@@ -407,7 +407,17 @@ in
     ]
     # When sharing from the same wireless interface, run `iw wlan0 info` to get the
     # channel and set the channel in linux-wifi-hotspot to the same.
-    ++ optional cfg.wireless.enable pkgs.linux-wifi-hotspot;
+    ++ optionals cfg.wireless.enable [
+      pkgs.linux-wifi-hotspot
+      (hiPrio (
+        # Rename so it doesn't get priority over wifi manager in app launcher
+        pkgs.runCommand "wifi-hotspot-desktop-modify" { } ''
+          mkdir -p $out/share/applications
+          substitute ${pkgs.linux-wifi-hotspot}/share/applications/wihotspot.desktop $out/share/applications/wihotspot.desktop \
+            --replace-fail "Name=Wifi Hotspot" "Name=Hotspot"
+        ''
+      ))
+    ];
 
   ns.hm = mkIf home-manager.enable {
     xdg.desktopEntries.impala =

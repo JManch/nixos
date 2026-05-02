@@ -2,7 +2,6 @@
   lib,
   cfg,
   args,
-  pkgs,
   config,
 }:
 let
@@ -12,6 +11,7 @@ let
     replaceStrings
     optional
     optionalString
+    optionalAttrs
     boolToString
     mkEnableOption
     ;
@@ -48,38 +48,41 @@ in
       wantedBy = [ "graphical-session.target" ];
     };
 
-    ns.programs.gaming.gamemode.profiles."default" =
+    ns.programs.gaming.gamemode.profiles =
       let
         inherit (config.${ns}.hmNs.desktop) hyprland;
         inherit (config.${ns}.core.device) primaryMonitor;
 
-        # Remap the killactive key to use the shift modifier
-        killActiveRebind = isStart: ''
-          keyword unbind ${hyprland.modKey}${optionalString (!isStart) "SHIFTCONTROL"}, W; \
-          keyword bind ${hyprland.modKey}${optionalString isStart "SHIFTCONTROL"}, W, killactive'';
+        settings = start: ''
+          hyprctl --instance 0 --batch "\
+            keyword unbind ${hyprland.modKey}${optionalString (!start) "SHIFTCONTROL"}, W; \
+            keyword bind ${hyprland.modKey}${optionalString start "SHIFTCONTROL"}, W, killactive; \
+            keyword decoration:blur:enabled ${if start then "false" else boolToString hyprland.blur}; \
+            keyword render:direct_scanout ${
+              if start then (if hyprland.directScanout then "1" else "0") else "0"
+            }"
+        '';
+
+        monitor = start: ''
+          hyprctl --instance 0 keyword monitor ${
+            getMonitorHyprlandCfgStr (
+              primaryMonitor // optionalAttrs start { refreshRate = primaryMonitor.gamingRefreshRate; }
+            )
+          }
+        '';
       in
       {
-        start."hyprland" =
-          # bash
-          ''
-            hyprctl --instance 0 --batch "\
-              keyword monitor ${
-                getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
-              }; \
-              ${killActiveRebind true}; \
-              keyword decoration:blur:enabled false; \
-              keyword render:direct_scanout ${if hyprland.directScanout then "1" else "0"}"
-          '';
+        "default-monitor" = {
+          start."hyprland-settings" = settings true;
+          stop."hyprland-settings" = settings false;
+        };
 
-        stop."hyprland" =
-          # bash
-          ''
-            hyprctl --instance 0 --batch "\
-              keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
-              ${killActiveRebind false}; \
-              keyword decoration:blur:enabled ${boolToString hyprland.blur}; \
-              keyword render:direct_scanout 0"
-          '';
+        "default" = {
+          start."hyprland-settings" = settings true;
+          start."hyprland-monitor" = monitor true;
+          stop."hyprland-settings" = settings false;
+          stop."hyprland-monitor" = monitor false;
+        };
       };
   }
 

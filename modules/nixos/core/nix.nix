@@ -388,6 +388,9 @@ in
     pkgs.nh
     pkgs.dix
     pkgs.npins
+    (pkgs.writeShellScriptBin "nixpkgs-rev" ''
+      nix eval --raw --impure --expr '(builtins.getFlake "${configDir}").inputs.nixpkgs.rev'
+    '')
   ]
   ++ rebuildScripts
   ++ remoteRebuildScripts

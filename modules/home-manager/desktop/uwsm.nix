@@ -12,6 +12,8 @@
 # being transfered from the login shell env. Then display managers will be
 # viable again.
 # https://github.com/nix-community/home-manager/issues/2659
+
+# Update: this is a potential solution https://github.com/hyprland-community/hyprnix/pull/29
 { lib }:
 let
   inherit (lib) types mkOption;

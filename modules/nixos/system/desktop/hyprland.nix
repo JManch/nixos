@@ -107,23 +107,23 @@ in
               ++ [
                 # Makes the togglespecialworkspace dispatcher always toggle instead
                 # of moving the open special workspace to the active monitor
-                ../../../../patches/hyprland-special-workspace-toggle.patch
-                ../../../../patches/hyprland-resize-params-floats.patch
+                # ../../../../patches/hyprland-special-workspace-toggle.patch
+                # ../../../../patches/hyprland-resize-params-floats.patch
                 # Fixes center and size/move window rules using the active monitor instead
                 # of the monitor that the window is on
-                ../../../../patches/hyprland-windowrule-monitor.patch
+                # ../../../../patches/hyprland-windowrule-monitor.patch
                 # Makes exact resizeparams in dispatchers relative to the window's current
                 # monitor instead of the last active monitor
-                ../../../../patches/hyprland-better-resize-args.patch
+                # ../../../../patches/hyprland-better-resize-args.patch
                 # Always override the monitor in repeated workspacerules. Allows us
                 # to change workspace monitors layouts in our external monitor
                 # layout scripts with `hyprctl keyword workspace x, monitor:`
-                ../../../../patches/hyprland-workspacerules-monitor.patch
+                # ../../../../patches/hyprland-workspacerules-monitor.patch
                 # Add fullscreenMode to `hyprctl workspaces`
                 ../../../../patches/hyprland-hyprctl-workspace-fullscreen-mode.patch
                 # Adds dynamic mode to the resize gesture which moves the window
                 # if it's floating
-                ../../../../patches/hyprland-dynamic-resize-gesture.patch
+                # ../../../../patches/hyprland-dynamic-resize-gesture.patch
                 ../../../../patches/hyprland-fullscreen-gesture-maximize-fix.patch
                 # Do not want any of the features this offers and can't be
                 # bothered to get it properly working with uwsm

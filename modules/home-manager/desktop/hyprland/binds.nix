@@ -432,7 +432,7 @@ in
 
     settings.gesture = [
       "3, horizontal, workspace"
-      "4, swipe, scale: 2, resize, dynamic"
+      "4, swipe, scale: 2, resize"
       "4, swipe, mod: ALT, scale: 2, move"
       "3, pinch, fullscreen, maximize"
       "4, pinch, fullscreen"

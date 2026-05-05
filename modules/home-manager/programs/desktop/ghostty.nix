@@ -52,12 +52,12 @@ in
     window-padding-x=5
     window-padding-y=5
     window-padding-balance=true
-    window-padding-color=extend
+    window-padding-color=background
+    resize-overlay=never
 
     cursor-style=bar
     cursor-click-to-move
     mouse-hide-while-typing
-
 
     theme=light:base16-light,dark:base16-dark
     selection-invert-fg-bg

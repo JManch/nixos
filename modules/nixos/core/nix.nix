@@ -475,16 +475,6 @@ in
             buildInputs = old.buildInputs ++ [ final.libadwaita ];
           });
 
-        inherit
-          (
-            assert lib.assertMsg (prev.zellij.version == "0.44.1") "remove zellij overlay";
-            import (fetchTree "github:NixOS/nixpkgs/212df2b6d324b3913692b1dff40feb9c507a6257") {
-              inherit (pkgs.stdenv.hostPlatform) system;
-            }
-          )
-          zellij
-          ;
-
         # inherit
         #   (
         #     assert lib.assertMsg (prev.navidrome.version == "0.60.0") "Remove navidrome overlay";

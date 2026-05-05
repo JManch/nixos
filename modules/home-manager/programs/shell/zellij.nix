@@ -15,12 +15,14 @@ let
   inherit (lib)
     ns
     mkOrder
+    singleton
     concatLines
     getExe
     optionalString
     ;
   inherit (config.${ns}.programs.desktop) alacritty;
   inherit (config.${ns}.desktop.services) darkman;
+  inherit (config.xdg) configHome dataHome;
 in
 {
   enableOpt = false;
@@ -46,16 +48,38 @@ in
               long_running=true
             fi
 
-            # Every new zellij session creates a `zellij --server` process. Future zellij
-            # instances attaching to this session will use the environment variables of the
-            # original server process. This causes issues if the session happened to be
-            # created in a headless environment (in which case app2unit puts it in a
-            # NoDesktop scope) then we later attach to it in a graphical environment. Stuff
-            # like the clipboard and graphical keyring breaks. The solution is keep a
-            # separate sesssion for `tty`, `ssh` and `desktop/local` (hostname without a
-            # suffix).
+            # Match zellij theme to client theme when SSHing into remote hosts. SSH
+            # is configured to forward DARKMAN_THEME and we have a zsh wrapper
+            # around `ssh` setting the variable.
             if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) ]]; then
-              session="''${session}-ssh"
+              ${
+              # Every new zellij session creates a `zellij --server` process. Future zellij
+              # instances attaching to this session will use the environment variables of the
+              # original server process. This causes issues if the session happened to be
+              # created in a headless environment (in which case app2unit puts it in a
+              # NoDesktop scope) then we later attach to it in a graphical environment. Stuff
+              # like the clipboard and graphical keyring breaks. The solution is keep a
+              # separate sesssion for `tty`, `ssh` and `desktop/local` (hostname without a
+              # suffix).
+              ''
+                session="''${session}-ssh"
+
+                if [[ -n $DARKMAN_THEME ]]; then
+                  ${
+                    if darkman.enable then
+                      ''
+                        config_flag=(--config "${dataHome}/darkman/variants/.config/zellij/config.kdl.$DARKMAN_THEME")
+                      ''
+                    else
+                      ''
+                        if [[ $DARKMAN_THEME == "light" ]]; then
+                          ${getExe pkgs.gnused} "s/theme \"dark-theme\"/theme \"light-theme\"/" ${configHome}/zellij/config.kdl > /tmp/zellij-light-config.kdl
+                          config_flag=(--config /tmp/zellij-light-config.kdl)
+                        fi
+                      ''
+                  }
+                fi
+              ''} 
             elif [[ -z $ZELLIJ && -z $graphical ]]; then
               session="''${session}-tty"
             ${optionalString alacritty.enable ''
@@ -107,17 +131,13 @@ in
     KillMode=mixed
   '';
 
-  ns.desktop.darkman.switchScripts."zelllij" =
-    assert lib.assertMsg (config.${ns}.desktop.terminal == "Alacritty") ''
-      This manual theme switching is only needed for Alacritty as it does not
-      support CS2031 theme switching
-      https://github.com/alacritty/alacritty/pull/8752.
-
-      If you've switched to a terminal that supports CS2031 this can be disabled.
-    '';
-    theme: ''
-      ${getExe pkgs.zellij} action set-${theme}-theme
-    '';
+  ns.desktop.darkman.switchApps."zellij" = {
+    paths = [ ".config/zellij/config.kdl" ];
+    extraReplacements = singleton {
+      dark = ''theme "dark-theme"'';
+      light = ''theme "light-theme"'';
+    };
+  };
 
   ns.persistence.directories = [ ".cache/zellij" ];
 
@@ -131,29 +151,6 @@ in
         ''
           if [[ -z $ZELLIJ && (-n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY) && -z $DISPLAY && -z $WAYLAND_DISPLAY ]]; then
             zellij && exit
-          fi
-
-          if [[ -n $ZELLIJ ]]; then
-            # Match zellij theme to client theme when SSHing into remote hosts. SSH
-            # is configured to forward DARKMAN_THEME and we have a zsh wrapper
-            # around `ssh` setting the variable.
-            if [[ -n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY ]]; then
-              if [[ $DARKMAN_THEME == "light" ]]; then
-                zellij action "set-light-theme"
-              else
-                zellij action "set-dark-theme"
-              fi
-            # In local sessions sync the zellij theme to the active darkman
-            # theme. Otherwise darkman switches when zellij is not running have
-            # no effect and zellij will launch with the incorrect theme.
-            ${
-              assert lib.assertMsg (config.${ns}.desktop.terminal == "Alacritty") "Same as switch script assert";
-              optionalString darkman.enable ''
-                else
-                  zellij action "set-$(darkman get)-theme"
-              ''
-            }
-            fi
           fi
         '';
   };
@@ -386,8 +383,6 @@ in
       default_layout "compact-top-bar"
       simplified_ui false
       theme "dark-theme"
-      theme_dark "dark-theme"
-      theme_light "light-theme"
       mouse_mode true
       copy_on_select true
       advanced_mouse_actions true

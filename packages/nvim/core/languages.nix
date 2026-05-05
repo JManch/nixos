@@ -81,6 +81,11 @@ in
         "--lsp"
       ];
     };
+
+    zig = {
+      enable = true;
+      lsp.enable = true;
+    };
   };
 
   # Typstyle will not automatically wrap to the line width by default
@@ -123,5 +128,7 @@ in
       "typescript-language-server"
       "--stdio"
     ];
+
+    zls.cmd = mkForce [ "zls" ];
   };
 }

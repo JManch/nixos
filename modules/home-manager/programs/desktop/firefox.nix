@@ -70,6 +70,10 @@ in
           '';
       });
 
+    # Not switching to the new xdg dir layout because multiple dirs slightly
+    # complicates our run-in-ram script
+    configPath = ".mozilla/firefox";
+
     profiles = {
       default = {
         id = 0;

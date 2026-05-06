@@ -68,7 +68,7 @@ let
 
         nh os ${
           if (cmd == "diff") then "build" else cmd
-        } "$flake" --hostname ${hostname} --out-link ~/result-${hostname} --diff always ${
+        } "$flake" --keep-going --hostname ${hostname} --out-link ~/result-${hostname} --diff always ${
           optionalString (cmd != "diff" && cmd != "build") "--show-activation-logs "
         }"$@"
       '';
@@ -206,7 +206,7 @@ let
         + (
           if (cmd == "build" || cmd == "diff") then
             ''
-              nh os build "$flake" --diff never --hostname "$hostname" --out-link "$remote_builds/result-$hostname" "''${@:2}"
+              nh os build "$flake" --keep-going --diff never --hostname "$hostname" --out-link "$remote_builds/result-$hostname" "''${@:2}"
               ${optionalString (cmd == "diff") ''
                 remote_system=$(ssh "${adminUsername}@$host_address" readlink /run/current-system)
                 built_system=$(readlink "$remote_builds/result-$hostname")
@@ -216,7 +216,7 @@ let
             ''
           else
             ''
-              nh os ${cmd} "$flake" --elevation-program=none --hostname "$hostname" --out-link "$remote_builds/result-$hostname" --target-host "root@$host_address" "''${@:2}"
+              nh os ${cmd} "$flake" --keep-going --elevation-program=none --hostname "$hostname" --out-link "$remote_builds/result-$hostname" --target-host "root@$host_address" "''${@:2}"
             ''
         );
     }

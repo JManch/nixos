@@ -115,6 +115,7 @@ in
           upowerSupport = false;
           pulseSupport = false;
           withMediaPlayer = false;
+          runTests = false;
         };
 
     settings = {

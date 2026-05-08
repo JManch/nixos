@@ -160,6 +160,9 @@ in
   # We workaround this by instead defining plain unit files containing just
   # the set text. Setting `systemd.user.services.<name>.path = mkForce []`
   # also works (it still adds extra Environment= vars however).
+
+  # Update: nixpkgs got an `enableDefaultPath` option to workaround this but
+  # I'm going to keep doing `text` overrides to avoid Environment pollution.
   systemd.user.units =
     genAttrs
       [

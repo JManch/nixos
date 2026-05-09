@@ -42,11 +42,7 @@
             name = "eDP-1";
             number = 1;
             refreshRate = 120.0;
-            # For some reason, if an icc profile is enabled for hyprland launch, it breaks
-            # blur in apps like alacritty. Blur is fine as long as the profile
-            # is applied with `hyprctl keyword monitor ...` after the blurred
-            # app has launched
-            # iccProfile = pkgs.${lib.ns}.framework-icc;
+            iccProfile = pkgs.${lib.ns}.framework-icc;
             width = 2880;
             height = 1920;
             scale = 1.5;

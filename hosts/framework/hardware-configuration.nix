@@ -131,7 +131,12 @@
 
   services.logind.settings.Login = {
     HandlePowerKey = "poweroff";
-    HandleLidSwitch = "suspend-then-hibernate";
+    # HandleLidSwitch = "suspend-then-hibernate";
+    HandleLidSwitch =
+      assert lib.assertMsg (
+        config.system.build.kernel.version == "7.0.5"
+      ) "Framework hibernate issue may be fixed with new kernel?";
+      "suspend";
   };
 
   services.fwupd.enable = true;

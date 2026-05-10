@@ -1,11 +1,6 @@
-{
-  lib,
-  pkgs,
-  config,
-}:
+{ lib, pkgs }:
 let
   inherit (lib) ns;
-  inherit (config.${ns}.desktop) style hyprland;
 
   unzipMusicHomelab = pkgs.writeShellApplication {
     name = "unzip-music-homelab";
@@ -43,18 +38,5 @@ in
 
   ns.programs.shell.qobuz-dl.enable = true;
 
-  ns.desktop.hyprland.settings = {
-    workspace = [
-      "special:music, gapsin:${toString (style.gapSize * 2)}, gapsout:${toString (style.gapSize * 4)}"
-    ];
-
-    bind = [
-      "${hyprland.modKey}, S, togglespecialworkspace, music"
-      "${hyprland.modKey}SHIFT, S, movetoworkspacesilent, special:music"
-    ];
-
-    gesture = [ "3, up, special, music" ];
-
-    windowrule = [ "match:class spek, float true" ];
-  };
+  ns.desktop.hyprland.settings.windowrule = [ "match:class spek, float true" ];
 }

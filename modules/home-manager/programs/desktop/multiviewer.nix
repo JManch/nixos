@@ -359,11 +359,13 @@ in
       };
     };
 
-    hyprland.settings.bind = [
-      "${modKey}, F, workspace, ${namedWorkspaceIDs.F1}"
-      "${modKey}SHIFT, F, movetoworkspace, ${namedWorkspaceIDs.F1}"
-      "${modKey}SHIFTCONTROL, F, exec, systemctl restart --user hyprland-multiviewer-tiler"
-    ];
+    # TODO: Find a non-clashing key for this
+
+    # hyprland.settings.bind = [
+    #   "${modKey}, F, workspace, ${namedWorkspaceIDs.F1}"
+    #   "${modKey}SHIFT, F, movetoworkspace, ${namedWorkspaceIDs.F1}"
+    #   "${modKey}SHIFTCONTROL, F, exec, systemctl restart --user hyprland-multiviewer-tiler"
+    # ];
   };
 
   ns.persistence.directories = [ ".config/MultiViewer" ];

@@ -1,12 +1,4 @@
-{
-  lib,
-  pkgs,
-  config,
-}:
-let
-  inherit (lib) ns;
-  inherit (config.${ns}.desktop) style hyprland;
-in
+{ pkgs }:
 {
   home.packages = with pkgs; [
     discord
@@ -14,22 +6,9 @@ in
     # (vesktop.override { withMiddleClickScroll = true; })
   ];
 
-  ns.desktop.hyprland.settings = {
-    workspace = [
-      "special:discord, gapsin:${toString (style.gapSize * 2)}, gapsout:${toString (style.gapSize * 4)}"
-    ];
-
-    windowrule = [
-      "match:class vesktop|discord, workspace special:discord silent"
-    ];
-
-    bind = [
-      "${hyprland.modKey}, D, togglespecialworkspace, discord"
-      "${hyprland.modKey}SHIFT, D, movetoworkspacesilent, special:discord"
-    ];
-
-    gesture = [ "3, down, special, discord" ];
-  };
+  ns.desktop.hyprland.settings.windowrule = [
+    "match:class vesktop|discord, workspace special:scratch3 silent"
+  ];
 
   # Electron apps core dump on exit with the default KillMode control-group.
   # This causes compositor exit to get delayed so just aggressively kill

@@ -476,7 +476,11 @@ in
         ++ optionals cfg.noGapsWhenOnly [
           "w[tv1]s[false], gapsout:0, gapsin:0"
           "f[1]s[false], gapsout:0, gapsin:0"
-        ];
+        ]
+        ++ builtins.genList (
+          i:
+          "special:scratch${toString (i + 1)}, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
+        ) 3;
 
       plugin = mkIf cfg.plugins {
         hyprexpo = {

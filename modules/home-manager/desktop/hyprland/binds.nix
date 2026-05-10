@@ -51,16 +51,6 @@ let
         fi
       '';
 
-  toggleAnimations = pkgs.writeShellScript "hypr-toggle-animations" ''
-    if [ "$(hyprctl -j animations | ${jaq} '.[0][] | select(.name == "workspaces") | .enabled')" = "true" ]; then
-      hyprctl --batch "keyword animation workspaces,0 ; keyword animation specialWorkspace,0"
-      ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Workspace animations disabled'
-    else
-      hyprctl --batch "keyword animation workspaces,1,3,easeOutCubic,slide ; keyword animation specialWorkspace,1,3,easeOutCubic,slidevert"
-      ${notifySend} --transient --urgency=low -t 2000 'Hyprland' 'Workspace animations enabled'
-    fi
-  '';
-
   toggleAlwaysOnTop =
     pkgs.writeShellScript "hypr-toggle-always-on-top" # bash
       ''
@@ -342,7 +332,6 @@ in
       "${mod}Shift, Z, pin, active"
       "${mod}, R, exec, ${hyprctl} dispatch layoutmsg splitratio 1 exact"
       "${modShift}, R, exec, ${make16By9}"
-      "${mod}, A, exec, ${toggleAnimations}"
       "${modShift}, A, exec, ${toggleGaps}"
       "${modShiftCtrl}, V, exec, ${syncClipboard}"
       "${mod}, Y, exec, ${scaleTabletToWindow}"
@@ -395,6 +384,14 @@ in
       "${mod}, M, workspace, emptym"
       "${modShift}, M, exec, ${moveToNextEmpty}"
       "${modShiftCtrl}, M, movetoworkspacesilent, emptym"
+      "${mod}, A, togglespecialworkspace, scratch1"
+      "${mod}, S, togglespecialworkspace, scratch2"
+      "${mod}, D, togglespecialworkspace, scratch3"
+      "${mod}, F, togglespecialworkspace, scratch4"
+      "${modShift}, A, movetoworkspacesilent, special:scratch1"
+      "${modShift}, S, movetoworkspacesilent, special:scratch2"
+      "${modShift}, D, movetoworkspacesilent, special:scratch3"
+      "${modShift}, F, movetoworkspacesilent, special:scratch4"
     ]
     ++ flatten (
       builtins.genList (
@@ -436,6 +433,8 @@ in
       "4, swipe, mod: ALT, scale: 2, move"
       "3, pinch, fullscreen, maximize"
       "4, pinch, fullscreen"
+      "3, up, special, scratch2"
+      "3, down, special, scratch3"
     ];
 
     settings.layerrule = [

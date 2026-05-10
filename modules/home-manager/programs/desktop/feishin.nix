@@ -27,7 +27,7 @@ in
     '';
 
     hyprland.settings.windowrule = [
-      "match:class feishin, workspace special:music silent"
+      "match:class feishin, workspace special:scratch2 silent"
     ];
   };
 

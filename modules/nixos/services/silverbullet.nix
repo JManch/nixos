@@ -1,6 +1,7 @@
 {
   lib,
   cfg,
+  pkgs,
   config,
 }:
 {
@@ -20,37 +21,21 @@
 
   requirements = [ "services.caddy" ];
 
-  # nixos module is out of date and broken
-  # WARN: Remember to change ownership of secrets, persist directories and
-  # backup restores when switching to nixos module
+  # The upstream module sucks
+  systemd.services."silverbullet" = {
+    description = "SilverBullet Server";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
 
-  # services.silverbullet = {
-  #   enable = true;
-  #   package = pkgs.silverbullet.overrideAttrs (old: {
-  #     version = "0-unstable";
-  #     src = fetchurl {
-  #       url = "";
-  #       hash = "";
-  #     };
-  #   });
-  #   openFirewall = false;
-  #   listenPort = cfg.port;
-  #   listenAddress = "127.0.0.1";
-  # };
-
-  virtualisation.oci-containers.containers."silverbullet" = {
-    image = "ghcr.io/silverbulletmd/silverbullet:latest";
-    pull = "always";
-    ports = [ "127.0.0.1:${toString cfg.port}:3000" ];
-    volumes = [ "/var/lib/silverbullet:/space" ];
-    environmentFiles = [ config.age.secrets.silverbulletVars.path ];
-    # Can't get rootless podman to work unfortunately
-    # podman.users = "silverbullet";
-  };
-
-  systemd.services."podman-silverbullet".serviceConfig = {
-    StateDirectory = "silverbullet";
-    StateDirectoryMode = "0700";
+    serviceConfig = lib.${lib.ns}.hardeningBaseline config {
+      EnironmentFile = config.age.secrets.silverbulletVars.path;
+      StateDirectory = "silverbullet";
+      ExecStart = "${
+        lib.getExe pkgs.${lib.ns}.silverbullet
+      } --port ${toString cfg.port} --hostname 127.0.0.1 $STATE_DIRECTORY";
+      Restart = "on-failure";
+      RestartSec = 10;
+    };
   };
 
   ns.services.caddy.virtualHosts."notes" = {
@@ -63,11 +48,17 @@
 
   ns.backups."silverbullet" = {
     backend = "restic";
-    paths = [ "/var/lib/silverbullet" ];
+    paths = [ "/var/lib/private/silverbullet" ];
+    restore.preRestoreScript = "sudo systemctl stop silverbullet";
+    restore.pathOwnership."/var/lib/private/silverbullet" = {
+      user = "nobody";
+      group = "nogroup";
+    };
   };
 
   ns.persistence.directories = lib.singleton {
-    directory = "/var/lib/silverbullet";
-    mode = "0700";
+    directory = "/var/lib/private/silverbullet";
+    user = "nobody";
+    group = "nogroup";
   };
 }

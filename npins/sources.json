@@ -345,6 +345,22 @@
       "url": "https://files.pythonhosted.org/packages/29/68/602ea370bb383a043f577787a4bbfd9f4e193ffcbe1a7b6325e37f126a08/scdl-3.0.4.tar.gz",
       "hash": "sha256-r7cvsoKTWE0W/pbjmbaGqra9+qb1MDxf2B5C/rdrCdU="
     },
+    "silverbullet": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "silverbulletmd",
+        "repo": "silverbullet"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "2.7.0",
+      "revision": "ec2df68944cdb0b6e4b6612de65c9fb263aca5a0",
+      "url": "https://api.github.com/repos/silverbulletmd/silverbullet/tarball/refs/tags/2.7.0",
+      "hash": "sha256-6Jpo7Nugais7KaFnkyzKttZDHcwgcFGMlVXa2gGcmqk="
+    },
     "slskd-stats": {
       "type": "GitRelease",
       "repository": {

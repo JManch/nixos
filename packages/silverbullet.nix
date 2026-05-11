@@ -1,19 +1,13 @@
 {
   gitMinimal,
-  fetchFromGitHub,
   buildGoModule,
   buildNpmPackage,
+  sources,
 }:
 buildGoModule (finalAttrs: {
   pname = "silverbullet";
-  version = "2.7.0";
-
-  src = fetchFromGitHub {
-    owner = "silverbulletmd";
-    repo = "silverbullet";
-    tag = finalAttrs.version;
-    hash = "sha256-6Jpo7Nugais7KaFnkyzKttZDHcwgcFGMlVXa2gGcmqk=";
-  };
+  inherit (sources.silverbullet) version;
+  src = sources.silverbullet;
 
   clientBundle = buildNpmPackage {
     pname = "silverbullet-client-bundle";

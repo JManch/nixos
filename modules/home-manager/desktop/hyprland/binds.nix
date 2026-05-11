@@ -332,7 +332,6 @@ in
       "${mod}Shift, Z, pin, active"
       "${mod}, R, exec, ${hyprctl} dispatch layoutmsg splitratio 1 exact"
       "${modShift}, R, exec, ${make16By9}"
-      "${modShift}, A, exec, ${toggleGaps}"
       "${modShiftCtrl}, V, exec, ${syncClipboard}"
       "${mod}, Y, exec, ${scaleTabletToWindow}"
       "${mod}, P, exec, ${toggleFreeze}"

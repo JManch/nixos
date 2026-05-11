@@ -480,7 +480,7 @@ in
         ++ builtins.genList (
           i:
           "special:scratch${toString (i + 1)}, gapsin:${toString (gapSize * 2)}, gapsout:${toString (gapSize * 4)}"
-        ) 3;
+        ) 4;
 
       plugin = mkIf cfg.plugins {
         hyprexpo = {

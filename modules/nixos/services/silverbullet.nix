@@ -35,6 +35,9 @@
       } --port ${toString cfg.port} --hostname 127.0.0.1 $STATE_DIRECTORY";
       Restart = "on-failure";
       RestartSec = 10;
+      # Make file system inaccessible
+      TemporaryFileSystem = "/";
+      BindReadOnlyPaths = [ builtins.storeDir ];
     };
   };
 

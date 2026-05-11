@@ -29,19 +29,22 @@
   };
 
   boot = {
-    kernelPackages = config.${lib.ns}.hardware.cachy-kernel.package { arch = "zen4"; };
+    kernelPackages = config.${lib.ns}.hardware.cachy-kernel.package {
+      arch = "zen4";
+      kernelPackage = "linux-cachyos-lts";
+    };
 
     kernelModules = [ "kvm-amd" ];
 
-    kernelPatches = [
-      {
-        name = "amdgpu-ism";
-        patch = pkgs.fetchpatch2 {
-          url = "https://lore.kernel.org/amd-gfx/20260325212202.45824-1-sunpeng.li@amd.com/raw";
-          hash = "sha256-IeAyw7CnjkVTKhRvUc/OibHm7cdl0298NwU3w6lSrao=";
-        };
-      }
-    ];
+    # kernelPatches = [
+    #   {
+    #     name = "amdgpu-ism";
+    #     patch = pkgs.fetchpatch2 {
+    #       url = "https://lore.kernel.org/amd-gfx/20260325212202.45824-1-sunpeng.li@amd.com/raw";
+    #       hash = "sha256-IeAyw7CnjkVTKhRvUc/OibHm7cdl0298NwU3w6lSrao=";
+    #     };
+    #   }
+    # ];
 
     initrd.availableKernelModules = [
       "nvme"
@@ -131,12 +134,7 @@
 
   services.logind.settings.Login = {
     HandlePowerKey = "poweroff";
-    # HandleLidSwitch = "suspend-then-hibernate";
-    HandleLidSwitch =
-      assert lib.assertMsg (
-        config.system.build.kernel.version == "7.0.5"
-      ) "Framework hibernate issue may be fixed with new kernel?";
-      "suspend";
+    HandleLidSwitch = "suspend-then-hibernate";
   };
 
   services.fwupd.enable = true;

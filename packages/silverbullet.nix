@@ -5,16 +5,19 @@
   buildNpmPackage,
 }:
 buildGoModule (finalAttrs: {
-  client = buildNpmPackage {
-    pname = "silverbullet-client";
-    inherit (finalAttrs) version;
+  pname = "silverbullet";
+  version = "2.7.0";
 
-    src = fetchFromGitHub {
-      owner = "silverbulletmd";
-      repo = "silverbullet";
-      tag = finalAttrs.version;
-      hash = "sha256-6Jpo7Nugais7KaFnkyzKttZDHcwgcFGMlVXa2gGcmqk=";
-    };
+  src = fetchFromGitHub {
+    owner = "silverbulletmd";
+    repo = "silverbullet";
+    tag = finalAttrs.version;
+    hash = "sha256-6Jpo7Nugais7KaFnkyzKttZDHcwgcFGMlVXa2gGcmqk=";
+  };
+
+  clientBundle = buildNpmPackage {
+    pname = "silverbullet-client-bundle";
+    inherit (finalAttrs) src version;
 
     nativeBuildInputs = [ gitMinimal ];
 
@@ -23,8 +26,12 @@ buildGoModule (finalAttrs: {
     buildPhase = ''
       runHook preBuild
 
-      npm run build
-      npm run build:plug-compile
+      npm run build:plugs
+      # The version gets embeded during the build and must match the server
+      # version otherwise the client spams "a new version of SilverBullet
+      # client is available" messages.
+      echo 'export const publicVersion = "${finalAttrs.version}";' > ./public_version.ts
+      npm run build:client
 
       runHook postBuild
     '';
@@ -32,16 +39,21 @@ buildGoModule (finalAttrs: {
     dontCheckForBrokenSymlinks = true;
 
     installPhase = ''
-      mkdir -p $out
-      cp -r * $out
+      cp -r client_bundle $out
     '';
   };
 
-  # TODO: Figure out how to exclude the CLI package from building and package it separately
-  pname = "silverbullet";
-  version = "2.7.0";
-  src = finalAttrs.client;
+  postPatch = ''
+    rm -r client_bundle
+    ln -s $clientBundle client_bundle
+  '';
+
+  preBuild = ''
+    echo 'export const publicVersion = "${finalAttrs.version}";' > ./public_version.ts
+  '';
+
   vendorHash = "sha256-SvMPyJbSVrj+lwXrNh2WEYNI41oqlzchFxCtXvIl4/4=";
-  doCheck = false;
+  subPackages = [ "." ];
+  ldflags = [ "-X main.buildTime=1970-01-01T00:00:00Z" ];
   meta.mainProgram = "silverbullet";
 })

@@ -1,4 +1,5 @@
 {
+  lib,
   gitMinimal,
   buildGoModule,
   buildNpmPackage,
@@ -30,7 +31,11 @@ buildGoModule (finalAttrs: {
       runHook postBuild
     '';
 
-    dontCheckForBrokenSymlinks = true;
+    dontCheckForBrokenSymlinks =
+      assert lib.assertMsg (
+        finalAttrs.version == "2.7.0"
+      ) "Silverbullet broken symlink check can be re-enabled";
+      true;
 
     installPhase = ''
       cp -r client_bundle $out

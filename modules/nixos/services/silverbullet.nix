@@ -28,8 +28,13 @@
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = lib.${lib.ns}.hardeningBaseline config {
-      EnironmentFile = config.age.secrets.silverbulletVars.path;
+      EnvironmentFile = config.age.secrets.silverbulletVars.path;
       StateDirectory = "silverbullet";
+      ExecStartPre = pkgs.writeShellScript "silverbullet-assert-auth-var" ''
+        # Assert that the authentication variable is set otherwise the server
+        # runs with no authentication
+        test -n "$SB_USER"
+      '';
       ExecStart = "${
         lib.getExe pkgs.${lib.ns}.silverbullet
       } --port ${toString cfg.port} --hostname 127.0.0.1 $STATE_DIRECTORY";

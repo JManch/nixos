@@ -75,10 +75,7 @@ in
         builtins.storeDir
         "/etc/ssl/certs"
       ];
-      BindPaths = [
-        "/var/lib/qbittorrent-nox"
-        "${mediaDir}/torrents"
-      ];
+      BindPaths = [ "${mediaDir}/torrents" ];
     };
 
     wantedBy = [ "multi-user.target" ];

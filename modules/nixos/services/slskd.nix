@@ -74,10 +74,7 @@ in
         "${mediaDir}/music"
         "/run/agenix/slskdVars"
       ];
-      BindPaths = [
-        "/var/lib/slskd"
-        "${mediaDir}/slskd"
-      ];
+      BindPaths = [ "${mediaDir}/slskd" ];
     };
     # slskd creates an inotify watch for every directory in the nix store.
     # This breaks jellyfin and probably a bunch of other stuff

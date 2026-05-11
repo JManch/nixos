@@ -175,7 +175,7 @@ in
       args.inputs.${flake}.packages.${args.options._module.args.value.pkgs.stdenv.hostPlatform.system};
 
     # Packages our flake exposes
-    # Allowing attrs here breaks `nix flake show` but I don't care
+    # Attrs are not compatible with `nix flake show` so this should be exposed through `legacyPackages`
     flakePackages = pkgs: filterAttrs (_: v: isDerivation v || isAttrs v) pkgs.${ns};
 
     addPatches =

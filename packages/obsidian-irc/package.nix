@@ -18,30 +18,29 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "obsidian-irc";
-  version = "0.2.4";
+  version = "0.3.1-pre";
 
   src = fetchFromGitHub {
     owner = "ObsidianIRC";
     repo = "ObsidianIRC";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-6wDD6wth8qyNSQRCMGLBxjvstLAuZsbDwaHWJwjR3Ck=";
+    hash = "sha256-+WwHZTctplPEHa3jdeP5/ovr7gbN9K82R5kGvTnHNtA=";
   };
 
   patches = [
     ./no-register-all.patch
     ./no-decorations.patch
-    ./env-var-api-keys.patch
-    ./tauri-fetch.patch
+    # ./env-var-api-keys.patch
+    # ./tauri-fetch.patch
   ];
 
-  # Patches don't apply to lock files so we need to vendor the patched file
-  cargoLock.lockFile = ./Cargo.lock;
   cargoRoot = "src-tauri";
   buildAndTestSubdir = finalAttrs.cargoRoot;
+  cargoHash = "sha256-c8benovgvfLL8XM3HSAu+Ps6c1YBPSu02OlUP370j4E=";
 
   npmDeps = fetchNpmDeps {
     inherit (finalAttrs) src patches;
-    hash = "sha256-NFuFsJ4bnSUTPRhsUpnptfNHHaQSQB7zQX/5UKxc/rQ=";
+    hash = "sha256-2uiDil1bjsWGQCFHa1WSiZBp/cNElvh2HNgTpX7st10=";
   };
 
   nativeBuildInputs = [

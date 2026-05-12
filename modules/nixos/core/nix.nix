@@ -494,6 +494,20 @@ in
             };
           };
 
+        ergochat = prev.ergochat.overrideAttrs {
+          version = "2.18.0";
+          src = final.fetchFromGitHub {
+            owner = "ergochat";
+            repo = "ergo";
+            rev = "v2.18.0";
+            sha256 = "sha256-6aibQ4dq3zkRoeLLrAc3OXXQWRZIQ7mPMSnWhz8LJsM=";
+          };
+        };
+
+        ircv3-filehost-server =
+          assert assertMsg (!(prev ? ircv3-filehost-server)) "ircv3-filehost-server is now in nixpkgs";
+          (flakePkgs args "ircv3-filehost-server").default;
+
         # inherit
         #   (
         #     assert lib.assertMsg (prev.navidrome.version == "0.60.0") "Remove navidrome overlay";

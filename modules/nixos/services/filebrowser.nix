@@ -30,6 +30,7 @@
     settings = {
       root = "/var/lib/filebrowser/data";
       port = cfg.port;
+      auth.method = "noauth";
     };
   };
 

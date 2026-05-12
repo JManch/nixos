@@ -1,0 +1,13 @@
+diff --git a/main.go b/main.go
+index 17a04be..2106726 100644
+--- a/main.go
++++ b/main.go
+@@ -223,7 +223,7 @@ func authorize(w http.ResponseWriter, r *http.Request) (slug string, err error)
+ 			!slices.Contains(config.Auth.Sasl.Allowlist, username) {
+ 			return "", fmt.Errorf("not allowlisted: %s", username)
+ 		}
+-		slug = fmt.Sprintf("user/%s", username)
++		slug = fmt.Sprintf("user/%s", escapeFilename(username))
+ 
+ 	default:
+ 		return "", fmt.Errorf("unknown authorization type")

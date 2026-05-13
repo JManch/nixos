@@ -149,7 +149,7 @@ in
       };
 
       unrealircd = {
-        enable = true;
+        enable = false;
         interfaces = [ "wg-friends" ];
       };
 

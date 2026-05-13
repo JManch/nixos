@@ -23,7 +23,7 @@
     hyprland.windowRules."spotify" = {
       matchers.initial_title = "Spotify( Premium)?";
       params.border_color = "0xff1ED760";
-      params.workspace = "special:music silent";
+      params.workspace = "special:scratch2 silent";
     };
 
     services.playerctl.musicPlayers = [ "spotify" ];

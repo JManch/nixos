@@ -2,7 +2,10 @@
 {
   home.packages = lib.singleton (
     pkgs.wrapOBS.override { obs-studio = pkgs.obs-studio; } {
-      plugins = [ pkgs.obs-studio-plugins.obs-pipewire-audio-capture ];
+      plugins = with pkgs.obs-studio-plugins; [
+        obs-pipewire-audio-capture
+        obs-plugin-countdown
+      ];
     }
   );
 

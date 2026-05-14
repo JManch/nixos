@@ -1,3 +1,7 @@
+# https://github.com/hyprwm/hyprlock/commit/927e09fb7dac85df8e21c64989b65bcd3383d67e
+# regressed fingerprint unlock status.
+# According to https://github.com/hyprwm/hyprlock/issues/998#issuecomment-4346087307
+# we may want to disable either the pam fprintd module or hyprlock fingerprint.
 {
   lib,
   pkgs,

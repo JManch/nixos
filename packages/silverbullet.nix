@@ -1,5 +1,4 @@
 {
-  lib,
   gitMinimal,
   buildGoModule,
   buildNpmPackage,
@@ -16,7 +15,7 @@ buildGoModule (finalAttrs: {
 
     nativeBuildInputs = [ gitMinimal ];
 
-    npmDepsHash = "sha256-cn7s7JK6JV9NF0w+gTU56Y3bnR0xKMzvNRlh5GIpuA8=";
+    npmDepsHash = "sha256-g5IAIIXUGzOIRrnAcUH1MWYBD8cZqpZPx3hpUA4O/iE=";
 
     buildPhase = ''
       runHook preBuild
@@ -30,12 +29,6 @@ buildGoModule (finalAttrs: {
 
       runHook postBuild
     '';
-
-    dontCheckForBrokenSymlinks =
-      assert lib.assertMsg (
-        finalAttrs.version == "2.7.0"
-      ) "Silverbullet broken symlink check can be re-enabled";
-      true;
 
     installPhase = ''
       cp -r client_bundle $out
@@ -51,7 +44,7 @@ buildGoModule (finalAttrs: {
     echo 'export const publicVersion = "${finalAttrs.version}";' > ./public_version.ts
   '';
 
-  vendorHash = "sha256-SvMPyJbSVrj+lwXrNh2WEYNI41oqlzchFxCtXvIl4/4=";
+  vendorHash = "sha256-8zZlhVptJq8y3k2DBghJ0lPNcIcaZYkrxN67b6dNBPs=";
   subPackages = [ "." ];
   ldflags = [ "-X main.buildTime=1970-01-01T00:00:00Z" ];
   meta.mainProgram = "silverbullet";

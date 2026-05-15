@@ -356,10 +356,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2.7.0",
-      "revision": "ec2df68944cdb0b6e4b6612de65c9fb263aca5a0",
-      "url": "https://api.github.com/repos/silverbulletmd/silverbullet/tarball/refs/tags/2.7.0",
-      "hash": "sha256-6Jpo7Nugais7KaFnkyzKttZDHcwgcFGMlVXa2gGcmqk="
+      "version": "2.8.0",
+      "revision": "84bda95a21973b52f4fde888f31291f453a9f912",
+      "url": "https://api.github.com/repos/silverbulletmd/silverbullet/tarball/refs/tags/2.8.0",
+      "hash": "sha256-8TRarV40wcs0kAbh+xe/IihbubQY0S8EPUKoAio6wK0="
     },
     "slskd-stats": {
       "type": "GitRelease",

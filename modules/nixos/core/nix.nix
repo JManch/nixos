@@ -476,6 +476,24 @@ in
             };
           };
 
+        halloy =
+          assert assertMsg (prev.halloy.version == "2026.6") "halloy overlay can be removed";
+          prev.halloy.overrideAttrs rec {
+            version = "0-unstable-2026-05-16";
+
+            src = final.fetchFromGitHub {
+              owner = "squidowl";
+              repo = "halloy";
+              rev = "6744bb5ec852b1df5ea08de58b66e1df98450359";
+              hash = "sha256-6tqIm2IwFgzHo673d6H8S+JCnFEwp/w+w/C5Rco4Cls=";
+            };
+
+            cargoDeps = final.rustPlatform.fetchCargoVendor {
+              inherit src;
+              hash = "sha256-VXnahgm+dQT2Ar58F2Zm9QJDBUAbIJ0CUTeqtiazlnc=";
+            };
+          };
+
         # inherit
         #   (
         #     assert lib.assertMsg (prev.navidrome.version == "0.60.0") "Remove navidrome overlay";

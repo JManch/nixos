@@ -90,6 +90,7 @@
         jellyfin-media-player.enable = true;
         davinci-resolve.enable = false;
         signal.enable = true;
+        halloy.enable = true;
 
         firefox = {
           enable = true;

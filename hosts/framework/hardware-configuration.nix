@@ -31,7 +31,7 @@
   boot = {
     kernelPackages = config.${lib.ns}.hardware.cachy-kernel.package {
       arch = "zen4";
-      kernelPackage = "linux-cachyos-lts";
+      kernelPackage = "linux-cachyos-latest";
     };
 
     kernelModules = [ "kvm-amd" ];

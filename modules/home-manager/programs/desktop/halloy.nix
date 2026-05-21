@@ -48,7 +48,7 @@ in
       preview.card.hide_url = "contains-only-url";
 
       buffer.text_input = {
-        max_lines = 999999;
+        max_lines = 10000;
         auto_format = "markdown";
       };
 

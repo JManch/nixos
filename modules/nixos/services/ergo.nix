@@ -227,8 +227,8 @@ let
         chan-list-modes: 100
         registration-messages: 1024
         multiline:
-          max-bytes: 0
-          max-lines: 0
+          max-bytes: 16384
+          max-lines: 10000
 
       fakelag:
         enabled: true

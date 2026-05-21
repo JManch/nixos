@@ -54,7 +54,7 @@ in
     initContent = # bash
       ''
         function nix-run-app() {
-          app2unit -t service "$(nix build n#$1 --print-out-paths | head)/bin/$(nix eval --raw n#$1.meta.mainProgram)"
+          app2unit -t service -- nix run n#$1
         }
       '';
   };

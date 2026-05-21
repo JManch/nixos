@@ -14,6 +14,8 @@ let
     optionalAttrs
     boolToString
     mkEnableOption
+    max
+    mod
     ;
   inherit (lib.${ns})
     isHyprland
@@ -70,11 +72,31 @@ in
             )
           }
         '';
+
+        # Set refresh to highest supported multiple of 60
+        monitor-60 = start: ''
+          hyprctl --instance 0 keyword monitor ${
+            getMonitorHyprlandCfgStr (
+              primaryMonitor
+              // optionalAttrs start {
+                refreshRate = max 60 (primaryMonitor.gamingRefreshRate - mod primaryMonitor.gamingRefreshRate 60);
+              }
+            )
+          }
+        '';
       in
       {
         "default-monitor" = {
           start."hyprland-settings" = settings true;
           stop."hyprland-settings" = settings false;
+        };
+
+        # For games locked to 60hz
+        "monitor-60" = {
+          start."hyprland-settings" = settings true;
+          start."hyprland-monitor" = monitor-60 true;
+          stop."hyprland-settings" = settings false;
+          stop."hyprland-monitor" = monitor-60 false;
         };
 
         "default" = {

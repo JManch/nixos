@@ -88,7 +88,7 @@
     hardware = {
       secure-boot.enable = true;
       bluetooth.enable = true;
-      fanatec.enable = true;
+      fanatec.enable = false;
       tablet.enable = true;
       scanner.enable = true;
       "8bitdo-ultimate-2".enable = true;
@@ -96,7 +96,7 @@
       garmin.enable = true;
 
       valve-index = {
-        enable = true;
+        enable = false;
         audio = {
           card = "alsa_card.pci-0000_09_00.1";
           profile = "output:hdmi-stereo-extra1";

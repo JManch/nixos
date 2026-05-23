@@ -8,7 +8,10 @@ let
 in
 {
   enableOpt = false;
-  conditions = [ "osConfigStrict.hardware.valve-index" ];
+  conditions = [
+    false # needs a refactor, package is now called wayvr
+    "osConfigStrict.hardware.valve-index"
+  ];
 
   home.packages = [ pkgs.wlx-overlay-s ];
 

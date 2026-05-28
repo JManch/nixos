@@ -458,24 +458,6 @@ in
             })
           ];
 
-        zellij =
-          assert assertMsg (prev.zellij.version == "0.44.1") "zellij overlay can be removed";
-          prev.zellij.overrideAttrs rec {
-            version = "0.44.3";
-
-            src = final.fetchFromGitHub {
-              owner = "zellij-org";
-              repo = "zellij";
-              tag = "v${version}";
-              hash = "sha256-r8GAOiau4CZPVotFmsBQJOvEu+t0Bu9UCYAOs18i3Kg=";
-            };
-
-            cargoDeps = final.rustPlatform.fetchCargoVendor {
-              inherit src;
-              hash = "sha256-966FpfSsF9I10SrYe3+YNsfM2kLLv+gd0/Aw8vLp4Lk=";
-            };
-          };
-
         halloy =
           assert assertMsg (prev.halloy.version == "2026.6") "halloy overlay can be removed";
           prev.halloy.overrideAttrs rec {

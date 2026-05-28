@@ -20,7 +20,7 @@ let
   entranceNotify = singleton {
     alias = "Entrance Person Notify";
     use_blueprint = {
-      path = "SgtBatten/frigate_notifications.yaml";
+      path = "frigate_notifications.yaml";
       input = {
         camera = "camera.driveway";
         state_filter = true;
@@ -43,7 +43,7 @@ let
   highAlertNotify = map (camera: {
     alias = "High Alert ${toSentenceCase camera} Notify";
     use_blueprint = {
-      path = "SgtBatten/frigate_notifications.yaml";
+      path = "frigate_notifications.yaml";
       input = {
         camera = "camera.${camera}";
         state_filter = true;
@@ -66,7 +66,7 @@ let
   catNotify = map (camera: {
     alias = "${toSentenceCase camera} Cat Notify";
     use_blueprint = {
-      path = "SgtBatten/frigate_notifications.yaml";
+      path = "frigate_notifications.yaml";
       input = {
         camera = "camera.${camera}";
         custom_filter = "{{ states('sensor.outdoor_sensor_temperature') | float(0) >= 20 }}";

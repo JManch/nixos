@@ -42,7 +42,7 @@ let
         };
         tap_action = {
           action = "navigate";
-          navigation_path = "/lovelace/hvac";
+          navigation_path = "/nixos-lovelace/hvac";
         };
       }
       {
@@ -77,7 +77,7 @@ let
         state_content = "name";
         tap_action = {
           action = "navigate";
-          navigation_path = "/lovelace/cctv";
+          navigation_path = "/nixos-lovelace/cctv";
         };
         visibility = singleton {
           condition = "state";

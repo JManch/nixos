@@ -298,7 +298,7 @@ let
               type = "button";
               tap_action = {
                 action = "navigate";
-                navigation_path = "/lovelace/${card}";
+                navigation_path = "/nixos-lovelace/${card}";
               };
               layout_options = {
                 grid_columns = 1;

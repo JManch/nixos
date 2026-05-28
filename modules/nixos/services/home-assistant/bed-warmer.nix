@@ -35,8 +35,13 @@ in
 
           config.lovelace.sections = optional config.bedWarmer.enable {
             title = "Bed Warmer";
-            priority = 6;
             type = "grid";
+            priority = 6;
+            visibility = singleton {
+              condition = "state";
+              entity = "switch.${switchId}";
+              state_not = "unavailable";
+            };
             cards =
               optional sleepTracking.enable {
                 type = "tile";

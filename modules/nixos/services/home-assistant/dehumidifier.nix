@@ -61,6 +61,11 @@ in
             title = "Dehumifier";
             type = "grid";
             priority = 5;
+            visibility = singleton {
+              condition = "state";
+              entity = "switch.${config.dehumidifier.switchId}";
+              state_not = "unavailable";
+            };
             cards = [
               {
                 type = "tile";

@@ -429,7 +429,6 @@ in
     overlays = [
       (final: prev: {
         inherit (final.${ns}) brightnessctl;
-        microfetch = addPatches prev.microfetch [ "microfetch-icon.patch" ];
 
         # Uses the emblem-default-symbolic icon which has been removed from the
         # adwaita icon theme

@@ -447,16 +447,6 @@ in
           ) "rnnoise-plugin-cross.patch"
         );
 
-        # https://github.com/novnc/noVNC/issues/1946
-        novnc =
-          assert assertMsg (prev.novnc.version == "1.6.0") "novnc patch should be in stable now";
-          addPatches prev.novnc [
-            (final.fetchpatch2 {
-              url = "https://github.com/novnc/noVNC/commit/f0a39cd357a5995673149b95951d4c1261b69571.patch";
-              hash = "sha256-GTXFAK1T8LiCIuukYFIOqoXNbrXJF0smTzALBdry9eA=";
-            })
-          ];
-
         halloy =
           assert assertMsg (prev.halloy.version == "2026.6") "halloy overlay can be removed";
           prev.halloy.overrideAttrs rec {

@@ -220,11 +220,17 @@ in
                 below = thresholds.lower;
               }
             ];
-            conditions = singleton {
-              condition = "state";
-              entity_id = "input_boolean.${room}_dehumidifier_automatic_control";
-              state = "on";
-            };
+            conditions = [
+              {
+                condition = "template";
+                value_template = "{{ has_value('switch.${switchId}') }}";
+              }
+              {
+                condition = "state";
+                entity_id = "input_boolean.${room}_dehumidifier_automatic_control";
+                state = "on";
+              }
+            ];
             action = singleton {
               "if" = singleton {
                 condition = "numeric_state";

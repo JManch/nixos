@@ -176,6 +176,7 @@ in
             icon = "mdi:white-balance-sunny";
             device_class = "light";
             state = "{{ (states('sensor.joshua_presence_illuminance') | float) > ${toString threshold} }}";
+            availability = "{{ has_value('sensor.joshua_presence_illuminance') }}";
           };
         }
       )

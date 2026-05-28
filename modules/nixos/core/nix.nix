@@ -455,13 +455,13 @@ in
             src = final.fetchFromGitHub {
               owner = "squidowl";
               repo = "halloy";
-              rev = "6744bb5ec852b1df5ea08de58b66e1df98450359";
-              hash = "sha256-6tqIm2IwFgzHo673d6H8S+JCnFEwp/w+w/C5Rco4Cls=";
+              rev = "b41dde61f6e2c53bd1bfaa7446e01b32db55b90f";
+              hash = "sha256-kmz5m8k0vdqnK2NZTmPxYJ5GqB1O4aRaVjPyNZTWnrQ=";
             };
 
             cargoDeps = final.rustPlatform.fetchCargoVendor {
               inherit src;
-              hash = "sha256-VXnahgm+dQT2Ar58F2Zm9QJDBUAbIJ0CUTeqtiazlnc=";
+              hash = "sha256-hrYWF5WNhLqKMFJJlir7tumxNZqgGm+gK+RI1iDPatM=";
             };
           };
 

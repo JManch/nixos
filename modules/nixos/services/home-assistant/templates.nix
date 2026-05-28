@@ -218,7 +218,7 @@ in
     ];
 
     thermal_comfort = singleton {
-      custom_icons = true;
+      custom_icons = false;
       sensor = [
         # The unique IDs here are random and have no meaning
         {

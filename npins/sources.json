@@ -32,19 +32,6 @@
       "url": null,
       "hash": "sha256-2MjRAsXeTjGoLRGVxF9LApmxYGpv6tpLdUP7t4FDxFA="
     },
-    "HA_blueprints": {
-      "type": "Git",
-      "repository": {
-        "type": "GitHub",
-        "owner": "SgtBatten",
-        "repo": "HA_blueprints"
-      },
-      "branch": "main",
-      "submodules": false,
-      "revision": "f003ea11ba96e262199ea130fe8f749605645a52",
-      "url": "https://github.com/SgtBatten/HA_blueprints/archive/f003ea11ba96e262199ea130fe8f749605645a52.tar.gz",
-      "hash": "sha256-z2gM+qdKwFiHqQDArRrsxDJnhd37l+yj/+z6nI8Emlg="
-    },
     "ModernX": {
       "type": "GitRelease",
       "repository": {
@@ -201,6 +188,22 @@
       "revision": "4f47bb1866f867bbdb3603f21762d5355a61e415",
       "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/4f47bb1866f867bbdb3603f21762d5355a61e415.tar.gz",
       "hash": "sha256-GQxxJGWNfOP/wPLPhukyZKbPV59DlPjRo16IG0miXio="
+    },
+    "frigate-blueprint": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "SgtBatten",
+        "repo": "HA_blueprints"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v0.12.0.6",
+      "revision": "2ffeb0990c97582e46f2f33edaae7870bef24afa",
+      "url": "https://api.github.com/repos/SgtBatten/HA_blueprints/tarball/refs/tags/v0.12.0.6",
+      "hash": "sha256-1LJXW4V0ljj7egD00imMN6FkPYEy56+qH/DEnJrHjR4="
     },
     "frigate-hass-integration": {
       "type": "GitRelease",

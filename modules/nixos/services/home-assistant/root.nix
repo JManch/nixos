@@ -16,11 +16,8 @@ let
     mkEnableOption
     types
     optional
-    optionalString
-    optionalAttrs
     getExe'
     mkVMOverride
-    escapeShellArg
     singleton
     attrNames
     ;
@@ -153,6 +150,15 @@ in
     ]
     ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;
 
+    customLovelaceModules = optional frigate.enable pkgs.home-assistant-custom-lovelace-modules.advanced-camera-card;
+
+    blueprints.automation = optional frigate.enable "${
+      pkgs.runCommand "frigate-notifications-blueprint" { } ''
+        mkdir -p $out
+        cp ${sources.frigate-blueprint}/Frigate_Camera_Notifications/Stable.yaml $out/frigate_notifications.yaml
+      ''
+    }/frigate_notifications.yaml";
+
     configWritable = false;
     config = {
       # WARN: default_config enables zeroconf which runs an mDNS server. It
@@ -211,17 +217,6 @@ in
           "::1"
         ];
       };
-
-      lovelace.resources = [
-        {
-          type = "js";
-          url = "/local/thermal_comfort_icons.js";
-        }
-        (optionalAttrs frigate.enable {
-          url = "/local/advanced-camera-card/advanced-camera-card.js";
-          type = "module";
-        })
-      ];
     };
   };
 
@@ -242,48 +237,6 @@ in
     # pressing "refresh" in the top right of the dashboard.
     reloadTriggers = mkForce [ ];
   };
-
-  systemd.services.home-assistant.preStart =
-    let
-      inherit (config.services.home-assistant) configDir;
-      inherit (pkgs.${ns})
-        advanced-camera-card
-        frigate-blueprint
-        thermal-comfort-icons
-        ;
-
-      # Removing existing symbolic links so that packages will uninstall if
-      # they're removed from config
-      removeExistingLinks =
-        subdir: # bash
-        ''
-          readarray -d "" links < <(find "${configDir}/${subdir}" -maxdepth 1 -type l -print0)
-            for link in "''${links[@]}"; do
-              if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
-                rm "$link"
-              fi
-            done
-        '';
-    in
-    # bash
-    ''
-      mkdir -p "${configDir}/www"
-      ${removeExistingLinks "www"}
-      [[ -d ${configDir}/blueprints/automation/SgtBatten ]] && rm -rf "${configDir}/blueprints/automation/SgtBatten"
-      ln -fsn "${thermal-comfort-icons}" "${configDir}/www/thermal_comfort_icons.js"
-
-      ${optionalString frigate.enable # bash
-        ''
-          ln -fsn "${advanced-camera-card}/advanced-camera-card" "${configDir}/www"
-
-          # For reasons I don't understand, blueprints will not work if they
-          # are in a symlinked directory. The blueprint file has to be
-          # symlinked directly.
-          mkdir -p "${configDir}/blueprints/automation/SgtBatten"
-          ln -fsn "${frigate-blueprint}/frigate_notifications.yaml" "${configDir}/blueprints/automation/SgtBatten/frigate_notifications.yaml"
-        ''
-      }
-    '';
 
   services.postgresql = {
     ensureDatabases = [ "hass" ];

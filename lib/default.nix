@@ -45,7 +45,18 @@ let
 
         # The arg here is the packages defined in the scope. In the future
         # might find it useful to add // { ${ns} = scopePkgs; }
-        _: callPackageWith (final // { inherit self sources prev; });
+        _:
+        callPackageWith (
+          final
+          // {
+            inherit
+              ns
+              self
+              sources
+              prev
+              ;
+          }
+        );
     in
     makeScope newScope (
       scopeFinal:

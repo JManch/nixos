@@ -122,6 +122,7 @@
       winbox.enable = true;
       matlab.enable = false;
       adb.enable = false;
+      esphome.enable = true;
 
       wireshark = {
         enable = true;

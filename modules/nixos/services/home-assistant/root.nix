@@ -116,6 +116,7 @@ in
       "mobile_app"
       "profiler"
       "isal" # https://www.home-assistant.io/integrations/isal
+      "bluetooth"
       "local_file"
       "local_todo"
       "local_calendar"
@@ -147,6 +148,7 @@ in
       pkgs.${ns}.heatmiser
       pkgs.${ns}.thermal-comfort
       pkgs.${ns}.daikin-onecta
+      pkgs.${ns}.tuiss2ha
     ]
     ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;
 

@@ -131,6 +131,11 @@ in
         useAlarm = true;
       };
 
+      blinds = [
+        "joshua_blind_garden"
+        "joshua_blind_driveway"
+      ];
+
       lighting = {
         enable = true;
         wakeUpLights.enable = true;
@@ -472,6 +477,11 @@ in
             };
           };
         };
+
+        blinds = [
+          "${person}_blind_garden"
+          "${person}_blind_west"
+        ];
       };
 
     joshua_bathroom = {

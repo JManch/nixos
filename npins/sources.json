@@ -464,6 +464,19 @@
       "url": "https://github.com/po5/thumbfast/archive/9d78edc167553ccea6290832982d0bc15838b4ac.tar.gz",
       "hash": "sha256-AG3w5B8lBcSXV4cbvX3nQ9hri/895xDbTsdaqF+RL64="
     },
+    "tuiss2ha": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "pink88",
+        "repo": "tuiss2ha"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "dfcc3069c2cad9deca3d61114b5ae0262b5a1265",
+      "url": "https://github.com/pink88/tuiss2ha/archive/dfcc3069c2cad9deca3d61114b5ae0262b5a1265.tar.gz",
+      "hash": "sha256-L/CQAvcFurKH8Bjw68hG84n8QcAiNnbvciGnnH9GIJA="
+    },
     "uwsm": {
       "type": "GitRelease",
       "repository": {

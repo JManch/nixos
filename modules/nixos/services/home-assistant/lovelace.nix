@@ -87,32 +87,6 @@ let
       }
       {
         type = "entity";
-        entity = "sensor.guinea_pig_feeder";
-        icon = "mdi:carrot";
-        name = "Guinea Pig Feeder";
-        display_type = "complete";
-        color = "orange";
-        visibility = singleton {
-          condition = "state";
-          entity = "input_boolean.guinea_pigs_fed";
-          state = "off";
-        };
-      }
-      {
-        type = "entity";
-        entity = "input_boolean.guinea_pigs_fed";
-        name = "Guinea Pigs Not Fed";
-        color = "red";
-        state_content = "name";
-        tap_action.action = "toggle";
-        visibility = singleton {
-          condition = "state";
-          entity = "input_boolean.guinea_pigs_fed";
-          state = "off";
-        };
-      }
-      {
-        type = "entity";
         entity = "sensor.outdoor_thermal_comfort_heat_index";
         display_type = "complete";
         name = "Heat Index";

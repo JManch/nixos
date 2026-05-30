@@ -54,9 +54,6 @@ in
               type = "tile";
               name = blindName id;
               entity = "cover.${id}";
-              features = singleton {
-                type = "cover-open-close";
-              };
               grid_options.rows = "auto";
             }) blinds;
           };

@@ -120,6 +120,39 @@ in
             state = "{{ state_attr('sensor.next_bin_collection', 'daysTo') }}";
             unit_of_measurement = "d";
           }
+          # TODO: Clean this up by moving energy related stuff to a separate module
+          # These sensors are used by HAEO
+          {
+            name = "Octopus Import Price Forecast";
+            unique_id = "octopus_import_price_forecast";
+            unit_of_measurement = "GBP/kWh";
+            state = "{{ states('sensor.octopus_energy_electricity_current_rate') | float(0) }}";
+            attributes.forecast = ''
+              {% set today = state_attr('event.octopus_energy_electricity_current_day_rates', 'rates') or [] %}
+              {% set tom = state_attr('event.octopus_energy_electricity_next_day_rates', 'rates') or [] %}
+              {% set ns = namespace(out=[]) %}
+              {% for r in (today + tom) %}
+                {% set ns.out = ns.out + [{'time': r.start, 'value': r.value_inc_vat}] %}
+              {% endfor %}
+              {{ ns.out }}
+            '';
+          }
+
+          {
+            name = "Octopus Export Price Forecast";
+            unique_id = "octopus_export_price_forecast";
+            unit_of_measurement = "GBP/kWh";
+            state = "{{ states('sensor.octopus_energy_electricity_export_current_rate') | float(0) }}";
+            attributes.forecast = ''
+              {% set today = state_attr('event.octopus_energy_electricity_export_current_day_rates', 'rates') or [] %}
+              {% set tom = state_attr('event.octopus_energy_electricity_export_next_day_rates', 'rates') or [] %}
+              {% set ns = namespace(out=[]) %}
+              {% for r in (today + tom) %}
+                {% set ns.out = ns.out + [{'time': r.start, 'value': r.value_inc_vat}] %}
+              {% endfor %}
+              {{ ns.out }}
+            '';
+          }
         ];
       }
       {

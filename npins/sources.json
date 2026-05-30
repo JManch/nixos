@@ -245,6 +245,22 @@
       "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/refs/tags/v2.25.0",
       "hash": "sha256-LP8E5JBYiLu5UFxmkwht2noJLLqFzM9snuwhlbgdK2s="
     },
+    "haeo": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "hass-energy",
+        "repo": "haeo"
+      },
+      "pre_releases": true,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v0.4.0rc5",
+      "revision": "d817d6a6ee1ddf87c110891cf93f4398b3af0414",
+      "url": "https://api.github.com/repos/hass-energy/haeo/tarball/refs/tags/v0.4.0rc5",
+      "hash": "sha256-Y43ekEjoefVGzWAQGIOoNe9c7LPuOv4/N3XOuvwDUv4="
+    },
     "hass-web-proxy-lib": {
       "type": "Git",
       "repository": {
@@ -395,6 +411,22 @@
       "revision": "5779345a2cff1a0556308df2145e56358301027b",
       "url": "https://api.github.com/repos/Arairon/slskd-stats/tarball/refs/tags/v0.1.3",
       "hash": "sha256-Q8Yhkqtr8n84PeXaeQ57qh1/yfofN7Y5qTB0ULA54pg="
+    },
+    "solcast-solar": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "BJReplay",
+        "repo": "ha-solcast-solar"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v4.5.2",
+      "revision": "33c552763f0fb1abb7d308b30487f903fe16831f",
+      "url": "https://api.github.com/repos/BJReplay/ha-solcast-solar/tarball/refs/tags/v4.5.2",
+      "hash": "sha256-LM6+RhlVNM26PpooM0RrmrlKWTrQM3lmiAbZjgCYI0Q="
     },
     "soularr": {
       "type": "Git",

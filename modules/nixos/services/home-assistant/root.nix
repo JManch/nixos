@@ -117,6 +117,7 @@ in
       "profiler"
       "isal" # https://www.home-assistant.io/integrations/isal
       "bluetooth"
+      "timer"
       "local_file"
       "local_todo"
       "local_calendar"

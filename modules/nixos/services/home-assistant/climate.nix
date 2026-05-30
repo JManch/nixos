@@ -8,15 +8,18 @@ let
     attrValues
     mkOption
     optional
+    optionals
     mkEnableOption
     singleton
+    mkMerge
+    mapAttrsToList
     ;
 in
 {
   opts.rooms = mkOption {
     type = types.attrsOf (
       types.submodule (
-        { config, ... }:
+        { name, config, ... }:
         let
           inherit (config.climate)
             temperature
@@ -86,6 +89,28 @@ in
                   else
                     [ ]
                 )
+                ++ optionals (airConditioning.enable) [
+                  {
+                    type = "tile";
+                    entity = "input_number.${name}_ac_timer_hours";
+                    name = "Auto-Off Time";
+                    features = singleton {
+                      style = "slider";
+                      type = "numeric-input";
+                    };
+                  }
+                  {
+                    type = "tile";
+                    entity = "timer.${name}_ac_auto_off";
+                    name = "Toggle Auto-Off Timer";
+                    tap_action = {
+                      action = "perform-action";
+                      perform_action = "script.turn_on";
+                      target.entity_id = "script.${name}_ac_timer_toggle";
+                    };
+                    grid_options.rows = 2;
+                  }
+                ]
                 ++ optional (temperature != null) {
                   name = "Temperature";
                   type = "sensor";
@@ -218,62 +243,122 @@ in
       }
     ];
 
-    config = {
-      automation = singleton {
-        alias = "Central Heating Toggle";
-        mode = "single";
-        triggers = [
-          {
-            platform = "homeassistant";
-            event = "start";
-          }
-          {
-            platform = "time";
-            at = "input_datetime.central_heating_enable_time";
-          }
-          {
-            platform = "time";
-            at = "input_datetime.central_heating_disable_time";
-          }
-        ];
-        conditions = singleton {
-          condition = "state";
-          entity_id = "input_boolean.central_heating_toggle_enable";
-          state = "on";
-        };
-        actions = singleton {
-          "if" = singleton {
-            condition = "time";
-            after = "input_datetime.central_heating_enable_time";
-            before = "input_datetime.central_heating_disable_time";
+    config = mkMerge (
+      [
+        {
+          automation = singleton {
+            alias = "Central Heating Toggle";
+            mode = "single";
+            triggers = [
+              {
+                platform = "homeassistant";
+                event = "start";
+              }
+              {
+                platform = "time";
+                at = "input_datetime.central_heating_enable_time";
+              }
+              {
+                platform = "time";
+                at = "input_datetime.central_heating_disable_time";
+              }
+            ];
+            conditions = singleton {
+              condition = "state";
+              entity_id = "input_boolean.central_heating_toggle_enable";
+              state = "on";
+            };
+            actions = singleton {
+              "if" = singleton {
+                condition = "time";
+                after = "input_datetime.central_heating_enable_time";
+                before = "input_datetime.central_heating_disable_time";
+              };
+              "then" = singleton {
+                action = "climate.turn_on";
+                target.entity_id = "climate.central_heating";
+              };
+              "else" = singleton {
+                action = "climate.turn_off";
+                target.entity_id = "climate.central_heating";
+              };
+            };
           };
-          "then" = singleton {
-            action = "climate.turn_on";
-            target.entity_id = "climate.central_heating";
+
+          input_datetime = {
+            central_heating_enable_time = {
+              name = "Central Heating Enable Time";
+              has_time = true;
+            };
+
+            central_heating_disable_time = {
+              name = "Central Heating Disable Time";
+              has_time = true;
+            };
           };
-          "else" = singleton {
-            action = "climate.turn_off";
-            target.entity_id = "climate.central_heating";
+
+          input_boolean.central_heating_toggle_enable = {
+            name = "Central Heating Toggle Enable";
+            icon = "mdi:heating-coil";
           };
-        };
-      };
+        }
+      ]
+      ++ mapAttrsToList (
+        room: roomCfg:
+        let
+          inherit (roomCfg) formattedRoomName;
+          inherit (roomCfg.climate) airConditioning;
+        in
+        (mkIf airConditioning.enable {
+          input_number."${room}_ac_timer_hours" = {
+            name = "${formattedRoomName} AC Timer Hours";
+            min = 1;
+            max = 8;
+            step = 0.5;
+            unit_of_measurement = "h";
+            icon = "mdi:timer-sand";
+          };
 
-      input_datetime = {
-        central_heating_enable_time = {
-          name = "Central Heating Enable Time";
-          has_time = true;
-        };
+          timer."${room}_ac_auto_off" = {
+            name = "${formattedRoomName} AC Auto Off";
+            restore = true;
+          };
 
-        central_heating_disable_time = {
-          name = "Central Heating Disable Time";
-          has_time = true;
-        };
-      };
+          script."${room}_ac_timer_toggle" = {
+            alias = "Toggle ${formattedRoomName} AC Auto-Off Timer";
+            sequence = singleton {
+              "if" = singleton {
+                condition = "state";
+                entity_id = "timer.${room}_ac_auto_off";
+                state = "active";
+              };
+              "then" = singleton {
+                action = "timer.cancel";
+                target.entity_id = "timer.${room}_ac_auto_off";
+              };
+              "else" = singleton {
+                action = "timer.start";
+                target.entity_id = "timer.${room}_ac_auto_off";
+                data.duration = "{{ (states('input_number.${room}_ac_timer_hours') | float * 3600) | int }}";
+              };
+            };
+          };
 
-      input_boolean.central_heating_toggle_enable = {
-        name = "Central Heating Toggle Enable";
-        icon = "mdi:heating-coil";
-      };
-    };
+          automation = singleton {
+            alias = "${formattedRoomName} AC Auto Off";
+            mode = "single";
+            triggers = singleton {
+              platform = "event";
+              event_type = "timer_finished";
+              event_data.entity_id = "timer.${room}_ac_auto_off";
+            };
+            actions = singleton {
+              action = "climate.turn_off";
+              target.entity_id = "climate.${airConditioning.id}";
+            };
+          };
+        })
+      ) cfg.rooms
+    );
   };
 }

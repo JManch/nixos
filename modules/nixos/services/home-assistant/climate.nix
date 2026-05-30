@@ -89,28 +89,43 @@ in
                   else
                     [ ]
                 )
-                ++ optionals (airConditioning.enable) [
-                  {
-                    type = "tile";
-                    entity = "input_number.${name}_ac_timer_hours";
-                    name = "Auto-Off Time";
-                    features = singleton {
-                      style = "slider";
-                      type = "numeric-input";
+                ++ optionals (airConditioning.enable) (
+                  let
+                    visibility = singleton {
+                      condition = "state";
+                      entity = "climate.${airConditioning.id}";
+                      state_not = [
+                        "off"
+                        "unavailable"
+                        "unknown"
+                      ];
                     };
-                  }
-                  {
-                    type = "tile";
-                    entity = "timer.${name}_ac_auto_off";
-                    name = "Toggle Auto-Off Timer";
-                    tap_action = {
-                      action = "perform-action";
-                      perform_action = "script.turn_on";
-                      target.entity_id = "script.${name}_ac_timer_toggle";
-                    };
-                    grid_options.rows = 2;
-                  }
-                ]
+                  in
+                  [
+                    {
+                      inherit visibility;
+                      type = "tile";
+                      entity = "input_number.${name}_ac_timer_duration";
+                      name = "Auto-Off Duration";
+                      features = singleton {
+                        style = "slider";
+                        type = "numeric-input";
+                      };
+                    }
+                    {
+                      inherit visibility;
+                      type = "tile";
+                      entity = "timer.${name}_ac_auto_off";
+                      name = "Toggle Auto-Off Timer";
+                      tap_action = {
+                        action = "perform-action";
+                        perform_action = "script.turn_on";
+                        target.entity_id = "script.${name}_ac_timer_toggle";
+                      };
+                      grid_options.rows = 2;
+                    }
+                  ]
+                )
                 ++ optional (temperature != null) {
                   name = "Temperature";
                   type = "sensor";
@@ -310,9 +325,9 @@ in
           inherit (roomCfg.climate) airConditioning;
         in
         (mkIf airConditioning.enable {
-          input_number."${room}_ac_timer_hours" = {
-            name = "${formattedRoomName} AC Timer Hours";
-            min = 1;
+          input_number."${room}_ac_timer_duration" = {
+            name = "${formattedRoomName} AC Timer Duration";
+            min = 0.5;
             max = 8;
             step = 0.5;
             unit_of_measurement = "h";
@@ -339,24 +354,40 @@ in
               "else" = singleton {
                 action = "timer.start";
                 target.entity_id = "timer.${room}_ac_auto_off";
-                data.duration = "{{ (states('input_number.${room}_ac_timer_hours') | float * 3600) | int }}";
+                data.duration = "{{ (states('input_number.${room}_ac_timer_duration') | float * 3600) | int }}";
               };
             };
           };
 
-          automation = singleton {
-            alias = "${formattedRoomName} AC Auto Off";
-            mode = "single";
-            triggers = singleton {
-              platform = "event";
-              event_type = "timer_finished";
-              event_data.entity_id = "timer.${room}_ac_auto_off";
-            };
-            actions = singleton {
-              action = "climate.turn_off";
-              target.entity_id = "climate.${airConditioning.id}";
-            };
-          };
+          automation = [
+            {
+              alias = "${formattedRoomName} AC Auto Off";
+              mode = "single";
+              triggers = singleton {
+                platform = "event";
+                event_type = "timer.finished";
+                event_data.entity_id = "timer.${room}_ac_auto_off";
+              };
+              actions = singleton {
+                action = "climate.turn_off";
+                target.entity_id = "climate.${airConditioning.id}";
+              };
+            }
+            {
+              alias = "${formattedRoomName} AC Auto Off Cancel";
+              mode = "single";
+              triggers = singleton {
+                trigger = "state";
+                entity_id = [ "climate.${airConditioning.id}" ];
+                from = null;
+                to = [ "off" ];
+              };
+              actions = singleton {
+                action = "timer.cancel";
+                target.entity_id = "timer.${room}_ac_auto_off";
+              };
+            }
+          ];
         })
       ) cfg.rooms
     );

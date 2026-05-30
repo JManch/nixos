@@ -128,7 +128,6 @@ in
       "webostv"
       "powerwall"
       "co2signal"
-      "forecast_solar"
       "husqvarna_automower"
       "roborock"
       "unifi"

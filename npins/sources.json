@@ -163,6 +163,14 @@
       "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/refs/tags/v4.6.2",
       "hash": "sha256-uLEFbYG+3+f+LNfJlLi06v75StLBsHdJTiHxA/tNwj4="
     },
+    "emhass": {
+      "type": "PyPi",
+      "name": "emhass",
+      "version_upper_bound": null,
+      "version": "0.17.5",
+      "url": "https://files.pythonhosted.org/packages/a7/6b/7606cf880c3b98c875145e5dbc0667f4404c9c1ce106eb89cd3ee77f2551/emhass-0.17.5.tar.gz",
+      "hash": "sha256-WhYJiC3a4IsOIG+KcnNA5EXrP7DjYzbGUw6+tOVqWxU="
+    },
     "filen-rclone": {
       "type": "Git",
       "repository": {
@@ -363,6 +371,14 @@
       "revision": "dbf35506552977ed0b453c886c6a3a97f7eefdf1",
       "url": "https://api.github.com/repos/silverbulletmd/silverbullet/tarball/refs/tags/2.8.1",
       "hash": "sha256-yfq5cA+K4rykccmEvOyQyXMTbJAmVVDtxyPoPfSmo70="
+    },
+    "skforecast": {
+      "type": "PyPi",
+      "name": "skforecast",
+      "version_upper_bound": null,
+      "version": "0.22.0",
+      "url": "https://files.pythonhosted.org/packages/da/8e/8bc56f6ed1323c636199c2c1a84215617d9b01a6d7dd62d0e415eabfa310/skforecast-0.22.0.tar.gz",
+      "hash": "sha256-wspSiu5lwEiYH6abLx37vxLZ5xsgCl5s9JptWa1GxQQ="
     },
     "slskd-stats": {
       "type": "GitRelease",

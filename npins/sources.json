@@ -32,6 +32,22 @@
       "url": null,
       "hash": "sha256-2MjRAsXeTjGoLRGVxF9LApmxYGpv6tpLdUP7t4FDxFA="
     },
+    "HomeAssistant-OctopusEnergy": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "BottlecapDave",
+        "repo": "HomeAssistant-OctopusEnergy"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v18.3.0",
+      "revision": "2edae23ec2091982ac4d6d129abc60b982722764",
+      "url": "https://api.github.com/repos/BottlecapDave/HomeAssistant-OctopusEnergy/tarball/refs/tags/v18.3.0",
+      "hash": "sha256-V26sdgzA7i16SbAKTLiUgdRVTKJo23kgsRxaJsEtbyw="
+    },
     "ModernX": {
       "type": "GitRelease",
       "repository": {

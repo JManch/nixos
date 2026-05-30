@@ -146,10 +146,16 @@ in
         inherit (sources.adaptive-lighting) version;
         src = sources.adaptive-lighting;
       })
+      (pkgs.home-assistant-custom-components.octopus_energy.overrideAttrs {
+        inherit (sources.HomeAssistant-OctopusEnergy) version;
+        src = sources.HomeAssistant-OctopusEnergy;
+      })
       pkgs.${ns}.heatmiser
       pkgs.${ns}.thermal-comfort
       pkgs.${ns}.daikin-onecta
       pkgs.${ns}.tuiss2ha
+      pkgs.${ns}.haeo
+      pkgs.${ns}.solcast-solar
     ]
     ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;
 

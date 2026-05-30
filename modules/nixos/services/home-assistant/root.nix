@@ -154,6 +154,7 @@ in
       pkgs.${ns}.daikin-onecta
       pkgs.${ns}.tuiss2ha
       pkgs.${ns}.haeo
+      pkgs.${ns}.hafo
       pkgs.${ns}.solcast-solar
     ]
     ++ optional frigate.enable pkgs.home-assistant-custom-components.frigate;

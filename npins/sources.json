@@ -277,6 +277,22 @@
       "url": "https://api.github.com/repos/hass-energy/haeo/tarball/refs/tags/v0.4.0rc5",
       "hash": "sha256-Y43ekEjoefVGzWAQGIOoNe9c7LPuOv4/N3XOuvwDUv4="
     },
+    "hafo": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "hass-energy",
+        "repo": "hafo"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v0.1.1",
+      "revision": "6899e179c6369525acab2adf5d26c38c950fd646",
+      "url": "https://api.github.com/repos/hass-energy/hafo/tarball/refs/tags/v0.1.1",
+      "hash": "sha256-m9oZ6s4YQW+vKwFBuTxNfx156Fs+uH7Gp6stqh2+4m0="
+    },
     "hass-web-proxy-lib": {
       "type": "Git",
       "repository": {

@@ -29,6 +29,7 @@ in
         nullOr (enum [
           "xfce"
           "gnome"
+          "plasma"
         ]);
       default = null;
       description = ''

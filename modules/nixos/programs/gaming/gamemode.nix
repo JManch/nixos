@@ -157,7 +157,12 @@ in
           }
         )
       );
-      default = { };
+      default = {
+        default = {
+          start = { };
+          stop = { };
+        };
+      };
       description = ''
         Attribute set of Gamemode profiles with start/stop bash scripts.
         Gamemode profiles can be enabled by setting the GAMEMODE_PROFILES

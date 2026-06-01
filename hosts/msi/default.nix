@@ -58,10 +58,21 @@
       };
     };
 
+    programs = {
+      gaming = {
+        enable = true;
+        steam.enable = true;
+        gamemode.enable = true;
+      };
+    };
+
+    services = {
+      scrutiny.collector.enable = true;
+    };
+
     system = {
       audio.enable = true;
       ssh.server.enable = true;
-      networking.wiredInterface = "enp3s0";
 
       backups.restic = {
         enable = true;
@@ -74,24 +85,22 @@
 
       desktop = {
         enable = true;
-        # Suspend is very close to being stable but it sometimes causes
-        # applications to crash and the system sometimes gets stuck in a
-        # suspend loop
-        suspend.enable = false;
-        desktopEnvironment = "gnome";
+        # This wasn't stable in the past but testing it out now
+        suspend.enable = true;
+        desktopEnvironment = "plasma";
       };
-    };
 
-    programs = {
-      gaming = {
-        enable = true;
-        steam.enable = true;
-        gamemode.enable = true;
+      networking = {
+        wiredInterface = "enp3s0";
+        defaultGateway = "192.168.88.1";
+        tcpOptimisations = true;
+        resolved.enable = true;
+
+        firewall = {
+          enable = true;
+          defaultInterfaces = [ "enp3s0" ];
+        };
       };
-    };
-
-    services = {
-      scrutiny.collector.enable = true;
     };
   };
 }

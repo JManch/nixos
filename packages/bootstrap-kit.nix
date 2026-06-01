@@ -18,7 +18,7 @@ writeShellApplication {
 
   text = ''
     if [[ $(id -u) != 0 ]]; then
-       echo "Bootstrap kit management must be run as root" >&2
+       echo "bootstrap-kit must be run as root" >&2
        exit 1
     fi
 

@@ -132,7 +132,8 @@ in
               {% set tom = state_attr('event.octopus_energy_electricity_next_day_rates', 'rates') or [] %}
               {% set ns = namespace(out=[]) %}
               {% for r in (today + tom) %}
-                {% set ns.out = ns.out + [{'time': r.start, 'value': r.value_inc_vat}] %}
+                {% set t = r.start if r.start is string else r.start.isoformat() %}
+                {% set ns.out = ns.out + [{'time': t, 'value': r.value_inc_vat}] %}
               {% endfor %}
               {{ ns.out }}
             '';
@@ -148,7 +149,8 @@ in
               {% set tom = state_attr('event.octopus_energy_electricity_export_next_day_rates', 'rates') or [] %}
               {% set ns = namespace(out=[]) %}
               {% for r in (today + tom) %}
-                {% set ns.out = ns.out + [{'time': r.start, 'value': r.value_inc_vat}] %}
+                {% set t = r.start if r.start is string else r.start.isoformat() %}
+                {% set ns.out = ns.out + [{'time': t, 'value': r.value_inc_vat}] %}
               {% endfor %}
               {{ ns.out }}
             '';

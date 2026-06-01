@@ -35,17 +35,10 @@ buildGoModule (finalAttrs: {
     '';
   };
 
-  postPatch = ''
-    rm -r client_bundle
-    # Using $clientBundle here causes:
-    # "github.com/silverbulletmd/silverbullet/client_bundle: open /build/source/client_bundle: too many levels of symbolic links"
-    # when `npmDepsHash` has not been set. I suspect it's because the postPatch
-    # phase runs regardless of whether clientBundle is realised...
-    ln -s ${finalAttrs.clientBundle} client_bundle
-  '';
-
   preBuild = ''
     echo 'export const publicVersion = "${finalAttrs.version}";' > ./public_version.ts
+    rm -r client_bundle
+    ln -s ${finalAttrs.clientBundle} client_bundle
   '';
 
   vendorHash = "sha256-8zZlhVptJq8y3k2DBghJ0lPNcIcaZYkrxN67b6dNBPs=";

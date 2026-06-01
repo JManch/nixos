@@ -1,10 +1,10 @@
 {
-  JManch,
+  scopePkgs,
   buildGoModule,
 }:
 buildGoModule (finalAttrs: {
   pname = "silverbullet-cli";
-  inherit (JManch.silverbullet) version src vendorHash;
+  inherit (scopePkgs.silverbullet) version src vendorHash;
   subPackages = [ "./cmd/cli" ];
   doCheck = false;
   ldflags = [

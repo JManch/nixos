@@ -43,17 +43,17 @@ let
         # we want to overlay our custom package back into primary package set scope
         # https://discourse.nixos.org/t/why-does-prev-callpackage-use-packages-from-final/25263
 
-        # The arg here is the packages defined in the scope. In the future
-        # might find it useful to add // { ${ns} = scopePkgs; }
-        _:
+        # The arg here is the packages defined in the scope.
+        scopePkgs:
         callPackageWith (
           final
           // {
             inherit
-              ns
+              lib # use our extended lib
               self
               sources
               prev
+              scopePkgs
               ;
           }
         );

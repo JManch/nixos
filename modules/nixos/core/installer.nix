@@ -10,7 +10,7 @@ let
     name = "setup-sd-image";
     runtimeInputs = [
       pkgs.parted
-      pkgs.${ns}.bootstrap-kit
+      pkgs.${ns}.install-bootstrap-kit
     ];
     text = ''
       if [ "$(id -u)" != "0" ]; then
@@ -63,45 +63,11 @@ let
       mkdir -p $rootDir
       mount -o loop,offset="$offset" -t ext4 "$tmpdir"/*.img "$rootDir"
 
-      echo "### Decrypting bootstrap-kit ###"
-      bootstrap_kit=$(mktemp -d)
-      clean_up_keys() {
-        rm -rf "$bootstrap_kit"
-      }
-      add_exit_trap clean_up_keys
-      bootstrap-kit decrypt "$bootstrap_kit"
-
-      echo "### Installing keys ###"
-      install -d -m755 "$rootDir/etc/ssh" "$rootDir/home"
-      install -d -m700 "$rootDir/home/$username" "$rootDir/home/${adminUsername}"
-      install -d -m700 "$rootDir/home/$username/.ssh" "$rootDir/home/${adminUsername}/.ssh"
-
-      # Host keys
-      mv "$bootstrap_kit/$hostname"/ssh_host_ed25519_key* "$rootDir/etc/ssh"
-
-      # Nix store keys
-      if [ -f "$bootstrap_kit/$hostname/nix_store_ed25519_key" ]; then
-        mv "$bootstrap_kit/$hostname"/nix_store_ed25519_key* "$rootDir/etc/nix"
-      fi
-
-      # User keys
-      if [ -d "$bootstrap_kit/$username" ]; then
-        mv "$bootstrap_kit/$username"/* "$rootDir/home/$username/.ssh"
-      fi
-
-      # Admin user keys
-      if [[ -d "$bootstrap_kit/${adminUsername}" && -n "$(ls -A "$bootstrap_kit/${adminUsername}")" ]]; then
-        mv "$bootstrap_kit/${adminUsername}"/* "$rootDir/home/${adminUsername}/.ssh"
-      fi
-
-      rm -rf "$bootstrap_kit"
-      # user:users
-      chown -R 1000:100 "$rootDir/home/$username"
-
-      if [ "$username" != "${adminUsername}" ]; then
-        # admin_user:wheel
-        chown -R 1:1 "$rootDir/home/${adminUsername}"
-      fi
+      install-bootstrap-kit \
+        --root-dir "$rootDir" \
+        --username "$username" \
+        --admin-username "${adminUsername}" \
+        --hostname "$hostname"
 
       umount "$rootDir"
       mv "$tmpdir"/*.img .

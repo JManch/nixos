@@ -1,14 +1,17 @@
-lib: self: pkgs:
+{
+  lib,
+  self,
+  scopePkgs,
+}:
 let
   inherit (lib)
     ns
+    nixosSystem
     listToAttrs
     mapAttrs'
-    mapAttrs
     nameValuePair
     hasPrefix
     filterAttrs
-    modules
     mkBefore
     mkForce
     ;
@@ -16,37 +19,21 @@ let
   mkInstaller = name: system: base: extraConfig: {
     inherit name;
     value =
-      let
-        nixosSystem = (
-          lib.nixosSystem {
-            specialArgs = {
-              hostname = "installer";
-              inherit self base;
-            };
-            modules = [
-              {
-                nixpkgs.hostPlatform = system;
-                nixpkgs.buildPlatform = "x86_64-linux";
-                nixpkgs.overlays = mkBefore [ (_: prev: { ${ns} = import ../../packages self lib prev; }) ];
-              }
-              (modules.importApply ../../hosts/installer { })
-              extraConfig
-            ];
+      (nixosSystem {
+        specialArgs = {
+          hostname = "installer";
+          inherit self base;
+        };
+        modules = [
+          {
+            nixpkgs.hostPlatform = system;
+            nixpkgs.buildPlatform = "x86_64-linux";
+            nixpkgs.overlays = mkBefore [ (_: prev: { ${ns} = scopePkgs; }) ];
           }
-        );
-      in
-      nixosSystem.config.system.build.isoImage.overrideAttrs (
-        let
-          tests = import ./tests.nix lib self name base pkgs;
-        in
-        {
-          passthru = {
-            inherit nixosSystem;
-            tests = mapAttrs (_: value: value.test) tests;
-            testHosts = mapAttrs (_: value: value.testHost) tests;
-          };
-        }
-      );
+          ./installer.nix
+          extraConfig
+        ];
+      }).config.system.build.isoImage;
   };
 
   piInstallers = mapAttrs' (

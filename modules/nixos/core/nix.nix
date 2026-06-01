@@ -626,6 +626,13 @@ in
       };
     };
 
+  # Fix for ssh-ng substitutors hanging as connect-timeout is ignored
+  # https://github.com/NixOS/nix/issues/7459
+  programs.ssh.extraConfig = ''
+    Match user nix-ssh
+      ConnectTimeout ${toString config.nix.settings.connect-timeout}
+  '';
+
   system.autoUpgrade = mkIf cfg.autoUpgrade {
     enable = true;
     flake = "github:JManch/nixos";

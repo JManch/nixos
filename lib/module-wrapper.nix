@@ -262,7 +262,7 @@ in
           categoryDir:
           let
             newCategoryPath = categoryPath ++ [
-              (builtins.unsafeDiscardStringContext (builtins.baseNameOf categoryDir))
+              (builtins.unsafeDiscardStringContext (baseNameOf categoryDir))
             ];
 
             category = mkCategory {

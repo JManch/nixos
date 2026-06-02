@@ -2,7 +2,6 @@
   lib,
   cfg,
   pkgs,
-  config,
   osConfig,
 }:
 let
@@ -12,14 +11,16 @@ let
     getExe'
     mkEnableOption
     ;
-  inherit (config.${ns}) desktop;
-  inherit (desktop.style) cursor;
 in
 {
-  enableOpt = false;
+  opts = {
+    enable = mkEnableOption "gtk theme management" // {
+      default = osConfig.${ns}.system.desktop.desktopEnvironment == null;
+    };
 
-  opts.customTheme = mkEnableOption "custom GTK icon theme and adw-gtk3 theme" // {
-    default = osConfig.${ns}.system.desktop.desktopEnvironment == null;
+    customTheme = mkEnableOption "custom GTK icon theme and adw-gtk3 theme" // {
+      default = osConfig.${ns}.system.desktop.desktopEnvironment == null;
+    };
   };
 
   gtk = {
@@ -62,12 +63,4 @@ in
       ${gsettings} set org.gnome.desktop.interface gtk-theme ${gtkTheme.${theme}}
       ${gsettings} set org.gnome.desktop.interface color-scheme prefer-${theme}
     '';
-
-  # Also sets gtk.cursorTheme
-  home.pointerCursor = mkIf cursor.enable {
-    gtk.enable = true;
-    name = cursor.name;
-    package = cursor.package;
-    size = cursor.size;
-  };
 }

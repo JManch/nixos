@@ -1,6 +1,12 @@
-{ pkgs }:
+{
+  lib,
+  pkgs,
+  osConfig,
+}:
 {
   enableOpt = false;
+  conditions = [ (osConfig.${lib.ns}.system.desktop.desktopEnvironment == null) ];
+
   home.packages = [ pkgs.nautilus ];
 
   dconf.settings."org/gnome/nautilus/preferences".default-folder-viewer = "list-view";

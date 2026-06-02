@@ -5,7 +5,6 @@
     spotify
     discord
     chromium
-    netflix
   ];
 
   ${lib.ns} = {
@@ -18,10 +17,7 @@
     };
 
     programs.desktop = {
-      firefox.enable = false;
-      firefox.backup = false;
       anki.enable = true;
-      rnote.enable = true;
 
       gaming = {
         mangohud.enable = true;

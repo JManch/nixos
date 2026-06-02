@@ -186,6 +186,7 @@ let
                 host_address="$hostname-vpn.lan"
               else
                 echo "Host '$hostname' is not up"
+                exit 1
               fi
             ''
           }

@@ -67,20 +67,21 @@ in
       format.enable = true;
     };
 
-    ts = {
+    typescript = {
       enable = true;
       lsp.enable = true;
       format.enable = true;
     };
 
-    haskell = {
-      enable = true;
-      lsp.enable = true;
-      lsp.cmd = [
-        "haskell-language-server-wrapper"
-        "--lsp"
-      ];
-    };
+    # Needs my patch https://github.com/JManch/nvf/commit/f8451061aca3fc5657af792ee8204782e2ae30db
+    # haskell = {
+    #   enable = true;
+    #   lsp.enable = true;
+    #   lsp.cmd = [
+    #     "haskell-language-server-wrapper"
+    #     "--lsp"
+    #   ];
+    # };
 
     zig = {
       enable = true;

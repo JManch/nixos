@@ -41,7 +41,6 @@ in
 
   home.sessionVariables = {
     EDITOR = "nvim";
-    NIX_NEOVIM = 1; # this is just for our legacy config
     NIX_NEOVIM_DARKMAN = if darkman.enable then 1 else 0;
   };
 

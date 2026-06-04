@@ -7,6 +7,13 @@
     chromium
   ];
 
+  programs.firefox = {
+    enable = true;
+    profiles.default.settings = {
+      "media.av1.enabled" = lib.mkForce false;
+    };
+  };
+
   ${lib.ns} = {
     desktop = {
       enable = true;

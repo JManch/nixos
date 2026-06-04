@@ -131,8 +131,10 @@
 
       gaming = {
         enable = true;
-        steam.enable = true;
-        steam.lanTransfer = true;
+        steam = {
+          lanTransfer = true;
+          protonWayland = true;
+        };
         gamescope.enable = true;
         gamemode.enable = true;
       };

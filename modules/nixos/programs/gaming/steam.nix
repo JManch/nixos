@@ -53,7 +53,10 @@ in
   # It's important to disable steam input otherwise our TX15 gets detected as
   # an xbox 360 controller and gets deadzones
 
-  opts.lanTransfer = mkEnableOption "opening port for Steam LAN game transfer";
+  opts = {
+    protonWayland = mkEnableOption "launching Proton games with Wayland by default";
+    lanTransfer = mkEnableOption "opening port for Steam LAN game transfer";
+  };
 
   ns.userPackages = [ pkgs.steam-run ];
 
@@ -62,7 +65,7 @@ in
     package = pkgs.steam.override {
       # Prefer wayland as clients automatically have their content type set to
       # "game" for our game-specific workspace and window rules
-      extraEnv.PROTON_ENABLE_WAYLAND = 1;
+      extraEnv.PROTON_ENABLE_WAYLAND = mkIf cfg.protonWayland 1;
     };
     protontricks.enable = true;
     extraCompatPackages = [ pkgs.proton-ge-bin ];

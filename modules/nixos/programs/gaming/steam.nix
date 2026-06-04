@@ -10,6 +10,7 @@ let
     mkIf
     getExe
     singleton
+    optional
     mkEnableOption
     ;
   inherit (config.${ns}.core) home-manager;
@@ -62,11 +63,23 @@ in
 
   programs.steam = {
     enable = true;
+
     package = pkgs.steam.override {
       # Prefer wayland as clients automatically have their content type set to
       # "game" for our game-specific workspace and window rules
       extraEnv.PROTON_ENABLE_WAYLAND = mkIf cfg.protonWayland 1;
     };
+
+    # Fix cursor in Steam
+    # Not an ideal fix as it assumes a breeze cursor is used and doesn't apply
+    # to other FHS applications. The /sw/share/icons/default symlink doesn't
+    # work and linking ~/.icons/default to breeze_cursors isn't ideal as it
+    # forces the dark theme cursor.
+    # https://github.com/NixOS/nixpkgs/issues/437281
+    extraPackages = optional (
+      config.${ns}.system.desktop.desktopEnvironment == "plasma"
+    ) pkgs.kdePackages.breeze;
+
     protontricks.enable = true;
     extraCompatPackages = [ pkgs.proton-ge-bin ];
   };

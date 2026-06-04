@@ -4,7 +4,11 @@
 
   disko.devices.disk."1TB-SATA" = {
     type = "disk";
-    device = if inputs.vmInstall.value then "/dev/disk/by-path/pci-0000:04:00.0" else null;
+    device =
+      if inputs.vmInstall.value then
+        "/dev/disk/by-path/pci-0000:04:00.0"
+      else
+        "/dev/disk/by-id/ata-CT1000MX500SSD1_2114E59329CE";
     content = {
       type = "gpt";
       partitions = {

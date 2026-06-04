@@ -74,6 +74,10 @@
       audio.enable = true;
       ssh.server.enable = true;
 
+      windows = {
+        enable = true;
+      };
+
       backups.restic = {
         enable = true;
         timerConfig = {

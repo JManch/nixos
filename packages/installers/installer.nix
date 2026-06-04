@@ -17,7 +17,7 @@ let
     runtimeInputs = [
       pkgs.${ns}.bootstrap-kit
       pkgs.${ns}.install-bootstrap-kit
-      (lib.${ns}.addPatches pkgs.disko [ "disko-no-flake-attr-prefix.patch" ])
+      pkgs.disko
       pkgs.gitMinimal
       # The upstream package hardcodes the database path but we want to be able
       # to modify it at runtime using the --export and --database-path flags

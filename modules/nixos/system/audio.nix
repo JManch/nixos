@@ -21,6 +21,7 @@ let
     optionalString
     mapAttrsToList
     optional
+    optionals
     hiPrio
     ;
   inherit (lib.${ns}) wrapHyprlandMoveToActive mkHyprlandCenterFloatRule throttleHyprlandRepeatBind;
@@ -69,31 +70,44 @@ in
       };
     };
 
-    ns.userPackages = mkIf desktop.enable [
-      (wrapHyprlandMoveToActive args pkgs.pwvucontrol "com.saivert.pwvucontrol" "")
-      (hiPrio (
-        pkgs.runCommand "pwvucontrol-desktop-modify" { } ''
-          mkdir -p $out/share/applications
-          substitute ${pkgs.pwvucontrol}/share/applications/com.saivert.pwvucontrol.desktop $out/share/applications/com.saivert.pwvucontrol.desktop \
-            --replace-fail "Name=pwvucontrol" "Name=Volume Control"
-        ''
-      ))
-      # Also installing pavucontrol because I've had multiple instances where
-      # pwvucontrol is unable to change the volume of devices. The UI changes
-      # but the volume change is not applied. Think it's something to do with
-      # the active profile. Also the project is in a bit of an uncertain state
-      # at the moment:
-      # https://github.com/saivert/pwvucontrol/issues/10
-      (wrapHyprlandMoveToActive args pkgs.pavucontrol "org.pulseaudio.pavucontrol" "")
-      (hiPrio (
-        pkgs.runCommand "pavucontrol-desktop-modify" { } ''
-          mkdir -p $out/share/applications
-          substitute ${pkgs.pavucontrol}/share/applications/org.pulseaudio.pavucontrol.desktop $out/share/applications/org.pulseaudio.pavucontrol.desktop \
-            --replace-fail "Name=Volume Control" "Name=Pavucontrol"
-        ''
-      ))
-      pkgs.qpwgraph
+    asserts = [
+      (cfg.alwaysMuteSink -> desktop.desktopEnvironment == null)
+      "Always mute sink does not work with a desktop environment"
+      (cfg.defaultSink != null -> desktop.desktopEnvironment == null)
+      "Default sink does not work with a desktop environment"
+      (cfg.defaultSource != null -> desktop.desktopEnvironment == null)
+      "Default source does not work with a desktop environment"
     ];
+
+    ns.userPackages = mkIf desktop.enable (
+      optionals (desktop.desktopEnvironment == null) [
+        (wrapHyprlandMoveToActive args pkgs.pwvucontrol "com.saivert.pwvucontrol" "")
+        (hiPrio (
+          pkgs.runCommand "pwvucontrol-desktop-modify" { } ''
+            mkdir -p $out/share/applications
+            substitute ${pkgs.pwvucontrol}/share/applications/com.saivert.pwvucontrol.desktop $out/share/applications/com.saivert.pwvucontrol.desktop \
+              --replace-fail "Name=pwvucontrol" "Name=Volume Control"
+          ''
+        ))
+        # Also installing pavucontrol because I've had multiple instances where
+        # pwvucontrol is unable to change the volume of devices. The UI changes
+        # but the volume change is not applied. Think it's something to do with
+        # the active profile. Also the project is in a bit of an uncertain state
+        # at the moment:
+        # https://github.com/saivert/pwvucontrol/issues/10
+        (wrapHyprlandMoveToActive args pkgs.pavucontrol "org.pulseaudio.pavucontrol" "")
+        (hiPrio (
+          pkgs.runCommand "pavucontrol-desktop-modify" { } ''
+            mkdir -p $out/share/applications
+            substitute ${pkgs.pavucontrol}/share/applications/org.pulseaudio.pavucontrol.desktop $out/share/applications/org.pulseaudio.pavucontrol.desktop \
+              --replace-fail "Name=Volume Control" "Name=Pavucontrol"
+          ''
+        ))
+      ]
+      ++ [
+        pkgs.qpwgraph
+      ]
+    );
 
     services.pulseaudio.enable = mkForce false;
 
@@ -201,7 +215,7 @@ in
         wireplumber.unitConfig.ConditionUser = "!@system";
         pipewire-pulse.unitConfig.ConditionUser = "!@system";
 
-        setup-pipewire-devices = {
+        setup-pipewire-devices = mkIf (desktop.desktopEnvironment == null) {
           description = "Setup Pipewire devices on login";
           after = [
             "wireplumber.service"
@@ -257,6 +271,8 @@ in
       };
     };
 
+    # TODO: Rewrite audio notifications to listen on a socket for pipewire
+    # events. Something like this: https://github.com/francma/wob/pull/146/changes/b64b6a38ea9fad53ff204a91b02a331af28cd906
     ns.hm =
       let
         inherit (config.${ns}.hmNs.desktop) hyprland;
@@ -323,7 +339,7 @@ in
             -h 'string:x-canonical-private-synchronous:pipewire-volume' "''${name^} - $media" "Volume ''${percentage%.*}%"
         '';
       in
-      mkIf home-manager.enable {
+      mkIf (home-manager.enable && desktop.desktopEnvironment == null) {
         dconf.settings."com/saivert/pwvucontrol".enable-overamplification = true;
         programs.waybar.settings.bar = {
           "wireplumber#sink".on-click-right = "${toggleAudioMute} sink";

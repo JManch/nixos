@@ -1,7 +1,6 @@
 {
   lib,
   cfg,
-  pkgs,
   config,
 }:
 let
@@ -44,10 +43,9 @@ in
       ''
       ++ optional (secure-boot.enable && cfg.bootEntry.enable) ''
         You have enabled secure boot and the Windows boot entry. It is not
-        recommended to use both as manually signing the edk2 shell reduces
-        the security of secure boot and the declarative systemd-boot config
-        for the windows boot options will not work as lanzaboote overrides
-        it.
+        recommended to use both as manually signing the edk2 shell reduces the
+        security of secure boot and the declarative systemd-boot config for the
+        windows boot options might not work as lanzaboote overrides it.
       '';
 
     # How to get the fs alias:
@@ -58,28 +56,21 @@ in
 
     # Detailed instructions:
     # https://forum.endeavouros.com/t/tutorial-add-a-systemd-boot-loader-menu-entry-for-a-windows-installation-using-a-separate-esp-partition/37431
-    # Mirror: https://archive.is/wwZaP
+    # https://archive.is/wwZaP
 
-    # TODO: Config this with new boot.loader.systemd-boot.windows options
+    # There's also this resource: https://nixos.org/manual/nixos/unstable/options#opt-boot.loader.systemd-boot.windows._name_.efiDeviceHandle
     boot.loader.systemd-boot = {
       edk2-uefi-shell.enable = fsAlias == null;
 
-      extraEntries."windows.conf" = mkIf (fsAlias != null) ''
-        title     Windows
-        sort-key  0
-        efi       /EFI/edk2-shell/shellx64.efi
-        options   -nointerrupt -nomap -noversion windows.nsh
-      '';
-
-      extraFiles."windows.nsh" = mkIf (fsAlias != null) (
-        pkgs.writeText "windows.nsh" ''
-          ${cfg.bootEntry.fsAlias}:EFI\Microsoft\Boot\Bootmgfw.efi
-        ''
-      );
+      windows."windows" = mkIf (fsAlias != null) {
+        title = "Windows";
+        efiDeviceHandle = mkIf (fsAlias != null) fsAlias;
+        sortKey = "0"; # place above NixOS entries
+      };
     };
 
     programs.zsh.shellAliases = {
-      boot-windows = "systemctl reboot --boot-loader-entry=windows.conf";
+      boot-windows = "systemctl reboot --boot-loader-entry=windows_windows.conf";
     };
   })
 ]

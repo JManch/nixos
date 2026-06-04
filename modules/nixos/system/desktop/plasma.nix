@@ -2,7 +2,9 @@
   lib,
   pkgs,
   config,
+  username,
   categoryCfg,
+  adminUsername,
 }:
 let
   inherit (lib) ns mkIf mkDefault;
@@ -21,12 +23,12 @@ in
     elisa # music player
   ];
 
-  security.polkit.extraConfig = # js
-    ''
-      polkit.addAdminRule(function(action, subject) {
-        return ["unix-group:wheel"];
-      });
-    '';
+  # KDE GUI prompts for root password sometimes. Ideally it would prompt for
+  # sudo on our admin user but I don't see an easy way to do that so this
+  # works.
+  users.users."root" = mkIf (username != adminUsername) {
+    hashedPasswordFile = config.age.secrets."${adminUsername}Passwd".path;
+  };
 
   ns.hm = mkIf home-manager.enable {
     ${ns}.desktop.terminal = mkDefault "org.kde.konsole";

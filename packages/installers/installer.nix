@@ -233,6 +233,23 @@ in
       ])
       ++ [ installScript ];
 
+    programs.bash.interactiveShellInit = ''
+      # Auto-start zellij
+      if [[ -z $ZELLIJ ]]; then
+        zellij
+      fi
+    '';
+
+    environment.etc."zellij/config.kdl".text = # kdl
+      ''
+        simplified_ui true
+        mouse_mode false
+        copy_on_select false
+        session_serialization false
+        styled_underlines false
+        show_startup_tips false
+      '';
+
     nix.settings = {
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;

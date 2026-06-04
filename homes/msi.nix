@@ -5,6 +5,7 @@
     spotify
     discord
     chromium
+    netflix
   ];
 
   programs.firefox = {
@@ -19,6 +20,7 @@
 
     programs.desktop = {
       anki.enable = true;
+      obs.enable = true;
 
       gaming = {
         mangohud.enable = true;

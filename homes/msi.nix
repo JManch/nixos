@@ -15,13 +15,7 @@
   };
 
   ${lib.ns} = {
-    desktop = {
-      enable = true;
-      style.cursor = {
-        enable = true;
-        name = "Bibata-Modern-Ice";
-      };
-    };
+    desktop.enable = true;
 
     programs.desktop = {
       anki.enable = true;

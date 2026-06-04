@@ -146,7 +146,7 @@ let
             exit 1
           fi
           echo "### Running disko format and mount ###"
-          disko --mode disko --flake "$flake#nixosConfigurations.$hostname"
+          disko --mode disko --flake "$flake#$hostname"
         fi
       }
 

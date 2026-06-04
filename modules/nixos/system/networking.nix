@@ -164,6 +164,10 @@ in
     "VLAN config only works with networkd"
     (length vlanIds <= 10)
     "A single interface cannot have more than 10 VLANs assigned (arbitrary limit because of VLAN name mapping)"
+    (cfg.wireless.enable -> !config.networking.networkmanager.enable)
+    "Custom wireless config should not be used with networkmanager"
+    (cfg.eduroam.enable -> cfg.wireless.enable && cfg.wireless.backend == "iwd")
+    "Eduroam only works with IWD backend"
   ];
 
   nixpkgs.overlays = [
@@ -346,29 +350,37 @@ in
         wpa_cli -i "${cfg.wireless.interface}" reassociate
       ''
     )
-    ++ optionals (cfg.wireless.enable && cfg.wireless.backend == "wpa_supplicant" && desktop.enable) [
-      # wpa_gui attempts to load the first interface it finds in
-      # /var/run/wpa_supplicant. If this happens to be a p2p-dev-* interface,
-      # wpa_gui goes into a fails with "Could not get status from
-      # wpa_supplicant". Forcing the correct interface with -i fixes this.
-      # (the -q flag disables the "running in tray" notification)
-      (wrapHyprlandMoveToActive args pkgs.wpa_supplicant_gui "wpa_gui" ''
-        --add-flags "-i ${cfg.wireless.interface} -q" \
-        --run '
-          if ${getExe' pkgs.procps "pidof"} wpa_gui > /dev/null; then
-            ${getExe pkgs.libnotify} --urgency=critical -t 5000 "WPA GUI" "Application already running"
-            exit 1
-          fi
-        '
-      '')
-      (hiPrio (
-        pkgs.runCommand "wpa-supplicant-desktop-modify" { } ''
-          mkdir -p $out/share/applications
-          substitute ${pkgs.wpa_supplicant_gui}/share/applications/wpa_gui.desktop $out/share/applications/wpa_gui.desktop \
-            --replace-fail "Name=wpa_gui" "Name=WPA GUI"
-        ''
-      ))
-    ]
+    ++
+      optionals
+        (
+          cfg.wireless.enable
+          && cfg.wireless.backend == "wpa_supplicant"
+          && desktop.enable
+          && desktop.desktopEnvironment == null
+        )
+        [
+          # wpa_gui attempts to load the first interface it finds in
+          # /var/run/wpa_supplicant. If this happens to be a p2p-dev-* interface,
+          # wpa_gui goes into a fails with "Could not get status from
+          # wpa_supplicant". Forcing the correct interface with -i fixes this.
+          # (the -q flag disables the "running in tray" notification)
+          (wrapHyprlandMoveToActive args pkgs.wpa_supplicant_gui "wpa_gui" ''
+            --add-flags "-i ${cfg.wireless.interface} -q" \
+            --run '
+              if ${getExe' pkgs.procps "pidof"} wpa_gui > /dev/null; then
+                ${getExe pkgs.libnotify} --urgency=critical -t 5000 "WPA GUI" "Application already running"
+                exit 1
+              fi
+            '
+          '')
+          (hiPrio (
+            pkgs.runCommand "wpa-supplicant-desktop-modify" { } ''
+              mkdir -p $out/share/applications
+              substitute ${pkgs.wpa_supplicant_gui}/share/applications/wpa_gui.desktop $out/share/applications/wpa_gui.desktop \
+                --replace-fail "Name=wpa_gui" "Name=WPA GUI"
+            ''
+          ))
+        ]
     ++ optionals (cfg.wireless.enable && cfg.wireless.backend == "iwd") [
       pkgs.impala
       # This is useful when sharing wifi with linux-wifi-hotspot. When both
@@ -421,7 +433,13 @@ in
 
   ns.hm = mkIf home-manager.enable {
     xdg.desktopEntries.impala =
-      mkIf (cfg.wireless.enable && cfg.wireless.backend == "iwd" && desktop.enable)
+      mkIf
+        (
+          cfg.wireless.enable
+          && cfg.wireless.backend == "iwd"
+          && desktop.enable
+          && desktop.desktopEnvironment == null
+        )
         {
           name = "Impala";
           genericName = "Wifi Manager";

@@ -1,4 +1,4 @@
-{ lib, inputs, ... }:
+{ lib, ... }:
 {
   imports = [
     ./disko.nix
@@ -42,14 +42,13 @@
     };
 
     hardware = {
-      secure-boot.enable = true;
+      secure-boot.enable = false;
       scanner.enable = true;
 
       file-system = {
-        type = "zfs";
+        type = "ext4";
         tmpfsTmp = true;
-        zfs.trim = true;
-        zfs.encryption.passphraseCred = inputs.nix-resources.secrets.zfsPassphrases.msi;
+        ext4.trim = true;
       };
 
       printing.client = {

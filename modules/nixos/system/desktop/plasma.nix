@@ -21,6 +21,13 @@ in
     elisa # music player
   ];
 
+  security.polkit.extraConfig = # js
+    ''
+      polkit.addAdminRule(function(action, subject) {
+        return ["unix-group:wheel"];
+      });
+    '';
+
   ns.hm = mkIf home-manager.enable {
     ${ns}.desktop.terminal = mkDefault "org.kde.konsole";
   };

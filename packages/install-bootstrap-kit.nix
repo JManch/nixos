@@ -30,12 +30,12 @@ writeShellApplication {
       esac
     done
 
-    if [[ -z $rootDir ]]; then
+    if [[ -z $root_dir ]]; then
       echo "Error: --root-dir must not be empty" >&2
       exit 1
     fi
 
-    if [[ ! -d $rootDir ]]; then
+    if [[ ! -d $root_dir ]]; then
       echo "Error: root dir '$root_dir' does not exist (is the target filesystem mounted?)" >&2
       exit 1
     fi

@@ -235,7 +235,7 @@ in
 
     programs.bash.interactiveShellInit = ''
       # Auto-start zellij
-      if [[ -z $ZELLIJ ]]; then
+      if [[ -z $ZELLIJ && $EUID -ne 0 ]]; then
         zellij
       fi
     '';

@@ -6,6 +6,7 @@
     discord
     chromium
     netflix
+    btop
   ];
 
   programs.firefox = {

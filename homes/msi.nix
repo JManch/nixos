@@ -16,6 +16,8 @@
     };
   };
 
+  gnome-keybinds.binds.mic-mute = lib.mkForce "F8";
+
   ${lib.ns} = {
     desktop = {
       enable = true;

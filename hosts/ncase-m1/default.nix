@@ -132,6 +132,7 @@
       gaming = {
         enable = true;
         steam = {
+          enable = true;
           lanTransfer = true;
           protonWayland = true;
         };

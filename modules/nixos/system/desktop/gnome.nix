@@ -152,6 +152,8 @@ in
         toggle-maximized = "<Super>f";
         toggle-fullscreen = "<Shift><Super>f";
         show-desktop = "<Super>d";
+        mic-mute = "<Super>m";
+        toggle-message-tray = [ ];
         screensaver = [ ];
         switch-to-workspace-left = "<Super>Left";
         switch-to-workspace-right = "<Super>Right";
@@ -161,8 +163,31 @@ in
         move-to-monitor-right = "<Shift><Control><Super>Right";
         toggle-tiled-left = "<Super>bracketleft";
         toggle-tiled-right = "<Super>bracketright";
-        mic-mute = "<Super>m";
-        toggle-message-tray = [ ];
+
+        switch-to-workspace-1 = "<Super>1";
+        switch-to-workspace-2 = "<Super>2";
+        switch-to-workspace-3 = "<Super>3";
+        switch-to-workspace-4 = "<Super>4";
+
+        move-to-workspace-1 = "<Shift><Super>1";
+        move-to-workspace-2 = "<Shift><Super>2";
+        move-to-workspace-3 = "<Shift><Super>3";
+        move-to-workspace-4 = "<Shift><Super>4";
+
+        switch-to-application-1 = [ ];
+        switch-to-application-2 = [ ];
+        switch-to-application-3 = [ ];
+        switch-to-application-4 = [ ];
+
+        open-new-window-application-1 = [ ];
+        open-new-window-application-2 = [ ];
+        open-new-window-application-3 = [ ];
+        open-new-window-application-4 = [ ];
+
+        switch-applications = "<Super>Tab";
+        switch-applications-backward = "<Shift><Super>Tab";
+        switch-windows = "<Alt>Tab";
+        switch-windows-backward = "<Shift><Alt>Tab";
       }
       // optionalAttrs cfg.advancedBinds {
         toggle-maximized = "<Super>e";

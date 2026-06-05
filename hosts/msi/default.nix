@@ -91,7 +91,7 @@
         enable = true;
         # This wasn't stable in the past but testing it out now
         suspend.enable = true;
-        desktopEnvironment = "plasma";
+        desktopEnvironment = "gnome";
       };
 
       networking = {

@@ -17,7 +17,13 @@
   };
 
   ${lib.ns} = {
-    desktop.enable = true;
+    desktop = {
+      enable = true;
+      style.cursor = {
+        enable = true;
+        name = "Bibata-Modern-Classic";
+      };
+    };
 
     programs.desktop = {
       anki.enable = true;

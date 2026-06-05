@@ -23,7 +23,7 @@ let
   extensions = with pkgs.gnomeExtensions; [
     appindicator
     night-theme-switcher
-    dash-to-dock
+    dash-to-panel
     alphabetical-app-grid
   ];
 in
@@ -99,8 +99,7 @@ in
 
         "org/gnome/settings-daemon/plugins/power" = {
           power-button-action = "interactive";
-          sleep-inactive-ac-type = if categoryCfg.suspend.enable then "suspend" else "nothing";
-          sleep-inactive-ac-timeout = 1200;
+          sleep-inactive-ac-type = "nothing";
         };
 
         "org/gnome/desktop/session" = {
@@ -116,22 +115,12 @@ in
 
         "org/gnome/shell/extensions/nightthemeswitcher/commands" = {
           enabled = true;
-          sunset = "gsettings set org.gnome.desktop.interface cursor-theme Bibata-Modern-Classic";
-          sunrise = "gsettings set org.gnome.desktop.interface cursor-theme Bibata-Modern-Ice";
         };
 
         "org/gnome/shell/extensions/nightthemeswitcher/time" = {
           manual-schedule = true;
           sunrise = mkDouble "7.0";
           sunset = mkDouble "21.0";
-        };
-
-        "org/gnome/shell/extensions/dash-to-dock" = {
-          click-action = "focus-or-appspread";
-          scroll-action = "cycle-windows";
-          apply-custom-theme = true;
-          show-trash = false;
-          hot-keys = false;
         };
 
         "org/gnome/system/location" = {

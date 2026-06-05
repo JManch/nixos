@@ -1,11 +1,34 @@
-{ lib, cfg }:
 {
-  opts.config =
-    with lib;
-    mkOption {
+  lib,
+  cfg,
+  username,
+  adminUsername,
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    types
+    optional
+    ;
+in
+{
+  opts = {
+    acknowledgeUserIssue = mkEnableOption "acknowledge user issue" // {
+      default = username == adminUsername;
+    };
+
+    config = mkOption {
       type = with types; nullOr lines;
       description = "Lact yaml config";
     };
+  };
+
+  warnings = optional (!cfg.acknowledgeUserIssue) ''
+    Lact cannot connect to the daemon if the user running the application is
+    not a member of the wheel group. Fix the issue by setting:
+      `admin_user: ${username}`
+  '';
 
   services.lact.enable = true;
   # Not using `lact.settings` because the keys for fan curve have to be

@@ -66,7 +66,10 @@
     };
 
     services = {
-      lact.enable = true;
+      lact = {
+        enable = true;
+        acknowledgeUserIssue = true;
+      };
       scrutiny.collector.enable = true;
     };
 

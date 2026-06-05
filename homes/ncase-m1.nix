@@ -77,7 +77,6 @@
         vscode.enable = true;
         mpv.enable = true;
         mpv.jellyfinShim.enable = true;
-        chatterino.enable = true;
         images.enable = true;
         anki.enable = true;
         zathura.enable = true;
@@ -91,6 +90,11 @@
         davinci-resolve.enable = false;
         signal.enable = true;
         halloy.enable = true;
+
+        chatterino = {
+          enable = true;
+          chatSide = "left";
+        };
 
         firefox = {
           enable = true;

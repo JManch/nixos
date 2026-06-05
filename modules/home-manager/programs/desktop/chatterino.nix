@@ -1,5 +1,6 @@
 {
   lib,
+  cfg,
   pkgs,
   config,
   osConfig,
@@ -12,6 +13,8 @@ let
     optionalString
     getExe
     replaceStrings
+    mkOption
+    types
     ;
   inherit (config.${ns}.programs.desktop) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
@@ -34,6 +37,15 @@ let
   };
 in
 {
+  opts.chatSide = mkOption {
+    type = types.enum [
+      "left"
+      "right"
+    ];
+    default = "right";
+    description = "Whether to place Chatterino on the left or right of the stream";
+  };
+
   home.packages = [ pkgs.chatterino7 ] ++ optional mpv.enable streamlink;
 
   programs.mpv.profiles.streamlink = {
@@ -127,7 +139,9 @@ in
             windows=$(hyprctl clients -j | jaq -r '((.[] | select(.workspace.name == "TWITCH")) | "\(.address),\(.class),\(.title),\(.alwaysOnTop)")')
             while IFS=',' read -r address class title alwaysontop; do
               if [ "$class" = "firefox" ] || [ "$class" = "mpv" ]; then
-                cmds+="dispatch movewindowpixel exact 0% 0%, address:$address;"
+                cmds+="dispatch movewindowpixel exact ${
+                  if cfg.chatSide == "right" then "0" else chatterinoPercentage
+                }% 0%, address:$address;"
                 cmds+="dispatch resizewindowpixel exact ${
                   if theaterMode then firefoxPercentage else "100"
                 }% 100%, address:$address;"
@@ -135,7 +149,9 @@ in
                 if [[ "$title" == *"Overlay"* ]]; then
                   ${optionalString (!theaterMode) ''
                     cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 40%, address:$address;"
-                    cmds+="dispatch movewindowpixel exact ${firefoxPercentage}% 0%, address:$address;"
+                    cmds+="dispatch movewindowpixel exact ${
+                      if cfg.chatSide == "right" then firefoxPercentage else "0"
+                    }% 0%, address:$address;"
                   ''}
                   if [ "$alwaysontop" = "${if theaterMode then "true" else "false"}" ]; then
                     cmds+="dispatch togglealwaysontop address:$address;"
@@ -143,7 +159,9 @@ in
                   cmds+="dispatch alterzorder ${if theaterMode then "bottom" else "top"}, address:$address;"
                 else
                   cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 100%, address:$address;"
-                  cmds+="dispatch movewindowpixel exact ${firefoxPercentage}% 0%, address:$address;"
+                  cmds+="dispatch movewindowpixel exact ${
+                    if cfg.chatSide == "right" then firefoxPercentage else "0"
+                  }% 0%, address:$address;"
                   cmds+="dispatch alterzorder ${if theaterMode then "top" else "bottom"}, address:$address;"
                 fi
               else

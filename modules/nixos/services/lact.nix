@@ -3,7 +3,7 @@
   opts.config =
     with lib;
     mkOption {
-      type = types.lines;
+      type = with types; nullOr lines;
       description = "Lact yaml config";
     };
 
@@ -11,5 +11,7 @@
   # Not using `lact.settings` because the keys for fan curve have to be
   # integers
   # https://github.com/NixOS/nixpkgs/pull/427876#issuecomment-3694036066
-  environment.etc."lact/config.yaml".text = cfg.config;
+  environment.etc."lact/config.yaml" = lib.mkIf (cfg.config != null) {
+    text = cfg.config;
+  };
 }

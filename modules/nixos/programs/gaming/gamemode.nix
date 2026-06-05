@@ -114,12 +114,6 @@ let
               fi
             '') profiles
         )}
-
-        message="${if mode == "stop" then "Stopped" else "Started"}"
-        if (( ''${#profiles[@]} )); then
-          message="$message with profile(s) $(IFS=', '; echo "''${profiles[*]}")"
-        fi
-        notify-send -e --urgency=critical -t 5000 'GameMode' "$message"
       '';
     };
 

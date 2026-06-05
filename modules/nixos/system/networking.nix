@@ -53,7 +53,6 @@ in
 
     tcpOptimisations = mkEnableOption "TCP optimisations";
     resolved.enable = mkEnableOption "Resolved";
-    eduroam.enable = mkEnableOption "eduroam";
 
     wiredInterface = mkOption {
       type = with types; nullOr str;
@@ -84,6 +83,7 @@ in
 
     wireless = {
       enable = mkEnableOption "wireless";
+      eduroam = mkEnableOption "eduroam";
 
       backend = mkOption {
         type = types.enum [
@@ -166,7 +166,7 @@ in
     "A single interface cannot have more than 10 VLANs assigned (arbitrary limit because of VLAN name mapping)"
     (cfg.wireless.enable -> !config.networking.networkmanager.enable)
     "Custom wireless config should not be used with networkmanager"
-    (cfg.eduroam.enable -> cfg.wireless.enable && cfg.wireless.backend == "iwd")
+    (cfg.wireless.eduroam -> cfg.wireless.backend == "iwd")
     "Eduroam only works with IWD backend"
   ];
 

@@ -88,6 +88,7 @@ in
 
     system = {
       networking = {
+        eduroam = true;
         firewall.defaultInterfaces = mkForce [
           "wg-home"
           "wg-home-minimal"

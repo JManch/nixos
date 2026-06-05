@@ -215,7 +215,6 @@
       networking = {
         tcpOptimisations = true;
         resolved.enable = true;
-        eduroam.enable = true;
 
         firewall = {
           enable = true;
@@ -227,6 +226,7 @@
 
         wireless = {
           enable = true;
+          eduroam = true;
           interface = "wlan0";
         };
       };

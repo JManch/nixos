@@ -232,7 +232,6 @@
         defaultGateway = "192.168.88.1";
         tcpOptimisations = true;
         resolved.enable = true;
-        eduroam.enable = true;
 
         firewall = {
           enable = true;

@@ -54,7 +54,7 @@ in
     initContent = # bash
       ''
         function nix-run-app() {
-          app2unit -t service -- nix run n#$1
+          app2unit -t service -a "$1" -- nix run n#$1
         }
       '';
   };

@@ -26,14 +26,18 @@ in
   };
 
   # https://github.com/elFarto/nvidia-vaapi-driver#configuration
-  environment = {
-    systemPackages = [ pkgs.libva-utils ];
-    variables = {
-      MOZ_DISABLE_RDD_SANDBOX = 1;
-      NVD_BACKEND = "direct";
-      LIBVA_DRIVER_NAME = "nvidia";
+  environment =
+    assert lib.assertMsg (
+      !lib.hasPrefix "153" pkgs.firefox.version
+    ) "Firefox should support vulkan hardware decode";
+    {
+      systemPackages = [ pkgs.libva-utils ];
+      variables = {
+        MOZ_DISABLE_RDD_SANDBOX = 1;
+        NVD_BACKEND = "direct";
+        LIBVA_DRIVER_NAME = "nvidia";
+      };
     };
-  };
 
   ns.hm = mkIf (home-manager.enable && config.hardware.nvidia.videoAcceleration) {
     programs.firefox.profiles.default.settings = {

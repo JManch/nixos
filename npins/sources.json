@@ -262,17 +262,20 @@
       "hash": "sha256-LP8E5JBYiLu5UFxmkwht2noJLLqFzM9snuwhlbgdK2s="
     },
     "haeo": {
-      "type": "Git",
+      "type": "GitRelease",
       "repository": {
         "type": "GitHub",
         "owner": "hass-energy",
         "repo": "haeo"
       },
-      "branch": "main",
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
       "submodules": false,
-      "revision": "92e687fa9cfedc5f70c8d7d65fd5e9ef18a830f7",
-      "url": "https://github.com/hass-energy/haeo/archive/92e687fa9cfedc5f70c8d7d65fd5e9ef18a830f7.tar.gz",
-      "hash": "sha256-E0fvzGE/2oD+zBldNgD2hPidvUBt5xdpfzgAvsw7Fq4="
+      "version": "v0.4.0",
+      "revision": "e30a52525e5171db6d3f9ff92ae6cdb782a9f263",
+      "url": "https://api.github.com/repos/hass-energy/haeo/tarball/refs/tags/v0.4.0",
+      "hash": "sha256-G5ZnzL54rK72sUOxb33DT4BU7yHdE0lM46v2auOevkE="
     },
     "hafo": {
       "type": "GitRelease",

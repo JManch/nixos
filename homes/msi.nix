@@ -7,6 +7,7 @@
     chromium
     netflix
     btop
+    anki
   ];
 
   programs.firefox = {
@@ -28,7 +29,6 @@
     };
 
     programs.desktop = {
-      anki.enable = true;
       obs.enable = true;
 
       gaming = {

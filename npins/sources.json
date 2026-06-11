@@ -415,10 +415,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "2.8.1",
-      "revision": "dbf35506552977ed0b453c886c6a3a97f7eefdf1",
-      "url": "https://api.github.com/repos/silverbulletmd/silverbullet/tarball/refs/tags/2.8.1",
-      "hash": "sha256-yfq5cA+K4rykccmEvOyQyXMTbJAmVVDtxyPoPfSmo70="
+      "version": "2.9.0",
+      "revision": "72bba941c86ba7752661027cbd572e6669df6d9e",
+      "url": "https://api.github.com/repos/silverbulletmd/silverbullet/tarball/refs/tags/2.9.0",
+      "hash": "sha256-XQ0OKkiQrrmwmdGXk3dcim/2qosenF3EG2lkglQQ/iY="
     },
     "skforecast": {
       "type": "PyPi",

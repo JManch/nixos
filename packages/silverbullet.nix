@@ -15,7 +15,7 @@ buildGoModule (finalAttrs: {
 
     nativeBuildInputs = [ gitMinimal ];
 
-    npmDepsHash = "sha256-gNkmPZO2CARVPFKavi/iDKsfIbMW/pSjDWgEYRDukK4=";
+    npmDepsHash = "sha256-Twcv3I3scF09onJQdYsc1zOFzMFPOEyPF7VPYa7LBko=";
 
     buildPhase = ''
       runHook preBuild

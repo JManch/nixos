@@ -3,7 +3,7 @@
   home-assistant,
   sources,
 }:
-home-assistant.python.pkgs.callPackage (
+home-assistant.python3Packages.callPackage (
   {
     buildHomeAssistantComponent,
     highspy,

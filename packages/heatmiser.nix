@@ -1,5 +1,5 @@
 { home-assistant, sources }:
-home-assistant.python.pkgs.callPackage (
+home-assistant.python3Packages.callPackage (
   # MIT License
   #
   # Copyright (c) 2018 Francesco Gazzetta, Joshua Manchester

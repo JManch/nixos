@@ -1,8 +1,8 @@
 diff --git a/src/main/index.ts b/src/main/index.ts
-index ec3aa87d..300f2b7e 100644
+index 7533c157..35edc67e 100644
 --- a/src/main/index.ts
 +++ b/src/main/index.ts
-@@ -21,9 +21,11 @@ import {
+@@ -23,9 +23,11 @@ import {
  import electronLocalShortcut from 'electron-localshortcut';
  import log from 'electron-log/main';
  import { AppImageUpdater, autoUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
@@ -15,7 +15,7 @@ index ec3aa87d..300f2b7e 100644
  
  import packageJson from '../../package.json';
  import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
-@@ -853,6 +855,45 @@ ipcMain.on(
+@@ -956,6 +958,45 @@ ipcMain.on(
      },
  );
  
@@ -58,14 +58,14 @@ index ec3aa87d..300f2b7e 100644
 +    request.end();
 +});
 +
- ipcMain.handle('power-save-blocker-start', () => {
+ ipcMain.handle('power-save-blocker-start', (_event, { full }: { full: boolean }) => {
      if (powerSaveBlockerId !== null) {
          return powerSaveBlockerId;
 diff --git a/src/renderer/features/player/hooks/use-scrobble.ts b/src/renderer/features/player/hooks/use-scrobble.ts
-index 2e16f67e..81c3c1f8 100644
+index 98b4af6b..cac09a9a 100644
 --- a/src/renderer/features/player/hooks/use-scrobble.ts
 +++ b/src/renderer/features/player/hooks/use-scrobble.ts
-@@ -216,15 +216,21 @@ export const useScrobble = () => {
+@@ -328,15 +328,21 @@ export const useScrobble = () => {
                      ) {
                          const artists =
                              currentSong.artists?.length > 0

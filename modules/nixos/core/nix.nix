@@ -451,24 +451,6 @@ in
           ) "rnnoise-plugin-cross.patch"
         );
 
-        halloy =
-          assert assertMsg (prev.halloy.version == "2026.6") "halloy overlay can be removed";
-          prev.halloy.overrideAttrs rec {
-            version = "0-unstable-2026-05-16";
-
-            src = final.fetchFromGitHub {
-              owner = "squidowl";
-              repo = "halloy";
-              rev = "b41dde61f6e2c53bd1bfaa7446e01b32db55b90f";
-              hash = "sha256-kmz5m8k0vdqnK2NZTmPxYJ5GqB1O4aRaVjPyNZTWnrQ=";
-            };
-
-            cargoDeps = final.rustPlatform.fetchCargoVendor {
-              inherit src;
-              hash = "sha256-hrYWF5WNhLqKMFJJlir7tumxNZqgGm+gK+RI1iDPatM=";
-            };
-          };
-
         ergochat = prev.ergochat.overrideAttrs {
           version = "2.18.0";
           src = final.fetchFromGitHub {

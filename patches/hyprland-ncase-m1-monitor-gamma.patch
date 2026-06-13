@@ -1,7 +1,7 @@
-diff --git a/src/helpers/Monitor.cpp b/src/helpers/Monitor.cpp
+diff --git a/src/output/Monitor.cpp b/src/output/Monitor.cpp
 index 6e88357e..5c4c9f3b 100644
---- a/src/helpers/Monitor.cpp
-+++ b/src/helpers/Monitor.cpp
+--- a/src/output/Monitor.cpp
++++ b/src/output/Monitor.cpp
 @@ -365,6 +365,37 @@ void CMonitor::onConnect(bool noRule) {
  
      PROTO::gamma->applyGammaToState(m_self.lock());

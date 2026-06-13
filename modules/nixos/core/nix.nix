@@ -506,7 +506,10 @@ in
         protocol = "ssh-ng";
         # The nix-ssh user is only capable of running `nix serve` and ssh substituters
         # do not support passphrase encrypted keys so just use host keys
-        keys = [ keys.ssh-host.framework ]; # should really be attrValues keys.ssh-host; but don't need that right now
+        keys = [
+          keys.ssh-host.framework
+          keys.ssh-host.msi
+        ]; # should really be attrValues keys.ssh-host; but don't need that right now
       };
 
       settings = {

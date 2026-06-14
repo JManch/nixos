@@ -62,7 +62,7 @@ index 7533c157..35edc67e 100644
      if (powerSaveBlockerId !== null) {
          return powerSaveBlockerId;
 diff --git a/src/renderer/features/player/hooks/use-scrobble.ts b/src/renderer/features/player/hooks/use-scrobble.ts
-index 98b4af6b..cac09a9a 100644
+index 98b4af6b..030fbf48 100644
 --- a/src/renderer/features/player/hooks/use-scrobble.ts
 +++ b/src/renderer/features/player/hooks/use-scrobble.ts
 @@ -328,15 +328,21 @@ export const useScrobble = () => {
@@ -89,7 +89,7 @@ index 98b4af6b..cac09a9a 100644
 -                                icon: imageUrlRef.current || undefined,
 -                                silent: true,
 -                            });
-+                            window.electron.ipcRenderer.send('notify-send', args);
++                            window.api.ipc.send('notify-send', args);
                          } catch (error) {
                              logFn.error('an error occurred while sending a desktop notification', {
                                  category: LogCategory.SCROBBLE,

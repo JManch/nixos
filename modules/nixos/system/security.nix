@@ -15,7 +15,9 @@ in
 
   security.pam.services = mkIf (home-manager.enable) {
     swaylock = mkIf (locker == "swaylock") { };
-    hyprlock = mkIf (locker == "hyprlock" && hyprlock.settings.auth.pam.enabled) { };
+    hyprlock = mkIf (locker == "hyprlock" && hyprlock.settings.auth.pam.enabled) {
+      fprintAuth = false; # prefer native hyprlock fingerprint support https://github.com/hyprwm/hyprlock/pull/1026
+    };
     waylock = mkIf (locker == "waylock") { };
   };
 }

@@ -1,7 +1,3 @@
-# https://github.com/hyprwm/hyprlock/commit/927e09fb7dac85df8e21c64989b65bcd3383d67e
-# regressed fingerprint unlock status.
-# According to https://github.com/hyprwm/hyprlock/issues/998#issuecomment-4346087307
-# we may want to disable either the pam fprintd module or hyprlock fingerprint.
 {
   lib,
   pkgs,
@@ -37,11 +33,6 @@ in
         # Adds fingerprint initialising message to fix brief period where
         # FPRINTPROMPT is empty on launch
         "hyprlock-fingerprint-initialising-message.patch"
-        # Fixes the fingerprint present prompt not being displayed. Password box
-        # border color only gets update in time if animation are disabled. Need
-        # to figure out how to trigger another render pass to update color
-        # animations.
-        "hyprlock-fingerprint-present-fix.patch"
       ]
     );
 
@@ -66,7 +57,7 @@ in
     package = inputs.hyprlock.packages.${pkgs.stdenv.hostPlatform.system}.default;
     settings = {
       general.hide_cursor = false;
-      animations.enabled = !hasFingerprint; # because of our fingerprint present patch
+      animations.enabled = true;
 
       auth = {
         pam.enabled = true;

@@ -1,6 +1,7 @@
 {
   lib,
   cfg,
+  args,
   pkgs,
   config,
   sources,
@@ -49,7 +50,7 @@ in
 
     package =
       # Can't use pkgs.symlinkJoin here because home-manager wraps this package
-      pkgs.firefox.overrideAttrs (old: {
+      (lib.${ns}.flakePkgs args "firefox").firefox-nightly-bin.overrideAttrs (old: {
         buildCommand =
           let
             systemctl = getExe' pkgs.systemd "systemctl";
@@ -62,7 +63,7 @@ in
           # bash
           ''
             ${old.buildCommand}
-            wrapProgram $out/bin/firefox \
+            wrapProgram $out/bin/firefox-nightly \
               --set MESA_SHADER_CACHE_DIR "${homeDirectory}/.mozilla/.cache" \
               ${optionalString cfg.runInRam ''
                 --run "${systemctl} is-active --quiet --user firefox-persist-init \
@@ -82,15 +83,11 @@ in
 
         settings = {
           # General
-          "general.autoScroll" = true;
-          "extensions.pocket.enabled" = false;
-          # Enable userChrome.css modifications
-          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-          # Enable hardware acceleration
-          # Firefox only support VAAPI acceleration. This is natively supported
-          # by AMD cards but NVIDIA cards need a translation library to go from
-          # VDPAU to VAAPI.
-          "media.ffmpeg.vaapi.enabled" = ((osConfig.${ns}.core.device.gpu.type or true) != null);
+          "general.autoScroll" = true; # middle-click scrolling
+          "toolkit.legacyUserProfileCustomizations.stylesheets" = true; # enable userChrome.css modifications
+          "dom.security.https_only_mode" = true;
+          "media.hardware-video-decoding-vulkan.enabled" = true; # prefer vulkan decode (had bad experience with vaapi)
+          "media.hardware-video-decoding-vulkan.direct-export.enabled" = true;
 
           # UI
           "layout.css.devPixelsPerPx" = cfg.uiScale;
@@ -98,53 +95,51 @@ in
           "browser.uidensity" = 1;
           "browser.urlbar.suggest.engines" = false;
           "browser.urlbar.suggest.openpage" = false;
+          "browser.urlbar.suggest.quicksuggest.sponsored" = false;
+          "browser.urlbar.suggest.quicksuggest.nonsponsored" = false;
           "browser.toolbars.bookmarks.visibility" = "never";
+          "browser.newtabpage.activity-stream.showSponsored" = false;
+          "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
+          "browser.newtabpage.activity-stream.default.sites" = "";
+          "browser.newtabpage.activity-stream.feeds.telemetry" = false;
+          "browser.newtabpage.activity-stream.telemetry" = false;
           "browser.newtabpage.activity-stream.feeds.system.topstories" = false;
           "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts" = false;
-          "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.searchEngines" = "";
+          "browser.newtabpage.activity-stream.widgets.enabled" = false;
           "media.videocontrols.picture-in-picture.video-toggle-enabled" = false;
+          "findbar.highlightAll" = true;
 
           # QOL
           "signon.rememberSignons" = false;
-          "signon.management.page.breach-alerts.enabled" = false;
           "layout.word_select.eat_space_to_next_word" = false;
           "browser.download.useDownloadDir" = false;
           "browser.aboutConfig.showWarning" = false;
           "extensions.formautofill.creditCards.enabled" = false;
-          "doms.forms.autocomplete.formautofill" = false;
 
           # Privacy
-          "private.globalprivacycontrol.enabled" = true;
-          "private.donottrackheader.enabled" = true;
-          "browser.newtabpage.activity-stream.showSponsored" = false;
-          "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
-          "browser.newtabpage.activity-stream.default.sites" = "";
+          "privacy.fingerprintingProtection" = true;
+          "browser.contentblocking.category" = "strict";
+          "privacy.globalprivacycontrol.enabled" = true;
           "extensions.getAddons.showPane" = false;
           "extensions.htmlaboutaddons.recommendations.enabled" = false;
           "browser.discovery.enabled" = false;
           "datareporting.policy.dataSubmissionEnabled" = false;
           "datareporting.healthreport.uploadEnabled" = false;
-          "toolkit.telemetry.unified" = false;
           "toolkit.telemetry.enabled" = false;
-          "toolkit.telemetry.server" = "data:,";
-          "toolkit.telemetry.archive.enabled" = false;
-          "toolkit.telemetry.newProfilePing.enabled" = false;
-          "toolkit.telemetry.shutdownPingSender.enabled" = false;
-          "toolkit.telemetry.updatePing.enabled" = false;
-          "toolkit.telemetry.bhrPing.enabled" = false;
-          "toolkit.telemetry.firstShutdownPing.enabled" = false;
+          "toolkit.telemetry.unified" = false;
           "toolkit.telemetry.coverage.opt-out" = true;
           "toolkit.coverage.opt-out" = true;
           "toolkit.coverage.endpoint.base" = "";
           "browser.ping-centre.telemetry" = false;
-          "browser.newtabpage.activity-stream.feeds.telemetry" = false;
-          "browser.newtabpage.activity-stream.telemetry" = false;
           "breakpad.reportURL" = "";
           "browser.tabs.crashReporting.sendReport" = false;
           "browser.crashReports.unsubmittedCheck.autoSubmit2" = false;
           "captivedetect.canonicalURL" = "";
           "network.captive-portal-service.enabled" = false;
           "network.connectivity-service.enabled" = false;
+          "app.normandy.enabled" = false;
+          "app.normandy.api_url" = "";
+          "app.shield.optoutstudies.enabled" = false;
         }
         // optionalAttrs (device.type != "laptop") {
           # Scrolling
@@ -303,10 +298,10 @@ in
     "x-scheme-handler/mpv" = mkIf mpv.enable [ "open-in-mpv.desktop" ];
 
     # Set firefox as default browser
-    "default-web-browser" = [ "firefox.desktop" ];
-    "text/html" = [ "firefox.desktop" ];
-    "x-scheme-handler/http" = [ "firefox.desktop" ];
-    "x-scheme-handler/https" = [ "firefox.desktop" ];
+    "default-web-browser" = [ "firefox-nightly.desktop" ];
+    "text/html" = [ "firefox-nightly.desktop" ];
+    "x-scheme-handler/http" = [ "firefox-nightly.desktop" ];
+    "x-scheme-handler/https" = [ "firefox-nightly.desktop" ];
   };
 
   ns.backups.firefox = mkIf cfg.backup {
@@ -330,21 +325,21 @@ in
         inherit (desktop.hyprland) modKey;
       in
       [
-        "${modKey}, Backspace, exec, app2unit -t service firefox.desktop"
+        "${modKey}, Backspace, exec, app2unit -t service firefox-nightly.desktop"
         "${modKey}SHIFT, Backspace, workspace, emptym"
-        "${modKey}SHIFT, Backspace, exec, app2unit -t service firefox.desktop"
+        "${modKey}SHIFT, Backspace, exec, app2unit -t service firefox-nightly.desktop"
       ];
 
     settings.windowrule = [
-      "match:class firefox, scroll_touchpad 0.6"
-      "match:class firefox, match:float true, center true, size monitor_w*0.75 monitor_h*0.75"
-      "match:class firefox, match:title Extension: \\(Bitwarden Password Manager\\) - Bitwarden — Mozilla Firefox, no_screen_share true"
+      "match:class firefox-nightly, scroll_touchpad 0.6"
+      "match:class firefox-nightly, match:float true, center true, size monitor_w*0.75 monitor_h*0.75"
+      "match:class firefox-nightly, match:title Extension: \\(Bitwarden Password Manager\\) - Bitwarden — Mozilla Firefox Nightly, no_screen_share true"
     ];
 
     eventScripts.windowtitlev2 = # bash
       ''
         # float bitwarden extension window
-        if [[ "''${args[1]}" == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
+        if [[ "''${args[1]}" == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox Nightly" ]]; then
           hyprctl --batch "\
             dispatch focuswindow address:0x''${args[0]}; \
             dispatch setfloating address:0x''${args[0]}; \

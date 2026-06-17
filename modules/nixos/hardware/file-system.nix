@@ -155,7 +155,7 @@ in
 
     zramSwap.enable = true;
     swapDevices = mkIf cfg.swap.enable (singleton {
-      device = lib.${ns}.impermanencePrefix config "/var/lib/swapfile";
+      device = lib.${ns}.impermanencePrefix config "/swapfile";
       size = cfg.swap.size;
     });
 

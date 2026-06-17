@@ -13,13 +13,13 @@
 
       device = {
         type = "desktop";
-        address = "192.168.88.244";
+        address = "192.168.88.239";
         memory = 1024 * 16;
 
         cpu = {
-          name = "i7 6700k";
-          type = "intel";
-          threads = 8;
+          name = "R5 2600";
+          type = "amd";
+          threads = 12;
         };
 
         gpu = {

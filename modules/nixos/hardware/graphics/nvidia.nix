@@ -37,6 +37,11 @@ in
         NVD_BACKEND = "direct";
         LIBVA_DRIVER_NAME = "nvidia";
       };
+
+      # WARN: Don't remove this with firefox update
+      # Increase Nvidia's shader cache size to 12GB
+      # https://wiki.cachyos.org/configuration/gaming/#increase-maximum-shader-cache-size
+      sessionVariables.__GL_SHADER_DISK_CACHE_SIZE = "12000000000";
     };
 
   ns.hm = mkIf (home-manager.enable && config.hardware.nvidia.videoAcceleration) {

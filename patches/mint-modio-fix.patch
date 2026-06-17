@@ -1,0 +1,18 @@
+diff --git a/src/providers/modio.rs b/src/providers/modio.rs
+index d8d7ec9..458d8e6 100644
+--- a/src/providers/modio.rs
++++ b/src/providers/modio.rs
+@@ -413,10 +413,10 @@ impl DrgModio for modio::Modio {
+         &self,
+         name_id: &str,
+     ) -> Result<Vec<ModioModResponse>, DrgModioError> {
+-        use modio::filter::{Eq, In};
+-        use modio::mods::filters::{NameId, Visible};
++        use modio::filter::Eq;
++        use modio::mods::filters::NameId;
+ 
+-        let filter = NameId::eq(name_id).and(Visible::_in(vec![0, 1]));
++        let filter = NameId::eq(name_id);
+         Ok(self
+             .game(MODIO_DRG_ID)
+             .mods()

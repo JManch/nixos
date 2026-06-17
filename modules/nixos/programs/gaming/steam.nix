@@ -65,9 +65,12 @@ in
     enable = true;
 
     package = pkgs.steam.override {
-      # Prefer wayland as clients automatically have their content type set to
-      # "game" for our game-specific workspace and window rules
-      extraEnv.PROTON_ENABLE_WAYLAND = mkIf cfg.protonWayland 1;
+      extraEnv = {
+        DXVK_HUD = mkIf (device.gpu.type == "nvidia") "compiler";
+        # Prefer wayland as clients automatically have their content type set to
+        # "game" for our game-specific workspace and window rules
+        PROTON_ENABLE_WAYLAND = mkIf cfg.protonWayland 1;
+      };
     };
 
     # Fix cursor in Steam

@@ -66,10 +66,9 @@ in
 
     package = pkgs.steam.override {
       extraEnv = {
-        DXVK_HUD = mkIf (device.gpu.type == "nvidia") "compiler";
         # Prefer wayland as clients automatically have their content type set to
         # "game" for our game-specific workspace and window rules
-        PROTON_ENABLE_WAYLAND = mkIf cfg.protonWayland 1;
+        PROTON_ENABLE_WAYLAND = if cfg.protonWayland then 1 else 0;
       };
     };
 

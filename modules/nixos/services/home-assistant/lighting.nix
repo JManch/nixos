@@ -39,8 +39,20 @@ in
             type = types.submodule {
               options = {
                 enable = mkEnableOption "smart lighting integration";
+
                 basicLights = mkEnableOption "basic lights that don't support warmth" // {
                   default = false;
+                };
+
+                rockerSwitch.topic = mkOption {
+                  type = with types; nullOr str;
+                  default = null;
+                  description = ''
+                    Zigbee topic of rocker wall switch in the room. A single
+                    flick will toggle the lights whilst up to 3 repeated flicks
+                    will send custom flicked events that other automations can
+                    subscribe to.
+                  '';
                 };
 
                 individualLights = mkOption {
@@ -876,6 +888,74 @@ in
             };
           }
         )
+
+        (mkIf (cfg'.wallSwitch != null) {
+          automation = singleton {
+            alias = "${formattedRoomName} Rocker Switch";
+            mode = "single";
+            triggers = singleton {
+              trigger = "mqtt";
+              options.topic = "zigbee2mqtt/${cfg'.wallSwitch}";
+              options.payload = "left_press";
+            };
+            actions = [
+              # wait for a second flick
+              {
+                wait_for_trigger = singleton {
+                  trigger = "mqtt";
+                  options.topic = "zigbee2mqtt/${cfg'.wallSwitch}";
+                  options.payload = "left_press";
+                };
+                timeout.milliseconds = 35;
+                continue_on_timeout = true;
+              }
+              {
+                "if" = singleton {
+                  condition = "template";
+                  value_template = "{{ wait.trigger is none }}";
+                };
+                "then" = [
+                  {
+                    event = "${room}_rocker_switch_flick";
+                    event_data.flicks = 1;
+                  }
+                  {
+                    action = "light.toggle";
+                    target.entity_id = "light.${room}_lights";
+                  }
+                  { stop = "single flick"; }
+                ];
+              }
+              # got a second flick wait for a third
+              {
+                wait_for_trigger = singleton {
+                  trigger = "mqtt";
+                  options.topic = "zigbee2mqtt/${cfg'.wallSwitch}";
+                  options.payload = "left_press";
+                };
+                timeout.milliseconds = 35;
+                continue_on_timeout = true;
+              }
+              {
+                "if" = singleton {
+                  condition = "template";
+                  value_template = "{{ wait.trigger is none }}";
+                };
+                "then" = [
+                  {
+                    event = "${room}_rocker_switch_flick";
+                    event_data.flicks = 2;
+                  }
+                  { stop = "single flick"; }
+                ];
+              }
+              {
+                event = "${room}_rocker_switch_flick";
+                event_data.flicks = 3;
+              }
+            ];
+          };
+        })
       ])
     ) cfg.rooms
   );

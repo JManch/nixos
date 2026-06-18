@@ -1,6 +1,7 @@
 {
   lib,
   cfg,
+  pkgs,
   config,
 }:
 let
@@ -69,7 +70,18 @@ in
       };
     };
 
-    programs.zsh.shellAliases = {
+    ns.userPackages = optional (fsAlias != null) (
+      pkgs.makeDesktopItem {
+        name = "boot-windows";
+        desktopName = "Boot Windows";
+        type = "Application";
+        exec = "systemctl reboot --boot-loader-entry=windows_windows.conf";
+        icon = "computer";
+        categories = [ "System" ];
+      }
+    );
+
+    programs.zsh.shellAliases = mkIf (fsAlias != null) {
       boot-windows = "systemctl reboot --boot-loader-entry=windows_windows.conf";
     };
   })

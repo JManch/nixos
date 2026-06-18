@@ -81,6 +81,10 @@
 
       windows = {
         enable = true;
+        bootEntry = {
+          enable = true;
+          fsAlias = "HD1d65535a2";
+        };
       };
 
       backups.restic = {

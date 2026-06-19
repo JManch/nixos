@@ -59,6 +59,11 @@
   networking.hostId = "625ec505";
   hardware.cpu.amd.updateMicrocode = true;
 
+  hardware.logitech.wireless = {
+    enable = true;
+    enableGraphical = true;
+  };
+
   # Fix for motherboard-specific suspend issue
   # https://wiki.archlinux.org/title/Power_management/Wakeup_triggers#Gigabyte_motherboards
   # https://wiki.archlinux.org/title/Power_management/Suspend_and_hibernate#PC_will_not_wake_from_sleep_on_A520I_and_B550I_motherboards

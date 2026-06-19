@@ -1,7 +1,6 @@
 {
   lib,
   cfg,
-  args,
   pkgs,
   config,
   sources,
@@ -50,7 +49,7 @@ in
 
     package =
       # Can't use pkgs.symlinkJoin here because home-manager wraps this package
-      (lib.${ns}.flakePkgs args "firefox").firefox-nightly-bin.overrideAttrs (old: {
+      pkgs.firefox.overrideAttrs (old: {
         buildCommand =
           let
             systemctl = getExe' pkgs.systemd "systemctl";
@@ -63,7 +62,7 @@ in
           # bash
           ''
             ${old.buildCommand}
-            wrapProgram $out/bin/firefox-nightly \
+            wrapProgram $out/bin/firefox \
               --set MESA_SHADER_CACHE_DIR "${homeDirectory}/.mozilla/.cache" \
               ${optionalString cfg.runInRam ''
                 --run "${systemctl} is-active --quiet --user firefox-persist-init \
@@ -298,10 +297,10 @@ in
     "x-scheme-handler/mpv" = mkIf mpv.enable [ "open-in-mpv.desktop" ];
 
     # Set firefox as default browser
-    "default-web-browser" = [ "firefox-nightly.desktop" ];
-    "text/html" = [ "firefox-nightly.desktop" ];
-    "x-scheme-handler/http" = [ "firefox-nightly.desktop" ];
-    "x-scheme-handler/https" = [ "firefox-nightly.desktop" ];
+    "default-web-browser" = [ "firefox.desktop" ];
+    "text/html" = [ "firefox.desktop" ];
+    "x-scheme-handler/http" = [ "firefox.desktop" ];
+    "x-scheme-handler/https" = [ "firefox.desktop" ];
   };
 
   ns.backups.firefox = mkIf cfg.backup {
@@ -325,21 +324,21 @@ in
         inherit (desktop.hyprland) modKey;
       in
       [
-        "${modKey}, Backspace, exec, app2unit -t service firefox-nightly.desktop"
+        "${modKey}, Backspace, exec, app2unit -t service firefox.desktop"
         "${modKey}SHIFT, Backspace, workspace, emptym"
-        "${modKey}SHIFT, Backspace, exec, app2unit -t service firefox-nightly.desktop"
+        "${modKey}SHIFT, Backspace, exec, app2unit -t service firefox.desktop"
       ];
 
     settings.windowrule = [
-      "match:class firefox-nightly, scroll_touchpad 0.6"
-      "match:class firefox-nightly, match:float true, center true, size monitor_w*0.75 monitor_h*0.75"
-      "match:class firefox-nightly, match:title Extension: \\(Bitwarden Password Manager\\) - Bitwarden — Mozilla Firefox Nightly, no_screen_share true"
+      "match:class firefox, scroll_touchpad 0.6"
+      "match:class firefox, match:float true, center true, size monitor_w*0.75 monitor_h*0.75"
+      "match:class firefox, match:title Extension: \\(Bitwarden Password Manager\\) - Bitwarden — Mozilla Firefox, no_screen_share true"
     ];
 
     eventScripts.windowtitlev2 = # bash
       ''
         # float bitwarden extension window
-        if [[ "''${args[1]}" == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox Nightly" ]]; then
+        if [[ "''${args[1]}" == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
           hyprctl --batch "\
             dispatch focuswindow address:0x''${args[0]}; \
             dispatch setfloating address:0x''${args[0]}; \

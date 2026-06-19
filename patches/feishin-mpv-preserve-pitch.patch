@@ -1,0 +1,61 @@
+diff --git a/src/renderer/features/player/audio-player/engine/mpv-player-engine.tsx b/src/renderer/features/player/audio-player/engine/mpv-player-engine.tsx
+index acbf3fe9..30d8a2c4 100644
+--- a/src/renderer/features/player/audio-player/engine/mpv-player-engine.tsx
++++ b/src/renderer/features/player/audio-player/engine/mpv-player-engine.tsx
+@@ -57,7 +57,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
+     const hasPopulatedQueueRef = useRef<boolean>(false);
+     const isMountedRef = useRef<boolean>(true);
+ 
+-    const { mpvAudioDeviceId, transcode } = usePlaybackSettings();
++    const { mpvAudioDeviceId, preservePitch, transcode } = usePlaybackSettings();
+     const mpvExtraParameters = useSettingsStore((store) => store.playback.mpvExtraParameters);
+     const mpvProperties = useSettingsStore((store) => store.playback.mpvProperties);
+     const [reloadTrigger, setReloadTrigger] = useState(0);
+@@ -103,6 +103,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
+             // Initialize mpv with fresh state
+             const properties: Record<string, any> = {
+                 ...getMpvProperties(mpvProperties),
++                'audio-pitch-correction': preservePitch ? 'yes' : 'no',
+                 speed: speed,
+                 volume: volume,
+             };
+@@ -157,10 +158,10 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
+             isInitializedRef.current = false;
+             hasPopulatedQueueRef.current = false;
+         };
+-        // Note: volume, speed, and transcode are intentionally not in dependencies.
+-        // Volume and speed changes are handled by separate useEffects below to avoid
+-        // reinitializing the entire player. Transcode changes are handled by queue
+-        // update callbacks in usePlayerEvents.
++        // Note: volume, speed, preservePitch, and transcode are intentionally not in
++        // dependencies. Volume, speed, and pitch correction changes are handled by
++        // separate useEffects below to avoid reinitializing the entire player.
++        // Transcode changes are handled by queue update callbacks in usePlayerEvents.
+         // reloadTrigger is included to allow manual reload via MPV_RELOAD event.
+         // eslint-disable-next-line react-hooks/exhaustive-deps
+     }, [mpvExtraParameters, mpvProperties, mpvAudioDeviceId, reloadTrigger]);
+@@ -187,7 +188,9 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
+         mpvPlayer.mute(isMuted);
+     }, [isMuted]);
+ 
+-    // Update speed/playback rate
++    // Update speed/playback rate and pitch correction.
++    // `audio-pitch-correction=no` makes speed changes a plain resample (pitch
++    // shifts with speed); `yes` time-stretches to keep pitch constant.
+     useEffect(() => {
+         if (!mpvPlayer) {
+             return;
+@@ -197,8 +200,11 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
+             return;
+         }
+ 
+-        mpvPlayer.setProperties({ speed });
+-    }, [speed]);
++        mpvPlayer.setProperties({
++            'audio-pitch-correction': preservePitch ? 'yes' : 'no',
++            speed,
++        });
++    }, [speed, preservePitch]);
+ 
+     // Handle play/pause status
+     useEffect(() => {

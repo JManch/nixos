@@ -7,7 +7,14 @@ in
     # we don't want feishin loading mpv scripts
     (pkgs.symlinkJoin {
       name = "feishin-mpv-unwrapped";
-      paths = [ (lib.${ns}.addPatches pkgs.feishin [ "feishin-notifications.patch" ]) ];
+      paths = [
+        (lib.${ns}.addPatches pkgs.feishin [
+          "feishin-notifications.patch"
+          # The "preserve pitch" is not implemented for the mpv backend and is
+          # effectively always switched on. This fixes that.
+          "feishin-mpv-preserve-pitch.patch"
+        ])
+      ];
       nativeBuildInputs = [ pkgs.makeWrapper ];
       postBuild = ''
         wrapProgram $out/bin/feishin \

@@ -138,7 +138,10 @@
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";
 
+    rust-overlay.url = "github:oxalica/rust-overlay";
     mint.url = "github:trumank/mint";
+    mint.inputs.rust-overlay.follows = "rust-overlay";
+    mint.inputs.nixpkgs.follows = "nixpkgs";
 
     noita-entangled-worlds.url = "github:IntQuant/noita_entangled_worlds";
 

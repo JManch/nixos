@@ -13,7 +13,6 @@ let
     concatMapStringsSep
     splitString
     replaceStrings
-    removeAttrs
     singleton
     sortOn
     toSentenceCase
@@ -131,28 +130,44 @@ in
         useAlarm = true;
       };
 
-      blinds = [
-        "joshua_blind_garden"
-        "joshua_blind_driveway"
-      ];
+      blinds = {
+        automatedClose.enable = true;
+        entities = [
+          "joshua_blind_garden"
+          "joshua_blind_driveway"
+        ];
+      };
 
       lighting = {
         enable = true;
         wakeUpLights.enable = true;
+        wallSwitch.topic = "Joshua Wall Switch";
 
         individualLights = [
           "joshua_lamp_floor"
           "joshua_lamp_bed"
-          "joshua_bulb_ceiling"
+          # "joshua_bulb_ceiling"
           "joshua_play_desk_1"
           "joshua_play_desk_2"
+
+          "joshua_spot_ceiling_1"
+          "joshua_spot_ceiling_2"
+          "joshua_spot_ceiling_3"
+          "joshua_spot_ceiling_4"
+          "joshua_spot_ceiling_5"
+          "joshua_spot_ceiling_6"
         ];
 
         adaptiveLighting = {
           enable = true;
           sleepMode = {
             automate = true;
-            disabledLights = [ "light.joshua_bulb_ceiling" ];
+            disabledLights = [
+              "light.joshua_spot_ceiling_1"
+              "light.joshua_spot_ceiling_2"
+              "light.joshua_spot_ceiling_4"
+              "light.joshua_spot_ceiling_5"
+            ];
           };
         };
 
@@ -478,7 +493,7 @@ in
           };
         };
 
-        blinds = [
+        blinds.entities = [
           "${person}_blind_garden"
           "${person}_blind_west"
         ];

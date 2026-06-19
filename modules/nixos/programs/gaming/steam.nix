@@ -11,6 +11,7 @@ let
     getExe
     singleton
     optional
+    optionalAttrs
     mkEnableOption
     ;
   inherit (config.${ns}.core) home-manager;
@@ -65,10 +66,10 @@ in
     enable = true;
 
     package = pkgs.steam.override {
-      extraEnv = {
+      extraEnv = optionalAttrs cfg.protonWayland {
         # Prefer wayland as clients automatically have their content type set to
         # "game" for our game-specific workspace and window rules
-        PROTON_ENABLE_WAYLAND = if cfg.protonWayland then 1 else 0;
+        PROTON_ENABLE_WAYLAND = "1";
       };
     };
 

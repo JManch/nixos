@@ -83,7 +83,7 @@
         enable = true;
         bootEntry = {
           enable = true;
-          fsAlias = "HD1d65535a2";
+          fsAlias = "HD2d65535a2";
         };
       };
 

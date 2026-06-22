@@ -10,6 +10,7 @@ in
 
   ns.services.slskd.enable = true;
   ns.services.navidrome.enable = true;
+  ns.services.audiomuse.enable = true;
   ns.programs.beets.enable = true;
 
   ns.backups."music" = {

@@ -343,6 +343,7 @@ in
 
       audiobookshelf = {
         enable = true;
+        port = 8001;
         extraAllowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
       };
     };

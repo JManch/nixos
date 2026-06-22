@@ -1,4 +1,5 @@
 # How to fix database collation warnings: https://dba.stackexchange.com/a/330184
+# Or: https://wiki.nixos.org/wiki/PostgreSQL#WARNING:_database_%22XXX%22_has_a_collation_version_mismatch
 
 # Sometimes after adding a new user/database with ensureUsers and ensureDatabases this error happens:
 # Relevant github issue: https://github.com/NixOS/nixpkgs/issues/318777

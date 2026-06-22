@@ -107,6 +107,7 @@ in
         };
 
         "org/gnome/shell" = {
+          disable-user-extensions = false; # I think extensions sometimes get disabled after a crash?
           enabled-extensions = (map (e: e.extensionUuid) extensions) ++ [
             "drive-menu@gnome-shell-extensions.gcampax.github.com"
             "launch-new-instance@gnome-shell-extensions.gcampax.github.com"

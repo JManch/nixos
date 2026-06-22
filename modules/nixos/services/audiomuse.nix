@@ -1,13 +1,13 @@
 { lib, config }:
 let
-  inherit (lib) getExe' singleton;
+  inherit (lib) foldl' getExe' singleton;
   inherit (config.age.secrets) audiomuseVars audiomuseRedisPass;
   image = "ghcr.io/neptunehub/audiomuse-ai:latest";
   ports = {
     redis = 6379; # WARN: If changing this remember to update REDIS_URL in secret env file
     postgres = config.services.postgresql.settings.port;
-    # unfortunately flask port is hardcoded to 8000. Not using `host` mode for
-    # the containers because it's a nightmare with firewall etc...
+    # unfortunately flask port is hardcoded to 8000. Using `host` mode for
+    # the containers because otherwise it's a nightmare with firewall etc...
     flask = 8000;
   };
 
@@ -55,40 +55,43 @@ in
     ensureDatabases = [ "audiomuse" ];
   };
 
-  virtualisation.oci-containers.containers = {
-    "audiomuse-flask" = {
-      inherit image;
-      environment = envVars // {
-        SERVICE_TYPE = "flask";
-      };
-      environmentFiles = [ audiomuseVars.path ];
-      volumes = [ "/var/cache/audiomuse-flask:/app/temp_audio" ];
-      user = "${toString config.users.users."audiomuse".uid}:${
-        toString config.users.groups."audiomuse".gid
-      }";
-      networks = [ "host" ];
-      extraOptions = [ "--security-opt=no-new-privileges" ];
-    };
+  virtualisation.oci-containers.containers =
+    foldl'
+      (
+        acc: type:
+        acc
+        // {
+          "audiomuse-${type}" = {
+            inherit image;
+            environment = envVars // {
+              SERVICE_TYPE = type;
+            };
+            environmentFiles = [ audiomuseVars.path ];
+            volumes = [ "/var/cache/audiomuse/${type}:/app/temp_audio" ];
+            user = "${toString config.users.users."audiomuse".uid}:${
+              toString config.users.groups."audiomuse".gid
+            }";
+            networks = [ "host" ];
+            extraOptions = [ "--security-opt=no-new-privileges" ];
+          };
+        }
+      )
+      { }
+      [
+        "flask"
+        "worker"
+      ];
 
-    "audiomuse-worker" = {
-      inherit image;
-      environment = envVars // {
-        SERVICE_TYPE = "worker";
-      };
-      environmentFiles = [ audiomuseVars.path ];
-      volumes = [ "/var/cache/audiomuse-worker:/app/temp_audio" ];
-      user = "${toString config.users.users."audiomuse".uid}:${
-        toString config.users.groups."audiomuse".gid
-      }";
-      networks = [ "host" ];
-      extraOptions = [ "--security-opt=no-new-privileges" ];
-    };
+  # Each track is temporarily downloaded to the temp dirs for analysis so might
+  # as well reduce IO with tmpfs
+  fileSystems."/var/cache/audiomuse" = {
+    fsType = "tmpfs";
+    options = [ "size=25%" ];
   };
 
-  # Not using serviceConfig.CacheDirectory because ownership would be root
   systemd.tmpfiles.rules = [
-    "d /var/cache/audiomuse-worker 0750 audiomuse audiomuse - -"
-    "d /var/cache/audiomuse-flask 0750 audiomuse audiomuse - -"
+    "d /var/cache/audiomuse/worker 0750 audiomuse audiomuse - -"
+    "d /var/cache/audiomuse/flask 0750 audiomuse audiomuse - -"
   ];
 
   systemd.services = {
@@ -139,18 +142,6 @@ in
   };
 
   ns.persistence.directories = [
-    {
-      directory = "/var/cache/audiomuse-flask";
-      user = "audiomuse";
-      group = "audiomuse";
-      mode = "0750";
-    }
-    {
-      directory = "/var/cache/audiomuse-worker";
-      user = "audiomuse";
-      group = "audiomuse";
-      mode = "0750";
-    }
     {
       directory = "/var/lib/redis-audiomuse";
       user = "redis-audiomuse";

@@ -365,8 +365,12 @@ in
     after = [
       "network.target"
       "postgresql.target"
+      "acme-irc.${fqDomain}.service"
     ];
-    requires = [ "postgresql.target" ];
+    requires = [
+      "postgresql.target"
+      "acme-irc.${fqDomain}.service"
+    ];
     startLimitBurst = 3;
     startLimitIntervalSec = 180;
     serviceConfig = hardeningBaseline config {
@@ -421,8 +425,11 @@ in
     '';
   };
 
-  # Reload ergo.service when certificates refresh
-  security.acme.certs."irc.${fqDomain}".reloadServices = [ "ergo.service" ];
+  # Have to restart instead of reload here because we're using LoadCredentials
+  # https://nixos.org/manual/nixos/stable/#module-security-acme-root-owned
+  security.acme.certs."irc.${fqDomain}".postRun = ''
+    systemctl restart ergo.service
+  '';
 
   networking.firewall.allowedTCPPorts = [ 6697 ];
 

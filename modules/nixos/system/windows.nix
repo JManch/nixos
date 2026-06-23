@@ -12,9 +12,10 @@ let
     mkOption
     types
     optional
+    mkForce
     ;
   inherit (config.${ns}.hardware) secure-boot;
-  inherit (cfg.bootEntry) fsAlias;
+  fsAliasConfigured = cfg.bootEntry.fsAlias != null || cfg.bootEntry.unstableFsAlias;
 in
 [
   {
@@ -28,6 +29,11 @@ in
         default = null;
         description = "The fs alias of the windows partition";
       };
+
+      unstableFsAlias = mkEnableOption ''
+        a workaround for unstable fs alias that involves iterating through ESPs
+        and booting the first Windows ESP we find.
+      '';
     };
   }
 
@@ -38,7 +44,7 @@ in
 
   (mkIf cfg.bootEntry.enable {
     warnings =
-      optional (fsAlias == null) ''
+      optional (!fsAliasConfigured) ''
         The Windows fs alias is not set. The Windows boot entry will NOT work
         and the insecure edk2 shell will be enabled.
       ''
@@ -61,16 +67,35 @@ in
 
     # There's also this resource: https://nixos.org/manual/nixos/unstable/options#opt-boot.loader.systemd-boot.windows._name_.efiDeviceHandle
     boot.loader.systemd-boot = {
-      edk2-uefi-shell.enable = fsAlias == null;
+      edk2-uefi-shell.enable = !fsAliasConfigured;
 
-      windows."windows" = mkIf (fsAlias != null) {
+      windows."windows" = mkIf fsAliasConfigured {
         title = "Windows";
-        efiDeviceHandle = mkIf (fsAlias != null) fsAlias;
+        efiDeviceHandle = cfg.bootEntry.fsAlias;
         sortKey = "0"; # place above NixOS entries
       };
+
+      extraEntries."windows_windows.conf" = mkIf cfg.bootEntry.unstableFsAlias (mkForce ''
+        title Windows
+        efi /efi/edk2-uefi-shell/shell.efi
+        options -nointerrupt -noversion
+        sort-key 0
+      '');
+
+      extraFiles."efi/edk2-uefi-shell/startup.nsh" = mkIf cfg.bootEntry.unstableFsAlias (
+        pkgs.writeText "startup.nsh" ''
+          @echo -off
+          for %a in fs0 fs1 fs2 fs3 fs4 fs5 fs6 fs7 fs8 fs9
+            if exist %a:\EFI\Microsoft\Boot\Bootmgfw.efi then
+              %a:\EFI\Microsoft\Boot\Bootmgfw.efi
+            endif
+          endfor
+          echo Windows bootloader not found.
+        ''
+      );
     };
 
-    ns.userPackages = optional (fsAlias != null) (
+    ns.userPackages = optional fsAliasConfigured (
       pkgs.makeDesktopItem {
         name = "boot-windows";
         desktopName = "Boot Windows";
@@ -81,7 +106,7 @@ in
       }
     );
 
-    programs.zsh.shellAliases = mkIf (fsAlias != null) {
+    programs.zsh.shellAliases = mkIf fsAliasConfigured {
       boot-windows = "systemctl reboot --boot-loader-entry=windows_windows.conf";
     };
   })

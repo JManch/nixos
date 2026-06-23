@@ -146,6 +146,7 @@
       scrutiny.collector.enable = true;
       mosquitto.explorer.enable = true;
       air-vpn.enable = true;
+      audiomuse.worker.enable = true;
 
       ollama = {
         enable = true;

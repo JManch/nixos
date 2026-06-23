@@ -37,21 +37,82 @@
 # - rebuild-boot the host then reboot
 # - sudo -i -u postgres; pg_restore -U postgres --dbname postgres --clean --create /var/backup/...
 # - Re-enable the home-assistant target then rebuild-switch
-{ lib, config }:
+{
+  lib,
+  cfg,
+  config,
+  inputs,
+}:
 let
-  inherit (lib) ns mkIf;
+  inherit (lib)
+    ns
+    genAttrs
+    mkIf
+    mkEnableOption
+    mkOption
+    types
+    ;
+  inherit (inputs.nix-resources.secrets) fqDomain;
+  certDir = config.security.acme.certs."postgres.${fqDomain}".directory;
 in
 {
+  opts.expose = {
+    enable = mkEnableOption ''
+      listening on all interfaces and configuring SSL certificates. This should
+      be safe since the default authentication configuration does not allow
+      remote logins. Look at audiomuse module for an authentication example.
+    '';
+
+    interfaces = mkOption {
+      type = with types; listOf str;
+      default = [ ];
+      description = ''
+        List of interfaces for Postgres to be exposed on.
+      '';
+    };
+  };
+
+  asserts = [
+    (cfg.expose.enable -> config.${ns}.services.acme.enable)
+    "`expose.enable` requires ACME to be enabled"
+  ];
+
   services.postgresql = {
     enable = true;
-    # Version 15 enabled checkout logging by default which is quite verbose.
-    # It's useful for debugging performance problems though this is unlikely
-    # with my simple deployment.
-    # https://git.postgresql.org/gitweb/?p=postgresql.git;a=commit;h=64da07c41a8c0a680460cdafc79093736332b6cf
+    enableTCPIP = cfg.expose.enable;
     settings = {
+      # Version 15 enabled checkout logging by default which is quite verbose.
+      # It's useful for debugging performance problems though this is unlikely
+      # with my simple deployment.
+      # https://git.postgresql.org/gitweb/?p=postgresql.git;a=commit;h=64da07c41a8c0a680460cdafc79093736332b6cf
       log_checkpoints = false;
       full_page_writes = mkIf (config.${ns}.hardware.file-system.type == "zfs") false;
+
+      ssl = cfg.expose.enable;
+      ssl_cert_file = mkIf cfg.expose.enable "/run/credentials/postgresql.service/cert.pem";
+      ssl_key_file = mkIf cfg.expose.enable "/run/credentials/postgresql.service/key.pem";
     };
+  };
+
+  networking.firewall.interfaces = mkIf cfg.expose.enable (
+    genAttrs cfg.expose.interfaces (_: {
+      allowedTCPPorts = [ config.services.postgresql.settings.port ];
+    })
+  );
+
+  systemd.services.postgresql = mkIf cfg.expose.enable {
+    requires = [ "acme-postgres.${fqDomain}.service" ];
+    after = [ "acme-postgres.${fqDomain}.service" ];
+    serviceConfig.LoadCredential = [
+      "cert.pem:${certDir}/fullchain.pem"
+      "key.pem:${certDir}/key.pem"
+    ];
+  };
+
+  security.acme.certs = mkIf cfg.expose.enable {
+    "postgres.${fqDomain}".postRun = ''
+      systemctl restart postgresql.service
+    '';
   };
 
   services.postgresqlBackup = {

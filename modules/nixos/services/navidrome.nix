@@ -53,14 +53,14 @@ in
 
   services.navidrome = {
     enable = true;
-    plugins = optional audiomuse.enable pkgs.navidromePlugins.audiomuseai;
+    plugins = optional audiomuse.server.enable pkgs.navidromePlugins.audiomuseai;
     openFirewall = false;
     package = lib.${ns}.addPatches pkgs.navidrome [ "navidrome-lastfm-apostrophe.patch" ];
 
     settings = {
       Address = "127.0.0.1";
       MusicFolder = musicDir;
-      Agents = "${optionalString audiomuse.enable "audiomuse,"}lastfm,listenbrainz";
+      Agents = "${optionalString audiomuse.server.enable "audiomuse,"}lastfm,listenbrainz";
       # Uses inotify events to trigger scans
       Scanner.Enabled = true;
       Scanner.WatcherWait = "1m";

@@ -57,7 +57,6 @@ in
     services = {
       home-assistant.enable = true;
       home-assistant.everythingPresenceContainer = false;
-      postgresql.enable = true;
       unifi.enable = true;
       mosquitto.enable = true;
       mikrotik-backup.enable = true;
@@ -71,6 +70,22 @@ in
       anki-sync-server.enable = true;
       arr-stack.enable = true;
       qbittorrent-nox.enable = true;
+
+      postgresql = {
+        enable = true;
+        expose = {
+          enable = true;
+          interfaces = config.${ns}.system.networking.firewall.defaultInterfaces;
+        };
+      };
+
+      audiomuse.server = {
+        enable = true;
+        remote = {
+          enable = true;
+          interfaces = config.${ns}.system.networking.firewall.defaultInterfaces;
+        };
+      };
 
       silverbullet = {
         enable = true;

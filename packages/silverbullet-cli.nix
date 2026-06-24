@@ -1,14 +1,17 @@
 {
   scopePkgs,
-  buildGoModule,
+  rustPlatform,
 }:
-buildGoModule (finalAttrs: {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "silverbullet-cli";
-  inherit (scopePkgs.silverbullet) version src vendorHash;
-  subPackages = [ "./cmd/cli" ];
-  doCheck = false;
-  ldflags = [
-    "-X main.version=${finalAttrs.version}"
-  ];
+  inherit (scopePkgs.silverbullet)
+    version
+    src
+    cargoHash
+    clientBundle
+    preBuild
+    ;
+
+  cargoBuildFlags = [ "-p sb" ];
   meta.mainProgram = "cli";
 })

@@ -405,20 +405,17 @@
       "hash": "sha256-kAvK1KqfVK6axQXTkBtcMxc7OHLPYNfIyy2n+97LhB4="
     },
     "silverbullet": {
-      "type": "GitRelease",
+      "type": "Git",
       "repository": {
         "type": "GitHub",
         "owner": "silverbulletmd",
         "repo": "silverbullet"
       },
-      "pre_releases": false,
-      "version_upper_bound": null,
-      "release_prefix": null,
+      "branch": "main",
       "submodules": false,
-      "version": "2.9.0",
-      "revision": "72bba941c86ba7752661027cbd572e6669df6d9e",
-      "url": "https://api.github.com/repos/silverbulletmd/silverbullet/tarball/refs/tags/2.9.0",
-      "hash": "sha256-XQ0OKkiQrrmwmdGXk3dcim/2qosenF3EG2lkglQQ/iY="
+      "revision": "50d8f1f09f6ac4ad8b1aac1d20c4fb40081e31d2",
+      "url": "https://github.com/silverbulletmd/silverbullet/archive/50d8f1f09f6ac4ad8b1aac1d20c4fb40081e31d2.tar.gz",
+      "hash": "sha256-UaUAy2CX5j4epO7TvBFp55TwfobY+U6dQ3HWIy+/TfM="
     },
     "skforecast": {
       "type": "PyPi",

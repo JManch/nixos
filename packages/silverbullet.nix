@@ -1,12 +1,12 @@
 {
-  gitMinimal,
-  buildGoModule,
+  rustPlatform,
   buildNpmPackage,
+  gitMinimal,
   sources,
 }:
-buildGoModule (finalAttrs: {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "silverbullet";
-  inherit (sources.silverbullet) version;
+  version = "0-unstable-${sources.silverbullet.revision}";
   src = sources.silverbullet;
 
   clientBundle = buildNpmPackage {
@@ -20,11 +20,16 @@ buildGoModule (finalAttrs: {
     buildPhase = ''
       runHook preBuild
 
-      npm run build:plugs
-      # The version gets embeded during the build and must match the server
-      # version otherwise the client spams "a new version of SilverBullet
-      # client is available" messages.
-      echo 'export const publicVersion = "${finalAttrs.version}";' > ./public_version.ts
+      npm run build:plugs # version.json is generated during this phase
+
+      # Override version.json with a deterministic one that does not include
+      # build date. Versions on server and client must match otherwise client
+      # spams reload messages.
+
+      # Version is just an equality check so the value doesn't matter.
+      # https://github.com/silverbulletmd/silverbullet/blob/10bf48dd8c2e32557fb49d5972e8b3dd158271e0/client/client.ts#L1129
+      echo '{"version":"${finalAttrs.version}"}' > version.json
+
       npm run build:client
 
       runHook postBuild
@@ -36,13 +41,12 @@ buildGoModule (finalAttrs: {
   };
 
   preBuild = ''
-    echo 'export const publicVersion = "${finalAttrs.version}";' > ./public_version.ts
-    rm -r client_bundle
+    echo '{"version":"${finalAttrs.version}"}' > version.json
     ln -s ${finalAttrs.clientBundle} client_bundle
   '';
 
-  vendorHash = "sha256-8zZlhVptJq8y3k2DBghJ0lPNcIcaZYkrxN67b6dNBPs=";
-  subPackages = [ "." ];
-  ldflags = [ "-X main.buildTime=1970-01-01T00:00:00Z" ];
+  cargoHash = "sha256-N1YWW3zXXlQ6gsopDEAZbpcszZvbS1rgbk2vSMtK+aY=";
+  cargoBuildFlags = [ "-p silverbullet" ];
+
   meta.mainProgram = "silverbullet";
 })

@@ -465,6 +465,26 @@ in
           assert assertMsg (!(prev ? ircv3-filehost-server)) "ircv3-filehost-server is now in nixpkgs";
           (flakePkgs args "ircv3-filehost-server").default;
 
+        navidrome =
+          assert lib.assertMsg (prev.navidrome.version == "0.61.2") "Remove navidrome override";
+          prev.navidrome.overrideAttrs {
+            version = "0.62.0";
+
+            src = final.fetchFromGitHub {
+              owner = "navidrome";
+              repo = "navidrome";
+              tag = "v${final.navidrome.version}";
+              hash = "sha256-pLhb2x3dGLsCk405rBVdMwazhf0EQd72VLKtlzGoJDA=";
+            };
+
+            vendorHash = "sha256-3ciCzFhJi4YTIjGbPJ2UP8mPzQe3vBgZ+Pc7Nto1LEw=";
+
+            ldflags = [
+              "-X github.com/navidrome/navidrome/consts.gitSha=${final.navidrome.src.rev}"
+              "-X github.com/navidrome/navidrome/consts.gitTag=v${final.navidrome.version}"
+            ];
+          };
+
         # inherit
         #   (
         #     assert lib.assertMsg (prev.navidrome.version == "0.60.0") "Remove navidrome overlay";

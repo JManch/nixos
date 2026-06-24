@@ -30,6 +30,7 @@
   ns.backups.atuin-server = {
     backend = "restic";
     paths = [ "/var/backup/postgresql/atuin.sql" ];
+    dependencies = [ "postgresqlBackup-atuin.service" ];
     restore =
       let
         pg_restore = lib.getExe' config.services.postgresql.package "pg_restore";
@@ -41,11 +42,6 @@
           sudo -u postgres ${pg_restore} -U postgres --dbname postgres --clean --create ${backup}
         '';
       };
-  };
-
-  systemd.services.restic-backups-atuin-server = {
-    requires = [ "postgresqlBackup-atuin.service" ];
-    after = [ "postgresqlBackup-atuin.service" ];
   };
 
   ns.services.caddy.virtualHosts.atuin.extraConfig =

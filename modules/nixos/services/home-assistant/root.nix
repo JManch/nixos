@@ -263,6 +263,7 @@ in
       "/var/lib/hass"
       "/var/backup/postgresql/hass.sql"
     ];
+    dependencies = [ "postgresqlBackup-hass.service" ];
     backendOptions.exclude = [ "*.log*" ];
 
     restore =
@@ -277,11 +278,6 @@ in
           sudo -u postgres ${pg_restore} -U postgres --dbname postgres --clean --create ${backup}
         '';
       };
-  };
-
-  systemd.services.restic-backups-hass = {
-    requires = [ "postgresqlBackup-hass.service" ];
-    after = [ "postgresqlBackup-hass.service" ];
   };
 
   virtualisation.oci-containers.containers.everything-presence =

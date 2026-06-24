@@ -448,6 +448,7 @@ in
       "/var/lib/ergo"
       "/var/backup/postgresql/ergo.sql"
     ];
+    dependencies = [ "postgresqlBackup-ergo.service" ];
     restore =
       let
         pg_restore = lib.getExe' config.services.postgresql.package "pg_restore";
@@ -459,11 +460,6 @@ in
           sudo -u postgres ${pg_restore} -U postgres --dbname postgres --clean --create ${backup}
         '';
       };
-  };
-
-  systemd.services."restic-backups-ergo" = {
-    requires = [ "postgresqlBackup-ergo.service" ];
-    after = [ "postgresqlBackup-ergo.service" ];
   };
 
   ns.persistence.directories = [

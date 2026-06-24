@@ -140,6 +140,9 @@ in
       name: value:
       nameValuePair "${value.backend}-backups-${name}" (
         mkIf cfg.${value.backend}.enable {
+          requires = value.dependencies;
+          after = value.dependencies;
+
           preStart = mkOrder 0 ''
             ${value.preBackupScript}
           '';

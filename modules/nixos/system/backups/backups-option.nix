@@ -46,6 +46,15 @@ mkOption {
             description = "Paths to backup";
           };
 
+          dependencies = mkOption {
+            type = with types; listOf str;
+            default = [ ];
+            description = ''
+              List of systemd dependencies that the backup will run before
+              activating using the Requires and After options.
+            '';
+          };
+
           doNotModifyPaths = mkOption {
             type = types.bool;
             default = false;

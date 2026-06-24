@@ -60,7 +60,7 @@ in
     settings = {
       Address = "127.0.0.1";
       MusicFolder = musicDir;
-      Agents = "${optionalString audiomuse.server.enable "audiomuse,"}lastfm,listenbrainz";
+      Agents = "${optionalString audiomuse.server.enable "audiomuseai,"}lastfm,listenbrainz";
       # Uses inotify events to trigger scans
       Scanner.Enabled = true;
       Scanner.WatcherWait = "1m";

@@ -224,6 +224,7 @@ in
     ns.backups."audiomuse" = {
       backend = "restic";
       paths = [ "/var/backup/postgresql/audiomuse.sql" ];
+      dependencies = [ "postgresqlBackup-audiomuse.service" ];
       restore =
         let
           pg_restore = getExe' config.services.postgresql.package "pg_restore";

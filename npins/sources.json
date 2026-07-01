@@ -43,10 +43,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v18.3.1",
-      "revision": "b4b621b316456182c4f6f300131d5ca5a39ed907",
-      "url": "https://api.github.com/repos/BottlecapDave/HomeAssistant-OctopusEnergy/tarball/refs/tags/v18.3.1",
-      "hash": "sha256-5Cjaq4DIe11hx/goKxGDSj6zyOb3H16s8KqlFRzhOYs="
+      "version": "v18.3.2",
+      "revision": "bf6a61d6feb60da5cc19c4fbff1378cc8c1b1377",
+      "url": "https://api.github.com/repos/BottlecapDave/HomeAssistant-OctopusEnergy/tarball/refs/tags/v18.3.2",
+      "hash": "sha256-KSnpebEUzp25PsBMFqCajdnTINk51hdswmV9rGtG+3Q="
     },
     "ModernX": {
       "type": "GitRelease",
@@ -107,10 +107,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.4.1",
-      "revision": "fc2f7250fa1419204211c531612395427c660d01",
-      "url": "https://api.github.com/repos/Vladimir-csp/app2unit/tarball/refs/tags/v1.4.1",
-      "hash": "sha256-upYW+aTJ6LCHrI0+IOYnA98uDLKPxu/wCi7uUWe/Geg="
+      "version": "v1.4.2",
+      "revision": "df91c7577e63c7d5a41c20053700060fff76b729",
+      "url": "https://api.github.com/repos/Vladimir-csp/app2unit/tarball/refs/tags/v1.4.2",
+      "hash": "sha256-jUAjcpR4IszvmqWAIjZo0rWZt9yydCe3xH4X+mJ5O8k="
     },
     "async-property": {
       "type": "PyPi",
@@ -143,9 +143,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "871c13d0f495996924537d9388ac650d4dc84baf",
-      "url": "https://github.com/zzyil/comick.io-Downloader/archive/871c13d0f495996924537d9388ac650d4dc84baf.tar.gz",
-      "hash": "sha256-Xtip7ba88x1p8srk5sSZ675XeGR+1CULM6n9hSEQc38="
+      "revision": "e67e3beb9680462d5097c2afec765427b124e742",
+      "url": "https://github.com/zzyil/comick.io-Downloader/archive/e67e3beb9680462d5097c2afec765427b124e742.tar.gz",
+      "hash": "sha256-f22X5lvr2hN1MxYqbn/M1MnFddZ/N05cloTymJYdvgA="
     },
     "ctrld": {
       "type": "GitRelease",
@@ -158,10 +158,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.5.2",
-      "revision": "a343528a0b0c5170e14e65b9f5475c9a3e44f873",
-      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/refs/tags/v1.5.2",
-      "hash": "sha256-tnDbIdmSDfwiIYceyyHkzzV8XqEafI0/uEIAweBg2eo="
+      "version": "v1.5.3",
+      "revision": "96cb7dc42991245dcdac0b4ee37f00bc0ea83b11",
+      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/refs/tags/v1.5.3",
+      "hash": "sha256-Q9vG2U8a7AhVKGaLSgzKcJRqjmaq/zXq8aDbWOa9yvU="
     },
     "daikin_onecta": {
       "type": "GitRelease",
@@ -174,18 +174,18 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v4.6.3",
-      "revision": "d14c14efc0f1be19c6bfce397db1c38b6becea86",
-      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/refs/tags/v4.6.3",
-      "hash": "sha256-55IGU3qYTt4V+BYDNiYx2l/EiuPNESfJHi5QCRm36Qk="
+      "version": "v4.6.8",
+      "revision": "79ec32d74a928d913e65d87a73c8ddcb5cefa11f",
+      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/refs/tags/v4.6.8",
+      "hash": "sha256-+bkzzJ/8O0rwHV4qNvsCFeB3ku88zBeDGwSFvGPbtos="
     },
     "emhass": {
       "type": "PyPi",
       "name": "emhass",
       "version_upper_bound": null,
-      "version": "0.17.7",
-      "url": "https://files.pythonhosted.org/packages/36/a2/efd7c0b8ba4ec125525e5491b6c6ac1ee111c6956fda1aa9bab4359aa193/emhass-0.17.7.tar.gz",
-      "hash": "sha256-xxFVwT29AnPg4DT9wbNdSPdQYGel5i8Nx0RyqgJG0M0="
+      "version": "0.17.8",
+      "url": "https://files.pythonhosted.org/packages/88/2e/413cefc62cd73cbc7f82b165fc06e52c621fe2416ae2bd1412a9e653e154/emhass-0.17.8.tar.gz",
+      "hash": "sha256-ztgeQxXxMguZ7IY7741clSqbCwSd2CgyitAUfCkLPmY="
     },
     "filen-rclone": {
       "type": "Git",
@@ -209,9 +209,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "f460dc79bedcb5cd077dfb8e14e9d46e1881c0e3",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/f460dc79bedcb5cd077dfb8e14e9d46e1881c0e3.tar.gz",
-      "hash": "sha256-EouTytS0ji/R7AfPsjhwGaMONmlxVpXCJIyPNpC7tOs="
+      "revision": "e7b748bfa4572ddcc50cced16a524f5f75dc04f2",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/e7b748bfa4572ddcc50cced16a524f5f75dc04f2.tar.gz",
+      "hash": "sha256-KTjiWPp/KUY99rff5gws+s6T8oC1o9a+Eqp+aKlrCWE="
     },
     "frigate-blueprint": {
       "type": "GitRelease",
@@ -256,10 +256,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v2.27.0",
-      "revision": "70d9e5deec8971f82c8dd1c56e268069f8b41bb4",
-      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/refs/tags/v2.27.0",
-      "hash": "sha256-jjLebP2rkxI59JN4peTAGDBQe8/Si6xihQW8aqE1neo="
+      "version": "v2.29.0",
+      "revision": "60d3b858198873494995973c65eae0baef3b0762",
+      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/refs/tags/v2.29.0",
+      "hash": "sha256-8OgHPhCSYuFymUBd0CtrWjf/W7OAuC7We5NRFEzHyuI="
     },
     "haeo": {
       "type": "GitRelease",
@@ -362,10 +362,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "6.2.0.3",
-      "revision": "bd22e6e8ca744f2f6d54371a092fc7072e2c6976",
-      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/refs/tags/6.2.0.3",
-      "hash": "sha256-4XOMuNGLya99Xhi2Mt95vrAw1tSZ4orc7Vv9apkwPZc="
+      "version": "6.3.1.2",
+      "revision": "47f0605cbf6f16cee8d610c5bba0df9975eccff4",
+      "url": "https://api.github.com/repos/lyarenei/jellyfin-plugin-listenbrainz/tarball/refs/tags/6.3.1.2",
+      "hash": "sha256-RrBSZzYQUd7zyZo9miUM67I4pV0XdyrgSrukDWxgVZI="
     },
     "neohubapi": {
       "type": "PyPi",
@@ -392,9 +392,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "505c1e565c08d994520c0ca46fc23dee7bf99fd9",
-      "url": "https://github.com/recyclarr/config-templates/archive/505c1e565c08d994520c0ca46fc23dee7bf99fd9.tar.gz",
-      "hash": "sha256-B4Yy8DNOqJjBjK+xJZYhc150WLKjNtyTXXT0KjDAgbM="
+      "revision": "86bed2fded1acbe364e165c1d7d60be0d5473e63",
+      "url": "https://github.com/recyclarr/config-templates/archive/86bed2fded1acbe364e165c1d7d60be0d5473e63.tar.gz",
+      "hash": "sha256-enfzzYnDjO2zFxB+RHFSVp07D/u8a+6ALLxpKg1GMQ4="
     },
     "scdl": {
       "type": "PyPi",
@@ -413,9 +413,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "50d8f1f09f6ac4ad8b1aac1d20c4fb40081e31d2",
-      "url": "https://github.com/silverbulletmd/silverbullet/archive/50d8f1f09f6ac4ad8b1aac1d20c4fb40081e31d2.tar.gz",
-      "hash": "sha256-UaUAy2CX5j4epO7TvBFp55TwfobY+U6dQ3HWIy+/TfM="
+      "revision": "a0782ddb6d4a3a9f53955f44acf1e910275d6801",
+      "url": "https://github.com/silverbulletmd/silverbullet/archive/a0782ddb6d4a3a9f53955f44acf1e910275d6801.tar.gz",
+      "hash": "sha256-mrgzMisFkctrEWvebks1/OZjoZF1puku7L2JgxKrldI="
     },
     "skforecast": {
       "type": "PyPi",
@@ -492,9 +492,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "1794d690ee048660fde5eb92253700873e4f1894",
-      "url": "https://github.com/dweymouth/supersonic/archive/1794d690ee048660fde5eb92253700873e4f1894.tar.gz",
-      "hash": "sha256-KjwEHX+GEXBChkdWD/QIofaMRs+ZhwKlVSQzeCWUBbU="
+      "revision": "b84c3b53d348a3dfe5a2e0e4409860f62ac876a8",
+      "url": "https://github.com/dweymouth/supersonic/archive/b84c3b53d348a3dfe5a2e0e4409860f62ac876a8.tar.gz",
+      "hash": "sha256-orYMtuwaB6xmd1rnSOsh1zQqhrIayeihJapa+9q3GxQ="
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -550,9 +550,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "69974a179d6ccd5a128db6ac489f6d8f37beb7d6",
-      "url": "https://github.com/pink88/tuiss2ha/archive/69974a179d6ccd5a128db6ac489f6d8f37beb7d6.tar.gz",
-      "hash": "sha256-Qra6dZNHaWlVyitHQdej8IuU94j+8ZDGYyJFUibsOjE="
+      "revision": "274f4151b3eaec9624af1c4021ef9c0f40916a8d",
+      "url": "https://github.com/pink88/tuiss2ha/archive/274f4151b3eaec9624af1c4021ef9c0f40916a8d.tar.gz",
+      "hash": "sha256-K1k/QmFe6WVP3gK+q63R1z5Ek66VAGaRKKjTqdWFWAU="
     },
     "uwsm": {
       "type": "GitRelease",
@@ -565,10 +565,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.26.4",
-      "revision": "3294dd3163bf9f2334b787b3cde5a14e56491404",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/refs/tags/v0.26.4",
-      "hash": "sha256-hsuLerOQONc2CMywQWKO8wbFMf2lVQlF0eEx3O6oD7s="
+      "version": "v0.26.6",
+      "revision": "469a39a5436f6c1086b4904d42227c03aee2e394",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/refs/tags/v0.26.6",
+      "hash": "sha256-5wfQ2Iv4j2Gd/CV1BQ7mdkIXG7sA90iMiBAefmM3BvY="
     },
     "workspaces.nvim": {
       "type": "GitRelease",

@@ -25,19 +25,11 @@ let
     ;
   inherit (lib.${ns})
     hostIps
-    flakePkgs
     mkHyprlandCenterFloatRule
     wrapHyprlandMoveToActive
     sliceSuffix
     ;
   inherit (config.age.secrets) lanMouseCert;
-  lan-mouse =
-    assert (
-      lib.assertMsg (
-        pkgs.lan-mouse.version == "0.10.0"
-      ) "lan-mouse has a new release so I can remove the flake"
-    );
-    (flakePkgs args "lan-mouse").default;
   otherFingerprints = filterAttrs (
     h: _: h != hostname
   ) inputs.nix-resources.secrets.lanMouseAuthorizedFingerprints;
@@ -74,7 +66,7 @@ in
   };
 
   home.packages = [
-    (wrapHyprlandMoveToActive args lan-mouse "de.feschber.LanMouse"
+    (wrapHyprlandMoveToActive args pkgs.lan-mouse "de.feschber.LanMouse"
       "--run 'systemctl start --user lan-mouse'"
     )
     (pkgs.writeShellScriptBin "start-lan-mouse" ''
@@ -113,7 +105,7 @@ in
 
     Service = {
       Slice = "app${sliceSuffix osConfig}.slice";
-      ExecStart = "${getExe lan-mouse} --cert-path ${lanMouseCert.path} daemon";
+      ExecStart = "${getExe pkgs.lan-mouse} --cert-path ${lanMouseCert.path} daemon";
     };
   };
 

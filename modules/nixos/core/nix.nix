@@ -581,10 +581,6 @@ in
           "https://nix-community.cachix.org"
           # "https://nix-on-droid.cachix.org"
         ]
-        ++ (
-          assert lib.assertMsg (pkgs.lan-mouse.version == "0.10.0") "Remove lan-mouse substituter";
-          [ "https://lan-mouse.cachix.org/" ]
-        )
         ++ (concatMap (
           host:
           let
@@ -609,11 +605,7 @@ in
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU="
         ]
-        ++ attrValues keys.nix-store
-        ++ (
-          assert lib.assertMsg (pkgs.lan-mouse.version == "0.10.0") "Remove lan-mouse public key";
-          [ "lan-mouse.cachix.org-1:KlE2AEZUgkzNKM7BIzMQo8w9yJYqUpor1CAUNRY6OyM=" ]
-        );
+        ++ attrValues keys.nix-store;
 
         build-dir = mkIf impermanence.enable "/var/nix-tmp";
       };

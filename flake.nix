@@ -155,7 +155,6 @@
     xdg-override.inputs.nixpkgs.follows = "nixpkgs";
 
     nvf.url = "github:NotAShelf/nvf";
-    nvf.inputs.ndg.follows = "";
 
     # Personal inputs
 

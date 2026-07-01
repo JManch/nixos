@@ -72,6 +72,7 @@ in
   home.packages = with pkgs; [
     xdg-terminal-exec
     wl-clipboard
+    qdirstat # file-system explorer
   ];
 
   xdg.configFile."xdg-terminals.list".text = ''

@@ -104,6 +104,10 @@ in
     mode = "0700";
   };
 
+  # xdg-document-portal depends on fuse
+  # https://github.com/NixOS/nixpkgs/pull/528369
+  programs.fuse.enable = true;
+
   # Necessary for xdg-portal home-manager module to work with useUserPackages enabled
   # https://github.com/nix-community/home-manager/pull/5184
   # NOTE: When https://github.com/nix-community/home-manager/pull/2548 gets

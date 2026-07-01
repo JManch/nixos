@@ -114,14 +114,17 @@
 
     hyprpolkitagent.url = "github:hyprwm/hyprpolkitagent";
     hyprpolkitagent.inputs.nixpkgs.follows = "nixpkgs";
+    hyprpolkitagent.inputs.aquamarine.follows = "hyprland/aquamarine";
     hyprpolkitagent.inputs.hyprutils.follows = "hyprland/hyprutils";
 
     hyprpaper.url = "github:hyprwm/hyprpaper";
     hyprpaper.inputs.nixpkgs.follows = "nixpkgs";
+    hyprpaper.inputs.aquamarine.follows = "hyprland/aquamarine";
     hyprpaper.inputs.hyprutils.follows = "hyprland/hyprutils";
     hyprpaper.inputs.hyprgraphics.follows = "hyprland/hyprgraphics";
     hyprpaper.inputs.hyprlang.follows = "hyprland/hyprlang";
     hyprpaper.inputs.hyprwayland-scanner.follows = "hyprland/hyprwayland-scanner";
+    hyprpaper.inputs.hyprwire.follows = "hyprland/hyprwire";
 
     hyprsunset.url = "github:hyprwm/hyprsunset";
     hyprsunset.inputs.nixpkgs.follows = "nixpkgs";

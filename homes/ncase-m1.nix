@@ -90,6 +90,7 @@
         davinci-resolve.enable = false;
         signal.enable = true;
         halloy.enable = true;
+        silverbullet.enable = true;
 
         chatterino = {
           enable = true;

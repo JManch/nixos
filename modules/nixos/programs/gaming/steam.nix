@@ -155,13 +155,13 @@ in
       programs.desktop.gaming = {
         gameClasses = [
           "steam_app_.*" # xwayland proton games do not automatically get assigned the "game" content type
-          "factorio"
+          "com\\.factorio\\.Factorio"
         ];
 
         tearingExcludedClasses = [
           "teardown\\.exe"
           "rdr2\\.exe" # half v-sync without tearing is preferable
-          "factorio"
+          "com\\.factorio\\.Factorio"
         ];
       };
 

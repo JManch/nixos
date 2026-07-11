@@ -17,15 +17,16 @@
 # - Inside the Windows VM launch Ultimate Software 2 with the controller connected
 # - After performing the firmware update the controller may not be detected inside the VM,
 #   adding the hardware device again tends to fix it
+#
+# UPDATE:
+# Ultimate software v2 apparently now works in proton or can use web.8bitdo.com
+# https://redd.it/1r5rs3m
 
 # Steam Input:
 # https://gist.github.com/barraIhsan/783a82bcf32bed896c85d27dbb8018a5
 # Basically want to use DInput mode all the time to enable use of the extra buttons.
-# Unfortunately the controller will ALWAYS boot into XInput mode. Cannot enter
-# DInput directly from the dock so have to turn controller off then hold B
-# whilst turning back on.
-
-# Currently seems to be bugged though: https://steamcommunity.com/app/1675200/discussions/0/603032812101052230/
+# Hold B whilst turning on to enter XInput mode. The controller should remember
+# the last input mode so not always needed.
 { pkgs }:
 {
   # Not using services.udev.extraRules due to https://github.com/NixOS/nixpkgs/issues/308681

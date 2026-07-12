@@ -13,10 +13,16 @@ in
   programs.fzf = {
     enable = true;
     defaultCommand = "${fd} -H --type f";
-    changeDirWidgetCommand = "${fd} --type d --hidden --exclude .git";
-    changeDirWidgetOptions = [ ];
-    fileWidgetCommand = "${fd} --type f --hidden --exclude .git --exclude .cache";
-    fileWidgetOptions = [ "--preview '${bat} --style=numbers --color=always --line-range :500 {}'" ];
+
+    changeDirWidget = {
+      command = "${fd} --type d --hidden --exclude .git";
+      options = [ ];
+    };
+
+    fileWidget = {
+      command = "${fd} --type f --hidden --exclude .git --exclude .cache";
+      options = [ "--preview '${bat} --style=numbers --color=always --line-range :500 {}'" ];
+    };
 
     defaultOptions = [
       "--height 20%"

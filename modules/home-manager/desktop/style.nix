@@ -74,10 +74,13 @@ in
     };
   };
 
-  home.pointerCursor = mkIf cfg.cursor.enable {
+  home.pointerCursor = {
+    inherit (cfg.cursor)
+      enable
+      name
+      package
+      size
+      ;
     gtk.enable = true; # always want this enabled for gtk apps
-    name = cfg.cursor.name;
-    package = cfg.cursor.package;
-    size = cfg.cursor.size;
   };
 }

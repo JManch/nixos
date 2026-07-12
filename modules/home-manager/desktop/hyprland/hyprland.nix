@@ -312,6 +312,7 @@ in
 
   wayland.windowManager.hyprland = {
     enable = true;
+    configType = "hyprlang";
     systemd.enable = false; # we use UWSM instead
     plugins = optionals cfg.plugins (with flakePkgs args "hyprland-plugins"; [ hyprexpo ]);
     package = null;

@@ -30,7 +30,6 @@ in
     rust = {
       enable = true;
       lsp.enable = true;
-      lsp.package = mkForce [ "rust-analyzer" ];
     };
 
     python = {
@@ -90,7 +89,20 @@ in
   };
 
   # Typstyle will not automatically wrap to the line width by default
-  vim.formatter.conform-nvim.setupOpts.formatters."typstyle".args = [ "--wrap-text" ];
+  vim.formatter.conform-nvim.setupOpts.formatters."typstyle".args = (
+    # https://github.com/NotAShelf/nvf/blob/9cad654982744e1333cda802b943460ff8c69560/modules/plugins/formatter/conform-nvim/presets/typstyle.nix#L23-L32
+    lib.generators.mkLuaInline ''
+      function(self, ctx)
+        return {
+          "--inplace",
+          "--wrap-text",
+          "--indent-width",
+          vim.bo[ctx.buf].shiftwidth,
+          "$FILENAME"
+        }
+      end
+    ''
+  );
 
   # We would rather use lsp server's from the local dev shell instead of
   # packing them all in our nvim derivation.
@@ -131,5 +143,7 @@ in
     ];
 
     zls.cmd = mkForce [ "zls" ];
+
+    rust-analyzer.cmd = mkForce [ "rust-analyzer" ];
   };
 }

@@ -431,15 +431,6 @@ in
       (final: prev: {
         inherit (final.${ns}) brightnessctl;
 
-        # Uses the emblem-default-symbolic icon which has been removed from the
-        # adwaita icon theme
-        # https://gitlab.gnome.org/GNOME/gnome-terminal/-/issues/8126
-        # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1109086
-        pwvucontrol =
-          assert assertMsg (prev.pwvucontrol.version == "0.5.2")
-            "pwvucontrol patch can be removed https://github.com/saivert/pwvucontrol/commit/1503f1abdcc7b79685e4b902523519dd18b62500";
-          addPatches prev.pwvucontrol [ "pwvucontrol-icon-fix.patch" ];
-
         xdg-terminal-exec = prev.xdg-terminal-exec.overrideAttrs {
           inherit (sources.xdg-terminal-exec) version;
           src = sources.xdg-terminal-exec;

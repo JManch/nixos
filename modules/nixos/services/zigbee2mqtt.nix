@@ -127,7 +127,7 @@ in
         # Presumably due to instability in the ember driver the service sometimes
         # thinks the dongle has disconnected and stops gracefully
         Restart = mkForce "always";
-        RestartSec = 30;
+        RestartSec = mkForce 30;
       };
     };
 

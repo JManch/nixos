@@ -65,6 +65,7 @@
         atuin.enable = true;
         btop.enable = true;
         cava.enable = true;
+        claude-code.enable = true;
         git.enable = true;
         neovim.enable = true;
         fastfetch.enable = true;

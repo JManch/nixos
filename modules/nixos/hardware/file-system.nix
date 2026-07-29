@@ -45,6 +45,7 @@ let
     stringToCharacters
     ;
   inherit (config.${ns}.hardware) raspberry-pi;
+  inherit (config.${ns}.core) device;
 in
 [
   {
@@ -175,9 +176,7 @@ in
       };
     };
 
-    programs.zsh.shellAliases = {
-      boot-bios = "systemctl reboot --firmware-setup";
-    };
+    programs.zsh.shellAliases."boot-bios" = "systemctl reboot --firmware-setup";
 
     systemd.tmpfiles.rules = mkIf (cfg.mediaDir != null) (mkBefore [
       "d ${cfg.mediaDir} 0770 root media - -"
@@ -191,6 +190,10 @@ in
       users.${username}.extraGroups = [ "media" ];
       groups.media = { };
     };
+
+    # Rather than syncing to disk every 5 secs sync every 15 secs. Marginal
+    # efficiency improvement for laptops where sudden powerloss risk is low.
+    boot.kernel.sysctl."vm.dirty_writeback_centisecs" = mkIf (device.type == "laptop") 1500;
   }
 
   (mkIf (cfg.type == "ext4") {

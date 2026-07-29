@@ -161,7 +161,7 @@
 
       # Networking
       WIFI_PWR_ON_AC = "off";
-      WIFI_PWR_ON_BAT = "off"; # attempt to improve poor wifi performance
+      WIFI_PWR_ON_BAT = "on";
 
       # Platform (affects TDP apparently)
       # https://www.phoronix.com/review/framework-13-ryzen-ai-power

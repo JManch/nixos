@@ -24,7 +24,13 @@ let
     optionals
     hiPrio
     ;
-  inherit (lib.${ns}) wrapHyprlandMoveToActive mkHyprlandCenterFloatRule throttleHyprlandRepeatBind mkHyprBind mkHyprExec;
+  inherit (lib.${ns})
+    wrapHyprlandMoveToActive
+    mkHyprlandCenterFloatRule
+    throttleHyprlandRepeatBind
+    mkHyprBind
+    mkHyprExec
+    ;
   inherit (config.${ns}.core) home-manager device;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.hardware) raspberry-pi;
@@ -268,16 +274,120 @@ in
           };
           wantedBy = [ "graphical-session.target" ];
         };
+
+        # Monitors the PipeWire/PulseAudio event socket and emits volume and
+        # mute notifications for the default sink and source.
+        audio-notifications = mkIf (home-manager.enable && desktop.desktopEnvironment == null) {
+          description = "Audio notification monitor";
+          after = [
+            "wireplumber.service"
+            "graphical-session.target"
+          ];
+          requires = [ "wireplumber.service" ];
+          requisite = [ "graphical-session.target" ];
+          partOf = [ "graphical-session.target" ];
+          unitConfig.ConditionUser = "!@system";
+          serviceConfig = {
+            Restart = "on-failure";
+            RestartSec = 2;
+            ExecStart = getExe (
+              pkgs.writeShellApplication {
+                name = "audio-notifications";
+                runtimeInputs = with pkgs; [
+                  coreutils
+                  pulseaudio
+                  wireplumber
+                  libnotify
+                  gnugrep
+                  gawk
+                  bc
+                ];
+                bashOptions = [
+                  "nounset"
+                  "pipefail"
+                ];
+                text = ''
+                  notify() {
+                    notify-send --transient -u "$1" -t 2000 \
+                      -h 'string:x-canonical-private-synchronous:pipewire-volume' "$2" "$3"
+                  }
+
+                  prev_sink_vol=""
+                  prev_sink_mute=""
+                  prev_source_mute=""
+
+                  handle_sink() {
+                    local output mute volume percentage vol description
+                    output=$(wpctl get-volume @DEFAULT_AUDIO_SINK@) || return
+                    if [[ $output == *MUTED* ]]; then mute="yes"; else mute="no"; fi
+                    volume=$(awk '{print $2}' <<< "$output")
+                    percentage=$(bc <<< "$volume * 100")
+                    vol="''${percentage%.*}"
+
+                    # The event was for a different sink so do nothing
+                    if [[ $mute == "$prev_sink_mute" && $vol == "$prev_sink_vol" ]]; then
+                      return
+                    fi
+
+                    description=$(wpctl inspect @DEFAULT_AUDIO_SINK@ | grep 'node\.description' | cut -d '"' -f 2)
+
+                    if [[ $mute != "$prev_sink_mute" ]]; then
+                      if [[ $mute == "yes" ]]; then
+                        [[ -n $quiet ]] || notify critical "$description" "Muted"
+                      else
+                        [[ -n $quiet ]] || notify critical "$description" "Unmuted"
+                      fi
+                    else
+                      [[ -n $quiet ]] || notify low "$description" "Volume $vol%"
+                    fi
+
+                    prev_sink_mute="$mute"
+                    prev_sink_vol="$vol"
+                  }
+
+                  handle_source() {
+                    local inspect_data class output mute description
+                    inspect_data=$(wpctl inspect @DEFAULT_AUDIO_SOURCE@) || return
+                    # @DEFAULT_AUDIO_SOURCE@ can resolve to a sink if no sources exist
+                    # https://gitlab.freedesktop.org/pipewire/wireplumber/-/issues/509
+                    class=$(grep 'media\.class' <<< "$inspect_data" | cut -d '"' -f 2)
+                    [[ $class == "Audio/Source" ]] || return
+
+                    output=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@) || return
+                    if [[ $output == *MUTED* ]]; then mute="yes"; else mute="no"; fi
+                    [[ $mute == "$prev_source_mute" ]] && return
+
+                    description=$(grep 'node\.description' <<< "$inspect_data" | cut -d '"' -f 2)
+                    if [[ $mute == "yes" ]]; then
+                      [[ -n $quiet ]] || notify critical "$description" "Microphone Muted"
+                    else
+                      [[ -n $quiet ]] || notify critical "$description" "Microphone Unmuted"
+                    fi
+                    prev_source_mute="$mute"
+                  }
+
+                  quiet="1"
+                  handle_sink
+                  handle_source
+                  quiet=""
+
+                  pactl subscribe | while read -r line; do
+                    case "$line" in
+                      *"'change' on sink #"*) handle_sink ;;
+                      *"'change' on source #"*) handle_source ;;
+                    esac
+                  done
+                '';
+              }
+            );
+          };
+          wantedBy = [ "graphical-session.target" ];
+        };
       };
     };
 
-    # TODO: Rewrite audio notifications to listen on a socket for pipewire
-    # events. Something like this: https://github.com/francma/wob/pull/146/changes/b64b6a38ea9fad53ff204a91b02a331af28cd906
     ns.hm =
       let
-        inherit (config.${ns}.hmNs.desktop) hyprland;
-        jaq = getExe pkgs.jaq;
-
         toggleAudioMute = pkgs.writeShellScript "toggle-audio-mute" ''
           class=$1
           if [[ $class != "source" && $class != "sink" ]]; then
@@ -296,47 +406,11 @@ in
           fi
 
           ${wpctl} set-mute "$device" toggle
-          status=$(${wpctl} get-volume "$device")
-          message=$([[ $status == *MUTED* ]] && echo "Muted" || echo "Unmuted")
-          if [[ $class == "SOURCE" ]]; then
-            message="Microphone $message"
-          fi
-          description=$(echo "$inspect_data" | grep 'node\.description' | cut -d '"' -f 2)
-          ${notify-send} --transient -u critical -t 2000 \
-            -h 'string:x-canonical-private-synchronous:pipewire-volume' "$description" "$message"
         '';
 
         modifyVolume = pkgs.writeShellScript "modify-volume" ''
           ${throttleHyprlandRepeatBind "volume" 10}
           ${wpctl} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "$1"
-          output=$(${wpctl} get-volume @DEFAULT_AUDIO_SINK@)
-          volume=$(echo "$output" | ${getExe pkgs.gawk} '{print $2}')
-          percentage="$(echo "$volume * 100" | ${getExe pkgs.bc})"
-          description=$(${wpctl} inspect @DEFAULT_AUDIO_SINK@ | grep 'node\.description' | cut -d '"' -f 2)
-          ${notify-send} --urgency=low -t 2000 \
-            -h 'string:x-canonical-private-synchronous:pipewire-volume' "$description" "Volume ''${percentage%.*}%"
-        '';
-
-        modifyFocusedWindowVolume = pkgs.writeShellScript "hypr-modify-focused-window-volume" ''
-          pid=$(${getExe' pkgs.hyprland "hyprctl"} activewindow -j | ${jaq} -r '.pid')
-          node=$(${getExe' pkgs.pipewire "pw-dump"} | ${jaq} -r \
-            "[.[] | select((.type == \"PipeWire:Interface:Node\") and (.info?.props?[\"application.process.id\"]? == "$pid"))] | sort_by(if .info?.state? == \"running\" then 0 else 1 end) | first")
-          if [ "$node" == "null" ]; then
-            ${notify-send} --transient --urgency=critical -t 2000 \
-              'Pipewire' "Active window does not have an interface node"
-            exit 1
-          fi
-
-          id=$(echo "$node" | ${jaq} -r '.id')
-          name=$(echo "$node" | ${jaq} -r '.info.props["application.name"]')
-          media=$(echo "$node" | ${jaq} -r '.info.props["media.name"]')
-
-          ${wpctl} set-volume "$id" "$1"
-          output=$(${wpctl} get-volume "$id")
-          volume=''${output#Volume: }
-          percentage="$(echo "$volume * 100" | ${getExe pkgs.bc})"
-          ${notify-send} --transient --urgency=low -t 2000 \
-            -h 'string:x-canonical-private-synchronous:pipewire-volume' "''${name^} - $media" "Volume ''${percentage%.*}%"
         '';
       in
       mkIf (home-manager.enable && desktop.desktopEnvironment == null) {
@@ -381,15 +455,19 @@ in
           };
 
           hyprland.binds = [
-            (mkHyprBind "" "XF86AudioRaiseVolume" ''hl.dsp.exec_cmd("${modifyVolume} 5%+"), { repeating = true }'')
-            (mkHyprBind "" "XF86AudioLowerVolume" ''hl.dsp.exec_cmd("${modifyVolume} 5%-"), { repeating = true }'')
+            (mkHyprBind "" "XF86AudioRaiseVolume"
+              ''hl.dsp.exec_cmd("${modifyVolume} 5%+"), { repeating = true }''
+            )
+            (mkHyprBind "" "XF86AudioLowerVolume"
+              ''hl.dsp.exec_cmd("${modifyVolume} 5%-"), { repeating = true }''
+            )
 
             (mkHyprExec "" "XF86AudioMute" "${toggleAudioMute} sink")
             (mkHyprExec "" "XF86AudioMicMute" "${toggleAudioMute} source")
-            (mkHyprExec "mod_shift_ctrl" "XF86AudioRaiseVolume" "${modifyFocusedWindowVolume} 5%+")
-            (mkHyprExec "mod_shift_ctrl" "XF86AudioLowerVolume" "${modifyFocusedWindowVolume} 5%-")
 
-            (mkHyprBind "mod" "ALT + ALT_L" ''hl.dsp.exec_cmd("${toggleAudioMute} source"), { release = true }'')
+            (mkHyprBind "mod" "ALT + ALT_L"
+              ''hl.dsp.exec_cmd("${toggleAudioMute} source"), { release = true }''
+            )
           ];
         };
       };

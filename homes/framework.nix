@@ -25,10 +25,10 @@
         animations = false;
         directScanout = true;
         secondaryModKey = "SUPER"; # for some reason VMs ignore keyd remaps
-        settings.device = lib.singleton {
-          name = "pixa3854:00-093a:0274-touchpad";
-          accel_profile = "adaptive";
-        };
+        extraConf = # lua
+          ''
+            hl.device({ name = "pixa3854:00-093a:0274-touchpad", accel_profile = "adaptive" })
+          '';
       };
 
       services = {

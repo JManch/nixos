@@ -10,123 +10,29 @@ let
   inherit (lib)
     ns
     mkIf
-    optionals
     getExe
     getExe'
-    flatten
-    concatMapStringsSep
+    optionalString
     ;
-  inherit (lib.${ns}) throttleHyprlandRepeatBind getMonitorHyprlandCfgStr;
+  inherit (lib.${ns}) throttleHyprlandRepeatBind;
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.core) device;
-  mod = cfg.modKey;
-  modShift = "${cfg.modKey}SHIFT";
-  modShiftCtrl = "${cfg.modKey}SHIFTCONTROL";
 
-  jaq = getExe pkgs.jaq;
-  bc = getExe' pkgs.bc "bc";
-  awk = getExe pkgs.gawk;
-  brightnessctl = getExe pkgs.brightnessctl;
   notifySend = getExe pkgs.libnotify;
-  hyprctl = getExe' pkgs.hyprland "hyprctl";
-  loginctl = getExe' pkgs.systemd "loginctl";
 
-  toggleDwindleGaps =
-    pkgs.writeShellScript "hypr-toggle-dwindle-gaps" # bash
-      ''
-        new_value=$(($(${hyprctl} getoption -j dwindle:no_gaps_when_only | ${jaq} -r '.int') ^ 1))
-        ${hyprctl} keyword dwindle:no_gaps_when_only $new_value
-        message=$([[ $new_value == "1" ]] && echo "Dwindle gaps disabled" || echo "Dwindle gaps enabled")
-        ${notifySend} --transient --urgency=low -t 2000 -h \
-          'string:x-canonical-private-synchronous:hypr-dwindle-gaps' 'Hyprland' "$message"
-      '';
-
-  toggleFloating =
-    pkgs.writeShellScript "hypr-toggle-floating" # bash
-      ''
-        if [[ $(${hyprctl} activewindow -j | ${jaq} -r '.floating') == "false" ]]; then
-          ${hyprctl} --batch 'dispatch togglefloating; dispatch resizeactive exact 75% 75%; dispatch centerwindow;'
-        else
-          ${hyprctl} dispatch togglefloating
-        fi
-      '';
-
-  toggleAlwaysOnTop =
-    pkgs.writeShellScript "hypr-toggle-always-on-top" # bash
-      ''
-        ${hyprctl} dispatch togglealwaysontop active
-        if [ $(${hyprctl} activewindow -j | ${jaq} -r '.alwaysOnTop') = "true" ]; then
-          message="enabled"
-        else
-          message="disabled"
-        fi
-        ${notifySend} --transient --urgency=low -t 2000 -h \
-          'string:x-canonical-private-synchronous:hypr-always-on-top' 'Hyprland' "Always on top $message"
-      '';
-
-  # Same as `fullscreen, 1` except will not do anything if active workspace
-  # contains a single non-fullscreen tiled window
-  toggleFullscreen =
-    pkgs.writeShellScript "hypr-toggle-fullscreen" # bash
-      ''
-        active_monitor=$(${hyprctl} monitors -j | ${jaq} -r '.[] | select(.focused == true)')
-        id=$(echo "$active_monitor" | ${jaq} -r '.specialWorkspace.id')
-        if [ "$id" -ge 0 ]; then
-          id=$(echo "$active_monitor" | ${jaq} -r '.activeWorkspace.id')
-        fi
-        workspace=$(${hyprctl} workspaces -j | ${jaq} -r ".[] | select(.id == $id)")
-        windows=$(echo $workspace | ${jaq} -r '.windows')
-        hasfullscreen=$(echo $workspace | ${jaq} -r '.hasfullscreen')
-        if [[ $windows == 1 && $hasfullscreen == "false" ]]; then
-          floating=$(${hyprctl} activewindow -j | ${jaq} -r '.floating')
-          if [ $floating = "false" ]; then exit 0; fi
-        fi
-        ${hyprctl} dispatch fullscreen 1
-      '';
-
-  toggleGaps =
-    let
-      inherit (config.wayland.windowManager.hyprland.settings) general decoration;
-    in
-    pkgs.writeShellScript "hypr-toggle-gaps" # bash
-      ''
-        rounding=$(${hyprctl} getoption -j decoration:rounding | ${jaq} -r '.int')
-        if [[ "$rounding" == "0" ]]; then
-          ${hyprctl} --batch "\
-            keyword general:gaps_in ${toString general.gaps_in}; \
-            keyword general:gaps_out ${toString general.gaps_out}; \
-            keyword general:border_size ${toString general.border_size}; \
-            keyword decoration:rounding ${toString decoration.rounding} \
-          "
-          message="Gaps enabled"
-        else
-          ${hyprctl} --batch "\
-            keyword general:gaps_in 0; \
-            keyword general:gaps_out 0; \
-            keyword general:border_size 0; \
-            keyword decoration:rounding 0 \
-          "
-          message="Gaps disabled"
-        fi
-        ${notifySend} --transient --urgency=low -t 2000 -h \
-          'string:x-canonical-private-synchronous:hypr-toggle-gaps' 'Hyprland' "$message"
-      '';
-
-  toggleFreeze =
+  freezeUnit =
     assert osConfig.${ns}.system.desktop.uwsm.enable;
-    pkgs.writeShellScript "hypr-toggle-freeze"
-      # bash
+    pkgs.writeShellScript "hypr-toggle-freeze" # bash
       ''
-        pid=$(${hyprctl} activewindow -j | ${jaq} -r .pid)
+        pid="$1"
 
         if [[ ! -f /proc/$pid/cgroup ]]; then
-          ${notifySend} --transient --urgency=critical -t 5000 "$unit" "Unit does not have a cgroup"
+          ${notifySend} --transient --urgency=critical -t 5000 "Freeze" "Unit does not have a cgroup"
           exit 1
         fi
 
-        unit=$(basename $(<"/proc/$pid/cgroup"))
+        unit=$(basename "$(<"/proc/$pid/cgroup")")
 
-        # This check assume apps were launched with app2unit
         if [[ $unit != "app-"* ]]; then
           ${notifySend} --transient --urgency=critical -t 5000 "$unit" "Unit is not app so cannot freeze"
           exit 1
@@ -139,48 +45,6 @@ let
           systemctl freeze --user "$unit"
           ${notifySend} --transient --urgency=critical -t 5000 "$unit" "Frozen"
         fi
-      '';
-
-  make16By9 =
-    pkgs.writeShellScript "hypr-16-by-9" # bash
-      ''
-        width=$(${hyprctl} activewindow -j | ${jaq} -r '.size[0]')
-        ${hyprctl} dispatch resizeactive exact "$width" "$(( ($width * 9) / 16 ))"
-      '';
-
-  scaleTabletToWindow =
-    pkgs.writeShellScript "hypr-scale-tablet" # bash
-      ''
-        tablet_width=152
-        tablet_height=95
-        window=$(${hyprctl} activewindow -j)
-        width=$(echo $window | ${jaq} -r '.size[0]')
-        height=$(echo $window | ${jaq} -r '.size[1]')
-        pos_x=$(echo $window | ${jaq} -r '.at[0]')
-        pos_y=$(echo $window | ${jaq} -r '.at[1]')
-        new_width=$(echo "scale=0; $height*$tablet_width/$tablet_height" | ${bc} -l)
-        new_height=$(echo "scale=0; $width*$tablet_height/$tablet_width" | ${bc} -l)
-
-        if [ $((width - new_width)) -lt 0 ]; then
-            region_height=$new_height
-            region_width=$width
-            region_pos_x=$pos_x
-            region_pos_y=$((pos_y + (height - new_height) / 2))
-        else
-            region_height=$height
-            region_width=$new_width
-            region_pos_x=$((pos_x + (width - new_width) / 2))
-            region_pos_y=$pos_y
-        fi
-
-        ${hyprctl} --batch "\
-          keyword input:tablet:region_size $region_width $region_height; \
-          keyword input:tablet:output \"\"; \
-          keyword input:tablet:absolute_region_position true; \
-          keyword input:tablet:region_position $region_pos_x $region_pos_y \
-        "
-        ${notifySend} --transient --urgency=low -t 2000 -h \
-          'string:x-canonical-private-synchronous:hypr-scale-tablet' 'Hyprland' 'Scaled tablet to active window'
       '';
 
   # By design, the wayland clipboard does not sync with unfocused x clients.
@@ -210,36 +74,12 @@ let
     fi
   '';
 
-  moveToNextEmpty = pkgs.writeShellScript "hypr-move-to-next-empty" ''
-    fullscreen=$(${hyprctl} activewindow -j | ${jaq} -r '.fullscreen')
-    cmd="dispatch movetoworkspace emptym"
-    if [ "$fullscreen" = 1 ]; then
-        cmd+=";dispatch fullscreenstate 0 -1"
-    fi
-    ${hyprctl} --batch "$cmd"
-  '';
-
   modifyBrightness = pkgs.writeShellScript "hypr-modify-brightness" ''
     ${throttleHyprlandRepeatBind "brightness" 10}
-    ${brightnessctl} set -e4 "$1"
-    brightness=$(${brightnessctl} get --percentage)
+    ${getExe pkgs.brightnessctl} set -e4 "$1"
+    brightness=$(${getExe pkgs.brightnessctl} get --percentage)
     ${notifySend} --transient --urgency=low -t 2000 \
       -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $brightness%"
-  '';
-
-  zoom =
-    type:
-    pkgs.writeShellScript "hypr-zoom-${type}" ''
-      new_zoom=$(${hyprctl} getoption cursor:zoom_factor | ${awk} 'NR==1 {factor = $2; if (factor < 1) {factor = 1}; print factor ${
-        if type == "in" then "*" else "/"
-      } 1.25}' "$zoom_factor")
-      ${hyprctl} keyword cursor:zoom_factor "$new_zoom"
-    '';
-
-  resetMonitors = pkgs.writeShellScript "hypr-reset-monitors" ''
-    ${hyprctl} --batch "${
-      concatMapStringsSep ";" (m: "keyword monitor ${getMonitorHyprlandCfgStr m}") device.monitors
-    }"
   '';
 
   takeScreenshot = getExe (
@@ -320,138 +160,252 @@ in
   # Force secondaryModKey VM variant because binds are repeated on host
   categoryConfig.modKey = mkIf vmVariant (lib.mkVMOverride cfg.secondaryModKey);
 
-  wayland.windowManager.hyprland = {
-    settings.bind = [
-      # General
-      "${modShiftCtrl}, Q, exec, ${loginctl} terminate-session \"$XDG_SESSION_ID\""
-      "${mod}, ${cfg.killActiveKey}, killactive"
-      "${mod}, C, exec, ${toggleFloating}"
-      "${mod}, E, exec, ${toggleFullscreen}"
-      "${modShift}, E, fullscreen, 0"
-      "${mod}, Z, exec, ${toggleAlwaysOnTop}"
-      "${mod}Shift, Z, pin, active"
-      "${mod}, R, exec, ${hyprctl} dispatch layoutmsg splitratio 1 exact"
-      "${modShift}, R, exec, ${make16By9}"
-      "${modShiftCtrl}, V, exec, ${syncClipboard}"
-      "${mod}, Y, exec, ${scaleTabletToWindow}"
-      "${mod}, P, exec, ${toggleFreeze}"
+  ns.desktop.hyprland.extraConf = # lua
+    ''
+      local function notify(sync_id, title, message)
+        hl.exec_cmd(
+          "${notifySend} --transient --urgency=low -t 2000 "
+          .. "-h 'string:x-canonical-private-synchronous:" .. sync_id .. "' "
+          .. "'" .. title .. "' '" .. message .. "'"
+        )
+      end
 
-      # Movement
-      "${mod}, H, movefocus, l"
-      "${mod}, L, movefocus, r"
-      "${mod}, K, movefocus, u"
-      "${mod}, J, movefocus, d"
-      "${modShiftCtrl}, H, movewindow, l"
-      "${modShiftCtrl}, L, movewindow, r"
-      "${modShiftCtrl}, K, movewindow, u"
-      "${modShiftCtrl}, J, movewindow, d"
-      "${mod}, mouse:275, workspace, m-1"
-      "${mod}, mouse:276, workspace, m+1"
-      "${modShift}, Left, movetoworkspace, r-1"
-      "${modShift}, Right, movetoworkspace, r+1"
-      "${modShift}, J, workspace, m-1"
-      "${modShift}, K, workspace, m+1"
-      "${mod}, mouse_down, exec, ${zoom "in"}"
-      "${mod}, mouse_up, exec, ${zoom "out"}"
-      "${modShift}, mouse_up, exec, ${hyprctl} keyword cursor:zoom_factor 1"
-      "${mod}, Equal, exec, ${zoom "in"}"
-      "${mod}, Minus, exec, ${zoom "out"}"
-      "${modShift}, Minus, exec, ${hyprctl} keyword cursor:zoom_factor 1"
+      function toggle_floating()
+        local w = hl.get_active_window()
+        if w == nil then return end
+        if not w.floating then
+          hl.dispatch(hl.dsp.window.float({ action = "enable" }))
+          hl.dispatch(hl.dsp.window.resize({ x = "75%", y = "75%", relative = false }))
+          hl.dispatch(hl.dsp.window.center())
+        else
+          hl.dispatch(hl.dsp.window.float({ action = "disable" }))
+        end
+      end
 
-      # Monitors
-      "${modShift}, H, focusmonitor, l"
-      "${modShift}, L, focusmonitor, r"
-      "${mod}, TAB, focusmonitor, +1"
-      "${modShift}, TAB, movecurrentworkspacetomonitor, +1"
-      ", XF86AudioMedia, exec, sleep 1 && hyprctl dispatch dpms toggle ${device.primaryMonitor.name}"
-      "${mod}, XF86AudioMedia, exec, ${resetMonitors}"
+      -- Same as maximize dispatcher except it does nothing if the
+      -- active workspace holds a single non-fullscreen tiled window meaning
+      -- the client is already effectively maximized.
+      function toggle_maximize()
+        local ws = hl.get_active_special_workspace() or hl.get_active_workspace()
+        if ws ~= nil and ws.windows == 1 and not ws.has_fullscreen then
+          local w = hl.get_active_window()
+          if w ~= nil and not w.floating then return end
+        end
+        hl.dispatch(hl.dsp.window.fullscreen({ mode = "maximized" }))
+      end
 
-      # Dwindle
-      "${modShiftCtrl}, G, exec, ${toggleDwindleGaps}"
-      "${mod}, X, layoutmsg, togglesplit"
-      "${modShift}, X, layoutmsg, swapsplit"
+      function make_16_by_9()
+        local w = hl.get_active_window()
+        if w == nil then return end
+        local width = w.size.x
+        hl.dispatch(hl.dsp.window.resize({
+          x = width,
+          y = math.floor((width * 9) / 16),
+          relative = false,
+        }))
+      end
 
-      # Screenshots
-      ", Print, exec, ${takeScreenshot} copy area"
-      "${mod}, I, exec, ${takeScreenshot} copy output"
-      "${modShift}, Print, exec, ${takeScreenshot} save area"
-      "${modShift}, I, exec, ${takeScreenshot} save output"
-      "${modShiftCtrl}, C, exec, ${copyScreenshotText}"
+      function scale_tablet_to_window()
+        local tablet_width = 152
+        local tablet_height = 95
+        local w = hl.get_active_window()
+        if w == nil then return end
+        local width = w.size.x
+        local height = w.size.y
+        local pos_x = w.at.x
+        local pos_y = w.at.y
+        local new_width = math.floor((height * tablet_width) / tablet_height)
+        local new_height = math.floor((width * tablet_height) / tablet_width)
 
-      # Workspaces other
-      "${mod}, N, workspace, previous_per_monitor"
-      "${mod}, M, workspace, emptym"
-      "${modShift}, M, exec, ${moveToNextEmpty}"
-      "${modShiftCtrl}, M, movetoworkspacesilent, emptym"
-      "${mod}, A, togglespecialworkspace, scratch1"
-      "${mod}, S, togglespecialworkspace, scratch2"
-      "${mod}, D, togglespecialworkspace, scratch3"
-      "${mod}, F, togglespecialworkspace, scratch4"
-      "${modShift}, A, movetoworkspacesilent, special:scratch1"
-      "${modShift}, S, movetoworkspacesilent, special:scratch2"
-      "${modShift}, D, movetoworkspacesilent, special:scratch3"
-      "${modShift}, F, movetoworkspacesilent, special:scratch4"
-    ]
-    ++ flatten (
-      builtins.genList (
-        x:
-        let
-          key = toString x;
-          w = toString (if x == 0 then 10 else x);
-        in
-        [
-          "${mod}, ${key}, workspace, ${w}"
-          "${modShift}, ${key}, movetoworkspace, ${w}"
-          "${modShiftCtrl}, ${key}, movetoworkspacesilent, ${w}"
-        ]
-      ) 10
-    )
-    ++ optionals cfg.plugins [
-      "${mod}, Escape, hyprexpo:expo, toggle"
-    ];
+        local region_width, region_height, region_pos_x, region_pos_y
+        if (width - new_width) < 0 then
+          region_height = new_height
+          region_width = width
+          region_pos_x = pos_x
+          region_pos_y = pos_y + math.floor((height - new_height) / 2)
+        else
+          region_height = height
+          region_width = new_width
+          region_pos_x = pos_x + math.floor((width - new_width) / 2)
+          region_pos_y = pos_y
+        end
 
-    settings.bindm = [
-      "${mod}, mouse:272, movewindow"
-      "${mod}, mouse:273, resizewindow"
-    ];
+        hl.config({
+          input = {
+            tablet = {
+              region_size = region_width .. " " .. region_height,
+              output = "",
+              absolute_region_position = true,
+              region_position = region_pos_x .. " " .. region_pos_y,
+            },
+          },
+        })
+        notify("hypr-scale-tablet", "Hyprland", "Scaled tablet to active window")
+      end
 
-    settings.binde = [
-      "${mod}, Right, resizeactive, 20 0"
-      "${mod}, Left, resizeactive, -20 0"
-      "${mod}, Up, resizeactive, 0 -20"
-      "${mod}, Down, resizeactive, 0 20"
-    ]
-    ++ optionals (device.backlight != null) [
-      ", XF86MonBrightnessUp, exec, ${modifyBrightness} 3%+"
-      ", XF86MonBrightnessDown, exec, ${modifyBrightness} 3%-"
-    ];
+      function toggle_freeze()
+        local w = hl.get_active_window()
+        if w == nil then return end
+        hl.exec_cmd("${freezeUnit} " .. w.pid)
+      end
 
-    settings.gesture = [
-      "3, horizontal, workspace"
-      "4, swipe, scale: 2, resize"
-      "4, swipe, mod: ALT, scale: 2, move"
-      "3, pinch, fullscreen, maximize"
-      "4, pinch, fullscreen"
-      "3, up, special, scratch2"
-      "3, down, special, scratch3"
-    ];
+      function zoom(direction)
+        local factor = hl.get_config("cursor.zoom_factor")
+        if factor < 1 then factor = 1 end
+        if direction == "in" then
+          factor = factor * 1.25
+        else
+          factor = factor / 1.25
+        end
+        hl.config({ cursor = { zoom_factor = factor } })
+      end
 
-    settings.layerrule = [
-      # fix black border around screenshots
-      "match:namespace selection, no_anim true"
-    ];
+      function reset_zoom()
+        hl.config({ cursor = { zoom_factor = 1 } })
+      end
 
-    extraConfig = ''
-      bind = ${mod}, Delete, submap, Grab
-      submap = Grab
-      bind = ${mod}SHIFT, Delete, submap, reset
-      submap = reset
+      function move_to_next_empty()
+        local w = hl.get_active_window()
+        local fullscreen = w ~= nil and w.fullscreen ~= nil and w.fullscreen ~= 0
+        hl.dispatch(hl.dsp.window.move({ workspace = "emptym" }))
+        if fullscreen then
+          hl.dispatch(hl.dsp.window.fullscreen_state({ internal = 0, client = -1 }))
+        end
+      end
+
+      -- Toggle special workspace open on any monitor rather than just the
+      -- active monitor. Ensures that only a single special workspace can be
+      -- opened across all monitors at a time.
+      function global_toggle_special_workspace(name)
+        local target = "special:" .. name
+        for _, m in ipairs(hl.get_monitors()) do
+          local ws = m.active_special_workspace
+          if ws ~= nil and ws.name == target then
+            if not m.focused then
+              -- first toggle will pull the special workspace to the focused monitor
+              hl.dispatch(hl.dsp.workspace.toggle_special(name))
+            end
+            hl.dispatch(hl.dsp.workspace.toggle_special(name))
+            return
+          end
+        end
+        hl.dispatch(hl.dsp.workspace.toggle_special(name))
+      end
+
+      -- General
+      hl.bind(mod_shift_ctrl .. " + Q", hl.dsp.exec_cmd("loginctl terminate-session \"$XDG_SESSION_ID\""))
+      hl.bind(mod .. " + ${cfg.killActiveKey}", hl.dsp.window.close())
+      hl.bind(mod .. " + C", toggle_floating)
+      hl.bind(mod .. " + E", toggle_maximize)
+      hl.bind(mod_shift .. " + E", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
+      hl.bind(mod_shift .. " + Z", hl.dsp.window.pin())
+      hl.bind(mod .. " + R", hl.dsp.layout("splitratio 1 exact"))
+      hl.bind(mod_shift .. " + R", make_16_by_9)
+      hl.bind(mod_shift_ctrl .. " + V", hl.dsp.exec_cmd("${syncClipboard}"))
+      hl.bind(mod .. " + Y", scale_tablet_to_window)
+      hl.bind(mod .. " + P", toggle_freeze)
+
+      -- Movement
+      hl.bind(mod .. " + H", hl.dsp.focus({ direction = "l" }))
+      hl.bind(mod .. " + L", hl.dsp.focus({ direction = "r" }))
+      hl.bind(mod .. " + K", hl.dsp.focus({ direction = "u" }))
+      hl.bind(mod .. " + J", hl.dsp.focus({ direction = "d" }))
+      hl.bind(mod_shift_ctrl .. " + H", hl.dsp.window.move({ direction = "l" }))
+      hl.bind(mod_shift_ctrl .. " + L", hl.dsp.window.move({ direction = "r" }))
+      hl.bind(mod_shift_ctrl .. " + K", hl.dsp.window.move({ direction = "u" }))
+      hl.bind(mod_shift_ctrl .. " + J", hl.dsp.window.move({ direction = "d" }))
+      hl.bind(mod .. " + mouse:275", hl.dsp.focus({ workspace = "m-1" }))
+      hl.bind(mod .. " + mouse:276", hl.dsp.focus({ workspace = "m+1" }))
+      hl.bind(mod_shift .. " + Left", hl.dsp.window.move({ workspace = "r-1" }))
+      hl.bind(mod_shift .. " + Right", hl.dsp.window.move({ workspace = "r+1" }))
+      hl.bind(mod_shift .. " + J", hl.dsp.focus({ workspace = "m-1" }))
+      hl.bind(mod_shift .. " + K", hl.dsp.focus({ workspace = "m+1" }))
+      hl.bind(mod .. " + mouse_down", function() zoom("in") end)
+      hl.bind(mod .. " + mouse_up", function() zoom("out") end)
+      hl.bind(mod_shift .. " + mouse_up", reset_zoom)
+      hl.bind(mod .. " + Equal", function() zoom("in") end)
+      hl.bind(mod .. " + Minus", function() zoom("out") end)
+      hl.bind(mod_shift .. " + Minus", reset_zoom)
+
+      -- Monitors
+      hl.bind(mod_shift .. " + H", hl.dsp.focus({ monitor = "l" }))
+      hl.bind(mod_shift .. " + L", hl.dsp.focus({ monitor = "r" }))
+      hl.bind(mod .. " + TAB", hl.dsp.focus({ monitor = "+1" }))
+      hl.bind(mod_shift .. " + TAB", hl.dsp.workspace.move({ monitor = "+1" }))
+      hl.bind("XF86AudioMedia", function()
+        hl.timer(function()
+          hl.dispatch(hl.dsp.dpms({ monitor = "${device.primaryMonitor.name}" }))
+        end, { timeout = 1000, type = "oneshot" })
+      end)
+
+      -- Workspaces
+      hl.bind(mod .. " + N", hl.dsp.focus({ workspace = "previous_per_monitor" }))
+      hl.bind(mod .. " + M", hl.dsp.focus({ workspace = "emptym" }))
+      hl.bind(mod_shift .. " + M", move_to_next_empty)
+      hl.bind(mod_shift_ctrl .. " + M", hl.dsp.window.move({ workspace = "emptym", follow = false }))
+      hl.bind(mod .. " + A", function() global_toggle_special_workspace("scratch1") end)
+      hl.bind(mod .. " + S", function() global_toggle_special_workspace("scratch2") end)
+      hl.bind(mod .. " + D", function() global_toggle_special_workspace("scratch3") end)
+      hl.bind(mod .. " + F", function() global_toggle_special_workspace("scratch4") end)
+      hl.bind(mod_shift .. " + A", hl.dsp.window.move({ workspace = "special:scratch1", follow = false }))
+      hl.bind(mod_shift .. " + S", hl.dsp.window.move({ workspace = "special:scratch2", follow = false }))
+      hl.bind(mod_shift .. " + D", hl.dsp.window.move({ workspace = "special:scratch3", follow = false }))
+      hl.bind(mod_shift .. " + F", hl.dsp.window.move({ workspace = "special:scratch4", follow = false }))
+      for i = 0, 9 do
+        local ws = (i == 0) and 10 or i
+        hl.bind(mod .. " + " .. i, hl.dsp.focus({ workspace = ws }))
+        hl.bind(mod_shift .. " + " .. i, hl.dsp.window.move({ workspace = ws }))
+        hl.bind(mod_shift_ctrl .. " + " .. i, hl.dsp.window.move({ workspace = ws, follow = false }))
+      end
+
+      -- Dwindle
+      hl.bind(mod .. " + X", hl.dsp.layout("togglesplit"))
+      hl.bind(mod_shift .. " + X", hl.dsp.layout("swapsplit"))
+
+      -- Resize
+      hl.bind(mod .. " + Right", hl.dsp.window.resize({ x = 20, y = 0, relative = true }), { repeating = true })
+      hl.bind(mod .. " + Left", hl.dsp.window.resize({ x = -20, y = 0, relative = true }), { repeating = true })
+      hl.bind(mod .. " + Up", hl.dsp.window.resize({ x = 0, y = -20, relative = true }), { repeating = true })
+      hl.bind(mod .. " + Down", hl.dsp.window.resize({ x = 0, y = 20, relative = true }), { repeating = true })
+
+      -- Mouse
+      hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
+      hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+      -- Screenshots
+      hl.bind("Print", hl.dsp.exec_cmd("${takeScreenshot} copy area"))
+      hl.bind(mod .. " + I", hl.dsp.exec_cmd("${takeScreenshot} copy output"))
+      hl.bind(mod_shift .. " + Print", hl.dsp.exec_cmd("${takeScreenshot} save area"))
+      hl.bind(mod_shift .. " + I", hl.dsp.exec_cmd("${takeScreenshot} save output"))
+      hl.bind(mod_shift_ctrl .. " + C", hl.dsp.exec_cmd("${copyScreenshotText}"))
+
+      -- Gestures
+      hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+      hl.gesture({ fingers = 4, direction = "swipe", scale = 2, action = "resize" })
+      hl.gesture({ fingers = 4, direction = "swipe", mods = "ALT", scale = 2, action = "move" })
+      hl.gesture({ fingers = 3, direction = "pinch", action = "fullscreen", mode = "maximize" })
+      hl.gesture({ fingers = 4, direction = "pinch", action = "fullscreen" })
+      hl.gesture({ fingers = 3, direction = "up", action = "special", workspace_name = "scratch2" })
+      hl.gesture({ fingers = 3, direction = "down", action = "special", workspace_name = "scratch3" })
+
+      ${optionalString (device.backlight != null)
+        # nix
+        ''
+          hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("${modifyBrightness} 3%+"), { repeating = true })
+          hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("${modifyBrightness} 3%-"), { repeating = true })
+        ''
+      }
+
+      -- Layer rules
+      hl.layer_rule({ match = { namespace = "selection" }, no_anim = true })
+
+      -- Submaps
+      -- disables all keybinds
+      hl.bind(mod .. " + Delete", hl.dsp.submap("Grab"))
+      hl.define_submap("Grab", function()
+        hl.bind(mod_shift .. " + Delete", hl.dsp.submap("reset"))
+      end)
     '';
-  };
-
-  ns.desktop.hyprland.eventScripts.monitorremoved = mkIf (
-    device.type == "laptop"
-  ) resetMonitors.outPath;
 
   programs.zsh.initContent = # bash
     ''

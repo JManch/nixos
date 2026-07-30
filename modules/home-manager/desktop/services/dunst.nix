@@ -123,8 +123,9 @@ in
       postUnlockScript = "${dunstctl} set-paused false";
     };
 
-    hyprland.settings.layerrule = [
-      "match:namespace notifications, blur true, xray false, ignore_alpha 0, animation slide"
-    ];
+    hyprland.extraConf = # lua
+      ''
+        hl.layer_rule({ match = { namespace = "notifications" }, blur = true, xray = false, ignore_alpha = 0, animation = "slide" })
+      '';
   };
 }

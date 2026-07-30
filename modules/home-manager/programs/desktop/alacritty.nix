@@ -10,6 +10,7 @@ let
     singleton
     hiPrio
     ;
+  inherit (lib.${ns}) mkHyprBind mkHyprExec;
   inherit (config.${ns}) desktop;
   colors = config.colorScheme.palette;
 in
@@ -108,14 +109,15 @@ in
       };
     };
 
-    hyprland = {
-      settings.windowrule = [ "match:class Alacritty, scroll_touchpad 0.6" ];
+    hyprland.extraConf = # lua
+      ''
+        hl.window_rule({ match = { class = "Alacritty" }, scroll_touchpad = 0.6 })
+      '';
 
-      binds = mkIf (desktop.terminal == "Alacritty") [
-        "${desktop.hyprland.modKey}, Return, exec, app2unit -t service Alacritty.desktop"
-        "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
-        "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit -t service Alacritty.desktop"
-      ];
-    };
+    hyprland.binds = mkIf (desktop.terminal == "Alacritty") [
+      (mkHyprExec "mod" "Return" "app2unit -t service Alacritty.desktop")
+      (mkHyprBind "mod_shift" "Return" ''hl.dsp.focus({ workspace = "emptym" })'')
+      (mkHyprExec "mod_shift" "Return" "app2unit -t service Alacritty.desktop")
+    ];
   };
 }

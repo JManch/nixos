@@ -18,7 +18,7 @@ let
     elemAt
     concatMap
     singleton
-    concatStringsSep
+    optionalAttrs
     nixosSystem
     optionals
     hasPrefix
@@ -243,19 +243,21 @@ in
       in
       findFirst (m: m.name == name) (head monitors) monitors;
 
-    getMonitorHyprlandCfgStr =
+    getHyprlandMonitorConfig =
       m:
-      concatStringsSep "," (
-        [
-          m.name
-          "${toString m.width}x${toString m.height}@${toString m.refreshRate}"
-          "${toString m.position.x}x${toString m.position.y}"
-          (toString m.scale)
-          "transform,${toString m.transform}"
-        ]
-        ++ optional (m.iccProfile != null) "icc,${m.iccProfile}"
-        ++ optional (m.mirror != null) "mirror,${m.mirror}"
-      );
+      {
+        inherit (m) scale transform;
+        disabled = !m.enabled;
+        output = m.name;
+        mode = "${toString m.width}x${toString m.height}@${toString m.refreshRate}";
+        position = "${toString m.position.x}x${toString m.position.y}";
+      }
+      // optionalAttrs (m.iccProfile != null) {
+        icc = m.iccProfile;
+      }
+      // optionalAttrs (m.mirror != null) {
+        mirror = m.mirror;
+      };
 
     asserts =
       asserts:
@@ -432,6 +434,16 @@ in
         center = true;
       };
     };
+
+    mkHyprBind =
+      mods: key: rest:
+      "hl.bind(${if mods == "" then ''"${key}"'' else ''${mods} .. " + ${key}"''}, ${rest})";
+
+    mkHyprExec =
+      mods: key: cmd:
+      "hl.bind(${
+        if mods == "" then ''"${key}"'' else ''${mods} .. " + ${key}"''
+      }, hl.dsp.exec_cmd(\"${cmd}\"))";
 
     throttleHyprlandRepeatBind =
       name: targetRepeatRate:

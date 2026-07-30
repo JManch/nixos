@@ -91,10 +91,11 @@ in
     }
   );
 
-  ns.desktop.hyprland.settings.windowrule = [
-    "match:class org\\.squidowl\\.halloy, workspace special:scratch3 silent"
-    "match:class org\\.squidowl\\.halloy, suppress_event maximize"
-  ];
+  ns.desktop.hyprland.extraConf = # lua
+    ''
+      hl.window_rule({ match = { class = "org\\.squidowl\\.halloy" }, workspace = "special:scratch3 silent" })
+      hl.window_rule({ match = { class = "org\\.squidowl\\.halloy" }, suppress_event = "maximize" })
+    '';
 
   ns.persistence.directories = [ ".local/share/halloy" ];
 }

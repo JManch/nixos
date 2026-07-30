@@ -5,6 +5,7 @@
 }:
 let
   inherit (lib) ns mkIf hiPrio;
+  inherit (lib.${ns}) mkHyprBind mkHyprExec;
   inherit (config.${ns}) desktop;
 in
 {
@@ -65,8 +66,8 @@ in
   ];
 
   ns.desktop.hyprland.binds = mkIf (desktop.terminal == "foot") [
-    "${desktop.hyprland.modKey}, Return, exec, app2unit -t service foot.desktop"
-    "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
-    "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit -t service foot.desktop"
+    (mkHyprExec "mod" "Return" "app2unit -t service foot.desktop")
+    (mkHyprBind "mod_shift" "Return" ''hl.dsp.focus({ workspace = "emptym" })'')
+    (mkHyprExec "mod_shift" "Return" "app2unit -t service foot.desktop")
   ];
 }

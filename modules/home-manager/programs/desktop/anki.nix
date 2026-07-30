@@ -17,10 +17,11 @@
       KillMode=mixed
     '';
 
-    desktop.hyprland.settings.windowrule = [
-      "match:class anki, match:float true, center true"
-      # The browse window's initial title is Anki before switching to Browse.*
-      "match:class anki, match:title Anki, workspace emptym"
-    ];
+    desktop.hyprland.extraConf = # lua
+      ''
+        hl.window_rule({ match = { class = "anki", float = true }, center = true })
+        -- The browse window's initial title is Anki before switching to Browse.*
+        hl.window_rule({ match = { class = "anki", title = "Anki" }, workspace = "emptym" })
+      '';
   };
 }

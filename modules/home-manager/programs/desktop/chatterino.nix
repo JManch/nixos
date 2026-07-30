@@ -16,6 +16,7 @@ let
     mkOption
     types
     ;
+  inherit (lib.${ns}) mkHyprBind mkHyprExec;
   inherit (config.${ns}.programs.desktop) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
   inherit (config.${ns}.desktop) hyprland;
@@ -174,15 +175,16 @@ in
     in
     {
       services.waybar.autoHideWorkspaces = [ "TWITCH" ];
-      hyprland.namedWorkspaces.TWITCH = "monitor:${secondMonitor.name}, on-created-empty:${getExe initWorkspace}";
-
-      hyprland.settings = {
-        bind = [
-          "${hyprland.modKey}, T, workspace, ${hyprland.namedWorkspaceIDs.TWITCH}"
-          "${hyprland.modKey}SHIFT, T, exec, ${getExe (resetWorkspace true)}"
-          "${hyprland.modKey}SHIFTCONTROL, T, exec, ${getExe (resetWorkspace false)}"
-        ];
+      hyprland.namedWorkspaces.TWITCH = {
+        monitor = secondMonitor.name;
+        on_created_empty = "${getExe initWorkspace}";
       };
+
+      hyprland.binds = [
+        (mkHyprBind "mod" "T" ''hl.dsp.focus({ workspace = ${hyprland.namedWorkspaceIDs.TWITCH} })'')
+        (mkHyprExec "mod_shift" "T" "${getExe (resetWorkspace true)}")
+        (mkHyprExec "mod_shift_ctrl" "T" "${getExe (resetWorkspace false)}")
+      ];
 
       hyprland.windowRules = {
         twitch-workspace = {

@@ -7,7 +7,6 @@
 let
   inherit (lib)
     ns
-    mkAliasOptionModule
     mkEnableOption
     mkOption
     types
@@ -23,43 +22,9 @@ in
   noChildren = true;
   defaultOpts.conditions = [ (isHyprland config) ];
 
-  imports = [
-    (mkAliasOptionModule
-      [
-        ns
-        "desktop"
-        "hyprland"
-        "binds"
-      ]
-      [
-        "wayland"
-        "windowManager"
-        "hyprland"
-        "settings"
-        "bind"
-      ]
-    )
-
-    (mkAliasOptionModule
-      [
-        ns
-        "desktop"
-        "hyprland"
-        "settings"
-      ]
-      [
-        "wayland"
-        "windowManager"
-        "hyprland"
-        "settings"
-      ]
-    )
-  ];
-
   opts = {
     logging = mkEnableOption "logging";
     tearing = mkEnableOption "enable tearing";
-    plugins = mkEnableOption "plugins";
     noGapsWhenOnly = mkEnableOption "no gaps when only";
     vrr = mkEnableOption "vrr";
 
@@ -121,11 +86,15 @@ in
     };
 
     namedWorkspaces = mkOption {
-      type = types.attrsOf types.str;
+      type = with types; attrsOf attrs;
       default = { };
       example = {
-        GAME = "monitor:DP-1";
-        VM = "monitor:DP-1";
+        GAME = {
+          monitor = "DP-1";
+        };
+        VM = {
+          monitor = "DP-1";
+        };
       };
       description = ''
         Attribute set of named workspaces to create. Value is additional
@@ -149,54 +118,41 @@ in
       );
     };
 
-    socketListenerExtraLines = mkOption {
-      type = types.lines;
-      default = "";
-      description = ''
-        Extra lines inserted at the start of the socket listener script.
-      '';
-    };
-
-    eventScripts = mkOption {
-      type = with types; attrsOf lines;
+    options = mkOption {
+      type = with types; attrsOf anything;
       default = { };
       description = ''
-        Attribute set where the names are hyprland socket events and the values
-        are scripts to run when the event fires. The socket listener runs in a
-        systemd service.
+        Attribute set of options passed to the hl.config function.
       '';
     };
 
     windowRules = mkOption {
-      type = types.attrsOf (
-        types.submodule {
-          options = {
-            matchers = mkOption {
-              type = with types; attrsOf anything;
-              example = {
-                class = "gcr-prompter";
-              };
-              description = ''
-                Attribute set of matchers and their regex values for the window
-                rule.
-
-                Note that the regex does NOT need to be wrapped in ^$ since
-                Hyprland always uses the FullMatch method from the RE2 library
-                which implicitly does this.
-              '';
-            };
-
-            params = mkOption {
-              type = with types; attrsOf anything;
-            };
-          };
-        }
-      );
+      type = with types; attrsOf anything;
       default = { };
       description = ''
-        Attribute set of window rules which will use the extended window rule
-        syntax to set the name.
+        Attribute set of named window rules. Rule `name` will be set to the
+        attribute name.
       '';
+    };
+
+    workspaceRules = mkOption {
+      type = with types; listOf attrs;
+      default = { };
+      description = "List of attributes defining workspace rules";
+    };
+
+    binds = mkOption {
+      type = with types; listOf str;
+      default = [ ];
+      description = ''
+        List of binds built with the `mkHyprBind` or `mkHyprExec` helpers.
+      '';
+    };
+
+    extraConf = mkOption {
+      type = types.lines;
+      default = "";
+      description = "Extra lua config";
     };
   };
 }

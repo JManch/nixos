@@ -17,11 +17,14 @@ let
     optionalString
     mkForce
     getExe
-    concatLines
     sort
     concatMapStringsSep
     ;
-  inherit (lib.${ns}) addPatches sliceSuffix getMonitorByName;
+  inherit (lib.${ns})
+    addPatches
+    sliceSuffix
+    mkHyprExec
+    ;
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.core) device;
   inherit (osConfig.${ns}.system) networking;
@@ -46,21 +49,7 @@ let
   notify-send = getExe pkgs.libnotify;
   systemctl = getExe' pkgs.systemd "systemctl";
   hyprctl = getExe' pkgs.hyprland "hyprctl";
-  jaq = getExe pkgs.jaq;
   app2unit = getExe pkgs.app2unit;
-
-  monitorNameToNumMap = # bash
-    ''
-      declare -A waybar_monitor_name_to_num
-      ${concatLines (
-        map (
-          m:
-          "waybar_monitor_name_to_num[${m.name}]='${
-            if m.mirror == null then toString m.number else toString (getMonitorByName osConfig m.mirror).number
-          }'"
-        ) monitors
-      )}
-    '';
 in
 {
   programs.waybar = {
@@ -390,65 +379,62 @@ in
   };
 
   ns.desktop.hyprland = {
-    settings =
-      let
-        inherit (config.${ns}.desktop.hyprland) modKey;
+    binds = [
+      (mkHyprExec "mod_shift_ctrl" "B" "systemctl restart --user waybar")
+    ];
 
-        toggleActiveMonitorBar = pkgs.writeShellScript "hypr-toggle-active-monitor-waybar" ''
-          focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
-          # Get ID of the monitor based on x pos sort
-          ${monitorNameToNumMap}
-          monitor_num=''${waybar_monitor_name_to_num[$focused_monitor]}
-          ${systemctl} kill --user --signal="SIGRTMIN+$(((2 << 3) | monitor_num))" waybar
-        '';
-      in
-      {
-        bind = [
-          "${modKey}, B, exec, ${toggleActiveMonitorBar}"
-          "${modKey}SHIFTCONTROL, B, exec, ${systemctl} restart --user waybar"
-        ];
-      };
+    extraConf = # lua
+      ''
+        do
+          -- Maps monitor name -> waybar output number
+          local output = {}
+          for num, m in pairs(monitors) do
+            output[m.name] = num
+          end
 
-    socketListenerExtraLines = ''
-      ${monitorNameToNumMap}
-      declare -A monitor_last_workspace
-      declare -A waybar_schedule_monitor_unhide
-    '';
+          -- Signal encodes a 3-bit action (hide 0, show 1, toggle 2) then the
+          -- 3-bit output.
+          local function signal(out, action)
+            hl.exec_cmd("systemctl kill --user --signal=SIGRTMIN+" .. (action * 8 + out) .. " waybar")
+          end
 
-    # Update bar auto toggle when active workspace changes
-    eventScripts.workspace =
-      mkIf (cfg.autoHideWorkspaces != [ ]) # bash
-        ''
-          # waybar auto toggle workspace
-          workspace_name="''${args[0]}"
-          focused_monitor=$(${hyprctl} monitors -j | ${jaq} -r 'first(.[] | select(.focused == true) | .name)')
-          last_workspace_name=''${monitor_last_workspace["$focused_monitor"]:-}
-          monitor_last_workspace["$focused_monitor"]=$workspace_name
+          -- Toggle the bar on the focused monitor
+          hl.bind(mod .. " + B", function()
+            local mon = hl.get_active_monitor()
+            if mon ~= nil and output[mon.name] ~= nil then
+              signal(output[mon.name], 2)
+            end
+          end)
 
-          monitor_num=''${waybar_monitor_name_to_num["$focused_monitor"]}
-          if [[ ${
-            concatMapStringsSep " || " (workspace: "$workspace_name == \"${workspace}\"") cfg.autoHideWorkspaces
-          } ]]; then
-            # hide the bar
-            systemctl kill --user --signal="SIGRTMIN+$(((0 << 3) | monitor_num ))" waybar
-          else
-            # If the last workspace on this monitor was an auto hide workspace
-            if [[ ${
-              concatMapStringsSep " || " (
-                workspace: "$last_workspace_name == \"${workspace}\""
-              ) cfg.autoHideWorkspaces
-            } ]] || [[ ''${waybar_schedule_monitor_unhide["$focused_monitor"]:-false} == "true" ]]; then
-              fullscreen_mode=$(${hyprctl} workspaces -j | ${jaq} -r "first(.[] | select(.name == \"$workspace_name\") | .fullscreenMode)")
-              # if active workspace is not maximised fullscreen
-              if [[ $fullscreen_mode != "2" ]]; then
-                # unhide the bar
-                systemctl kill --user --signal="SIGRTMIN+$(((1 << 3) | monitor_num ))" waybar
-                waybar_schedule_monitor_unhide["$focused_monitor"]=false
+          -- Auto hide/show the bar as the active workspace changes
+          local auto_hide = { ${
+            concatMapStringsSep ", " (workspace: ''["${workspace}"] = true'') cfg.autoHideWorkspaces
+          } }
+          local last = {}
+          local scheduled = {}
+
+          hl.on("workspace.active", function(ws)
+            local mon = ws.monitor
+            if mon == nil then return end
+            local out = output[mon.name]
+            if out == nil then return end
+
+            local prev = last[mon.name]
+            last[mon.name] = ws.name
+
+            if auto_hide[ws.name] then
+              signal(out, 0) -- hide the bar
+            elseif auto_hide[prev] or scheduled[mon.name] then
+              -- don't unhide over a maximised-fullscreen window; defer instead
+              if ws.fullscreen_mode == 2 then
+                scheduled[mon.name] = true
               else
-                waybar_schedule_monitor_unhide["$focused_monitor"]=true
-              fi
-            fi
-          fi
-        '';
+                signal(out, 1) -- unhide the bar
+                scheduled[mon.name] = false
+              end
+            end
+          end)
+        end
+      '';
   };
 }

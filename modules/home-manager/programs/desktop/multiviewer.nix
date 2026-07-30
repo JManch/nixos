@@ -339,7 +339,11 @@ in
 
   ns.desktop = {
     services.waybar.autoHideWorkspaces = [ "F1" ];
-    hyprland.namedWorkspaces.F1 = "decorate:false, rounding:false, border:false";
+    hyprland.namedWorkspaces.F1 = {
+      decorate = false;
+      no_rounding = true;
+      no_border = true;
+    };
 
     hyprland.windowRules = {
       "multiviewer-windows" = {

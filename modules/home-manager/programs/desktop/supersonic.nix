@@ -49,9 +49,10 @@
   ns.desktop = {
     services.playerctl.musicPlayers = lib.mkBefore [ "Supersonic" ];
 
-    hyprland.settings.windowrule = [
-      "match:initial_title Supersonic, workspace special:music silent"
-    ];
+    hyprland.extraConf = # lua
+      ''
+        hl.window_rule({ match = { initial_title = "Supersonic" }, workspace = "special:music silent" })
+      '';
   };
 
   ns.persistence.directories = [

@@ -5,9 +5,10 @@
   osConfig,
 }:
 let
-  inherit (lib) ns mkIf;
-  inherit (lib.${ns}) isHyprland getMonitorHyprlandCfgStr;
+  inherit (lib) ns mkIf generators;
+  inherit (lib.${ns}) isHyprland getHyprlandMonitorConfig;
   inherit (osConfig.${ns}.core.device) primaryMonitor;
+  toLuaInline = generators.toLua { multiline = false; };
 in
 {
   home.packages = [
@@ -30,26 +31,40 @@ in
     gameClasses = [ "osu!" ];
     gamemode.profiles.osu = mkIf (isHyprland config) {
       start."tablet" = ''
-        hyprctl --instance 0 --batch "\
-          keyword monitor ${
-            getMonitorHyprlandCfgStr (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
-          }; \
-          keyword input:tablet:region_position 0 0; \
-          keyword input:tablet:region_size 0 0; \
-          keyword input:tablet:active_area_size 96 54; \
-          keyword input:tablet:active_area_position 28 20.5; \
-          keyword input:tablet:output '${primaryMonitor.name}'; \
-        "
+        hyprctl --instance 0 eval '
+          hl.monitor(${
+            toLuaInline (
+              getHyprlandMonitorConfig (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
+            )
+          })
+          hl.config({
+            input = {
+              tablet = {
+                region_position = "0 0",
+                region_size = "0 0",
+                active_area_size = "96 54",
+                active_area_position = "28 20.5",
+                output = "${primaryMonitor.name}",
+              },
+            },
+          })
+        ' >/dev/null
       '';
 
       # FIX: Hyprland bug: active_area_size cannot be reset by setting it to 0 0
       stop."tablet" = ''
-        hyprctl --instance 0 --batch "\
-          keyword monitor ${getMonitorHyprlandCfgStr primaryMonitor}; \
-          keyword input:tablet:active_area_size 152 95; \
-          keyword input:tablet:active_area_position 0 0; \
-          keyword input:tablet:output current; \
-        "
+        hyprctl --instance 0 eval '
+          hl.monitor(${toLuaInline (getHyprlandMonitorConfig primaryMonitor)})
+          hl.config({
+            input = {
+              tablet = {
+                active_area_size = "152 95",
+                active_area_position = "0 0",
+                output = "current",
+              },
+            },
+          })
+        ' >/dev/null
       '';
     };
   };

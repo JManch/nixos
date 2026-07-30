@@ -1,17 +1,15 @@
 {
   lib,
   pkgs,
-  config,
   osConfig,
 }:
 let
   inherit (lib)
     ns
-    mkIf
     getExe
     getExe'
     ;
-  inherit (lib.${ns}) sliceSuffix isHyprland;
+  inherit (lib.${ns}) sliceSuffix mkHyprExec;
   inherit (osConfig.${ns}.core.device) primaryMonitor;
 in
 {
@@ -27,9 +25,6 @@ in
 
     Service = {
       Slice = "app${sliceSuffix osConfig}.slice";
-      ExacStartPre = mkIf (isHyprland config) "${pkgs.writeShellScript "wayvnc-pre-start" ''
-        ${getExe' pkgs.hyprland "hyprctl"} --instance 0 keyword animations:enabled false
-      ''}";
       ExecStart = "${getExe pkgs.wayvnc} --output=${primaryMonitor.name} --gpu --log-level info";
     };
   };
@@ -67,6 +62,6 @@ in
   # Since VNC clients usually have a button for this key combination and we
   # don't use it for anything else
   ns.desktop.hyprland.binds = [
-    "ALTCONTROL, Delete, exec, ${getExe' pkgs.wayvnc "wayvncctl"} output-cycle"
+    (mkHyprExec "" "ALT + CONTROL + Delete" "${getExe' pkgs.wayvnc "wayvncctl"} output-cycle")
   ];
 }

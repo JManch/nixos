@@ -314,10 +314,10 @@ in
       ${ns}.desktop.hyprland =
 
         let
-          inherit (hyprland) modKey namedWorkspaceIDs;
+          inherit (hyprland) namedWorkspaceIDs;
         in
         {
-          namedWorkspaces.VM = "monitor:${primaryMonitor.name}";
+          namedWorkspaces."VM".monitor = primaryMonitor.name;
 
           windowRules."vm-window" = {
             matchers.class = "\\.qemu.*|\\.virt-manager-wrapped";
@@ -330,16 +330,15 @@ in
             };
           };
 
-          settings = {
-            bind = [
-              "${modKey}, V, workspace, ${namedWorkspaceIDs.VM}"
-              "${modKey}SHIFT, V, movetoworkspace, ${namedWorkspaceIDs.VM}"
-            ];
+          binds = [
+            (lib.${ns}.mkHyprBind "mod" "V" "hl.dsp.focus({ workspace = ${namedWorkspaceIDs.VM} })")
+            (lib.${ns}.mkHyprBind "mod_shift" "V" "hl.dsp.window.move({ workspace = ${namedWorkspaceIDs.VM} })")
+          ];
 
-            windowrule = [
-              "match:class aquamarine, workspace ${namedWorkspaceIDs.VM} silent"
-            ];
-          };
+          extraConf = # lua
+            ''
+              hl.window_rule({ match = { class = "aquamarine" }, workspace = "${namedWorkspaceIDs.VM} silent" })
+            '';
         };
     };
 
@@ -388,9 +387,7 @@ in
         }
       '';
 
-    systemd.tmpfiles.rules = [
-      "d /tmp/tmp-vms 0777 root root - -"
-    ];
+    systemd.tmpfiles.rules = [ "d /tmp/tmp-vms 0777 root root - -" ];
 
     ns.persistence.directories = [ "/var/lib/libvirt" ];
   })

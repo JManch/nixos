@@ -15,7 +15,6 @@
       xdg.lowercaseUserDirs = true;
 
       hyprland = {
-        plugins = false;
         tearing = true;
         directScanout = false;
         logging = false;

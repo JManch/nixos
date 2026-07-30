@@ -17,7 +17,7 @@ let
     optionalString
     mkEnableOption
     ;
-  inherit (lib.${ns}) sliceSuffix;
+  inherit (lib.${ns}) sliceSuffix mkHyprBind mkHyprExec;
   inherit (config.${ns}) desktop;
   inherit (config.home) homeDirectory;
   inherit (config.${ns}.programs.desktop) mpv;
@@ -319,33 +319,27 @@ in
   ];
 
   ns.desktop.hyprland = {
-    binds =
-      let
-        inherit (desktop.hyprland) modKey;
-      in
-      [
-        "${modKey}, Backspace, exec, app2unit -t service firefox.desktop"
-        "${modKey}SHIFT, Backspace, workspace, emptym"
-        "${modKey}SHIFT, Backspace, exec, app2unit -t service firefox.desktop"
-      ];
-
-    settings.windowrule = [
-      "match:class firefox, scroll_touchpad 0.6"
-      "match:class firefox, match:float true, center true, size monitor_w*0.75 monitor_h*0.75"
-      "match:class firefox, match:title Extension: \\(Bitwarden Password Manager\\) - Bitwarden — Mozilla Firefox, no_screen_share true"
+    binds = [
+      (mkHyprExec "mod" "Backspace" "app2unit -t service firefox.desktop")
+      (mkHyprBind "mod_shift" "Backspace" ''hl.dsp.focus({ workspace = "emptym" })'')
+      (mkHyprExec "mod_shift" "Backspace" "app2unit -t service firefox.desktop")
     ];
 
-    eventScripts.windowtitlev2 = # bash
+    extraConf = # lua
       ''
-        # float bitwarden extension window
-        if [[ "''${args[1]}" == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" ]]; then
-          hyprctl --batch "\
-            dispatch focuswindow address:0x''${args[0]}; \
-            dispatch setfloating address:0x''${args[0]}; \
-            dispatch resizewindowpixel exact 20% 50%, address:0x''${args[0]}; \
-            dispatch centerwindow; \
-          "
-        fi
+        hl.window_rule({ match = { class = "firefox" }, scroll_touchpad = 0.6 })
+        hl.window_rule({ match = { class = "firefox", float = true }, center = true, size = "monitor_w*0.75 monitor_h*0.75" })
+        hl.window_rule({ match = { class = "firefox", title = "Extension: \\(Bitwarden Password Manager\\) - Bitwarden — Mozilla Firefox" }, no_screen_share = true })
+
+        -- float bitwarden extension window
+        hl.on("window.title", function(w)
+          if w ~= nil and w.title == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" then
+            hl.dispatch(hl.dsp.focus({ window = w }))
+            hl.dispatch(hl.dsp.window.float({ action = "enable", window = w }))
+            hl.dispatch(hl.dsp.window.resize({ x = "20%", y = "50%", relative = false, window = w }))
+            hl.dispatch(hl.dsp.window.center({ window = w }))
+          end
+        end)
       '';
   };
 }

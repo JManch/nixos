@@ -266,10 +266,10 @@ in
   ns.hm = mkIf home-manager.enable {
     ${ns}.desktop =
       let
-        inherit (config.${ns}.hmNs.desktop.hyprland) modKey namedWorkspaceIDs;
+        inherit (config.${ns}.hmNs.desktop.hyprland) namedWorkspaceIDs;
       in
       {
-        hyprland.namedWorkspaces.VR = "monitor:${primaryMonitor.name}";
+        hyprland.namedWorkspaces."VR".monitor = primaryMonitor.name;
 
         hyprland.windowRules."monado-vr-mirror" = {
           matchers.class = "monado-service";
@@ -279,12 +279,12 @@ in
           };
         };
 
-        hyprland.settings = {
-          bind = [
-            "${modKey}, Grave, workspace, ${namedWorkspaceIDs.VR}"
-            "${modKey}SHIFT, Grave, movetoworkspace, ${namedWorkspaceIDs.VR}"
-          ];
-        };
+        hyprland.binds = [
+          (lib.${ns}.mkHyprBind "mod" "Grave" "hl.dsp.focus({ workspace = ${namedWorkspaceIDs.VR} })")
+          (lib.${ns}.mkHyprBind "mod_shift" "Grave"
+            "hl.dsp.window.move({ workspace = ${namedWorkspaceIDs.VR} })"
+          )
+        ];
       };
   };
 }

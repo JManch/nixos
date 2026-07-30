@@ -30,7 +30,7 @@ let
     types
     mkAliasOptionModule
     ;
-  inherit (lib.${ns}) addPatches sliceSuffix wrapAlacrittyOpaque;
+  inherit (lib.${ns}) addPatches sliceSuffix wrapAlacrittyOpaque mkHyprExec;
   inherit (config.${ns}) desktop;
   inherit (osConfig.${ns}.core.device) hassIntegration;
   inherit (osConfig.${ns}.core.time-zone) coordinates;
@@ -223,7 +223,7 @@ in
   };
 
   ns.desktop.hyprland.binds = [
-    "${desktop.hyprland.modKey}SHIFT, C, exec, ${getExe darkman.package} toggle"
+    (mkHyprExec "mod_shift" "C" "${getExe darkman.package} toggle")
   ];
 
   systemd.user.services.darkman-luminence-switcher = mkIf (cfg.switchMethod == "hass") {

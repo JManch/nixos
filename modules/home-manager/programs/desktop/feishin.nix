@@ -33,9 +33,10 @@ in
       KillMode=mixed
     '';
 
-    hyprland.settings.windowrule = [
-      "match:class feishin, workspace special:scratch2 silent"
-    ];
+    hyprland.extraConf = # lua
+      ''
+        hl.window_rule({ match = { class = "feishin" }, workspace = "special:scratch2 silent" })
+      '';
   };
 
   ns.persistence.directories = [ ".config/feishin" ];

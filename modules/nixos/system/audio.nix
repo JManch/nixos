@@ -24,7 +24,7 @@ let
     optionals
     hiPrio
     ;
-  inherit (lib.${ns}) wrapHyprlandMoveToActive mkHyprlandCenterFloatRule throttleHyprlandRepeatBind;
+  inherit (lib.${ns}) wrapHyprlandMoveToActive mkHyprlandCenterFloatRule throttleHyprlandRepeatBind mkHyprBind mkHyprExec;
   inherit (config.${ns}.core) home-manager device;
   inherit (config.${ns}.system) desktop;
   inherit (config.${ns}.hardware) raspberry-pi;
@@ -380,21 +380,17 @@ in
             pavucontrol = mkHyprlandCenterFloatRule "org\\.pulseaudio\\.pavucontrol" 60 60;
           };
 
-          hyprland.settings = {
-            binde = [
-              ", XF86AudioRaiseVolume, exec, ${modifyVolume} 5%+"
-              ", XF86AudioLowerVolume, exec, ${modifyVolume} 5%-"
-            ];
+          hyprland.binds = [
+            (mkHyprBind "" "XF86AudioRaiseVolume" ''hl.dsp.exec_cmd("${modifyVolume} 5%+"), { repeating = true }'')
+            (mkHyprBind "" "XF86AudioLowerVolume" ''hl.dsp.exec_cmd("${modifyVolume} 5%-"), { repeating = true }'')
 
-            bind = [
-              ", XF86AudioMute, exec, ${toggleAudioMute} sink"
-              ", XF86AudioMicMute, exec, ${toggleAudioMute} source"
-              "${hyprland.modKey}SHIFTCONTROL, XF86AudioRaiseVolume, exec, ${modifyFocusedWindowVolume} 5%+"
-              "${hyprland.modKey}SHIFTCONTROL, XF86AudioLowerVolume, exec, ${modifyFocusedWindowVolume} 5%-"
-            ];
+            (mkHyprExec "" "XF86AudioMute" "${toggleAudioMute} sink")
+            (mkHyprExec "" "XF86AudioMicMute" "${toggleAudioMute} source")
+            (mkHyprExec "mod_shift_ctrl" "XF86AudioRaiseVolume" "${modifyFocusedWindowVolume} 5%+")
+            (mkHyprExec "mod_shift_ctrl" "XF86AudioLowerVolume" "${modifyFocusedWindowVolume} 5%-")
 
-            bindr = [ "${hyprland.modKey}ALT, ALT_L, exec, ${toggleAudioMute} source" ];
-          };
+            (mkHyprBind "mod" "ALT + ALT_L" ''hl.dsp.exec_cmd("${toggleAudioMute} source"), { release = true }'')
+          ];
         };
       };
 

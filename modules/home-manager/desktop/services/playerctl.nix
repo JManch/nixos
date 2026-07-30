@@ -13,6 +13,7 @@ let
     getExe
     toSentenceCase
     ;
+  inherit (lib.${ns}) mkHyprBind mkHyprExec;
   inherit (cfg) musicPlayers;
   playerctl = getExe pkgs.playerctl;
 
@@ -83,31 +84,23 @@ in
       (sleep 30 && playerctl --all-players pause) &
     '';
 
-    hyprland.settings =
-      let
-        inherit (config.${ns}.desktop.hyprland) modKey;
-      in
-      {
-        bindr = [
-          "${modKey}, ${modKey}_R, exec, ${playerctl} play-pause --player ${musicPlayers}"
-          "${modKey}SHIFT, ${modKey}_R, exec, ${playerctl} play-pause --ignore-player ${musicPlayers}"
-        ];
+    hyprland.binds = [
+      (mkHyprExec "mod" "Period" "${playerctl} next --player ${musicPlayers}")
+      (mkHyprExec "mod" "Comma" "${playerctl} previous --player ${musicPlayers}")
+      (mkHyprExec "" "XF86AudioNext" "${playerctl} next")
+      (mkHyprExec "" "XF86AudioPrev" "${playerctl} previous")
+      (mkHyprExec "" "XF86AudioPlay" "${playerctl} play-pause")
+      (mkHyprExec "" "XF86AudioPause" "${playerctl} pause")
+      (mkHyprBind "mod" "XF86AudioRaiseVolume" ''hl.dsp.exec_cmd("${getExe (modifyPlayerVolume true)} 5"), { repeating = true }'')
+      (mkHyprBind "mod" "XF86AudioLowerVolume" ''hl.dsp.exec_cmd("${getExe (modifyPlayerVolume true)} -5"), { repeating = true }'')
+      (mkHyprBind "mod_shift" "XF86AudioRaiseVolume" ''hl.dsp.exec_cmd("${getExe (modifyPlayerVolume false)} 5"), { repeating = true }'')
+      (mkHyprBind "mod_shift" "XF86AudioLowerVolume" ''hl.dsp.exec_cmd("${getExe (modifyPlayerVolume false)} -5"), { repeating = true }'')
+    ];
 
-        bind = [
-          "${modKey}, Period, exec, ${playerctl} next --player ${musicPlayers}"
-          "${modKey}, Comma, exec, ${playerctl} previous --player ${musicPlayers}"
-          ", XF86AudioNext, exec, ${playerctl} next"
-          ", XF86AudioPrev, exec, ${playerctl} previous"
-          ", XF86AudioPlay, exec, ${playerctl} play-pause"
-          ", XF86AudioPause, exec, ${playerctl} pause"
-        ];
-
-        binde = [
-          "${modKey}, XF86AudioRaiseVolume, exec, ${getExe (modifyPlayerVolume true)} 5"
-          "${modKey}, XF86AudioLowerVolume, exec, ${getExe (modifyPlayerVolume true)} -5"
-          "${modKey}SHIFT, XF86AudioRaiseVolume, exec, ${getExe (modifyPlayerVolume false)} 5"
-          "${modKey}SHIFT, XF86AudioLowerVolume, exec, ${getExe (modifyPlayerVolume false)} -5"
-        ];
-      };
+    hyprland.extraConf = # lua
+      ''
+        hl.bind(mod .. " + " .. mod .. "_R", hl.dsp.exec_cmd("${playerctl} play-pause --player ${musicPlayers}"), { release = true })
+        hl.bind(mod_shift .. " + " .. mod .. "_R", hl.dsp.exec_cmd("${playerctl} play-pause --ignore-player ${musicPlayers}"), { release = true })
+      '';
   };
 }

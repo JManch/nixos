@@ -14,10 +14,9 @@ in
   # - Add non-steam game pointing to .local/share/Steam/steamapps/common/BeamNG.drive/BinLinux/BeamNG.drive.x64
   # - Set compatibilty tool to steam linux runtime 3.0
   categoryConfig = {
-    gameClasses = [ "BeamNG\\.drive - .*" ];
+    gameClasses = [ "BeamNG\\.drive" ];
     tearingExcludedClasses = [
-      # TODO: Add wayland proton class
-      "BeamNG\\.drive - .*" # native linux version
+      "BeamNG\\.drive" # native linux version
     ];
   };
 

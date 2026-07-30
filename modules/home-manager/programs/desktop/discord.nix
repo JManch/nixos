@@ -6,9 +6,10 @@
     # (vesktop.override { withMiddleClickScroll = true; })
   ];
 
-  ns.desktop.hyprland.settings.windowrule = [
-    "match:class vesktop|discord, workspace special:scratch3 silent"
-  ];
+  ns.desktop.hyprland.extraConf = # lua
+    ''
+      hl.window_rule({ match = { class = "vesktop|discord" }, workspace = "special:scratch3 silent" })
+    '';
 
   # Electron apps core dump on exit with the default KillMode control-group.
   # This causes compositor exit to get delayed so just aggressively kill

@@ -10,19 +10,20 @@ let
     mkForce
     replaceStrings
     optional
-    optionalString
     optionalAttrs
     boolToString
     mkEnableOption
     max
     mod
+    generators
     ;
   inherit (lib.${ns})
     isHyprland
     sliceSuffix
     flakePkgs
-    getMonitorHyprlandCfgStr
+    getHyprlandMonitorConfig
     ;
+  toLuaInline = generators.toLua { multiline = false; };
 in
 [
   {
@@ -56,33 +57,40 @@ in
         inherit (config.${ns}.core.device) primaryMonitor;
 
         settings = start: ''
-          hyprctl --instance 0 --batch "\
-            keyword unbind ${hyprland.modKey}${optionalString (!start) "SHIFTCONTROL"}, W; \
-            keyword bind ${hyprland.modKey}${optionalString start "SHIFTCONTROL"}, W, killactive; \
-            keyword decoration:blur:enabled ${if start then "false" else boolToString hyprland.blur}; \
-            keyword render:direct_scanout ${
-              if start then (if hyprland.directScanout then "1" else "0") else "0"
-            }"
+          hyprctl --instance 0 eval '
+            hl.unbind(${if start then "mod" else "mod_shift_ctrl"} .. " + ${hyprland.killActiveKey}")
+            hl.bind(${
+              if start then "mod_shift_ctrl" else "mod"
+            } .. " + ${hyprland.killActiveKey}", hl.dsp.window.close())
+            hl.config({
+              decoration = { blur = { enabled = ${if start then "false" else boolToString hyprland.blur} } },
+              render = { direct_scanout = ${if start then boolToString hyprland.directScanout else "false"} },
+            })
+          ' >/dev/null
         '';
 
         monitor = start: ''
-          hyprctl --instance 0 keyword monitor ${
-            getMonitorHyprlandCfgStr (
-              primaryMonitor // optionalAttrs start { refreshRate = primaryMonitor.gamingRefreshRate; }
+          hyprctl --instance 0 eval 'hl.monitor(${
+            toLuaInline (
+              getHyprlandMonitorConfig (
+                primaryMonitor // optionalAttrs start { refreshRate = primaryMonitor.gamingRefreshRate; }
+              )
             )
-          }
+          })' >/dev/null
         '';
 
         # Set refresh to highest supported multiple of 60
         monitor-60 = start: ''
-          hyprctl --instance 0 keyword monitor ${
-            getMonitorHyprlandCfgStr (
-              primaryMonitor
-              // optionalAttrs start {
-                refreshRate = max 60 (primaryMonitor.gamingRefreshRate - mod primaryMonitor.gamingRefreshRate 60);
-              }
+          hyprctl --instance 0 eval 'hl.monitor(${
+            toLuaInline (
+              getHyprlandMonitorConfig (
+                primaryMonitor
+                // optionalAttrs start {
+                  refreshRate = max 60 (primaryMonitor.gamingRefreshRate - mod primaryMonitor.gamingRefreshRate 60);
+                }
+              )
             )
-          }
+          })' >/dev/null
         '';
       in
       {

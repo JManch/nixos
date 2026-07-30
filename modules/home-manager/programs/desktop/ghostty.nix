@@ -5,6 +5,7 @@
 }:
 let
   inherit (lib) ns mkIf hiPrio;
+  inherit (lib.${ns}) mkHyprBind mkHyprExec;
   inherit (config.${ns}) desktop core;
   desktopId = "com.mitchellh.ghostty";
 
@@ -68,8 +69,8 @@ in
   xdg.configFile."ghostty/themes/base16-light".text = mkTheme "light";
 
   ns.desktop.hyprland.binds = mkIf (desktop.terminal == desktopId) [
-    "${desktop.hyprland.modKey}, Return, exec, app2unit -t service ${desktopId}.desktop"
-    "${desktop.hyprland.modKey}SHIFT, Return, workspace, emptym"
-    "${desktop.hyprland.modKey}SHIFT, Return, exec, app2unit -t service ${desktopId}.desktop"
+    (mkHyprExec "mod" "Return" "app2unit -t service ${desktopId}.desktop")
+    (mkHyprBind "mod_shift" "Return" ''hl.dsp.focus({ workspace = "emptym" })'')
+    (mkHyprExec "mod_shift" "Return" "app2unit -t service ${desktopId}.desktop")
   ];
 }

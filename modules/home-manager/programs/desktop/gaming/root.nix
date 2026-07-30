@@ -82,12 +82,14 @@ in
 
   ns.desktop.hyprland =
     let
-      inherit (hyprland) modKey namedWorkspaceIDs;
+      inherit (hyprland) namedWorkspaceIDs;
       concatRegex = regexes: "${concatStringsSep "|" regexes}";
       gameClassRegex = concatRegex cfg.gameClasses;
     in
     {
-      namedWorkspaces.GAME = "monitor:${primaryMonitor.name}";
+      namedWorkspaces.GAME = {
+        monitor = primaryMonitor.name;
+      };
 
       windowRules = {
         "x11-game-workspace" = {
@@ -113,9 +115,9 @@ in
         };
       };
 
-      settings.bind = [
-        "${modKey}, G, workspace, ${namedWorkspaceIDs.GAME}"
-        "${modKey}SHIFT, G, movetoworkspace, ${namedWorkspaceIDs.GAME}"
+      binds = [
+        (lib.${ns}.mkHyprBind "mod" "G" ''hl.dsp.focus({ workspace = ${namedWorkspaceIDs.GAME} })'')
+        (lib.${ns}.mkHyprBind "mod_shift" "G" ''hl.dsp.window.move({ workspace = ${namedWorkspaceIDs.GAME} })'')
       ];
     };
 }

@@ -102,9 +102,8 @@ in
       };
     };
 
-  ns.desktop.hyprland.settings =
+  ns.desktop.hyprland.binds =
     let
-      inherit (desktopCfg.hyprland) modKey;
       hyprlandWindowSwitcher = pkgs.writeShellApplication {
         name = "hyprland-fuzzel-window-switcher";
         runtimeInputs = with pkgs; [
@@ -133,11 +132,13 @@ in
         '';
       };
     in
-    {
-      bindr = [ "${modKey}, ${modKey}_L, exec, ${getExe' pkgs.procps "pkill"} fuzzel || fuzzel" ];
-      bind = [
-        "${modKey}, Space, exec, ${getExe' pkgs.procps "pkill"} fuzzel || ${getExe hyprlandWindowSwitcher}"
-      ];
-      layerrule = [ "match:namespace launcher, animation slide" ];
-    };
+    [
+      (lib.${ns}.mkHyprExec "mod" "Space" ''${getExe' pkgs.procps "pkill"} fuzzel || ${getExe hyprlandWindowSwitcher}'')
+    ];
+
+  ns.desktop.hyprland.extraConf = # lua
+    ''
+      hl.bind(mod .. " + " .. mod .. "_L", hl.dsp.exec_cmd("${getExe' pkgs.procps "pkill"} fuzzel || fuzzel"), { release = true })
+      hl.layer_rule({ match = { namespace = "launcher" }, animation = "slide" })
+    '';
 }

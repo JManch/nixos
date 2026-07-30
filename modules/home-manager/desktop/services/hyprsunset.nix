@@ -7,6 +7,7 @@
 }:
 let
   inherit (lib) ns getExe;
+  inherit (lib.${ns}) mkHyprBind mkHyprExec;
 in
 {
   xdg.configFile."hypr/hyprsunset.conf".text = ''
@@ -67,9 +68,8 @@ in
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  ns.desktop.hyprland.settings =
+  ns.desktop.hyprland.binds =
     let
-      inherit (config.${ns}.desktop.hyprland) modKey;
       notify-send = getExe pkgs.libnotify;
 
       modifyGamma = pkgs.writeShellScript "hypr-modify-gamma" ''
@@ -106,30 +106,26 @@ in
       '';
 
     in
-    {
-      bind = [
-        "${modKey}, XF86MonBrightnessUp, exec, ${modifyGamma} 5"
-        "${modKey}, F8, exec, ${modifyGamma} 5"
-        "${modKey}, XF86MonBrightnessDown, exec, ${modifyGamma} -5"
-        "${modKey}, F7, exec, ${modifyGamma} -5"
-        "${modKey}SHIFT, XF86MonBrightnessUp, exec, ${modifyTemperature} +200"
-        "${modKey}SHIFT, F8, exec, ${modifyTemperature} +200"
-        "${modKey}SHIFT, XF86MonBrightnessDown, exec, ${modifyTemperature} -200"
-        "${modKey}SHIFT, F7, exec, ${modifyTemperature} -200"
-      ];
+    [
+      (mkHyprExec "mod" "XF86MonBrightnessUp" "${modifyGamma} 5")
+      (mkHyprExec "mod" "F8" "${modifyGamma} 5")
+      (mkHyprExec "mod" "XF86MonBrightnessDown" "${modifyGamma} -5")
+      (mkHyprExec "mod" "F7" "${modifyGamma} -5")
+      (mkHyprExec "mod_shift" "XF86MonBrightnessUp" "${modifyTemperature} +200")
+      (mkHyprExec "mod_shift" "F8" "${modifyTemperature} +200")
+      (mkHyprExec "mod_shift" "XF86MonBrightnessDown" "${modifyTemperature} -200")
+      (mkHyprExec "mod_shift" "F7" "${modifyTemperature} -200")
 
-      bindo = [
-        # Reset with long press
-        "${modKey}, XF86MonBrightnessUp, exec, ${resetGamma}"
-        "${modKey}, F8, exec, ${resetGamma}"
-        "${modKey}, XF86MonBrightnessDown, exec, ${resetGamma}"
-        "${modKey}, F7, exec, ${resetGamma}"
-        "${modKey}SHIFT, XF86MonBrightnessUp, exec, ${resetTemperature}"
-        "${modKey}SHIFT, F8, exec, ${resetTemperature}"
-        "${modKey}SHIFT, XF86MonBrightnessDown, exec, ${resetTemperature}"
-        "${modKey}SHIFT, F7, exec, ${resetTemperature}"
-      ];
-    };
+      # Reset with long press
+      (mkHyprBind "mod" "XF86MonBrightnessUp" ''hl.dsp.exec_cmd("${resetGamma}"), { long_press = true }'')
+      (mkHyprBind "mod" "F8" ''hl.dsp.exec_cmd("${resetGamma}"), { long_press = true }'')
+      (mkHyprBind "mod" "XF86MonBrightnessDown" ''hl.dsp.exec_cmd("${resetGamma}"), { long_press = true }'')
+      (mkHyprBind "mod" "F7" ''hl.dsp.exec_cmd("${resetGamma}"), { long_press = true }'')
+      (mkHyprBind "mod_shift" "XF86MonBrightnessUp" ''hl.dsp.exec_cmd("${resetTemperature}"), { long_press = true }'')
+      (mkHyprBind "mod_shift" "F8" ''hl.dsp.exec_cmd("${resetTemperature}"), { long_press = true }'')
+      (mkHyprBind "mod_shift" "XF86MonBrightnessDown" ''hl.dsp.exec_cmd("${resetTemperature}"), { long_press = true }'')
+      (mkHyprBind "mod_shift" "F7" ''hl.dsp.exec_cmd("${resetTemperature}"), { long_press = true }'')
+    ];
 
   ns.desktop.programs.locker.postUnlockScript =
     "${lib.getExe' pkgs.hyprland "hyprctl"} hyprsunset reset gamma";

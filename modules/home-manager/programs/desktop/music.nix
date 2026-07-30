@@ -38,5 +38,8 @@ in
 
   ns.programs.shell.qobuz-dl.enable = true;
 
-  ns.desktop.hyprland.settings.windowrule = [ "match:class spek, float true" ];
+  ns.desktop.hyprland.extraConf = # lua
+    ''
+      hl.window_rule({ match = { class = "spek" }, float = true })
+    '';
 }

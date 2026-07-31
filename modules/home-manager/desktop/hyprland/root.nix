@@ -129,9 +129,17 @@ in
     windowRules = mkOption {
       type = with types; attrsOf anything;
       default = { };
+      example = {
+        nautilus-float = {
+          match.class = "org\\.gnome\\.Nautilus";
+          float = true;
+        };
+      };
       description = ''
-        Attribute set of named window rules. Rule `name` will be set to the
-        attribute name.
+        Attribute set of named window rules. Each value is passed straight to
+        the `hl.window_rule` function so it holds a `match` attrset of matchers
+        alongside the rule's effects. Rule `name` will be set to the attribute
+        name.
       '';
     };
 

@@ -270,7 +270,7 @@ in
       windowRules = {
         # https://github.com/hyprwm/Hyprland/issues/6543
         fix-xwayland-drags = {
-          matchers = {
+          match = {
             xwayland = true;
             class = "";
             title = "";
@@ -278,20 +278,20 @@ in
             fullscreen = false;
             pin = false;
           };
-          params.no_focus = true;
+          no_focus = true;
         };
 
         no-gaps-when-only = mkIf cfg.noGapsWhenOnly {
-          matchers.workspace = "w[tv1]s[false]";
-          matchers.float = false;
-          params.border_size = 0;
-          params.rounding = 0;
+          match.workspace = "w[tv1]s[false]";
+          match.float = false;
+          border_size = 0;
+          rounding = 0;
         };
 
         single-window-hide-border = mkIf (!cfg.noGapsWhenOnly) {
-          matchers.float = false;
-          matchers.workspace = "w[t1]s[false]";
-          params.border_size = 0;
+          match.float = false;
+          match.workspace = "w[t1]s[false]";
+          border_size = 0;
         };
       };
 
@@ -373,18 +373,7 @@ in
 
         -- window rules
         ${concatLines (
-          mapAttrsToList (
-            name: v:
-            "hl.window_rule(${
-              toLuaInline (
-                {
-                  inherit name;
-                  match = v.matchers or { };
-                }
-                // (v.params or { })
-              )
-            })"
-          ) cfg.windowRules
+          mapAttrsToList (name: v: "hl.window_rule(${toLuaInline ({ inherit name; } // v)})") cfg.windowRules
         )}
 
         -- monitors

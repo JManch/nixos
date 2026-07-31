@@ -10,12 +10,12 @@
   ];
 
   ns.desktop.hyprland.windowRules."davinci-resolve" = {
-    matchers = {
+    match = {
       class = "resolve";
       title = "negative:resolve|Message";
       float = true;
     };
-    params.size = "monitor_w*0.4 monitor_h*0.4";
-    params.center = true;
+    size = "monitor_w*0.4 monitor_h*0.4";
+    center = true;
   };
 }

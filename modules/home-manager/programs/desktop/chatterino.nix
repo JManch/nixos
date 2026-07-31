@@ -184,88 +184,76 @@ in
 
     hyprland.windowRules = {
       twitch-workspace = {
-        matchers.workspace = twitchWorkspace;
-        params = {
-          tag = "+twitch_unexpected";
-          float = true;
-        };
+        match.workspace = twitchWorkspace;
+        tag = "+twitch_unexpected";
+        float = true;
       };
 
       twitch-workspace-chatterino-main-window = {
-        matchers = {
+        match = {
           workspace = twitchWorkspace;
           class = "com\\.chatterino\\.";
           title = "Chatterino (${replaceStrings [ "." ] [ "\\." ] pkgs.chatterino7.version} -.*|Overlay)";
         };
 
-        params = {
-          border_size = 0;
-          rounding = 0;
-          tag = "-twitch_unexpected";
-          move = "(monitor_w*${chatOffset}/100) 0";
-          size = "(monitor_w*${chatterinoPercentage}/100) monitor_h";
-        };
+        border_size = 0;
+        rounding = 0;
+        tag = "-twitch_unexpected";
+        move = "(monitor_w*${chatOffset}/100) 0";
+        size = "(monitor_w*${chatterinoPercentage}/100) monitor_h";
       };
 
       twitch-workspace-chatterino-usercard = {
-        matchers = {
+        match = {
           workspace = twitchWorkspace;
           class = "com\\.chatterino\\.";
           title = ".* Usercard - .*";
         };
 
-        params = {
-          tag = "-twitch_unexpected";
-          size = "(monitor_w*${chatterinoPercentage}/100) monitor_h*0.33";
-          center = true;
-        };
+        tag = "-twitch_unexpected";
+        size = "(monitor_w*${chatterinoPercentage}/100) monitor_h*0.33";
+        center = true;
       };
 
       twitch-workspace-firefox = {
-        matchers = {
+        match = {
           workspace = twitchWorkspace;
           class = "firefox";
         };
 
-        params = {
-          tag = "-twitch_unexpected";
-          border_size = 0;
-          rounding = 0;
-          move = "(monitor_w*${streamOffset}/100) 0";
-          size = "(monitor_w*${firefoxPercentage}/100) monitor_h";
-        };
+        tag = "-twitch_unexpected";
+        border_size = 0;
+        rounding = 0;
+        move = "(monitor_w*${streamOffset}/100) 0";
+        size = "(monitor_w*${firefoxPercentage}/100) monitor_h";
       };
 
-      mpv.matchers.title = "negative:twitch\\.tv.*";
+      mpv.match.title = "negative:twitch\\.tv.*";
 
       twitch-mpv = {
-        matchers = {
+        match = {
           class = "mpv";
           title = "twitch\\.tv.*";
         };
 
-        params = {
-          tag = "-twitch_unexpected";
-          border_size = 0;
-          rounding = 0;
-          workspace = "${twitchWorkspace} silent";
-          float = true;
-          move = "(monitor_w*${streamOffset}/100) 0";
-          size = "(monitor_w*${firefoxPercentage}/100) monitor_h";
-        };
+        tag = "-twitch_unexpected";
+        border_size = 0;
+        rounding = 0;
+        workspace = "${twitchWorkspace} silent";
+        float = true;
+        move = "(monitor_w*${streamOffset}/100) 0";
+        size = "(monitor_w*${firefoxPercentage}/100) monitor_h";
       };
 
       twitch-unexpected = {
-        matchers = {
+        match = {
           workspace = twitchWorkspace;
           tag = "twitch_unexpected*";
         };
 
-        params = {
-          size = "(monitor_w*0.6) (monitor_h*0.6)";
-          center = true;
-          tag = "-twitch-unexpected";
-        };
+        size = "(monitor_w*0.6) (monitor_h*0.6)";
+        center = true;
+        tag = "-twitch-unexpected";
       };
     };
   };

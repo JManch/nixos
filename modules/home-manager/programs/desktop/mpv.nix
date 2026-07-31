@@ -143,8 +143,8 @@ in
     '';
 
   ns.desktop.hyprland.windowRules."mpv" = {
-    matchers.class = "mpv";
-    params.workspace = "emptym";
+    match.class = "mpv";
+    workspace = "emptym";
   };
 
   ns.persistence.directories = optional cfg.jellyfinShim.enable ".config/jellyfin-mpv-shim";

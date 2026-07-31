@@ -167,26 +167,24 @@ in
 
       desktop.hyprland.windowRules = {
         "steam-main-window" = {
-          matchers.class = "steam";
-          matchers.title = "Steam";
-          params.workspace = "emptym";
+          match.class = "steam";
+          match.title = "Steam";
+          workspace = "emptym";
         };
 
         "steam-sign-in-window" = {
-          matchers.class = "steam";
-          matchers.title = "Sign in to Steam";
-          params.no_initial_focus = true;
-          params.workspace = "special:special silent";
+          match.class = "steam";
+          match.title = "Sign in to Steam";
+          no_initial_focus = true;
+          workspace = "special:special silent";
         };
 
         "steam-friends-list" = {
-          matchers.class = "steam";
-          matchers.title = "Friends List";
-          params = {
-            float = true;
-            size = "monitor_w*0.15 monitor_h*0.4";
-            center = true;
-          };
+          match.class = "steam";
+          match.title = "Friends List";
+          float = true;
+          size = "monitor_w*0.15 monitor_h*0.4";
+          center = true;
         };
       };
 

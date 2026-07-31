@@ -320,14 +320,12 @@ in
           namedWorkspaces."VM".monitor = primaryMonitor.name;
 
           windowRules."vm-window" = {
-            matchers.class = "\\.qemu.*|\\.virt-manager-wrapped";
-            params = {
-              workspace = "${namedWorkspaceIDs.VM} silent";
-              float = true;
-              size = "monitor_w*0.8 monitor_h*0.8";
-              center = true;
-              keep_aspect_ratio = true;
-            };
+            match.class = "\\.qemu.*|\\.virt-manager-wrapped";
+            workspace = "${namedWorkspaceIDs.VM} silent";
+            float = true;
+            size = "monitor_w*0.8 monitor_h*0.8";
+            center = true;
+            keep_aspect_ratio = true;
           };
 
           binds = [

@@ -93,31 +93,31 @@ in
 
       windowRules = {
         "x11-game-workspace" = {
-          matchers.class = gameClassRegex;
-          params = {
-            workspace = namedWorkspaceIDs.GAME;
-            content = "game";
-          };
+          match.class = gameClassRegex;
+          workspace = namedWorkspaceIDs.GAME;
+          content = "game";
         };
 
         "game-workspace" = {
-          matchers.content = 3;
-          params.workspace = namedWorkspaceIDs.GAME;
+          match.content = 3;
+          workspace = namedWorkspaceIDs.GAME;
         };
 
         "game-tearing" = mkIf hyprland.tearing {
-          matchers = {
+          match = {
             content = 3; # 3 is game
             class = "negative:${concatRegex cfg.tearingExcludedClasses}";
             title = "negative:${concatRegex cfg.tearingExcludedClasses}";
           };
-          params.immediate = true;
+          immediate = true;
         };
       };
 
       binds = [
-        (lib.${ns}.mkHyprBind "mod" "G" ''hl.dsp.focus({ workspace = ${namedWorkspaceIDs.GAME} })'')
-        (lib.${ns}.mkHyprBind "mod_shift" "G" ''hl.dsp.window.move({ workspace = ${namedWorkspaceIDs.GAME} })'')
+        (lib.${ns}.mkHyprBind "mod" "G" "hl.dsp.focus({ workspace = ${namedWorkspaceIDs.GAME} })")
+        (lib.${ns}.mkHyprBind "mod_shift" "G"
+          "hl.dsp.window.move({ workspace = ${namedWorkspaceIDs.GAME} })"
+        )
       ];
     };
 }

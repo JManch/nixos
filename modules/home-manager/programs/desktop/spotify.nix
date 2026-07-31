@@ -21,9 +21,9 @@
 
   ns.desktop = {
     hyprland.windowRules."spotify" = {
-      matchers.initial_title = "Spotify( Premium)?";
-      params.border_color = "0xff1ED760";
-      params.workspace = "special:scratch2 silent";
+      match.initial_title = "Spotify( Premium)?";
+      border_color = "0xff1ED760";
+      workspace = "special:scratch2 silent";
     };
 
     services.playerctl.musicPlayers = [ "spotify" ];

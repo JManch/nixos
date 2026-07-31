@@ -272,11 +272,9 @@ in
         hyprland.namedWorkspaces."VR".monitor = primaryMonitor.name;
 
         hyprland.windowRules."monado-vr-mirror" = {
-          matchers.class = "monado-service";
-          params = {
-            workspace = "${namedWorkspaceIDs.VR} silent";
-            center = true;
-          };
+          match.class = "monado-service";
+          workspace = "${namedWorkspaceIDs.VR} silent";
+          center = true;
         };
 
         hyprland.binds = [

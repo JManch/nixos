@@ -23,12 +23,10 @@ in
 
   ns.hm = mkIf home-manager.enable {
     ${ns}.desktop.hyprland.windowRules."waydroid" = {
-      matchers.class = "Waydroid";
-      params = {
-        float = true;
-        center = true;
-        keep_aspect_ratio = true;
-      };
+      match.class = "Waydroid";
+      float = true;
+      center = true;
+      keep_aspect_ratio = true;
     };
   };
 

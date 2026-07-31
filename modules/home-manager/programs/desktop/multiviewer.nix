@@ -347,19 +347,17 @@ in
 
     hyprland.windowRules = {
       "multiviewer-windows" = {
-        matchers.class = "MultiViewer";
-        params.float = true;
-        params.workspace = namedWorkspaceIDs.F1;
+        match.class = "MultiViewer";
+        float = true;
+        workspace = namedWorkspaceIDs.F1;
       };
 
       "multiviewer-track-map" = {
-        matchers.class = "MultiViewer";
-        matchers.title = "Track Map.*";
-        params = {
-          xray = false;
-          no_blur = true;
-          border_size = 0;
-        };
+        match.class = "MultiViewer";
+        match.title = "Track Map.*";
+        xray = false;
+        no_blur = true;
+        border_size = 0;
       };
     };
 

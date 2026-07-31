@@ -13,15 +13,15 @@
 
   ns.desktop.hyprland.windowRules = {
     "nautilus-float" = {
-      matchers.class = "org\\.gnome\\.Nautilus";
-      params.float = true;
+      match.class = "org\\.gnome\\.Nautilus";
+      float = true;
     };
 
     "nautilus-resize" = {
-      matchers.class = "org\\.gnome\\.Nautilus";
-      matchers.title = "negative:Properties";
-      params.size = "monitor_w*0.6 monitor_h*0.6";
-      params.center = true;
+      match.class = "org\\.gnome\\.Nautilus";
+      match.title = "negative:Properties";
+      size = "monitor_w*0.6 monitor_h*0.6";
+      center = true;
     };
   };
 }

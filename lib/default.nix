@@ -427,12 +427,10 @@ in
       false;
 
     mkHyprlandCenterFloatRule = class: widthPercentage: heightPercentage: {
-      matchers.class = class;
-      params = {
-        float = true;
-        size = "(monitor_w*${toString widthPercentage}/100) (monitor_h*${toString heightPercentage}/100)";
-        center = true;
-      };
+      match.class = class;
+      float = true;
+      size = "(monitor_w*${toString widthPercentage}/100) (monitor_h*${toString heightPercentage}/100)";
+      center = true;
     };
 
     mkHyprBind =

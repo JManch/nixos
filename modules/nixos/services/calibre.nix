@@ -14,14 +14,6 @@ let
   inherit (lib.${ns}) addPatches hardeningBaseline;
 in
 {
-  conditions = [
-    (
-      assert lib.assertMsg (
-        pkgs.python3Packages.pip-chill.version == "1.0.3"
-      ) "calibre-web can be re-enabled";
-      false
-    )
-  ];
   requirements = [ "services.caddy" ];
 
   opts = with lib; {

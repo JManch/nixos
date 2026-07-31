@@ -230,7 +230,7 @@ in
 
       mpv.match.title = "negative:twitch\\.tv.*";
 
-      twitch-mpv = {
+      twitch-workspace-mpv = {
         match = {
           class = "mpv";
           title = "twitch\\.tv.*";
@@ -253,7 +253,6 @@ in
 
         size = "(monitor_w*0.6) (monitor_h*0.6)";
         center = true;
-        tag = "-twitch-unexpected";
       };
     };
   };

@@ -2,7 +2,6 @@
   lib,
   args,
   pkgs,
-  config,
   osConfig,
 }:
 let
@@ -119,11 +118,17 @@ in
       # Reset with long press
       (mkHyprBind "mod" "XF86MonBrightnessUp" ''hl.dsp.exec_cmd("${resetGamma}"), { long_press = true }'')
       (mkHyprBind "mod" "F8" ''hl.dsp.exec_cmd("${resetGamma}"), { long_press = true }'')
-      (mkHyprBind "mod" "XF86MonBrightnessDown" ''hl.dsp.exec_cmd("${resetGamma}"), { long_press = true }'')
+      (mkHyprBind "mod" "XF86MonBrightnessDown"
+        ''hl.dsp.exec_cmd("${resetGamma}"), { long_press = true }''
+      )
       (mkHyprBind "mod" "F7" ''hl.dsp.exec_cmd("${resetGamma}"), { long_press = true }'')
-      (mkHyprBind "mod_shift" "XF86MonBrightnessUp" ''hl.dsp.exec_cmd("${resetTemperature}"), { long_press = true }'')
+      (mkHyprBind "mod_shift" "XF86MonBrightnessUp"
+        ''hl.dsp.exec_cmd("${resetTemperature}"), { long_press = true }''
+      )
       (mkHyprBind "mod_shift" "F8" ''hl.dsp.exec_cmd("${resetTemperature}"), { long_press = true }'')
-      (mkHyprBind "mod_shift" "XF86MonBrightnessDown" ''hl.dsp.exec_cmd("${resetTemperature}"), { long_press = true }'')
+      (mkHyprBind "mod_shift" "XF86MonBrightnessDown"
+        ''hl.dsp.exec_cmd("${resetTemperature}"), { long_press = true }''
+      )
       (mkHyprBind "mod_shift" "F7" ''hl.dsp.exec_cmd("${resetTemperature}"), { long_press = true }'')
     ];
 

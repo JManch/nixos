@@ -328,7 +328,6 @@ in
     extraConf = # lua
       ''
         hl.window_rule({ match = { class = "firefox" }, scroll_touchpad = 0.6 })
-        hl.window_rule({ match = { class = "firefox", float = true }, center = true, size = "monitor_w*0.75 monitor_h*0.75" })
         hl.window_rule({ match = { class = "firefox", title = "Extension: \\(Bitwarden Password Manager\\) - Bitwarden — Mozilla Firefox" }, no_screen_share = true })
 
         -- float bitwarden extension window
@@ -336,8 +335,10 @@ in
           if w ~= nil and w.title == "Extension: (Bitwarden Password Manager) - — Mozilla Firefox" then
             hl.dispatch(hl.dsp.focus({ window = w }))
             hl.dispatch(hl.dsp.window.float({ action = "enable", window = w }))
-            hl.dispatch(hl.dsp.window.resize({ x = "20%", y = "50%", relative = false, window = w }))
-            hl.dispatch(hl.dsp.window.center({ window = w }))
+            hl.dispatch(hl.dsp.window.resize(mon_px(0.2, 0.5, false, { relative = false, window = w })))
+            hl.timer(function()
+              hl.dispatch(hl.dsp.window.center({ window = w }))
+            end, { timeout = 1000, type = "oneshot" })
           end
         end)
       '';

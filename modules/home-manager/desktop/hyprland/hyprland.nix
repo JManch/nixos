@@ -235,7 +235,7 @@ in
           on_focus_under_fullscreen = 2;
           enable_swallow = false;
           # Otherwise it sometimes appears briefly during shutdown
-          lockdead_screen_delay = 10000;
+          lockdead_screen_delay = 5000;
         };
 
         ecosystem.no_donation_nag = true;
@@ -457,6 +457,24 @@ in
           hl.timer(function()
             hl.dispatch(hl.dsp.dpms({ action = "toggle", monitor = active_monitor }))
           end, { timeout = 1000, type = "oneshot" })
+        end
+
+        -- fx and fy are fractions of the monitor. Just doing width/height *
+        -- frac doesn't take scale into account so we need this util.
+        function mon_px(fx, fy, offset, args)
+          local mon = hl.get_active_monitor()
+          if not mon then return nil end
+
+          local x = math.floor((mon.width  / mon.scale) * fx)
+          local y = math.floor((mon.height / mon.scale) * fy)
+
+          if offset then
+            x, y = x + mon.position.x, y + mon.position.y
+          end
+
+          local out = { x = x, y = y }
+          for k, v in pairs(args or {}) do out[k] = v end
+          return out
         end
 
         ${cfg.extraConf}

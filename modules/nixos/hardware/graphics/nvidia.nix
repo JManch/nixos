@@ -1,8 +1,4 @@
-{
-  lib,
-  pkgs,
-  config,
-}:
+{ lib, config }:
 let
   inherit (lib) ns mkIf;
   inherit (config.${ns}.core.device) gpu;
@@ -25,34 +21,16 @@ in
     powerManagement.enable = desktop.suspend.enable;
   };
 
-  # https://github.com/elFarto/nvidia-vaapi-driver#configuration
-  environment =
-    assert lib.assertMsg (
-      !lib.hasPrefix "153" pkgs.firefox.version
-    ) "Firefox should support vulkan hardware decode";
-    {
-      systemPackages = [ pkgs.libva-utils ];
-      variables = {
-        MOZ_DISABLE_RDD_SANDBOX = 1;
-        NVD_BACKEND = "direct";
-        LIBVA_DRIVER_NAME = "nvidia";
-      };
-
-      # WARN: Don't remove this with firefox update
-      # Increase Nvidia's shader cache size to 12GB
-      # https://wiki.cachyos.org/configuration/gaming/#increase-maximum-shader-cache-size
-      sessionVariables = {
-        DXVK_HUD = "compiler";
-        __GL_SHADER_DISK_CACHE_SIZE = "12000000000";
-      };
-    };
+  # Increase Nvidia's shader cache size to 12GB
+  # https://wiki.cachyos.org/configuration/gaming/#increase-maximum-shader-cache-size
+  environment.sessionVariables = {
+    DXVK_HUD = "compiler";
+    __GL_SHADER_DISK_CACHE_SIZE = "12000000000";
+  };
 
   ns.hm = mkIf (home-manager.enable && config.hardware.nvidia.videoAcceleration) {
     programs.firefox.profiles.default.settings = {
-      "media.hardware-video-decoding.force-enabled" = true;
-      "media.av1.enabled" = true; # override to false on a per-host basis
-      "gfx.x11-egl.force-enabled" = true;
-      "widget.dmabuf.force-enabled" = true;
+      "media.hardware-video-decoding-vulkan.enabled" = true;
     };
   };
 

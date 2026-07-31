@@ -10,20 +10,24 @@ let
     ns
     mkIf
     optional
-    optionalString
     getExe
+    getExe'
     replaceStrings
     mkOption
     types
     ;
-  inherit (lib.${ns}) mkHyprBind mkHyprExec;
+  inherit (lib.${ns}) mkHyprBind;
   inherit (config.${ns}.programs.desktop) mpv;
   inherit (config.age.secrets) streamlinkTwitchAuth;
   inherit (config.${ns}.desktop) hyprland;
-  inherit (osConfig.${ns}.system.desktop.hyprland) alwaysOnTopPatch;
   secondMonitor = lib.${ns}.getMonitorByNumber osConfig 2;
+  hyprctl = getExe' pkgs.hyprland "hyprctl";
+  twitchWorkspace = hyprland.namedWorkspaceIDs.TWITCH;
   chatterinoPercentage = "17.5";
   firefoxPercentage = "82.5";
+  # Horizontal offsets of the chat and the stream as monitor percentages
+  chatOffset = if cfg.chatSide == "right" then firefoxPercentage else "0";
+  streamOffset = if cfg.chatSide == "right" then "0" else chatterinoPercentage;
 
   # Wrap with twitch auth token config
   streamlink = pkgs.symlinkJoin {
@@ -99,181 +103,170 @@ in
     "hyprland/workspaces".format-icons.TWITCH = "󰕃";
   };
 
-  ns.desktop =
-    let
-      initWorkspace = pkgs.writeShellApplication {
-        name = "hypr-chatterino-init-workspace";
-        runtimeInputs = [
-          pkgs.hyprland
-          pkgs.jaq
-          pkgs.app2unit
-        ];
-        text = ''
-          # Check if a special workspace is focused and, if so, close it
-          # (ideally hyprland would close the special workspace if the
-          # workspace that has been switched to is behind it)
-          hyprctl repl '
-            local ws = hl.get_active_special_workspace()
-            if ws ~= nil then
-              -- strip the leading "special:"
-              hl.dispatch(hl.dsp.workspace.toggle_special(ws.name:match(":(.*)") or ws.name))
-            end
-          '
+  ns.desktop = {
+    services.waybar.autoHideWorkspaces = [ "TWITCH" ];
+    hyprland.namedWorkspaces.TWITCH = {
+      monitor = secondMonitor.name;
+      on_created_empty = "${hyprctl} repl 'twitch_init_workspace()'";
+    };
 
-          # We can't use the [workspace id silent] exec dispatcher here
-          # because firefox doesn't respect it. Instead we have to assume
-          # that the TWITCH workspace is actively focused.
-          app2unit -t service com.chatterino.chatterino.desktop
-          app2unit -t service firefox.desktop:new-window https://www.twitch.tv/directory
-        '';
-      };
+    hyprland.binds = [
+      (mkHyprBind "mod" "T" "hl.dsp.focus({ workspace = ${twitchWorkspace} })")
+      (mkHyprBind "mod_shift" "T" "function() twitch_reset_workspace(true) end")
+      (mkHyprBind "mod_shift_ctrl" "T" "function() twitch_reset_workspace(false) end")
+    ];
 
-      resetWorkspace =
-        theaterMode:
-        pkgs.writeShellApplication {
-          name = "hypr-chatterino-reset-${if theaterMode then "theater" else "fullscreen"}-workspace";
-          runtimeInputs = [
-            pkgs.hyprland
-            pkgs.jaq
-          ];
-          text = ''
-            cmds=""
-            windows=$(hyprctl clients -j | jaq -r '((.[] | select(.workspace.name == "TWITCH")) | "\(.address),\(.class),\(.title),\(.alwaysOnTop)")')
-            while IFS=',' read -r address class title alwaysontop; do
-              if [ "$class" = "firefox" ] || [ "$class" = "mpv" ]; then
-                cmds+="dispatch movewindowpixel exact ${
-                  if cfg.chatSide == "right" then "0" else chatterinoPercentage
-                }% 0%, address:$address;"
-                cmds+="dispatch resizewindowpixel exact ${
-                  if theaterMode then firefoxPercentage else "100"
-                }% 100%, address:$address;"
-              elif [ "$class" = "com.chatterino." ]; then
-                if [[ "$title" == *"Overlay"* ]]; then
-                  ${optionalString (!theaterMode) ''
-                    cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 40%, address:$address;"
-                    cmds+="dispatch movewindowpixel exact ${
-                      if cfg.chatSide == "right" then firefoxPercentage else "0"
-                    }% 0%, address:$address;"
-                  ''}
-                  if [ "$alwaysontop" = "${if theaterMode then "true" else "false"}" ]; then
-                    cmds+="dispatch togglealwaysontop address:$address;"
-                  fi
-                  cmds+="dispatch alterzorder ${if theaterMode then "bottom" else "top"}, address:$address;"
-                else
-                  cmds+="dispatch resizewindowpixel exact ${chatterinoPercentage}% 100%, address:$address;"
-                  cmds+="dispatch movewindowpixel exact ${
-                    if cfg.chatSide == "right" then firefoxPercentage else "0"
-                  }% 0%, address:$address;"
-                  cmds+="dispatch alterzorder ${if theaterMode then "top" else "bottom"}, address:$address;"
-                fi
+    hyprland.extraConf = # lua
+      ''
+        function twitch_init_workspace()
+          -- Check if a special workspace is focused and, if so, close it
+          -- (ideally hyprland would close the special workspace if the
+          -- workspace that has been switched to is behind it)
+          local ws = hl.get_active_special_workspace()
+          if ws ~= nil then
+            -- strip the leading "special:"
+            hl.dispatch(hl.dsp.workspace.toggle_special(ws.name:match(":(.*)") or ws.name))
+          end
+
+          -- We can't use the [workspace id silent] exec dispatcher here
+          -- because firefox doesn't respect it. Instead we have to assume
+          -- that the TWITCH workspace is actively focused.
+          hl.exec_cmd("app2unit -t service com.chatterino.chatterino.desktop")
+          hl.exec_cmd("app2unit -t service firefox.desktop:new-window https://www.twitch.tv/directory")
+        end
+
+        -- Restores the twitch workspace layout. Theater mode places the stream
+        -- alongside chat whilst fullscreen mode expands the stream to fill the
+        -- monitor and renders the chat overlay on top of it.
+        function twitch_reset_workspace(theater)
+          local ws = hl.get_workspace(${twitchWorkspace})
+          if ws == nil then return end
+          local mon = ws.monitor
+
+          local chat_w = ${chatterinoPercentage} / 100
+          local chat_x = ${chatOffset} / 100
+          local stream_w = ${firefoxPercentage} / 100
+          local stream_x = ${streamOffset} / 100
+
+          -- Resize before moving so that the final position is exact
+          -- regardless of the anchor the resize uses
+          local function place(w, fw, fh, fx)
+            local args = { relative = false, window = w }
+            hl.dispatch(hl.dsp.window.resize(mon_px(fw, fh, false, args, mon)))
+            hl.dispatch(hl.dsp.window.move(mon_px(fx, 0, true, args, mon)))
+          end
+
+          local function zorder(w, mode)
+            hl.dispatch(hl.dsp.window.alter_zorder({ mode = mode, window = w }))
+          end
+
+          for _, w in ipairs(hl.get_workspace_windows(ws)) do
+            if w.class == "firefox" or w.class == "mpv" then
+              if theater then
+                place(w, stream_w, 1, stream_x)
               else
-                cmds+="dispatch alterzorder top, address:$address;"
-              fi
-            done <<< "$windows"
-            hyprctl dispatch --batch "$cmds"
-          '';
+                place(w, 1, 1, 0)
+              end
+            elseif w.class == "com.chatterino." then
+              if w.title:find("Overlay", 1, true) then
+                if not theater then place(w, chat_w, 0.4, chat_x) end
+                zorder(w, theater and "bottom" or "top")
+              else
+                place(w, chat_w, 1, chat_x)
+                zorder(w, theater and "top" or "bottom")
+              end
+            else
+              zorder(w, "top")
+            end
+          end
+        end
+      '';
+
+    hyprland.windowRules = {
+      twitch-workspace = {
+        matchers.workspace = twitchWorkspace;
+        params = {
+          tag = "+twitch_unexpected";
+          float = true;
         };
-    in
-    {
-      services.waybar.autoHideWorkspaces = [ "TWITCH" ];
-      hyprland.namedWorkspaces.TWITCH = {
-        monitor = secondMonitor.name;
-        on_created_empty = "${getExe initWorkspace}";
       };
 
-      hyprland.binds = [
-        (mkHyprBind "mod" "T" "hl.dsp.focus({ workspace = ${hyprland.namedWorkspaceIDs.TWITCH} })")
-        (mkHyprExec "mod_shift" "T" "${getExe (resetWorkspace true)}")
-        (mkHyprExec "mod_shift_ctrl" "T" "${getExe (resetWorkspace false)}")
-      ];
-
-      hyprland.windowRules = {
-        twitch-workspace = {
-          matchers.workspace = hyprland.namedWorkspaceIDs.TWITCH;
-          params = {
-            tag = "+twitch_unexpected";
-            float = true;
-          };
+      twitch-workspace-chatterino-main-window = {
+        matchers = {
+          workspace = twitchWorkspace;
+          class = "com\\.chatterino\\.";
+          title = "Chatterino (${replaceStrings [ "." ] [ "\\." ] pkgs.chatterino7.version} -.*|Overlay)";
         };
 
-        twitch-workspace-chatterino-main-window = {
-          matchers = {
-            workspace = hyprland.namedWorkspaceIDs.TWITCH;
-            class = "com\\.chatterino\\.";
-            title = "Chatterino (${replaceStrings [ "." ] [ "\\." ] pkgs.chatterino7.version} -.*|Overlay)";
-          };
+        params = {
+          border_size = 0;
+          rounding = 0;
+          tag = "-twitch_unexpected";
+          move = "(monitor_w*${chatOffset}/100) 0";
+          size = "(monitor_w*${chatterinoPercentage}/100) monitor_h";
+        };
+      };
 
-          params = {
-            border_size = 0;
-            rounding = 0;
-            tag = "-twitch_unexpected";
-            move = "(monitor_w*${firefoxPercentage}/100) 0";
-            size = "(monitor_w*${chatterinoPercentage}/100) monitor_h";
-          };
+      twitch-workspace-chatterino-usercard = {
+        matchers = {
+          workspace = twitchWorkspace;
+          class = "com\\.chatterino\\.";
+          title = ".* Usercard - .*";
         };
 
-        twitch-workspace-chatterino-usercard = {
-          matchers = {
-            workspace = hyprland.namedWorkspaceIDs.TWITCH;
-            class = "com\\.chatterino\\.";
-            title = ".* Usercard - .*";
-          };
+        params = {
+          tag = "-twitch_unexpected";
+          size = "(monitor_w*${chatterinoPercentage}/100) monitor_h*0.33";
+          center = true;
+        };
+      };
 
-          params = {
-            tag = "-twitch_unexpected";
-            always_on_top = mkIf alwaysOnTopPatch true;
-            size = "(monitor_w*${chatterinoPercentage}/100) monitor_h*0.33";
-            center = true;
-          };
+      twitch-workspace-firefox = {
+        matchers = {
+          workspace = twitchWorkspace;
+          class = "firefox";
         };
 
-        twitch-workspace-firefox = {
-          matchers = {
-            workspace = hyprland.namedWorkspaceIDs.TWITCH;
-            class = "firefox";
-          };
+        params = {
+          tag = "-twitch_unexpected";
+          border_size = 0;
+          rounding = 0;
+          move = "(monitor_w*${streamOffset}/100) 0";
+          size = "(monitor_w*${firefoxPercentage}/100) monitor_h";
+        };
+      };
 
-          params = {
-            tag = "-twitch_unexpected";
-            border_size = 0;
-            rounding = 0;
-            move = "0 0";
-            size = "(monitor_w*${firefoxPercentage}/100) monitor_h";
-          };
+      mpv.matchers.title = "negative:twitch\\.tv.*";
+
+      twitch-mpv = {
+        matchers = {
+          class = "mpv";
+          title = "twitch\\.tv.*";
         };
 
-        mpv.matchers.title = "negative:twitch\\.tv.*";
+        params = {
+          tag = "-twitch_unexpected";
+          border_size = 0;
+          rounding = 0;
+          workspace = "${twitchWorkspace} silent";
+          float = true;
+          move = "(monitor_w*${streamOffset}/100) 0";
+          size = "(monitor_w*${firefoxPercentage}/100) monitor_h";
+        };
+      };
 
-        twitch-mpv = {
-          matchers = {
-            class = "mpv";
-            title = "twitch\\.tv.*";
-          };
-
-          params = {
-            tag = "-twitch_unexpected";
-            border_size = 0;
-            rounding = 0;
-            workspace = "${hyprland.namedWorkspaceIDs.TWITCH} silent";
-            float = true;
-            move = "0 0";
-            size = "(monitor_w*${firefoxPercentage}/100) monitor_h";
-          };
+      twitch-unexpected = {
+        matchers = {
+          workspace = twitchWorkspace;
+          tag = "twitch_unexpected*";
         };
 
-        twitch-unexpected = {
-          matchers = {
-            workspace = hyprland.namedWorkspaceIDs.TWITCH;
-            tag = "twitch_unexpected*";
-          };
-
-          params = {
-            always_on_top = mkIf alwaysOnTopPatch true;
-            size = "(monitor_w*0.6) (monitor_h*0.6)";
-            center = true;
-            tag = "-twitch-unexpected";
-          };
+        params = {
+          size = "(monitor_w*0.6) (monitor_h*0.6)";
+          center = true;
+          tag = "-twitch-unexpected";
         };
       };
     };
+  };
 }

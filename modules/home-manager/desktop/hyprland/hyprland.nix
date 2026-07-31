@@ -460,9 +460,10 @@ in
         end
 
         -- fx and fy are fractions of the monitor. Just doing width/height *
-        -- frac doesn't take scale into account so we need this util.
-        function mon_px(fx, fy, offset, args)
-          local mon = hl.get_active_monitor()
+        -- frac doesn't take scale into account so we need this util. Defaults
+        -- to the active monitor if one is not given.
+        function mon_px(fx, fy, offset, args, mon)
+          mon = mon or hl.get_active_monitor()
           if not mon then return nil end
 
           local x = math.floor((mon.width  / mon.scale) * fx)

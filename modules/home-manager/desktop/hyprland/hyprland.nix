@@ -497,14 +497,13 @@ in
   '';
 
   ns.desktop.programs.locker = {
-    preLockScript = "${hyprctl} keyword misc:key_press_enables_dpms true";
-    postUnlockScript = "${hyprctl} keyword misc:key_press_enables_dpms false";
+    preLockScript = "${hyprctl} eval 'hl.config({ misc = { key_press_enables_dpms = true }})'";
+    postUnlockScript = "${hyprctl} eval 'hl.config({ misc = { key_press_enables_dpms = false }})'";
   };
 
   ns.desktop.darkman.switchScripts.hyprland =
     let
       inherit (config.${ns}.core) color-scheme;
-      hyprctl = getExe' pkgs.hyprland "hyprctl";
     in
     theme: ''
       ${hyprctl} eval 'hl.config({

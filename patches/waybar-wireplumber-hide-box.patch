@@ -1,17 +1,19 @@
 diff --git a/src/modules/wireplumber.cpp b/src/modules/wireplumber.cpp
-index ddcdda6e..0cc88b75 100644
+index ddcdda6e..9ee82172 100644
 --- a/src/modules/wireplumber.cpp
 +++ b/src/modules/wireplumber.cpp
-@@ -694,6 +694,12 @@ auto waybar::modules::Wireplumber::update() -> void {
-     }
-   }
+@@ -713,6 +713,14 @@ auto waybar::modules::Wireplumber::update() -> void {
+   else if (config_[format_name].isString())
+     format = config_[format_name].asString();
  
++  // An empty resolved format (e.g. "format-muted": "") hides the module entirely, rather than
++  // leaving an empty label that still occupies the module's spacing and padding.
 +  if (format.empty() || node_name_.empty()) {
 +    event_box_.hide();
 +    return;
 +  }
 +  event_box_.show();
 +
-   // mixer-api is configured with the linear scale, so volume_ holds the raw linear gain. The
-   // perceptual "cubic" value shown by wpctl and used for {volume} is cbrt(linear), not linear^3.
-   // Cubing here drives small linear gains (typical for Bluetooth sinks) to 0%.
+   // Prepare source format string (similar to PulseAudio)
+   std::string format_source = "{volume}%";
+   if (source_muted_) {

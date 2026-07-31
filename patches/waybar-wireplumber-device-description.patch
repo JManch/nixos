@@ -1,0 +1,18 @@
+diff --git a/src/modules/wireplumber.cpp b/src/modules/wireplumber.cpp
+index ddcdda6e..d2d1144a 100644
+--- a/src/modules/wireplumber.cpp
++++ b/src/modules/wireplumber.cpp
+@@ -215,12 +215,9 @@ void waybar::modules::Wireplumber::updateNodeName(waybar::modules::Wireplumber*
+   properties = wp_properties_ensure_unique_owner(properties);
+   wp_properties_add(properties, globalP);
+   wp_properties_set(properties, "object.id", nullptr);
+-  const auto* nick = wp_properties_get(properties, "node.nick");
+   const auto* description = wp_properties_get(properties, "node.description");
+ 
+-  self->node_name_ = nick != nullptr          ? nick
+-                     : description != nullptr ? description
+-                                              : "Unknown node name";
++  self->node_name_ = description != nullptr ? description : "Unknown node name";
+   spdlog::debug("[{}]: Updating '{}' node name to: {}", self->name_, self->type_, self->node_name_);
+ 
+   // find form-factor

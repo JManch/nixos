@@ -1,8 +1,8 @@
 diff --git a/include/ALabel.hpp b/include/ALabel.hpp
-index b3852877..83a451c7 100644
+index 948289ae..4a6d2ecd 100644
 --- a/include/ALabel.hpp
 +++ b/include/ALabel.hpp
-@@ -19,7 +19,20 @@ class ALabel : public AModule {
+@@ -26,7 +26,20 @@ class ALabel : public AModule {
    virtual std::string getIcon(uint16_t, const std::vector<std::string>& alts, uint16_t max = 0);
  
   protected:
@@ -25,10 +25,10 @@ index b3852877..83a451c7 100644
    const std::chrono::milliseconds interval_;
    bool alt_ = false;
 diff --git a/src/modules/bluetooth.cpp b/src/modules/bluetooth.cpp
-index f491f19b..db3acc7f 100644
+index 4c9994f4..32ad0299 100644
 --- a/src/modules/bluetooth.cpp
 +++ b/src/modules/bluetooth.cpp
-@@ -91,6 +91,7 @@ waybar::modules::Bluetooth::Bluetooth(const std::string& id, const Json::Value&
+@@ -180,6 +180,7 @@ waybar::modules::Bluetooth::Bluetooth(const std::string& id, const Json::Value&
        rfkill_{RFKILL_TYPE_BLUETOOTH},
  #endif
        manager_(generateManager()) {
@@ -37,10 +37,10 @@ index f491f19b..db3acc7f 100644
    if (config_["format-device-preference"].isArray()) {
      std::transform(config_["format-device-preference"].begin(),
 diff --git a/src/modules/network.cpp b/src/modules/network.cpp
-index c33e750d..061ebc8f 100644
+index 14922210..ddecac84 100644
 --- a/src/modules/network.cpp
 +++ b/src/modules/network.cpp
-@@ -84,6 +84,7 @@ waybar::modules::Network::readBandwidthUsage() {
+@@ -104,6 +104,7 @@ uint32_t waybar::modules::Network::readLinkSpeed() const {
  
  waybar::modules::Network::Network(const std::string& id, const Json::Value& config)
      : ALabel(config, "network", id, DEFAULT_FORMAT, 60) {
@@ -49,13 +49,13 @@ index c33e750d..061ebc8f 100644
    // update it. Since the text should be different, update() will be able
    // to show or hide the event_box_. This is to work around the case where
 diff --git a/src/modules/wireplumber.cpp b/src/modules/wireplumber.cpp
-index bb3005bd..ab682429 100644
+index ddcdda6e..a44774f5 100644
 --- a/src/modules/wireplumber.cpp
 +++ b/src/modules/wireplumber.cpp
-@@ -26,6 +26,7 @@ waybar::modules::Wireplumber::Wireplumber(const std::string& id, const Json::Val
-       source_muted_(false),
-       source_volume_(0.0),
-       default_source_name_(nullptr) {
+@@ -60,6 +60,7 @@ waybar::modules::Wireplumber::Wireplumber(const std::string& id, const Json::Val
+       default_source_name_(nullptr),
+       only_physical_(false),
+       form_factor_("") {
 +  label_.set_skip_redundant(false);
    waybar::modules::Wireplumber::modules.push_back(this);
  

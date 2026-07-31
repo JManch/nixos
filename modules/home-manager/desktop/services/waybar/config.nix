@@ -75,10 +75,10 @@ in
               sort (a: b: a.number < b.number) monitors
             );
           })
-          # Hides the module if the format string is empty
           # Forces use of device description instead of nick name in tooltip
-          # Hides the module instead of crashing when no source device exists
-          "waybar-wireplumber-improvements.patch"
+          "waybar-wireplumber-device-description.patch"
+          # Hides the wireplumber box when the format is empty
+          "waybar-wireplumber-hide-box.patch"
           # Removes constant logging when our `tomat watch` commands fails if the
           # service is not running
           "waybar-disable-stopped-log.patch"
@@ -94,17 +94,17 @@ in
         ++ optional (device.type == "laptop") "waybar-less-cpu-updates.patch"
       )).override
         {
-          cavaSupport = false;
-          inputSupport = false;
-          jackSupport = false;
-          mpdSupport = false;
-          mprisSupport = false;
-          rfkillSupport = false;
-          sndioSupport = false;
-          upowerSupport = false;
-          pulseSupport = false;
-          withMediaPlayer = false;
-          runTests = false;
+          # cavaSupport = false;
+          # inputSupport = false;
+          # jackSupport = false;
+          # mpdSupport = false;
+          # mprisSupport = false;
+          # rfkillSupport = false;
+          # sndioSupport = false;
+          # upowerSupport = false;
+          # pulseSupport = false;
+          # withMediaPlayer = false;
+          # runTests = false;
         };
 
     settings = {

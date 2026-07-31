@@ -1,0 +1,17 @@
+diff --git a/src/modules/wireplumber.cpp b/src/modules/wireplumber.cpp
+index ddcdda6e..0cc88b75 100644
+--- a/src/modules/wireplumber.cpp
++++ b/src/modules/wireplumber.cpp
+@@ -694,6 +694,12 @@ auto waybar::modules::Wireplumber::update() -> void {
+     }
+   }
+ 
++  if (format.empty() || node_name_.empty()) {
++    event_box_.hide();
++    return;
++  }
++  event_box_.show();
++
+   // mixer-api is configured with the linear scale, so volume_ holds the raw linear gain. The
+   // perceptual "cubic" value shown by wpctl and used for {volume} is cbrt(linear), not linear^3.
+   // Cubing here drives small linear gains (typical for Bluetooth sinks) to 0%.

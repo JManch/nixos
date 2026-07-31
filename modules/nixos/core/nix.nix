@@ -457,7 +457,8 @@ in
           (flakePkgs args "ircv3-filehost-server").default;
 
         waybar =
-          assert assertMsg (prev.waybar.version == "0.15.0") "new waybar release should support Hyprland Lua";
+          assert assertMsg (prev.waybar.version == "0.15.0")
+            "new waybar release should support Hyprland Lua. Remember to re-enable overrides in the Waybar module.";
           (flakePkgs args "waybar").waybar;
 
         # inherit

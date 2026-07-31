@@ -31,7 +31,7 @@ in
     gameClasses = [ "osu!" ];
     gamemode.profiles.osu = mkIf (isHyprland config) {
       start."tablet" = ''
-        hyprctl --instance 0 eval '
+        hyprctl eval '
           hl.monitor(${
             toLuaInline (
               getHyprlandMonitorConfig (primaryMonitor // { refreshRate = primaryMonitor.gamingRefreshRate; })
@@ -53,7 +53,7 @@ in
 
       # FIX: Hyprland bug: active_area_size cannot be reset by setting it to 0 0
       stop."tablet" = ''
-        hyprctl --instance 0 eval '
+        hyprctl eval '
           hl.monitor(${toLuaInline (getHyprlandMonitorConfig primaryMonitor)})
           hl.config({
             input = {

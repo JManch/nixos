@@ -166,14 +166,10 @@ in
     Service.ExecStart = "systemd-inhibit --who='Inhibit Lock' --what=idle --why='User request' sleep infinity";
   };
 
-  wayland.windowManager.hyprland.settings.bind =
-    let
-      inherit (config.${ns}.desktop.hyprland) modKey;
-    in
-    [
-      "${modKey}, U, exec, ${toggleLockInhibit}"
-      "${modKey}, Escape, exec, ${cfg.lockScript} --immediate"
-    ];
+  ns.desktop.hyprland.binds = [
+    (lib.${ns}.mkHyprExec "mod" "U" toggleLockInhibit)
+    (lib.${ns}.mkHyprExec "mod" "Escape" "${cfg.lockScript} --immediate")
+  ];
 
   programs.waybar.settings.bar = {
     modules-right = mkBefore [ "custom/locker" ];

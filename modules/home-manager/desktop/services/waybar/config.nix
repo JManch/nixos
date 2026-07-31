@@ -120,9 +120,8 @@ in
           sort-by-number = true;
           active-only = false;
           format = "{icon}";
-          on-scroll-up = "${hyprctl} dispatch workspace m-1";
-          on-scroll-down = "${hyprctl} dispatch workspace m+1";
-
+          on-scroll-up = "${hyprctl} dispatch 'hl.dsp.focus({workspace = \"m-1\"})' >/dev/null";
+          on-scroll-down = "${hyprctl} dispatch 'hl.dsp.focus({workspace = \"m+1\"})' >/dev/null";
           format-icons = {
             GAME = "󱎓";
           };

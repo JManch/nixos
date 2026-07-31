@@ -444,9 +444,9 @@ in
           name = "Impala";
           genericName = "Wifi Manager";
           exec = "${pkgs.writeShellScript "impala-desktop-launch" ''
-            address=$(hyprctl clients -j | ${getExe pkgs.jaq} -r "(.[] | select(.class == \"impala\")) | .address")
-            if [[ -n $address ]]; then
-              hyprctl dispatch movetoworkspacesilent e+0, address:"$address"
+            address=$(hyprctl repl '(hl.get_window("class:impala") or {}).address')
+            if [[ $address != "nil" ]]; then
+              hyprctl dispatch "hl.dsp.window.move({ workspace = 'e+0', window = 'address:$address', follow = false})"
               exit 0
             fi
             xdg-terminal-exec --title=impala --app-id=impala impala

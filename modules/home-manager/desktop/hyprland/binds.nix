@@ -126,7 +126,7 @@ let
         }
 
         if [[ $subject == "output" ]]; then
-          output=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')
+          output=$(hyprctl repl 'hl.get_active_monitor().name')
           grim -o "$output" "$output_file"
         elif [[ $subject == "area" ]]; then
           hyprpicker --render-inactive --no-zoom &
@@ -334,7 +334,7 @@ in
       hl.bind(mod_shift .. " + TAB", hl.dsp.workspace.move({ monitor = "+1" }))
       hl.bind("XF86AudioMedia", function()
         hl.timer(function()
-          hl.dispatch(hl.dsp.dpms({ monitor = "${device.primaryMonitor.name}" }))
+          hl.dispatch(hl.dsp.dpms({ action = "off", monitor = "${device.primaryMonitor.name}" }))
         end, { timeout = 1000, type = "oneshot" })
       end)
 
@@ -405,13 +405,5 @@ in
       hl.define_submap("Grab", function()
         hl.bind(mod_shift .. " + Delete", hl.dsp.submap("reset"))
       end)
-    '';
-
-  programs.zsh.initContent = # bash
-    ''
-      toggle-dpms() {
-        active_monitor=$(hyprctl activeworkspace | jaq -r '.monitor')
-        sleep 2 && hyprctl dispatch dpms toggle "$active_monitor"
-      }
     '';
 }

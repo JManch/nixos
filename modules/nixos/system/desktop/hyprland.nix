@@ -57,7 +57,7 @@ in
         inherit (config.${ns}.core.device) primaryMonitor;
 
         settings = start: ''
-          hyprctl --instance 0 eval '
+          hyprctl eval '
             hl.unbind(${if start then "mod" else "mod_shift_ctrl"} .. " + ${hyprland.killActiveKey}")
             hl.bind(${
               if start then "mod_shift_ctrl" else "mod"
@@ -70,7 +70,7 @@ in
         '';
 
         monitor = start: ''
-          hyprctl --instance 0 eval 'hl.monitor(${
+          hyprctl eval 'hl.monitor(${
             toLuaInline (
               getHyprlandMonitorConfig (
                 primaryMonitor // optionalAttrs start { refreshRate = primaryMonitor.gamingRefreshRate; }
@@ -81,7 +81,7 @@ in
 
         # Set refresh to highest supported multiple of 60
         monitor-60 = start: ''
-          hyprctl --instance 0 eval 'hl.monitor(${
+          hyprctl eval 'hl.monitor(${
             toLuaInline (
               getHyprlandMonitorConfig (
                 primaryMonitor

@@ -128,12 +128,14 @@ in
 
           selection=$(sed -n "$((selection_index + 1))p" <<< "$selections")
           IFS=$'\t' read -r address _ _ <<< "$selection"
-          hyprctl dispatch focuswindow "address:$address"
+          hyprctl dispatch "hl.dsp.focus({window = 'address:$address'})"
         '';
       };
     in
     [
-      (lib.${ns}.mkHyprExec "mod" "Space" ''${getExe' pkgs.procps "pkill"} fuzzel || ${getExe hyprlandWindowSwitcher}'')
+      (lib.${ns}.mkHyprExec "mod" "Space"
+        "${getExe' pkgs.procps "pkill"} fuzzel || ${getExe hyprlandWindowSwitcher}"
+      )
     ];
 
   ns.desktop.hyprland.extraConf = # lua

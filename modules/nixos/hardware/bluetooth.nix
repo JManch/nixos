@@ -38,9 +38,9 @@ in
       type = "Application";
       icon = "preferences-bluetooth";
       exec = "${pkgs.writeShellScript "bluetui-desktop-launch" ''
-        address=$(hyprctl clients -j | ${getExe pkgs.jaq} -r "(.[] | select(.class == \"bluetui\")) | .address")
-        if [[ -n $address ]]; then
-          hyprctl dispatch movetoworkspacesilent e+0, address:"$address"
+        address=$(hyprctl repl '(hl.get_window("class:bluetui") or {}).address')
+        if [[ $address != "nil" ]]; then
+          hyprctl dispatch "hl.dsp.window.move({ workspace = 'e+0', window = 'address:$address', follow = false})"
           exit 0
         fi
         xdg-terminal-exec --title=bluetui --app-id=bluetui bluetui

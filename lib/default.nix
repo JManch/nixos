@@ -380,9 +380,9 @@ in
           postBuild = ''
             wrapProgram $out/bin/${package.meta.mainProgram} --run '
               ${optionalString isHyprland ''
-                address=$(${getExe' pkgs.hyprland "hyprctl"} clients -j | ${getExe pkgs.jaq} -r "(.[] | select(.class == \"${class}\")) | .address")
-                if [[ -n $address ]]; then
-                  ${getExe' pkgs.hyprland "hyprctl"} dispatch movetoworkspacesilent e+0, address:"$address"
+                address=$(${getExe' pkgs.hyprland "hyprctl"} repl "(hl.get_window('class:${class}') or {}).address")
+                if [[ $address != "nil" ]]; then
+                  ${getExe' pkgs.hyprland "hyprctl"} dispatch "hl.dsp.window.move({ workspace = 'e+0', window = 'address:$address', follow = false})"
                   exit 0
                 fi
               ''}

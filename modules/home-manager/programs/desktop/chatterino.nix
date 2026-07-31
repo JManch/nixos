@@ -112,12 +112,13 @@ in
           # Check if a special workspace is focused and, if so, close it
           # (ideally hyprland would close the special workspace if the
           # workspace that has been switched to is behind it)
-          specialworkspace=$(hyprctl monitors -j | jaq -r '.[] | select(.focused == true) | .specialWorkspace')
-          id=$(echo "$specialworkspace" | jaq -r '.id')
-          if [ "$id" -lt 0 ]; then
-            name=$(echo "$specialworkspace" | jaq -r '.name')
-            hyprctl dispatch togglespecialworkspace "''${name#special:}"
-          fi
+          hyprctl repl '
+            local ws = hl.get_active_special_workspace()
+            if ws ~= nil then
+              -- strip the leading "special:"
+              hl.dispatch(hl.dsp.workspace.toggle_special(ws.name:match(":(.*)") or ws.name))
+            end
+          '
 
           # We can't use the [workspace id silent] exec dispatcher here
           # because firefox doesn't respect it. Instead we have to assume
@@ -181,7 +182,7 @@ in
       };
 
       hyprland.binds = [
-        (mkHyprBind "mod" "T" ''hl.dsp.focus({ workspace = ${hyprland.namedWorkspaceIDs.TWITCH} })'')
+        (mkHyprBind "mod" "T" "hl.dsp.focus({ workspace = ${hyprland.namedWorkspaceIDs.TWITCH} })")
         (mkHyprExec "mod_shift" "T" "${getExe (resetWorkspace true)}")
         (mkHyprExec "mod_shift_ctrl" "T" "${getExe (resetWorkspace false)}")
       ];

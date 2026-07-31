@@ -128,7 +128,7 @@ in
               continue
             fi
 
-            hyprctl dispatch dpms off
+            hyprctl dispatch "hl.dsp.dpms({action = 'off'})"
           fi
           # give screens time to turn off and prolong next countdown
           sleep ${toString cfg.lockTime}

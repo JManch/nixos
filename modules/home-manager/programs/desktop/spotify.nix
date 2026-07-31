@@ -35,7 +35,7 @@
     uwsm.appUnitOverrides."spotify@.service" = lib.mkIf (lib.${lib.ns}.isHyprland config) ''
       [Service]
       ExecStop=-${pkgs.writeShellScript "hypr-close-spotify" ''
-        ${lib.getExe' pkgs.hyprland "hyprctl"} dispatch closewindow pid:$MAINPID &>/dev/null
+        ${lib.getExe' pkgs.hyprland "hyprctl"} dispatch "hl.dsp.close({ window = 'pid:$MAINPID' })"
       ''}
       KillMode=mixed
     '';

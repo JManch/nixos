@@ -34,18 +34,6 @@ let
   colors = config.colorScheme.palette;
   hyprctl = getExe' pkgs.hyprland "hyprctl";
 
-  toggleMonitor = pkgs.writeShellApplication {
-    name = "toggle-monitor";
-    runtimeInputs = [ pkgs.hyprland ];
-    text = ''
-      if [[ ! ''${1:-} =~ ^[0-9]+$ ]]; then
-        echo "Usage: toggle-monitor <monitor_number>"
-        exit 1
-      fi
-      hyprctl repl "toggle_monitor($1)"
-    '';
-  };
-
   setupMonitors = pkgs.writeShellApplication {
     name = "setup-monitors";
     runtimeInputs = with pkgs; [
@@ -360,7 +348,6 @@ in
   ];
 
   home.packages = [
-    toggleMonitor
     setupMonitors
   ]
   # These are needed for xdg-desktop-portal-hyprland screenshot
@@ -421,20 +408,20 @@ in
         hl.curve("easeinoutsine", { type = "bezier", points = {{ 0.37, 0},{ 0.63, 1}}})
         hl.curve("easeOutQuint", { type = "bezier", points = {{ 0.23, 1},{ 0.32, 1}}})
 
-        hl.animation({ leaf = "windowsIn", speed = 3, bezier = "easeOutCubic", style = "popin 30%"})
-        hl.animation({ leaf = "windowsOut", speed = 3, bezier = "fluentDecel", style = "popin 70%"})
-        hl.animation({ leaf = "windowsMove", speed = 4, bezier = "easeOutQuint"})
-        hl.animation({ leaf = "fadeIn", speed = 3, bezier = "easeOutCubic"})
-        hl.animation({ leaf = "fadeOut", speed = 1.7, bezier = "easeOutCubic"})
+        hl.animation({ leaf = "windowsIn", enabled = true, speed = 3, bezier = "easeOutCubic", style = "popin 30%"})
+        hl.animation({ leaf = "windowsOut", enabled = true, speed = 3, bezier = "fluentDecel", style = "popin 70%"})
+        hl.animation({ leaf = "windowsMove", enabled = true, speed = 4, bezier = "easeOutQuint"})
+        hl.animation({ leaf = "fadeIn", enabled = true, speed = 3, bezier = "easeOutCubic"})
+        hl.animation({ leaf = "fadeOut", enabled = true, speed = 1.7, bezier = "easeOutCubic"})
         hl.animation({ leaf = "fadeSwitch", enabled = false})
-        hl.animation({ leaf = "fadeDim", speed = 4, bezier = "fluentDecel"})
+        hl.animation({ leaf = "fadeDim", enabled = true, speed = 4, bezier = "fluentDecel"})
         hl.animation({ leaf = "workspaces", speed = 3, bezier = "easeOutCubic", style = "slide", enabled = ${
           if cfg.animations then "true" else "false"
         }})
         hl.animation({ leaf = "specialWorkspace", speed = 3, bezier = "easeOutCubic", style = "slidevert", enabled = ${
           if cfg.animations then "true" else "false"
         }})
-        hl.animation({ leaf = "layers", speed = 4, bezier = "easeOutQuint"})
+        hl.animation({ leaf = "layers", enabled = true, speed = 4, bezier = "easeOutQuint"})
 
         -- binds
         mod = "${cfg.modKey}"
@@ -463,6 +450,13 @@ in
             hl.monitor({ output = m.name, disabled = true })
             return "Disabled monitor " .. m.name
           end
+        end
+
+        function toggle_dpms()
+          local active_monitor = hl.get_active_monitor().name
+          hl.timer(function()
+            hl.dispatch(hl.dsp.dpms({ action = "toggle", monitor = active_monitor }))
+          end, { timeout = 1000, type = "oneshot" })
         end
 
         ${cfg.extraConf}
@@ -505,12 +499,26 @@ in
       hyprctl = getExe' pkgs.hyprland "hyprctl";
     in
     theme: ''
-      ${hyprctl} keyword general:col.active_border 0xff${color-scheme.${theme}.palette.base0D}
-      ${hyprctl} keyword general:col.inactive_border 0x00${color-scheme.${theme}.palette.base0D}
+      ${hyprctl} eval 'hl.config({
+        general = {
+          ["col.active_border"]   = "0xff${color-scheme.${theme}.palette.base0D}",
+          ["col.inactive_border"] = "0x00${color-scheme.${theme}.palette.base0D}",
+        }
+      })'
     '';
 
-  programs.zsh.shellAliases = {
-    hyprland-setup-dev = "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -B build";
+  programs.zsh = {
+    initContent = # bash
+      ''
+        toggle-monitor() {
+          hyprctl repl "toggle_monitor($1)"
+        }
+      '';
+
+    shellAliases = {
+      "hyprland-setup-dev" = "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -B build";
+      "toggle-dpms" = "hyprctl repl 'toggle_dpms()'";
+    };
   };
 
   ns.persistence.directories = [ ".local/share/hyprland" ];

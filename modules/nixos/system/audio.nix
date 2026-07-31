@@ -410,7 +410,19 @@ in
 
         modifyVolume = pkgs.writeShellScript "modify-volume" ''
           ${throttleHyprlandRepeatBind "volume" 10}
+          before=$(${wpctl} get-volume @DEFAULT_AUDIO_SINK@)
           ${wpctl} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "$1"
+          after=$(${wpctl} get-volume @DEFAULT_AUDIO_SINK@)
+
+          # Pipewire only emits a change event when the volume actually
+          # changes so the notification monitor never fires when the volume is
+          # already clamped at 0% or 100%. Notify ourselves in that case.
+          if [[ $before == "$after" ]]; then
+            description=$(${wpctl} inspect @DEFAULT_AUDIO_SINK@ | grep 'node\.description' | cut -d '"' -f 2)
+            ${notify-send} --transient -u low -t 2000 \
+              -h 'string:x-canonical-private-synchronous:pipewire-volume' \
+              "$description" "Volume $(awk '{printf "%d", $2 * 100}' <<< "$after")%"
+          fi
         '';
       in
       mkIf (home-manager.enable && desktop.desktopEnvironment == null) {

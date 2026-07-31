@@ -133,8 +133,8 @@ in
       blinds = {
         automatedClose.enable = true;
         entities = [
-          "joshua_blind_garden"
           "joshua_blind_driveway"
+          "joshua_blind_garden"
         ];
       };
 

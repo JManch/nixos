@@ -456,6 +456,10 @@ in
           assert assertMsg (!(prev ? ircv3-filehost-server)) "ircv3-filehost-server is now in nixpkgs";
           (flakePkgs args "ircv3-filehost-server").default;
 
+        waybar =
+          assert assertMsg (prev.waybar.version == "0.15.0") "new waybar release should support Hyprland Lua";
+          (flakePkgs args "waybar").waybar;
+
         # inherit
         #   (
         #     assert lib.assertMsg (prev.navidrome.version == "0.60.0") "Remove navidrome overlay";

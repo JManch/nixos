@@ -133,6 +133,9 @@
     hyprsunset.inputs.hyprlang.follows = "hyprland/hyprlang";
     hyprsunset.inputs.hyprwayland-scanner.follows = "hyprland/hyprwayland-scanner";
 
+    waybar.url = "github:Alexays/Waybar";
+    waybar.inputs.nixpkgs.follows = "nixpkgs";
+
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";
 

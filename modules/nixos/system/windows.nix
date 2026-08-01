@@ -71,7 +71,7 @@ in
 
       windows."windows" = mkIf fsAliasConfigured {
         title = "Windows";
-        efiDeviceHandle = cfg.bootEntry.fsAlias;
+        efiDeviceHandle = if (cfg.bootEntry.fsAlias != null) then cfg.bootEntry.fsAlias else "";
         sortKey = "0"; # place above NixOS entries
       };
 

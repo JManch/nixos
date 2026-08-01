@@ -454,7 +454,13 @@ in
 
         ircv3-filehost-server =
           assert assertMsg (!(prev ? ircv3-filehost-server)) "ircv3-filehost-server is now in nixpkgs";
-          (flakePkgs args "ircv3-filehost-server").default;
+          (flakePkgs args "ircv3-filehost-server").default.overrideAttrs {
+            src =
+              assert assertMsg (
+                inputs.ircv3-filehost-server.rev == "5a799862fed85eb02e8527365d0586a0eff50e01"
+              ) "ircv3-filehost-server build might be fixed";
+              inputs.ircv3-filehost-server;
+          };
 
         waybar =
           assert assertMsg (prev.waybar.version == "0.15.0")

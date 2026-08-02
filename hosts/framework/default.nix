@@ -58,6 +58,7 @@
       secure-boot.enable = true;
       bluetooth.enable = true;
       fpv.enable = true;
+      "8bitdo-ultimate-2".enable = true;
 
       printing.client = {
         enable = true;

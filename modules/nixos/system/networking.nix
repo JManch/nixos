@@ -455,6 +455,7 @@ in
           type = "Application";
           icon = "nm-device-wireless";
           categories = [ "System" ];
+          settings.Keywords = "WiFi";
         };
 
     ${ns}.desktop.hyprland.windowRules = {

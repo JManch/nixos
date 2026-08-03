@@ -49,7 +49,7 @@ in
       "0"
     ];
 
-    postUnlockScript = optionalString hasFingerprint "${hyprctl} dispatch 'hl.dsp.dpms(action = \"on\")'";
+    postUnlockScript = optionalString hasFingerprint "${hyprctl} dispatch 'hl.dsp.dpms({action = \"on\"})'";
   };
 
   programs.hyprlock = {

@@ -175,7 +175,7 @@ in
         if w == nil then return end
         if not w.floating then
           hl.dispatch(hl.dsp.window.float({ action = "enable" }))
-          hl.dispatch(hl.dsp.window.resize({ x = "75%", y = "75%", relative = false }))
+          hl.dispatch(hl.dsp.window.resize(mon_px(0.75, 0.75, false, { relative = false })))
           hl.dispatch(hl.dsp.window.center())
         else
           hl.dispatch(hl.dsp.window.float({ action = "disable" }))

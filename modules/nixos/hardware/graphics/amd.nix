@@ -56,8 +56,11 @@ in
 
   # TODO: Use hardware.amdgpu option when I update my flake
 
-  # Make radv the default driver
-  environment.sessionVariables.AMD_VULKAN_ICD = "RADV";
+  environment.sessionVariables = {
+    AMD_VULKAN_ICD = "RADV"; # make radv the default driver
+    MESA_DISK_CACHE_DATABASE = "1"; # https://docs.mesa3d.org/envvars.html#envvar-MESA_DISK_CACHE_DATABASE
+    MESA_SHADER_CACHE_MAX_SIZE = "10G"; # bump cache size from 1GB default
+  };
 
   # There are two main AMD user drivers: AMDVLK and RADV. AMDVLK is the offical
   # open source driver provided by AMD whilst RADV is made by Valve. Depending
@@ -72,5 +75,8 @@ in
     extraPackages = optional davinciResolve pkgs.rocmPackages.clr.icd;
   };
 
-  ns.persistenceHome.directories = [ ".cache/AMD" ];
+  ns.persistenceHome.directories = [
+    ".cache/AMD" # AMDCLK shader cache dir
+    ".cache/mesa_shader_cache_db" # RADV shader cache dir
+  ];
 }

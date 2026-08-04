@@ -426,7 +426,8 @@ in
         pkgs.runCommand "wifi-hotspot-desktop-modify" { } ''
           mkdir -p $out/share/applications
           substitute ${pkgs.linux-wifi-hotspot}/share/applications/wihotspot.desktop $out/share/applications/wihotspot.desktop \
-            --replace-fail "Name=Wifi Hotspot" "Name=Hotspot"
+            --replace-fail "Name=Wifi Hotspot" "Name=Hotspot" \
+            --replace-fail "Keywords=Hotspot;WiFi" "Keywords=Hotspot"
         ''
       ))
     ];

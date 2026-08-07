@@ -138,9 +138,6 @@ in
     systemd.services = mapAttrs' (
       name: backup:
       nameValuePair "rclone-backups-${name}" {
-        wants = [ "network-online.target" ];
-        after = [ "network-online.target" ];
-
         serviceConfig = {
           Type = "oneshot";
           ExecStart =

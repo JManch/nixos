@@ -348,10 +348,8 @@ in
           name: backup:
           nameValuePair "restic-backups-${name}" {
             enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
-            after = [ "network-online.target" ] ++ optional cfg.server.enable "caddy.service";
-            wants = [ "network-online.target" ];
+            after = optional cfg.server.enable "caddy.service";
             requires = optional cfg.server.enable "caddy.service";
-            restartIfChanged = false;
 
             environment = {
               RESTIC_CACHE_DIR = cacheDir;

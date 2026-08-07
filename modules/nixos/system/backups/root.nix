@@ -119,13 +119,36 @@ in
         name = "backup-ssid-check";
         runtimeInputs = with pkgs; [
           coreutils
-          gnugrep
           systemd
           jaq
+          iproute2
         ];
-        bashOptions = [ "nounset" ];
         text = ''
-          active_ssid=$(networkctl status "${networking.wireless.interface}" --json short | jaq -r '.SSID')
+          iface="${networking.wireless.interface}"
+          default_dev=$(ip -json route show default | jaq -r '.[0].dev // ""')
+          if [[ -z "$default_dev" ]]; then
+            echo "No default route, skipping backup"
+            exit 1
+          fi
+          if [[ "$default_dev" != "$iface" ]]; then
+            echo "Default route is via $default_dev, SSID check not applicable"
+            exit 0
+          fi
+
+          status=$(networkctl status "$iface" --json=short)
+          oper=$(jaq -r '.OperationalState // ""' <<<"$status")
+          active_ssid=$(jaq -r '.SSID // ""' <<<"$status")
+
+          if [[ "$oper" != "routable" ]]; then
+            echo "Interface $iface is '$oper' rather than routable, skipping backup"
+            exit 1
+          fi
+
+          if [[ -z "$active_ssid" ]]; then
+            echo "Could not determine SSID for $iface, skipping backup out of caution"
+            exit 1
+          fi
+
           blacklist=(${concatMapStringsSep " " (ssid: "\"${ssid}\"") cfg.ssidBlacklist})
           for ssid in "''${blacklist[@]}"; do
             if [[ "$ssid" == "$active_ssid" ]]; then
@@ -140,8 +163,10 @@ in
       name: value:
       nameValuePair "${value.backend}-backups-${name}" (
         mkIf cfg.${value.backend}.enable {
+          wants = [ "network-online.target" ];
           requires = value.dependencies;
-          after = value.dependencies;
+          after = value.dependencies ++ [ "network-online.target" ];
+          restartIfChanged = false;
 
           preStart = mkOrder 0 ''
             ${value.preBackupScript}
@@ -175,6 +200,8 @@ in
         }
       )
     ) cfg.backups;
+
+  # TODO: We should probably define backup timers here
 
   ns.services =
     let

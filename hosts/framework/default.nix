@@ -95,6 +95,7 @@
       gaming = {
         enable = true;
         steam.enable = true;
+        steam.protonWayland = true;
         gamescope.enable = true;
         gamemode.enable = true;
       };

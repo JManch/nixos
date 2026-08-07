@@ -72,15 +72,13 @@ let
       echo "Otherwise, enter a custom repo passed to the -r flag"
       read -p "Enter the repo to restore from: " -r repo
 
-      env_vars="RESTIC_PASSWORD_FILE=\"${resticPasswordFile.path}\""
-      if [ -z "$repo" ]; then
-        env_vars+=" RESTIC_REPOSITORY_FILE=\"${resticRepositoryFile.path}\""
-      elif [ ! "remote" = "$repo" ]; then
-        env_vars+=" RESTIC_REPOSITORY=\"$repo\""
-      fi
+      case "$repo" in
+        remote) restic_cmd=( sudo ${getExe (resticRemote true)} ) ;;
+        "")     restic_cmd=( sudo restic --password-file ${resticPasswordFile.path} --repository-file ${resticRepositoryFile.path} ) ;;
+        *)      restic_cmd=( sudo restic --repo "$repo" ) ;;
+      esac
 
-      load_vars="set -a; if [[ \"$repo\" = \"remote\" ]]; then source ${resticReadOnlyBackblazeVars.path}; fi; set +a; export $env_vars;"
-      sudo sh -c "$load_vars restic snapshots --compact --no-lock --group-by tags"
+      "''${restic_cmd[@]}" snapshots --compact --no-lock --group-by tags
 
       read -p "Do you want to proceed with this repo? (y/N): " -n 1 -r
       if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
@@ -104,7 +102,7 @@ let
               read -p "Restore backup ${name}? (y/N): " -n 1 -r
               if [[ "$REPLY" =~ ^[Yy]$ ]]; then
                 echo
-                sudo sh -c "$load_vars restic snapshots --tag ${name} --host ${hostname} --no-lock"
+                "''${restic_cmd[@]}" snapshots --tag ${name} --host ${hostname} --no-lock
                 read -p "Enter the snapshot ID to restore (leave empty for latest): " -r snapshot
                 if [ -z "$snapshot" ]; then snapshot="latest"; fi
 
@@ -130,7 +128,7 @@ let
 
                 restore_snapshot() {
                   echo "Restoring snapshot..."
-                  sudo sh -c "$load_vars restic restore $snapshot --target $target --verify --tag ${name} --host ${hostname} --no-lock"
+                  "''${restic_cmd[@]}" restore $snapshot --target $target --verify --tag ${name} --host ${hostname} --no-lock"
                 }
 
                 restore_ownership() {
@@ -191,6 +189,25 @@ let
       ) (attrNames self.nixosConfigurations)}
     '';
   };
+
+  resticRemote =
+    readOnly:
+    pkgs.writeShellApplication {
+      name = "restic-remote${optionalString readOnly "-ro"}";
+      runtimeInputs = [ pkgs.restic ];
+      text = ''
+        if [ "$(id -u)" -ne 0 ]; then
+          echo "restic-remote: must run as root" >&2
+          exit 1
+        fi
+
+        set -a
+        # shellcheck disable=SC1091
+        . ${if readOnly then resticReadOnlyBackblazeVars.path else resticReadWriteBackblazeVars.path}
+        set +a
+        exec restic --password-file ${resticPasswordFile.path} "$@"
+      '';
+    };
 in
 [
   {
@@ -292,7 +309,9 @@ in
     # WARN: Always interact with the repository using the REST server, even on
     # the same host. It ensures correct repo file ownership.
     programs.zsh.shellAliases = {
-      restic = "sudo restic --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic = "sudo restic --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-remote = "sudo ${getExe (resticRemote false)}";
+      restic-remote-ro = "sudo ${getExe (resticRemote true)}";
       restic-snapshots = "sudo restic snapshots --no-cache --compact --group-by tags --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
       restic-restore-size = "sudo restic stats --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
       restic-repo-size = "sudo restic stats --no-cache --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";

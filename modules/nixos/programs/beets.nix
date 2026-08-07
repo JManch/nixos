@@ -39,6 +39,7 @@ in
             unimported.enable = true;
             hook.enable = true;
             fromfilename.enable = true;
+            info.enable = true;
           };
         }
       );
@@ -63,6 +64,7 @@ in
               "unimported"
               "hook"
               "fromfilename"
+              "info"
             ];
 
             incremental = false; # creates unwanted state.pickel file

@@ -137,7 +137,6 @@ in
       backend = "restic";
       paths = [ dataDir ];
       backendOptions.exclude = [ "log" ];
-      backendOptions.extraBackupArgs = [ "test" ];
       restore.pathOwnership.${dataDir} = {
         user = "zigbee2mqtt";
         group = "zigbee2mqtt";

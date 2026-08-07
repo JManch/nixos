@@ -139,7 +139,7 @@ in
   };
 
   # Upstream has good systemd hardening
-  systemd.services.vaultwarden.serviceConfig.EnvironmentFile =
+  systemd.services."vaultwarden".serviceConfig.EnvironmentFile =
     (optional (!virtualisation.vmVariant) vaultwardenSMTPVars.path)
     ++ (optional (!cfg.adminInterface) (
       pkgs.writeText "vaultwarden-disable-admin" ''
@@ -148,10 +148,13 @@ in
     ));
 
   # Run backup twice a day
-  systemd.timers.backup-vaultwarden.timerConfig.OnCalendar = "08,20:00";
-  systemd.services.backup-vaultwarden.wantedBy = mkForce [ ];
+  systemd.timers."backup-vaultwarden" = {
+    timerConfig.OnCalendar = "08,20:00";
+    unitConfig.X-OnlyManualStart = true;
+  };
+  systemd.services."backup-vaultwarden".wantedBy = mkForce [ ];
 
-  systemd.services.backup-vaultwarden.serviceConfig.ExecStartPost = getExe (
+  systemd.services."backup-vaultwarden".serviceConfig.ExecStartPost = getExe (
     pkgs.writeShellApplication {
       name = "vaultwarden-prepare-cloud-backup";
       runtimeInputs = with pkgs; [
@@ -320,7 +323,7 @@ in
     in
     mkMerge [
       (mkJail "vaultwarden-login" ''^.*Username or password is incorrect\. Try again\. IP: <ADDR>\..*$'')
-      (mkJail "vaultwarden-2fa" ''^.*Invalid TOTP code.*IP: <ADDR>.*$'')
+      (mkJail "vaultwarden-2fa" "^.*Invalid TOTP code.*IP: <ADDR>.*$")
       (mkJail "vaultwarden-admin" ''^.*Invalid admin token\. IP: <ADDR>.*$'')
     ];
 

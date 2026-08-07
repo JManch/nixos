@@ -3,6 +3,7 @@
   cfg,
   pkgs,
   self,
+  utils,
   config,
   inputs,
   hostname,
@@ -13,10 +14,9 @@ let
     ns
     mkIf
     mkMerge
+    mkForce
     filterAttrs
-    mapAttrs
     mapAttrsToList
-    flatten
     getExe
     concatStrings
     concatStringsSep
@@ -27,8 +27,7 @@ let
     optional
     mapAttrs'
     attrNames
-    mkForce
-    mkBefore
+    singleton
     optionalString
     mkOption
     mkEnableOption
@@ -43,8 +42,9 @@ let
     resticReadWriteBackblazeVars
     resticReadOnlyBackblazeVars
     ;
-  backups = filterAttrs (_: backup: backup.backend == "restic") categoryCfg.backups;
   resticExe = getExe pkgs.restic;
+  backups = filterAttrs (_: backup: backup.backend == "restic") categoryCfg.backups;
+  cacheDir = "/var/cache/restic";
 
   pruneOpts = [
     "--keep-daily 7"
@@ -74,8 +74,8 @@ let
 
       case "$repo" in
         remote) restic_cmd=( sudo ${getExe (resticRemote true)} ) ;;
-        "")     restic_cmd=( sudo restic --password-file ${resticPasswordFile.path} --repository-file ${resticRepositoryFile.path} ) ;;
-        *)      restic_cmd=( sudo restic --repo "$repo" ) ;;
+        "")     restic_cmd=( sudo restic --cache-dir ${cacheDir} --password-file ${resticPasswordFile.path} --repository-file ${resticRepositoryFile.path} ) ;;
+        *)      restic_cmd=( sudo restic --cache-dir ${cacheDir} --repo "$repo" ) ;;
       esac
 
       "''${restic_cmd[@]}" snapshots --compact --no-lock --group-by tags
@@ -128,7 +128,7 @@ let
 
                 restore_snapshot() {
                   echo "Restoring snapshot..."
-                  "''${restic_cmd[@]}" restore $snapshot --target $target --verify --tag ${name} --host ${hostname} --no-lock"
+                  "''${restic_cmd[@]}" restore "$snapshot" --target "$target" --verify --tag ${name} --host ${hostname} --no-lock
                 }
 
                 restore_ownership() {
@@ -205,7 +205,7 @@ let
         # shellcheck disable=SC1091
         . ${if readOnly then resticReadOnlyBackblazeVars.path else resticReadWriteBackblazeVars.path}
         set +a
-        exec restic --password-file ${resticPasswordFile.path} "$@"
+        exec restic --cache-dir ${cacheDir} --password-file ${resticPasswordFile.path} "$@"
       '';
     };
 in
@@ -214,38 +214,30 @@ in
     guardType = "custom";
 
     categoryConfig.backends.restic = args: {
-      # WARN: Exclude and include paths are not prefixed with persistence
-      # to allow non-absolute patterns, be careful with those
-
-      # Attributes get passed through to the upstream restic backup
-      # module
-
-      # Does not support merging of options that are not explicitly defined but
-      # will at least complain if there are conflicts
-      freeformType = with types; attrsOf anything;
-
       options = {
-        # We have to define this option ourselves to ensure the backup's
-        # `extraBackupArgs` get merged with out defaults
         extraBackupArgs = mkOption {
           type = with types; listOf str;
           default = [ ];
+          description = ''
+            Extra args passed to the restic backup command.
+          '';
+        };
+
+        exclude = mkOption {
+          type = with types; listOf str;
+          default = [ ];
+          description = ''
+            List of patterns to exclude from the backup. WARN: these are not
+            prefixed with persistence root so be careful.
+          '';
         };
       };
 
-      # Backup defaults
       config = {
-        # We use our own initialization script because upstream uses `restic
-        # cat` without `--no-lock`
-        initialize = false;
-        createWrapper = false;
-        repositoryFile = resticRepositoryFile.path;
-        passwordFile = resticPasswordFile.path;
         extraBackupArgs = [
-          # Disable cache because we don't persist cache directories
-          "--no-cache"
-          "--no-scan"
-          "--tag ${args.backupName}"
+          "--no-scan" # scan is used to estimate backup size for progress indicator
+          "--tag"
+          args.backupName
         ];
       };
     };
@@ -306,15 +298,16 @@ in
       restoreScript
     ];
 
+    systemd.tmpfiles.rules = [ "d ${cacheDir} 0700 root root - -" ];
+
     # WARN: Always interact with the repository using the REST server, even on
     # the same host. It ensures correct repo file ownership.
     programs.zsh.shellAliases = {
-      restic = "sudo restic --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-      restic-remote = "sudo ${getExe (resticRemote false)}";
-      restic-remote-ro = "sudo ${getExe (resticRemote true)}";
-      restic-snapshots = "sudo restic snapshots --no-cache --compact --group-by tags --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-      restic-restore-size = "sudo restic stats --no-cache --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
-      restic-repo-size = "sudo restic stats --no-cache --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic = "sudo restic --cache-dir ${cacheDir} --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-remote = "sudo ${getExe (resticRemote (!cfg.server.enable))}"; # read-only access if we're not the server
+      restic-snapshots = "sudo restic snapshots --cache-dir ${cacheDir} --compact --group-by tags --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-restore-size = "sudo restic stats --cache-dir ${cacheDir} --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
+      restic-repo-size = "sudo restic stats --cache-dir ${cacheDir} --mode raw-data --repository-file ${resticRepositoryFile.path} --password-file ${resticPasswordFile.path}";
       backup-all = concatStringsSep ";" (
         mapAttrsToList (name: _: "sudo systemctl start restic-backups-${name}") backups
       );
@@ -322,6 +315,11 @@ in
     // (mapAttrs' (
       name: _: nameValuePair "backup-${name}" "sudo systemctl start restic-backups-${name}"
     ) backups);
+
+    ns.persistence.directories = singleton {
+      directory = cacheDir;
+      mode = "0700";
+    };
 
     # Backblaze bucket setup:
     # backblaze-b2 create-bucket --defaultServerSideEncryption=SSE-B2 <bucket_name> --lifecycleRule '{"daysFromHidingToDeleting": 7, "daysFromUploadingToHiding": null, "fileNamePrefix": ""}' allPrivate
@@ -340,48 +338,58 @@ in
   })
 
   (mkIf cfg.enable {
-    asserts = flatten (
-      mapAttrsToList (name: backup: [
-        (!backup.backendOptions ? backupPrepareCommand && !backup.backendOptions ? backupCleanupCommand)
-        "Restic backup ${name} uses `backendOption` '{backupPrepare,backupCleanup}Command', use '{pre,post}BackupScript' instead"
-        (!backup.backendOptions ? paths)
-        "Restic backup ${name} uses unsupported `backendOption` 'paths'"
-      ]) backups
-    );
-
     ns.services.failureNotifyServices = mkIf cfg.runMaintenance {
       restic-repo-maintenance = failureCfg;
     };
 
-    services.restic.backups = mapAttrs (
-      name: value:
-      value.backendOptions
-      // {
-        inherit (value) paths timerConfig;
-      }
-    ) backups;
-
     systemd.services = mkMerge (
       [
         (mapAttrs' (
-          name: value:
+          name: backup:
           nameValuePair "restic-backups-${name}" {
             enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
-            after = optional cfg.server.enable "caddy.service";
+            after = [ "network-online.target" ] ++ optional cfg.server.enable "caddy.service";
+            wants = [ "network-online.target" ];
             requires = optional cfg.server.enable "caddy.service";
-            environment.RESTIC_CACHE_DIR = mkForce "";
+            restartIfChanged = false;
 
-            preStart = mkBefore ''
-              ${resticExe} cat config --no-cache --no-lock > /dev/null || ${resticExe} init
+            environment = {
+              RESTIC_CACHE_DIR = cacheDir;
+              RESTIC_PASSWORD_FILE = resticPasswordFile.path;
+              RESTIC_REPOSITORY_FILE = resticRepositoryFile.path;
+            };
+
+            preStart = ''
+              ${resticExe} cat config --no-lock >/dev/null || ${resticExe} init
             '';
 
             serviceConfig = {
+              Type = "oneshot";
+
+              ExecStart =
+                let
+                  excludeFlag =
+                    optional (backup.backendOptions.exclude != [ ])
+                      "--exclude-file=${pkgs.writeText "restic-backup-${name}-exclude-patterns" (concatStringsSep "\n" backup.backendOptions.exclude)}";
+                in
+                utils.escapeSystemdExecArgs (
+                  [
+                    resticExe
+                    "backup"
+                  ]
+                  ++ backup.backendOptions.extraBackupArgs
+                  ++ excludeFlag
+                  ++ backup.paths
+                );
+
               # There is no point in restarting Restic backups as we would only ever want to
               # restart after network errors and restic has a built-in incremental retry
               # mechanism that cannot currently be disabled
               # https://github.com/restic/restic/issues/5463
               Restart = mkForce "no";
-              CacheDirectory = mkForce "";
+
+              # we intentially do NOT set CacheDirectory because it's shared between units
+              PrivateTmp = true;
             };
           }
         ) backups)
@@ -390,13 +398,17 @@ in
         {
           # Rather than pruning and checking integrity with every backup service
           # we run a single maintenance service after all backups have completed
-          restic-repo-maintenance = {
+          "restic-repo-maintenance" = {
             restartIfChanged = false;
-            after = map (backup: "restic-backups-${backup}.service") (attrNames backups);
+            after =
+              optional (!cfg.server.enable) "network-online.target"
+              ++ optional cfg.server.enable "caddy.service"
+              ++ map (backup: "restic-backups-${backup}.service") (attrNames backups);
+            wants = optional (!cfg.server.enable) "network-online.target";
             requires = optional cfg.server.enable "caddy.service";
 
             environment = {
-              RESTIC_CACHE_DIR = "/var/cache/restic-repo-maintenance";
+              RESTIC_CACHE_DIR = cacheDir;
               RESTIC_REPOSITORY_FILE = resticRepositoryFile.path;
               RESTIC_PASSWORD_FILE = resticPasswordFile.path;
             };
@@ -404,35 +416,38 @@ in
             serviceConfig = {
               Type = "oneshot";
               ExecStart = [
-                "${resticExe} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
-                # Retry lock timeout in-case another host is performing a check
-                "${resticExe} check --read-data-subset=500M --retry-lock 5m"
+                "${resticExe} unlock" # we can safely unlock https://github.com/NixOS/nixpkgs/pull/387116/changes/138abab480251e74ab0214a867f365b1be69f814
+                "${resticExe} forget --cleanup-cache --retry-lock 5m --prune ${concatStringsSep " " pruneOpts}"
+                "${resticExe} check --with-cache --read-data-subset=500M --retry-lock 5m"
               ];
-
               PrivateTmp = true;
-              RuntimeDirectory = "restic-repo-maintenance";
-              CacheDirectory = "restic-repo-maintenance";
-              CacheDirectoryMode = "0700";
+              Restart = "no";
             };
           };
         }
       ]
     );
 
-    systemd.timers = mkIf cfg.runMaintenance {
-      restic-repo-maintenance = {
-        inherit (cfg) timerConfig;
-        enable = !inputs.firstBoot.value;
-        wantedBy = [ "timers.target" ];
-      };
-    };
+    systemd.timers = mkMerge [
+      (mapAttrs' (
+        name: _:
+        nameValuePair "restic-backups-${name}" {
+          inherit (cfg) timerConfig;
+          enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
+          wantedBy = [ "timers.target" ];
+          unitConfig.X-OnlyManualStart = true;
+        }
+      ) backups)
 
-    # Persist maintenance service cache otherwise forget command can be very
-    # expensive
-    ns.persistence.directories = optional cfg.runMaintenance {
-      directory = "/var/cache/restic-repo-maintenance";
-      mode = "0700";
-    };
+      (mkIf cfg.runMaintenance {
+        restic-repo-maintenance = {
+          inherit (cfg) timerConfig;
+          enable = !inputs.firstBoot.value;
+          wantedBy = [ "timers.target" ];
+          unitConfig.X-OnlyManualStart = true;
+        };
+      })
+    ];
   })
 
   (mkIf (cfg.server.enable && !virtualisation.vmVariant && !inputs.vmInstall.value) {
@@ -450,7 +465,7 @@ in
       restic-remote-maintenance = failureCfg;
     };
 
-    services.restic.server = {
+    services."restic".server = {
       enable = true;
       dataDir = cfg.server.dataDir;
       # WARN: If the port is changed the restic-rest-server.socket unit has to
@@ -466,19 +481,19 @@ in
 
     systemd.services = mkMerge [
       {
-        restic-remote-copy = {
+        "restic-remote-copy" = {
           enable = !inputs.firstBoot.value;
           wants = [ "network-online.target" ];
           requires = [ "caddy.service" ];
           after = [
             "network-online.target"
-            "restic-repo-maintenance.service"
             "caddy.service"
-          ];
+          ]
+          ++ optional cfg.runMaintenance "restic-repo-maintenance.service";
           restartIfChanged = false;
 
           environment = {
-            RESTIC_CACHE_DIR = "/var/cache/restic-remote-copy";
+            RESTIC_CACHE_DIR = cacheDir;
             RESTIC_FROM_REPOSITORY_FILE = resticRepositoryFile.path;
             RESTIC_FROM_PASSWORD_FILE = resticPasswordFile.path;
             RESTIC_PASSWORD_FILE = resticPasswordFile.path;
@@ -486,24 +501,22 @@ in
 
           preStart = ''
             # Initialise with copied chunker params to ensure good deduplication
-            ${resticExe} cat config || ${resticExe} init --copy-chunker-params
+            ${resticExe} cat config --no-lock >/dev/null || ${resticExe} init --copy-chunker-params
           '';
 
           serviceConfig = {
             Type = "oneshot";
             EnvironmentFile = resticReadWriteBackblazeVars.path;
             ExecStart = [
-              "${resticExe} copy"
+              "${resticExe} copy --retry-lock 5m"
               "${resticExe} check --with-cache --retry-lock 5m"
             ];
             PrivateTmp = true;
-            RuntimeDirectory = "restic-remote-copy";
-            CacheDirectory = "restic-remote-copy";
-            CacheDirectoryMode = "0700";
+            Restart = "no";
           };
         };
 
-        restic-remote-maintenance = {
+        "restic-remote-maintenance" = {
           enable = !inputs.firstBoot.value;
           wants = [ "network-online.target" ];
           requires = [ "caddy.service" ];
@@ -515,37 +528,30 @@ in
           restartIfChanged = false;
 
           environment = {
-            RESTIC_CACHE_DIR = "/var/cache/restic-remote-maintenance";
+            RESTIC_CACHE_DIR = cacheDir;
             RESTIC_FROM_REPOSITORY_FILE = resticRepositoryFile.path;
             RESTIC_FROM_PASSWORD_FILE = resticPasswordFile.path;
             RESTIC_PASSWORD_FILE = resticPasswordFile.path;
           };
 
-          preStart = ''
-            # Ensure the repository exists
-            ${resticExe} cat config
-          '';
-
           serviceConfig = {
             Type = "oneshot";
             EnvironmentFile = resticReadWriteBackblazeVars.path;
             ExecStart = [
-              "${resticExe} forget --prune ${concatStringsSep " " pruneOpts} --retry-lock 5m"
+              "${resticExe} unlock" # we can safely unlock https://github.com/NixOS/nixpkgs/pull/387116/changes/138abab480251e74ab0214a867f365b1be69f814
+              "${resticExe} forget --cleanup-cache --retry-lock 5m --prune ${concatStringsSep " " pruneOpts}"
               # In practice bandwidth usage seems to be data-subset * 2
-              "${resticExe} check --read-data-subset=400M --retry-lock 5m"
+              "${resticExe} check --with-cache --read-data-subset=400M --retry-lock 5m"
             ];
-
             PrivateTmp = true;
-            RuntimeDirectory = "restic-remote-maintenance";
-            CacheDirectory = "restic-remote-maintenance";
-            CacheDirectoryMode = "0700";
+            Restart = "no";
           };
         };
       }
     ];
 
     systemd.timers = {
-      restic-remote-copy = {
+      "restic-remote-copy" = {
         # Do not enable on firstBoot of a brand new deployment because we want to
         # manually copy the remote repo first
         enable = !inputs.firstBoot.value;
@@ -556,7 +562,7 @@ in
         };
       };
 
-      restic-remote-maintenance = {
+      "restic-remote-maintenance" = {
         enable = !inputs.firstBoot.value;
         wantedBy = [ "timers.target" ];
         timerConfig = {
@@ -579,15 +585,6 @@ in
         directory = cfg.server.dataDir;
         user = "restic";
         group = "restic";
-        mode = "0700";
-      }
-      # Persist cache because we want to avoid read operations from B2 storage
-      {
-        directory = "/var/cache/restic-remote-copy";
-        mode = "0700";
-      }
-      {
-        directory = "/var/cache/restic-remote-maintenance";
         mode = "0700";
       }
     ];

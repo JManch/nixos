@@ -93,7 +93,6 @@
           OnCalendar = "*-*-* 14:00:00";
           Persistent = true;
         };
-        runMaintenance = false;
       };
 
       desktop = {

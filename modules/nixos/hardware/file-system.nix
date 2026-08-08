@@ -219,6 +219,18 @@ in
       # configuration.
       kernelPackages = pkgs.linuxPackages;
       zfs.package = pkgs.zfs;
+      # ZFS will refuse to import pools that were last imported on other hosts
+      # (unless the previous host explicitly exported the pool OR this option
+      # is enabled - meaning `import` is passed the -f flag). This is relevant
+      # when switching between physical hosts or booting different installs
+      # e.g. booting an ISO. It should be safe for us to NOT force import as
+      # import should never fail as long as hostid is stable. However, I don't
+      # want to risk this on headless hosts which would be a massive pain to
+      # recover therefore I will continue to force import on those where it
+      # realistically has very little risk. Just need to remember to `zpool
+      # export` in sitations such as after importing a pool in an ISO for
+      # recovery or before moving a pool to another host.
+      zfs.forceImportRoot = device.type == "server";
 
       supportedFilesystems.zfs = true;
 

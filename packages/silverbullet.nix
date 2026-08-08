@@ -45,7 +45,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ln -s ${finalAttrs.clientBundle} client_bundle
   '';
 
-  cargoHash = "sha256-M/bX9oj76kmXGkCzvBJZMeI7/4UJ+yvz84KrysyPOLA=";
+  cargoHash = "sha256-tyd3Wshxbro3DIs9Lkytj13Xgn3HYZ75E/v6vO3Jny0=";
   cargoBuildFlags = [ "-p silverbullet" ];
 
   meta.mainProgram = "silverbullet";

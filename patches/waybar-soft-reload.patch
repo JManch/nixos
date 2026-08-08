@@ -1,0 +1,212 @@
+diff --git a/include/bar.hpp b/include/bar.hpp
+index 2dc51379..f040ff9c 100644
+--- a/include/bar.hpp
++++ b/include/bar.hpp
+@@ -74,6 +74,8 @@ class Bar : public sigc::trackable {
+   void show();
+   void hide();
+   void handleSignal(int);
++  /* Rebuild the modules from `new_config` without recreating the window/layer surface. */
++  void reloadModules(const Json::Value& new_config);
+   util::KillSignalAction getOnSigusr1Action();
+   util::KillSignalAction getOnSigusr2Action();
+ 
+@@ -97,6 +99,7 @@ class Bar : public sigc::trackable {
+  private:
+   void onMap(GdkEventAny*);
+   auto setupWidgets() -> void;
++  auto createModules() -> void;
+   void getModules(const Factory&, const std::string&, waybar::Group*);
+   void setupAltFormatKeyForModule(const std::string& module_name);
+   void setupAltFormatKeyForModuleList(const char* module_list_name);
+diff --git a/include/client.hpp b/include/client.hpp
+index 7971c132..54021dc4 100644
+--- a/include/client.hpp
++++ b/include/client.hpp
+@@ -21,6 +21,8 @@ class Client {
+   static Client* inst();
+   int main(int argc, char* argv[]);
+   void reset();
++  /* Re-read config and stylesheet, rebuilding modules in place. See Bar::reloadModules. */
++  void softReload();
+ 
+   Glib::RefPtr<Gtk::Application> gtk_app;
+   Glib::RefPtr<Gdk::Display> gdk_display;
+@@ -60,6 +62,8 @@ class Client {
+   std::list<struct waybar_output> outputs_;
+   std::unique_ptr<CssReloadHelper> m_cssReloadHelper;
+   std::string m_cssFile;
++  /* Retained from main() so softReload() resolves the config the same way. */
++  std::string m_configOpt;
+   sigc::connection monitor_added_connection_;
+   sigc::connection monitor_removed_connection_;
+   std::list<waybar_output*> pending_outputs_;
+diff --git a/include/util/kill_signal.hpp b/include/util/kill_signal.hpp
+index 221c554a..7a1e2811 100644
+--- a/include/util/kill_signal.hpp
++++ b/include/util/kill_signal.hpp
+@@ -9,6 +9,7 @@ namespace waybar::util {
+ enum class KillSignalAction : std::uint8_t {
+   TOGGLE,
+   RELOAD,
++  SOFT_RELOAD,
+   SHOW,
+   HIDE,
+   NOOP,
+@@ -16,6 +17,7 @@ enum class KillSignalAction : std::uint8_t {
+ inline const std::map<std::string, KillSignalAction> userKillSignalActions = {
+     {"TOGGLE", KillSignalAction::TOGGLE},
+     {"RELOAD", KillSignalAction::RELOAD},
++    {"SOFT-RELOAD", KillSignalAction::SOFT_RELOAD},
+     {"SHOW", KillSignalAction::SHOW},
+     {"HIDE", KillSignalAction::HIDE},
+     {"NOOP", KillSignalAction::NOOP}};
+diff --git a/man/waybar.5.scd.in b/man/waybar.5.scd.in
+index ff2af1bc..353ec3a6 100644
+--- a/man/waybar.5.scd.in
++++ b/man/waybar.5.scd.in
+@@ -159,15 +159,16 @@ The visual display elements for waybar use a CSS stylesheet. Waybar supports *st
+ 	typeof: string ++
+ 	default: *toggle* ++
+ 	Action that is performed when receiving SIGUSR1 kill signal. ++
+-	Possible values: *show*, *hide*, *toggle*, *reload*, *noop*. ++
++	Possible values: *show*, *hide*, *toggle*, *reload*, *soft-reload*, *noop*. ++
+ 	Default value: *toggle*.
+ 
+ *on-sigusr2* ++
+ 	typeof: string ++
+ 	default: *reload* ++
+ 	Action that is performed when receiving SIGUSR2 kill signal. ++
+-	Possible values: *show*, *hide*, *toggle*, *reload*, *noop*. ++
+-	Default value: *reload*.
++	Possible values: *show*, *hide*, *toggle*, *reload*, *soft-reload*, *noop*. ++
++	Default value: *reload*. ++
++	*soft-reload* re-reads the config and stylesheet and rebuilds the modules inside the existing windows, instead of recreating the bars -- and with them their layer surfaces -- as *reload* does. Window-level options (*position*, *height*, *width*, *layer*, *margin*, *mode*, *output*) still need a full *reload*.
+ 
+ # MODULE FORMAT
+ 
+diff --git a/src/bar.cpp b/src/bar.cpp
+index d84aafed..0ae74dbe 100644
+--- a/src/bar.cpp
++++ b/src/bar.cpp
+@@ -649,6 +649,12 @@ auto waybar::Bar::setupWidgets() -> void {
+   }
+   box_.pack_end(right_, expand_right, expand_right);
+ 
++  createModules();
++}
++
++auto waybar::Bar::createModules() -> void {
++  bool no_center = config["no-center"].isBool() ? config["no-center"].asBool() : false;
++
+   // Convert to button code for every module that is used.
+   setupAltFormatKeyForModuleList("modules-left");
+   setupAltFormatKeyForModuleList("modules-right");
+@@ -677,6 +683,37 @@ auto waybar::Bar::setupWidgets() -> void {
+   }
+ }
+ 
++/*
++ * Swap in a new config and rebuild the modules inside the *existing* window.
++ *
++ * A full reload (KillSignalAction::RELOAD) tears down every Bar and builds new ones, which means a
++ * new layer surface. Under Hyprland a freshly created layer surface is drawn over an
++ * exclusive-fullscreen window, so reloading to pick up a new colorscheme makes the bar pop back
++ * into view. Keeping the window -- and therefore the surface -- alive avoids that entirely.
++ *
++ * Only the module tree is rebuilt; window-level options (position, height, layer, margins, mode)
++ * still need a full reload.
++ */
++void waybar::Bar::reloadModules(const Json::Value& new_config) {
++  /* Detach the widgets before dropping the shared_ptrs: Group modules hold their children as
++   * widgets, so the modules have to outlive the removal. */
++  for (auto* box : {&left_, &center_, &right_}) {
++    for (auto* child : box->get_children()) {
++      box->remove(*child);
++    }
++  }
++
++  modules_left_.clear();
++  modules_center_.clear();
++  modules_right_.clear();
++  modules_all_.clear();
++
++  config = new_config;
++
++  createModules();
++  window.show_all();
++}
++
+ void waybar::Bar::onConfigure(GdkEventConfigure* ev) {
+   /*
+    * GTK wants new size for the window.
+diff --git a/src/client.cpp b/src/client.cpp
+index d09de5bd..68da5462 100644
+--- a/src/client.cpp
++++ b/src/client.cpp
+@@ -351,6 +351,7 @@ int waybar::Client::main(int argc, char* argv[]) {
+     throw std::runtime_error("Bar need to run under Wayland");
+   }
+   wl_display = gdk_wayland_display_get_wl_display(gdk_display->gobj());
++  m_configOpt = config_opt;
+   config.load(config_opt);
+   if (!portal) {
+     try {
+@@ -394,6 +395,41 @@ int waybar::Client::main(int argc, char* argv[]) {
+   return 0;
+ }
+ 
++/*
++ * Re-read the config and stylesheet and rebuild the modules inside the existing bars, so the
++ * layer surfaces are never recreated. See Bar::reloadModules for why that matters.
++ */
++void waybar::Client::softReload() {
++  try {
++    config.load(m_configOpt);
++  } catch (const std::exception& e) {
++    spdlog::error("Soft reload aborted, config not reloaded: {}", e.what());
++    return;
++  }
++
++  /* Bars are stored flat, so walk them per output and hand each the config in the same slot it
++   * was originally created from. A bar whose config disappeared keeps the one it has. */
++  for (auto& output : outputs_) {
++    auto configs = getOutputConfigs(output);
++    size_t idx = 0;
++    for (auto& bar : bars) {
++      if (bar->output == &output && idx < configs.size()) {
++        bar->reloadModules(configs[idx++]);
++      }
++    }
++  }
++
++  /* The stylesheet is swapped alongside the config by theme switchers, so pick it up too. The
++   * path is unchanged -- setupCss re-reads it from disk. */
++  try {
++    setupCss(m_cssFile);
++  } catch (const std::exception& e) {
++    spdlog::error("Soft reload: failed to reload style: {}", e.what());
++  }
++
++  spdlog::info("Soft reload done.");
++}
++
+ void waybar::Client::reset() {
+   gtk_app->quit();
+   // delete signal handler for css changes
+diff --git a/src/main.cpp b/src/main.cpp
+index 5e070b5a..551afbf0 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -120,6 +120,11 @@ void handleUserSignal(int signal, bool& reload) {
+         reload = true;
+         waybar::Client::inst()->reset();
+         return;
++      case waybar::util::KillSignalAction::SOFT_RELOAD:
++        /* Process-wide like RELOAD, so it runs once rather than per bar. */
++        spdlog::info("Soft reloading...");
++        waybar::Client::inst()->softReload();
++        return;
+       case waybar::util::KillSignalAction::NOOP:
+         break;
+     }

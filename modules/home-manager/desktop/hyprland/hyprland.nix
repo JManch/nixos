@@ -211,6 +211,8 @@ in
           inactive_timeout = 0;
           enable_hyprcursor = cfg.hyprcursor.package != null;
           hide_on_key_press = false;
+          zoom_detached_camera = false;
+          zoom_rigid = true;
         };
 
         animations.enabled = true;

@@ -1,0 +1,146 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joshua Manchester <JManch@protonmail.com>
+Date: Sat, 08 Aug 2026 15:33:35 +0100
+Subject: [PATCH] keybinds: consume held modifiers that triggered something else
+
+A release bind whose trigger is a bare modifier key, e.g.
+
+    hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd("pkill fuzzel || fuzzel"),
+            { release = true })
+
+fires on every release of that modifier, even when the modifier was held
+down in order to trigger something else. Holding SUPER to run a
+`mods = "SUPER"` trackpad gesture, or simply pressing SUPER+Enter, would
+launch the release bind's dispatcher as soon as SUPER came back up.
+
+Nothing in the keybind manager tracked whether a held modifier had been
+used. CBind::matches() is a pure function of the keys held at the moment
+of the event (src/keybinds/Bind.cpp), so at release time the bind sees
+only the modifier itself held and returns BIND_MATCH_FULL. The one
+existing cancellation primitive, CKeybindManager::shadowBinds(), cannot
+help here: it only shadows on BIND_MATCH_FULL, and matches() returns
+BIND_MATCH_PARTIAL for any BIND_FLAG_RELEASE bind while pressed == true,
+so a release bind can never enter m_shadowed.
+
+The trackpad gesture code had no connection to the keybind manager at
+all. It reads the held modifiers via getModsFromAllKBs() to decide
+whether a gesture matches, but never reported that it used them.
+
+Add CKeybindManager::consumeHeldModifiers(mask), which walks the pressed
+inputs whose key is one of the given modifiers and parks every release
+bind triggered by that bare modifier in the input's suppressedBinds list.
+processEvent() already consults that list through isSuppressed(), so no
+new gating is needed on the release path, and the flags die with the
+SPressedInput record when the modifier is physically released.
+
+It is called from two places:
+
+  - invokeBind(), for any bind firing on press that has at least one real
+    key of its own. The chordSize() > 0 test is what stops a bind whose
+    trigger is itself a bare modifier from consuming itself, so a plain
+    tap of SUPER still works. Routing it through invokeBind() rather than
+    processEvent() also covers invokeDeferredBinds() and the long-press
+    and repeat timers, which invoke binds directly.
+
+  - CTrackpadGestures::gestureUpdate(), both overloads, at the point a
+    gesture is selected. Consuming only on a successful match means a
+    swipe that matches no configured gesture still leaves the release
+    bind armed.
+
+Chord release binds are unaffected: the suppression lands on the
+modifier's own SPressedInput, while a bind like `SUPER + K, release` is
+triggered by K's record, which is never consumed.
+
+Known limitation: a long_press bind on a bare modifier can still fire
+during a trackpad gesture, since the long-press timer checks only
+canInvokeNow(). Ordinary key and mouse events already cancel pending
+timed binds, so this only applies to gestures.
+---
+ src/keybinds/Manager.cpp                         | 23 +++++++++++++++++++++++
+ src/keybinds/Manager.hpp                         |  1 +
+ src/managers/input/trackpad/TrackpadGestures.cpp |  3 +++
+ 3 files changed, 27 insertions(+)
+
+diff --git a/src/keybinds/Manager.cpp b/src/keybinds/Manager.cpp
+index 9025dbfd..cc7e615a 100644
+--- a/src/keybinds/Manager.cpp
++++ b/src/keybinds/Manager.cpp
+@@ -583,6 +583,9 @@ SBindResult CKeybindManager::processEvent(const SBindEventContext& context, cons
+ }
+ 
+ SBindResult CKeybindManager::invokeBind(const PBind& bind, bool pressed, SPressedInput* pressedInput) {
++    if (pressed && bind->chordSize() > 0)
++        consumeHeldModifiers(bind->modifierMask());
++
+     const auto INPUT_KEY    = pressedInput ? std::optional{pressedInput->key} : std::nullopt;
+     const auto INPUT_DEVICE = pressedInput ? pressedInput->device.lock() : nullptr;
+ 
+@@ -789,6 +792,26 @@ void CKeybindManager::shadowBinds(const std::optional<SResolvedKey>& excluded, c
+     }
+ }
+ 
++// a modifier that was held to trigger something else (a bind, a trackpad gesture) has been used up:
++// it must not go on to fire a release bind whose trigger is that bare modifier.
++void CKeybindManager::consumeHeldModifiers(ModifierMask mask) {
++    if (mask == HL_MODIFIER_NONE)
++        return;
++
++    for (auto& input : m_inputState.pressed()) {
++        if (!input.key.modifier || (mask & *input.key.modifier) == HL_MODIFIER_NONE)
++            continue;
++
++        for (const auto& bind : m_registry.binds()) {
++            if (!bind->hasFlag(BIND_FLAG_RELEASE) || !bind->containsKey(input.key))
++                continue;
++
++            if (std::ranges::none_of(input.suppressedBinds, [&bind](const auto& weak) { return weak.lock() == bind; }))
++                input.suppressedBinds.emplace_back(bind);
++        }
++    }
++}
++
+ PBind CKeybindManager::findConflictingBind(xkb_keysym_t keysym, ModifierMask modifiers) const {
+     return m_registry.findShortcutConflict(keysym, modifiers, m_xkbTranslationState);
+ }
+diff --git a/src/keybinds/Manager.hpp b/src/keybinds/Manager.hpp
+index 9782a237..c72d2bf3 100644
+--- a/src/keybinds/Manager.hpp
++++ b/src/keybinds/Manager.hpp
+@@ -35,6 +35,7 @@ namespace Keybinds {
+         void               updateXKBTranslationState();
+         PBind              findConflictingBind(xkb_keysym_t keysym, Input::ModifierMask modifiers) const;
+         void               shadowBinds(const std::optional<SResolvedKey>& excluded = std::nullopt, const SP<IHID>& excludedDevice = nullptr);
++        void               consumeHeldModifiers(Input::ModifierMask mask);
+ 
+         CRegistry&         registry();
+         const CRegistry&   registry() const;
+diff --git a/src/managers/input/trackpad/TrackpadGestures.cpp b/src/managers/input/trackpad/TrackpadGestures.cpp
+index 2a801541..44dad9ae 100644
+--- a/src/managers/input/trackpad/TrackpadGestures.cpp
++++ b/src/managers/input/trackpad/TrackpadGestures.cpp
+@@ -2,6 +2,7 @@
+ 
+ #include "../InputManager.hpp"
+ #include "../../../config/ConfigValue.hpp"
++#include "../../../keybinds/Manager.hpp"
+ #include "../../../protocols/ShortcutsInhibit.hpp"
+ 
+ #include <ranges>
+@@ -159,6 +160,7 @@ void CTrackpadGestures::gestureUpdate(const IPointer::SSwipeUpdateEvent& e) {
+ 
+             m_activeGesture     = g;
+             g->currentDirection = g->gesture->isDirectionSensitive() ? g->direction : direction;
++            Keybinds::mgr()->consumeHeldModifiers(g->modMask);
+             m_activeGesture->gesture->begin({.swipe = &e, .direction = direction, .scale = g->deltaScale});
+             break;
+         }
+@@ -227,6 +229,7 @@ void CTrackpadGestures::gestureUpdate(const IPointer::SPinchUpdateEvent& e) {
+ 
+             m_activeGesture     = g;
+             g->currentDirection = g->gesture->isDirectionSensitive() ? g->direction : direction;
++            Keybinds::mgr()->consumeHeldModifiers(g->modMask);
+             m_activeGesture->gesture->begin({.pinch = &e, .direction = direction});
+             break;
+         }
+-- 
+2.55.02.55.0

@@ -380,13 +380,12 @@ in
       hl.bind(mod_shift_ctrl .. " + C", hl.dsp.exec_cmd("${copyScreenshotText}"))
 
       -- Gestures
+      hl.gesture({ fingers = 2, direction = "pinch", mods = mod, action = "cursor_zoom", mode = "live" })
       hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
-      hl.gesture({ fingers = 4, direction = "swipe", scale = 2, action = "resize" })
-      hl.gesture({ fingers = 4, direction = "swipe", mods = "ALT", scale = 2, action = "move" })
+      hl.gesture({ fingers = 3, direction = "swipe", mods = mod, scale = 2, action = "resize" })
+      hl.gesture({ fingers = 4, direction = "swipe", mods = mod, scale = 2, action = "move" })
       hl.gesture({ fingers = 3, direction = "pinch", action = "fullscreen", mode = "maximize" })
       hl.gesture({ fingers = 4, direction = "pinch", action = "fullscreen" })
-      hl.gesture({ fingers = 3, direction = "up", action = "special", workspace_name = "scratch2" })
-      hl.gesture({ fingers = 3, direction = "down", action = "special", workspace_name = "scratch3" })
 
       ${optionalString (device.backlight != null)
         # nix

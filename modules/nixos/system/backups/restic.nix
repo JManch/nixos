@@ -3,7 +3,6 @@
   cfg,
   pkgs,
   self,
-  utils,
   config,
   inputs,
   hostname,
@@ -364,29 +363,25 @@ in
             serviceConfig = {
               Type = "oneshot";
 
-              ExecStart =
-                let
-                  excludeFlag =
-                    optional (backup.backendOptions.exclude != [ ])
-                      "--exclude-file=${pkgs.writeText "restic-backup-${name}-exclude-patterns" (concatStringsSep "\n" backup.backendOptions.exclude)}";
-                in
-                utils.escapeSystemdExecArgs (
-                  [
-                    resticExe
-                    "backup"
-                  ]
-                  ++ backup.backendOptions.extraBackupArgs
-                  ++ excludeFlag
-                  ++ backup.paths
-                );
+              ExecStart = concatStringsSep " " (
+                [
+                  resticExe
+                  "backup"
+                  "--files-from-verbatim ${pkgs.writeText "restic-backup-${name}-paths" (concatStringsSep "\n" backup.paths)}"
+                ]
+                ++ backup.backendOptions.extraBackupArgs
+                ++
+                  optional (backup.backendOptions.exclude != [ ])
+                    "--exclude-file=${pkgs.writeText "restic-backup-${name}-exclude-patterns" (concatStringsSep "\n" backup.backendOptions.exclude)}"
+              );
 
               # There is no point in restarting Restic backups as we would only ever want to
               # restart after network errors and restic has a built-in incremental retry
               # mechanism that cannot currently be disabled
               # https://github.com/restic/restic/issues/5463
               Restart = mkForce "no";
-
               # we intentially do NOT set CacheDirectory because it's shared between units
+              ReadWritePaths = [ cacheDir ];
               PrivateTmp = true;
             };
           }
@@ -419,6 +414,7 @@ in
                 "${resticExe} check --with-cache --read-data-subset=500M --retry-lock 5m"
               ];
               PrivateTmp = true;
+              ReadWritePaths = [ cacheDir ];
               Restart = "no";
             };
           };
@@ -509,6 +505,7 @@ in
               "${resticExe} copy --retry-lock 5m"
               "${resticExe} check --with-cache --retry-lock 5m"
             ];
+            ReadWritePaths = [ cacheDir ];
             PrivateTmp = true;
             Restart = "no";
           };
@@ -541,6 +538,7 @@ in
               # In practice bandwidth usage seems to be data-subset * 2
               "${resticExe} check --with-cache --read-data-subset=400M --retry-lock 5m"
             ];
+            ReadWritePaths = [ cacheDir ];
             PrivateTmp = true;
             Restart = "no";
           };

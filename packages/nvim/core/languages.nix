@@ -145,5 +145,9 @@ in
     zls.cmd = mkForce [ "zls" ];
 
     rust-analyzer.cmd = mkForce [ "rust-analyzer" ];
+
+    # Disable the "update flake inputs" prompt
+    # https://github.com/oxalica/nil/blob/205c8ba65a7f956d7837a710794001b3515c65ff/docs/configuration.md?plain=1#L66
+    nil.settings.nil.nix.flake.autoArchive = false;
   };
 }

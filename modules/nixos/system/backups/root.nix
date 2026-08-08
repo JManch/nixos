@@ -113,10 +113,13 @@ in
     };
   };
 
-  systemd.services =
+  systemd.services = mapAttrs' (
+    name: value:
     let
+      unitName = "${value.backend}-backups-${name}";
+      retryUnit = "retry-${unitName}";
       ssidCheck = pkgs.writeShellApplication {
-        name = "backup-ssid-check";
+        name = "backup-ssid-check-${unitName}";
         runtimeInputs = with pkgs; [
           coreutils
           systemd
@@ -125,10 +128,24 @@ in
         ];
         text = ''
           iface="${networking.wireless.interface}"
+
+          # Schedule a retry in 30 mins
+          skip() {
+            echo "$1"
+            systemctl stop "${retryUnit}.timer" "${retryUnit}.service" &>/dev/null || true
+            if ! systemd-run --quiet --collect \
+                   --on-active="30m" \
+                   --unit="${retryUnit}" \
+                   --description="Retry ${unitName} after a skipped backup" \
+                   systemctl start --no-block "${unitName}.service"; then
+              echo "WARNING: could not schedule retry for ${unitName}"
+            fi
+            exit 1
+          }
+
           default_dev=$(ip -json route show default | jaq -r '.[0].dev // ""')
           if [[ -z "$default_dev" ]]; then
-            echo "No default route, skipping backup"
-            exit 1
+            skip "No default route, skipping backup"
           fi
           if [[ "$default_dev" != "$iface" ]]; then
             echo "Default route is via $default_dev, SSID check not applicable"
@@ -140,66 +157,56 @@ in
           active_ssid=$(jaq -r '.SSID // ""' <<<"$status")
 
           if [[ "$oper" != "routable" ]]; then
-            echo "Interface $iface is '$oper' rather than routable, skipping backup"
-            exit 1
+            skip "Interface $iface is '$oper' rather than routable, skipping backup"
           fi
-
           if [[ -z "$active_ssid" ]]; then
-            echo "Could not determine SSID for $iface, skipping backup out of caution"
-            exit 1
+            skip "Could not determine SSID for $iface, skipping backup out of caution"
           fi
 
           blacklist=(${concatMapStringsSep " " (ssid: "\"${ssid}\"") cfg.ssidBlacklist})
           for ssid in "''${blacklist[@]}"; do
             if [[ "$ssid" == "$active_ssid" ]]; then
-              echo "Active SSID is blacklisted from performing backups"
-              exit 1
+              skip "Active SSID is blacklisted from performing backups"
             fi
           done
         '';
       };
     in
-    mapAttrs' (
-      name: value:
-      nameValuePair "${value.backend}-backups-${name}" (
-        mkIf cfg.${value.backend}.enable {
-          wants = [ "network-online.target" ];
-          requires = value.dependencies;
-          after = value.dependencies ++ [ "network-online.target" ];
-          restartIfChanged = false;
-
-          preStart = mkOrder 0 ''
-            ${value.preBackupScript}
-          '';
-
-          postStop = mkOrder 2000 ''
-            ${value.postBackupScript}
-          '';
-
-          unitConfig = {
-            StartLimitBurst = 4;
-            StartLimitIntervalSec = "2h";
-          };
-
-          serviceConfig = {
-            # If the SSID check fails the remaining service commands are skipped and the
-            # unit is NOT marked as failed. This isn't ideal as it means the backup will
-            # not be retried until the next scheduled run. I'd rather not be spammed with
-            # the OnFailure notifications everytime a backup is skipped though. Hopefully
-            # can find a better solution at some point.
-            ExecCondition = mkIf (cfg.ssidBlacklist != [ ]) "${getExe ssidCheck}";
-
-            Restart = "on-failure";
-            RestartSec = "5m";
-            RestartMaxDelaySec = "30m";
-            RestartSteps = 3;
-
-            ProtectSystem = "strict";
-            ProtectHome = "read-only";
-          };
-        }
-      )
-    ) cfg.backups;
+    nameValuePair unitName (
+      mkIf cfg.${value.backend}.enable {
+        wants = [ "network-online.target" ];
+        requires = value.dependencies;
+        after = value.dependencies ++ [ "network-online.target" ];
+        restartIfChanged = false;
+        preStart = mkOrder 0 ''
+          ${value.preBackupScript}
+        '';
+        postStop = mkOrder 2000 ''
+          ${value.postBackupScript}
+        '';
+        unitConfig = {
+          StartLimitIntervalSec = "2h";
+          StartLimitBurst = 4;
+        };
+        serviceConfig = {
+          # If the SSID check fails the remaining service commands are skipped and
+          # the unit is NOT marked as failed, so OnFailure notifications don't fire
+          # for a routine skip.
+          ExecCondition = mkIf (cfg.ssidBlacklist != [ ]) "${getExe ssidCheck}";
+          # Cancel any pending retries
+          ExecStartPost = mkIf (
+            cfg.ssidBlacklist != [ ]
+          ) "-${pkgs.systemd}/bin/systemctl stop ${retryUnit}.timer ${retryUnit}.service";
+          Restart = "on-failure";
+          RestartSec = "5m";
+          RestartMaxDelaySec = "30m";
+          RestartSteps = 3;
+          ProtectSystem = "strict";
+          ProtectHome = "read-only";
+        };
+      }
+    )
+  ) cfg.backups;
 
   systemd.timers = mapAttrs' (
     name: backup:

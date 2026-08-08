@@ -397,7 +397,11 @@ in
   ++ remoteRebuildScripts
   ++ droidRebuildScripts
   ++ flakeUpdate;
-  ns.persistenceAdminHome.directories = [ ".remote-builds" ];
+  ns.persistenceAdminHome.directories = [
+    ".remote-builds"
+    # nh uses nix-output-monitor which stores data here for build time estimates
+    ".local/state/nix-output-monitor"
+  ];
   boot.binfmt.emulatedSystems = cfg.builder.emulatedSystems;
   services.getty.helpLine = mkForce "";
 

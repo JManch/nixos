@@ -422,26 +422,14 @@ in
       ]
     );
 
-    systemd.timers = mkMerge [
-      (mapAttrs' (
-        name: _:
-        nameValuePair "restic-backups-${name}" {
-          inherit (cfg) timerConfig;
-          enable = mkIf cfg.server.enable (!inputs.firstBoot.value);
-          wantedBy = [ "timers.target" ];
-          unitConfig.X-OnlyManualStart = true;
-        }
-      ) backups)
-
-      (mkIf cfg.runMaintenance {
-        restic-repo-maintenance = {
-          inherit (cfg) timerConfig;
-          enable = !inputs.firstBoot.value;
-          wantedBy = [ "timers.target" ];
-          unitConfig.X-OnlyManualStart = true;
-        };
-      })
-    ];
+    systemd.timers = mkIf cfg.runMaintenance {
+      restic-repo-maintenance = {
+        inherit (cfg) timerConfig;
+        enable = !inputs.firstBoot.value;
+        wantedBy = [ "timers.target" ];
+        unitConfig.X-OnlyManualStart = true;
+      };
+    };
   })
 
   (mkIf (cfg.server.enable && !virtualisation.vmVariant && !inputs.vmInstall.value) {

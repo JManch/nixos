@@ -201,7 +201,17 @@ in
       )
     ) cfg.backups;
 
-  # TODO: We should probably define backup timers here
+  systemd.timers = mapAttrs' (
+    name: backup:
+    nameValuePair "${backup.backend}-backups-${name}" (
+      mkIf (cfg.${backup.backend}.enable && backup.timerConfig != null) {
+        inherit (backup) timerConfig;
+        enable = !inputs.firstBoot.value;
+        wantedBy = [ "timers.target" ];
+        unitConfig.X-OnlyManualStart = true;
+      }
+    )
+  ) cfg.backups;
 
   ns.services =
     let

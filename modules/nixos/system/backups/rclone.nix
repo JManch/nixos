@@ -209,14 +209,6 @@ in
       }
     ) backups;
 
-    systemd.timers = mapAttrs' (
-      name: backup:
-      nameValuePair "rclone-backups-${name}" {
-        wantedBy = [ "timers.target" ];
-        inherit (backup) timerConfig;
-      }
-    ) (filterAttrs (_: backup: backup.timerConfig != null) backups);
-
     ns.persistence.directories = mapAttrsToList (name: _: {
       directory = "/var/cache/rclone-backups/${name}";
       mode = "0700";

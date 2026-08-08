@@ -9,6 +9,7 @@ home-assistant.python3Packages.callPackage (
     aiohttp,
     aiofiles,
     watchdog,
+    watchfiles,
     ...
   }:
   buildHomeAssistantComponent {
@@ -21,6 +22,7 @@ home-assistant.python3Packages.callPackage (
       aiohttp
       aiofiles
       watchdog
+      watchfiles
     ];
 
     meta = {

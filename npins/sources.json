@@ -383,19 +383,6 @@
       "url": "https://files.pythonhosted.org/packages/8c/5b/ae62a2607b64134efcefccfb0b858b6017506c72738606c3b30e3bab3ea0/qobuz-dl-0.9.9.10.tar.gz",
       "hash": "sha256-q7TUl3scg+isoLB0xJvJLCtvJU7O+ogMlftt0O73qb4="
     },
-    "recyclarr-templates": {
-      "type": "Git",
-      "repository": {
-        "type": "GitHub",
-        "owner": "recyclarr",
-        "repo": "config-templates"
-      },
-      "branch": "master",
-      "submodules": false,
-      "revision": "86bed2fded1acbe364e165c1d7d60be0d5473e63",
-      "url": "https://github.com/recyclarr/config-templates/archive/86bed2fded1acbe364e165c1d7d60be0d5473e63.tar.gz",
-      "hash": "sha256-enfzzYnDjO2zFxB+RHFSVp07D/u8a+6ALLxpKg1GMQ4="
-    },
     "scdl": {
       "type": "PyPi",
       "name": "scdl",

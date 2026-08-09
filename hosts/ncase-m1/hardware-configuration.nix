@@ -119,14 +119,12 @@
       enable = true;
       config = # yaml
         ''
-          version: 5
+          version: 6
           daemon:
             log_level: info
             admin_group: wheel
             disable_clocks_cleanup: false
           apply_settings_timer: 5
-          current_profile: null
-          auto_switch_profiles: false
           gpus:
             1002:744C-1EAE:7905-0000:09:00.0:
               fan_control_enabled: true
@@ -156,6 +154,8 @@
               max_core_clock: 2394
               voltage_offset: -30
               power_profile_mode_index: 0
+          current_profile: null
+          auto_switch_profiles: false
         '';
     };
 

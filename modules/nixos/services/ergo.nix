@@ -445,7 +445,7 @@ in
   ns.backups."ergo" = {
     backend = "restic";
     paths = [
-      "/var/lib/ergo"
+      "/var/lib/private/ergo"
       "/var/backup/postgresql/ergo.sql"
     ];
     dependencies = [ "postgresqlBackup-ergo.service" ];

@@ -55,8 +55,12 @@ in
       }
 
       window#waybar {
-          background: @background;
+          background: @transparent;
           color: @text-light;
+      }
+
+      window#waybar > box {
+          background: @background;
           border-radius: ${
             if cfg.float then
               toString cornerRadius

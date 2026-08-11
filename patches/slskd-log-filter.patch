@@ -1,0 +1,12 @@
+diff --git a/src/slskd/Shares/ShareScanner.cs b/src/slskd/Shares/ShareScanner.cs
+index 7c93d437..3ea8e5cc 100644
+--- a/src/slskd/Shares/ShareScanner.cs
++++ b/src/slskd/Shares/ShareScanner.cs
+@@ -291,6 +291,7 @@ namespace slskd.Shares
+ 
+                                     if (filters.Any(filter => filter.IsMatch(originalFilename)))
+                                     {
++                                        Log.Information("Filtered path {String}", originalFilename);
+                                         filteredFiles++;
+                                         continue;
+                                     }

@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   config,
   inputs,
 }:
@@ -27,6 +28,7 @@ in
 
   services.slskd = {
     enable = true;
+    package = lib.${ns}.addPatches pkgs.slskd [ "slskd-log-filter.patch" ];
     domain = null;
     environmentFile = slskdVars.path;
     openFirewall = false;
@@ -47,7 +49,7 @@ in
         ++ map (p: "!${mediaDir}/${p}") slskdExcludePaths;
 
         filters = [
-          "library\\.db$"
+          "library\\.db.*" # beets also creates library.db-before-etc.bak https://github.com/beetbox/beets/blob/dc1709e14849adfec7208c53196dc2b01b5f3fd9/beets/dbcore/db.py#L1052
           "\\.nsp$"
           "\\.m3u$"
         ];

@@ -361,6 +361,11 @@ in
         port = 8001;
         extraAllowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
       };
+
+      llama-cpp.proxy = {
+        enable = true;
+        address = "192.168.88.254";
+      };
     };
 
     system = {

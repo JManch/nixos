@@ -148,8 +148,14 @@
       air-vpn.enable = true;
       audiomuse.worker.enable = true;
 
-      ollama = {
+      llama-cpp.worker = {
         enable = true;
+        model = "/persist/models/Qwen3.5-27B-Q4_K_M.gguf";
+        mmproj = "/persist/models/mmproj-Qwen3.5-27B-f16.gguf";
+      };
+
+      ollama = {
+        enable = false;
         openWebUI = {
           enable = false;
           openFirewall = true;

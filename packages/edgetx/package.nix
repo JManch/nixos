@@ -13,7 +13,7 @@
   imgui,
 }:
 let
-  version = "2.12.0";
+  version = "2.12.2";
 
   maxlibqt = fetchFromGitHub {
     owner = "edgetx";
@@ -66,6 +66,7 @@ in
     "t14"
     "nv14"
     "el18"
+    "pa01"
     "pl18"
     "pl18ev"
     "pl18u"
@@ -83,7 +84,7 @@ in
       repo = "edgetx";
       tag = "v${version}";
       fetchSubmodules = true;
-      hash = "sha256-bwS0nD1beXgqG1uiRZOK2rbhwAFvX/3nHAWPsuh7HWM=";
+      hash = "sha256-AN+XzADNAG3FXhRaofHPN7w9I51dUrF/wpQYgHuKX5k=";
     };
 
     patches = old.patches ++ [ ./install-desktop-files.patch ];

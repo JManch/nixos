@@ -17,12 +17,12 @@ in
       pkgs.imgui.version == "1.91.4"
     ) "Edgetx can be re-enabled now that imgui is fixed";
     [
-      # (
-      #   assert lib.assertMsg (
-      #     pkgs.edgetx.version == "2.11.3"
-      #   ) "Remove edgetx override if 2.12 has released";
-      #   pkgs.${ns}.edgetx
-      # )
+      (
+        assert lib.assertMsg (
+          pkgs.edgetx.version == "2.11.5"
+        ) "Remove edgetx override if 2.12 has released";
+        pkgs.${ns}.edgetx
+      )
       pkgs.${ns}.expresslrs-configurator
       (pkgs.makeDesktopItem {
         name = "betaflight";

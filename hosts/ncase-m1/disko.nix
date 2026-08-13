@@ -129,7 +129,7 @@ in
 
             "${pseudoRoot}/persist/models" = {
               type = "zfs_fs";
-              mountpoint = "/persist/var/lib/private/ollama";
+              mountpoint = "/persist/models";
               options.mountpoint = "legacy";
               options.recordsize = "1M";
             };

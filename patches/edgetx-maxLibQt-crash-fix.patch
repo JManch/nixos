@@ -1,0 +1,14 @@
+diff --git a/src/core/AppDebugMessageHandler.cpp b/src/core/AppDebugMessageHandler.cpp
+index 93fa5e7..000f37e 100644
+--- a/src/core/AppDebugMessageHandler.cpp
++++ b/src/core/AppDebugMessageHandler.cpp
+@@ -199,7 +199,8 @@ void AppDebugMessageHandler::messageHandler(QtMsgType type, const QMessageLogCon
+ 	msgPattern.replace(QLatin1String("%{short-type}"), shortTypeNames().value(type, QStringLiteral("?")));
+ 	msgPattern.replace(QLatin1String("%{full-function}"), context.function);
+ 
+-	QMessageLogContext newContext(qPrintable(file), context.line, context.function, context.category);
++	const QByteArray fileName = file.toLocal8Bit();
++	QMessageLogContext newContext(fileName.constData(), context.line, context.function, context.category);
+ 
+ 	qSetMessagePattern(msgPattern);
+ 

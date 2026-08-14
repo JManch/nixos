@@ -23,7 +23,7 @@ in
         ) "Remove edgetx override if 2.12 has released";
         pkgs.${ns}.edgetx
       )
-      pkgs.${ns}.expresslrs-configurator
+      pkgs.expresslrs-configurator
       (pkgs.makeDesktopItem {
         name = "betaflight";
         desktopName = "Betaflight";
@@ -37,8 +37,8 @@ in
     ];
 
   services.udev.packages = [
-    # These udev rules are also required for betaflight connectivity
-    pkgs.${ns}.expresslrs-configurator
+    # Required for betaflight connectivity and expresslrs-configurator
+    pkgs.platformio-core.udev
 
     # For giving direct access to TX15 HID devices in sims running through proton. Also needs
     # PROTON_ENABLE_HIDRAW=0x1209/0x4f54 in the launch options

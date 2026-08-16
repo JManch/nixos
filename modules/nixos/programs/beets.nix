@@ -40,6 +40,7 @@ in
             hook.enable = true;
             fromfilename.enable = true;
             info.enable = true;
+            edit.enable = true;
           };
         }
       );
@@ -65,6 +66,7 @@ in
               "hook"
               "fromfilename"
               "info"
+              "edit"
             ];
 
             incremental = false; # creates unwanted state.pickel file
@@ -80,6 +82,23 @@ in
                 { coverart = "releasegroup"; }
                 "itunes"
                 "albumart"
+              ];
+            };
+
+            edit = {
+              itemfields = [
+                "track"
+                "title"
+                "artist"
+                "artists"
+              ];
+              albumfields = [
+                "album"
+                "albumartist"
+                "albumartists"
+                "albumtype"
+                "albumtypes"
+                "year"
               ];
             };
 

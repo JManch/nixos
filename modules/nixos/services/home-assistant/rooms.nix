@@ -176,8 +176,7 @@ in
 
           luminence = {
             sensor = "joshua_presence_illuminance";
-            threshold.lower = 12.0;
-            threshold.upper = 32.0;
+            threshold = 12.0;
           };
 
           presenceTriggers = [

@@ -180,28 +180,20 @@ in
                     sensor = mkOption {
                       type = types.str;
                       default = "smoothed_solar_power";
-                      description = "Entity ID of luminence sensor";
+                      description = ''
+                        Entity ID of luminence sensor used to decide when lights should turn ON. This
+                        can be a physical sensor inside the room. Turning lights OFF is always driven
+                        by `sensor.smoothed_solar_power` rather than this sensor, because a sensor
+                        inside the room sees the room's own lights and would otherwise turn them
+                        straight back off after they turn on.
+                      '';
                     };
 
-                    threshold = {
-                      lower = mkOption {
-                        type = types.float;
-                        description = ''
-                          Luminence threshold below which lights will turn on.
-                          If a luminence sensor is used there should be a gap
-                          between the thresholds to avoid on/off loops. The
-                          lower threshold is used to determine whether lights
-                          should turn on. Upper threshold is just used for
-                          triggers.
-                        '';
-                      };
-
-                      upper = mkOption {
-                        type = types.float;
-                        description = ''
-                          Luminence threshold above which lights will turn off.
-                        '';
-                      };
+                    threshold = mkOption {
+                      type = types.float;
+                      description = ''
+                        Value of `luminence.sensor` below which lights will turn on.
+                      '';
                     };
                   };
 
@@ -710,6 +702,8 @@ in
               presenceConditions
               presenceTriggers
               ;
+            hasBlinds = roomCfg.blinds.entities != [ ];
+            upperSolarThreshold = 2; # lights turn off above this power gen
           in
           mkIf cfg'.automatedToggle.enable {
             automation = [
@@ -720,17 +714,23 @@ in
                 triggers = [
                   {
                     platform = "numeric_state";
-                    entity_id = [ "sensor.${luminence.sensor}" ];
-                    above = luminence.threshold.upper;
+                    entity_id = [ "sensor.smoothed_solar_power" ];
+                    above = upperSolarThreshold;
                     id = "luminence";
                   }
                   {
                     platform = "numeric_state";
                     entity_id = [ "sensor.${luminence.sensor}" ];
-                    below = luminence.threshold.lower;
+                    below = luminence.threshold;
                     id = "luminence";
                   }
                 ]
+                ++ optional hasBlinds {
+                  platform = "state";
+                  entity_id = [ "cover.${room}_blinds" ];
+                  to = "open";
+                  id = "luminence";
+                }
                 ++ presenceTriggers;
                 conditions = singleton {
                   condition = "state";
@@ -739,13 +739,27 @@ in
                 };
                 actions =
                   let
-                    luminenceCondition =
-                      below:
+                    # `luminence.sensor` is below the lower threshold, i.e. the
+                    # room is dark enough that lights should be on.
+                    darkCondition = singleton {
+                      condition = "numeric_state";
+                      entity_id = "sensor.${luminence.sensor}";
+                      below = luminence.threshold;
+                    };
+
+                    # Solar power is above the upper threshold, i.e. it's
+                    # bright enough outside that lights should be off. If the
+                    # room has blinds they must also be open.
+                    brightCondition =
                       singleton {
                         condition = "numeric_state";
-                        entity_id = "sensor.${luminence.sensor}";
-                        below = mkIf below luminence.threshold.lower;
-                        above = mkIf (!below) luminence.threshold.lower;
+                        entity_id = "sensor.smoothed_solar_power";
+                        above = upperSolarThreshold;
+                      }
+                      ++ optional hasBlinds {
+                        condition = "state";
+                        entity_id = "cover.${room}_blinds";
+                        state = "open";
                       };
 
                     triggeredByLuminence =
@@ -783,7 +797,7 @@ in
                   singleton {
                     "if" =
                       presenceConditions
-                      ++ luminenceCondition true
+                      ++ darkCondition
                       # If the room has sleep tracking we can add an additional check to ensure that
                       # lights do not turn on whilst sleeping even if presence conditions are met
                       ++ optional roomCfg.sleepTracking.enable {
@@ -818,7 +832,7 @@ in
                             }
                             {
                               condition = "and";
-                              conditions = triggeredByLuminence true ++ luminenceCondition false;
+                              conditions = triggeredByLuminence true ++ brightCondition;
                             }
                           ];
                         };
@@ -828,50 +842,6 @@ in
                         };
                       };
                   };
-              }
-              {
-                # Disables automated lighting if the lights are "manually"
-                # (not triggered by an automation) turned off. Automated
-                # lighting will re-enable if lights are turned on by an
-                # automation such as sunrise lighting.
-                alias = "${formattedRoomName} Automated Lights Toggle";
-                mode = "single";
-                triggers = singleton {
-                  platform = "state";
-                  entity_id = [ "light.${room}_lights" ];
-                  from = null;
-                };
-                actions = singleton {
-                  choose = [
-                    {
-                      conditions = [
-                        {
-                          condition = "template";
-                          value_template = "{{ trigger.to_state.context.parent_id == none }}";
-                        }
-                        {
-                          condition = "state";
-                          entity_id = "light.${room}_lights";
-                          state = "off";
-                        }
-                      ];
-                      sequence = singleton {
-                        action = "input_boolean.turn_off";
-                        target.entity_id = "input_boolean.${room}_automated_lights_toggle";
-                      };
-                    }
-                    {
-                      conditions = singleton {
-                        condition = "template";
-                        value_template = "{{ trigger.to_state.context.parent_id != none }}";
-                      };
-                      sequence = singleton {
-                        action = "input_boolean.turn_on";
-                        target.entity_id = "input_boolean.${room}_automated_lights_toggle";
-                      };
-                    }
-                  ];
-                };
               }
             ];
 

@@ -1,5 +1,5 @@
 diff --git a/service.go b/service.go
-index 112ddb2..d58cf53 100644
+index dfae6d1..d73e482 100644
 --- a/service.go
 +++ b/service.go
 @@ -41,6 +41,24 @@ func NewService(initialMode Mode) Service {
@@ -20,15 +20,15 @@ index 112ddb2..d58cf53 100644
 +	*service.listeners = append(*service.listeners, listener)
 +
 +	if (service.currentMode == "dark") {
-+		log.Println("Skipping script listener initial OnModeChanged as initial mode is dark")
++		slog.Info("Skipping script listener initial OnModeChanged as initial mode is dark")
 +		return
 +	}
 +
  	// Apply once with the initial mode.
  	if err := listener.OnModeChanged(service.currentMode); err != nil {
  		fmt.Println("error applying initial mode:", err)
-@@ -222,7 +240,7 @@ func ExecuteService(ctx context.Context, config *Config, readyFd *os.File) error
- 	log.Println("Initial mode set to:", initialMode)
+@@ -224,7 +242,7 @@ func ExecuteService(ctx context.Context, config *Config, readyFd *os.File) error
+ 	slog.Info("Initial mode set to", "mode", initialMode)
  
  	service := NewService(initialMode)
 -	service.AddListener(&ScriptRunner{})

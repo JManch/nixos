@@ -1,15 +1,14 @@
 diff --git a/configuration.go b/configuration.go
-index 4dd51ad..0c686f5 100644
+index 7b2ca16..ec7b673 100644
 --- a/configuration.go
 +++ b/configuration.go
-@@ -202,6 +202,24 @@ func ReadConfig(config *Config) error {
+@@ -179,6 +179,22 @@ func (config *Config) ReadConfig() error {
  		return fmt.Errorf("reading environment variables: %v", err)
  	}
  
 +	if _, err := os.Stat("/etc/coordinates/latitude"); config.Lat != nil && err == nil {
 +		if content, err := os.ReadFile("/etc/coordinates/latitude"); err == nil {
 +			if lat, err := strconv.ParseFloat(string(content), 64); err == nil {
-+				log.Println("Overriding latitude to:", lat)
 +				config.Lat = &lat
 +			}
 +		}
@@ -18,12 +17,11 @@ index 4dd51ad..0c686f5 100644
 +	if _, err := os.Stat("/etc/coordinates/longitude"); config.Lng != nil && err == nil {
 +		if content, err := os.ReadFile("/etc/coordinates/longitude"); err == nil {
 +			if lng, err := strconv.ParseFloat(string(content), 64); err == nil {
-+				log.Println("Overriding longitude to:", lng)
 +				config.Lng = &lng
 +			}
 +		}
 +	}
 +
- 	log.Printf("Loaded configuration: %v\n", config)
+ 	slog.Info("Loaded configuration", "config", config)
  	return nil
  }

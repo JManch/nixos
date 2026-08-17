@@ -11,7 +11,6 @@ let
     ns
     mkIf
     singleton
-    optionalAttrs
     mkForce
     optional
     ;
@@ -38,10 +37,9 @@ in
           description = "Absolute path to model";
         };
 
-        mmproj = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          description = "Absolute path to mmproj";
+        extraSettings = mkOption {
+          type = types.attrsOf types.any;
+          default = { };
         };
       };
 
@@ -58,6 +56,13 @@ in
           type = types.port;
           default = 1337;
           description = "Port of the proxied llama-server";
+        };
+
+        certFile = mkOption {
+          type = types.str;
+          description = ''
+            Cert file of the host we are proxying to. MUST be signed with the same address we proxy to.
+          '';
         };
       };
     };
@@ -90,9 +95,7 @@ in
         top-k = 40;
         min-p = "0.05";
       }
-      // optionalAttrs (cfg.worker.mmproj != null) {
-        mmproj = cfg.worker.mmproj;
-      };
+      // cfg.worker.extraSettings;
     };
 
     systemd.services."llama-cpp".wantedBy = mkForce (optional cfg.worker.autoStart "multi-user.target");
@@ -107,7 +110,12 @@ in
 
   (mkIf cfg.proxy.enable {
     ns.services.caddy.virtualHosts."llm".extraConfig = ''
-      reverse_proxy http://${cfg.proxy.address}:${toString cfg.proxy.port} {
+      reverse_proxy ${cfg.proxy.address}:${toString cfg.proxy.port} {
+        transport http {
+          tls_trust_pool file ${cfg.proxy.certFile}
+          tls_server_name ${cfg.proxy.address}
+        }
+
         flush_interval -1
       }
     '';

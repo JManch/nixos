@@ -364,7 +364,8 @@ in
 
       llama-cpp.proxy = {
         enable = true;
-        address = "192.168.88.254";
+        address = "ncase-m1.lan";
+        certFile = "${inputs.nix-resources}/secrets/ncase-m1/cert.crt";
       };
     };
 

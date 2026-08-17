@@ -151,7 +151,11 @@
       llama-cpp.worker = {
         enable = true;
         model = "/persist/models/Qwen3.8-27B-Q4_K_M.gguf";
-        mmproj = "/persist/models/mmproj-Qwen3.8-27B-f16.gguf";
+        extraSettings = {
+          mmproj = "/persist/models/mmproj-Qwen3.8-27B-f16.gguf";
+          sslKeyFile = config.age.secrets."ncase-m1Cert".path;
+          sslCertFile = "${inputs.nix-resources}/secrets/ncase-m1/cert.crt";
+        };
       };
 
       ollama = {

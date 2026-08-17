@@ -37,7 +37,11 @@ in
 
     port = mkOption {
       type = types.port;
+      readOnly = true;
       default = 8123;
+      description = ''
+        Port cannot be configured declaratively anymore https://github.com/NixOS/nixpkgs/pull/550733
+      '';
     };
   };
 
@@ -99,7 +103,6 @@ in
 
   services.home-assistant = {
     enable = true;
-    openFirewall = false;
 
     package = pkgs.home-assistant.override {
       extraPackages = ps: [
@@ -217,7 +220,6 @@ in
       };
 
       http = {
-        server_port = cfg.port;
         ip_ban_enabled = true;
         login_attempts_threshold = 3;
         use_x_forwarded_for = true;

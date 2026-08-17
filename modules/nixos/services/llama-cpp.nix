@@ -38,7 +38,7 @@ in
         };
 
         extraSettings = mkOption {
-          type = types.attrsOf types.any;
+          type = types.attrsOf types.anything;
           default = { };
         };
       };

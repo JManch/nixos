@@ -177,49 +177,24 @@ let
           mkdir -p "$remote_builds"
 
           # Check if host is on VPN
-          ${optionalString (cmd != "build")
-            # bash
-            ''
-              if ping -c 1 -W 1 "$hostname.lan" >/dev/null; then
-                host_address="$hostname.lan"
-              elif ping -c 1 -W 1 "$hostname-vpn.lan" >/dev/null; then
-                host_address="$hostname-vpn.lan"
-              else
-                echo "Host '$hostname' is not up"
-                exit 1
-              fi
-            ''
-          }
+          if ping -c 1 -W 1 "$hostname.lan" >/dev/null; then
+            host_address="$hostname.lan"
+          elif ping -c 1 -W 1 "$hostname-vpn.lan" >/dev/null; then
+            host_address="$hostname-vpn.lan"
+          else
+            echo "Host '$hostname' is not up"
+            exit 1
+          fi
         '';
     in
     pkgs.writeShellApplication {
       name = "host-rebuild-${cmd}";
-      runtimeInputs = [
-        pkgs.nh
-      ]
-      ++ optionals (cmd == "diff") [
-        pkgs.nix
-        pkgs.openssh
-        pkgs.dix
-      ];
-      text =
-        validation
-        + (
-          if (cmd == "build" || cmd == "diff") then
-            ''
-              nh os build "$flake" --keep-going --diff never --hostname "$hostname" --out-link "$remote_builds/result-$hostname" "''${@:2}"
-              ${optionalString (cmd == "diff") ''
-                remote_system=$(ssh "${adminUsername}@$host_address" readlink /run/current-system)
-                built_system=$(readlink "$remote_builds/result-$hostname")
-                nix copy --from "ssh://$host_address" "$remote_system"
-                dix "$remote_system" "$built_system"
-              ''}
-            ''
-          else
-            ''
-              nh os ${cmd} "$flake" --keep-going --elevation-program=none --hostname "$hostname" --out-link "$remote_builds/result-$hostname" --target-host "root@$host_address" "''${@:2}"
-            ''
-        );
+      runtimeInputs = [ pkgs.nh ];
+      text = validation + ''
+        nh os ${
+          if cmd == "diff" then "build" else cmd
+        } "$flake" --diff always --keep-going --elevation-program=none --hostname "$hostname" --out-link "$remote_builds/result-$hostname" --target-host "root@$host_address" "''${@:2}"
+      '';
     }
   ) rebuildCmds;
 

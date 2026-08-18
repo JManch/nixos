@@ -63,6 +63,15 @@ in
           description = "Address of the proxied llama-server";
         };
 
+        extraAllowedAddresses = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = ''
+            List of extra address to give access to llama-cpp in addition to
+            the Caddy trusted addreses.
+          '';
+        };
+
         port = mkOption {
           type = types.port;
           default = 1337;
@@ -95,7 +104,8 @@ in
         model = cfg.worker.model;
         fit = "on";
         no-mmproj-offload = true; # mmproj on CPU for additional VRAM
-        fit-target = 512; # default is 1024
+        fit-target = 1024; # default is 1024
+        parallel = 1; # queue requests instead of reducing context
         # fit-ctx = 262144;
         cache-type-k = "q8_0";
         cache-type-v = "q8_0";
@@ -128,15 +138,18 @@ in
   })
 
   (mkIf cfg.proxy.enable {
-    ns.services.caddy.virtualHosts."llm".extraConfig = ''
-      reverse_proxy ${cfg.proxy.address}:${toString cfg.proxy.port} {
-        transport http {
-          tls_trust_pool file ${cfg.proxy.certFile}
-          tls_server_name ${cfg.proxy.address}
-        }
+    ns.services.caddy.virtualHosts."llm" = {
+      inherit (cfg.proxy) extraAllowedAddresses;
+      extraConfig = ''
+        reverse_proxy ${cfg.proxy.address}:${toString cfg.proxy.port} {
+          transport http {
+            tls_trust_pool file ${cfg.proxy.certFile}
+            tls_server_name ${cfg.proxy.address}
+          }
 
-        flush_interval -1
-      }
-    '';
+          flush_interval -1
+        }
+      '';
+    };
   })
 ]

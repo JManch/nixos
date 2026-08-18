@@ -106,7 +106,6 @@ in
       vaultwarden = {
         enable = true;
         adminInterface = false;
-        extraAllowedAddresses = [ "10.0.0.0/24" ];
       };
 
       caddy = {
@@ -365,6 +364,7 @@ in
       llama-cpp.proxy = {
         enable = true;
         address = "ncase-m1.lan";
+        extraAllowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
         certFile = "${inputs.nix-resources}/secrets/ncase-m1/cert.crt";
       };
     };

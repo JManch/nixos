@@ -58,11 +58,8 @@
 
   networking.hostId = "625ec505";
   hardware.cpu.amd.updateMicrocode = true;
-
-  hardware.logitech.wireless = {
-    enable = true;
-    enableGraphical = true;
-  };
+  hardware.logitech.wireless.enable = true;
+  programs.solaar.enable = true; # Logitech GUI
 
   # Fix for motherboard-specific suspend issue
   # https://wiki.archlinux.org/title/Power_management/Wakeup_triggers#Gigabyte_motherboards

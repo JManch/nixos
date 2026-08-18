@@ -74,6 +74,7 @@ in
   i18n.defaultLocale = "en_GB.UTF-8";
   services.xserver.excludePackages = [ pkgs.xterm ];
   hardware.graphics.enable = true;
+  boot.kernelParams = [ "consoleblank=180" ]; # turn off displays when idle in console
 
   # We do not need these accessibility services
   # https://github.com/NixOS/nixpkgs/pull/329658

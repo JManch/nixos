@@ -55,6 +55,7 @@
         btop.enable = true;
         cava.enable = true;
         claude-code.enable = true;
+        pi-coding-agent.enable = true;
         git.enable = true;
         fastfetch.enable = true;
         neovim.enable = true;

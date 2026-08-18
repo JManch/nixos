@@ -24,6 +24,7 @@
       match.initial_title = "Spotify( Premium)?";
       border_color = "0xff1ED760";
       workspace = "special:scratch2 silent";
+      suppress_event = "maximize";
     };
 
     services.playerctl.musicPlayers = [ "spotify" ];
@@ -35,7 +36,7 @@
     uwsm.appUnitOverrides."spotify@.service" = lib.mkIf (lib.${lib.ns}.isHyprland config) ''
       [Service]
       ExecStop=-${pkgs.writeShellScript "hypr-close-spotify" ''
-        ${lib.getExe' pkgs.hyprland "hyprctl"} dispatch "hl.dsp.close({ window = 'pid:$MAINPID' })"
+        ${lib.getExe' pkgs.hyprland "hyprctl"} dispatch "hl.dsp.window.close({ window = 'pid:$MAINPID' })"
       ''}
       KillMode=mixed
     '';

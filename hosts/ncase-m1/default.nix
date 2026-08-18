@@ -150,11 +150,22 @@
 
       llama-cpp.worker = {
         enable = true;
+        autoStart = true;
         model = "/persist/models/Qwen3.8-27B-Q4_K_M.gguf";
+        sslKeyFile = config.age.secrets."ncase-m1Cert".path;
+        sslCertFile = "${inputs.nix-resources}/secrets/ncase-m1/cert.crt";
         extraSettings = {
+          alias = "qwen3.8-27b:q4_k_m";
           mmproj = "/persist/models/mmproj-Qwen3.8-27B-f16.gguf";
-          sslKeyFile = config.age.secrets."ncase-m1Cert".path;
-          sslCertFile = "${inputs.nix-resources}/secrets/ncase-m1/cert.crt";
+          chat-template-file = "/persist/models/chat_template.jinja";
+          reasoning-preserve = true;
+          reasoning-format = "deepseek";
+          # These are just defaults. Can be changed per-client in the webui
+          # https://unsloth.ai/docs/models/qwen3.8#qwen3.8-27b-settings
+          temp = "1.0";
+          top-p = "0.95";
+          top-k = 20;
+          min-p = "0.0";
         };
       };
 

@@ -13,6 +13,7 @@ let
     singleton
     mkForce
     optional
+    optionalAttrs
     ;
   inherit (config.${ns}.core) device;
   inherit (inputs.nix-resources.secrets) fqDomain;
@@ -35,6 +36,16 @@ in
           type = types.str;
           default = null;
           description = "Absolute path to model";
+        };
+
+        sslKeyFile = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+        };
+
+        sslCertFile = mkOption {
+          type = types.nullOr types.str;
+          default = null;
         };
 
         extraSettings = mkOption {
@@ -83,22 +94,30 @@ in
         port = cfg.worker.port;
         model = cfg.worker.model;
         fit = "on";
-        fit-target = 1024; # default is 1024
-        fit-ctx = 4096; # default is 4096
+        no-mmproj-offload = true; # mmproj on CPU for additional VRAM
+        fit-target = 512; # default is 1024
+        # fit-ctx = 262144;
         cache-type-k = "q8_0";
         cache-type-v = "q8_0";
         cache-ram = device.memory / 2;
         cors-origins = "https://llm.${fqDomain}";
         sleep-idle-seconds = 60 * 120;
-        temp = "0.8";
-        top-p = "0.95";
-        top-k = 40;
-        min-p = "0.05";
       }
-      // cfg.worker.extraSettings;
+      // cfg.worker.extraSettings
+      // optionalAttrs (cfg.worker.sslKeyFile != null) {
+        ssl-key-file = "/run/credentials/llama-cpp.service/cert.key";
+      }
+      // optionalAttrs (cfg.worker.sslCertFile != null) {
+        ssl-cert-file = cfg.worker.sslCertFile;
+      };
     };
 
-    systemd.services."llama-cpp".wantedBy = mkForce (optional cfg.worker.autoStart "multi-user.target");
+    systemd.services."llama-cpp" = {
+      serviceConfig.LoadCredential = optional (
+        cfg.worker.sslKeyFile != null
+      ) "cert.key:${cfg.worker.sslKeyFile}";
+      wantedBy = mkForce (optional cfg.worker.autoStart "multi-user.target");
+    };
 
     ns.persistence.directories = singleton {
       directory = "/var/lib/private/llama-cpp";

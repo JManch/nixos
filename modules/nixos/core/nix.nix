@@ -456,6 +456,18 @@ in
             };
           };
 
+        inherit
+          (
+            assert lib.assertMsg (
+              prev.firefox.version == "154.0"
+            ) "Nixpkgs might have added ffmpeg_9 to Firefox by now?";
+            import (fetchTree "github:JManch/nixpkgs/7027c9910ba7c2b7a1764463fa7bfa1f3fafe92c") {
+              inherit (pkgs.stdenv.hostPlatform) system;
+            }
+          )
+          firefox
+          ;
+
         # inherit
         #   (
         #     assert lib.assertMsg (prev.navidrome.version == "0.60.0") "Remove navidrome overlay";

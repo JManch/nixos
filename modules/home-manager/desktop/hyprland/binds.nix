@@ -96,9 +96,13 @@ let
         satty
         procps
         app2unit
+        xdg-user-dirs
       ];
       text = ''
-        output_dir="''${XDG_SCREENSHOTS_DIR:-''${XDG_PICTURES_DIR:-$HOME}}"
+        output_dir=$(xdg-user-dir SCREENSHOTS)
+        if [[ $output_dir == "$HOME" ]]; then
+          output_dir=$(xdg-user-dir PICTURES)
+        fi
         date=$(date +'%Y%m%d-%H%M%S')
 
         action=''${1:-""}

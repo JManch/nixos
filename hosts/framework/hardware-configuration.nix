@@ -4,7 +4,6 @@
 {
   lib,
   pkgs,
-  config,
   inputs,
   modulesPath,
   ...
@@ -29,10 +28,11 @@
   };
 
   boot = {
-    kernelPackages = config.${lib.ns}.hardware.cachy-kernel.package {
-      arch = "zen4";
-      kernelPackage = "linux-cachyos-latest";
-    };
+    kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
+    # kernelPackages = config.${lib.ns}.hardware.cachy-kernel.package {
+    #   arch = "zen4";
+    #   kernelPackage = "linux-cachyos-latest";
+    # };
 
     kernelModules = [ "kvm-amd" ];
 

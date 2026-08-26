@@ -85,8 +85,12 @@ in
           "general.autoScroll" = true; # middle-click scrolling
           "toolkit.legacyUserProfileCustomizations.stylesheets" = true; # enable userChrome.css modifications
           "dom.security.https_only_mode" = true;
-          "media.hardware-video-decoding-vulkan.enabled" = true; # prefer vulkan decode (had bad experience with vaapi)
-          "media.hardware-video-decoding-vulkan.direct-export.enabled" = true;
+          "media.hardware-video-decoding-vulkan.enabled" =
+            assert lib.assertMsg (lib.versionOlder pkgs.firefox.version "155.0") "Vulkan decode is fixed";
+            false; # prefer vulkan decode (had bad experience with vaapi)
+          "media.hardware-video-decoding-vulkan.direct-export.enabled" =
+            assert lib.assertMsg (lib.versionOlder pkgs.firefox.version "155.0") "Vulkan decode is fixed";
+            false;
 
           # UI
           "layout.css.devPixelsPerPx" = cfg.uiScale;

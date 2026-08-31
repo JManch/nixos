@@ -70,26 +70,6 @@
     KERNEL=="0000:02:00.0", SUBSYSTEM=="pci", DRIVER=="xhci_hcd", ATTR{vendor}=="0x1022", ATTR{device}=="0x43ee", ATTR{power/wakeup}="disabled"
   '';
 
-  nixpkgs.overlays = [
-    (final: prev: {
-      # Fix hardware acceleration artifacts
-      # https://discuss.cachyos.org/t/linux-firmware-amdgpu-20260810-causes-moving-vertical-color-artifacts/34307
-      linux-firmware =
-        assert lib.assertMsg (
-          prev.linux-firmware.version == "20260810"
-        ) "Can remove ncase-m1 linux-firmware overlay";
-        prev.linux-firmware.overrideAttrs {
-          version = "20260828";
-          src = final.fetchFromGitLab {
-            owner = "kernel-firmware";
-            repo = "linux-firmware";
-            rev = "b6bdea3726dc9b477eea2d7db7ceba54133964a2";
-            hash = "sha256-h8WMytwyNRolrTV62DbX7hXbPyALFvsLDmypgLBqqCE=";
-          };
-        };
-    })
-  ];
-
   boot = {
     initrd.availableKernelModules = [
       "nvme"

@@ -150,7 +150,7 @@
 
       llama-cpp.worker = {
         enable = true;
-        autoStart = true;
+        autoStart = false;
         model = "/persist/models/Qwen3.8-27B-Q4_K_M.gguf";
         sslKeyFile = config.age.secrets."ncase-m1Cert".path;
         sslCertFile = "${inputs.nix-resources}/secrets/ncase-m1/cert.crt";

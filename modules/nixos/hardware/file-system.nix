@@ -59,6 +59,47 @@ in
         generations on headless machines.
       '';
 
+      zramFs = {
+        enable = mkEnableOption ''
+          creation of a zram-backed ext4 file system on boot. This is created
+          earlier than the zram-generator so this file system can be used for /
+          on impermanence systems. The ext4 parameters are also optimised for a
+          RAM-backed use-case which is not natively possible with zram-generator.
+
+          Due to the zramSwap NixOS module reserving the first zram devices, we
+          have to use the final device which will be
+          /dev/zram${config.zramSwap.swapDevices}.
+        '';
+
+        algorithm = mkOption {
+          type = types.str;
+          default = "zstd";
+          description = "zram compression algorithm to use";
+        };
+
+        size = mkOption {
+          type = types.str;
+          description = ''
+            Virtual size of the device and therefore the size of the ext4
+            partition. Should be generous here to ensure there is enough
+            headroom to make use of compression so roughly 3x memoryLimit is
+            fine. Ideally memory limit is always hit before the device fills up.
+          '';
+        };
+
+        memoryLimit = mkOption {
+          type = types.str;
+          example = "24G";
+          description = ''
+            Maximum amount of system memory the zram disk can use. This is
+            final compressed size so is not correlated to the device's virtual
+            capacity. Should probably be conservative here and keep this well
+            under 50% system memory as this cannot be OOMED or evicted to swap
+            like tmpfs can.
+          '';
+        };
+      };
+
       type = mkOption {
         type = types.enum [
           "zfs"
@@ -326,5 +367,50 @@ in
           );
         };
     };
+  })
+
+  (mkIf cfg.zramFs.enable {
+    boot =
+      let
+        # The zramSwap NixOS module reserves devices 0 to swapDevices-1
+        device = if config.zramSwap.enable then config.zramSwap.swapDevices else 0;
+      in
+      {
+        kernelParams = [ "zram.num_devices=${toString (device + 1)}" ];
+        initrd.kernelModules = [ "zram" ];
+
+        initrd.systemd.services."zram-rootfs" = {
+          wantedBy = [ "initrd.target" ];
+          requiredBy = [ "sysroot.mount" ];
+          before = [ "sysroot.mount" ];
+          # we need the zram module to load first so depend on systemd-modules-load
+          requires = [ "systemd-modules-load.service" ];
+          after = [ "systemd-modules-load.service" ];
+          unitConfig.DefaultDependencies = false;
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          path = with pkgs; [
+            e2fsprogs
+            util-linux
+          ];
+          script = ''
+            # The device has to be /dev/zram1 because this zramSwap nixos module is
+            # hardcoded to /dev/zram0. This is also probably necessary to reliably
+            # set mem_limit.
+            zramctl /dev/zram${toString device} --size ${cfg.zramFs.size} --algorithm ${cfg.zramFs.algorithm}
+            echo ${cfg.zramFs.memoryLimit} > /sys/block/zram${toString device}/mem_limit
+            # -m 0: no need to reserve space for superuser
+            # -O ...: optimise for RAM-based ephemeral use
+            # -E nodiscard: not formatting an actual SSD
+            mkfs.ext4 \
+              -m 0 \
+              -O "^has_journal,^huge_file,^flex_bg,^metadata_csum,^resize_inode" \
+              -E nodiscard,lazy_itable_init=0 \
+              /dev/zram${toString device}
+          '';
+        };
+      };
   })
 ]

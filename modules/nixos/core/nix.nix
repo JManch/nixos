@@ -167,7 +167,7 @@ let
           fi
 
           flake="${configDir}"
-          if [ ! -d $flake ]; then
+          if [ ! -d "$flake" ]; then
             echo "Flake does not exist locally so using remote from github"
             flake="github:JManch/nixos"
           fi
@@ -176,14 +176,38 @@ let
           remote_builds="/home/${adminUsername}/.remote-builds"
           mkdir -p "$remote_builds"
 
+          # Prepare base arguments for nh
+          nh_args=(
+            "--keep-going"
+            "--elevation-program=none"
+            "--hostname" "$hostname"
+            "--out-link" "$remote_builds/result-$hostname"
+          )
+
           # Check if host is on VPN
           if ping -c 1 -W 1 "$hostname.lan" >/dev/null; then
             host_address="$hostname.lan"
           elif ping -c 1 -W 1 "$hostname-vpn.lan" >/dev/null; then
             host_address="$hostname-vpn.lan"
           else
-            echo "Host '$hostname' is not up"
-            exit 1
+            host_address=""
+          fi
+
+          if [ -n "$host_address" ]; then
+            nh_args+=("--target-host" "root@$host_address" "--diff" "always")
+          else
+            ${
+              if cmd == "build" then
+                ''
+                  echo "Host is not up, building locally"
+                  nh_args+=("--diff" "never")
+                ''
+              else
+                ''
+                  echo "Error: Host is not up so cannot perform '${cmd}'" >&2
+                  exit 1
+                ''
+            }
           fi
         '';
     in
@@ -191,9 +215,7 @@ let
       name = "host-rebuild-${cmd}";
       runtimeInputs = [ pkgs.nh ];
       text = validation + ''
-        nh os ${
-          if cmd == "diff" then "build" else cmd
-        } "$flake" --diff always --keep-going --elevation-program=none --hostname "$hostname" --out-link "$remote_builds/result-$hostname" --target-host "root@$host_address" "''${@:2}"
+        nh os ${if cmd == "diff" then "build" else cmd} "$flake" "''${nh_args[@]}" "''${@:2}"
       '';
     }
   ) rebuildCmds;

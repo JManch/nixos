@@ -68,6 +68,7 @@ in
     defaultUserShell = pkgs.zsh;
     users = {
       ${username} = {
+        uid = 1000;
         isNormalUser = true;
         description = toSentenceCase username; # displayed in GDM
         hashedPasswordFile = config.age.secrets."${username}Passwd".path;

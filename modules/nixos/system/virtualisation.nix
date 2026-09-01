@@ -187,8 +187,12 @@ in
     # We configure the vmVariant regardless of whether or not the host has
     # virtualisation enabled because it should be possible to create a VM of any host
     virtualisation.vmVariant = {
-      # Otherwise VM fails to start
-      boot.resumeDevice = mkVMOverride "";
+      boot = {
+        # Otherwise VM fails to start
+        resumeDevice = mkVMOverride "";
+        # For debugging initrd failures
+        initrd.systemd.emergencyAccess = true;
+      };
 
       ${ns} = {
         core.device = {

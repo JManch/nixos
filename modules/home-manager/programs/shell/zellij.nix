@@ -398,6 +398,7 @@ in
       stacked_resize true
       show_startup_tips false
       focus_follows_mouse true
+      scroll_mode_sync false
 
       themes {
         ${concatLines (

@@ -8,7 +8,7 @@ buildGoModule {
   inherit (sources.ctrld) version;
   src = sources.ctrld;
 
-  vendorHash = "sha256-m0dTt/wOwrzGPV6ZeL3NQQjp7eTI6KryTldD0oOYNdE=";
+  vendorHash = "sha256-zWfucQ3kR/GofRXAPBjZyWStiKA3uxIsCUqLFNtlWvU=";
 
   ldflags = [
     "-s"

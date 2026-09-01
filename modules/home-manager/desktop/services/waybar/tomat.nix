@@ -9,9 +9,6 @@ let
     # Show session number during breaks
     "tomat-always-show-sessions.patch"
     "tomat-disable-notification-icon.patch"
-    # Exit with exit code 1 if the watch command fails to connect to the
-    # daemon. Fixes waybar not hiding the module when the daemon is stopped.
-    "tomat-watch-exit-code.patch"
     # I would rather use my own icons and this allows me to set waybar
     # icon based on the state using format-icons.
     "tomat-alt-field.patch"
@@ -78,6 +75,7 @@ in
       exec = "${getExe tomat} watch --interval 1 2>/dev/null";
       restart-interval = 30; # attempt to reconnect to the daemon every 30 secs
       return-type = "json";
+      hide-empty-text = true;
       format = "<span color='#${config.colorScheme.palette.base04}'>{icon}</span> {text}";
       format-icons = {
         work = "󱎫";

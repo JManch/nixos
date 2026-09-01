@@ -1,8 +1,8 @@
 diff --git a/src/timer.rs b/src/timer.rs
-index 2c1509c..f79a4ac 100644
+index 3a182d5..e15ea0a 100644
 --- a/src/timer.rs
 +++ b/src/timer.rs
-@@ -144,6 +144,7 @@ pub enum StatusOutput {
+@@ -147,6 +147,7 @@ pub enum StatusOutput {
          tooltip: String,
          class: String,
          percentage: f64,
@@ -10,7 +10,15 @@ index 2c1509c..f79a4ac 100644
      },
      I3statusRs {
          text: String,
-@@ -549,6 +550,7 @@ impl TimerState {
+@@ -170,6 +171,7 @@ impl StatusOutput {
+                 tooltip: MESSAGE.to_string(),
+                 class: "disconnected".to_string(),
+                 percentage: 0.0,
++                alt: "".to_string(),
+             },
+             Format::I3statusRs => Self::I3statusRs {
+                 text: MESSAGE.to_string(),
+@@ -687,6 +689,7 @@ impl TimerState {
                  tooltip,
                  class: class.to_string(),
                  percentage,
@@ -18,15 +26,15 @@ index 2c1509c..f79a4ac 100644
              },
              Format::I3statusRs => {
                  // Map timer states to i3status-rs states
-@@ -803,6 +805,7 @@ mod tests {
+@@ -949,6 +952,7 @@ mod tests {
                  class,
                  tooltip,
                  percentage,
 +                alt,
              } => {
-                 assert_eq!(text, "🍅 25:00 ⏸");
-                 assert_eq!(class, "work-paused");
-@@ -829,6 +832,7 @@ mod tests {
+                 assert_eq!(text, "🍅 25:00 ⏹");
+                 assert_eq!(class, "idle");
+@@ -978,6 +982,7 @@ mod tests {
                  class,
                  tooltip,
                  percentage,

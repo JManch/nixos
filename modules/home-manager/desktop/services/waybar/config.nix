@@ -79,9 +79,6 @@ in
           "waybar-wireplumber-device-description.patch"
           # Hides the wireplumber box when the format is empty
           "waybar-wireplumber-hide-box.patch"
-          # Removes constant logging when our `tomat watch` commands fails if the
-          # service is not running
-          "waybar-disable-stopped-log.patch"
           # Waybar updates component widgets every interval, regardless of
           # whether their values have changed. This triggers a redraw and damages
           # the bar in the compositor. On my laptop this causes my GPU to jump

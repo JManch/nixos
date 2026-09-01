@@ -107,6 +107,9 @@
 
       file-system = {
         type = "zfs";
+        # / is zram backed ext4 which does not get evicted under memory
+        # pressure so mount /tmp on a tmpfs for eviction capabilities.
+        tmpfsTmp = true;
         zfs.trim = true;
         zfs.encryption.passphraseCred = inputs.nix-resources.secrets.zfsPassphrases.ncase-m1;
       };

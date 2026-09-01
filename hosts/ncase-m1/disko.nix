@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   inputs,
   username,
   hostname,
@@ -71,11 +72,13 @@ in
       };
     };
 
+    # nodev from disko's perspective, we build the device each boot in the service below
     nodev."/" = {
-      fsType = "tmpfs";
+      device = "/dev/zram1";
+      fsType = "ext4";
       mountOptions = [
-        "defaults"
-        "mode=755"
+        "noatime"
+        "discard"
       ];
     };
 
@@ -194,5 +197,40 @@ in
           };
         };
       };
+  };
+
+  boot = {
+    kernelParams = [ "zram.num_devices=2" ];
+    initrd.kernelModules = [ "zram" ];
+
+    initrd.systemd.services."zram-rootfs" = {
+      wantedBy = [ "initrd.target" ];
+      requiredBy = [ "sysroot.mount" ];
+      before = [ "sysroot.mount" ];
+      # we need the zram module to load first so depend on systemd-modules-load
+      requires = [ "systemd-modules-load.service" ];
+      after = [ "systemd-modules-load.service" ];
+      unitConfig.DefaultDependencies = false;
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      path = with pkgs; [
+        e2fsprogs
+        util-linux
+      ];
+      script = ''
+        zramctl /dev/zram1 --size 64G --algorithm zstd
+        echo 24G > /sys/block/zram1/mem_limit
+        # -m 0: no need to reserve space for root, this is ephemeral storage
+        # -O ...: optimise for RAM-based ephemeral use
+        # -E nodiscard: not formatting an actual SSD
+        mkfs.ext4 \
+          -m 0 \
+          -O "^has_journal,^huge_file,^flex_bg,^metadata_csum" \
+          -E nodiscard \
+          /dev/zram1
+      '';
+    };
   };
 }

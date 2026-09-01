@@ -150,8 +150,6 @@ in
     asserts = [
       (cfg.type != null)
       "Filesystem type must be set"
-      (cfg.tmpfsTmp -> !config.${ns}.system.impermanence.enable)
-      "Tmp on tmpfs should not be necessary if impermanence is enabled"
     ];
 
     zramSwap.enable = true;

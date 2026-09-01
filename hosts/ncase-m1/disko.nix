@@ -89,7 +89,9 @@ in
         fsType = "tmpfs";
         mountOptions = [
           "size=4G"
-          "mode=755"
+          "mode=0700"
+          "uid=${toString config.users.users.${username}.uid}"
+          "gid=${toString config.users.groups."users".gid}"
         ];
       };
     };

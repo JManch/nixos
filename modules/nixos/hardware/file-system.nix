@@ -65,11 +65,19 @@ in
           earlier than the zram-generator so this file system can be used for /
           on impermanence systems. The ext4 parameters are also optimised for a
           RAM-backed use-case which is not natively possible with zram-generator.
-
-          Due to the zramSwap NixOS module reserving the first zram devices, we
-          have to use the final device which will be
-          /dev/zram${config.zramSwap.swapDevices}.
         '';
+
+        device = mkOption {
+          type = types.str;
+          readOnly = true;
+          default =
+            if config.zramSwap.enable then "/dev/zram${toString config.zramSwap.swapDevices}" else "/dev/zram0";
+          description = ''
+            Due to the zramSwap NixOS module reserving the first zram devices, we
+            have to use the final device which will be
+            /dev/zram${config.zramSwap.swapDevices}.
+          '';
+        };
 
         algorithm = mkOption {
           type = types.str;
@@ -79,6 +87,7 @@ in
 
         size = mkOption {
           type = types.str;
+          default = null;
           description = ''
             Virtual size of the device and therefore the size of the ext4
             partition. Should be generous here to ensure there is enough
@@ -89,6 +98,7 @@ in
 
         memoryLimit = mkOption {
           type = types.str;
+          default = null;
           example = "24G";
           description = ''
             Maximum amount of system memory the zram disk can use. This is
@@ -98,6 +108,20 @@ in
             like tmpfs can.
           '';
         };
+      };
+
+      swapCompression = mkOption {
+        type = types.enum [
+          "zram"
+          "zswap"
+        ];
+        default = null;
+        description = ''
+          Swap optimisation method to use. Zwap should be preferred over zram
+          swap but can only be used if the host has disk swap.
+
+          https://chrisdown.name/2026/03/24/zswap-vs-zram-when-to-use-what.html
+        '';
       };
 
       type = mkOption {
@@ -193,13 +217,15 @@ in
       "Filesystem type must be set"
     ];
 
-    zramSwap.enable = true;
+    zramSwap.enable = cfg.swapCompression == "zram";
+
     swapDevices = mkIf cfg.swap.enable (singleton {
       device = lib.${ns}.impermanencePrefix config "/swapfile";
       size = cfg.swap.size;
     });
 
     boot = {
+      zswap.enable = cfg.swapCompression == "zswap";
       initrd.systemd.enable = true;
       tmp.useTmpfs = cfg.tmpfsTmp;
 

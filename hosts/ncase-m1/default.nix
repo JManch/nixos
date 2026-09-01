@@ -112,6 +112,11 @@
         tmpfsTmp = true;
         zfs.trim = true;
         zfs.encryption.passphraseCred = inputs.nix-resources.secrets.zfsPassphrases.ncase-m1;
+        zramFs = {
+          enable = true;
+          memoryLimit = "24G";
+          size = "72G";
+        };
       };
 
       printing.client = {

@@ -68,7 +68,7 @@
       file-system = {
         type = "ext4";
         ext4.trim = true;
-        swapCompression = "zswap";
+        swap.compression = "zswap";
       };
 
       keyd = {

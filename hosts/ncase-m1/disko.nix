@@ -74,7 +74,7 @@ in
 
     nodev = {
       "/" = {
-        device = config.${lib.ns}.file-system.zramFs.device;
+        device = config.${lib.ns}.hardware.file-system.zramFs.device;
         fsType = "ext4";
         mountOptions = [
           "noatime"

@@ -47,6 +47,7 @@ in
         zfs.trim = true;
         zfs.encryption.passphraseCred = inputs.nix-resources.secrets.zfsPassphrases.homelab;
         mediaDir = "/media";
+        swap.compression = "zram";
       };
     };
 

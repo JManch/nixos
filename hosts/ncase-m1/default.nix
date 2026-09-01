@@ -112,7 +112,7 @@
         tmpfsTmp = true;
         zfs.trim = true;
         zfs.encryption.passphraseCred = inputs.nix-resources.secrets.zfsPassphrases.ncase-m1;
-        swapCompression = "zram";
+        swap.compression = "zram";
         zramFs = {
           enable = true;
           algorithm = "lz4"; # sufficient compression for kernel builds

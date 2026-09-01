@@ -49,8 +49,11 @@
         type = "ext4";
         tmpfsTmp = true;
         ext4.trim = true;
-        swap.enable = true;
-        swap.size = 1024 * 20; # swap needed for overwatch shader caching using massive amounts of memory
+        swap = {
+          file.enable = true;
+          file.size = 1024 * 20; # swap needed for overwatch shader caching using massive amounts of memory
+          compression = "zswap";
+        };
       };
 
       printing.client = {

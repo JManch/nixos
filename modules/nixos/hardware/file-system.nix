@@ -110,20 +110,6 @@ in
         };
       };
 
-      swapCompression = mkOption {
-        type = types.enum [
-          "zram"
-          "zswap"
-        ];
-        default = null;
-        description = ''
-          Swap optimisation method to use. Zwap should be preferred over zram
-          swap but can only be used if the host has disk swap.
-
-          https://chrisdown.name/2026/03/24/zswap-vs-zram-when-to-use-what.html
-        '';
-      };
-
       type = mkOption {
         type = types.enum [
           "zfs"
@@ -175,20 +161,33 @@ in
           inherit (config.${ns}.core.device) memory;
         in
         {
-          enable = mkEnableOption "swap" // {
-            default = cfg.type != "zfs" && cfg.type != "sd-image" && memory <= 4 * 1024;
+          file = {
+            enable = mkEnableOption "swap file creation";
+            size = mkOption {
+              type = types.int;
+              default =
+                if memory <= 2 * 1024 then
+                  memory * 2
+                else if memory <= 8 * 1024 then
+                  memory
+                else
+                  1024 * 4;
+              description = "Size of swap file in megabytes";
+            };
           };
 
-          size = mkOption {
-            type = types.int;
-            default =
-              if memory <= 2 * 1024 then
-                memory * 2
-              else if memory <= 8 * 1024 then
-                memory
-              else
-                1024 * 4;
-            description = "Size of swap file in megabytes";
+          compression = mkOption {
+            type = types.enum [
+              "zram"
+              "zswap"
+            ];
+            default = null;
+            description = ''
+              Swap optimisation method to use. Zwap should be preferred over zram
+              swap but can only be used if the host has disk swap.
+
+              https://chrisdown.name/2026/03/24/zswap-vs-zram-when-to-use-what.html
+            '';
           };
         };
 
@@ -217,15 +216,15 @@ in
       "Filesystem type must be set"
     ];
 
-    zramSwap.enable = cfg.swapCompression == "zram";
+    zramSwap.enable = cfg.swap.compression == "zram";
 
-    swapDevices = mkIf cfg.swap.enable (singleton {
+    swapDevices = mkIf cfg.swap.file.enable (singleton {
       device = lib.${ns}.impermanencePrefix config "/swapfile";
-      size = cfg.swap.size;
+      size = cfg.swap.file.size;
     });
 
     boot = {
-      zswap.enable = cfg.swapCompression == "zswap";
+      zswap.enable = cfg.swap.compression == "zswap";
       initrd.systemd.enable = true;
       tmp.useTmpfs = cfg.tmpfsTmp;
 

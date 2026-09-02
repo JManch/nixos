@@ -10,7 +10,6 @@ let
     mkOption
     length
     types
-    mkEnableOption
     ;
   inherit (lib.${ns}) modulesInDir;
   osDesktop = osConfig.${ns}.system.desktop;
@@ -20,10 +19,6 @@ in
   defaultOpts.conditions = [ "desktop" ];
 
   opts = {
-    xdg.lowercaseUserDirs = mkEnableOption "lowercase user dirs" // {
-      default = (osConfig.${ns}.system.desktop.desktopEnvironment or false) == null;
-    };
-
     terminal = mkOption {
       type = with types; nullOr str;
       default = null;
@@ -74,6 +69,8 @@ in
     wl-clipboard
     qdirstat # file-system explorer
   ];
+
+  ns.desktop.xdg.removeMimeTypePackages = [ pkgs.qdirstat ];
 
   xdg.configFile."xdg-terminals.list".text = ''
     ${cfg.terminal}.desktop

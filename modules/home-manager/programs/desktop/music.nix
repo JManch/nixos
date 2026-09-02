@@ -36,6 +36,8 @@ in
     unzipMusicHomelab
   ];
 
+  ns.desktop.xdg.removeMimeTypePackages = [ pkgs.picard ];
+
   ns.programs.shell.qobuz-dl.enable = true;
 
   ns.desktop.hyprland.extraConf = # lua

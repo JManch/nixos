@@ -12,6 +12,8 @@ in
     gthumb # image editor
   ];
 
+  ns.desktop.xdg.removeMimeTypePackages = [ pkgs.gthumb ];
+
   xdg.configFile."swayimg/config".source = (pkgs.formats.ini { }).generate "config" {
     general.compositor = false;
     font.name = desktop.style.font.family;

@@ -1,7 +1,7 @@
 # NOTE: To fix credential saving (signing in with github) need to add
 # "password-store": "gnome" to ~/.vscode/argv.json
 # https://code.visualstudio.com/docs/editor/settings-sync#_troubleshooting-keychain-issues
-{ pkgs }:
+{ pkgs, config }:
 {
   programs.vscode = {
     enable = true;
@@ -16,6 +16,8 @@
       ]
     );
   };
+
+  ns.desktop.xdg.removeMimeTypePackages = [ config.programs.vscode.package ];
 
   ns.persistence.directories = [
     ".config/Code"

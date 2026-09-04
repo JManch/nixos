@@ -67,9 +67,12 @@ let
     any
     optionals
     attrValues
+    concatMap
+    filterAttrs
     ;
   inherit (config.${ns}.system) networking virtualisation;
   inherit (config.${ns}.services) dns-stack;
+  inherit (config.${ns}.core) device;
   inherit (lib.${ns}) asserts;
   interfaces = config.${ns}.services.wireguard;
 
@@ -77,6 +80,14 @@ let
     options = {
       enable = mkEnableOption "the wireguard interface";
       autoStart = mkEnableOption "auto start";
+
+      ddnsEndpoint =
+        mkEnableOption ''
+          running the reresolve-dns service for this interface 
+        ''
+        // {
+          default = true;
+        };
 
       address = mkOption {
         type = types.str;
@@ -290,7 +301,52 @@ in
   );
 
   systemd.services = mkMerge (
-    mapAttrsToList (
+    [
+      (mkIf (any (i: i.enable && i.ddnsEndpoint) (attrValues interfaces) && device.type != "laptop") {
+        # This fixes an issue where the wireguard interface goes inactive if the endpoint
+        # uses DDNS and the IP address changes after the interface went up.
+        "wg-quick-reresolve-dns" = {
+          description = "wg-quick reresolve DNS endpoints";
+          after = [
+            "network.target"
+            "network-online.target"
+          ];
+          requires = [ "network-online.target" ];
+          startAt = "*-*-* *:0/5:00";
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart =
+              let
+                checkPeer = pkgs.writeShellApplication {
+                  name = "wg-quick-check-peer";
+                  runtimeInputs = [ pkgs.wireguard-tools ];
+                  text = ''
+                    # Simplified version of wireguard-tools' reresolve-dns.sh script
+                    # SPDX-License-Identifier: GPL-2.0
+                    #
+                    # Copyright (C) 2015-2020 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+                    INTERFACE="$1"
+                    PUBLIC_KEY="$2"
+                    ENDPOINT="$3"
+
+                    [[ $(wg show "$INTERFACE" latest-handshakes) =~ ''${PUBLIC_KEY//+/\\+}\	([0-9]+) ]] || exit 0
+                    (( (EPOCHSECONDS - BASH_REMATCH[1]) > 135 )) || exit 0
+                    wg set "$INTERFACE" peer "$PUBLIC_KEY" endpoint "$ENDPOINT"
+                    echo "interface=$INTERFACE peer=$PUBLIC_KEY: stale handshake, re-applied endpoint $ENDPOINT"
+                  '';
+                };
+              in
+              concatMap (
+                interface:
+                map (
+                  peer: ''-${getExe checkPeer} "wg-${interface}" "${peer.publicKey}" "${peer.endpoint}"''
+                ) interfaces.${interface}.peers
+              ) (attrNames (filterAttrs (_: v: v.enable && v.ddnsEndpoint) interfaces));
+          };
+        };
+      })
+    ]
+    ++ mapAttrsToList (
       interface: cfg:
       mkMerge [
         (mkIf cfg.enable {

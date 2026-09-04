@@ -315,6 +315,8 @@ in
           startAt = "*-*-* *:0/5:00";
           serviceConfig = {
             Type = "oneshot";
+            LogLevelMax = "notice"; # suppress systemd Starting..., Finished... logs
+            SyslogLevel = "notice"; # elevate process logs so they do not get suppressed by above rule
             ExecStart =
               let
                 checkPeer = pkgs.writeShellApplication {
@@ -329,7 +331,8 @@ in
                     PUBLIC_KEY="$2"
                     ENDPOINT="$3"
 
-                    [[ $(wg show "$INTERFACE" latest-handshakes) =~ ''${PUBLIC_KEY//+/\\+}\	([0-9]+) ]] || exit 0
+                    HANDSHAKES=$(wg show "$INTERFACE" latest-handshakes 2>/dev/null) || exit 0
+                    [[ $HANDSHAKES =~ ''${PUBLIC_KEY//+/\\+}\	([0-9]+) ]] || exit 0
                     (( (EPOCHSECONDS - BASH_REMATCH[1]) > 135 )) || exit 0
                     wg set "$INTERFACE" peer "$PUBLIC_KEY" endpoint "$ENDPOINT"
                     echo "interface=$INTERFACE peer=$PUBLIC_KEY: stale handshake, re-applied endpoint $ENDPOINT"

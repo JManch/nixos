@@ -469,20 +469,22 @@ in
     };
   };
 
-  systemd.services.disable-wifi-on-boot = mkIf (cfg.wireless.enable && cfg.wireless.disableOnBoot) {
+  systemd.services."disable-wifi-on-boot" = mkIf (cfg.wireless.enable && cfg.wireless.disableOnBoot) {
     description = "Disable wifi on boot";
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
+      RemainAfterExit = true;
       ExecStart = "${rfkill} block wifi";
     };
   };
 
-  systemd.services.disable-wifi-powersave = mkIf (cfg.wireless.enable && !cfg.wireless.powersave) {
+  systemd.services."disable-wifi-powersave" = mkIf (cfg.wireless.enable && !cfg.wireless.powersave) {
     description = "Disable wifi powersave";
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
+      RemainAfterExit = true;
       ExecStart = "${getExe pkgs.iw} dev ${cfg.wireless.interface} set power_save off";
     };
   };

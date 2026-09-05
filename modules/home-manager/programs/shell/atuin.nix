@@ -94,7 +94,7 @@ in
 
     Service = {
       Slice = "background.slice";
-      ExecStart = "${getExe pkgs.atuin} daemon";
+      ExecStart = "${getExe pkgs.atuin} daemon start";
       Restart = "on-failure";
     };
 

@@ -134,7 +134,11 @@
 
   services.logind.settings.Login = {
     HandlePowerKey = "poweroff";
-    HandleLidSwitch = "suspend-then-hibernate";
+    # suspend-then-hibernate seems broken atm. Keep finding the laptop closed
+    # with screen on due to a failure to hibernate after waking up from suspend.
+    # https://github.com/systemd/systemd/issues/35743
+    # https://github.com/systemd/systemd/issues/38193
+    HandleLidSwitch = "suspend";
   };
 
   services.fwupd.enable = true;

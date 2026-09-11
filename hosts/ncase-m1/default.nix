@@ -199,7 +199,7 @@
         excludeSubnets = [ "192.168.89.2/32" ];
       };
 
-      wireguard.friends = {
+      wg-quick.friends = {
         enable = true;
         autoStart = true;
         address = "10.0.0.2";

@@ -274,11 +274,6 @@ in
         ) asserts
       );
 
-    wgInterfaceEnabled =
-      interface: osConfig:
-      (hasAttr interface (osConfig.${ns}.services.wireguard or { }))
-      && (osConfig.${ns}.services.wireguard.${interface}.enable);
-
     hardeningBaseline =
       config: overrides:
       {

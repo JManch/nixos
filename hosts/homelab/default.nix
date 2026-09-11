@@ -195,7 +195,7 @@ in
         deviceNode = "/dev/ttyACM0";
       };
 
-      wireguard.friends = {
+      wg-quick.friends = {
         enable = true;
         autoStart = true;
         address = "10.0.0.7";

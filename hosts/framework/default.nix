@@ -120,7 +120,7 @@
       air-vpn.enable = true;
       mosquitto.explorer.enable = true;
 
-      wireguard = {
+      wg-quick = {
         home-minimal = {
           enable = true;
           autoStart = true;

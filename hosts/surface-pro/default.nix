@@ -65,7 +65,7 @@
     };
 
     services = {
-      wireguard = {
+      wg-quick = {
         home = {
           enable = true;
           autoStart = true;

@@ -44,7 +44,7 @@ in
     };
 
     services = {
-      wireguard = {
+      wg-quick = {
         home-minimal = {
           enable = true;
           autoStart = true;

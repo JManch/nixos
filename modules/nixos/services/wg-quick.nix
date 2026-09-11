@@ -74,7 +74,7 @@ let
   inherit (config.${ns}.services) dns-stack;
   inherit (config.${ns}.core) device;
   inherit (lib.${ns}) asserts;
-  interfaces = config.${ns}.services.wireguard;
+  interfaces = config.${ns}.services.wg-quick;
 
   wgSubmodule = types.submodule {
     options = {

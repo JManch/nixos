@@ -88,12 +88,15 @@ in
 
     system = {
       networking = {
-        eduroam = true;
         firewall.defaultInterfaces = mkForce [
           "wg-home"
           "wg-home-minimal"
         ];
-        wireless.disableOnBoot = mkForce false;
+
+        wireless = {
+          eduroam = true;
+          disableOnBoot = mkForce false;
+        };
       };
     };
   };

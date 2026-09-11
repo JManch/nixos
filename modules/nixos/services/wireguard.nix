@@ -311,7 +311,7 @@ in
             "network.target"
             "network-online.target"
           ];
-          requires = [ "network-online.target" ];
+          wants = [ "network-online.target" ];
           startAt = "*-*-* *:0/5:00";
           serviceConfig = {
             Type = "oneshot";

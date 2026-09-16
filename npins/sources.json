@@ -400,9 +400,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "f21553786ceb80a148294fec6bcd4980c867b540",
-      "url": "https://github.com/silverbulletmd/silverbullet/archive/f21553786ceb80a148294fec6bcd4980c867b540.tar.gz",
-      "hash": "sha256-WQpNnCkzZcbFRPl2oK1Bib5/5ueEFG1v9BVUNIXdh3E="
+      "revision": "bf263fa14db38655d0efecca0c020999c245c21b",
+      "url": "https://github.com/silverbulletmd/silverbullet/archive/bf263fa14db38655d0efecca0c020999c245c21b.tar.gz",
+      "hash": "sha256-9BYHN3COk1vIdPpAEc6UzgzhBEgbfJ+FIwc5SjaxxU8="
     },
     "skforecast": {
       "type": "PyPi",

@@ -15,7 +15,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
     nativeBuildInputs = [ gitMinimal ];
 
-    npmDepsHash = "sha256-2O2qA1eXbVLUzxgsqZkWVnUhmux2Z8TsPUTUyyWlDw4=";
+    npmDepsHash = "sha256-EseKAqUJbpIAfJhG1hNlvLgMie/jsXbbVqwea8bEuJQ=";
 
     buildPhase = ''
       runHook preBuild

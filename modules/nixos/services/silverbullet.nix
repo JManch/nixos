@@ -21,20 +21,13 @@
 
   requirements = [ "services.caddy" ];
 
-  # The upstream module sucks
   systemd.services."silverbullet" = {
     description = "SilverBullet Server";
     after = [ "network.target" ];
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = lib.${lib.ns}.hardeningBaseline config {
-      EnvironmentFile = config.age.secrets.silverbulletVars.path;
       StateDirectory = "silverbullet";
-      ExecStartPre = pkgs.writeShellScript "silverbullet-assert-auth-var" ''
-        # Assert that the authentication variable is set otherwise the server
-        # runs with no authentication
-        test -n "$SB_USER"
-      '';
       ExecStart = "${
         lib.getExe pkgs.${lib.ns}.silverbullet
       } --port ${toString cfg.port} --hostname 127.0.0.1 $STATE_DIRECTORY";
@@ -46,7 +39,7 @@
     };
   };
 
-  ns.services.caddy.virtualHosts."notes" = {
+  ns.services.caddy.virtualHosts."silverbullet" = {
     allowTrustedAddresses = false;
     extraAllowedAddresses = cfg.allowedAddresses;
     extraConfig = ''

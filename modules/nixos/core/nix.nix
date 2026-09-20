@@ -468,6 +468,10 @@ in
             "new waybar release should support Hyprland Lua. Remember to re-enable overrides in the Waybar module.";
           (flakePkgs args "waybar").waybar;
 
+        lan-mouse =
+          assert assertMsg (prev.lan-mouse.version == "0.11.0") "lan-mouse overlay and flake can be removed";
+          (flakePkgs args "lan-mouse").lan-mouse;
+
         proton-ge-bin =
           assert assertMsg (prev.proton-ge-bin.version == "GE-Proton11-3") "remove proton-ge-bin overlay";
           prev.proton-ge-bin.overrideAttrs {

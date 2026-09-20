@@ -136,6 +136,9 @@
     waybar.url = "github:Alexays/Waybar";
     waybar.inputs.nixpkgs.follows = "nixpkgs";
 
+    lan-mouse.url = "github:feschber/lan-mouse";
+    lan-mouse.inputs.nixpkgs.follows = "nixpkgs";
+
     nix-matlab.url = "gitlab:doronbehar/nix-matlab";
     nix-matlab.inputs.nixpkgs.follows = "nixpkgs";
 

@@ -8,7 +8,7 @@
 let
   inherit (lib) ns foldl';
   inherit (lib.${ns}) hostIps;
-  inherit (config.${ns}.services) wireguard;
+  inherit (config.${ns}.services) wg-quick;
   inherit (inputs.nix-resources.secrets) fqDomain tomFqDomain;
   trustedHostIps =
     foldl' (a: e: a ++ (map (ip: "${ip}/32") (hostIps e)))
@@ -122,7 +122,7 @@ in
 
         virtualHosts = {
           squaremap = {
-            extraAllowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
+            extraAllowedAddresses = with wg-quick.friends; [ "${address}/${toString subnet}" ];
             extraConfig = ''
               reverse_proxy http://127.0.0.1:25566
               handle_errors {
@@ -160,7 +160,7 @@ in
             "10.20.20.33/32" # pixel 9
             "192.168.100.2/32" # pixel 9 VPN
           ]
-          ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
+          ++ (with wg-quick.friends; [ "${address}/${toString subnet}" ]);
       };
 
       unrealircd = {
@@ -178,7 +178,7 @@ in
             "10.20.20.33/32" # pixel 9
             "192.168.100.2/32" # pixel 9 VPN
           ]
-          ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
+          ++ (with wg-quick.friends; [ "${address}/${toString subnet}" ]);
       };
 
       factorio-server = {
@@ -232,7 +232,7 @@ in
       filebrowser = {
         enable = true;
         storeInRam = true;
-        allowedAddresses = trustedHostIps ++ (with wireguard.friends; [ "${address}/${toString subnet}" ]);
+        allowedAddresses = trustedHostIps ++ (with wg-quick.friends; [ "${address}/${toString subnet}" ]);
       };
 
       minecraft-server = {
@@ -337,13 +337,13 @@ in
 
         seerr = {
           enable = true;
-          extraAllowedAddresses = with wireguard.friends; [
+          extraAllowedAddresses = with wg-quick.friends; [
             "${address}/${toString subnet}"
           ];
         };
 
         # Google TV on guest VLAN
-        reverseProxy.extraAllowedAddresses = with wireguard.friends; [
+        reverseProxy.extraAllowedAddresses = with wg-quick.friends; [
           "10.30.30.6/32"
           "${address}/${toString subnet}"
         ];
@@ -359,13 +359,13 @@ in
       audiobookshelf = {
         enable = true;
         port = 8001;
-        extraAllowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
+        extraAllowedAddresses = with wg-quick.friends; [ "${address}/${toString subnet}" ];
       };
 
       llama-cpp.proxy = {
         enable = true;
         address = "ncase-m1.lan";
-        extraAllowedAddresses = with wireguard.friends; [ "${address}/${toString subnet}" ];
+        extraAllowedAddresses = with wg-quick.friends; [ "${address}/${toString subnet}" ];
         certFile = "${inputs.nix-resources}/secrets/ncase-m1/cert.crt";
       };
     };

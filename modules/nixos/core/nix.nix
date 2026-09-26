@@ -472,16 +472,6 @@ in
           assert assertMsg (prev.lan-mouse.version == "0.11.0") "lan-mouse overlay and flake can be removed";
           (flakePkgs args "lan-mouse").lan-mouse;
 
-        proton-ge-bin =
-          assert assertMsg (prev.proton-ge-bin.version == "GE-Proton11-3") "remove proton-ge-bin overlay";
-          prev.proton-ge-bin.overrideAttrs {
-            version = "GE-Proton11-5-x86_64";
-            src = final.fetchzip {
-              url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-5/GE-Proton11-5-x86_64.tar.gz";
-              hash = "sha256-Sbyi5zXMhPIKSotvL5LEZ2dbDoLpXRcCyuY9TsnBnus=";
-            };
-          };
-
         # inherit
         #   (
         #     assert lib.assertMsg (prev.navidrome.version == "0.60.0") "Remove navidrome overlay";

@@ -135,9 +135,6 @@ in
             patches =
               (old.patches or [ ])
               ++ [
-                # Fixes gestures with a mod key not consuming the mod causing
-                # our fuzzel bind to get triggered on release
-                ../../../../patches/hyprland-gesture-consume-mod.patch
                 # Fixes our bar disappearing out when using the fullscreen
                 # maximize gesture
                 ../../../../patches/hyprland-fullscreen-gesture-maximize-fix.patch

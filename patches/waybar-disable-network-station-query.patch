@@ -1,0 +1,38 @@
+diff --git a/src/modules/network.cpp b/src/modules/network.cpp
+index 14922210..77ce46da 100644
+--- a/src/modules/network.cpp
++++ b/src/modules/network.cpp
+@@ -1144,33 +1144,4 @@ auto waybar::modules::Network::getInfo() -> void {
+     spdlog::warn("nl80211: nl_send_sync get_scan error {}", err);
+     // Proceeding here as get_scan might not be essential if we already have ifid_
+   }
+-
+-  // If connected to an AP, try to get station data for bitrate
+-  if (ifid_ > 0 && !bssid_.empty() && nl80211_id_ >= 0) {
+-    nl_msg = nlmsg_alloc();
+-    if (nl_msg == nullptr) {
+-      return;
+-    }
+-
+-    // Convert BSSID string to uint8_t array
+-    uint8_t bssid_mac[ETH_ALEN];
+-    if (sscanf(bssid_.c_str(), "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &bssid_mac[0], &bssid_mac[1],
+-               &bssid_mac[2], &bssid_mac[3], &bssid_mac[4], &bssid_mac[5]) == ETH_ALEN) {
+-      if (genlmsg_put(nl_msg, NL_AUTO_PORT, NL_AUTO_SEQ, nl80211_id_, 0, 0, /* No DUMP flag */
+-                      NL80211_CMD_GET_STATION, 0) == nullptr ||
+-          nla_put_u32(nl_msg, NL80211_ATTR_IFINDEX, ifid_) < 0 ||
+-          nla_put(nl_msg, NL80211_ATTR_MAC, ETH_ALEN, bssid_mac) < 0) {
+-        nlmsg_free(nl_msg);
+-        return;
+-      }
+-      // Use station_sock_ for NL80211_CMD_GET_STATION
+-      err = nl_send_sync(station_sock_, nl_msg);
+-      if (err < 0) {
+-        spdlog::warn("nl80211: nl_send_sync get_station error {}", err);
+-      }
+-    } else {
+-      spdlog::warn("nl80211: Failed to parse BSSID string: {}", bssid_);
+-      nlmsg_free(nl_msg);
+-    }
+-  }
+ }

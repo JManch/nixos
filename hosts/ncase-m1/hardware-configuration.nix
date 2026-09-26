@@ -60,6 +60,7 @@
   hardware.cpu.amd.updateMicrocode = true;
   hardware.logitech.wireless.enable = true;
   programs.solaar.enable = true; # Logitech GUI
+  hardware.i2c.enable = true; # for dell monitor brightness control
 
   # Fix for motherboard-specific suspend issue
   # https://wiki.archlinux.org/title/Power_management/Wakeup_triggers#Gigabyte_motherboards

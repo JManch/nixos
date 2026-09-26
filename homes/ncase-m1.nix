@@ -1,6 +1,9 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
+let
+  inherit (lib) ns getExe;
+in
 {
-  ${lib.ns} = {
+  ${ns} = {
     core = {
       configManager = true;
       backupFiles = true;
@@ -19,6 +22,25 @@
         directScanout = false;
         logging = false;
         hyprcursor.package = null;
+        binds =
+          let
+            modifyBrightness = pkgs.writeShellScript "hypr-modify-brightness" ''
+              read -r _ _ _ current max < <(${getExe pkgs.ddcutil} --skip-ddc-checks --bus 6 --terse getvcp 10) || exit 1
+              new=$(( current $1 ))
+              (( new > max )) && new=$max
+              (( new < 0 )) && new=0
+              if (( new != current )); then
+                ${getExe pkgs.ddcutil} --noverify --skip-ddc-checks --bus 6 setvcp 10 "$new"
+              fi
+              brightness=$(( new * 100 / max ))
+              ${getExe pkgs.libnotify} --transient --urgency=low -t 2000 \
+                -h 'string:x-canonical-private-synchronous:brightness' "Display" "Brightness $brightness%"
+            '';
+          in
+          [
+            (lib.${ns}.mkHyprExec "mod" "F6" "${modifyBrightness} +10")
+            (lib.${ns}.mkHyprExec "mod" "F5" "${modifyBrightness} -10")
+          ];
       };
 
       services = {

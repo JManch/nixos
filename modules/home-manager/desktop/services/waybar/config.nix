@@ -89,6 +89,10 @@ in
           # slightly bumps clock speed and probably isn't optimal. This patch
           # removes the unnecessary redraws.
           "waybar-reduce-redraws.patch"
+          # Disables code that has a bug causing log spam `nl80211:
+          # nl_send_sync get_station error -16`. We do not use tx/rx bitrate in
+          # our module so there's no downside.
+          "waybar-disable-network-station-query.patch"
         ]
         # Do not update CPU usage value if it is <= 3% to reduce redraws
         ++ optional (device.type == "laptop") "waybar-less-cpu-updates.patch"

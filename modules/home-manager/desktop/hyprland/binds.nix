@@ -396,8 +396,6 @@ in
         ''
           hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("${modifyBrightness} 3%+"), { repeating = true })
           hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("${modifyBrightness} 3%-"), { repeating = true })
-          hl.bind(mod .. "F6", hl.dsp.exec_cmd("${modifyBrightness} 3%+"), { repeating = true })
-          hl.bind(mod .. "F5", hl.dsp.exec_cmd("${modifyBrightness} 3%-"), { repeating = true })
         ''
       }
 

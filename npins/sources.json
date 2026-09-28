@@ -27,10 +27,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": true,
-      "version": "v3.9.3",
-      "revision": "5669e2c5f3e3e9d90af897911fdf339a4a72e595",
+      "version": "v3.9.4",
+      "revision": "14462d8593e98dfc00dc676ff096c4a19ced659c",
       "url": null,
-      "hash": "sha256-2MjRAsXeTjGoLRGVxF9LApmxYGpv6tpLdUP7t4FDxFA="
+      "hash": "sha256-EPZJ+f8idnFB0CSHUgk7eQDg07wqgmTD3det7RRV0rY="
     },
     "HomeAssistant-OctopusEnergy": {
       "type": "GitRelease",
@@ -43,10 +43,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v19.0.1",
-      "revision": "5c4d465bc69047d565fe3c8cc59081671818d41e",
-      "url": "https://api.github.com/repos/BottlecapDave/HomeAssistant-OctopusEnergy/tarball/refs/tags/v19.0.1",
-      "hash": "sha256-PtDyUk4OzElgB0FeM/028O108R7J97k5SwGfNAIybJ8="
+      "version": "v19.2.1",
+      "revision": "ccfbccc3a6e6b75d48a955501afd232d9a9f23f7",
+      "url": "https://api.github.com/repos/BottlecapDave/HomeAssistant-OctopusEnergy/tarball/refs/tags/v19.2.1",
+      "hash": "sha256-KkQxLmp/5X/Z1WwklLzOCvL49Tn6ZinID2Rf2GZngXI="
     },
     "ModernX": {
       "type": "GitRelease",
@@ -75,10 +75,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "8.20.0",
-      "revision": "4ed3baffeccd1f85ef89b672089ba1131a571f03",
-      "url": "https://api.github.com/repos/Wolvenkit/Wolvenkit/tarball/refs/tags/8.20.0",
-      "hash": "sha256-UvvXoKz1a43aIstcs5dXqJJOaCAXQbLLbV+pl7OZNx4="
+      "version": "9.0.1",
+      "revision": "46808bd9ca938ac0a92c78c19df6be8c0bfcfbfd",
+      "url": "https://api.github.com/repos/Wolvenkit/Wolvenkit/tarball/refs/tags/9.0.1",
+      "hash": "sha256-S6OVX3XjZfB3BDnunzgfkybt5uhx+UWUxptaJ0Qfa3k="
     },
     "adaptive-lighting": {
       "type": "GitRelease",
@@ -91,10 +91,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.31.0",
-      "revision": "7afdf5bc5ca36bb17a999dba53ef84fc49c9b13e",
-      "url": "https://api.github.com/repos/basnijholt/adaptive-lighting/tarball/refs/tags/v1.31.0",
-      "hash": "sha256-L00M+74ZgJmUje5c/TBkBlsjCrqPt7i/8hH8SU5cnRc="
+      "version": "v1.32.0",
+      "revision": "7f7fec4e34d331fa5fd84b95514ddb1baf2a401e",
+      "url": "https://api.github.com/repos/basnijholt/adaptive-lighting/tarball/refs/tags/v1.32.0",
+      "hash": "sha256-+MO9wl4nu/yJ7Lyt1kf/thGcjNjR17cPkFAYZqfVzQ8="
     },
     "app2unit": {
       "type": "GitRelease",
@@ -174,18 +174,18 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v4.6.18",
-      "revision": "78554f7e76ac8fec8c559ae563137f6dce47f409",
-      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/refs/tags/v4.6.18",
-      "hash": "sha256-C+6xchxwNh0zXd+6ATCs8m20DvxEn5kygSe9r9yXPDs="
+      "version": "v4.6.19",
+      "revision": "719600642d2e21f02d87f4a570ce4580849f87b1",
+      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/refs/tags/v4.6.19",
+      "hash": "sha256-8VEURHJk3A449Y0HeUF+1cSsXlfZJHFFK3cg2Ero/Ec="
     },
     "emhass": {
       "type": "PyPi",
       "name": "emhass",
       "version_upper_bound": null,
-      "version": "0.18.1",
-      "url": "https://files.pythonhosted.org/packages/92/62/64e39096a2cbd1280bd3e7f303cd21229c87099c9dc2db58c4adf42536be/emhass-0.18.1.tar.gz",
-      "hash": "sha256-mxRtuxyeG3hMyFUs2w+MfdFJUoPyOFCdM/cFj5EN02o="
+      "version": "0.18.4",
+      "url": "https://files.pythonhosted.org/packages/be/1d/622e939389c2e62f1df703d4656e1459799fc234e11c413504450aef4584/emhass-0.18.4.tar.gz",
+      "hash": "sha256-fQfaKzsVdpI+St53hMXg8/cxL0ZkBIyOT88pYSnAysk="
     },
     "filen-rclone": {
       "type": "Git",
@@ -209,9 +209,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "93e903cd3f8d7493a5386edc2c8587a2330057e2",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/93e903cd3f8d7493a5386edc2c8587a2330057e2.tar.gz",
-      "hash": "sha256-KHXQl/kRTcYQoTWPWZp42Kw6kdIMdby0m4eU6LrfDO0="
+      "revision": "d722ef4d4ef257cb1495726395deeb834f2dfefd",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/d722ef4d4ef257cb1495726395deeb834f2dfefd.tar.gz",
+      "hash": "sha256-FPqmMcv2biBu7RK2WlPi5N1pG0AZbMExM7cMskRCNiI="
     },
     "frigate-blueprint": {
       "type": "GitRelease",
@@ -240,10 +240,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v5.15.5",
-      "revision": "08c735635c677576411826a7131fb3925e921829",
-      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/refs/tags/v5.15.5",
-      "hash": "sha256-WJFHV3s0EaSbYHksuVZoPZuObeOycP47y5Z2gLRNSR0="
+      "version": "v5.15.6",
+      "revision": "3f1469c3b5c6d4d842426fc02186df6202d12928",
+      "url": "https://api.github.com/repos/blakeblackshear/frigate-hass-integration/tarball/refs/tags/v5.15.6",
+      "hash": "sha256-xh8+X4C6QCb2Y4fbo60xCX3QuXEktbopB2DbOTfzAhA="
     },
     "hacs_waste_collection_schedule": {
       "type": "GitRelease",
@@ -256,10 +256,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v2.32.0",
-      "revision": "dbdea2cf32706539ae1715e236faf16b9a513970",
-      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/refs/tags/v2.32.0",
-      "hash": "sha256-blE5tqHt5ql1Y0qagmykIy2k/LA2Ao0IA0p0bBmfRZ0="
+      "version": "v2.35.0",
+      "revision": "018e5888c1f499429209489fa6f162802989735d",
+      "url": "https://api.github.com/repos/mampfes/hacs_waste_collection_schedule/tarball/refs/tags/v2.35.0",
+      "hash": "sha256-e3w0RdA7Av1wULMdaxmvaivJfuW/WRTca4/YRqTIh9w="
     },
     "haeo": {
       "type": "GitRelease",
@@ -317,10 +317,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v3.3.3",
-      "revision": "f300a76f7024ef955ae12a1acbf2e5bf44b5faf5",
-      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/refs/tags/v3.3.3",
-      "hash": "sha256-h3+CC/hlBsNwi2qtLhZd97GgNhaVO07mVGDHJpMrl2w="
+      "version": "v3.4.0",
+      "revision": "3da20c7f8fa0c0851e1068c7d9e6901d8070fecd",
+      "url": "https://api.github.com/repos/MindrustUK/heatmiser-for-home-assistant/tarball/refs/tags/v3.4.0",
+      "hash": "sha256-PppuNPaDEfOi+yzpHSVIvNNXkOi2q3SALAP6uQB7Ykc="
     },
     "hyprpy": {
       "type": "GitRelease",
@@ -371,9 +371,9 @@
       "type": "PyPi",
       "name": "neohubapi",
       "version_upper_bound": null,
-      "version": "3.1",
-      "url": "https://files.pythonhosted.org/packages/8b/16/af8642c21fe276938b4fa7f7264f358ae12b41c9a1f7a3a49dd51b431e37/neohubapi-3.1.tar.gz",
-      "hash": "sha256-5UcWaxCLchmZP1axvs3HS9BJwWoH7V9Y6qeZ9OpC6Hw="
+      "version": "3.2",
+      "url": "https://files.pythonhosted.org/packages/62/a9/bd9dbe656b8b2579b34d23e974aea441712173777548941829751dcb59fa/neohubapi-3.2.tar.gz",
+      "hash": "sha256-v0X0wta/4Z6jWRWm+yuU7TXsqkGVrsUjKKi7UlZ3iSo="
     },
     "qobuz-dl": {
       "type": "PyPi",
@@ -400,17 +400,17 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "5ee5fb0c3fe7af410757418f4d05374a1ec18e09",
-      "url": "https://github.com/silverbulletmd/silverbullet/archive/5ee5fb0c3fe7af410757418f4d05374a1ec18e09.tar.gz",
-      "hash": "sha256-1ZauiaLx/C17Bg86a5M1wjuXbfnxgFqZtPSq+lZ1Re0="
+      "revision": "3a6f14e464710555cccf0b909f7c18157919155e",
+      "url": "https://github.com/silverbulletmd/silverbullet/archive/3a6f14e464710555cccf0b909f7c18157919155e.tar.gz",
+      "hash": "sha256-ua01Z+vtt3niMvaS72HyxujXZJ/gYM1YcNzbzFTL8U8="
     },
     "skforecast": {
       "type": "PyPi",
       "name": "skforecast",
       "version_upper_bound": null,
-      "version": "0.24.0",
-      "url": "https://files.pythonhosted.org/packages/6a/fc/63567569e74bab8298d16fd524a9ce82e668b8703e7b50b1081d558b4b07/skforecast-0.24.0.tar.gz",
-      "hash": "sha256-RhIsfPFKSHUB5x8dJ5gIcdP40DLT+p03kd+HFaZEjeE="
+      "version": "0.25.0",
+      "url": "https://files.pythonhosted.org/packages/1c/f5/41163be254b0dec1bdf5f251ca678fe287547a8f97dc7678115925825e60/skforecast-0.25.0.tar.gz",
+      "hash": "sha256-45q+vpyc2eVDC3mxqRGwljpiHD+GTzb/CBBR3tAGMTw="
     },
     "slskd-stats": {
       "type": "GitRelease",
@@ -479,9 +479,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "88797cf10fceb46531114579b33894b825b6a5ce",
-      "url": "https://github.com/dweymouth/supersonic/archive/88797cf10fceb46531114579b33894b825b6a5ce.tar.gz",
-      "hash": "sha256-FGdQfgpkDsYrdHTEDlVcpkORDsXOLcSSXqD2ny9c7yE="
+      "revision": "0eb34945c59e1d010ef618a0dedd3bc1edd37908",
+      "url": "https://github.com/dweymouth/supersonic/archive/0eb34945c59e1d010ef618a0dedd3bc1edd37908.tar.gz",
+      "hash": "sha256-gBIlmv7GJv0gxR3SVLnXUmvpIif5exvvo99ztFCGVeY="
     },
     "thermal_comfort": {
       "type": "GitRelease",
@@ -537,9 +537,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "7df3816dbde1b3deaf8847b18fec9ba544dbd375",
-      "url": "https://github.com/pink88/tuiss2ha/archive/7df3816dbde1b3deaf8847b18fec9ba544dbd375.tar.gz",
-      "hash": "sha256-lNDnnJVhQRNcyQGn/A5RuLY+soVxZzxkuqe0KqITjiM="
+      "revision": "0e2be9fa645ab899fbf97e40f7842865558f0c1f",
+      "url": "https://github.com/pink88/tuiss2ha/archive/0e2be9fa645ab899fbf97e40f7842865558f0c1f.tar.gz",
+      "hash": "sha256-KTUdhEqhQY+I+m0QmHg25Knzi34D+F+GBshI31QWFe0="
     },
     "uwsm": {
       "type": "GitRelease",
@@ -552,10 +552,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v0.26.7",
-      "revision": "ab5ec16d96ed1f77c3c7ff2e3f07ed42caf23f2d",
-      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/refs/tags/v0.26.7",
-      "hash": "sha256-ibJx0vbZ11TPwQszGoRQo8124vIJTrFLnQC3GPj4E+o="
+      "version": "v0.27.0",
+      "revision": "f82dece2cedf308c897513f093f45025fbfdda4f",
+      "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/refs/tags/v0.27.0",
+      "hash": "sha256-al+SPMaYn9qpc7zTASKjrP/WJL2UEzgvGkMTAnLx99o="
     },
     "workspaces.nvim": {
       "type": "GitRelease",

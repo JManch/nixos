@@ -371,9 +371,10 @@
       "type": "PyPi",
       "name": "neohubapi",
       "version_upper_bound": null,
-      "version": "3.2",
-      "url": "https://files.pythonhosted.org/packages/62/a9/bd9dbe656b8b2579b34d23e974aea441712173777548941829751dcb59fa/neohubapi-3.2.tar.gz",
-      "hash": "sha256-v0X0wta/4Z6jWRWm+yuU7TXsqkGVrsUjKKi7UlZ3iSo="
+      "version": "3.1",
+      "url": "https://files.pythonhosted.org/packages/8b/16/af8642c21fe276938b4fa7f7264f358ae12b41c9a1f7a3a49dd51b431e37/neohubapi-3.1.tar.gz",
+      "hash": "sha256-5UcWaxCLchmZP1axvs3HS9BJwWoH7V9Y6qeZ9OpC6Hw=",
+      "frozen": true
     },
     "qobuz-dl": {
       "type": "PyPi",

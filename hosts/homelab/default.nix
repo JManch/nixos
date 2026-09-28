@@ -63,9 +63,9 @@ in
       mikrotik-backup.enable = true;
       index-checker.enable = false;
       fail2ban.enable = true;
-      mealie.enable = true;
+      mealie.enable = false;
       acme.enable = true;
-      taskchampion-server.enable = true;
+      taskchampion-server.enable = false;
       air-vpn.confinement.enable = true;
       atuin-server.enable = true;
       anki-sync-server.enable = true;
@@ -169,7 +169,7 @@ in
       };
 
       ergo = {
-        enable = true;
+        enable = false;
         bootstrap = false;
         interfaces = [ "wg-friends" ];
         files.allowedAddresses =
@@ -182,7 +182,7 @@ in
       };
 
       factorio-server = {
-        enable = true;
+        enable = false;
         interfaces = [ "wg-friends" ];
       };
 
@@ -230,7 +230,7 @@ in
       };
 
       filebrowser = {
-        enable = true;
+        enable = false;
         storeInRam = true;
         allowedAddresses = trustedHostIps ++ (with wg-quick.friends; [ "${address}/${toString subnet}" ]);
       };

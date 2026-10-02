@@ -252,22 +252,6 @@ in
     };
   };
 
-  systemd.services.frigate.serviceConfig = hardeningBaseline config {
-    DynamicUser = false;
-    SystemCallFilter = [
-      "@system-service"
-      "~@privileged"
-    ];
-    # Device access for hw accel
-    PrivateDevices = false;
-    # As of 0.17.0 needs access to /proc/cpuinfo
-    ProcSubset = "all";
-    DeviceAllow = [ ];
-    UMask = "0027";
-    EnvironmentFile = cctvVars.path;
-    MemoryDenyWriteExecute = false;
-  };
-
   # We just use go2rtc to provide a low latency WebRTC stream. It is lazy so
   # won't use resources if nobody is requesting the stream. We do not use the
   # go2rtc restreams in Frigate because it adds unnecessary overhead on

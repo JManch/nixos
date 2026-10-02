@@ -17,7 +17,9 @@
         overrides ? { },
       }:
       let
-        kernel = flake.packages.${pkgs.stdenv.hostPlatform.system}.${kernelPackage}.override (
+        flakePackages = flake.packages.${pkgs.stdenv.hostPlatform.system};
+        flakePkgs = flake.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+        kernel = flakePackages.${kernelPackage}.override (
           {
             lto = "thin"; # basically same performance as full with better build time
             processorOpt = arch;
@@ -37,12 +39,12 @@
           // overrides
         );
       in
-      ((pkgs.callPackage "${flake.outPath}/helpers.nix" { }).kernelModuleLLVMOverride (
-        pkgs.linuxKernel.packagesFor kernel
+      ((flakePkgs.callPackage "${flake.outPath}/helpers.nix" { }).kernelModuleLLVMOverride (
+        flakePkgs.linuxKernel.packagesFor kernel
       )).extend
         (
           _: _: {
-            zfs_cachyos = flake.packages.${pkgs.stdenv.hostPlatform.system}.zfs-cachyos.override {
+            zfs_cachyos = flakePackages.zfs-cachyos.override {
               inherit kernel;
             };
           }

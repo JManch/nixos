@@ -408,8 +408,7 @@ in
           wantedBy = [ "initrd.target" ];
           requiredBy = [ "sysroot.mount" ];
           before = [ "sysroot.mount" ];
-          # we need the zram module to load first so depend on systemd-modules-load
-          requires = [ "systemd-modules-load.service" ];
+          # we need the zram module to load first
           after = [ "systemd-modules-load.service" ];
           unitConfig.DefaultDependencies = false;
           serviceConfig = {

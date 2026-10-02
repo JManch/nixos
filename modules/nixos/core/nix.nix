@@ -516,10 +516,6 @@ in
         n.flake = inputs.nixpkgs;
       };
 
-      # Add flake inputs to nix path. Enables loading flakes with <flake_name>
-      # like how <nixpkgs> can be referenced.
-      nixPath = mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
-
       # https://nix.dev/manual/nix/2.26/package-management/ssh-substituter
       sshServe = mkIf cfg.builder.shareStore {
         enable = true;
@@ -539,6 +535,9 @@ in
           "nix-command"
           "auto-allocate-uids"
         ];
+        # Add flake inputs to nix path. Enables loading flakes with <flake_name>
+        # like how <nixpkgs> can be referenced.
+        nix-path = mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
         trace-import-from-derivation = true;
         # Causes excessive writes and potential slow downs when writing
         # content to the nix store. Optimising once a week with

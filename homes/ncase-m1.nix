@@ -104,7 +104,7 @@ in
         anki.enable = true;
         zathura.enable = true;
         qbittorrent.enable = true;
-        filen-desktop.enable = true;
+        filen-desktop.enable = false;
         multiviewer.enable = true;
         chromium.enable = true;
         foliate.enable = true;

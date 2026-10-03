@@ -1,0 +1,105 @@
+{
+  lib,
+  cfg,
+  pkgs,
+  utils,
+  config,
+}:
+let
+  inherit (lib)
+    ns
+    mkIf
+    getExe
+    genAttrs
+    singleton
+    ;
+  steamId = 380870;
+  port = 16261;
+  directPort = 16262;
+in
+{
+  requirements = [ "services.steamcmd" ];
+
+  opts = with lib; {
+    openFirewall = mkEnableOption "opening the firewall on default interfaces";
+    autoStart = mkEnableOption "automatic server start";
+
+    interfaces = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        List of additional interfaces for the Project Zomboid to be
+        exposed on
+      '';
+    };
+  };
+
+  systemd.sockets."project-zomboid-server" = {
+    bindsTo = [ "project-zomboid-server.service" ];
+    socketConfig = {
+      ListenFIFO = "/run/project-zomboid-server/zomboid.control";
+      RemoveOnStop = true;
+      SocketGroup = "wheel";
+      SocketMode = "0620";
+    };
+  };
+
+  systemd.services."project-zomboid-server" = {
+    wantedBy = mkIf cfg.autoStart [ "multi-user.target" ];
+    requires = [ "project-zomboid-server.socket" ];
+    after = [
+      "network.target"
+      "project-zomboid-server.socket"
+      "steamcmd@${toString steamId}.service"
+    ];
+    wants = [ "steamcmd@${toString steamId}.service" ];
+    serviceConfig = lib.${ns}.hardeningBaseline config {
+      StateDirectory = "project-zomboid-server";
+
+      StandardInput = "fd:project-zomboid-server.socket";
+      StandardOutput = "journal";
+
+      ExecStart = utils.escapeSystemdExecArgs [
+        (getExe pkgs.steam-run)
+        "/var/lib/steamcmd/apps/380870/start-server.sh"
+        "-cachedir=/var/lib/project-zomboid-server"
+      ];
+      ExecStop = "+${pkgs.writeShellScript "project-zomboid-server-stop" ''
+        [ -n "$MAINPID" ] || exit 0
+        fifo=/run/project-zomboid-server/zomboid.control
+        echo save > "$fifo"
+        sleep 15
+        echo quit > "$fifo"
+        ${lib.getExe' pkgs.util-linux "waitpid"} "$MAINPID"
+      ''}";
+
+      MemoryDenyWriteExecute = false;
+      ProtectProc = "default";
+      ProcSubset = "all";
+      RestrictNamespaces = "user mnt"; # for steam-run's bubblewrap
+      SystemCallArchitectures = "native x86"; # steamcmd is 32-bit
+      SystemCallFilter = [ ]; # bubblewrap needs all syscalls
+    };
+  };
+
+  networking.firewall = {
+    allowedUDPPorts = mkIf cfg.openFirewall [
+      port
+      directPort
+    ];
+
+    interfaces = genAttrs cfg.interfaces (_: {
+      allowedUDPPorts = [
+        port
+        directPort
+      ];
+    });
+  };
+
+  ns.persistence.directories = singleton {
+    directory = "/var/lib/private/project-zomboid-server";
+    user = "nobody";
+    group = "nobody";
+    mode = "0750";
+  };
+}

@@ -287,7 +287,9 @@ in
           requisite = [ "graphical-session.target" ];
           partOf = [ "graphical-session.target" ];
           unitConfig.ConditionUser = "!@system";
+
           serviceConfig = {
+            Slice = "background${lib.${ns}.sliceSuffix config}.slice";
             Restart = "on-failure";
             RestartSec = 2;
             ExecStart = getExe (

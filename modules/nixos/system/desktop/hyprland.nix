@@ -32,8 +32,6 @@ in
     conditions = [ (isHyprland config) ];
     opts.alwaysOnTopPatch = mkEnableOption "always on top patch";
 
-    ns.system.desktop.uwsm.desktopNames = [ "Hyprland" ];
-
     programs.hyprland = {
       enable = true;
       withUWSM = true;

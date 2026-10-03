@@ -53,25 +53,14 @@ in
         '';
       };
 
-      desktopNames = mkOption {
-        type = with types; listOf str;
-        internal = true;
-        default = [ ];
-        apply = v: v ++ [ "NoDesktop" ];
-        description = ''
-          List of desktop names to create drop-in overrides for. Should be the
-          exact case-sensitive name used in the .desktop file.
-        '';
-      };
-
       appUnitOverrides = mkOption {
         type = with types; attrsOf lines;
         default = { };
         apply = v: (optionalAttrs home-manager.enable homeUwsm.appUnitOverrides) // v;
         description = ''
           Attribute set of unit overrides. Attribute name should be the unit
-          name without the app-''${desktop} prefix. Attribute value should be
-          the multiline unit string.
+          name without the app- prefix. Attribute value should be the multiline
+          unit string.
         '';
         example = {
           "discord-.scope" = ''
@@ -110,14 +99,20 @@ in
 
     environment = {
       systemPackages = [ pkgs.app2unit ];
-      sessionVariables.APP2UNIT_SLICES = "a=app-graphical.slice b=background-graphical.slice s=session-graphical.slice";
-      # Even though I use the -t service flag pretty much everywhere in my
-      # config still keep the default behaviour as scope because this is
-      # generally how apps should be launched if we interactively run `app2unit
-      # app.desktop` in a terminal. Launching with a keybind, launcher or
-      # script should run the the app in a service since there's no value in
-      # process or input/output inheritance in these cases.
-      sessionVariables.APP2UNIT_TYPE = "scope";
+      sessionVariables = {
+        APP2UNIT_SLICES = "a=app-graphical.slice b=background-graphical.slice s=session-graphical.slice";
+        # Even though I use the -t service flag pretty much everywhere in my
+        # config still keep the default behaviour as scope because this is
+        # generally how apps should be launched if we interactively run `app2unit
+        # app.desktop` in a terminal. Launching with a keybind, launcher or
+        # script should run the the app in a service since there's no value in
+        # process or input/output inheritance in these cases.
+        APP2UNIT_TYPE = "scope";
+        # Having to include the desktop name in overrides just complicates
+        # things. I don't see much value in including desktop in the unit name
+        # as I only a single desktop session.
+        APP2UNIT_INSERT_XSD = "false";
+      };
     };
 
     systemd.user.services.fumon = {
@@ -174,29 +169,12 @@ in
           ''
       );
 
-    systemd.user.units = {
-      # Chromium apps randomly deploy scopes in app.slice
-      "app-org.chromium.Chromium-.scope" = {
+    systemd.user.units = concatMapAttrs (unitName: text: {
+      "app-${unitName}" = {
+        inherit text;
         overrideStrategy = "asDropin";
-        text = ''
-          [Scope]
-          Slice=app${lib.${ns}.sliceSuffix config}.slice
-        '';
       };
-    }
-    // concatMapAttrs (
-      unitName: text:
-      foldl' (
-        acc: desktop:
-        acc
-        // {
-          "app-${desktop}-${unitName}" = {
-            inherit text;
-            overrideStrategy = "asDropin";
-          };
-        }
-      ) { } cfg.desktopNames
-    ) cfg.appUnitOverrides;
+    }) cfg.appUnitOverrides;
   }
 
   {

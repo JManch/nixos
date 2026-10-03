@@ -24,6 +24,7 @@ in
   systemd.user.services."low-battery-notify" = {
     requisite = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
+    serviceConfig.LogLevelMax = "notice"; # suppress "Started low-battery-notify.service" journal spam
     path = lib.mkForce [ ]; # inherit user session env vars
     script = ''
       cap=$(cat /sys/class/power_supply/${device.battery}/capacity)

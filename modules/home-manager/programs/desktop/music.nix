@@ -34,6 +34,7 @@ in
     pkgs.spek
     pkgs.${ns}.resample-flacs
     unzipMusicHomelab
+    pkgs.songrec
   ];
 
   ns.desktop.xdg.removeMimeTypePackages = [ pkgs.picard ];
@@ -44,4 +45,6 @@ in
     ''
       hl.window_rule({ match = { class = "spek" }, float = true })
     '';
+
+  ns.persistence.directories = [ ".local/share/songrec" ];
 }

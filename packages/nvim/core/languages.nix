@@ -106,6 +106,7 @@ in
 
   # We would rather use lsp server's from the local dev shell instead of
   # packing them all in our nvim derivation.
+  # Waiting on https://github.com/NotAShelf/nvf/issues/1180 for a nicer solution.
   vim.lsp.servers = {
     basedpyright.cmd = mkForce [
       "basedpyright-langserver"

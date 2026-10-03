@@ -1,7 +1,11 @@
-{ pkgs }:
 {
-  home.packages = with pkgs; [
-    discord
+  lib,
+  pkgs,
+  osConfig,
+}:
+{
+  home.packages = [
+    pkgs.discord
     # Waiting for https://github.com/Vencord/Vesktop/pull/1198
     # (vesktop.override { withMiddleClickScroll = true; })
   ];

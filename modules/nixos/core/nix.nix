@@ -443,6 +443,12 @@ in
           ) "rnnoise-plugin-cross.patch"
         );
 
+        discord = prev.discord.override {
+          # Causes a coredump every launch due to speechd not being available
+          withTTS = false;
+          enableAutoscroll = true;
+        };
+
         ergochat = prev.ergochat.overrideAttrs {
           version = "2.18.0";
           src = final.fetchFromGitHub {

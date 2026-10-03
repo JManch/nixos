@@ -1,4 +1,8 @@
-{ lib, pkgs }:
+{
+  lib,
+  pkgs,
+  osConfig,
+}:
 let
   inherit (lib) ns mkBefore;
 in
@@ -21,9 +25,10 @@ in
   ns.desktop = {
     services.playerctl.musicPlayers = mkBefore [ "Feishin" ];
 
-    uwsm.appUnitOverrides."feishin@.service" = ''
-      [Service]
-      KillMode=mixed
+    # Chromium apps randomly deploy scopes in app.slice
+    uwsm.appUnitOverrides."feishin-.scope" = ''
+      [Scope]
+      Slice=app${lib.${lib.ns}.sliceSuffix osConfig}.slice
     '';
 
     hyprland.extraConf = # lua

@@ -60,6 +60,7 @@ in
     wants = [ steamCmdApp.unit ];
     serviceConfig = lib.${ns}.hardeningBaseline config {
       StateDirectory = "project-zomboid-server";
+      SyslogIdentifier = "zomboid-server";
 
       StandardInput = "fd:project-zomboid-server.socket";
       StandardOutput = "journal";

@@ -90,6 +90,7 @@ in
         Environment = "HOME=/var/lib/steamcmd"; # steamcmd boostraps into $HOME/.local/share/Steam
         StateDirectory = "steamcmd";
         StateDirectoryMode = "0711";
+        SyslogIdentifier = "steamcmd-${name}";
 
         ExecStart = utils.escapeSystemdExecArgs (
           [

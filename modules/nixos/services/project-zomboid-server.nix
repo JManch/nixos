@@ -4,6 +4,7 @@
   pkgs,
   utils,
   config,
+  hostname,
 }:
 let
   inherit (lib)
@@ -12,6 +13,7 @@ let
     getExe
     genAttrs
     singleton
+    toSentenceCase
     ;
   port = 16261;
   directPort = 16262;
@@ -66,6 +68,12 @@ in
         (getExe pkgs.steam-run)
         "${steamCmdApp.dir}/start-server.sh"
         "-cachedir=/var/lib/project-zomboid-server"
+        "-servername"
+        (toSentenceCase hostname)
+        "-adminpassword"
+        "admin"
+        "-steamvac"
+        "false"
       ];
       ExecStop = "+${pkgs.writeShellScript "project-zomboid-server-stop" ''
         [ -n "$MAINPID" ] || exit 0

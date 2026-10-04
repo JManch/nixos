@@ -329,6 +329,11 @@ in
         };
       };
 
+      project-zomboid-server = {
+        enable = true;
+        interfaces = [ "wg-friends" ];
+      };
+
       jellyfin = {
         enable = true;
         openFirewall = false;

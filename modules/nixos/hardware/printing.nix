@@ -95,9 +95,7 @@ in
       enable = true;
       openFirewall = true;
       stateless = true;
-      # Doesn't work well with stateless because previously configured printers
-      # gets removed everytime the service starts with this enabled
-      startWhenNeeded = false;
+      startWhenNeeded = true;
       defaultShared = true;
       listenAddresses = [ "*:631" ];
 
@@ -160,37 +158,16 @@ in
   })
 
   (mkIf (cfg.client.enable || cfg.server.enable) {
-    # We customise the service so that it runs every hour instead of once at
-    # boot. The script aborts if the printer is down or has already been
-    # configured. This way the printer gets configured even if it sometimes
-    # goes offline.
-    systemd.services.ensure-printers = {
-      after = [
-        "network-online.target"
-        "nss-lookup.target"
-      ];
-      wants = [ "network-online.target" ];
-      wantedBy = mkForce [ ];
-      requires = [ "nss-lookup.target" ];
-      startAt = mkIf (cfg.server.enable || cfg.client.autoAdd) (
-        if cfg.server.enable then "*-*-* *:00:00" else "*-*-* *:05:00"
-      );
-      serviceConfig.RemainAfterExit = mkForce false;
-
-      script =
-        mkBefore
-          # bash
-          ''
-            if ! ${getExe' pkgs.iputils "ping"} -c 1 -W 1 "printer.lan" &>/dev/null; then
-              echo "Cannot setup printer. Host is down."
-              exit 0
-            fi
-
-            if ${getExe' pkgs.cups "lpstat"} -p ${config.hardware.printers.ensureDefaultPrinter} &>/dev/null; then
-              echo "Printer already configured."
-              exit 0
-            fi
-          '';
-    };
+    # Do not fail the cups service if the printer is down (this postStart
+    # script is generated from ensurePrinters)
+    systemd.services.cups.postStart =
+      mkBefore
+        # bash
+        ''
+          if ! ${getExe' pkgs.iputils "ping"} -c 1 -W 1 "printer.lan" &>/dev/null; then
+            echo "Cannot setup printer. Host is down."
+            exit 0
+          fi
+        '';
   })
 ]

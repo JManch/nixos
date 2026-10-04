@@ -86,6 +86,8 @@ let
           IFS=',' read -r -a profiles <<< "$(<"$profiles_file")"
         fi
 
+        set +e
+
         profile_exists() {
           local profile="$1"
           for elem in "''${profiles[@]}"; do

@@ -194,7 +194,9 @@ let
           fi
 
           if [ -n "$host_address" ]; then
-            nh_args+=("--target-host" "root@$host_address" "--diff" "always")
+            nh_args+=("--target-host" "root@$host_address" "--diff" "${
+              if cmd == "diff" || cmd == "boot" then "always" else "never"
+            }")
           else
             ${
               if cmd == "build" then

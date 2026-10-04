@@ -78,7 +78,9 @@ in
               if (( zellij_show_cwd )); then
                 local dir="''${PWD##*/}/"
                 [[ "$PWD" == "$HOME" ]] && dir="~"
-                zellij action rename-tab "$dir" &>/dev/null &!
+                # Zellij has a bug where it gets stuck waiting for a reply from
+                # the IPC socket with high CPU usage
+                timeout -k 1 2 zellij action rename-tab "$dir" &>/dev/null &!
                 zellij_show_cwd=0
               fi
             }
@@ -94,7 +96,7 @@ in
                     zellij_show_cwd=1
                   else
                     zellij_show_cwd=0
-                    command zellij action rename-tab "$process_name" &>/dev/null &!
+                    timeout -k 1 2 zellij action rename-tab "$process_name" &>/dev/null &!
                   fi
                 fi
               else

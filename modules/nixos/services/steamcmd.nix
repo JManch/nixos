@@ -15,6 +15,7 @@ let
     getExe
     getExe'
     optionals
+    concatMap
     ;
 in
 {
@@ -24,7 +25,7 @@ in
   opts."apps" = mkOption {
     type = types.attrsOf (
       types.submodule (
-        { name, ... }: {
+        { name, config, ... }: {
           options = {
             id = mkOption {
               type = types.ints.positive;
@@ -41,6 +42,18 @@ in
               type = types.nullOr types.str;
               default = null;
               description = "Password for the beta branch";
+            };
+
+            workshopId = mkOption {
+              type = types.ints.positive;
+              default = config.id;
+              description = "App ID that Workshop items belong to";
+            };
+
+            workshopItems = lib.mkOption {
+              type = types.listOf types.ints.positive;
+              default = [ ];
+              description = "Workshop item IDs to download into the install directory";
             };
 
             dir = mkOption {
@@ -110,6 +123,11 @@ in
             "-betapassword"
             app.betapass
           ]
+          ++ concatMap (id: [
+            "+workshop_download_item"
+            (toString app.workshopId)
+            (toString id)
+          ]) app.workshopItems
           ++ [ "+quit" ]
         );
 

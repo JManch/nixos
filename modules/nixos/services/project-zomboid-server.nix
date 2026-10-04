@@ -37,6 +37,14 @@ in
   ns.services.steamcmd.apps."project-zomboid-server" = {
     id = 380870;
     branch = "unstable";
+    workshopId = 108600;
+    workshopItems = [
+      3386949627
+      3389003300
+      2710167561
+      3809306528
+      3619862853
+    ];
   };
 
   systemd.sockets."project-zomboid-server" = {

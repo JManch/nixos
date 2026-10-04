@@ -13,13 +13,11 @@ let
     genAttrs
     singleton
     ;
-  steamId = 380870;
   port = 16261;
   directPort = 16262;
+  steamCmdApp = config.${ns}.services.steamcmd.apps."project-zomboid-server";
 in
 {
-  requirements = [ "services.steamcmd" ];
-
   opts = with lib; {
     openFirewall = mkEnableOption "opening the firewall on default interfaces";
     autoStart = mkEnableOption "automatic server start";
@@ -32,6 +30,11 @@ in
         exposed on
       '';
     };
+  };
+
+  ns.services.steamcmd.apps."project-zomboid-server" = {
+    id = 380870;
+    branch = "unstable";
   };
 
   systemd.sockets."project-zomboid-server" = {
@@ -50,9 +53,9 @@ in
     after = [
       "network.target"
       "project-zomboid-server.socket"
-      "steamcmd@${toString steamId}.service"
+      steamCmdApp.unit
     ];
-    wants = [ "steamcmd@${toString steamId}.service" ];
+    wants = [ steamCmdApp.unit ];
     serviceConfig = lib.${ns}.hardeningBaseline config {
       StateDirectory = "project-zomboid-server";
 
@@ -61,7 +64,7 @@ in
 
       ExecStart = utils.escapeSystemdExecArgs [
         (getExe pkgs.steam-run)
-        "/var/lib/steamcmd/apps/380870/start-server.sh"
+        "${steamCmdApp.dir}/start-server.sh"
         "-cachedir=/var/lib/project-zomboid-server"
       ];
       ExecStop = "+${pkgs.writeShellScript "project-zomboid-server-stop" ''

@@ -26,9 +26,9 @@ in
     type = types.attrs;
     default = { };
     description = ''
-      Attribute set of unit overrides. Attribute name should be the unit
-      name without the app-''${desktop} prefix. Attribute value should be
-      the multiline unit string.
+      Attribute set of unit overrides. Attribute name should be the unit name
+      without the app- prefix. Attribute value should be the multiline unit
+      string.
     '';
   };
 

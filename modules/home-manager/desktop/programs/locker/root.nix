@@ -132,7 +132,7 @@ in
           done
 
           # Exit if locker is already running
-          systemctl --quiet --user is-active app-*-${baseNameOf (getExe cfg.package)}@*.service && exit 1
+          systemctl --quiet --user is-active app-${baseNameOf (getExe cfg.package)}@*.service && exit 1
 
           lockArgs=(${concatMapStringsSep " " (s: "\"${s}\"") cfg.defaultArgs})
 

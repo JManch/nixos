@@ -71,8 +71,17 @@ in
 
             incremental = false; # creates unwanted state.pickel file
             autobpm.auto = true;
-            lyrics.auto = true;
             asciify_paths = true;
+
+            lyrics = {
+              auto = true;
+              sources = [
+                "lrclib"
+                "lrcmux"
+              ];
+              keep_synced = true;
+              synced = true;
+            };
 
             fetchart = {
               auto = true;

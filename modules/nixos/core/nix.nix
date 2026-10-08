@@ -494,6 +494,29 @@ in
           assert assertMsg (prev.lan-mouse.version == "0.11.0") "lan-mouse overlay and flake can be removed";
           (flakePkgs args "lan-mouse").lan-mouse;
 
+        jellyfin-mpv-shim =
+          assert assertMsg (
+            prev.jellyfin-mpv-shim.version == "3.0.0"
+          ) "jellyfin-mpv-shim overlay can be removed";
+          prev.jellyfin-mpv-shim.overridePythonAttrs (old: rec {
+            version = "3.1.0";
+            src = final.fetchPypi {
+              pname = "jellyfin_mpv_shim";
+              inherit version;
+              hash = "sha256-ad6ZokTy8vxAVrgopK+DK9WQqOlEKssigA++68vuid4=";
+            };
+
+            postPatch = ''
+              substituteInPlace jellyfin_mpv_shim/conf.py \
+                --replace-fail "check_updates: bool = True" "check_updates: bool = False" \
+                --replace-fail 'notify_updates: str = "default"' 'notify_updates: str = "disabled"'
+              # python-mpv renamed to mpv with 1.0.4
+              substituteInPlace pyproject.toml \
+                --replace-fail "python-mpv" "mpv" \
+                --replace-fail "mpv-jsonipc" "python_mpv_jsonipc"
+            '';
+          });
+
         # inherit
         #   (
         #     assert lib.assertMsg (prev.navidrome.version == "0.60.0") "Remove navidrome overlay";

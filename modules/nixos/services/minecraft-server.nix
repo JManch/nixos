@@ -6,7 +6,6 @@
 }:
 let
   inherit (lib)
-    ns
     escapeShellArg
     concatStringsSep
     concatMapStringsSep
@@ -18,7 +17,7 @@ let
     mkForce
     singleton
     mkOption
-    attrValues
+    isDerivation
     types
     literalExpression
     ;
@@ -91,6 +90,15 @@ in
       description = "Server package";
     };
 
+    worldName = mkOption {
+      type = types.str;
+      default = "world";
+      description = ''
+        World name. Changing this will not delete old world saves but should
+        probably make a note of old world names and their versions.
+      '';
+    };
+
     memory = mkOption {
       type = types.int;
       default = 1024 * 6;
@@ -113,9 +121,15 @@ in
     };
 
     plugins = mkOption {
-      type = types.listOf (types.enum (attrValues pkgs.${ns}.minecraft-plugins));
+      type = with types; listOf (either package path);
       default = [ ];
       description = "List of plugins to install on the server";
+    };
+
+    mods = mkOption {
+      type = with types; listOf (either package path);
+      default = [ ];
+      description = "List of mods to install on the server";
     };
 
     files = mkOption {
@@ -123,13 +137,13 @@ in
         types.submodule {
           options = {
             value = mkOption {
-              type = types.nullOr types.lines;
+              type = with types; nullOr lines;
               default = null;
               description = "Lines of text to copy into target config file";
             };
 
             diff = mkOption {
-              type = types.nullOr types.lines;
+              type = with types; nullOr lines;
               default = null;
               description = ''
                 Diff file to be applied to reference config file. Use diff -u
@@ -138,7 +152,7 @@ in
             };
 
             reference = mkOption {
-              type = types.nullOr types.pathInStore;
+              type = with types; nullOr pathInStore;
               default = null;
               description = "Reference config file that diff is applied to";
             };
@@ -162,7 +176,7 @@ in
     serverProperties = {
       gamemode = "survival";
       hardcore = false;
-      level-name = "world";
+      level-name = cfg.worldName;
       level-type = "minecraft:normal";
       motd = "NixOS Minecraft server";
       server-port = cfg.port - 1;
@@ -202,6 +216,34 @@ in
       ExecStop = mkForce "";
     };
     preStart =
+      let
+        jarName = jar: if isDerivation jar then jar.name else baseNameOf (toString jar);
+
+        # Removes jars previously linked from the Nix store into `dir`, then links
+        # in the given jars. Entries can be a single jar (e.g. from fetchurl) or a
+        # derivation containing jars. Manually added jars are left alone.
+        installJars =
+          dir: jars: # bash
+          ''
+            mkdir -p "${dataDir}/${dir}"
+            readarray -d "" links < <(find "${dataDir}/${dir}" -maxdepth 5 -type l -print0)
+            for link in "''${links[@]}"; do
+              if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
+                rm "$link"
+              fi
+            done
+
+            ${concatMapStringsSep "\n" (
+              jar: # bash
+              ''
+                if [ -d "${jar}" ]; then
+                  ln -fs "${jar}"/*.jar "${dataDir}/${dir}/"
+                else
+                  ln -fs "${jar}" "${dataDir}/${dir}/${jarName jar}"
+                fi
+              '') jars}
+          '';
+      in
       # bash
       mkAfter ''
         # Msh setup
@@ -209,25 +251,13 @@ in
         ln -fs "${getExe cfg.package}" "${dataDir}/minecraft-server"
         ln -fs "${serverIcon}" "${dataDir}/server-icon-frozen.png"
 
-        # Remove existing plugins
-        readarray -d "" links < <(find "${dataDir}/plugins" -maxdepth 5 -type l -print0)
-          for link in "''${links[@]}"; do
-            if [[ "$(readlink "$link")" =~ ^${escapeShellArg builtins.storeDir} ]]; then
-              rm "$link"
-            fi
-          done
-
-        # Install new plugins
-        mkdir -p plugins
-        ${concatMapStringsSep "\n" (
-          plugin: # bash
-          ''
-            ln -fs "${plugin}"/*.jar "${dataDir}/plugins"
-          '') cfg.plugins}
+        # Install plugins (Paper/Bukkit) and mods (Fabric)
+        ${installJars "plugins" cfg.plugins}
+        ${installJars "mods" cfg.mods}
 
         # Install config files
-        # We can't symlink from store because plugins need config write privs as
-        # they merge our provided config with the default config
+        # We can't symlink from store because plugins and mods need config write
+        # privs as they merge our provided config with the default config
         ${concatLines (
           mapAttrsToList (
             path: file: # bash
@@ -239,7 +269,7 @@ in
             else
               ''
                 rm -f "${dataDir}/${path}"
-                mkdir -p $(dirname "${path}")
+                mkdir -p "$(dirname "${dataDir}/${path}")"
                 ${getExe pkgs.patch} -u "${file.reference}" "${pkgs.writeText "${baseNameOf path}.diff" file.diff}" -o "${dataDir}/${path}"
               ''
           ) cfg.files

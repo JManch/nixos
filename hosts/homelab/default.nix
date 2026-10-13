@@ -237,96 +237,115 @@ in
 
       minecraft-server = {
         enable = true;
-        package = pkgs.papermcServers.papermc-1_21_11;
+        package = inputs.nix-minecraft.packages.${pkgs.system}.fabric-server.override {
+          jre_headless = pkgs.jdk25_headless;
+        };
+        # Old worlds:
+        # world - papermc-1_21_11
+        worldName = "goose-world";
         interfaces = [ "wg-friends" ];
+        mods = [
+          "${inputs.nix-resources}/pkgs/goosemobs/goosemobs-0.7.1+26.3.jar"
 
-        plugins = with pkgs.${ns}.minecraft-plugins; [
-          vivecraft
-          squaremap
-          aura-skills
-          levelled-mobs
-          tab-tps
-          luck-perms
-          gsit
-          play-times
+          (pkgs.fetchurl {
+            name = "fabric-api-0.161.0+26.3.jar";
+            url = "https://cdn.modrinth.com/data/P7dR8mSH/versions/bNnaTiuM/fabric-api-0.161.0%2B26.3.jar";
+            hash = "sha256-hvFheKPOzIh6haTP6aedkvpzQdjzm1lRpNatgAq2V6Y=";
+          })
+
+          (pkgs.fetchurl {
+            name = "cloth-config-fabric-26.3.159.jar";
+            url = "https://cdn.modrinth.com/data/9s6osm5g/versions/fg2uyxOW/cloth-config-fabric-26.3.159.jar";
+            hash = "sha256-Fxa5lk+Q0riF+b04h/iCS3G1XDKkEjpYU0huci98Lks=";
+          })
         ];
 
-        files = {
-          "spigot.yml".value = # yaml
-            ''
-              world-settings:
-                default:
-                  entity-tracking-range:
-                    players: 128
-                    animals: 64
-                    monsters: 64
-                  merge-radius:
-                    exp: 0
-                    item: 0
-            '';
-
-          "plugins/AuraSkills/config.yml".value = # yaml
-            ''
-              on_death:
-                reset_xp: true
-            '';
-
-          "plugins/Vivecraft-Spigot-Extensions/config.yml".value = # yaml
-            ''
-              bow:
-                standingmultiplier: 1
-                seatedheadshotmultiplier: 2
-              welcomemsg:
-                enabled: true
-                welcomeVanilla: '&player has joined with non-VR!'
-              crawling:
-                enabled: true
-              teleport:
-                enable: false
-            '';
-
-          "plugins/squaremap/config.yml".value = # yaml
-            ''
-              settings:
-                web-address: https://squaremap.${fqDomain}
-                internal-webserver:
-                  bind: 127.0.0.1
-                  port: 25566
-            '';
-
-          "plugins/LevelledMobs/rules.yml" = {
-            reference = "${pkgs.${ns}.minecraft-plugins.levelled-mobs}/config/rules.yml";
-            diff = ''
-              --- rules.yml	2026-02-06 21:57:37.533978751 +0000
-              +++ rules-custom.yml	2026-02-06 21:56:43.769471945 +0000
-              @@ -283,9 +283,9 @@
-               default-rule:
-                 use-preset:
-                   #===== Choose a Challenge =====
-              -    #- challenge-vanilla
-              +    - challenge-vanilla
-                   #- challenge-bronze
-              -    - challenge-silver
-              +    #- challenge-silver
-                   #- challenge-gold
-                   #- challenge-platinum
-                   #- challenge-formula
-              @@ -301,10 +301,10 @@
-                   - lvlmodifier-custom-formula
-               
-                   #===== Choose Additional Options =====
-              -    - nametag-using-numbers
-              +    #- nametag-using-numbers
-                   #- nametag-using-indicator
-                   #- nametag-minimized
-              -    #- nametag-disabled
-              +    - nametag-disabled
-                   #- custom-death-messages
-               
-               
-            '';
-          };
-        };
+        # plugins = with pkgs.${ns}.minecraft-plugins; [
+        #   vivecraft
+        #   squaremap
+        #   aura-skills
+        #   levelled-mobs
+        #   tab-tps
+        #   luck-perms
+        #   gsit
+        #   play-times
+        # ];
+        #
+        # files = {
+        #   "spigot.yml".value = # yaml
+        #     ''
+        #       world-settings:
+        #         default:
+        #           entity-tracking-range:
+        #             players: 128
+        #             animals: 64
+        #             monsters: 64
+        #           merge-radius:
+        #             exp: 0
+        #             item: 0
+        #     '';
+        #
+        #   "plugins/AuraSkills/config.yml".value = # yaml
+        #     ''
+        #       on_death:
+        #         reset_xp: true
+        #     '';
+        #
+        #   "plugins/Vivecraft-Spigot-Extensions/config.yml".value = # yaml
+        #     ''
+        #       bow:
+        #         standingmultiplier: 1
+        #         seatedheadshotmultiplier: 2
+        #       welcomemsg:
+        #         enabled: true
+        #         welcomeVanilla: '&player has joined with non-VR!'
+        #       crawling:
+        #         enabled: true
+        #       teleport:
+        #         enable: false
+        #     '';
+        #
+        #   "plugins/squaremap/config.yml".value = # yaml
+        #     ''
+        #       settings:
+        #         web-address: https://squaremap.${fqDomain}
+        #         internal-webserver:
+        #           bind: 127.0.0.1
+        #           port: 25566
+        #     '';
+        #
+        #   "plugins/LevelledMobs/rules.yml" = {
+        #     reference = "${pkgs.${ns}.minecraft-plugins.levelled-mobs}/config/rules.yml";
+        #     diff = ''
+        #       --- rules.yml	2026-02-06 21:57:37.533978751 +0000
+        #       +++ rules-custom.yml	2026-02-06 21:56:43.769471945 +0000
+        #       @@ -283,9 +283,9 @@
+        #        default-rule:
+        #          use-preset:
+        #            #===== Choose a Challenge =====
+        #       -    #- challenge-vanilla
+        #       +    - challenge-vanilla
+        #            #- challenge-bronze
+        #       -    - challenge-silver
+        #       +    #- challenge-silver
+        #            #- challenge-gold
+        #            #- challenge-platinum
+        #            #- challenge-formula
+        #       @@ -301,10 +301,10 @@
+        #            - lvlmodifier-custom-formula
+        #
+        #            #===== Choose Additional Options =====
+        #       -    - nametag-using-numbers
+        #       +    #- nametag-using-numbers
+        #            #- nametag-using-indicator
+        #            #- nametag-minimized
+        #       -    #- nametag-disabled
+        #       +    - nametag-disabled
+        #            #- custom-death-messages
+        #
+        #
+        #     '';
+        # };
       };
 
       project-zomboid-server = {

@@ -78,10 +78,14 @@ in
       ];
       BindPaths = [ "${mediaDir}/slskd" ];
     };
-    # slskd creates an inotify watch for every directory in the nix store.
-    # This breaks jellyfin and probably a bunch of other stuff
-    # https://github.com/slskd/slskd/issues/1050
-    environment.DOTNET_USE_POLLING_FILE_WATCHER = "1";
+    environment = {
+      # slskd creates an inotify watch for every directory in the nix store.
+      # This breaks jellyfin and probably a bunch of other stuff
+      # https://github.com/slskd/slskd/issues/1050
+      DOTNET_USE_POLLING_FILE_WATCHER = "1";
+      # https://github.com/slskd/slskd/pull/1829
+      SLSKD_NO_DISK_LOGGER = "1";
+    };
     vpnConfinement = {
       inherit (device) vpnNamespace;
       enable = true;

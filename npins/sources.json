@@ -75,10 +75,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "9.0.1",
-      "revision": "46808bd9ca938ac0a92c78c19df6be8c0bfcfbfd",
-      "url": "https://api.github.com/repos/Wolvenkit/Wolvenkit/tarball/refs/tags/9.0.1",
-      "hash": "sha256-S6OVX3XjZfB3BDnunzgfkybt5uhx+UWUxptaJ0Qfa3k="
+      "version": "9.1.0",
+      "revision": "19c963f93424080a85072fe113cc22d2a10a048e",
+      "url": "https://api.github.com/repos/Wolvenkit/Wolvenkit/tarball/refs/tags/9.1.0",
+      "hash": "sha256-KWsKNZV8Rc7ecwIyakb5Eq77adMwck7NlJKLkLtKBsg="
     },
     "adaptive-lighting": {
       "type": "GitRelease",
@@ -158,10 +158,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v1.5.7",
-      "revision": "d176b70c19ce8687510a7de12de79c13d6371811",
-      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/refs/tags/v1.5.7",
-      "hash": "sha256-bhPyxys7tOsh1kZ0sg8dx/norzu0eKwAe/0Ai86FmTc="
+      "version": "v1.5.8",
+      "revision": "c51f2501e5143e2f82a5438b24d36620dae09210",
+      "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/refs/tags/v1.5.8",
+      "hash": "sha256-/Wm4+ApQka4d0wcZ6lOSpR/Ai2rrQxOesX1A2rKkQeY="
     },
     "daikin_onecta": {
       "type": "GitRelease",
@@ -174,18 +174,18 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "v4.6.19",
-      "revision": "719600642d2e21f02d87f4a570ce4580849f87b1",
-      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/refs/tags/v4.6.19",
-      "hash": "sha256-8VEURHJk3A449Y0HeUF+1cSsXlfZJHFFK3cg2Ero/Ec="
+      "version": "v5.0.1",
+      "revision": "43f89f9c16fa07a7f21ddb1146c60594c374a5fc",
+      "url": "https://api.github.com/repos/jwillemsen/daikin_onecta/tarball/refs/tags/v5.0.1",
+      "hash": "sha256-BY75zyGgN3VyE4VbPhWvrlEfndlKouaRaUV0MQq0u2M="
     },
     "emhass": {
       "type": "PyPi",
       "name": "emhass",
       "version_upper_bound": null,
-      "version": "0.18.4",
-      "url": "https://files.pythonhosted.org/packages/be/1d/622e939389c2e62f1df703d4656e1459799fc234e11c413504450aef4584/emhass-0.18.4.tar.gz",
-      "hash": "sha256-fQfaKzsVdpI+St53hMXg8/cxL0ZkBIyOT88pYSnAysk="
+      "version": "0.18.5",
+      "url": "https://files.pythonhosted.org/packages/48/99/b4dc161999e0b3f7edbb9733c7d3df9020147c77326f6d7a4fce03608cd6/emhass-0.18.5.tar.gz",
+      "hash": "sha256-t8JRwSxQNqCCtGXFPzMsI12ijrUrsnGvLY6ZYEuDabI="
     },
     "filen-rclone": {
       "type": "Git",
@@ -209,9 +209,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "d722ef4d4ef257cb1495726395deeb834f2dfefd",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/d722ef4d4ef257cb1495726395deeb834f2dfefd.tar.gz",
-      "hash": "sha256-FPqmMcv2biBu7RK2WlPi5N1pG0AZbMExM7cMskRCNiI="
+      "revision": "ca82b72f83090aee7b461ee6b8a4f4a39527beae",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/ca82b72f83090aee7b461ee6b8a4f4a39527beae.tar.gz",
+      "hash": "sha256-509HPZ0ucM8fmKyZgott/jhHB/lkP0nVb7T2yoDz6hU="
     },
     "frigate-blueprint": {
       "type": "GitRelease",
@@ -401,17 +401,17 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "3a6f14e464710555cccf0b909f7c18157919155e",
-      "url": "https://github.com/silverbulletmd/silverbullet/archive/3a6f14e464710555cccf0b909f7c18157919155e.tar.gz",
-      "hash": "sha256-ua01Z+vtt3niMvaS72HyxujXZJ/gYM1YcNzbzFTL8U8="
+      "revision": "64eec243dbfcf85e90ee4d64103b20f52c2c718a",
+      "url": "https://github.com/silverbulletmd/silverbullet/archive/64eec243dbfcf85e90ee4d64103b20f52c2c718a.tar.gz",
+      "hash": "sha256-RCHSwj5ZNY2CrTMxaFQ7BAwGdpwSQ/y0n+WuCCRXb88="
     },
     "skforecast": {
       "type": "PyPi",
       "name": "skforecast",
       "version_upper_bound": null,
-      "version": "0.25.0",
-      "url": "https://files.pythonhosted.org/packages/1c/f5/41163be254b0dec1bdf5f251ca678fe287547a8f97dc7678115925825e60/skforecast-0.25.0.tar.gz",
-      "hash": "sha256-45q+vpyc2eVDC3mxqRGwljpiHD+GTzb/CBBR3tAGMTw="
+      "version": "0.26.0",
+      "url": "https://files.pythonhosted.org/packages/ee/31/0a2b7c332ad40bac2e37c79780ae161530c70193c22e0ca49c3e33ee3a0f/skforecast-0.26.0.tar.gz",
+      "hash": "sha256-8P6IUMchWJqlSgIUy6XrY899u97P4wq+yWsY8Ackwek="
     },
     "slskd-stats": {
       "type": "GitRelease",
@@ -454,9 +454,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "0700090ed1c539455b05af9e16ab1a5bf8b9baff",
-      "url": "https://github.com/mrusse/soularr/archive/0700090ed1c539455b05af9e16ab1a5bf8b9baff.tar.gz",
-      "hash": "sha256-IRgk6xGBQSb/fdh4eUlwKlVxR8gEAmp2Q4yzraJGoNQ="
+      "revision": "2037399aa57433f9032bbae09833439830d2b409",
+      "url": "https://github.com/mrusse/soularr/archive/2037399aa57433f9032bbae09833439830d2b409.tar.gz",
+      "hash": "sha256-a/HufH1y5QOX0jJolz8oVXZvOlCzg41ab+S35ZsWhWk="
     },
     "sunset.nvim": {
       "type": "Git",
@@ -480,9 +480,9 @@
       },
       "branch": "main",
       "submodules": false,
-      "revision": "0eb34945c59e1d010ef618a0dedd3bc1edd37908",
-      "url": "https://github.com/dweymouth/supersonic/archive/0eb34945c59e1d010ef618a0dedd3bc1edd37908.tar.gz",
-      "hash": "sha256-gBIlmv7GJv0gxR3SVLnXUmvpIif5exvvo99ztFCGVeY="
+      "revision": "f28980f8d79d0c6b43d43b512c99d84a66632e47",
+      "url": "https://github.com/dweymouth/supersonic/archive/f28980f8d79d0c6b43d43b512c99d84a66632e47.tar.gz",
+      "hash": "sha256-fMGRTxjeRkMWII98z6OMo09GHbANaP791g2udP0CGeU="
     },
     "thermal_comfort": {
       "type": "GitRelease",

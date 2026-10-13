@@ -121,9 +121,7 @@ in
       in
       [
         (final: _: {
-          xdg-desktop-portal-hyprland = hyprlandPkgs.xdg-desktop-portal-hyprland.override {
-            inherit (final) hyprland;
-          };
+          inherit (hyprlandPkgs) xdg-desktop-portal-hyprland;
           hyprland = hyprlandPkgs.hyprland.overrideAttrs (old: {
             # Remove the "+" and "=" chars from version because it gets used in the
             # package path and has to be escaped in shell scripts due to SC2276

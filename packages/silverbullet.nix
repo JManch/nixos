@@ -15,7 +15,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
     nativeBuildInputs = [ gitMinimal ];
 
-    npmDepsHash = "sha256-nn8RkOP4ufR16u0t8NsVpquXcGaImuz1sFDmj0KpT5w=";
+    npmDepsHash = "sha256-wNtmPm2nmfBx3LVLPANf2MnN5VvDpw4pvXcT5jFwa20=";
 
     buildPhase = ''
       runHook preBuild
@@ -45,7 +45,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ln -s ${finalAttrs.clientBundle} client_bundle
   '';
 
-  cargoHash = "sha256-QTOVXtFlmlxjKSOV2VH8TLZ8nW1hLoGxMxjo9VNOc3k=";
+  cargoHash = "sha256-O+3olOVUMaaki3AMLp8MiFfTujeelvaI1nAghyXNz3c=";
   cargoBuildFlags = [
     "-p"
     "silverbullet"

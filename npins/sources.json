@@ -163,6 +163,14 @@
       "url": "https://api.github.com/repos/Control-D-Inc/ctrld/tarball/refs/tags/v1.5.8",
       "hash": "sha256-/Wm4+ApQka4d0wcZ6lOSpR/Ai2rrQxOesX1A2rKkQeY="
     },
+    "daikin-onecta": {
+      "type": "PyPi",
+      "name": "daikin-onecta",
+      "version_upper_bound": null,
+      "version": "0.6.0",
+      "url": "https://files.pythonhosted.org/packages/53/90/c19e191b6b79ca019bad9623335b80f25780a525deaf25ad855acb9cc456/daikin_onecta-0.6.0.tar.gz",
+      "hash": "sha256-wfJ/cYq8NgkiwrMMMkIVXA1ANfyJ+oXrNWwsIQljvzM="
+    },
     "daikin_onecta": {
       "type": "GitRelease",
       "repository": {

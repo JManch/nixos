@@ -150,6 +150,7 @@
     mint.inputs.nixpkgs.follows = "nixpkgs";
 
     noita-entangled-worlds.url = "github:IntQuant/noita_entangled_worlds";
+    noita-entangled-worlds.inputs.nixpkgs.follows = "nixpkgs";
 
     broadcast-box.url = "github:JManch/broadcast-box/discord";
     broadcast-box.inputs.nixpkgs.follows = "nixpkgs";

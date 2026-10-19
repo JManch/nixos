@@ -28,6 +28,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   patches = [ ./cmake.patch ];
 
+  # Fix ambiguous MarkReadyError overload with gcc 16
+  postPatch = ''
+    substituteInPlace src/TLuaEngine.cpp \
+      --replace-fail "Result->MarkReadyError(std::move(Res));" \
+        "Result->MarkReadyError(sol::protected_function_result(std::move(Res)));"
+  '';
+
   nativeBuildInputs = [
     cmake
     installShellFiles

@@ -353,6 +353,11 @@ in
         interfaces = [ "wg-friends" ];
       };
 
+      valheim-server = {
+        enable = true;
+        interfaces = [ "wg-friends" ];
+      };
+
       jellyfin = {
         enable = true;
         openFirewall = false;

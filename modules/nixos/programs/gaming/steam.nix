@@ -156,6 +156,7 @@ in
         gameClasses = [
           "steam_app_.*" # xwayland proton games do not automatically get assigned the "game" content type
           "com\\.factorio\\.Factorio"
+          "valheim\\.x86_64"
         ];
 
         tearingExcludedClasses = [
@@ -190,7 +191,7 @@ in
 
       persistence.directories = [
         ".factorio"
-        ".config/unity3d/LemaitreBros/STRAFTAT"
+        ".config/unity3d" # Native unity games store state here
       ];
     };
 

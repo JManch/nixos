@@ -1740,6 +1740,7 @@
       },
       "original": {
         "owner": "IntQuant",
+        "ref": "v1.6.6",
         "repo": "noita_entangled_worlds",
         "type": "github"
       }

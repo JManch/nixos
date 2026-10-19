@@ -149,7 +149,7 @@
     mint.inputs.rust-overlay.follows = "rust-overlay";
     mint.inputs.nixpkgs.follows = "nixpkgs";
 
-    noita-entangled-worlds.url = "github:IntQuant/noita_entangled_worlds";
+    noita-entangled-worlds.url = "github:IntQuant/noita_entangled_worlds/v1.6.6";
     noita-entangled-worlds.inputs.nixpkgs.follows = "nixpkgs";
 
     broadcast-box.url = "github:JManch/broadcast-box/discord";

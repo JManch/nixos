@@ -230,6 +230,7 @@ in
         btop
         neovim
         fd
+        smartmontools
       ])
       ++ [ installScript ];
 
@@ -251,7 +252,10 @@ in
       '';
 
     nix.settings = {
-      experimental-features = "nix-command flakes";
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       auto-optimise-store = true;
       # Causes a lot of spam in the install script otherwise
       warn-dirty = false;

@@ -55,15 +55,9 @@
     };
 
     hardware = {
-      secure-boot.enable = true;
+      secure-boot.enable = false;
       bluetooth.enable = true;
-      fpv.enable = true;
-      "8bitdo-ultimate-2".enable = true;
-
-      printing.client = {
-        enable = true;
-        serverAddress = "homelab.lan";
-      };
+      fpv.enable = false;
 
       file-system = {
         type = "ext4";
@@ -98,27 +92,10 @@
 
     programs = {
       waydroid.enable = false;
-      winbox.enable = true;
-
-      gaming = {
-        enable = true;
-        steam.enable = true;
-        steam.protonWayland = true;
-        gamescope.enable = true;
-        gamemode.enable = true;
-      };
-
-      wireshark = {
-        enable = true;
-        graphical = true;
-      };
     };
 
     services = {
-      udisks.enable = true;
       wgnord.enable = false;
-      air-vpn.enable = true;
-      mosquitto.explorer.enable = true;
 
       wg-quick = {
         home-minimal = {
@@ -187,19 +164,18 @@
     };
 
     system = {
-      impermanence.enable = true;
-      virtualisation.libvirt.enable = true;
+      impermanence.enable = false;
 
-      backups = {
-        ssidBlacklist = [ inputs.nix-resources.secrets.ssids.hotspot ];
-        restic = {
-          enable = true;
-          timerConfig = {
-            OnCalendar = "*-*-* 17:00:00";
-            Persistent = true;
-          };
-        };
-      };
+      # backups = {
+      #   ssidBlacklist = [ inputs.nix-resources.secrets.ssids.hotspot ];
+      #   restic = {
+      #     enable = true;
+      #     timerConfig = {
+      #       OnCalendar = "*-*-* 17:00:00";
+      #       Persistent = true;
+      #     };
+      #   };
+      # };
 
       ssh.server = {
         enable = true;
@@ -242,4 +218,5 @@
       };
     };
   };
+    boot.zswap.enable = lib.mkForce false;
 }

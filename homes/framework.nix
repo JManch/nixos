@@ -40,12 +40,6 @@
         darkman.enable = true;
         poweralertd.chargeThreshold = 80;
 
-        lan-mouse = {
-          enable = true;
-          defaultHosts = [ "ncase-m1" ];
-          defaultPositions."ncase-m1" = "top";
-        };
-
         waybar = {
           enable = true;
           bottom = true;
@@ -102,17 +96,6 @@
           # reads/writes during suspend and boot
           runInRam = false;
           hideToolbar = true;
-        };
-
-        gaming = {
-          mangohud = {
-            enable = true;
-            cpuName = "HX 370";
-            gpuName = "890M";
-          };
-
-          prism-launcher.enable = true;
-          beamng.enable = true;
         };
       };
     };

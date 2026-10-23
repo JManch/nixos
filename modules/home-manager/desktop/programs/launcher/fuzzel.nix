@@ -114,7 +114,7 @@ in
         ];
         text = ''
           clients=$(hyprctl -j clients)
-          selections=$(jaq -r 'map(select((.mapped == true) and (.workspace.name | startswith("special:") | not))) | sort_by(.focusHistoryID) | .[] | "\(.address)\t\(.workspace.name)\t\(.title)\\x0icon\\x1f\(.class)"' <<< "$clients" \
+          selections=$(jaq -r 'map(select(.mapped == true)) | sort_by(.focusHistoryID) | .[] | "\(.address)\t\(.workspace.name)\t\(.title)\\x0icon\\x1f\(.class)"' <<< "$clients" \
             | column -t -s $'\t' -o $'\t' \
             | sed 1d)
 

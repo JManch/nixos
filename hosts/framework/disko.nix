@@ -23,7 +23,7 @@ in
         type = "gpt";
         partitions = {
           esp = {
-            size = "512M";
+            size = "1G";
             type = "EF00";
             content = {
               type = "filesystem";
@@ -60,7 +60,6 @@ in
               # https://www.man7.org/linux/man-pages/man8/cryptsetup-luksFormat.8.html
               extraFormatArgs = [
                 "--type=luks2"
-                "--use-random" # true randomness at the cost of blocking if there isn't enough entropy
               ];
 
               content = {
@@ -77,7 +76,7 @@ in
       type = "lvm_vg";
       lvs = {
         swap = {
-          size = if vmInstall then "4G" else "96G";
+          size = if vmInstall then "4G" else "72G";
           content = {
             type = "swap";
             resumeDevice = true;
@@ -85,7 +84,7 @@ in
         };
 
         nix = {
-          size = if vmInstall then "20G" else "200G";
+          size = if vmInstall then "20G" else "300G";
           content = {
             type = "filesystem";
             format = "ext4";

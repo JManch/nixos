@@ -225,7 +225,6 @@ in
 
     boot = {
       zswap.enable = cfg.swap.compression == "zswap";
-      initrd.systemd.enable = true;
       tmp.useTmpfs = cfg.tmpfsTmp;
 
       loader = mkIf (!raspberry-pi.enable) {

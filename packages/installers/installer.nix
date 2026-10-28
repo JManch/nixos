@@ -220,7 +220,6 @@ in
   imports = [ "${modulesPath}/installer/${base}" ];
 
   config = {
-    boot.initrd.systemd.enable = true;
     isoImage.compressImage = false;
 
     environment.systemPackages =

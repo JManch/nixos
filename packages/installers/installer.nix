@@ -19,6 +19,7 @@ let
       pkgs.${ns}.install-bootstrap-kit
       pkgs.disko
       pkgs.gitMinimal
+      pkgs.age
       # The upstream package hardcodes the database path but we want to be able
       # to modify it at runtime using the --export and --database-path flags
       (pkgs.sbctl.overrideAttrs {
@@ -69,6 +70,14 @@ let
       mkdir -p "$ssh_dir"
       cp "$bootstrap_kit/joshua/id_ed25519" "$ssh_dir"
       cp "$bootstrap_kit/joshua/id_ed25519.pub" "$ssh_dir"
+
+      # Hardcode ncase-m1 as we definitely have the access tokens encrypted for this host
+      if access_tokens=$(age -d -i "$bootstrap_kit/ncase-m1/ssh_host_ed25519_key" "${self.inputs.nix-resources}/secrets/nix-access-tokens.age"); then
+        export NIX_CONFIG="$access_tokens"
+      else
+        echo "Error: Failed to decrypt nix access tokens"
+        exit 1
+      fi
 
       vmInstall=false
       read -p "Are you installing this host in a virtual machine? (y/N): " -n 1 -r

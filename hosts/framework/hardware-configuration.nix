@@ -138,7 +138,7 @@
     # with screen on due to a failure to hibernate after waking up from suspend.
     # https://github.com/systemd/systemd/issues/35743
     # https://github.com/systemd/systemd/issues/38193
-    HandleLidSwitch = "suspend";
+    HandleLidSwitch = "hibernate";
   };
 
   services.fwupd.enable = true;

@@ -210,5 +210,5 @@
       KEYBOARD_KEY_100c6=reserved
   '';
 
-  system.stateVersion = "25.05";
+  system.stateVersion = "26.11";
 }

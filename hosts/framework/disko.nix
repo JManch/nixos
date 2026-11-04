@@ -1,10 +1,4 @@
-{
-  lib,
-  config,
-  inputs,
-  hostname,
-  ...
-}:
+{ inputs, hostname, ... }:
 let
   vmInstall = inputs.vmInstall.value;
 in
@@ -106,14 +100,11 @@ in
     };
 
     nodev."/" = {
-      device = config.${lib.ns}.hardware.file-system.zramFs.device;
-      fsType = "ext4";
+      fsType = "tmpfs";
       mountOptions = [
-        "noatime"
-        "discard" # important to ensure memory is immediately freed after files are deleted
-        "lazytime"
-        "nobarrier"
-        "errors=continue"
+        "defaults"
+        "mode=755"
+        "size=100%"
       ];
     };
   };

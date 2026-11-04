@@ -74,6 +74,7 @@ in
 
     nodev = {
       "/" = {
+        # WARN: ZRAMFS root currently breaks in installer
         device = config.${lib.ns}.hardware.file-system.zramFs.device;
         fsType = "ext4";
         mountOptions = [

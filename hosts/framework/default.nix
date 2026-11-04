@@ -70,12 +70,6 @@
         ext4.trim = true;
         swap.compression = "zswap";
         tmpfsTmp = true;
-        zramFs = {
-          enable = true;
-          algorithm = "zstd";
-          memoryLimit = "16G";
-          size = "48G";
-        };
       };
 
       keyd = {

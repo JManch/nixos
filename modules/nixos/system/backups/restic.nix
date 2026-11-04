@@ -170,9 +170,16 @@ let
                   if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then echo "Aborting"; exit 1; fi
                   echo
                   ${optionalString value.restore.removeExisting (
-                    concatMapStringsSep ";" (
-                      path: "echo 'Removing existing files in ${path}...';sudo rm -rf ${path}"
-                    ) value.paths
+                    concatMapStrings (
+                      path: # bash
+                      ''
+                        echo 'Removing existing files in ${path}...'
+                        if sudo test -d ${path}; then
+                          sudo find ${path} -mindepth 1 -delete
+                        else
+                          sudo rm -f ${path}
+                        fi
+                      '') value.paths
                   )}
                   echo "Running pre-restore script..."
                   ${value.restore.preRestoreScript}

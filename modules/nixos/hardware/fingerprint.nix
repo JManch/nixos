@@ -1,3 +1,4 @@
+# Setup: `sudo fprintd-enroll <username>`
 { lib, config }:
 {
   enableOpt = false;

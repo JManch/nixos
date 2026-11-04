@@ -18,7 +18,7 @@ in
         if vmInstall then
           "/dev/disk/by-path/pci-0000:04:00.0"
         else
-          "/dev/disk/by-id/nvme-eui.000000000000000100a075254e014725";
+          "/dev/disk/by-id/nvme-eui.0025384361a01466";
       content = {
         type = "gpt";
         partitions = {

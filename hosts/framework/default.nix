@@ -182,7 +182,11 @@
 
     system = {
       impermanence.enable = true;
-      virtualisation.libvirt.enable = true;
+
+      virtualisation = {
+        libvirt.enable = true;
+        containerisation.enable = true;
+      };
 
       backups = {
         ssidBlacklist = [ inputs.nix-resources.secrets.ssids.hotspot ];

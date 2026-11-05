@@ -119,6 +119,7 @@ in
 
     opts = {
       libvirt.enable = mkEnableOption "libvirt virtualisation";
+      containerisation.enable = mkEnableOption "container virtualisation";
 
       vmVariant = mkOption {
         type = types.bool;
@@ -398,5 +399,15 @@ in
     virtualisation.oci-containers.backend = "podman";
 
     ns.persistence.directories = [ "/var/lib/containers" ];
+  })
+
+  (mkIf cfg.containerisation.enable {
+    virtualisation.podman = {
+      enable = true;
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
+    };
+
+    ns.userPackages = [ pkgs.podman-compose ];
   })
 ]

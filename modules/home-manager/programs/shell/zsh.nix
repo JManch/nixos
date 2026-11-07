@@ -121,21 +121,13 @@ in
             ZVM_INIT_MODE=sourcing
           }
 
-          function jump_end_of_line() {
-            zvm_navigation_handler $
-          }
-
-          function jump_start_of_line() {
-            zvm_navigation_handler '^'
-          }
-
           function zvm_after_lazy_keybindings() {
             zvm_define_widget jump_start_of_line
             zvm_define_widget jump_end_of_line
-            zvm_bindkey vicmd 'H' jump_start_of_line
-            zvm_bindkey vicmd 'L' jump_end_of_line
-            zvm_bindkey visual 'H' jump_start_of_line
-            zvm_bindkey visual 'L' jump_end_of_line
+            zvm_bindkey vicmd 'H' vi-first-non-blank
+            zvm_bindkey vicmd 'L' vi-end-of-line
+            zvm_bindkey visual 'H' vi-first-non-blank
+            zvm_bindkey visual 'L' vi-end-of-line
           }
 
           setopt interactivecomments

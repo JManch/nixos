@@ -1,12 +1,19 @@
 diff --git a/src/slskd/Shares/ShareScanner.cs b/src/slskd/Shares/ShareScanner.cs
-index 7c93d437..3ea8e5cc 100644
+index 98a3f092..6edf0eee 100644
 --- a/src/slskd/Shares/ShareScanner.cs
 +++ b/src/slskd/Shares/ShareScanner.cs
-@@ -291,6 +291,7 @@ namespace slskd.Shares
- 
-                                     if (filters.Any(filter => filter.IsMatch(originalFilename)))
+@@ -331,6 +331,7 @@ namespace slskd.Shares
+                                 {
+                                     if (filters.Any(filter => filter.IsMatch(info.FullName)))
                                      {
-+                                        Log.Information("Filtered path {String}", originalFilename);
++                                        Log.Information("Filtered path {String}", info.FullName);
                                          filteredFiles++;
                                          continue;
                                      }
+@@ -464,4 +465,4 @@ namespace slskd.Shares
+             return false;
+         }
+     }
+-}
+\ No newline at end of file
++}

@@ -8,6 +8,7 @@ home-assistant.python3Packages.callPackage (
     buildHomeAssistantComponent,
     highspy,
     numpy,
+    fetchPypi,
     ...
   }:
   buildHomeAssistantComponent {
@@ -17,7 +18,14 @@ home-assistant.python3Packages.callPackage (
     src = sources.haeo;
 
     dependencies = [
-      highspy
+      (highspy.overridePythonAttrs {
+        version = "1.15.1";
+        src = fetchPypi {
+          pname = "highspy";
+          version = "1.15.1";
+          hash = "sha256-IO0vvxy2S/METuZjI2S34mU9k+aQHisZ/T1d8QcC6MU=";
+        };
+      })
       numpy
     ];
 

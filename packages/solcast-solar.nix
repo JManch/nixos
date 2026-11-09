@@ -10,6 +10,7 @@ home-assistant.python3Packages.callPackage (
     aiofiles,
     watchdog,
     watchfiles,
+    asyncinotify,
     ...
   }:
   buildHomeAssistantComponent {
@@ -23,6 +24,7 @@ home-assistant.python3Packages.callPackage (
       aiofiles
       watchdog
       watchfiles
+      asyncinotify
     ];
 
     meta = {

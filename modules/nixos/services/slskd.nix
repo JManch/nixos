@@ -84,7 +84,7 @@ in
       # https://github.com/slskd/slskd/issues/1050
       DOTNET_USE_POLLING_FILE_WATCHER = "1";
       # https://github.com/slskd/slskd/pull/1829
-      SLSKD_NO_DISK_LOGGER = "1";
+      SLSKD_NO_DISK_LOGGER = "true";
     };
     vpnConfinement = {
       inherit (device) vpnNamespace;

@@ -16,6 +16,7 @@ in
       locker = "hyprlock";
       launcher = "fuzzel";
       xdg.lowercaseUserDirs = true;
+      programs.wl-kbptr.enable = true;
 
       hyprland = {
         tearing = true;

@@ -568,6 +568,19 @@
       "url": "https://api.github.com/repos/Vladimir-csp/uwsm/tarball/refs/tags/v0.27.2",
       "hash": "sha256-CeSK7GrE7ew+3vNwGrif0O7Gxn92SH07Um8k8KzYmgk="
     },
+    "wl-kbptr": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "moverest",
+        "repo": "wl-kbptr"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "6ef84f398816b7a007ba969047e43d095f332175",
+      "url": "https://github.com/moverest/wl-kbptr/archive/6ef84f398816b7a007ba969047e43d095f332175.tar.gz",
+      "hash": "sha256-nprdHawJqZK0zL0XcHuxmJquDLPKjl1z0rx5cRbkDe0="
+    },
     "workspaces.nvim": {
       "type": "GitRelease",
       "repository": {

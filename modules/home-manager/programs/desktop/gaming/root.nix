@@ -114,8 +114,8 @@ in
       };
 
       binds = [
-        (lib.${ns}.mkHyprBind "mod" "G" "hl.dsp.focus({ workspace = ${namedWorkspaceIDs.GAME} })")
-        (lib.${ns}.mkHyprBind "mod_shift" "G"
+        (lib.${ns}.mkHyprBind "mod" "semicolon""hl.dsp.focus({ workspace = ${namedWorkspaceIDs.GAME} })")
+        (lib.${ns}.mkHyprBind "mod_shift" "semicolon"
           "hl.dsp.window.move({ workspace = ${namedWorkspaceIDs.GAME} })"
         )
       ];

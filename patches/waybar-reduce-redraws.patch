@@ -1,5 +1,5 @@
 diff --git a/include/ALabel.hpp b/include/ALabel.hpp
-index 4d3cd0c6..e29eaeea 100644
+index 4127fef0..4f88893c 100644
 --- a/include/ALabel.hpp
 +++ b/include/ALabel.hpp
 @@ -27,7 +27,20 @@ class ALabel : public AModule {
@@ -25,22 +25,22 @@ index 4d3cd0c6..e29eaeea 100644
    const std::chrono::milliseconds interval_;
    bool alt_ = false;
 diff --git a/src/modules/bluetooth.cpp b/src/modules/bluetooth.cpp
-index 4784204d..11e20299 100644
+index ed1c9be7..72dafb34 100644
 --- a/src/modules/bluetooth.cpp
 +++ b/src/modules/bluetooth.cpp
-@@ -180,6 +180,7 @@ waybar::modules::Bluetooth::Bluetooth(const std::string& id, const Json::Value&
-       rfkill_{RFKILL_TYPE_BLUETOOTH},
+@@ -178,6 +178,7 @@ waybar::modules::Bluetooth::Bluetooth(const std::string& id, const Json::Value&
  #endif
-       manager_(generateManager()) {
+       manager_(generateManager()),
+       cancellable_(g_cancellable_new()) {
 +  label_.set_skip_redundant(false);
  
    if (config_["format-device-preference"].isArray()) {
      std::transform(config_["format-device-preference"].begin(),
 diff --git a/src/modules/network.cpp b/src/modules/network.cpp
-index 3663262d..8d1ebd7e 100644
+index 252e6203..73af26b6 100644
 --- a/src/modules/network.cpp
 +++ b/src/modules/network.cpp
-@@ -105,6 +105,7 @@ uint32_t waybar::modules::Network::readLinkSpeed() const {
+@@ -106,6 +106,7 @@ uint32_t waybar::modules::Network::readLinkSpeed() const {
  
  waybar::modules::Network::Network(const std::string& id, const Json::Value& config)
      : ALabel(config, "network", id, DEFAULT_FORMAT, 60) {
@@ -49,10 +49,10 @@ index 3663262d..8d1ebd7e 100644
    // update it. Since the text should be different, update() will be able
    // to show or hide the event_box_. This is to work around the case where
 diff --git a/src/modules/wireplumber.cpp b/src/modules/wireplumber.cpp
-index 8709b5ff..a682225f 100644
+index f675118f..eaec3f3c 100644
 --- a/src/modules/wireplumber.cpp
 +++ b/src/modules/wireplumber.cpp
-@@ -60,6 +60,7 @@ waybar::modules::Wireplumber::Wireplumber(const std::string& id, const Json::Val
+@@ -62,6 +62,7 @@ waybar::modules::Wireplumber::Wireplumber(const std::string& id, const Json::Val
        default_source_name_(nullptr),
        only_physical_(false),
        form_factor_("") {

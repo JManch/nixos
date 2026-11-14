@@ -94,17 +94,17 @@ in
         ++ optional (device.type == "laptop") "waybar-less-cpu-updates.patch"
       )).override
         {
-          # cavaSupport = false;
-          # inputSupport = false;
-          # jackSupport = false;
-          # mpdSupport = false;
-          # mprisSupport = false;
-          # rfkillSupport = false;
-          # sndioSupport = false;
-          # upowerSupport = false;
-          # pulseSupport = false;
-          # withMediaPlayer = false;
-          # runTests = false;
+          cavaSupport = false;
+          inputSupport = false;
+          jackSupport = false;
+          mpdSupport = false;
+          mprisSupport = false;
+          rfkillSupport = false;
+          sndioSupport = false;
+          upowerSupport = false;
+          pulseSupport = false;
+          withMediaPlayer = false;
+          runTests = false;
         };
 
     settings.bar = {

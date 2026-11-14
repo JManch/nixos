@@ -471,25 +471,6 @@ in
               inputs.ircv3-filehost-server;
           };
 
-        waybar =
-          assert assertMsg (prev.waybar.version == "0.15.0")
-            "new waybar release should support Hyprland Lua. Remember to re-enable overrides in the Waybar module.";
-          (flakePkgs args "waybar").waybar.override {
-            waybar = prev.waybar.override {
-              cavaSupport = false;
-              inputSupport = false;
-              jackSupport = false;
-              mpdSupport = false;
-              mprisSupport = false;
-              rfkillSupport = false;
-              sndioSupport = false;
-              upowerSupport = false;
-              pulseSupport = false;
-              withMediaPlayer = false;
-              runTests = false;
-            };
-          };
-
         lan-mouse =
           assert assertMsg (prev.lan-mouse.version == "0.11.0") "lan-mouse overlay and flake can be removed";
           (flakePkgs args "lan-mouse").lan-mouse;

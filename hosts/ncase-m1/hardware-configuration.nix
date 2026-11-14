@@ -98,18 +98,19 @@
 
     kernelPackages =
       assert (lib.assertMsg (pkgs.zfs.version == "2.4.4") "ncase-m1 kernel can be updated");
-      lib.mkForce (
-        pkgs.linuxPackages_7_2
-        # config.${lib.ns}.hardware.cachy-kernel.package {
-        #   arch = "x86_64-v3";
-        #   kernelPackage = "linux-cachyos-latest";
-        #   # flake =
-        #   #   assert (lib.assertMsg (pkgs.zfs.version == "2.4.3") "ncase-m1 kernel can be updated");
-        #   #   # get the narHash with nix flake metadata
-        #   #   builtins.getFlake
-        #   #     "github:xddxdd/nix-cachyos-kernel/3ecb73ccb985be2d1136481cabeefe14c34d0708?narHash=sha256-VXndmUA26RQ8hkUp%2BcG/43KNwMyybHKw0edrhANbnVM%3D";
-        # }
-      );
+      lib.mkForce
+        (import (fetchTree "github:NixOS/nixpkgs/31ecbaca1bdefa45dffc409f0250bd8039ea0010") {
+          inherit (pkgs.stdenv.hostPlatform) system;
+        }).linuxPackages_7_2;
+    # config.${lib.ns}.hardware.cachy-kernel.package {
+    #   arch = "x86_64-v3";
+    #   kernelPackage = "linux-cachyos-latest";
+    #   # flake =
+    #   #   assert (lib.assertMsg (pkgs.zfs.version == "2.4.3") "ncase-m1 kernel can be updated");
+    #   #   # get the narHash with nix flake metadata
+    #   #   builtins.getFlake
+    #   #     "github:xddxdd/nix-cachyos-kernel/3ecb73ccb985be2d1136481cabeefe14c34d0708?narHash=sha256-VXndmUA26RQ8hkUp%2BcG/43KNwMyybHKw0edrhANbnVM%3D";
+    # }
 
     # Can use pkgs.kernelPackages.zfs_cachyos if it compiles
     zfs.package = lib.mkForce pkgs.zfs;

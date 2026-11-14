@@ -324,7 +324,7 @@ in
           workspace = "special:scratch${toString (i + 1)}";
           gaps_in = gapSize * 2;
           gaps_out = gapSize * 4;
-        }) 4
+        }) 3
 
         ++ optionals cfg.noGapsWhenOnly [
           {

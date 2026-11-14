@@ -350,11 +350,9 @@ in
       hl.bind(mod .. " + A", function() global_toggle_special_workspace("scratch1") end)
       hl.bind(mod .. " + S", function() global_toggle_special_workspace("scratch2") end)
       hl.bind(mod .. " + D", function() global_toggle_special_workspace("scratch3") end)
-      hl.bind(mod .. " + F", function() global_toggle_special_workspace("scratch4") end)
       hl.bind(mod_shift .. " + A", hl.dsp.window.move({ workspace = "special:scratch1", follow = false }))
       hl.bind(mod_shift .. " + S", hl.dsp.window.move({ workspace = "special:scratch2", follow = false }))
       hl.bind(mod_shift .. " + D", hl.dsp.window.move({ workspace = "special:scratch3", follow = false }))
-      hl.bind(mod_shift .. " + F", hl.dsp.window.move({ workspace = "special:scratch4", follow = false }))
       for i = 0, 9 do
         local ws = (i == 0) and 10 or i
         hl.bind(mod .. " + " .. i, hl.dsp.focus({ workspace = ws }))

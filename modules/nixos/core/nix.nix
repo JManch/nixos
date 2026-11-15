@@ -473,7 +473,9 @@ in
 
         lan-mouse =
           assert assertMsg (prev.lan-mouse.version == "0.11.0") "lan-mouse overlay and flake can be removed";
-          (flakePkgs args "lan-mouse").lan-mouse;
+          (flakePkgs args "lan-mouse").lan-mouse.overrideAttrs (o: {
+            buildInputs = o.buildInputs ++ [ final.libgit2 ];
+          });
 
         # inherit
         #   (

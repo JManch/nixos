@@ -5,7 +5,9 @@
 }:
 {
   home.packages = [
-    (lib.${lib.ns}.flakePkgs args "noita-entangled-worlds").default
+    ((lib.${lib.ns}.flakePkgs args "noita-entangled-worlds").default.overrideAttrs (o: {
+      buildInputs = o.buildInputs ++ [ pkgs.zstd ];
+    }))
 
     (pkgs.writeShellApplication {
       name = "noita-switch-save";

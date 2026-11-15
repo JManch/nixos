@@ -137,7 +137,7 @@ in
           r2modman.enable = true;
           bottles.enable = false;
           prism-launcher.enable = true;
-          mint.enable = true;
+          mint.enable = false;
           osu.enable = true;
           beamng.enable = true;
           noita.enable = true;

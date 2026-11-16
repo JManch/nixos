@@ -418,6 +418,7 @@ in
         mod = "${cfg.modKey}"
         mod_shift = mod .. " + SHIFT"
         mod_shift_ctrl = mod .. " + SHIFT + CONTROL"
+        mod_alt = mod .. " + ALT"
         ${concatLines cfg.binds}
 
         -- misc

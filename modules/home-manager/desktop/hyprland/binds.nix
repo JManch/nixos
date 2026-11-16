@@ -406,5 +406,36 @@ in
       hl.define_submap("Grab", function()
         hl.bind(mod_shift .. " + Delete", hl.dsp.submap("reset"))
       end)
+
+      -- Scrolling
+      local scroll_timer
+
+      local function stop_scroll()
+        if scroll_timer then
+          scroll_timer:set_enabled(false)
+          scroll_timer = nil
+        end
+      end
+
+      local function hold_scroll(combo, dy, dx)
+        local cmd = ("%s pointer scroll %d %d"):format("${getExe pkgs.wlrctl}", dy, dx)
+        local keysym = combo:match("([^%s+]+)%s*$"):lower()
+
+        hl.bind(combo, function()
+          stop_scroll()
+          hl.exec_cmd(cmd)
+          scroll_timer = hl.timer(function()
+            if not hl.is_key_down(keysym) then return stop_scroll() end
+            hl.exec_cmd(cmd)
+          end, { timeout = 12, type = "repeat" })
+        end)
+      end
+
+      hold_scroll(mod_alt .. " + J",  3,  0)
+      hold_scroll(mod_alt .. " + K", -3,  0)
+      hold_scroll(mod_alt .. " + H",  0, -3)
+      hold_scroll(mod_alt .. " + L",  0,  3)
+      hold_scroll(mod_alt .. " + D",  10,  0)
+      hold_scroll(mod_alt .. " + U", -10,  0)
     '';
 }

@@ -242,7 +242,11 @@
     system = {
       impermanence.enable = true;
       ssh.server.enable = true;
-      virtualisation.libvirt.enable = true;
+
+      virtualisation = {
+        libvirt.enable = true;
+        containerisation.enable = true;
+      };
 
       backups.restic = {
         enable = true;

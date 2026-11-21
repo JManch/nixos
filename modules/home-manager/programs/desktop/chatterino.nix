@@ -167,7 +167,7 @@ in
               else
                 place(w, 1, 1, 0)
               end
-            elseif w.class == "com.chatterino." then
+            elseif w.class == "com.chatterino.chatterino" then
               if w.title:find("Overlay", 1, true) then
                 if not theater then place(w, chat_w, 0.4, chat_x) end
                 zorder(w, theater and "bottom" or "top")
@@ -192,7 +192,7 @@ in
       twitch-workspace-chatterino-main-window = {
         match = {
           workspace = twitchWorkspace;
-          class = "com\\.chatterino\\.";
+          class = "com\\.chatterino\\.chatterino";
           title = "Chatterino (${replaceStrings [ "." ] [ "\\." ] pkgs.chatterino7.version} -.*|Overlay)";
         };
 
@@ -206,7 +206,7 @@ in
       twitch-workspace-chatterino-usercard = {
         match = {
           workspace = twitchWorkspace;
-          class = "com\\.chatterino\\.";
+          class = "com\\.chatterino\\.chatterino";
           title = ".* Usercard - .*";
         };
 

@@ -22,6 +22,12 @@ in
       lsp.enable = true;
     };
 
+    php = {
+      enable = true;
+      lsp.enable = true;
+      format.enable = true;
+    };
+
     clang = {
       enable = true;
       lsp.enable = true;
@@ -111,6 +117,11 @@ in
     basedpyright.cmd = mkForce [
       "basedpyright-langserver"
       "--stdio"
+    ];
+
+    phpactor.cmd = mkForce [
+      "phpactor"
+      "language-server"
     ];
 
     clangd.cmd = mkForce [ "clangd" ];

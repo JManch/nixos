@@ -25,7 +25,6 @@ in
     php = {
       enable = true;
       lsp.enable = true;
-      format.enable = true;
     };
 
     clang = {
@@ -109,6 +108,9 @@ in
       end
     ''
   );
+
+  # Preferred formatter for mediawiki extensions
+  vim.formatter.conform-nvim.setupOpts.formatters_by_ft."php" = [ "phpcbf" ];
 
   # We would rather use lsp server's from the local dev shell instead of
   # packing them all in our nvim derivation.

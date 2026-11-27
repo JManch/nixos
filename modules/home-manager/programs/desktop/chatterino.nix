@@ -11,7 +11,6 @@ let
     mkIf
     optional
     getExe
-    getExe'
     replaceStrings
     mkOption
     types
@@ -21,7 +20,6 @@ let
   inherit (config.age.secrets) streamlinkTwitchAuth;
   inherit (config.${ns}.desktop) hyprland;
   secondMonitor = lib.${ns}.getMonitorByNumber osConfig 2;
-  hyprctl = getExe' pkgs.hyprland "hyprctl";
   twitchWorkspace = hyprland.namedWorkspaceIDs.TWITCH;
   chatterinoPercentage = "17.5";
   firefoxPercentage = "82.5";
@@ -105,10 +103,7 @@ in
 
   ns.desktop = {
     services.waybar.autoHideWorkspaces = [ "TWITCH" ];
-    hyprland.namedWorkspaces.TWITCH = {
-      monitor = secondMonitor.name;
-      on_created_empty = "${hyprctl} repl 'twitch_init_workspace()'";
-    };
+    hyprland.namedWorkspaces.TWITCH.monitor = secondMonitor.name;
 
     hyprland.binds = [
       (mkHyprBind "mod" "T" "hl.dsp.focus({ workspace = ${twitchWorkspace} })")
@@ -134,6 +129,12 @@ in
           hl.exec_cmd("app2unit -t service com.chatterino.chatterino.desktop")
           hl.exec_cmd("app2unit -t service firefox.desktop:new-window https://www.twitch.tv/directory")
         end
+
+        hl.on("workspace.created", function(ws)
+          if ws.id == ${twitchWorkspace} and ws.is_empty then
+            twitch_init_workspace()
+          end
+        end)
 
         -- Restores the twitch workspace layout. Theater mode places the stream
         -- alongside chat whilst fullscreen mode expands the stream to fill the

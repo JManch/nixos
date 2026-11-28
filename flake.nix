@@ -89,7 +89,7 @@
 
     # Inputs that provide packages
 
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/920a3823872b21640181fe8065a5fb35fcb06e3f";
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/a7007e69122c80d09252224b19cc5ad466627217";
 
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
     nix-minecraft.inputs.nixpkgs.follows = "nixpkgs";

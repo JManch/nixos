@@ -53,7 +53,7 @@ in
 
   services.navidrome = {
     enable = true;
-    plugins = optional audiomuse.server.enable pkgs.pkgsCross.wasi32.navidromePlugins.audiomuseai;
+    withPlugins = p: optional audiomuse.server.enable p.audiomuseai;
     openFirewall = false;
     package = lib.${ns}.addPatches pkgs.navidrome [ "navidrome-lastfm-apostrophe.patch" ];
 

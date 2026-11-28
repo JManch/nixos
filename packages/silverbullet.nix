@@ -6,7 +6,7 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "silverbullet";
-  version = "0-unstable-${sources.silverbullet.revision}";
+  version = sources.silverbullet.version;
   src = sources.silverbullet;
 
   clientBundle = buildNpmPackage {
@@ -15,7 +15,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
     nativeBuildInputs = [ gitMinimal ];
 
-    npmDepsHash = "sha256-1bzN7tsERaRUc9J3Yr23mj6kP/eZ9pW771ODUEW75lo=";
+    npmDepsHash = "sha256-pDQhvsKbgsCIk3/he3cnNH+k10akMS7J352Q8gsvGew=";
 
     buildPhase = ''
       runHook preBuild
@@ -45,7 +45,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ln -s ${finalAttrs.clientBundle} client_bundle
   '';
 
-  cargoHash = "sha256-v0CJqq3Rz2dMyl8mA1hj1brnvbRc8rVo8UhOIQnNWFo=";
+  cargoHash = "sha256-gHQ6H0JFbryijqGSC3X0yMlSECPbbY6qQBFFpK7KXPk=";
   cargoBuildFlags = [
     "-p"
     "silverbullet"

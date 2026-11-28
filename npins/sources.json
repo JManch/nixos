@@ -191,9 +191,9 @@
       "type": "PyPi",
       "name": "emhass",
       "version_upper_bound": null,
-      "version": "0.18.11",
-      "url": "https://files.pythonhosted.org/packages/dc/9c/42efc834ff606e9644774a59b72e3f93d3f8dd2ba0ac6571ba62b322b11f/emhass-0.18.11.tar.gz",
-      "hash": "sha256-HwaU0xC7ghJMrzpo35XOurITNy1ejmq2bmK7HUPp7vg="
+      "version": "0.19.0",
+      "url": "https://files.pythonhosted.org/packages/cb/98/03c7e68eef3d47e2637d57bfbf4d0ddf1bc3e49f8fd80f82131084043677/emhass-0.19.0.tar.gz",
+      "hash": "sha256-XmmHk/HXSpcLKW6ifLHLHW2z6Et71wNxAzAgVzvBkwU="
     },
     "filen-rclone": {
       "type": "Git",
@@ -217,9 +217,9 @@
       },
       "branch": "master",
       "submodules": false,
-      "revision": "cfe91830a850c4284f65cef22e4d39eba43eae1f",
-      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/cfe91830a850c4284f65cef22e4d39eba43eae1f.tar.gz",
-      "hash": "sha256-rMQ24tJmSUvIUfN9Pf0O4ZH/60rl6lOmn8h2TUJGMf8="
+      "revision": "9e72f2cc932593b9a54e9e7bfec84900c40dd361",
+      "url": "https://github.com/MrOtherGuy/firefox-csshacks/archive/9e72f2cc932593b9a54e9e7bfec84900c40dd361.tar.gz",
+      "hash": "sha256-77xfNiLt7GzFoQpeMORWucNVWatbsuVDMc4l77j9/qs="
     },
     "frigate-blueprint": {
       "type": "GitRelease",
@@ -410,10 +410,10 @@
       "version_upper_bound": null,
       "release_prefix": null,
       "submodules": false,
-      "version": "3.0.0",
-      "revision": "0f9b90bb896ccb996208ebdfcfce004623f38a6f",
-      "url": "https://api.github.com/repos/silverbulletmd/silverbullet/tarball/refs/tags/3.0.0",
-      "hash": "sha256-Hbjq9fX50e5yA8WjM3/311Go4CcMOe27goxf/2YeYNo="
+      "version": "3.0.1",
+      "revision": "1a4e3ad61b2ae696cdb33790a7282b5a30a5e63d",
+      "url": "https://api.github.com/repos/silverbulletmd/silverbullet/tarball/refs/tags/3.0.1",
+      "hash": "sha256-G4jyojhfiojfhxUdfjIqQtO6VsBHOv+IDSfSrS57h2w="
     },
     "skforecast": {
       "type": "PyPi",

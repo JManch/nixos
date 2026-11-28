@@ -52,5 +52,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
   ];
   cargoTestFlags = finalAttrs.cargoBuildFlags;
 
+  # buildRustPackage exports RUST_LOG="" which silverbullet's EnvFilter parses
+  # as a valid (ERROR-only) filter, suppressing the INFO logs that the
+  # migration_boot integration test waits for.
+  preCheck = ''
+    unset RUST_LOG
+  '';
+
   meta.mainProgram = "silverbullet";
 })

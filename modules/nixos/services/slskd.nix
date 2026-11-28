@@ -98,10 +98,8 @@ in
       to = port;
     };
 
-    openVPNPorts = singleton {
-      port = soulseekPort;
-      protocol = "both";
-    };
+    vpn.allowedUDPPorts = [ soulseekPort ];
+    vpn.allowedTCPPorts = [ soulseekPort ];
   };
 
   ns.services.caddy.virtualHosts.slskd.extraConfig =

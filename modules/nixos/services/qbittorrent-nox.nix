@@ -87,10 +87,7 @@ in
       to = port;
     };
 
-    openVPNPorts = singleton {
-      port = qBittorrentPort;
-      protocol = "tcp";
-    };
+    vpn.allowedTCPPorts = [ qBittorrentPort ];
   };
 
   ns.backups."qbittorrent-nox" = {

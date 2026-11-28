@@ -53,7 +53,7 @@ in
     vpnNamespaces."air-vpn" = {
       enable = true;
       wireguardConfigFile = airVpnConfig.path;
-      accessibleFrom = [ "127.0.0.1" ];
+      allowedIngress = [ "127.0.0.1" ];
     };
 
     # Attempt to fix VPN failing to start on boot due to temporary network

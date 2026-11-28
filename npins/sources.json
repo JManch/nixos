@@ -167,9 +167,9 @@
       "type": "PyPi",
       "name": "daikin-onecta",
       "version_upper_bound": null,
-      "version": "0.7.7",
-      "url": "https://files.pythonhosted.org/packages/b7/1a/b7436afd9481243e8cd40a889f010d876c9abe1c9357f15e9d58f260a277/daikin_onecta-0.7.7.tar.gz",
-      "hash": "sha256-cHj5Ohp3xqSDKAxYFafJ2LMECqpjH7fbDoRj7ZHM8iQ="
+      "version": "0.6.2",
+      "url": "https://files.pythonhosted.org/packages/3a/4c/bfe96407856e3ca8948fe93f9ad77aec2514c5c9de5af5f5f72f95b6b8df/daikin_onecta-0.6.2.tar.gz",
+      "hash": "sha256-KAjlH6Tf5j3/ucEQC1Bubq/JTwYQW93fcwSziNa5h+0="
     },
     "daikin_onecta": {
       "type": "GitRelease",
